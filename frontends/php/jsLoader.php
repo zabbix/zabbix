@@ -308,7 +308,10 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
-	header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
+	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+		header('Set-Cookie: localstoragePath=' . crc32($_COOKIE['zbx_sessionid']));
+	}
+
 	$files = [
 		'prototype.js',
 		'jquery.js',

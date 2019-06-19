@@ -23,427 +23,327 @@
  */
 ZBX_Notifications.POLL_INTERVAL = 30;
 
+ZBX_Notifications.ALARM_SEVERITY_RESOLVED = -1;
+ZBX_Notifications.ALARM_INFINITE_SERVER = -1;
+ZBX_Notifications.ALARM_ONCE_PLAYER = 1;
+ZBX_Notifications.ALARM_ONCE_SERVER = -1;
+
+ZBX_Notifications.DEBUG_DEBOUNCE = 0;
+ZBX_Notifications.DEBUG_GRPS = [];
+ZBX_Notifications.DEBUG_GRP = function(log) {
+	clearTimeout(ZBX_Notifications.DEBUG_DEBOUNCE);
+	ZBX_Notifications.DEBUG_GRPS.push(log);
+	ZBX_Notifications.DEBUG_DEBOUNCE = setTimeout(function() {
+		var d = new Date();
+		var time = ("00" + d.getHours()).slice(-2) + ":" +
+		("00" + d.getMinutes()).slice(-2) + ":" +
+		("00" + d.getSeconds()).slice(-2);
+
+		console.groupCollapsed("%cNOTIF: " + time + ' [' + ZBX_Notifications.DEBUG_GRPS.length + ']', 'color:cadetblue');
+		ZBX_Notifications.DEBUG_GRPS.forEach(function(log) {
+			console.groupCollapsed.apply(console, log.title);
+			log.args.forEach(function(arg) {
+				console.dir(arg)
+			});
+
+			console.groupEnd();
+		});
+
+		ZBX_Notifications.DEBUG_GRPS = [];
+
+		console.groupEnd();
+	}, 100);
+};
+
+ZBX_Notifications.DEBUG = function() {
+	// return
+	if (IE) return;
+	if (ZBX_Notifications.DEBUG.halt) {
+		!ZBX_Notifications.DEBUG.halted && console.warn("debug halt")
+		ZBX_Notifications.DEBUG.halted = 1
+		return;
+	}
+	var stack = new Error().stack;
+	trace = stack.split('\n');
+	var pos = trace[2].match('at (.*) .*')[1];
+
+	var style = 'color:red;';
+
+	if (pos.match('\\.handlePushed')) {
+		// console.info('%c<< ' + pos, 'color:red');
+	}
+
+	if (pos.match('\\.consume')) {
+		// console.info('%c[!]' + pos, 'color:gold');
+	}
+
+	if (pos.match('\\.push')) {
+		// console.info('%c>> ' + pos, 'color:green');
+	}
+
+	if (pos.match('Collection\\.') || pos.match('Collection$')) {
+		style = 'color:darkgoldenrod;';
+	}
+
+	if (pos.match('Notification\\.') || pos.match('Notification$')) {
+		style = 'color:darkkhaki;';
+	}
+
+	if (pos.match('Notifications\\.') || pos.match('Notifications$')) {
+		style = 'color:crimson;';
+	}
+
+	if (pos.match('Audio\\.') || pos.match('Audio$')) {
+		style = 'color:antiquewhite;';
+	}
+
+	if (pos.match('^new ')) {
+		style += 'background:black;font-size:14px';
+	}
+	// if (trace.length > 6) return;
+
+	var log = {
+		title: ['-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
+		args: [],
+	}
+
+	var len = arguments.length;
+	for (var i = 0; i < len; i ++) {
+		var a = arguments[i];
+
+		if (typeof a === 'string' && a[0] === ':') {
+			log.title[0] += '%c' + a;
+			log.title.push('color: white;');
+			continue;
+		}
+
+
+		if (
+			(a instanceof ZBX_Notifications) ||
+			(a instanceof ZBX_Notification) ||
+			(a instanceof ZBX_BrowserTab) ||
+			(a instanceof ZBX_NotificationsAudio) ||
+			(a instanceof ZBX_NotificationCollection) ||
+			(a instanceof ZBX_LocalStorage)
+		) {
+			log.args.push(a);
+		}
+		else if (typeof a === 'object' && a !== null) {
+			try {
+				log.args.push(JSON.parse(Object.toJSON(a)));
+			} catch (e) {
+				log.args.push("FAIL");
+				console.warn("FAIL", log, a, e);
+			}
+		}
+		else {
+			log.args.push(a);
+		}
+	}
+
+	ZBX_Notifications.DEBUG_GRP(log);
+};
+
 /**
+ * Fetches and renders notifications. Server always returns actual, full list of notifications that this class will
+ * render into DOM. Last focused instance is the active one. Active instance is the only one that polls server,
+ * meanwhile other instances are inactive. This is achieved by synchronizing via ZBX_LocalStorage and responding to
+ * it's change event.
+ *
+ * Only methods prefixed with <push> are the "action dispatchers", methods prefixed with <handlePushed> responds to
+ * these "actions" by passing the new received state value through a method prefixed with <consume> that will adjust
+ * instance's internal state, that in turn can be dispatched as "action". Other methods prefixed with <handle> responds
+ * to other events than localStorage change event - (poll, focus, timeout..) and still they would reuse <consume>
+ * domain methods and issue an anction via <push> if needed and call to render method explicitly. The <handlePushed> is
+ * not reused on the instance that produces the action. This is so to reduce complexity and increase maintainebility,
+ * because when an action produces an action, logic diverges deep, instead <consume> various domain within logic
+ * and call `render` once, then <push> into localStorage once.
+ *
+ * Methods prefixed with <render> uses only consumed internal state and should not <push> any changes.
+ *
  * @param {ZBX_LocalStorage} store
  * @param {ZBX_BrowserTab} tab
  */
 function ZBX_Notifications(store, tab) {
+	N = this;
+	ZBX_Notifications.DEBUG(store, tab);
+
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
 	}
 
-	this.disabled = false;
-	this.player = new ZBX_NotificationsAudio();
-
-	this.store = store;
-
-	this.tab = tab;
-	this.tab.onFocus(this.onTabFocus.bind(this));
-	this.tab.onUnload(this.onTabUnload.bind(this));
-
-	this.dom = new ZBX_NotificationCollection();
-	this.dom.onTimeout = this.onNotifTimeout.bind(this);
-
-	this.do_poll_server = false;
-
-	this.dom.btn_close.onclick = this.btnCloseClicked.bind(this);
-	this.dom.btn_snooze.onclick = this.btnSnoozeClicked.bind(this);
-	this.dom.btn_mute.onclick = this.btnMuteClicked.bind(this);
-
-	this.store.onUpdate(this.onStoreUpdate.bind(this));
-
-	this.onSnoozeChange(this.store.readKey('notifications.alarm.snoozed'));
-	this.onMuteChange(this.store.readKey('notifications.alarm.muted'));
-	this.onNotificationsList(this.store.readKey('notifications.list'));
-	this.onTabFocusChanged(this.store.readKey('tabs.lastfocused'));
-
-	this.player.seek(this.store.readKey('notifications.alarm.seek'));
-	this.player.file(this.store.readKey('notifications.alarm.wave'));
-
-	this.player.onTimeout = this.onPlayerTimeout.bind(this);
+	this.active = false;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
+
+	this.store = store;
+	this.tab = tab;
+
+	this.player = new ZBX_NotificationsAudio();
+	this.collection = new ZBX_NotificationCollection();
+
+	this.bindEventHandlers();
+
+	this.fetchUpdates();
+	this.consumeList(this.list);
+	this.consumeUserSettings(this.user_settings);
+	this.consumeAlarmState(this.alarm_state);
+
+	// Latest data page is being reloaded in background.
+	var all_tabids = this.tab.getAllTabIds(),
+		any_active_tab = (all_tabids.indexOf(this.active_tabid) !== -1);
+
+	// If pages are opened in background, and has never yet received focusIn event.
+	if (!any_active_tab || document.hasFocus()) {
+		this.becomeActive();
+	}
+	else {
+		this.becomeInActive();
+	}
+
+	/*
+	 * Fetched store is immediately rendered if this is not the only session, data as can be trusted then.
+	 * Then if this is active instance it will always poll server once at construction, and then rerender if needed.
+	 */
+	if (all_tabids.length > 1) {
+		this.render();
+	}
+
+	this.pushUpdates();
 	this.restartMainLoop();
-
-	/*
-	 * Upon object creation, invoke tab.onFocus hook if tab was not yet opened in background. Re-stack exists
-	 * because of IE11.
-	 */
-	setTimeout(function() {
-		document.hasFocus() && this.onTabFocus(this.tab);
-		this.mainLoop();
-	}.bind(this), 0);
 }
 
 /**
- * Sets interval for main loop.
+ * Binds to click events, LS update events and tab events.
  */
-ZBX_Notifications.prototype.restartMainLoop = function() {
-	if (this.main_loop_id) {
-		clearInterval(this.main_loop_id);
-	}
+ZBX_Notifications.prototype.bindEventHandlers = function() {
+	ZBX_Notifications.DEBUG();
 
-	this.main_loop_id = setInterval(this.mainLoop.bind(this), this.poll_interval * 1000);
+	this.tab.onUnload(this.handleTabUnload.bind(this));
+	this.tab.onFocus(this.handleTabFocusIn.bind(this));
+	this.tab.onCrashed(this.handleTabFocusIn.bind(this));
+
+	this.collection.btn_snooze.onclick = this.handleSnoozeClicked.bind(this);
+	this.collection.btn_close.onclick = this.handleCloseClicked.bind(this);
+	this.collection.btn_mute.onclick = this.handleMuteClicked.bind(this);
+
+	this.store.onKeyUpdate('notifications.active_tabid', this.handlePushedActiveTabid.bind(this));
+	this.store.onKeyUpdate('notifications.list', this.handlePushedList.bind(this));
+	this.store.onKeyUpdate('notifications.user_settings', this.handlePushedUserSettings.bind(this));
+	this.store.onKeyUpdate('notifications.alarm_state', this.handlePushedAlarmState.bind(this));
 };
 
 /**
- * Proxies and stores update event to various handlers.
- *
- * @param {string} key   The local storage key.
- * @param {mixed} value  That the key holds.
+ * Reads all from store.
  */
-ZBX_Notifications.prototype.onStoreUpdate = function(key, value) {
-	switch (key) {
-		case 'notifications.alarm.end':
-		case 'notifications.alarm.start':
-			this.renderPlayer();
-			break;
-		case 'notifications.alarm.wave':
-			this.player.file(value);
-			break;
-		case 'notifications.alarm.seek':
-			this.player.seek(value);
-			break;
-		case 'notifications.alarm.timeout':
-			this.do_poll_server && this.player.timeout(value);
-			break;
-		case 'notifications.alarm.muted':
-			this.onMuteChange(value);
-			break;
-		case 'notifications.alarm.snoozed':
-			this.onSnoozeChange(value);
-			break;
-		case 'notifications.localtimeouts':
-			this.onNotificationsList(this.store.readKey('notifications.list'), value);
-			break;
-		case 'notifications.list':
-			this.onNotificationsList(value);
-			break;
-		case 'tabs.lastfocused':
-			this.onTabFocusChanged(value);
-			break;
-		case 'notifications.disabled':
-			this.disabled = value;
-			value && this.onNotificationsList({});
-			value && this.player.stop();
-			break;
-		case 'notifications.poll_interval':
-			this.poll_interval = value;
-			this.restartMainLoop();
-			break;
-	}
+ZBX_Notifications.prototype.fetchUpdates = function() {
+	var default_alarm_state = {
+		severity: -2,
+		start: '',
+		end: '',
+		seek: 0,
+		timeout: 0,
+		muted: true,
+		snoozed: false
+	};
+
+	this.list = this.store.readKey('notifications.list', []);
+	this.user_settings = this.store.readKey('notifications.user_settings', {});
+	this.active_tabid = this.store.readKey('notifications.active_tabid', '');
+	this.alarm_state = this.store.readKey('notifications.alarm_state', default_alarm_state);
 };
 
 /**
- * Handles server response. Local timedouts object is maintained.
+ * This does not bother for this.list property as it is not used for render or push.
  *
- * @param {object} resp  Server response object.
+ * @param {string} id
  */
-ZBX_Notifications.prototype.onPollerReceiveUpdates = function(resp) {
-	var time_local = (+new Date / 1000),
-		severity_settings = this.store.readKey('notifications.severity_settings'),
-		stored_list = this.store.readKey('notifications.list'),
-		stored_timeouts = this.store.readKey('notifications.localtimeouts'),
-		snoozedids = this.store.readKey('notifications.snoozedids'),
-		new_list = {},
-		new_timeouts = {},
-		alarm_severity = -2,
-		ctn_snoozed = 0,
-		alarm_notif = null;
+ZBX_Notifications.prototype.removeById = function(id) {
+	ZBX_Notifications.DEBUG(id);
 
-	resp.notifications.forEach(function(notif) {
-		if (stored_timeouts[notif.uid]) {
-			if (time_local >= (stored_timeouts[notif.uid].recv_time + stored_timeouts[notif.uid].msg_timeout)) {
-				return;
-			}
-			new_timeouts[notif.uid] = stored_timeouts[notif.uid];
+	this.collection.removeById(id);
+};
+
+/**
+ * @param {string} id
+ *
+ * @return {ZBX_Notification}
+ */
+ZBX_Notifications.prototype.getById = function(id) {
+	ZBX_Notifications.DEBUG(id);
+
+	return this.collection.getById(id);
+};
+
+/**
+ * TODO very complex, uncomprehensible method...
+ * TODO maybe this primitive object `alarm_state` should be wrapped because it looks like contains behaviour.
+ *
+ * @param {object} alarm_state
+ */
+ZBX_Notifications.prototype.consumeAlarmState = function(alarm_state) {
+	ZBX_Notifications.DEBUG(alarm_state);
+
+	// Nothing to play.
+	if (!alarm_state.start) {
+		alarm_state.timeout = 0;
+	}
+	// Playback has happened.
+	else if (alarm_state.start === alarm_state.end) {
+		alarm_state.timeout = 0;
+	}
+	// Regardless if this is new/unitialized playback or not, recalculate this user setting.
+	else if (this.user_settings.alarm_timeout == ZBX_Notifications.ALARM_INFINITE_SERVER) {
+		var display_timeout = this.getById(alarm_state.start).calcDisplayTimeout(this.user_settings);
+		alarm_state.timeout = parseInt(display_timeout / 1000);
+	}
+	// New playback.
+	else if (alarm_state.timeout == 0) {
+		// Player instance will know length of timeout, only then it will pass actual time into alarm_state.
+		if (this.user_settings.alarm_timeout == ZBX_Notifications.ALARM_ONCE_SERVER) {
+			// TODO these values are flipped - server side should have user settings -2 for msg_timeout and -1 for once
+			alarm_state.timeout = ZBX_Notifications.ALARM_ONCE_PLAYER;
 		}
+		// New playback has arbitrary user setting timeout (most likely 10 seconds)
 		else {
-			new_timeouts[notif.uid] = {
-				eventid: notif.eventid,
-				recv_time: time_local,
-				msg_timeout: notif.resolved
-					? resp.settings.msg_recovery_timeout
-					: resp.settings.msg_timeout
-			};
+			alarm_state.timeout = this.user_settings.alarm_timeout;
 		}
-
-		if (notif.body) {
-			new_list[notif.eventid] = notif;
-		}
-		else if (stored_list[notif.eventid]) {
-			new_list[notif.eventid] = stored_list[notif.eventid];
-			new_list[notif.eventid].resolved = notif.resolved;
-			new_list[notif.eventid].uid = notif.uid;
-		}
-		else {
-			return;
-		}
-
-		new_list[notif.eventid].snoozed = !! snoozedids[notif.eventid];
-
-		ctn_snoozed += new_list[notif.eventid].snoozed;
-
-		var notif_alarm_severity = new_list[notif.eventid].resolved ? -1 : new_list[notif.eventid].severity;
-		if (!new_list[notif.eventid].snoozed && alarm_severity < notif_alarm_severity) {
-			alarm_severity = notif_alarm_severity;
-			alarm_notif = new_list[notif.eventid];
-		}
-	});
-
-	this.writeAlarm(alarm_notif, resp.settings, new_timeouts);
-
-	this.store.writeKey('notifications.list', new_list);
-	this.onNotificationsList(new_list, new_timeouts, severity_settings);
-
-	this.store.writeKey('notifications.localtimeouts', new_timeouts);
-	this.store.writeKey('notifications.alarm.snoozed', ctn_snoozed == resp.notifications.length);
-
-	this.onSnoozeChange(ctn_snoozed == resp.notifications.length);
-}
-
-/**
- * Handles server response.
- *
- * @param {object} resp  Server response object.
- */
-ZBX_Notifications.prototype.onPollerReceive = function(resp) {
-	if (resp.error) {
-		clearInterval(this.main_loop_id);
-		return this.store.truncate();
-	}
-
-	this.disabled = !resp.settings.enabled;
-	this.store.writeKey('notifications.disabled', this.disabled);
-
-	if (this.disabled) {
-		this.player.stop();
-		this.onNotificationsList({});
-		this.store.truncateBackup();
-		this.store.truncate(function(key_variants) {
-			return !! key_variants.key.match('^notifications\\.');
-		});
-
-		return;
-	}
-
-	this.writeSettings(resp.settings);
-	if (this.store.readKey('notifications.listid') == resp.listid) {
-		return;
-	}
-
-	this.store.writeKey('notifications.listid', resp.listid);
-	this.onPollerReceiveUpdates(resp);
-};
-
-/**
- * Callback that is bound into notification and called by notification object when it has timed out. Check if that was
- * the last notification and update store.
- *
- * @param {ZBX_Notification} notif
- */
-ZBX_Notifications.prototype.onNotifTimeout = function(notif) {
-	notif.remove(ZBX_Notification.ease, function() {
-		if (!this.dom.list_node.children.length) {
-			this.dom.hide();
-		}
-
-		if (this.store.readKey('notifications.alarm.start') == notif.eventid) {
-			this.store.writeKey('notifications.alarm.end', notif.eventid);
-			this.player.stop();
-		}
-
-		this.store.mutateObject('notifications.localtimeouts', function(list_obj) {
-			delete list_obj[notif.eventid];
-		});
-
-		this.store.mutateObject('notifications.list', function(list_obj) {
-			delete list_obj[notif.eventid];
-		});
-
-	}.bind(this));
-};
-
-/**
- * Callback that is bound into player instance. Once player has reached timeout we update store to mark this
- * notification as played. This must only happen for playing/focused tab.
- */
-ZBX_Notifications.prototype.onPlayerTimeout = function() {
-	if (this.do_poll_server) {
-		this.store.writeKey('notifications.alarm.end', this.store.readKey('notifications.alarm.start'));
-	}
-};
-
-/**
- * Updates DOM on local storage change.
- *
- * @param {object} list_obj  Notification ID keyed hash-map of storable notification objects.
- * @param {object} timeouts_obj  Optional reference, if it is possible to read store less often.
- */
-ZBX_Notifications.prototype.onNotificationsList = function(list_obj, timeouts_obj, severity_settings) {
-	var timeouts_obj = timeouts_obj || this.store.readKey('notifications.localtimeouts'),
-		severity_settings = severity_settings || this.store.readKey('notifications.severity_settings'),
-		length = this.dom.renderFromStorable(list_obj, timeouts_obj, severity_settings);
-
-	if (length) {
-		this.dom.node.hidden && this.dom.show();
 	}
 	else {
-		!this.dom.node.hidden && this.dom.hide();
+		// Timeout cycles through LS across tabs.
+	}
+
+	ZBX_Notifications.DEBUG(alarm_state);
+	this.alarm_state = alarm_state;
+
+	// DEBUG-T
+	if (ZBX_Notifications._playin) { try { ZBX_Notifications._playin.node._playin.remove(); } catch(e){} }
+	if (this.alarm_state.start) {
+		if (this.getById(this.alarm_state.start)) {
+			ZBX_Notifications._playin = this.getById(this.alarm_state.start);
+			ZBX_Notifications._playin.node._playin = document.createElement('span');
+			ZBX_Notifications._playin.node._playin.style.float = 'right';
+			ZBX_Notifications._playin.node._playin.style.marginTop = '-43px';
+			ZBX_Notifications._playin.node.appendChild(ZBX_Notifications._playin.node._playin);
+			var file = this.user_settings.files[this.alarm_state.severity];
+			var pf = '(' + this.user_settings.alarm_timeout + ')🔊';
+			ZBX_Notifications._playin.node._playin.innerHTML = file + ' ' + pf;
+		}
 	}
 };
 
 /**
- * Sets snooze state, either snoozed on not. It is not allowed to de-snooze whole list.
+ * Used to speed up poll interval, in case if user has set message timeout to be short enough it is possible
+ * to miss a recovered event for notification that is long gone, because of how Problems API is implemented.
  *
- * @param {bool} bool
- */
-ZBX_Notifications.prototype.onSnoozeChange = function(bool) {
-	this.dom.btn_snooze.renderState(bool);
-	if (!bool) {
-		return;
-	}
-
-	var list_obj = this.store.readKey('notifications.list'),
-		snoozedids = {},
-		eventid;
-
-	for (eventid  in list_obj) {
-		snoozedids[eventid] = bool;
-		list_obj[eventid].snoozed = bool;
-	}
-
-	this.player.stop();
-	this.store.writeKey('notifications.snoozedids', snoozedids);
-	this.store.writeKey('notifications.list', list_obj);
-	this.onNotificationsList(list_obj);
-};
-
-/**
- * Sets mute state, either muted on not.
+ * @param {objects} user_settings
  *
- * @param {bool} bool
+ * @return {integer}
  */
-ZBX_Notifications.prototype.onMuteChange = function(bool) {
-	this.dom.btn_mute.renderState(bool);
-	bool && this.player.stop();
-};
+ZBX_Notifications.prototype.calcPollInterval = function(user_settings) {
+	ZBX_Notifications.DEBUG(user_settings);
 
-/**
- * On tab or window close we update local storage.
- *
- * @param {ZBX_BrowserTab} tab.
- */
-ZBX_Notifications.prototype.onTabUnload = function(tab) {
-	if (this.do_poll_server && !this.disabled) {
-		this.store.writeKey('notifications.alarm.seek', this.player.getSeek());
-		this.store.writeKey('notifications.alarm.timeout', this.player.getTimeout());
-	}
-
-	// If the last tab is unladed.
-	if (!tab.getAllTabIds().length) {
-		this.store.truncate();
-	}
-};
-
-/**
- * Determine if this is the instance that will poll server.
- *
- * @param {string} tabid.
- */
-ZBX_Notifications.prototype.onTabFocusChanged = function(tabid) {
-	if (this.disabled) {
-		return;
-	}
-
-	var is_single_tab = this.tab.isSingleSession();
-
-	if (is_single_tab) {
-		this.do_poll_server = true;
-	}
-
-	var active_blured = (this.do_poll_server && this.tab.uid != tabid);
-
-	if (active_blured) {
-		this.store.writeKey('notifications.alarm.seek', this.player.getSeek());
-		this.store.writeKey('notifications.alarm.timeout', this.player.getTimeout());
-		this.player.stop();
-	}
-
-	this.do_poll_server = (is_single_tab || this.tab.uid === tabid);
-};
-
-/**
- * Bound as callback in ZBX_BrowserTab, and it just passes tab ID into storage key change handler.
- *
- * @param {ZBX_BrowserTab} tab.
- */
-ZBX_Notifications.prototype.onTabFocus = function(tab) {
-	this.onTabFocusChanged(tab.uid);
-};
-
-/**
- * Adjust alarm settings and update local storage to play a notification.
- *
- * @param {object|null} notif     Notification object in the format it was received from server.
- * @param {object}      opts      Notification settings object.
- * @param {object}      timeouts
- */
-ZBX_Notifications.prototype.writeAlarm = function(notif, opts, timeouts_obj) {
-	if (!notif) {
-		this.store.resetKey('notifications.alarm.start');
-		this.store.resetKey('notifications.alarm.end');
-		this.store.resetKey('notifications.alarm.seek');
-		this.store.resetKey('notifications.alarm.wave');
-		this.store.resetKey('notifications.alarm.timeout');
-		return;
-	}
-
-	if (this.store.readKey('notifications.alarm.start') != notif.uid) {
-		this.player.seek(0);
-		this.store.resetKey('notifications.alarm.seek');
-	}
-
-	// Play in loop till end of notification timeout.
-	if (opts.alarm_timeout == -1) {
-		var timeout = timeouts_obj[notif.uid],
-			time_local = (+new Date / 1000);
-		this.store.writeKey('notifications.alarm.timeout', timeout.recv_time - time_local + timeout.msg_timeout);
-	}
-	// Play once till end of audio file.
-	else if (opts.alarm_timeout == 1) {
-		this.store.writeKey('notifications.alarm.timeout', -1);
-	}
-	// Play in loop till end of arbitrary timeout.
-	else {
-		this.store.writeKey('notifications.alarm.timeout', opts.alarm_timeout);
-	}
-
-	this.store.writeKey('notifications.alarm.wave', opts.files[notif.resolved ? -1 : notif.severity]);
-
-	// This write event is an trigger to play action.
-	this.store.writeKey('notifications.alarm.start', notif.uid);
-
-	/*
-	 * Re-stack because in chrome the `alarm.start` key sometimes misbehaves, maybe it's because the next call reads
-	 * this key too soon after the write call above.
-	 */
-	setTimeout(this.renderPlayer.bind(this), 0);
-};
-
-/**
- * @param {object} settings  Settings object received from server.
- */
-ZBX_Notifications.prototype.writeSettings = function(settings) {
-	this.store.writeKey('notifications.severity_settings', {
-		styles: settings.severity_styles,
-		files: settings.files,
-	});
-
-	this.store.writeKey('notifications.disabled', !settings.enabled);
-	this.store.writeKey('notifications.alarm.muted', settings.muted);
-
-	var min_timeout = Math.floor(settings.msg_timeout / 2);
+	var min_timeout = Math.floor(user_settings.msg_timeout / 2);
 
 	if (min_timeout < 1) {
 		min_timeout = 1;
@@ -452,94 +352,487 @@ ZBX_Notifications.prototype.writeSettings = function(settings) {
 		min_timeout = ZBX_Notifications.POLL_INTERVAL;
 	}
 
-	if (this.poll_interval != min_timeout) {
-		this.poll_interval = min_timeout;
-		this.store.writeKey('notifications.poll_interval', this.poll_interval);
-		this.restartMainLoop(this.poll_interval);
+	return min_timeout;
+};
+
+/**
+ * @param {objects} user_settings
+ */
+ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
+	ZBX_Notifications.DEBUG(user_settings);
+
+	var poll_interval = this.calcPollInterval(user_settings);
+	if (this.poll_interval != poll_interval) {
+		this.poll_interval = poll_interval;
+		this._main_loop_id && this.restartMainLoop();
 	}
 
-	this.onMuteChange(settings.muted);
+	this.user_settings = user_settings;
+
+	if (this.user_settings.disabled) {
+		// this.resetAlarmState();
+		// this.pushAlarmState();
+		// this.dropStore();
+	}
 };
 
 /**
- * On close click, send a request to server that marks current notifications as read.
+ * Appends notification to alarm_state context.
+ *
+ * @param {ZBX_Notification} notif
  */
-ZBX_Notifications.prototype.btnCloseClicked = function() {
-	this.fetch('notifications.read', {ids: Object.keys(this.store.readKey('notifications.list'))})
-		.catch(console.error)
-		.then(function(resp) {
-			this.store.resetKey('notifications.list');
-			this.store.resetKey('notifications.localtimeouts');
-			this.onNotificationsList({});
+ZBX_Notifications.prototype.consumeNotifAlarmCtx = function(notif) {
+	ZBX_Notifications.DEBUG(notif);
 
-			this.store.resetKey('notifications.alarm.start');
-			this.renderPlayer();
-		}.bind(this));
+	var raw = notif.getRaw(),
+		severity = raw.resolved ? ZBX_Notifications.ALARM_SEVERITY_RESOLVED : raw.severity,
+		notifid = notif.getId();
+
+	if (this.alarm_state.snoozed && !raw.snoozed) {
+		this.alarm_state.snoozed = false;
+	}
+
+	if (this.alarm_state.severity < severity) {
+		this.alarm_state.severity = severity;
+		this.alarm_state.start = notifid;
+	}
 };
 
 /**
- * Marks whole list as snoozed. Updates local storage.
+ * Consumes list into virtual DOM (collection). Computes and resets display timeouts for notification objects.
+ * After display timeout collection is mutated and rendered. This loop is reused (consumeNotifAlarmCtx) to choose
+ * a notification to be played - most recent, most severe. Then it is written into alarm_state that once consumed,
+ * will know if this notification has been played or not.
+ *
+ * @param {array} list  Ordered list of raw notification objects.
  */
-ZBX_Notifications.prototype.btnSnoozeClicked = function() {
-	if (this.store.readKey('notifications.alarm.snoozed')) {
+ZBX_Notifications.prototype.consumeList = function(list) {
+	ZBX_Notifications.DEBUG(list);
+
+	this.collection.consumeList(list);
+	this.list = this.collection.getRawList();
+
+	/*
+	 * These values are zeroed out for case of empty list. The same notification id is computed again if lesser priority
+	 * notification resolves, while consuming this new list.
+	 */
+	this.alarm_state.start = '';
+	this.alarm_state.severity = -2;
+
+	this.collection.map(function(notif) {
+		this.consumeNotifAlarmCtx(notif);
+
+		notif.display_timeoutid && clearTimeout(notif.display_timeoutid);
+		notif.display_timeoutid = setTimeout(function() {
+			this.removeById(notif.getId());
+			this.debounceRender();
+		}.bind(this), notif.calcDisplayTimeout(this.user_settings));
+
+		// DEBUG-T
+		var ttld = (notif.calcDisplayTimeout(this.user_settings) / 1000).toFixed();
+		if (notif.__) {
+			clearTimeout(notif.__);
+		}
+		if (!notif.node._id) {
+			notif.node._id = document.createElement('span');
+			notif.node._id.style.float = 'right';
+			notif.node._id.style.marginTop = '-30px';
+			notif.node._id.style.fontSize = '9px';
+			notif.node.appendChild(notif.node._id);
+		}
+		notif.node._id.innerHTML = 'ID: ' + notif.getId();
+
+		if (!notif.node._timer) {
+			notif.node._timer = document.createElement('span');
+			notif.node._timer.style.float = 'right';
+			notif.node._timer.style.marginTop = '-57px';
+			notif.node.appendChild(notif.node._timer);
+		}
+		notif.__ = setInterval(function() {
+			notif.node._timer.innerHTML = ttld --;
+		}.bind(this), 1000);
+		// DEBUG-T
+
+	}.bind(this));
+
+	this.consumeAlarmState(this.alarm_state);
+};
+
+/**
+ * Stops ticking.
+ */
+ZBX_Notifications.prototype.stopMainLoop = function() {
+	ZBX_Notifications.DEBUG();
+
+	if (this._main_loop_id) {
+		clearInterval(this._main_loop_id);
+	}
+}
+
+/**
+ * Sets interval for main loop. Tick is immediately executed.
+ */
+ZBX_Notifications.prototype.restartMainLoop = function() {
+	ZBX_Notifications.DEBUG(':this.poll_interval: ' + this.poll_interval);
+
+	this.stopMainLoop();
+	this._main_loop_id = setInterval(this.mainLoop.bind(this), this.poll_interval * 1000);
+	this.mainLoop();
+};
+
+/**
+ * Invokes render once after some timeout if not called again during last timeout.
+ *
+ * @param {integer} ms  Optional milliseconds for debounce.
+ */
+ZBX_Notifications.prototype.debounceRender = function(ms) {
+
+	ms = ms || 50;
+	if (this._render_timeoutid) {
+		clearTimeout(this._render_timeoutid);
+	}
+
+	this._render_timeoutid = setTimeout(this.render.bind(this), ms);
+
+	ZBX_Notifications.DEBUG(ms);
+}
+
+/**
+ * TODO below is {WIP}
+ *
+ * Write ZBX_LocalStorage only values that were updated by <consume> methods. For example, during a new user_settings
+ * consumption it came clear that alarm_state has to be updated, only if that happened, alarm_state will be pushed.
+ */
+ZBX_Notifications.prototype.pushUpdates = function() {
+	ZBX_Notifications.DEBUG();
+
+	if (this.active) {
+		this.pushActiveTabid(this.tab.uid);
+	}
+
+	// TODO optimize - not always needed to write them, if they not changed.
+	// TODO in consume<domain> methods construct a "change object", based on that push only needded stuff.
+	this.pushUserSettings(this.user_settings);
+	this.pushList(this.collection.getRawList());
+	this.pushAlarmState(this.alarm_state);
+};
+
+/**
+ * @param {array} list
+ */
+ZBX_Notifications.prototype.pushList = function(list) {
+	ZBX_Notifications.DEBUG(list);
+
+	this.store.writeKey('notifications.list', list);
+};
+
+/**
+ * @param {object} user_settings
+ */
+ZBX_Notifications.prototype.pushUserSettings = function(user_settings) {
+	ZBX_Notifications.DEBUG(user_settings);
+
+	this.store.writeKey('notifications.user_settings', user_settings);
+};
+
+/**
+ * @param {object} alarm_state
+ */
+ZBX_Notifications.prototype.pushAlarmState = function(alarm_state) {
+	ZBX_Notifications.DEBUG(alarm_state);
+
+	this.store.writeKey('notifications.alarm_state', alarm_state);
+};
+
+/**
+ * @param {string} tabid
+ */
+ZBX_Notifications.prototype.pushActiveTabid = function(tabid) {
+	ZBX_Notifications.DEBUG(tabid);
+
+	this.store.writeKey('notifications.active_tabid', tabid);
+};
+
+/**
+ * This logic is a response - if other instance writes this tabid into LS, when current tab receives focusIn event
+ * or at new instance creation depending on context (for example single tab scenario without receiving focusIn event).
+ */
+ZBX_Notifications.prototype.becomeActive = function() {
+	document.title = "Act";
+	document.title += (+new Date) - 1560000000000;
+
+	if (this.active) {
 		return;
 	}
 
-	this.store.writeKey('notifications.alarm.snoozed', true);
-	this.onSnoozeChange(true);
+	ZBX_Notifications.DEBUG();
+
+	this.active_tabid = this.tab.uid;
+	this.active = true;
+
+	this.pushActiveTabid(this.tab.uid);
+	this.renderAudio();
+}
+
+/**
+ * Notification instance may only ever become inactive when another instance becomes active. At single tab unload case
+ * various artifacts like seek position are transfered explicitly.
+ *
+ * (TODO is it possible to just call this method at unload).
+ */
+ZBX_Notifications.prototype.becomeInActive = function() {
+	document.title = "Ina";
+	document.title += (+new Date) - 1560000000000;
+
+	ZBX_Notifications.DEBUG();
+
+	if (this.active) {
+		// No need to push everything.
+		this.alarm_state = this.getAlarmState();
+		this.consumeAlarmState(this.alarm_state);
+		this.pushAlarmState(this.alarm_state);
+	}
+
+	this.active_tabid = '';
+	this.active = false;
+
+	this.renderAudio();
 };
 
 /**
- * Toggles muted state on server. If successful, sets new muted value for all tabs.
+ * Collects how alarm_state looks at this time (during playback).
+ *
+ * @return {object}
  */
-ZBX_Notifications.prototype.btnMuteClicked = function() {
-	var new_value = this.store.readKey('notifications.alarm.muted') ? 0 : 1;
+ZBX_Notifications.prototype.getAlarmState = function() {
+	ZBX_Notifications.DEBUG();
 
-	this.fetch('notifications.mute', {mute: new_value})
+	return {
+		start: this.alarm_state.start,
+		end: this.alarm_state.end,
+		muted: this.alarm_state.muted,
+		snoozed: this.alarm_state.snoozed,
+		severity: this.alarm_state.severity,
+		seek: this.player.getSeek(),
+		timeout: this.player.getTimeout()
+	};
+};
+
+/**
+ * Backup store still remains, this is used mainly for single instance session case on tab unload event.
+ */
+ZBX_Notifications.prototype.dropStore = function() {
+	ZBX_Notifications.DEBUG();
+
+	this.store.eachKeyRegex('^notifications\\.', function(key) {
+		key.truncatePrimary();
+	});
+}
+
+/**
+ * @param {object} user_settings
+ */
+ZBX_Notifications.prototype.handlePushedUserSettings = function(user_settings) {
+	this.consumeUserSettings(user_settings);
+	this.consumeList(this.list);
+	this.render();
+};
+
+/**
+ * @param {array} list
+ */
+ZBX_Notifications.prototype.handlePushedList = function(list) {
+	this.consumeList(list);
+	this.render();
+};
+
+/**
+ * @param {object} alarm_state
+ */
+ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
+	ZBX_Notifications.DEBUG(alarm_state);
+
+	this.consumeAlarmState(alarm_state);
+	this.render();
+};
+
+/**
+ * @param {string} tabid
+ */
+ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
+	tabid === this.tab.uid ? this.becomeActive() : this.becomeInActive();
+};
+
+/**
+ * When active tab is unloaded, any sibling tab is set to become active. If single session, then we drop LS (privacy).
+ * We cannot know if this unload will happen because of navigation, scripted reload or a tab was just closed.
+ * Latter is always assumed, so when navigating active tab, focus is deligated onto to any tab if possible,
+ * then this tab might reclaim focus again at construction if during during that time document has focus.
+ * At slow connection during page navigation there will be another active tab polling for notifications (if multitab).
+ * Here `tab` is refered as ZBX_Notifications instance and `focus` - wheather instance is `active` (not focused).
+ *
+ * @param {ZBX_BrowseTab} removed_tab  Current tab instance.
+ * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
+ */
+ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids) {
+	ZBX_Notifications.DEBUG(removed_tab, other_tabids);
+
+	if (this.active && other_tabids.length) {
+		this.becomeInActive();
+		this.pushActiveTabid(other_tabids[0]);
+	}
+	else if (this.active) {
+		this.dropStore();
+	}
+};
+
+/**
+ * Responds when this instance tab receives focus event.
+ */
+ZBX_Notifications.prototype.handleTabFocusIn = function() {
+	ZBX_Notifications.DEBUG();
+
+	this.becomeActive();
+};
+
+/**
+ * @param {MouseEvent} e
+ */
+ZBX_Notifications.prototype.handleCloseClicked = function(e) {
+	ZBX_Notifications.DEBUG();
+
+	this.fetch('notifications.read', {ids: this.getEventIds()})
 		.catch(console.error)
-		.then(function() {
-			this.store.writeKey('notifications.alarm.muted', new_value);
-			this.onMuteChange(new_value);
+		.then(function(resp) {
+
+			resp.ids.forEach(function(id) {
+				this.removeById(id);
+				this.debounceRender();
+			}.bind(this));
+
+			this.alarm_state.start = '';
+			this.pushUpdates();
 		}.bind(this));
 };
 
 /**
- * Updates player instance to match with local storage.
- *
- * @return {ZBX_NotificationsAudio}
+ * @param {MouseEvent} e
  */
-ZBX_Notifications.prototype.renderPlayer = function() {
-	if (!this.do_poll_server) {
+ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
+	ZBX_Notifications.DEBUG();
+
+	if (this.alarm_state.snoozed) {
+		return;
+	}
+
+	this.alarm_state.snoozed = true;
+	this.consumeAlarmState(this.alarm_state);
+
+	this.list.forEach(function(raw) {raw.snoozed = true;});
+	this.consumeList(this.list);
+
+	this.pushUpdates();
+	this.render();
+};
+
+/**
+ * @param {MouseEvent} e
+ */
+ZBX_Notifications.prototype.handleMuteClicked = function(e) {
+	ZBX_Notifications.DEBUG();
+
+	this.fetch('notifications.mute', {mute: this.alarm_state.muted ? 0 : 1})
+		.catch(console.error)
+		.then(function(resp) {
+
+			this.alarm_state.muted = resp.mute;
+			this.consumeAlarmState(this.alarm_state);
+
+			this.pushAlarmState(this.alarm_state);
+			this.render();
+
+		}.bind(this));
+};
+
+/**
+ * Handles server response.
+ *
+ * @param {object} resp  Server response object. Contains settings and list of notifications.
+ */
+ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
+	ZBX_Notifications.DEBUG(resp);
+
+	if (resp.error) {
+		this.stopMainLoop();
+		this.store.truncateBackup();
+		this.dropStore();
+
+		return;
+	}
+
+	this.consumeUserSettings(resp.settings);
+	this.consumeList(resp.notifications);
+	this.render();
+
+	this.pushUpdates();
+};
+
+/**
+ * Collection renders whole list of notifications and snooze, and mute buttons, not all state is passed down here, just
+ * user configuration, the list state to be rendered, has been consumed by collection before.
+ */
+ZBX_Notifications.prototype.renderCollection = function() {
+	ZBX_Notifications.DEBUG();
+
+	this.collection.render(this.user_settings.severity_styles, this.alarm_state);
+};
+
+/**
+ * Render everything. Any painting optimization may be considered levels deeper.
+ */
+ZBX_Notifications.prototype.render = function() {
+	ZBX_Notifications.DEBUG();
+
+	this.renderCollection();
+	this.renderAudio();
+};
+
+/**
+ * Updates player instance to match with this.alarm_state.
+ *
+ * @return {Promise}  Resolved once playback has reached timeout (only during playback in action).
+ */
+ZBX_Notifications.prototype.renderAudio = function() {
+	ZBX_Notifications.DEBUG();
+
+	var playback_ended = !this.alarm_state.start || (this.alarm_state.start === this.alarm_state.end),
+		playback_suppressed = this.alarm_state.muted || this.alarm_state.snoozed;
+
+	if (!this.active || playback_ended || playback_suppressed) {
+		// return this.player.fadeStop(100);
 		return this.player.stop();
 	}
 
-	var start = this.store.readKey('notifications.alarm.start'),
-		end = this.store.readKey('notifications.alarm.end');
+	var file = this.user_settings.files[this.alarm_state.severity];
 
-	if (!start) {
-		return this.player.stop();
+	this.player.file(file);
+	this.player.seek(this.alarm_state.seek);
+
+	if (this.alarm_state.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
+		this.alarm_state.end = this.alarm_state.start;
+		this.player.once();
 	}
-	else if (start == end) {
-		return this.player.stop();
-	}
-
-	if (this.store.readKey('notifications.alarm.muted')) {
-		return this.player.stop();
-	}
-
-	if (this.store.readKey('notifications.alarm.snoozed')) {
-		return this.player.stop();
-	}
-
-	var wave = this.store.readKey('notifications.alarm.wave');
-
-	if (wave) {
-		this.player.file(wave);
+	else {
+		this.player.timeout(this.alarm_state.timeout).then(function(player) {
+			/*
+			 * It is not checked again here if this bound instance is active or not, because if it isn't active, player has been
+			 * rerendered as stopped and this promise is never resolved.
+			 */
+			this.alarm_state.end = this.alarm_state.start;
+			this.pushAlarmState(this.alarm_state);
+		}.bind(this));
 	}
 
-	this.player.timeout(this.store.readKey('notifications.alarm.timeout'));
-
-	return this.player;
 };
 
 /**
@@ -549,6 +842,9 @@ ZBX_Notifications.prototype.renderPlayer = function() {
  * @return {Promise}  For IE11 ZBX_Promise poly-fill is returned.
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
+	ZBX_Notifications.DEBUG(resource, params);
+
+	// TODO the sendAjaxData will call a `success` method for you on network error! Not in the scope of this task.
 	return new Promise(function(resolve, reject) {
 		sendAjaxData('zabbix.php?action=' + resource, {
 			data: params || {},
@@ -559,19 +855,171 @@ ZBX_Notifications.prototype.fetch = function(resource, params) {
 };
 
 /**
+ * @return {array}
+ */
+ZBX_Notifications.prototype.getEventIds = function() {
+	ZBX_Notifications.DEBUG();
+
+	return this.collection.getIds();
+};
+
+/**
  * Main loop periodically executes at some interval. Only if this instance is 'active' notifications are fetched
  * and rendered.
  */
 ZBX_Notifications.prototype.mainLoop = function() {
-	if (!this.do_poll_server) {
+	ZBX_Notifications.DEBUG('this.poll_interval: ' + this.poll_interval, 'active: ' + this.active);
+
+	if (!this.active) {
 		return;
 	}
 
-	this.fetch('notifications.get', {
-		validate_eventids: Object.keys(this.store.readKey('notifications.list'))
-	})
+	this.fetch('notifications.get', {validate_eventids: this.getEventIds()})
 		.catch(console.error)
-		.then(this.onPollerReceive.bind(this));
+		.then(this.handleMainLoopResp.bind(this));
+};
+
+/**
+ * Utilities..
+ *
+ * TODO could these be removed if we use scss and some class toggling?
+ */
+ZBX_Notifications.util = {};
+
+/**
+ * @param {Node} node  Display none node.
+ *
+ * @return {Promise}
+ */
+ZBX_Notifications.util.getNodeHeight = function(node) {
+	node.style.display = 'block';
+	node.style.position = 'absolute';
+	node.style.visibility = 'hidden';
+	node.style.overflow = 'hidden';
+
+	return new Promise(function(resolve, failed) {
+		function readHeight() {
+			if (!node.offsetHeight) {
+				requestAnimationFrame(readHeight);
+			}
+			else {
+				node.removeAttribute('style');
+				resolve(node.offsetHeight);
+			}
+		}
+
+		readHeight();
+	});
+};
+
+/**
+ * Fully IE11 compatible slideUp animation using CSS.
+ *
+ * @param {Node} node
+ * @param {integer} duration  Animation duration in milliseconds.
+ * @param {integer} delay  Milliseconds to wait before animating.
+ *
+ * @return {Promise}  Resolved once animation should have finished.
+ */
+ZBX_Notifications.util.slideDown = function(node, duration, delay) {
+	delay = delay || 0;
+	duration = duration || 200;
+
+	return new Promise(function(resolved, failed) {
+		ZBX_Notifications.util.getNodeHeight(node).then(function(height) {
+			var padding = window.getComputedStyle(node).padding;
+
+			node.style.height = '0px';
+			node.style.padding = '0px';
+			node.style.overflow = 'hidden';
+			node.style.boxSizing = 'border-box';
+			node.style.transitionDuration = duration + 'ms';
+			node.style.transitionProperty = 'opacity, height, margin, padding';
+
+			setTimeout(function() {
+				node.style.height = height + 'px';
+				node.style.padding = padding;
+				setTimeout(function() {
+					node.removeAttribute('style');
+				}, duration);
+				resolved(node);
+			}, delay);
+		});
+	});
+};
+
+/**
+ * @param {Node} node
+ */
+ZBX_Notifications.util.fadeIn = function(node) {
+	node.style.opacity = 0;
+	node.style.display = 'inherit';
+
+	var op = 0;
+	var id = setInterval(function() {
+		op += 0.1;
+		if (op > 1) {
+			return clearInterval(id);
+		}
+		node.style.opacity = op;
+	}, 50);
+};
+
+/**
+ * @param {Node} node
+ *
+ * @return {Promise}  Resolved once animation should have finished.
+ */
+ZBX_Notifications.util.fadeOut = function(node) {
+	var opacity = 1,
+		intervalid;
+
+	return new Promise(function(resolved, failed) {
+		if (node.style.display === 'none') {
+			return resolved(node);
+		}
+
+		node.style.opacity = opacity;
+		intervalid = setInterval(function() {
+			opacity -= 0.1;
+			if (opacity < 0) {
+				node.style.display = 'none';
+
+				resolved(node);
+				return clearInterval(intervalid);
+			}
+			node.style.opacity = opacity;
+		}, 50);
+	});
+};
+
+/**
+ * Fully IE11 compatible slideUp animation using CSS.
+ *
+ * @param {Node} node
+ * @param {integer} duration  Animation duration in milliseconds.
+ * @param {integer} delay  Milliseconds to wait before animating.
+ *
+ * @return {Promise}  Resolved once animation should have finished.
+ */
+ZBX_Notifications.util.slideUp = function(node, duration, delay) {
+	delay = delay || 0;
+
+	node.style.overflow = 'hidden';
+	node.style.boxSizing = 'border-box';
+	node.style.transitionDuration = duration + 'ms';
+	node.style.transitionProperty = 'height, margin, padding';
+	node.style.height = node.offsetHeight + 'px';
+
+	setTimeout(function() {
+		node.style.height = '0px';
+		node.style.padding = '0px';
+		node.style.margin = '0px';
+	}, delay);
+
+	return new Promise(function(resolved, failed) {
+		setTimeout(resolved.bind(null, node), delay + duration);
+	});
 };
 
 /**
@@ -582,8 +1030,11 @@ ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
 	ZABBIX.namespace('instances.browserTab')
 ));
 
+/**
+ * Appends list node to DOM when document is ready, then makes it draggable.
+ */
 jQuery(function() {
-	var notifications_node = ZABBIX.namespace('instances.notifications.dom.node');
+	var notifications_node = ZABBIX.namespace('instances.notifications.collection.node');
 
 	document.body.appendChild(notifications_node);
 	jQuery(notifications_node).draggable();

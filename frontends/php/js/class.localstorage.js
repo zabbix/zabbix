@@ -18,6 +18,96 @@
 **/
 
 
+ZBX_LocalStorage.DEBUG_DEBOUNCE = 0;
+ZBX_LocalStorage.DEBUG_GRPS = [];
+ZBX_LocalStorage.DEBUG_GRP = function(log) {
+	clearTimeout(ZBX_LocalStorage.DEBUG_DEBOUNCE);
+	ZBX_LocalStorage.DEBUG_GRPS.push(log);
+	ZBX_LocalStorage.DEBUG_DEBOUNCE = setTimeout(function() {
+		var d = new Date();
+		var time = ("00" + d.getHours()).slice(-2) + ":" +
+		("00" + d.getMinutes()).slice(-2) + ":" +
+		("00" + d.getSeconds()).slice(-2);
+
+		console.groupCollapsed("%cLS/BT: " + time + ' [' + ZBX_LocalStorage.DEBUG_GRPS.length + ']', 'color:grey');
+		ZBX_LocalStorage.DEBUG_GRPS.forEach(function(log) {
+			console.groupCollapsed.apply(console, log.title);
+			log.args.forEach(function(arg) {
+				console.dir(arg)
+			});
+
+			console.groupEnd();
+		});
+
+		ZBX_LocalStorage.DEBUG_GRPS = [];
+
+		console.groupEnd();
+	}, 100);
+};
+
+ZBX_LocalStorage.DEBUG = function() {
+	return;
+	if (IE) return;
+	// return
+	var stack = new Error().stack;
+	trace = stack.split('\n');
+	var pos = trace[2].match('at (.*) .*')[1];
+
+	var style = 'color:red;';
+
+	if (pos.match('BrowserTab\\.') || pos.match('BrowserTab')) {
+		style = 'color:darkgoldenrod;';
+	}
+
+	if (pos.match('LocakStorage\\.') || pos.match('LocakStorage$')) {
+		style = 'color:darkkhaki;';
+	}
+
+	// if (pos.match('^new ')) {
+	// 	style += 'background:black;font-size:14px';
+	// }
+	// // if (trace.length > 6) return;
+
+	var log = {
+		title: ['-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
+		args: [],
+	}
+
+	var len = arguments.length;
+	for (var i = 0; i < len; i ++) {
+		var a = arguments[i];
+
+		if (typeof a === 'string' && a[0] === ':') {
+			log.title[0] += '%c' + a;
+			log.title.push('color: white;');
+			continue;
+		}
+
+		if (
+			(a instanceof ZBX_LocalStorage) ||
+			(a instanceof ZBX_Notification) ||
+			(a instanceof ZBX_NotificationCollection) ||
+			(a instanceof ZBX_LocalStorage)
+		) {
+			log.args.push(a);
+		}
+		else if (typeof a === 'object' && a !== null) {
+			try {
+				log.args.push(JSON.parse(Object.toJSON(a)));
+			} catch (e) {
+				log.args.push("FAIL");
+				console.warn("FAIL", log, a, e);
+			}
+		}
+		else {
+			log.args.push(a);
+		}
+		// log.args.push(stack);
+	}
+
+	ZBX_LocalStorage.DEBUG_GRP(log);
+};
+
 ZBX_LocalStorage.defines = {
 	PREFIX_SEPARATOR: ':',
 	KEEP_ALIVE_INTERVAL: 30,
@@ -33,6 +123,8 @@ ZBX_LocalStorage.defines = {
  * @param {string} prefix   Used to distinct keys between sessions within same domain.
  */
 function ZBX_LocalStorage(version, prefix) {
+	ZBX_LocalStorage.DEBUG(version, prefix);
+
 	if (!version || !prefix) {
 		throw 'Local storage instantiation must be versioned, and prefixed.';
 	}
@@ -41,92 +133,90 @@ function ZBX_LocalStorage(version, prefix) {
 		return ZBX_LocalStorage.instance;
 	}
 
+	ZBX_LocalStorage.master = localStorage;
+	ZBX_LocalStorage.slave = sessionStorage;
+
 	ZBX_LocalStorage.sessionid = prefix;
 	ZBX_LocalStorage.prefix = prefix + ZBX_LocalStorage.defines.PREFIX_SEPARATOR;
 	ZBX_LocalStorage.instance = this;
 	ZBX_LocalStorage.signature = (Math.random() % 9e6).toString(36).substr(2);
 
-	this.keys = {
-		// Store versioning.
-		'version': version,
-		// An object where every tab updates timestamp at key of it's ID, in order to assume if there are crashed tabs.
-		'tabs.lastseen': {},
-		// Browser tab ID that was the last one focused.
-		'tabs.lastfocused': '',
-		// Browser tab ID that was the last one left focus.
-		'tabs.lastblured': '',
-		// Stores manifest for notifications that currently are in DOM. Keyed by ID.
-		'notifications.list': {},
-		// Each notification property of snooze is help separately - keyed by notification ID.
-		'notifications.snoozedids': {},
-		// Holds a list checksum. This way we know if list we received has updates.
-		'notifications.listid': '',
-		// Represents state of snooze icon.
-		'notifications.alarm.snoozed': '',
-		// No audio for notifications will be played.
-		'notifications.alarm.muted': false,
-		// Currently played notifications audio file.
-		'notifications.alarm.wave': '',
-		// Seek position will always be read on focus, if playing.
-		'notifications.alarm.seek': 0,
-		// Duration a player will play audio for.
-		'notifications.alarm.timeout': 0,
-		// Notification start ID is written when we receive a notification that should be played.
-		'notifications.alarm.start': '',
-		// Notification end ID is written when notification has completed it's audio playback.
-		'notifications.alarm.end': '',
-		// Poll interval will be reduced, if there is possibility for user to miss new notifications.
-		'notifications.poll_interval': 0,
-		// Disabled setting tells notifier objects to stop audio, hide notifications and to stop following active tab.
-		'notifications.disabled': false,
-		// An object of timeout setting and client time at first render, keyed by notification id.
-		'notifications.localtimeouts': {},
-		// Severity styles are rendered and determined clients side.
-		'notifications.severity_settings': {}
-	};
+	this.rel_keys = {};
+	this.abs_keys = {};
 
-	/*
-	 * This subset of keys will be mirrored in session storage to be read if session storage has no value under a key.
-	 * This way we survive data across page reloads in case of single tab.
-	 */
-	this.keys_to_backup = {
-		'tabs.lastfocused': true,
-		'notifications.alarm.end': true,
-		'notifications.alarm.snoozed': true,
-		'notifications.snoozedids': true,
-		'notifications.list': true,
-		'notifications.listid': true,
-		'notifications.disabled': true,
-		'notifications.localtimeouts': true,
-		'notifications.severity_settings': true
-	};
+	this.addKey('version');
+	this.addKey('tabs.lastseen');
+	this.addKey('notifications.list');
+	this.addKey('notifications.active_tabid');
+	this.addKey('notifications.user_settings');
+	this.addKey('notifications.alarm_state');
 
-	if (this.readKey('version') != this.keys.version) {
+	if (this.readKey('version') != version) {
 		this.truncate();
+		this.writeKey('version', version);
 	}
-
-	/*
-	 * We first copy everything from session storage into local storage, an then we copy everything from local storage
-	 * into session storage. This way session is transfered onto next tab, meanwhile allowing us to truncate local
-	 * storage at single tab reload or close. Else in case when user opens second tab, then closes first, second tab
-	 * would not be able to restore backup keys session storage, because it has new session storage.
-	 */
-	this.iteratorSession().forEach(function(key_variant) {
-		localStorage.setItem(key_variant.abs_key, sessionStorage.getItem(key_variant.abs_key));
-	});
-
-	this.iteratorLocal().forEach(function(key_variant) {
-		sessionStorage.setItem(key_variant.abs_key, localStorage.getItem(key_variant.abs_key));
-	});
 
 	this.keepAlive();
 	setInterval(this.keepAlive, ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL * 1000);
+
+	this.register();
 }
 
 /**
+ * @return {string}
+ */
+ZBX_LocalStorage.prototype.onKeyUpdate = function(key, callback) {
+	this.rel_keys[key].subscribe(callback);
+};
+
+
+/**
+ * Transform key into absolute key.
+ *
+ * @param {string} key
+ *
+ * @return {string}
+ */
+ZBX_LocalStorage.prototype.toAbsKey = function(key) {
+	return ZBX_LocalStorage.prefix + key;
+};
+
+/**
+ * @param {string} relative_key
+ */
+ZBX_LocalStorage.prototype.addKey = function(relative_key) {
+	var absolute_key = this.toAbsKey(relative_key);
+
+	this.rel_keys[relative_key] = new ZBX_LocalStorageKey(relative_key, absolute_key);
+	this.abs_keys[absolute_key] = this.rel_keys[relative_key];
+
+	// DEBUG
+	var properties = {};
+	var that = this;
+	var kk = '_' + relative_key.replace('.', '_').replace('.', '_')
+	properties[kk] = properties[relative_key] = {
+		set: function(k) {
+			return function(value) {
+				return that.writeKey(k, value);
+			}
+		}(relative_key),
+
+		get: function(k) {
+			return function() {
+				return that.readKey(k);
+			}
+		}(relative_key)
+	}
+	Object.defineProperties(this, properties);
+};
+
+/**
+ * TODO test after this refactoring.
+ *
  * Keeps alive local storage sessions. Removes inactive session.
  */
 ZBX_LocalStorage.prototype.keepAlive = function() {
+	ZBX_LocalStorage.DEBUG();
 	var timestamp = Math.floor(+new Date / 1000),
 		sessions = JSON.parse(localStorage.getItem(ZBX_LocalStorage.defines.KEY_SESSIONS) || '{}'),
 		alive_ids = [],
@@ -164,10 +254,30 @@ ZBX_LocalStorage.prototype.keepAlive = function() {
  * @param {callable} callback
  */
 ZBX_LocalStorage.prototype.mutateObject = function(key, callback) {
+	ZBX_LocalStorage.DEBUG(key, callback);
 	var obj = this.readKey(key);
 
 	callback(obj);
 	this.writeKey(key, obj);
+};
+
+/**
+ * @param {RegEx|string} regex
+ * @param {callback} callback
+ */
+ZBX_LocalStorage.prototype.eachKeyRegex = function(regex, callback) {
+	this.eachKey(function(key) {
+		key.relative_key.match(regex) && callback(key);
+	});
+};
+
+/**
+ * @param {callback}
+ */
+ZBX_LocalStorage.prototype.eachKey = function(callback) {
+	for (var i in this.rel_keys) {
+		callback(this.rel_keys[i]);
+	}
 };
 
 /**
@@ -178,7 +288,7 @@ ZBX_LocalStorage.prototype.mutateObject = function(key, callback) {
  * @return {bool}
  */
 ZBX_LocalStorage.prototype.hasKey = function(key) {
-	return typeof this.keys[key] !== 'undefined';
+	return typeof this.rel_keys[key] !== 'undefined';
 };
 
 /**
@@ -187,6 +297,8 @@ ZBX_LocalStorage.prototype.hasKey = function(key) {
  * @param {string} key  Key to test.
  */
 ZBX_LocalStorage.prototype.ensureKey = function(key) {
+	// ZBX_LocalStorage.DEBUG(key);
+
 	if (typeof key !== 'string') {
 		throw 'Key must be a string, ' + (typeof key) + ' given instead.';
 	}
@@ -194,112 +306,6 @@ ZBX_LocalStorage.prototype.ensureKey = function(key) {
 	if (!this.hasKey(key)) {
 		throw 'Unknown localStorage key access at "' + key + '"';
 	}
-};
-
-/**
- * Transforms absolute key into relative key.
- *
- * @param {string} abs_key
- *
- * @return {string|null}  Relative key if found.
- */
-ZBX_LocalStorage.prototype.fromAbsKey = function(abs_key) {
-	var match = abs_key.match('^' + ZBX_LocalStorage.prefix + '(.*)');
-
-	if (match !== null) {
-		match = match[1];
-	}
-
-	return match;
-};
-
-/**
- * Transform key into absolute key.
- *
- * @param {string} key
- *
- * @return {string}
- */
-ZBX_LocalStorage.prototype.toAbsKey = function(key) {
-	return ZBX_LocalStorage.prefix + key;
-};
-
-/**
- * Writes an underlaying value.
- *
- * @param {string} key
- * @param {string} value
- */
-ZBX_LocalStorage.prototype.writeKey = function(key, value) {
-	if (typeof value === 'undefined') {
-		throw 'Value may not be undefined, use null instead';
-	}
-
-	this.ensureKey(key);
-
-	var abs_key = this.toAbsKey(key);
-	value = this.wrap(value);
-
-	if (this.keys_to_backup[key]) {
-		sessionStorage.setItem(abs_key, value);
-	}
-
-	localStorage.setItem(abs_key, value);
-};
-
-/**
- * Writes default value.
- *
- * @param {string} key  Key to reset.
- */
-ZBX_LocalStorage.prototype.resetKey = function(key) {
-	this.ensureKey(key);
-	this.writeKey(key, this.keys[key]);
-};
-
-/**
- * Fetches underlaying value. A copy of default value is returned if key has no data.
- *
- * @param {string} key  Key to test.
- *
- * @return {mixed}
- */
-ZBX_LocalStorage.prototype.readKey = function(key) {
-	this.ensureKey(key);
-
-	try {
-		var abs_key = this.toAbsKey(key),
-			item = this.primaryFetch(abs_key)
-				|| this.keys_to_backup[key] && this.backupFetch(abs_key)
-				|| this.wrap(this.keys[key]);
-
-		return this.unwrap(item).payload;
-	}
-	catch(e) {
-		console.warn('failed to parse storage item "' + key + '"');
-		this.truncate();
-		this.truncateBackup();
-
-		return null;
-	}
-};
-
-/**
- * @param {string} abs_key
- *
- * @return {mixed|null}  A null is returned when there is no such key.
- */
-ZBX_LocalStorage.prototype.backupFetch = function(abs_key) {
-	return sessionStorage.getItem(abs_key);
-};
-
-/**
- * @param {string} abs_key
- *
- * @return {mixed|null}  A null is returned when there is no such key.
- */
-ZBX_LocalStorage.prototype.primaryFetch = function(abs_key) {
-	return localStorage.getItem(abs_key);
 };
 
 /**
@@ -331,11 +337,18 @@ ZBX_LocalStorage.prototype.wrap = function(value) {
 };
 
 /**
+ * Not only IE dispatches 'storage' event 'onwrite' instead of 'onchange', but this event is also dispatched onto
+ * window that is the modifier. So we need to sign all payloads.
+ *
  * @param {string} value
  *
  * @return {mixed}
  */
 ZBX_LocalStorage.prototype.unwrap = function(value) {
+	if (value === null) {
+		throw "Expected JSON string";
+	}
+
 	return JSON.parse(value);
 };
 
@@ -352,16 +365,9 @@ ZBX_LocalStorage.prototype.destruct = function() {
  * Backup keys are removed.
  */
 ZBX_LocalStorage.prototype.truncateBackup = function() {
-	var abs_key, key, i;
-
-	for (i = 0; i < sessionStorage.length; i++) {
-		abs_key = sessionStorage.key(i);
-		key = this.fromAbsKey(abs_key);
-
-		if (key && this.keys_to_backup[key]) {
-			sessionStorage.removeItem(abs_key);
-		}
-	}
+	this.eachKey(function(key) {
+		key.truncateBackup();
+	});
 };
 
 /**
@@ -370,122 +376,172 @@ ZBX_LocalStorage.prototype.truncateBackup = function() {
  * @param {callable} filter_cb  Optional callback which return true if key should be removed.
  */
 ZBX_LocalStorage.prototype.truncate = function(filter_cb) {
-	var iter = this.iteratorLocal();
-
-	if (filter_cb && filter_cb.constructor === Function) {
-		iter = iter.filter(filter_cb);
-	}
-
-	iter.forEach(function(key_variants) {
-		localStorage.removeItem(key_variants.abs_key);
+	this.eachKey(function(key) {
+		key.truncate();
 	});
 };
 
-/**
- * Registers an event handler. A callback will get passed key that were modified and the new value the key now holds.
- * Note: handle is fired only when there was a change, not in the case of every `writeKey` call.
- *
- * @param {callable} callback
- */
-ZBX_LocalStorage.prototype.onUpdate = function(callback) {
+ZBX_LocalStorage.prototype.register = function() {
 	window.addEventListener('storage', function(event) {
 		// This key is for internal use only.
+		// TODO can be made as one of keys
 		if (event.key === ZBX_LocalStorage.defines.KEY_SESSIONS) {
 			return;
 		}
 
-		// This means, storage has been truncated.
-		if (event.key === null || event.key === '') {
-			return this.mapCallback(callback);
-		}
-
-		try {
-			/*
-			 * Not only IE dispatches 'storage' event 'onwrite' instead of 'onchange', but event is also dispatched onto
-			 * window that is the modifier. So we need to sign all payloads.
-			 */
-			var value = this.unwrap(event.newValue);
-
-			if (value.signature !== ZBX_LocalStorage.signature) {
-				callback(this.fromAbsKey(event.key), value.payload, ZBX_LocalStorage.defines.EVT_CHANGE);
-			}
-		}
-		catch(e) {
-			// If value could not be unwraped, it has not originated from this class.
-		}
+		this.handleStorageEvent(event);
 	}.bind(this));
 };
 
-/**
- * Apply every callback for each localStorage entry.
- *
- * @param {callable} callback
- */
-ZBX_LocalStorage.prototype.mapCallback = function(callback) {
-	this.iteratorLocal().forEach(function(key_variants) {
-		if (this.hasKey(key_variants.key)) {
-			callback(key_variants.key, this.readKey(key_variants.key), ZBX_LocalStorage.defines.EVT_MAP);
-		}
-	}.bind(this));
+ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
+	if (event.constructor != StorageEvent) {
+		throw 'Unmatched method signature!';
+	}
+
+	// This means, storage has been truncated.
+	if (event.key === null || event.key === '') {
+		// return this.mapCallback(callback);
+		return;
+	}
+
+	if (event.newValue === event.oldValue) {
+		// This is expensive, but internet expoler just dispatched storage change event at write.
+		return;
+	}
+
+	var value, key;
+
+	try {
+		value = this.unwrap(event.newValue);
+	}
+	catch(e) {
+		// If value could not be unwraped, it has not originated from this class.
+		return;
+	}
+
+	if (value.signature === ZBX_LocalStorage.signature) {
+		// Internet expoler just dispatched storage event onto current instance.
+		return;
+	}
+
+	if (!this.abs_keys[event.key]) {
+		return;
+	}
+
+	this.abs_keys[event.key].publish(value.payload);
 };
 
 /**
- * Returns list of keys found in sessionStorage relevant for current session.
+ * Writes an underlaying value.
  *
- * @return {array}
+ * @param {string} key
+ * @param {string} value
  */
-ZBX_LocalStorage.prototype.iteratorSession = function() {
-	var length = sessionStorage.length,
-		list = [],
-		abs_key,
-		key,
-		i;
-
-	for (i = 0; i < length; i++) {
-		abs_key = sessionStorage.key(i);
-		key = this.fromAbsKey(abs_key);
-
-		if (!key) {
-			continue;
-		}
-
-		list.push({
-			abs_key: abs_key,
-			key: key
-		});
+ZBX_LocalStorage.prototype.writeKey = function(key, value) {
+	if (typeof value === 'undefined') {
+		throw 'Value may not be undefined, use null instead: ' + key;
 	}
 
-
-	return list;
+	this.ensureKey(key);
+	this.rel_keys[key].write(this.wrap(value));
 };
 
 /**
- * Returns list of keys found in localStorage relevant for current session.
+ * Fetches underlaying value. A copy of default value is returned if key has no data.
  *
- * @return {array}
+ * @param {string} key
+ *
+ * @return {mixed}
  */
-ZBX_LocalStorage.prototype.iteratorLocal = function() {
-	var length = localStorage.length,
-		list = [],
-		abs_key,
-		key,
-		i;
+ZBX_LocalStorage.prototype.readKey = function(key, fallback) {
+	this.ensureKey(key);
 
-	for (i = 0; i < length; i++) {
-		abs_key = localStorage.key(i);
-		key = this.fromAbsKey(abs_key);
+	try {
+		var item = this.rel_keys[key].fetch();
 
-		if (!key) {
-			continue;
+		if (!item) {
+			return fallback;
 		}
 
-		list.push({
-			abs_key: abs_key,
-			key: key
-		});
+		return this.unwrap(item).payload;
+	}
+	catch(e) {
+		console.warn('failed to parse storage item "' + key + '"');
+
+		this.truncate();
+		this.truncateBackup();
 	}
 
-	return list;
+	return null;
+};
+
+function ZBX_LocalStorageKey(relative_key, absolute_key) {
+	this.backup_store = sessionStorage;
+	this.primary_store = localStorage;
+
+	this.relative_key = relative_key;
+	this.absolute_key = ZBX_LocalStorage.prefix + this.relative_key;
+
+	this.on_update_cbs = [];
+}
+
+ZBX_LocalStorageKey.prototype.writePrimary = function(string) {
+	if (string.constructor != String || string[0] != '{') {
+		throw 'Corrupted input.';
+	}
+	this.backup_store.setItem(this.absolute_key, string);
+};
+
+ZBX_LocalStorageKey.prototype.writeBackup = function(string) {
+	if (string.constructor != String || string[0] != '{') {
+		throw 'Corrupted input.';
+	}
+	this.primary_store.setItem(this.absolute_key, string);
+};
+
+ZBX_LocalStorageKey.prototype.write = function(string) {
+	this.writeBackup(string);
+	this.writePrimary(string);
+};
+
+ZBX_LocalStorageKey.prototype.sync = function() {
+	// TODO obay settings per key
+	this.writePrimary(this.fetchBackup());
+};
+
+ZBX_LocalStorageKey.prototype.fetchPrimary = function() {
+	return this.primary_store.getItem(this.absolute_key);
+};
+
+ZBX_LocalStorageKey.prototype.fetchBackup = function() {
+	return this.backup_store.getItem(this.absolute_key);
+};
+
+ZBX_LocalStorageKey.prototype.fetch = function() {
+	return this.fetchPrimary() || this.fetchBackup();
+};
+
+ZBX_LocalStorageKey.prototype.truncateBackup = function() {
+	this.backup_store.removeItem(this.absolute_key);
+};
+
+ZBX_LocalStorageKey.prototype.truncatePrimary = function() {
+	this.primary_store.removeItem(this.absolute_key);
+};
+
+ZBX_LocalStorageKey.prototype.truncate = function() {
+	this.truncateBackup();
+	this.truncatePrimary();
+};
+
+ZBX_LocalStorageKey.prototype.subscribe = function(callback) {
+	this.on_update_cbs.push(callback);
+};
+
+ZBX_LocalStorageKey.prototype.publish = function(payload) {
+	this.on_update_cbs.forEach(function(callback) {
+		callback(payload);
+	});
 };
 
 ZABBIX.namespace(

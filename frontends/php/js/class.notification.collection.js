@@ -19,21 +19,121 @@
 
 
 /**
- * Represents DOM node for notification list. Stores the list of notification objects.
+ * Represents DOM node for notification list. Stores the collection of ZBX_Notification objects.
  */
 function ZBX_NotificationCollection() {
-	this.list = [];
+	ZBX_Notifications.DEBUG();
+
+	this._dangling_nodes = [];
+
+	this._list_sequence = [];
+	this._list_obj = {};
+
 	this.makeNodes();
-	this.onTimeout = function() {};
 
 	this.node.style.right = '0px';
 	this.node.style.top = '126px';
 }
 
 /**
- * Creates DOM nodes.
+ * @return {array}
+ */
+ZBX_NotificationCollection.prototype.getIds = function() {
+	ZBX_Notifications.DEBUG();
+
+	return this._list_sequence;
+};
+
+/**
+ * @param {callable} callback
+ */
+ZBX_NotificationCollection.prototype.map = function(callback) {
+	ZBX_Notifications.DEBUG(callback);
+
+	var len = this._list_sequence.length;
+
+	while (-- len > -1) {
+		var ret = callback(this.getById(this._list_sequence[len]), len);
+	}
+};
+
+/**
+ * @param {callable} callback
+ *
+ * @return {array}
+ */
+ZBX_NotificationCollection.prototype.filterList = function(callback) {
+	ZBX_Notifications.DEBUG();
+
+	var list = [],
+		len = this._list_sequence.length;
+
+	while (-- len > -1) {
+		var ret = callback(this.getById(this._list_sequence[len]));
+		(ret !== false) && list.push(ret);
+	}
+
+	return list;
+};
+
+/**
+ * @return {array} List of raw notification objects.
+ */
+ZBX_NotificationCollection.prototype.getRawList = function() {
+	ZBX_Notifications.DEBUG();
+
+	return this.filterList(function(notif) {
+		return notif.getRaw();
+	});
+};
+
+/**
+ * Merges current with new list. Updates changes for ZBX_Notification if possible, or creates new ZBX_Notification.
+ * Recoverable notification is just partial of raw with one mandatory field - `eventid`. New iterator sequence reflects
+ * the order of list given to this method. During merge, nodes that are not present in list will be removed.
+ *
+ * @param {array} list List of raw/recoverable notification objects.
+ */
+ZBX_NotificationCollection.prototype.consumeList = function(list) {
+	ZBX_Notifications.DEBUG(list);
+
+	var new_list_sequence = [];
+
+	while (raw = list.pop()) {
+		/*
+		 * Case if server responds with "recoved" notification type, that cannot be recovered by client.
+		 * This should never happen.
+		 */
+		if (!raw.body && !this._list_obj[raw.eventid]) {
+			continue;
+		}
+
+		if (this._list_obj[raw.eventid]) {
+			this._list_obj[raw.eventid].updateRaw(raw);
+		}
+		else {
+			this._list_obj[raw.eventid] = new ZBX_Notification(raw);
+		}
+
+		new_list_sequence.push(raw.eventid);
+	}
+
+	for (var id in this._list_obj) {
+		if (new_list_sequence.indexOf(id) === -1) {
+			this._dangling_nodes.push(this._list_obj[id].node);
+			delete this._list_obj[id];
+		}
+	}
+
+	this._list_sequence = new_list_sequence;
+};
+
+/**
+ * Creates detatched DOM nodes.
  */
 ZBX_NotificationCollection.prototype.makeNodes = function() {
+	ZBX_Notifications.DEBUG();
+
 	var header = document.createElement('div'),
 		controls = document.createElement('ul');
 
@@ -72,15 +172,17 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 };
 
 /**
- * Creates a button node with a method 'renderState(bool)'.
+ * Creates a button node with a method `renderState(bool)`.
  *
  * @param {object} attrs_inactive  Attribute key-value object to be mapped on renderState(true).
  * @param {object} attrs_active    Attribute key-value object to be mapped on renderState(false).
  */
 ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, attrs_active) {
+	ZBX_Notifications.DEBUG(attrs_inactive, attrs_active);
+
 	var button = document.createElement('button');
-	button.renderState = function(isActive) {
-		var attrs = isActive ? attrs_active : attrs_inactive,
+	button.renderState = function(is_active) {
+		var attrs = is_active ? attrs_active : attrs_inactive,
 			attr_name;
 
 		for (attr_name in attrs) {
@@ -92,90 +194,125 @@ ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, at
 };
 
 /**
+ * Iterator property will be updated and reference to DOM node kept to be gracefully removed at render. No reference
+ * to notification object would exists after this call - notification is removed and will not cycle back into LS.
+ *
+ * @param {string} id
+ */
+ZBX_NotificationCollection.prototype.removeById = function(id) {
+	ZBX_Notifications.DEBUG(id);
+
+	this._list_sequence.splice(this._list_sequence.indexOf(id), 1);
+
+	if (this._list_obj[id]) {
+		this._dangling_nodes.push(this._list_obj[id].node);
+		delete this._list_obj[id];
+	}
+};
+
+/**
+ * @param {string} id
+ *
+ * @return {ZBX_Notification}
+ */
+ZBX_NotificationCollection.prototype.getById = function(id) {
+	ZBX_Notifications.DEBUG(id);
+
+	return this._list_obj[id];
+};
+
+/**
  * Shows list of notifications.
+ *
+ * @return {Promise}
  */
 ZBX_NotificationCollection.prototype.show = function() {
-	this.node.style.opacity = 0;
-	this.node.style.display = 'inherit';
-	this.node.hidden = false;
+	ZBX_Notifications.DEBUG();
 
-	var op = 0;
-	var id = setInterval(function() {
-		op += 0.1;
-		if (op > 1 || this.hidden) {
-			return clearInterval(id);
-		}
-		this.style.opacity = op;
-	}.bind(this.node), 50);
+	return ZBX_Notifications.util.fadeIn(this.node);
 };
 
 /**
  * Hides list of notifications.
+ *
+ * @return {Promise}
  */
 ZBX_NotificationCollection.prototype.hide = function() {
-	this.node.style.opacity = 1;
+	ZBX_Notifications.DEBUG();
 
-	var op = 1,
-		id = setInterval(function() {
-			op -= 0.1;
-			if (op < 0 || !this.hidden) {
-				this.style.display = 'none';
-				this.hidden = true;
-
-				return clearInterval(id);
-			}
-			this.style.opacity = op;
-		}.bind(this.node), 50);
+	return ZBX_Notifications.util.fadeOut(this.node);
 };
 
 /**
- * Creates list node contents and replaces current list node children.
- *
- * @param {object} list_obj  Notifications list object in format it is stored in local storage.
- * @param {object} timeouts_obj
- * @param {object} severity_settings
+ * @return {integer}
  */
-ZBX_NotificationCollection.prototype.renderFromStorable = function(list_obj, timeouts_obj, severity_settings) {
-	var time_local = (+new Date / 1000),
-		frag = document.createDocumentFragment();
+ZBX_NotificationCollection.prototype.isEmpty = function() {
+	ZBX_Notifications.DEBUG();
 
-	this.list = [];
+	return !this._list_sequence.length;
+};
 
-	for (var eventid in list_obj) {
-		var timeout = timeouts_obj[list_obj[eventid].uid],
-			notif = list_obj[eventid],
-			severity_style = notif.resolved ? severity_settings.styles[-1] : severity_settings.styles[notif.severity],
-			title = (notif.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON) + ' ' + notif.title
+/**
+ * Animates slide-up-remove on dangling nodes one by one.
+ */
+ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
+	ZBX_Notifications.DEBUG();
 
-		var notif = new ZBX_Notification({
-			eventid: eventid,
-			uid: list_obj[eventid].uid,
-			title: title,
-			body: list_obj[eventid].body,
-			severity_style: severity_style
-		});
+	var duration = this._dangling_nodes.length > 4 ? 200 : 500;
+	var first = true;
 
-		notif.clock = list_obj[eventid].clock;
-		notif.onTimeout = this.onTimeout;
-		notif.setTimeout(timeout.recv_time - time_local + timeout.msg_timeout);
-		notif.renderSnoozed(list_obj[eventid].snoozed);
+	while (node = this._dangling_nodes.pop()) {
+		ZBX_Notifications.util.slideUp(node, first && 500 || duration, this._dangling_nodes.length * duration)
+			.then(function(node) {node.remove();});
+		first &= false;
+	}
+};
 
-		this.list.push(notif);
-	};
+/**
+ * Notification sequecnce is maintained in DOM, in server response notifications must be ordered.
+ * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
+ *
+ * @param {object} severity_styles
+ * @param {object} alarm_state
+ */
+ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
+	ZBX_Notifications.DEBUG(severity_styles, alarm_state);
 
-	this.list.sort(function(a, b) {
-		return a.clock > b.clock ? -1 : 1;
-	});
+	this.btn_snooze.renderState(alarm_state.snoozed);
+	this.btn_mute.renderState(alarm_state.muted);
 
-	this.list.forEach(function(notif) {
-		frag.appendChild(notif.node);
-	});
+	var list_node = this.list_node,
+		prev_notif_node = null;
 
-	this.list_node.innerHTML = '';
-
-	if (frag.childNodes.length) {
-		this.list_node.appendChild(frag);
+	if (this.isEmpty()) {
+		return this.hide().then(function() {
+			list_node.innerHTML = '';
+			this._dangling_nodes = [];
+		}.bind(this));
 	}
 
-	return this.list_node.children.length;
-};
+	var slide_down = list_node.children.length != 0;
+
+	this.map(function(notif, index) {
+		notif.render(severity_styles);
+
+		if (notif.isNodeConnected()) {
+			prev_notif_node = notif.node;
+			return;
+		}
+
+		if (prev_notif_node) {
+			prev_notif_node.insertAdjacentElement('afterend', notif.node);
+		}
+		else {
+			list_node.insertAdjacentElement('afterbegin', notif.node);
+		}
+
+		slide_down && ZBX_Notifications.util.slideDown(notif.node, 200);
+		prev_notif_node = notif.node;
+	});
+
+	this.removeDanglingNodes();
+
+	this.node.style.display === 'none' && this.show();
+}

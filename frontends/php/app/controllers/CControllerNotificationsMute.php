@@ -46,7 +46,7 @@ class CControllerNotificationsMute extends CController {
 
 		updateMessageSettings($msg_settings);
 
-		$data = json_encode(['mute' => $msg_settings['sounds.mute']]);
+		$data = json_encode(['mute' => (int) $msg_settings['sounds.mute']]);
 		$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 	}
 }

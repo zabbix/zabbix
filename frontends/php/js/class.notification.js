@@ -19,144 +19,136 @@
 
 
 /**
- * In milliseconds, slide animation duration upon notification element remove.
- */
-ZBX_Notification.ease = 500;
-
-/**
  * In case if user has set incredibly long notification timeout - he would end up never seeing them, because JS would
  * execute scheduled timeout immediately. So limit the upper bound.
  */
 ZBX_Notification.max_timeout = Math.pow(2, 30);
 
 /**
- * Upon instance creation an detached DOM node is created and closing time has been scheduled.
+ * Represents notification object.
  *
- * @param {object} options
+ * @param {object} raw  A server or LS format of this notification.
  */
-function ZBX_Notification(options) {
-	this.eventid   = options.eventid;
-	this.uid       = options.uid;
-	this.node      = this.makeNode(options);
-	this.timeoutid = 0;
-	this.onTimeout = function() {};
-	this.snoozed   = options.snoozed;
+function ZBX_Notification(raw) {
+	ZBX_Notifications.DEBUG(raw);
+
+	/*
+	 * These are pseudo that properties will cycle back into store, to be reused when rendering next time.
+	 * If `received_at` property has not been set it is first render. This property might be updated to a new client time
+	 * when it's raw state changes from unresolved into resolved.
+	 */
+	this._raw = {
+		snoozed: false,
+		received_at: raw.received_at || (+new Date / 1000)
+	};
+
+	this.updateRaw(raw);
+
+	this.node = this.makeNode();
 }
 
 /**
- * Removes previous timeout if it is scheduled, then schedules a timeout to close this message.
- *
- * @param {integer} seconds  Timeout in seconds for 'close' to be called.
- *
- * @return ZBX_Notification
+ * @return {string}
  */
-ZBX_Notification.prototype.setTimeout = function(seconds) {
-	clearTimeout(this.timeoutid);
+ZBX_Notification.prototype.getId = function() {
+	return this._raw.eventid;
+};
 
-	if (seconds <= 0) {
-		this.onTimeout(this);
+/**
+ * @return {object}
+ */
+ZBX_Notification.prototype.getRaw = function() {
+	return this._raw;
+};
 
-		return this;
+/**
+ * Merge another raw object into current. If resolution state changes into resolved during this merge, then
+ * raw object is assumed to be just received.
+ *
+ * @param {object} raw  An object in format that is used in store. All keys are optional.
+ */
+ZBX_Notification.prototype.updateRaw = function(raw) {
+	ZBX_Notifications.DEBUG(raw);
+
+	if (!this._raw.resolved && raw.resolved) {
+		this._raw.received_at = (+new Date / 1000);
 	}
 
-	var ms = seconds * 1000;
-
-	if (ms > ZBX_Notification.max_timeout) {
-		ms = ZBX_Notification.max_timeout;
+	for (var field_name in raw) {
+		this._raw[field_name] = raw[field_name];
 	}
-
-	this.timeoutid = setTimeout(function() {
-		this.onTimeout(this);
-	}.bind(this), ms);
 
 	return this;
 };
 
 /**
- * Renders message object.
+ * Notification body is not updated if server changed it's name, this is to be less confuzing.
  *
+ * @param {object} severity_styles  Object of class names keyed by severity id.
+ */
+ZBX_Notification.prototype.render = function(severity_styles) {
+	ZBX_Notifications.DEBUG(':render', this._raw);
+
+	var title_prefix = this._raw.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON;
+
+	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title)
+	this.node.indicator.className = 'notif-indic ' + severity_styles[this._raw.resolved ? -1 : this._raw.severity];
+	this.node.snooze_icon.style.opacity = this._raw.snoozed ? 1 : 0;
+};
+
+/**
+ * @return {float}  Zero or more milliseconds.
+ */
+ZBX_Notification.prototype.calcDisplayTimeout = function(user_settings) {
+	ZBX_Notifications.DEBUG(user_settings);
+
+	var time_local = (+new Date / 1000),
+		timeout = this._raw.resolved ? user_settings.msg_recovery_timeout : user_settings.msg_timeout,
+		ttl = (this._raw.received_at - time_local) + timeout;
+
+	return ttl < 0 ? 0 : ttl * 1000;
+};
+
+/**
  * @depends {BBCode}
- *
- * @param {object} obj
  *
  * @return {HTMLElement}  Detached DOM node.
  */
-ZBX_Notification.prototype.makeNode = function(obj) {
+ZBX_Notification.prototype.makeNode = function() {
+	ZBX_Notifications.DEBUG();
+
 	var node = document.createElement('li'),
 		indicator = document.createElement('div'),
 		title_node = document.createElement('h4');
 
-	indicator.className = 'notif-indic ' + obj.severity_style;
 	node.appendChild(indicator);
-
-	title_node.innerHTML = BBCode.Parse(obj.title);
 	node.appendChild(title_node);
 
-	obj.body.forEach(function(line) {
+	this._raw.body.forEach(function(line) {
 		var p = document.createElement('p');
 		p.innerHTML = BBCode.Parse(line);
-		node.appendChild(p)
+		node.appendChild(p);
 	});
 
+	node.indicator = indicator;
+	node.title_node = title_node;
 	node.snooze_icon = document.createElement('div');
 	node.snooze_icon.className = 'notif-indic-snooze';
 	node.snooze_icon.style.opacity = 0;
 
-	node.querySelector('.notif-indic').appendChild(node.snooze_icon)
+	node.indicator.appendChild(node.snooze_icon)
 
 	return node;
 };
 
-/**
- * @param {bool} bool  If true, mark notification as snoozed.
- */
-ZBX_Notification.prototype.renderSnoozed = function(bool) {
-	this.snoozed = bool;
-
-	if (bool) {
-		this.node.snooze_icon.style.opacity = 0.5;
-	}
-	else {
-		this.node.snooze_icon.style.opacity = 0;
-	}
-};
-
-/**
- * Remove notification from DOM.
+/*
+ * Since there is loaded prototype.js and it extends DOM's native 'remove' method, explicitly check
+ * if node is connected. Also, in case of IE11 there is no 'isConnected' getter.
  *
- * @param {number} ease  Amount for slide animation or disable.
- * @param {callable} cb  Closer to be called after remove.
+ * @return {bool}
  */
-ZBX_Notification.prototype.remove = function(ease, cb) {
-	var rate = 10;
+ZBX_Notification.prototype.isNodeConnected = function() {
+	ZBX_Notifications.DEBUG(!!(this.node.isConnected || this.node.parentNode));
 
-	ease *= rate;
-
-	if (ease > 0) {
-		this.node.style.overflow = 'hidden';
-
-		var t = ease / rate,
-			step = this.node.offsetHeight / t,
-			id = setInterval(function() {
-				if (t < rate) {
-					/*
-					 * Since there is loaded prototype.js and it extends DOM's native 'remove' method, explicitly check
-					 * if node is connected. Also, case of IE11 there is no 'isConnected' method.
-					 */
-					if (this.node.isConnected || this.node.parentNode) {
-						this.node.remove();
-						cb && cb();
-					}
-					clearInterval(id);
-				}
-				else {
-					t -= rate;
-					this.node.style.height = (step * t).toFixed() + 'px';
-				}
-			}.bind(this), rate);
-	}
-	else {
-		this.node.remove();
-		cb && cb();
-	}
+	return !!(this.node.isConnected || this.node.parentNode);
 };
