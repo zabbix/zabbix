@@ -107,6 +107,7 @@ typedef struct
 	int			history_num;
 	int			trends_num;
 	int			trends_last_cleanup_hour;
+	int			history_num_total;
 }
 ZBX_DC_CACHE;
 
@@ -3191,6 +3192,27 @@ static void	sync_history_cache_full(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+void	zbx_log_sync_history_cache_progress(void)
+{
+	int	history_num, history_num_total;
+
+	LOCK_CACHE;
+
+	if (0 == cache->history_num_total)
+		cache->history_num_total = cache->history_num;
+
+	history_num = cache->history_num;
+	history_num_total = cache->history_num_total;
+
+	UNLOCK_CACHE;
+
+	if (0 != history_num_total)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+				100 * (double)(history_num_total - history_num) / history_num_total);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sync_history_cache                                           *
@@ -4172,6 +4194,7 @@ static int	init_trend_cache(char **error)
 
 	cache->trends_num = 0;
 	cache->trends_last_cleanup_hour = 0;
+	cache->history_num_total = 0;
 
 #define INIT_HASHSET_SIZE	100	/* Should be calculated dynamically based on trends size? */
 					/* Still does not make sense to have it more than initial */

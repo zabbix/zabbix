@@ -88,6 +88,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			zbx_dc_clear_timer_queue();
 
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+
+		if (!ZBX_IS_RUNNING())
+			zbx_log_sync_history_cache_progress();
+
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
 		total_sec += zbx_time() - sec;
