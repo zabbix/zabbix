@@ -44,7 +44,9 @@ static const char	*source_ip6_option = NULL;
 /* starting with fping (4.x), the packets interval can be 0ms, otherwise minimum value is 10ms */
 #define 		FPING_UNINITIALIZED_INTERVAL	-1
 static int		packet_interval = FPING_UNINITIALIZED_INTERVAL;
+#ifdef HAVE_IPV6
 static int		packet_interval6 = FPING_UNINITIALIZED_INTERVAL;
+#endif
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -94,10 +96,14 @@ int	zbx_get_fping_interval_value()
 	if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
 		return packet_interval;
 
+#ifdef HAVE_IPV6
 	if (FPING_UNINITIALIZED_INTERVAL == packet_interval6)
-		return packet_interval6;
+		return packet_interval;				/* fping may be present without fping6 */
 
 	return packet_interval > packet_interval6 ? packet_interval : packet_interval6;
+#else
+	return packet_interval
+#endif
 }
 
 /******************************************************************************
