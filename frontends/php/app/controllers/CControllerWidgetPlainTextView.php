@@ -88,13 +88,9 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 
 				foreach ($histories as &$history) {
 					$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-
-					if ($fields['show_as_html']) {
-						$history['value'] = new CJsScript($history['value']);
-					}
-					else {
-						$history['value'] = new CPre($history['value']);
-					}
+					$history['value'] = $fields['show_as_html']
+						? new CJsScript($history['value'])
+						: new CPre($history['value']);
 				}
 				unset($history);
 			}
