@@ -102,7 +102,7 @@ int	zbx_get_fping_interval_value()
 
 	return packet_interval > packet_interval6 ? packet_interval : packet_interval6;
 #else
-	return packet_interval
+	return packet_interval;
 #endif
 }
 
@@ -202,6 +202,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (0 != timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
 
+#ifdef HAVE_IPV6
 	if (0 != (fping_existence & FPING_EXISTS))
 	{
 		if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
@@ -209,6 +210,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
 	}
+#else
+	if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
+		packet_interval = get_interval_option(CONFIG_FPING_LOCATION, "127.0.0.1");
+
+	zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
+#endif	/* HAVE_IPV6 */
+
 #ifdef HAVE_IPV6
 	strscpy(params6, params);
 
