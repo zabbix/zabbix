@@ -4926,10 +4926,12 @@ table.preprocessing-test-results .rel-container {
     padding: 0 10px; }
     .host-avail-widget tr td span {
       font-size: 16px; }
-  .host-avail-widget.host-avail-layout-horizontal tr td {
-    text-align: center; }
-    .host-avail-widget.host-avail-layout-horizontal tr td span {
-      display: block; }
+  .host-avail-widget.host-avail-layout-horizontal {
+    min-width: 305px; }
+    .host-avail-widget.host-avail-layout-horizontal tr td {
+      text-align: center; }
+      .host-avail-widget.host-avail-layout-horizontal tr td span {
+        display: block; }
   .host-avail-widget.host-avail-layout-vertical tr td span {
     margin-right: 5px; }
   .host-avail-widget .host-avail-col-true {

@@ -6834,11 +6834,15 @@ table.preprocessing-test-results {
 		}
 	}
 
-	&.host-avail-layout-horizontal tr td {
-		text-align: center;
+	&.host-avail-layout-horizontal {
+		min-width: 305px;
 
-		span {
-			display: block;
+		tr td {
+			text-align: center;
+
+			span {
+				display: block;
+			}
 		}
 	}
 	&.host-avail-layout-vertical tr td span {
