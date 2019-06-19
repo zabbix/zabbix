@@ -150,7 +150,8 @@ else {
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
 		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
 		'editable' => $data['dashboard']['editable'],
-		'edit_mode' => $data['dashboard_edit_mode']
+		'edit_mode' => $data['dashboard_edit_mode'],
+		'message-exhausted' => _('Free space exhausted. Resize existing widgets')
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];

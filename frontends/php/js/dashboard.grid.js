@@ -1321,6 +1321,12 @@
 			}
 			else {
 				pos = findEmptyPosition($obj, data, type);
+				if (!pos) {
+					$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
+						data.dialogue.body
+					).fadeOut(5000);
+					return;
+				}
 			}
 
 			$placeholder = $('<div>').css({
@@ -1419,10 +1425,14 @@
 
 		// Go y by row and try to position widget in each space.
 		var	max_col = data['options']['max-columns'] - pos['width'],
+			max_row = data['options']['max-rows'] - pos['height'],
 			found = false,
 			x, y;
 
 		for (y = 0; !found; y++) {
+			if (y > max_row) {
+				return false;
+			}
 			for (x = 0; x <= max_col && !found; x++) {
 				pos['x'] = x;
 				pos['y'] = y;
@@ -1997,6 +2007,7 @@
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
+				'message-exhausted': t('Free space exhausted. Resize existing widgets'),
 				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
@@ -2408,6 +2419,16 @@
 							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
+						var type = (data.dialogue['widget_type'] === undefined)
+								? 'actionlog'
+								: data.dialogue['widget_type'],
+							pos = findEmptyPosition($this, data, type);
+
+						if (!pos) {
+							$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
+								data.dialogue.body
+							).fadeOut(5000);
+						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
 				});
