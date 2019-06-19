@@ -3188,7 +3188,8 @@ static void	sync_history_cache_full(void)
 	zbx_binary_heap_destroy(&cache->history_queue);
 	cache->history_queue = tmp_history_queue;
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
+	if (0 != values_num)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
