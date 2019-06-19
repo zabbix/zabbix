@@ -22,54 +22,61 @@
 	"use strict"
 
 	function makeWidgetDiv($obj, data, widget) {
+
 		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head'}).append(
 			$('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
 			))
 			.append(
-				$('<ul>', {'class': 'dashbrd-grid-widget-actions'}).append(
-					$('<li>').append(
-						$('<button>', {
-							'type': 'button',
-							'class': 'btn-widget-edit',
-							'title': t('Edit')
-						}).on('click', function() {
-							if (!methods.isEditMode.call($obj)) {
-								showEditMode();
-							}
-							doAction('beforeConfigLoad', $obj, data, widget);
-							methods.editWidget.call($obj, widget, this);
-						})
-					))
-				.append(
-					$('<li>').append(
-						$('<button>', {
-							'type': 'button',
-							'class': 'btn-widget-action',
-							'title': t('Adjust widget refresh interval'),
-							'data-menu-popup': JSON.stringify({
-								'type': 'refresh',
-								'data': {
-									'widgetName': widget['widgetid'],
-									'currentRate': widget['rf_rate'],
-									'multiplier': '0'
+				$('<ul>', {'class': 'dashbrd-grid-widget-actions'})
+					.append(
+						data['options']['editable']
+							? $('<li>').append(
+								$('<button>', {
+									'type': 'button',
+									'class': 'btn-widget-edit',
+									'title': t('Edit')
+								}).on('click', function() {
+									if (!methods.isEditMode.call($obj)) {
+										showEditMode();
+									}
+									doAction('beforeConfigLoad', $obj, data, widget);
+									methods.editWidget.call($obj, widget, this);
+								}))
+							: ''
+						)
+					.append(
+						$('<li>').append(
+							$('<button>', {
+								'type': 'button',
+								'class': 'btn-widget-action',
+								'title': t('Adjust widget refresh interval'),
+								'data-menu-popup': JSON.stringify({
+									'type': 'refresh',
+									'data': {
+										'widgetName': widget['widgetid'],
+										'currentRate': widget['rf_rate'],
+										'multiplier': '0'
+									}
+								}),
+								'attr': {
+									'aria-haspopup': true
 								}
-							}),
-							'attr': {
-								'aria-haspopup': true
-							}
-						})
-					))
-				.append(
-					$('<li>').hide().append(
-						$('<button>', {
-							'type': 'button',
-							'class': 'btn-widget-delete',
-							'title': t('Delete')
-						}).on('click', function(){
-							methods.deleteWidget.call($obj, widget);
-						})
-					))
+							})
+						))
+					.append(
+						data['options']['editable']
+							? $('<li>').hide().append(
+								$('<button>', {
+									'type': 'button',
+									'class': 'btn-widget-delete',
+									'title': t('Delete')
+								}).on('click', function(){
+									methods.deleteWidget.call($obj, widget);
+								}))
+							: ''
+						)
+
 			);
 		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content'});
 		widget['content_script'] = $('<div>');
