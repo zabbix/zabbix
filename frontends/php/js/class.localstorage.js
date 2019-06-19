@@ -489,24 +489,19 @@ ZBX_LocalStorageKey.prototype.writePrimary = function(string) {
 	if (string.constructor != String || string[0] != '{') {
 		throw 'Corrupted input.';
 	}
-	this.backup_store.setItem(this.absolute_key, string);
+	this.primary_store.setItem(this.absolute_key, string);
 };
 
 ZBX_LocalStorageKey.prototype.writeBackup = function(string) {
 	if (string.constructor != String || string[0] != '{') {
 		throw 'Corrupted input.';
 	}
-	this.primary_store.setItem(this.absolute_key, string);
+	this.backup_store.setItem(this.absolute_key, string);
 };
 
 ZBX_LocalStorageKey.prototype.write = function(string) {
 	this.writeBackup(string);
 	this.writePrimary(string);
-};
-
-ZBX_LocalStorageKey.prototype.sync = function() {
-	// TODO obay settings per key
-	this.writePrimary(this.fetchBackup());
 };
 
 ZBX_LocalStorageKey.prototype.fetchPrimary = function() {
