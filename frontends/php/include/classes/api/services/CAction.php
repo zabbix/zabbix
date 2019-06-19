@@ -952,8 +952,7 @@ class CAction extends CApiService {
 
 		if ($actions_update_data) {
 			DB::update('actions', $actions_update_data);
-			$audit_actions = CArrayHelper::renameObjectsKeys($actions, ['recovery_operations' => 'recoveryOperations', 'acknowledge_operations' => 'acknowledgeOperations']);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $audit_actions, $db_actions);
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
 		}
 
 		// add, update and delete operations
