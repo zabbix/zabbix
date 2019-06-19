@@ -18,6 +18,7 @@ Bug fixes:
 Changes for 4.2.4rc2
 
 Bug fixes:
+...G...PS. [ZBX-15827] fixed Windows agent build (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.4rc1
