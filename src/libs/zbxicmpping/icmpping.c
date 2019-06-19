@@ -78,6 +78,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 
 	*checked = 1;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_fping_interval_value                                     *
@@ -429,7 +430,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NOTSUPPORTED == ret)
 		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
