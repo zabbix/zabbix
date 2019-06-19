@@ -425,7 +425,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	{
 		if (0 < CONFIG_PINGER_FORKS && 0 < zbx_get_fping_interval_value())
 		{
-			*max_pinger_items = config->queues[ZBX_POLLER_TYPE_PINGER]->elems_num / CONFIG_PINGER_FORKS;
+			*max_pinger_items = DCconfig_get_poller_queue(ZBX_POLLER_TYPE_PINGER)->elems_num /
+					CONFIG_PINGER_FORKS;
 
 			if (MAX_PINGER_ITEMS < *max_pinger_items)
 				*max_pinger_items = MAX_PINGER_ITEMS;
@@ -436,7 +437,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			*max_pinger_items = MAX_PINGER_ITEMS;
 	}
 
-	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, max_pinger_items, items);
+	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, *max_pinger_items, items);
 
 	for (i = 0; i < num; i++)
 	{

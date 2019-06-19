@@ -7639,7 +7639,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int max_items_count, DC
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d max_items_count:d", __function_name, (int)poller_type,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d max_items_count:%d", __function_name, (int)poller_type,
 			max_items_count);
 
 	now = time(NULL);
@@ -11810,6 +11810,11 @@ void	zbx_dc_cleanup_data_sessions(void)
 	}
 
 	UNLOCK_CACHE;
+}
+
+zbx_binary_heap_t	*DCconfig_get_poller_queue(unsigned char poller_type)
+{
+	return &config->queues[poller_type];
 }
 
 #ifdef HAVE_TESTS

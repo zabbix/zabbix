@@ -44,6 +44,7 @@ static const char	*source_ip6_option = NULL;
 /* starting with fping (4.x), the packets interval can be 0ms, otherwise minimum value is 10ms */
 #define 		FPING_UNINITIALIZED_INTERVAL	-1
 static int		packet_interval = FPING_UNINITIALIZED_INTERVAL;
+static int		packet_interval6 = FPING_UNINITIALIZED_INTERVAL;
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -79,9 +80,9 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 }
 /******************************************************************************
  *                                                                            *
- * Function: get_fping_interval_value                                         *
+ * Function: zbx_get_fping_interval_value                                     *
  *                                                                            *
- * Purpose: return value of fping packet interval                             *
+ * Purpose: return largest value of fping packet interval                     *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -89,7 +90,13 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  ******************************************************************************/
 int	zbx_get_fping_interval_value()
 {
-	return packet_interval;
+	if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
+		return packet_interval;
+
+	if (FPING_UNINITIALIZED_INTERVAL == packet_interval6)
+		return packet_interval6;
+
+	return packet_interval > packet_interval6 ? packet_interval : packet_interval6;
 }
 
 /******************************************************************************
@@ -200,10 +207,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (0 != (fping_existence & FPING6_EXISTS))
 	{
-		if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
-			packet_interval = get_interval_option(CONFIG_FPING6_LOCATION, "::1");
+		if (FPING_UNINITIALIZED_INTERVAL == packet_interval6)
+			packet_interval6 = get_interval_option(CONFIG_FPING6_LOCATION, "::1");
 
-		zbx_snprintf(params6 + offset, sizeof(params6) - offset, " -i%d", packet_interval);
+		zbx_snprintf(params6 + offset, sizeof(params6) - offset, " -i%d", packet_interval6);
 	}
 #endif	/* HAVE_IPV6 */
 
