@@ -3171,7 +3171,8 @@ static void	sync_history_cache_full(void)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
+	if (0 != hc_queue_get_size())
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
 	while (0 != hc_queue_get_size())
 	{
