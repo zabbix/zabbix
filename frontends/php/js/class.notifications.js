@@ -634,7 +634,7 @@ ZBX_Notifications.prototype.dropStore = function() {
  */
 ZBX_Notifications.prototype.handlePushedUserSettings = function(user_settings) {
 	this.consumeUserSettings(user_settings);
-	this.consumeList(this.list);
+	this.consumeList(this.collection.getRawList());
 	this.render();
 };
 
@@ -728,8 +728,11 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
 	this.alarm_state.snoozed = true;
 	this.consumeAlarmState(this.alarm_state);
 
-	this.list.forEach(function(raw) {raw.snoozed = true;});
-	this.consumeList(this.list);
+	this.collection.map(function(notif) {
+		notif.updateRaw({snoozed: true});
+	});
+
+	this.consumeList(this.collection.getRawList());
 
 	this.pushUpdates();
 	this.render();

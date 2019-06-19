@@ -169,7 +169,6 @@ ZBX_LocalStorage.prototype.onKeyUpdate = function(key, callback) {
 	this.rel_keys[key].subscribe(callback);
 };
 
-
 /**
  * Transform key into absolute key.
  *
