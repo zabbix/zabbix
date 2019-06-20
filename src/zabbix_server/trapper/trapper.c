@@ -111,6 +111,14 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
+	if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "shutdown in progress");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process agent history data data from active proxy at"
+					" \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
+
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
@@ -135,6 +143,14 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 
 	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+
+	if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "shutdown in progress");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process agent history data data from active proxy at"
+					" \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
