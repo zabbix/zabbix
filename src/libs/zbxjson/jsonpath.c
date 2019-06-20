@@ -31,9 +31,9 @@
 ZBX_VECTOR_DECL(var, zbx_variant_t)
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
-static int	jsonpath_query_object(struct zbx_json_parse *jp_root, struct zbx_json_parse *jp,
+static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects);
-static int	jsonpath_query_array(struct zbx_json_parse *jp_root, struct zbx_json_parse *jp,
+static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects);
 
 typedef struct
@@ -1288,7 +1288,7 @@ static int	jsonpath_pointer_to_jp(const char *pnext, struct zbx_json_parse *jp)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_query_contents(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_query_contents(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects)
 {
 	struct zbx_json_parse	jp_child;
@@ -1326,7 +1326,7 @@ static int	jsonpath_query_contents(struct zbx_json_parse *jp_root, const char *p
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_query_next_segment(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects)
 {
 	/* check if jsonpath end has been reached, so we have found matching data */
@@ -1361,7 +1361,7 @@ static int	jsonpath_query_next_segment(struct zbx_json_parse *jp_root, const cha
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_name(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, const char *name, zbx_vector_str_t *objects)
 {
 	zbx_jsonpath_segment_t		*segment;
@@ -1401,7 +1401,7 @@ static int	jsonpath_match_name(struct zbx_json_parse *jp_root, const char *pnext
  *                         extract                                            *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_extract_value(struct zbx_json_parse *jp, const char *path, zbx_variant_t *value)
+static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const char *path, zbx_variant_t *value)
 {
 	struct zbx_json_parse	jp_child;
 	char			*data = NULL, *tmp_path = NULL;
@@ -1599,7 +1599,7 @@ static void	jsonpath_variant_to_boolean(zbx_variant_t *value)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_expression(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects)
 {
 	struct zbx_json_parse	jp;
@@ -1815,7 +1815,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_query_object(struct zbx_json_parse *jp_root, struct zbx_json_parse *jp,
+static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects)
 {
 	const char		*pnext = NULL;
@@ -1868,7 +1868,7 @@ static int	jsonpath_query_object(struct zbx_json_parse *jp_root, struct zbx_json
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_index(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_str_t *objects)
 {
 	int				query_index;
@@ -1915,7 +1915,7 @@ static int	jsonpath_match_index(struct zbx_json_parse *jp_root, const char *pnex
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_range(struct zbx_json_parse *jp_root, const char *pnext,
+static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_str_t *objects)
 {
 	int			start_index, end_index;
@@ -1957,7 +1957,7 @@ static int	jsonpath_match_range(struct zbx_json_parse *jp_root, const char *pnex
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_query_array(struct zbx_json_parse *jp_root, struct zbx_json_parse *jp,
+static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
 		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_str_t *objects)
 {
 	const char		*pnext = NULL;
@@ -2409,7 +2409,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_jsonpath_query(struct zbx_json_parse *jp, const char *path, char **output)
+int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output)
 {
 	zbx_jsonpath_t		jsonpath;
 	int			path_depth = 0, ret = SUCCEED;

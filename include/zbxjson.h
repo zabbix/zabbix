@@ -217,12 +217,12 @@ typedef struct
 	int			segments_alloc;
 
 	/* set to 1 when jsonpath points at single location */
-	int			definite;
+	unsigned char		definite;
 }
 zbx_jsonpath_t;
 
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath);
-int	zbx_jsonpath_query(struct zbx_json_parse *jp, const char *path, char **output);
+int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output);
 
 #endif /* ZABBIX_ZJSON_H */
