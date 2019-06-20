@@ -47,13 +47,15 @@ typedef enum
 	ZBX_JSONPATH_FUNCTION_MAX,
 	ZBX_JSONPATH_FUNCTION_AVG,
 	ZBX_JSONPATH_FUNCTION_LENGTH,
-	ZBX_JSONPATH_FUNCTION_FIRST,
+	ZBX_JSONPATH_FUNCTION_FIRST
 }
 zbx_jsonpath_function_type_t;
 
 typedef struct zbx_jsonpath_list_item
 {
 	struct zbx_jsonpath_list_item	*next;
+	/* the structure is always over-allocated so that either int */
+	/* or a zero terminated string can be stored in data         */
 	char				data[1];
 }
 zbx_jsonpath_list_node_t;
