@@ -1448,10 +1448,11 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 	int			i;
 	char			*str = NULL;
 	size_t			str_alloc = 0, str_offset = 0;
-	zbx_jsonpath_token_t	*token;
 
 	for (i = 0; i < expression->tokens.values_num; i++)
 	{
+		zbx_jsonpath_token_t	*token = (zbx_jsonpath_token_t *)expression->tokens.values[i];
+
 		if (0 != i)
 			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, ",");
 
