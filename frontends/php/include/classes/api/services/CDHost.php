@@ -168,12 +168,12 @@ class CDHost extends CApiService {
 			$result = $this->unsetExtraFields($result, ['druleid'], $options['output']);
 		}
 
-// removing keys (hash -> array)
+		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
-	return $result;
+		return $result;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -234,10 +234,9 @@ class CDHost extends CApiService {
 				]);
 				$dservices = zbx_toHash($dservices, 'dhostid');
 				foreach ($result as $dhostid => $dhost) {
-					if (isset($dservices[$dhostid]))
-						$result[$dhostid]['dservices'] = $dservices[$dhostid]['rowscount'];
-					else
-						$result[$dhostid]['dservices'] = 0;
+					$result[$dhostid]['dservices'] = array_key_exists($dhostid, $dservices)
+						? $dservices[$dhostid]['rowscount']
+						: '0';
 				}
 			}
 		}

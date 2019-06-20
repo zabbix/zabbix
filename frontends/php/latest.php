@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
@@ -331,7 +330,8 @@ if (in_array($page['web_layout_mode'], [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'groupids_',
-								'real_hosts' => true
+								'real_hosts' => true,
+								'enrich_parent_groups' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

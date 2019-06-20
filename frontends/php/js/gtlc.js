@@ -22,7 +22,7 @@
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
@@ -123,20 +123,16 @@ jQuery(function ($){
 			element.label.text(data.label);
 		}
 
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', false);
 
 		$.each({
 			decrement: data.can_decrement,
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			if (state === true) {
-				element[elm].removeAttr('disabled');
+			if (typeof state !== 'undefined') {
+				element[elm].prop('disabled', !state);
 			}
-			else if (state === false) {
-				element[elm].attr('disabled', true);
-			}
-
 			element[elm].removeClass('disabled');
 		});
 
@@ -156,7 +152,7 @@ jQuery(function ($){
 		}
 
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 
 		ui_disabled = true;
@@ -295,18 +291,22 @@ jQuery(function ($){
 		was_dragged = false,
 		prevent_click = false;
 
-	$(document).on('mousedown', 'img', selectionHandlerDragStart)
+	$(document)
+		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(e) {
-			$.publish('timeselector.zoomout', {
-				from: element.from.val(),
-				to: element.to.val()
-			});
+			if (typeof $(e.target).data('zbx_sbox') !== 'undefined') {
+				$.publish('timeselector.zoomout', {
+					from: element.from.val(),
+					to: element.to.val()
+				});
 
-			return cancelEvent(e);
+				return cancelEvent(e);
+			}
 		})
 		.on('click', 'a', function(e) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click && $(this).hasClass('dashbrd-widget-graph-link')) {
+			if ($(e.target).is('img') && typeof $(e.target).data('zbx_sbox') !== 'undefined' && prevent_click
+					&& $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});

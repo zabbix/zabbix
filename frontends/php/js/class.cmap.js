@@ -198,13 +198,21 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			// create container for forms
-			this.formContainer = $('<div></div>', {
+			this.formContainer = $('<div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
-					style: 'display:none; top: 50px; left: 500px'})
+					style: 'display: none; top: 0; left: 0;'
+				})
 				.appendTo('body')
 				.draggable({
-					containment: [0, 0, 3200, 3200]
+					containment: [0, 0, 3200, 3200],
+					start: function(){
+						$(this).data("scroll", {top: window.pageYOffset, left: window.pageXOffset});
+					},
+					drag: function(event, ui){
+						ui.position.top -= parseInt($(this).data("scroll").top);
+						ui.position.left -= parseInt($(this).data("scroll").left);
+					}
 				});
 
 			this.updateImage();
@@ -218,7 +226,7 @@ ZABBIX.apps.map = (function($) {
 			// initialize selectable
 			this.container.selectable({
 				start: $.proxy(function(event) {
-					this.hideContextMenus();
+					this.hideMenuPopups();
 
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
@@ -258,7 +266,7 @@ ZABBIX.apps.map = (function($) {
 			expand_sources: [],
 
 			save: function() {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				$.ajax({
 					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
@@ -293,7 +301,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			expandMacros: function(source) {
-				var url = new Curl(location.href);
+				var url = new Curl();
 
 				if (source !== null) {
 					if (/\{.+\}/.test(source.getLabel(false))) {
@@ -641,7 +649,7 @@ ZABBIX.apps.map = (function($) {
 
 					// Recreate menu everytime due copy/paste function availability changes.
 					if (item_data.popupid) {
-						$('#' + item_data.popupid).filter('.action-menu').remove();
+						$('#' + item_data.popupid).filter('.menu-popup').remove();
 					}
 
 					var items = [
@@ -652,7 +660,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'last');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -660,7 +668,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'next');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -668,7 +676,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'previous');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -676,7 +684,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'first');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								}
 							]
@@ -688,7 +696,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_copy,
 									clickCallback: function() {
 										that.copypaste_buffer = that.getSelectionBuffer(that);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -708,7 +716,7 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
 										that.selectElements(selectedids, false);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -730,7 +738,7 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
 										that.selectElements(selectedids, false);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -751,7 +759,7 @@ ZABBIX.apps.map = (function($) {
 
 										}
 
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.toggleForm();
 										that.updateImage();
 									}
@@ -1457,8 +1465,8 @@ ZABBIX.apps.map = (function($) {
 				this.updateImage();
 			},
 
-			hideContextMenus: function () {
-				$('.action-menu').each(function() {
+			hideMenuPopups: function () {
+				$('.menu-popup').each(function() {
 					$(this).data('is-active', false).fadeOut(0);
 				});
 			},
@@ -1755,7 +1763,7 @@ ZABBIX.apps.map = (function($) {
 						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_shape')
+				.addClass('cursor-pointer sysmap_shape')
 				.attr('data-id', this.id)
 				.attr('data-type', 'shapes');
 
@@ -1949,12 +1957,18 @@ ZABBIX.apps.map = (function($) {
 								return this.sysmap.dragGroupPlaceholder();
 							}, this),
 							start: $.proxy(function() {
+								this.domNode
+									.addClass(IE ? 'cursor-move' : 'cursor-dragging')
+									.removeClass('cursor-pointer');
 								this.sysmap.dragGroupInit(this);
 							}, this),
 							drag: $.proxy(function(event, data) {
 								this.sysmap.dragGroupDrag(data, this);
 							}, this),
 							stop: $.proxy(function() {
+								this.domNode
+									.addClass('cursor-pointer')
+									.removeClass(IE ? 'cursor-move' : 'cursor-dragging');
 								this.sysmap.dragGroupStop(this);
 							}, this)
 						});
@@ -2251,7 +2265,7 @@ ZABBIX.apps.map = (function($) {
 			// create dom
 			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_element')
+				.addClass('cursor-pointer sysmap_element')
 				.attr('data-id', this.id)
 				.attr('data-type', 'selements');
 
@@ -2785,6 +2799,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#formDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3091,7 +3107,8 @@ ZABBIX.apps.map = (function($) {
 					disabled: (triggerContainer.find('tr.sortable').length < 2),
 					items: 'tbody tr.sortable',
 					axis: 'y',
-					cursor: 'move',
+					containment: 'parent',
+					cursor: IE ? 'move' : 'grabbing',
 					handle: 'div.drag-icon',
 					tolerance: 'pointer',
 					opacity: 0.6,
@@ -3223,6 +3240,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.updateList();
 			},
 
@@ -3354,6 +3373,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#shapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3482,6 +3503,8 @@ ZABBIX.apps.map = (function($) {
 				this.formContainer.draggable('option', 'handle', '#massShapeDragHandler');
 				this.formContainer.show();
 				this.domNode.show();
+				// Element must first be visible so that outerWidth() and outerHeight() are correct.
+				this.formContainer.positionOverlayDialogue();
 				this.active = true;
 			},
 
@@ -3543,7 +3566,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			show: function() {
 				this.domNode.show();
-				$('.element-edit-control').attr('disabled', true);
+				$('.element-edit-control').prop('disabled', true);
 			},
 
 			/**
@@ -3551,7 +3574,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			hide: function() {
 				$('#linkForm').hide();
-				$('.element-edit-control').attr('disabled', false);
+				$('.element-edit-control').prop('disabled', false);
 			},
 
 			/**
@@ -3931,3 +3954,31 @@ ZABBIX.apps.map = (function($) {
 		}
 	};
 }(jQuery));
+
+jQuery(function ($) {
+	/*
+	 * Reposition the overlay dialogue window. The previous position is remembered using offset(). Each time overlay
+	 * dialogue is opened, it could have different content (shape form, element form etc) and different size, so the
+	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
+	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
+	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
+	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * or too wide.
+	 */
+	$.fn.positionOverlayDialogue = function () {
+		var $map = $('#map-area'),
+			map_margin = 10,
+			obj_pos = this.offset(),
+			obj_size = {width: this.outerWidth(), height: this.outerHeight()},
+			scroll_pos = {left: $(window).scrollLeft(), top: $(window).scrollTop()};
+
+		if (obj_pos.left == 0 && obj_pos.top == 0) {
+			obj_pos = {left: $map.offset().left + $map.width(), top: $map.offset().top - map_margin};
+		}
+
+		return this.css({
+			left: Math.max(0, Math.min(obj_pos.left, $(window).width() - obj_size.width)) + scroll_pos.left,
+			top: Math.max(scroll_pos.top, Math.min(obj_pos.top, $(window).height() - obj_size.height + scroll_pos.top))
+		});
+	};
+});

@@ -1,6 +1,7 @@
 SUBDIRS = \
 	. \
-	libs
+	libs \
+	zabbix_server
 
 noinst_LIBRARIES = \
 	libzbxmocktest.a \
@@ -16,7 +17,6 @@ libzbxmockdata_a_SOURCES = \
 	zbxmockdir.c \
 	zbxmockexit.c \
 	zbxmockfile.c \
-	zbxmockstat.c \
 	zbxmockdata.c \
 	zbxmockdata.h \
 	zbxmockassert.c \
@@ -26,5 +26,4 @@ libzbxmockdata_a_SOURCES = \
 	zbxmocktime.c \
 	zbxmockhelper.c \
 	zbxmockhelper.h \
-	zbxmockcomm.c \
 	zbxmocklog.c

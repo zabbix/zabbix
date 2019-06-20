@@ -312,7 +312,8 @@
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
-			cursor: 'move',
+			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -353,7 +354,7 @@
 
 	jQuery(function($) {
 		$('#tabs').on('tabsactivate', function(event, ui) {
-			if (ui.newPanel.selector === '#previewTab') {
+			if (ui.newPanel.attr('id') === 'previewTab') {
 				var preview_chart = $('#previewChart'),
 					name = 'chart3.php',
 					src = '&name=' + encodeURIComponent($('#name').val()) +
@@ -400,7 +401,7 @@
 
 				preview_chart.attr('class', 'preloader');
 
-				$('<img />').attr('src', name + '?period=3600' + src).load(function() {
+				$('<img />').attr('src', name + '?period=3600' + src).on('load', function() {
 					preview_chart
 						.removeAttr('class')
 						.append($(this));

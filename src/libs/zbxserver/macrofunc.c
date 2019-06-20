@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxregexp.h"
+#include "macrofunc.h"
 
 /******************************************************************************
  *                                                                            *

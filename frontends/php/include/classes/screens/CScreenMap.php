@@ -46,11 +46,9 @@ class CScreenMap extends CScreenBase {
 		}
 
 		$div = (new CDiv($output))
-			->addClass('map-container')
 			->addClass('flickerfreescreen')
 			->setId($this->getScreenId())
-			->setAttribute('data-timestamp', $this->timestamp)
-			->addStyle('position: relative;');
+			->setAttribute('data-timestamp', $this->timestamp);
 
 		// Add map to additional wrapper to enable horizontal scrolling.
 		$div = (new CDiv($div))->addClass('sysmap-scroll-container');

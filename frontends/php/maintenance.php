@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/maintenances.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -212,6 +211,14 @@ elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') ==
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 		uncheckTableRows();
+	}
+	else {
+		$maintenances = API::Maintenance()->get([
+			'maintenanceids' => getRequest('maintenanceids'),
+			'output' => [],
+			'editable' => true
+		]);
+		uncheckTableRows(null, zbx_objectValues($maintenances, 'maintenanceid'));
 	}
 
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));

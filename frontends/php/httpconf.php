@@ -52,10 +52,18 @@ $fields = [
 	'pairs'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    null],
 	'steps'           => [T_ZBX_STR, O_OPT, P_NO_TRIM,  null,                    'isset({add}) || isset({update})', _('Steps')],
 	'authentication'  => [T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({add}) || isset({update})'],
-	'http_user'       => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               '(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('User')],
-	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication} == '.HTTPTEST_AUTH_BASIC.
-		' || {authentication} == '.HTTPTEST_AUTH_NTLM.')', _('Password')],
+	'http_user'       => [T_ZBX_STR, O_OPT, null,  null,
+		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+		')',
+		_('User')
+	],
+	'http_password'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,
+		'(isset({add}) || isset({update})) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			' || {authentication}=='.HTTPTEST_AUTH_NTLM.
+		')',
+		_('Password')
+	],
 	'http_proxy'		=> [T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
 	'new_application'	=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'hostname'			=> [T_ZBX_STR, O_OPT, null,	null,				null],
@@ -101,28 +109,18 @@ if (!empty($_REQUEST['steps'])) {
  * Permissions
  */
 //*
-if (isset($_REQUEST['httptestid']) || !empty($_REQUEST['group_httptestid'])) {
-	$testIds = [];
-	if (isset($_REQUEST['httptestid'])) {
-		$testIds[] = $_REQUEST['httptestid'];
-	}
-	if (!empty($_REQUEST['group_httptestid'])) {
-		$testIds = array_merge($testIds, $_REQUEST['group_httptestid']);
-	}
-	if ($testIds) {
-		$testIds = array_unique($testIds);
+if (hasRequest('httptestid')) {
+	$httptests = API::HttpTest()->get([
+		'output' => [],
+		'httptestids' => getRequest('httptestid'),
+		'editable' => true
+	]);
 
-		$count = API::HttpTest()->get([
-			'countOutput' => true,
-			'httptestids' => $testIds,
-			'editable' => true
-		]);
-
-		if ($count != count($testIds)) {
-			access_deny();
-		}
+	if (!$httptests) {
+		access_deny();
 	}
 }
+
 if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
 	access_deny();
 }
@@ -364,6 +362,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			foreach ($httpTest['steps'] as $snum => $step) {
+				if ($step['httpstepid'] < 1) {
+					unset($step['httpstepid']);
+					unset($httpTest['steps'][$snum]['httpstepid']);
+				}
 				if (array_key_exists('httpstepid', $step) && array_key_exists($step['httpstepid'], $dbHttpSteps)) {
 					$db_step = $dbHttpSteps[$step['httpstepid']];
 					$new_step = CArrayHelper::unsetEqualValues($step, $db_step, ['httpstepid']);
@@ -392,8 +394,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			$httpTest['httptestid'] = $httpTestId = $_REQUEST['httptestid'];
+
 			$result = API::HttpTest()->update($httpTest);
 			if (!$result) {
+
 				throw new Exception();
 			}
 			else {
@@ -422,6 +426,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	catch (Exception $e) {
 		DBend(false);
+
 
 		$msg = $e->getMessage();
 		if (!empty($msg)) {
@@ -514,6 +519,16 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		uncheckTableRows(getRequest('hostid'));
 	}
 	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
+}
+
+if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {
+	$httptests = API::HttpTest()->get([
+		'output' => [],
+		'httptestids' => getRequest('group_httptestid'),
+		'editable' => true
+	]);
+
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($httptests, 'httptestid'));
 }
 
 show_messages();
@@ -694,6 +709,22 @@ if (isset($_REQUEST['form'])) {
 		);
 		while ($dbApp = DBfetch($dbApps)) {
 			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
+		}
+	}
+
+	foreach($data['steps'] as $stepid => $step) {
+		$pairs_grouped = [
+			'query_fields' => [],
+			'post_fields' => [],
+			'variables' => [],
+			'headers' => [],
+		];
+
+		if (array_key_exists('pairs', $step)) {
+			foreach ($step['pairs'] as $field) {
+				$pairs_grouped[$field['type']][] = $field;
+			}
+			$data['steps'][$stepid]['pairs'] = $pairs_grouped;
 		}
 	}
 

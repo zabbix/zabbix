@@ -150,6 +150,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -159,6 +160,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -190,6 +192,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(proxy->tls_psk_identity) != attr.psk_identity_len ||
@@ -199,6 +202,7 @@ int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock,
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
@@ -233,6 +237,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
@@ -242,6 +247,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
 	{
 		*error = zbx_strdup(*error, "internal error: invalid connection type");
@@ -273,6 +279,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
 		if (strlen(host->tls_psk_identity) != attr.psk_identity_len ||
@@ -282,6 +289,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
 			return FAIL;
 		}
 	}
+#endif
 #endif
 	return SUCCEED;
 }
@@ -909,7 +917,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 {
 	const char		*__function_name = "process_proxyconfig_table";
 
-	int			f, fields_count, insert, is_null, i, ret = FAIL, id_field_nr = 0, move_out = 0,
+	int			f, fields_count, insert, i, ret = FAIL, id_field_nr = 0, move_out = 0,
 				move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -1137,8 +1145,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			if (1 == move_out)
 			{
-				int	last_n = 0;
-				size_t	last_pos = 0;
+				int		last_n = 0;
+				size_t		last_pos = 0;
+				zbx_json_type_t	type;
 
 				/* locate a copy of this record as found in database */
 				id_offset.id = recid;
@@ -1150,7 +1159,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 				/* find the field requiring special preprocessing in JSON record */
 				f = 1;
-				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null)))
+				while (NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type)))
 				{
 					/* parse values for the entry (lines 10-12 in T1) */
 
@@ -1167,7 +1176,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				}
 
 				if (0 != compare_nth_field(fields, recs + p_id_offset->offset, move_field_nr, buf,
-						is_null, &last_n, &last_pos))
+						(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos))
 				{
 					zbx_vector_uint64_append(&moves, recid);
 				}
@@ -1257,11 +1266,17 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-		int	rec_differ = 0;	/* how many fields differ */
-		int	last_n = 0;
-		size_t	tmp_offset = sql_offset, last_pos = 0;
+		int		rec_differ = 0;	/* how many fields differ */
+		int		last_n = 0;
+		size_t		tmp_offset = sql_offset, last_pos = 0;
+		zbx_json_type_t	type;
 
-		zbx_json_brackets_open(p, &jp_row);
+		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+		{
+			*error = zbx_dsprintf(*error, "invalid data format: %s", zbx_json_strerror());
+			goto clean;
+		}
+
 		pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL);
 
 		/* check whether we need to insert a new entry or update an existing one */
@@ -1280,7 +1295,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			zbx_vector_ptr_append(&values, value);
 
 			/* add the rest of fields */
-			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type));
 					f++)
 			{
 				if (f == fields_count)
@@ -1290,7 +1305,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
+				if (ZBX_JSON_TYPE_NULL == type && 0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
@@ -1308,7 +1323,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						ZBX_STR2UINT64(value->ui64, buf);
 						break;
 					case ZBX_TYPE_ID:
-						if (0 == is_null)
+						if (ZBX_JSON_TYPE_NULL != type)
 							ZBX_STR2UINT64(value->ui64, buf);
 						else
 							value->ui64 = 0;
@@ -1374,7 +1389,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
 
-			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &is_null));
+			for (f = 1; NULL != (pf = zbx_json_next_value_dyn(&jp_row, pf, &buf, &buf_alloc, &type));
 					f++)
 			{
 				int	field_differ = 1;
@@ -1388,7 +1403,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				if (0 != is_null && 0 != (fields[f]->flags & ZBX_NOTNULL))
+				if (ZBX_JSON_TYPE_NULL == type && 0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
 					*error = zbx_dsprintf(*error, "column \"%s.%s\" cannot be null",
 							table->table, fields[f]->name);
@@ -1403,7 +1418,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				}
 
 				if (0 == (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
-						is_null, &last_n, &last_pos)))
+						(ZBX_JSON_TYPE_NULL == type), &last_n, &last_pos)))
 				{
 					continue;
 				}
@@ -1420,7 +1435,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
 				rec_differ++;
 
-				if (0 != is_null)
+				if (ZBX_JSON_TYPE_NULL == type)
 				{
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
 					continue;
@@ -1454,15 +1469,15 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
 						table->recid, recid);
+
+				if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+					goto clean;
 			}
 			else
 			{
 				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
 				*(sql + sql_offset) = '\0';
 			}
-
-			if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
-				goto clean;
 		}
 	}
 
@@ -2543,7 +2558,7 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	zbx_timespec_t	client_timediff;
 	int		sec, ns;
 
-	if (SUCCEED != zabbix_check_log_level(level))
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
@@ -4014,4 +4029,74 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 		DBexecute("update hosts set auto_compress=%d where hostid=" ZBX_FS_UI64, diff.compress, diff.hostid);
 
 	zbx_db_flush_proxy_lastaccess();
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_update_proxy_lasterror                                       *
+ *                                                                            *
+ * Purpose: flushes last_version_error_time changes runtime                   *
+ *          variable for proxies structures                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_update_proxy_lasterror(DC_PROXY *proxy)
+{
+	zbx_proxy_diff_t	diff;
+
+	diff.hostid = proxy->hostid;
+	diff.flags = ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR;
+	diff.lastaccess = time(NULL);
+	diff.last_version_error_time = proxy->last_version_error_time;
+
+	zbx_dc_update_proxy(&diff);
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_check_protocol_version                                       *
+ *                                                                            *
+ * Purpose: check server and proxy versions and compatibility rules           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     proxy        - [IN] the source proxy                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - no compatibility issue                                       *
+ *     FAIL    - compatibility check fault                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_check_protocol_version(DC_PROXY *proxy)
+{
+	int	server_version;
+	int	ret = SUCCEED;
+	int	now;
+	int	print_log = 0;
+
+	/* warn if another proxy version is used and proceed with compatibility rules*/
+	if ((server_version = ZBX_COMPONENT_VERSION(ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR)) != proxy->version)
+	{
+		now = (int)time(NULL);
+
+		if (proxy->last_version_error_time <= now)
+		{
+			print_log = 1;
+			proxy->last_version_error_time = now + 5 * SEC_PER_MIN;
+			zbx_update_proxy_lasterror(proxy);
+		}
+
+		if (1 == print_log)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" protocol version %d.%d differs from server version"
+					" %d.%d", proxy->host, ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
+					ZBX_COMPONENT_VERSION_MINOR(proxy->version),
+					ZABBIX_VERSION_MAJOR, ZABBIX_VERSION_MINOR);
+		}
+
+		if (proxy->version > server_version)
+		{
+			if (1 == print_log)
+				zabbix_log(LOG_LEVEL_WARNING, "cannot accept proxy data");
+			ret = FAIL;
+		}
+	}
+
+	return ret;
 }

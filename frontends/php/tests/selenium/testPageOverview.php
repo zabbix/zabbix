@@ -241,30 +241,14 @@ class testPageOverview extends CLegacyWebTest {
 					'name' => 'Trigger-map-test-zbx6840'
 				]
 			],
-			// Acknowledge status option in filter.
+			// Show unacknowledged only option in filter.
 			[
 				[
 					'main_filter' => [
 						'groupid' => 'Group to check Overview',
 						'type' => 'Triggers'
 					],
-					'ack_status' => 'With last event unacknowledged',
-					'result_hosts' => [
-						'1_Host_to_check_Monitoring_Overview'
-					],
-					'result_triggers' => [
-						'1_trigger_Not_classified', '1_trigger_Warning', '1_trigger_Average', '1_trigger_High',
-						'1_trigger_Disaster'
-					]
-				]
-			],
-			[
-				[
-					'main_filter' => [
-						'groupid' => 'Group to check Overview',
-						'type' => 'Triggers'
-					],
-					'ack_status' => 'With unacknowledged events',
+					'ack_status' => true,
 					'result_hosts' => [
 						'1_Host_to_check_Monitoring_Overview'
 					],
@@ -325,7 +309,7 @@ class testPageOverview extends CLegacyWebTest {
 						'3_Host_to_check_Monitoring_Overview'
 					],
 					'result_triggers' => [
-						'3_trigger_Average'
+						'3_trigger_Average', '3_trigger_Disaster'
 					]
 				]
 			],
@@ -552,7 +536,7 @@ class testPageOverview extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('ack_status', $data)) {
-			$this->zbxTestDropdownSelect('ack_status', $data['ack_status']);
+			$this->zbxTestCheckboxSelect('ack_status', $data['ack_status']);
 		}
 
 		if (array_key_exists('show_severity', $data)) {
@@ -679,7 +663,7 @@ class testPageOverview extends CLegacyWebTest {
 		$this->assertEquals(count($tbody), count($columns));
 	}
 
-	public function getContextMenu() {
+	public function getMenuPopup() {
 		return [
 			[
 				[
@@ -709,9 +693,9 @@ class testPageOverview extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getContextMenu
+	 * @dataProvider getMenuPopup
 	 */
-	public function testPageOverview_ContextMenuLinks($data) {
+	public function testPageOverview_MenuPopupLinks($data) {
 		$this->zbxTestLogin('overview.php');
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestClickButtonText('Reset');
@@ -721,23 +705,23 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "menu-popup")]//a'));
 
 		// Check context menu links text and url.
-		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="History"]');
+		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//h3[text()="History"]');
 		if ($data['type'] === 'Triggers') {
-			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="Trigger"]');
+			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//h3[text()="Trigger"]');
 		}
 
 		$get_links_text = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//ul[contains(@class, "menu-popup")]//a'));
 		foreach ($elements as $element) {
 			$get_links_text[] = $element->getText();
 		}
 		$this->assertEquals($data['links_text'], $get_links_text);
 
 		foreach ($data['links'] as $link) {
-			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//a[contains(@href, "'.$link.'")]');
+			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//a[contains(@href, "'.$link.'")]');
 		}
 	}
 

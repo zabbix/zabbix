@@ -38,7 +38,7 @@ class CTableRowElement extends CElement {
 	 */
 	public function normalize() {
 		if ($this->parent === null) {
-			$this->parent = $this->parents('tag:table')->one();
+			$this->parent = $this->parents('tag:table')->asTable()->one();
 		}
 	}
 
@@ -79,6 +79,38 @@ class CTableRowElement extends CElement {
 	}
 
 	/**
+	 * Get value from table column.
+	 *
+	 * @param string $name		table column name
+	 * @param string $value		value from data provider
+	 *
+	 * @return string
+	 *
+	 * @throws Exception    on unsupported value format
+	 */
+	public function getColumnData($name, $value) {
+		if (!is_array($value)) {
+			$value = ['text' => $value];
+		}
+
+		if (!array_key_exists('text', $value)) {
+			throw new Exception('Cannot get column data not by element text.');
+		}
+
+		$column = $this->getColumn($name);
+
+		if (array_key_exists('selector', $value)) {
+			$query = $column->query($value['selector']);
+			$text = (!is_array($value['text'])) ? $query->one()->getText() : $query->all()->asText();
+		}
+		else {
+			$text = (is_array($value['text'])) ? [$column->getText()] : $column->getText();
+		}
+
+		return $text;
+	}
+
+	/**
 	 * Select table row.
 	 * For tables with checkboxes.
 	 *
@@ -94,9 +126,11 @@ class CTableRowElement extends CElement {
 	 * Check if table row is selected.
 	 * For tables with checkboxes.
 	 *
-	 * @return $this
+	 * @param boolean $selected    if it is expected for row to be selected or not
+	 *
+	 * @return boolean
 	 */
-	public function isSelected() {
-		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected();
+	public function isSelected($selected = true) {
+		return $this->query('xpath:.//input[@type="checkbox"]')->one()->isSelected($selected);
 	}
 }

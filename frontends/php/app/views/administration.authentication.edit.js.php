@@ -20,10 +20,8 @@
 				: form.find('[name^=ldap_],button[name=change_bind_password]');
 
 			fields
-				.not(this)
-				.attr('disabled', !this.checked)
-				.filter('[name$=_case_sensitive]:not(:disabled)')
-				.prop('checked', true);
+				.not('[name=http_auth_enabled],[name=ldap_configured]')
+				.prop('disabled', !this.checked);
 		});
 
 		form.find('button#change_bind_password').click(function () {

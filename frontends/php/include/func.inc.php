@@ -441,7 +441,7 @@ function zbx_num2bitstr($num, $rev = false) {
 }
 
 /**
- * Converts strings like 2M or 5k to bytes
+ * Converts strings like 2M or 5k to bytes.
  *
  * @param string $val
  *
@@ -454,30 +454,38 @@ function str2mem($val) {
 
 	switch ($last) {
 		case 'g':
-			$val *= 1024;
-			// break; is not missing here
+			$val *= ZBX_GIBIBYTE;
+			break;
 		case 'm':
-			$val *= 1024;
-			// break; is not missing here
+			$val *= ZBX_MEBIBYTE;
+			break;
 		case 'k':
-			$val *= 1024;
+			$val *= ZBX_KIBIBYTE;
+			break;
 	}
 
 	return $val;
 }
 
+/**
+ * Converts bytes into human-readable form.
+ *
+ * @param string|int $size
+ *
+ * @return string
+ */
 function mem2str($size) {
 	$prefix = 'B';
-	if ($size > 1048576) {
-		$size = $size / 1048576;
+	if ($size > ZBX_MEBIBYTE) {
+		$size = $size / ZBX_MEBIBYTE;
 		$prefix = 'M';
 	}
-	elseif ($size > 1024) {
-		$size = $size / 1024;
+	elseif ($size > ZBX_KIBIBYTE) {
+		$size = $size / ZBX_KIBIBYTE;
 		$prefix = 'K';
 	}
 
-	return round($size, 6).$prefix;
+	return round($size, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT).$prefix;
 }
 
 function convertUnitsUptime($value) {
@@ -695,13 +703,13 @@ function convert_units($options = []) {
 
 	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
 	if ($options['byteStep']) {
-		$step = 1024;
+		$step = ZBX_KIBIBYTE;
 	}
 	else {
 		switch ($options['units']) {
 			case 'Bps':
 			case 'B':
-				$step = 1024;
+				$step = ZBX_KIBIBYTE;
 				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
 				break;
 			case 'b':
@@ -883,13 +891,13 @@ function convertFunctionValue($value, $scale = 0) {
 			return bcmul($value, '604800', $scale);
 
 		case 'K':
-			return bcmul($value, '1024', $scale);
+			return bcmul($value, ZBX_KIBIBYTE, $scale);
 
 		case 'M':
-			return bcmul($value, '1048576', $scale);
+			return bcmul($value, ZBX_MEBIBYTE, $scale);
 
 		case 'G':
-			return bcmul($value, '1073741824', $scale);
+			return bcmul($value, ZBX_GIBIBYTE, $scale);
 
 		case 'T':
 			return bcmul($value, '1099511627776', $scale);
@@ -2412,12 +2420,21 @@ function hasErrorMesssages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $cookieId		parent ID, is used as cookie suffix
+ * @param string $parentid  parent ID, is used as sessionStorage suffix
+ * @param array  $keepids   checked rows ids
  */
-function uncheckTableRows($cookieId = null) {
-	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
-		($cookieId === null ? '' : '_'.$cookieId).'")'
-	);
+function uncheckTableRows($parentid = null, $keepids = []) {
+	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+
+	if ($keepids) {
+		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
+		$keepids = array_combine($keepids, $keepids);
+
+		insert_js('sessionStorage.setItem("'.$key.'", JSON.stringify('.CJs::encodeJson($keepids).'))');
+	}
+	else {
+		insert_js('sessionStorage.removeItem("'.$key.'")');
+	}
 }
 
 /**

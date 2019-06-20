@@ -211,13 +211,13 @@ $fields = [
 										IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 										null
 									],
-	'http_username' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 										_('Username')
 									],
-	'http_password' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>				[T_ZBX_STR, O_OPT, null,	null,
 										'(isset({add}) || isset({update})) && isset({http_authtype})'.
 											' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 												' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
@@ -400,6 +400,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -638,6 +641,15 @@ elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelet
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
 	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+}
+
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$item_prototypes = API::ItemPrototype()->get([
+		'itemids' => getRequest('group_itemid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($item_prototypes, 'itemid'));
 }
 
 /*

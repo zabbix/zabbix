@@ -202,7 +202,7 @@ function checkAll(form_name, chkMain, shkName) {
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
-	chkbxRange.saveCookies(shkName);
+	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
 }
@@ -549,9 +549,14 @@ function closeDialogHandler(event) {
 					hintBox.hideHint(dialog.element, true);
 					break;
 
-				// Close context menu overlays.
-				case 'contextmenu':
-					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+				// Close popup menu overlays.
+				case 'menu-popup':
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close context menu preloader.
+				case 'preloader':
+					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
 					break;
 
 				// Close overlay time picker.
@@ -810,13 +815,12 @@ function validate_trigger_expression(formname, dialogueid) {
 }
 
 function redirect(uri, method, needle, invert_needle, add_sid) {
-	if (typeof add_sid === 'undefined') {
-		add_sid = true;
-	}
-	method = method || 'get';
+	method = (method || 'get').toLowerCase();
+	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
+
 	var url = new Curl(uri, add_sid);
 
-	if (method.toLowerCase() == 'get') {
+	if (method == 'get') {
 		window.location = url.getUrl();
 	}
 	else {
@@ -838,15 +842,32 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
 
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
-				action += '&' + key + '=' + args[key];
+				if (Array.isArray(args[key])) {
+					for (var i = 0, l = args[key].length; i < l; i++) {
+						action += '&' + key + '[]=' + args[key][i];
+					}
+				}
+				else {
+					action += '&' + key + '=' + args[key];
+				}
+
 				continue;
 			}
 
 			var hInput = document.createElement('input');
 			hInput.setAttribute('type', 'hidden');
 			postForm.appendChild(hInput);
-			hInput.setAttribute('name', key);
-			hInput.setAttribute('value', args[key]);
+
+			if (Array.isArray(args[key])) {
+				hInput.setAttribute('name', key + '[]');
+				for (var i = 0, l = args[key].length; i < l; i++) {
+					hInput.setAttribute('value', args[key][i]);
+				}
+			}
+			else {
+				hInput.setAttribute('name', key);
+				hInput.setAttribute('value', args[key]);
+			}
 		}
 
 		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));

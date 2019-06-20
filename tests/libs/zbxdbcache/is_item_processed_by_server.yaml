@@ -1,0 +1,358 @@
+---
+test case: invalid item key type (1)
+in:
+  type: 'ITEM_TYPE_ZABBIX'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (2)
+in:
+  type: 'ITEM_TYPE_ZABBIX'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (3)
+in:
+  type: 'ITEM_TYPE_SNMPv1'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (4)
+in:
+  type: 'ITEM_TYPE_SNMPv1'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (5)
+in:
+  type: 'ITEM_TYPE_TRAPPER'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (6)
+in:
+  type: 'ITEM_TYPE_TRAPPER'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (7)
+in:
+  type: 'ITEM_TYPE_SIMPLE'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (8)
+in:
+  type: 'ITEM_TYPE_SIMPLE'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (9)
+in:
+  type: 'ITEM_TYPE_SNMPv2c'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (10)
+in:
+  type: 'ITEM_TYPE_SNMPv2c'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (11)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key type (12)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key syntax (13)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix1[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key syntax (14)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbi1[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key syntax (15)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,discovery,items]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key syntax (16)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,,items_unsupported]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key syntax (17)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,discovery,items_unsupported]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key syntax (18)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,discovery,interfaces]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key syntax (19)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,,interfaces]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key syntax (20)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,,maintenance]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key syntax (21)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[host,discovery,,maintenance]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key syntax (22)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[proxy,proxy1,lastaccess]'
+out:
+  return: 'SUCCEED'
+---
+test case: valid item key syntax (23)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[proxy,,lastaccess]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key syntax (24)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix1[proxy,,lastaccess]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key syntax (25)
+in:
+  type: 'ITEM_TYPE_INTERNAL'
+  key: 'zabbix[proxy,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (26)
+in:
+  type: 'ITEM_TYPE_SNMPv3'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (27)
+in:
+  type: 'ITEM_TYPE_SNMPv3'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (27)
+in:
+  type: 'ITEM_TYPE_ZABBIX_ACTIVE'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (29)
+in:
+  type: 'ITEM_TYPE_ZABBIX_ACTIVE'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key type (30)
+in:
+  type: 'ITEM_TYPE_AGGREGATE'
+  key: 'key1[]'
+out:
+  return: 'SUCCEED'
+---
+test case: valid item key type (31)
+in:
+  type: 'ITEM_TYPE_AGGREGATE'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key type (32)
+in:
+  type: 'ITEM_TYPE_HTTPTEST'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (33)
+in:
+  type: 'ITEM_TYPE_HTTPTEST'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (34)
+in:
+  type: 'ITEM_TYPE_EXTERNAL'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (35)
+in:
+  type: 'ITEM_TYPE_EXTERNAL'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (36)
+in:
+  type: 'ITEM_TYPE_DB_MONITOR'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (37)
+in:
+  type: 'ITEM_TYPE_DB_MONITOR'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (38)
+in:
+  type: 'ITEM_TYPE_IPMI'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (39)
+in:
+  type: 'ITEM_TYPE_IPMI'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (40)
+in:
+  type: 'ITEM_TYPE_SSH'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (41)
+in:
+  type: 'ITEM_TYPE_SSH'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (42)
+in:
+  type: 'ITEM_TYPE_TELNET'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (43)
+in:
+  type: 'ITEM_TYPE_TELNET'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: valid item key type (44)
+in:
+  type: 'ITEM_TYPE_CALCULATED'
+  key: 'key1[]'
+out:
+  return: 'SUCCEED'
+---
+test case: valid item key type (45)
+in:
+  type: 'ITEM_TYPE_CALCULATED'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'SUCCEED'
+---
+test case: invalid item key type (46)
+in:
+  type: 'ITEM_TYPE_JMX'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (47)
+in:
+  type: 'ITEM_TYPE_JMX'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (48)
+in:
+  type: 'ITEM_TYPE_SNMPTRAP'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: invalid item key type (49)
+in:
+  type: 'ITEM_TYPE_SNMPTRAP'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+---
+test case: non-existing item type (50)
+in:
+  type: '255'
+  key: 'key1[]'
+out:
+  return: 'FAIL'
+---
+test case: non-existing item type (51)
+in:
+  type: '255'
+  key: 'zabbix[host,,items]'
+out:
+  return: 'FAIL'
+...

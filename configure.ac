@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.6rc1])
+AC_INIT([Zabbix],[4.0.10rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -966,6 +966,7 @@ AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
 AC_CHECK_FUNCS(sigqueue)
+AC_CHECK_FUNCS(round)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1283,10 +1284,9 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-ipv6]) ;;
 esac],
 [ipv6=no])
+AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
-
-AM_CONDITIONAL([ZBXCUNIT], [test -f src/libs/zbxcunit/zbxcunit.c])
 
 AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
 
@@ -1582,6 +1582,7 @@ SENDER_LDFLAGS="$SENDER_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
+AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
 
 dnl Check if Zabbix internal IPC services are used
 have_ipcservice="no"
@@ -1658,12 +1659,12 @@ if test "x$want_openssl" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
-	if test "x$found_openssl" != "xyes"; then
+	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
-		have_tls="OpenSSL"
+		have_tls=$found_openssl
 	fi
 	TLS_CFLAGS="$OPENSSL_CFLAGS"
 	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
@@ -1718,7 +1719,7 @@ AC_SUBST(LDAP_CPPFLAGS)
 
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.20.0], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -1734,6 +1735,8 @@ SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
 
 PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
+
+AM_CONDITIONAL(HAVE_LIBCURL, test "x$found_curl" = "xyes")
 
 dnl Starting from 2.0 agent can do web monitoring
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"

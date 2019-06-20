@@ -98,6 +98,7 @@ if (!$data['is_profile']) {
 
 // append password to form list
 if ($data['userid'] == 0 || $data['change_password']) {
+	$userForm->disablePasswordAutofill();
 	$password_box = new CPassBox('password1', $data['password1']);
 
 	if (!$form_autofocus) {
@@ -148,7 +149,7 @@ foreach (getLocales() as $localeId => $locale) {
 	if ($locale['display']) {
 		// checking if this locale exists in the system. The only way of doing it is to try and set one
 		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB');
+		$localeExists = ($localeId === 'en_GB' || setlocale(LC_MONETARY , zbx_locale_variants($localeId)));
 
 		$languageComboBox->addItem(
 			$localeId,
@@ -345,7 +346,9 @@ if ($data['is_profile']) {
 
 	$userMessagingFormList = new CFormList();
 	$userMessagingFormList->addRow(_('Frontend messaging'),
-		(new CCheckBox('messages[enabled]'))->setChecked($data['messages']['enabled'] == 1)
+		(new CCheckBox('messages[enabled]'))
+			->setChecked($data['messages']['enabled'] == 1)
+			->setUncheckedValue(0)
 	);
 	$userMessagingFormList->addRow(_('Message timeout'),
 		(new CTextBox('messages[timeout]', $data['messages']['timeout']))
@@ -372,7 +375,8 @@ if ($data['is_profile']) {
 		->addRow([
 			(new CCheckBox('messages[triggers.recovery]'))
 				->setLabel(_('Recovery'))
-				->setChecked($data['messages']['triggers.recovery'] == 1),
+				->setChecked($data['messages']['triggers.recovery'] == 1)
+				->setUncheckedValue(0),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -408,7 +412,8 @@ if ($data['is_profile']) {
 		$triggersTable->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(getSeverityName($severity, $data['config']))
-				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities'])),
+				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
+				->setUncheckedValue(0),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -433,6 +438,7 @@ if ($data['is_profile']) {
 		->addRow(_('Show suppressed problems'),
 			(new CCheckBox('messages[show_suppressed]'))
 				->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
 }
 else {

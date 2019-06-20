@@ -89,7 +89,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/frontends/php/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');;
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name does not exist in the DB');

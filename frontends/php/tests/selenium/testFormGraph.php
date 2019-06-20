@@ -855,7 +855,7 @@ class testFormGraph extends CLegacyWebTest {
 				$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
 				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
-				$this->zbxTestClickLinkText($link);
+				$this->zbxTestClickLinkTextWait($link);
 
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
 				$this->zbxTestTextPresent($this->host . ': ' . $link);
@@ -924,7 +924,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
-			$this->zbxTestClickLinkText($this->itemSimple);
+			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymin_name = $data['ymin_name'];
 			$ymin_nameValue = $this->zbxTestGetValue("//input[@id='ymin_name']");
@@ -939,7 +939,7 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//div[@id='overlay_dialogue']//select[@name='hostid']"));
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
 
-			$this->zbxTestClickLinkText($this->itemSimple);
+			$this->zbxTestClickLinkTextWait($this->itemSimple);
 
 			$ymax_name = $data['ymax_name'];
 			$ymax_nameValue = $this->zbxTestGetValue("//input[@id='ymax_name']");

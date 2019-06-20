@@ -24,8 +24,8 @@
  */
 class CDashboard extends CApiService {
 
-	const MAX_X = 11; // DASHBOARD_MAX_COLUMNS - 1
-	const MAX_Y = 63; // DASHBOARD_MAX_ROWS - 1
+	const MAX_X = 11; // DASHBOARD_MAX_COLUMNS - 1;
+	const MAX_Y = 62; // DASHBOARD_MAX_ROWS - 2;
 
 	protected $tableName = 'dashboard';
 	protected $tableAlias = 'd';
@@ -33,6 +33,8 @@ class CDashboard extends CApiService {
 
 	/**
 	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array|int
 	 */
@@ -134,9 +136,8 @@ class CDashboard extends CApiService {
 			if ($options['countOutput']) {
 				return $row['rowscount'];
 			}
-			else {
-				$db_dashboards[$row['dashboardid']] = $row;
-			}
+
+			$db_dashboards[$row['dashboardid']] = $row;
 		}
 
 		if ($db_dashboards) {
@@ -213,8 +214,8 @@ class CDashboard extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
 				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X, 'default' => DB::getDefault('widget', 'x')],
 				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y, 'default' => DB::getDefault('widget', 'y')],
-				'width' =>				['type' => API_INT32, 'in' => '1:12', 'default' => DB::getDefault('widget', 'width')],
-				'height' =>				['type' => API_INT32, 'in' => '2:32', 'default' => DB::getDefault('widget', 'height')],
+				'width' =>				['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS, 'default' => DB::getDefault('widget', 'width')],
+				'height' =>				['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS, 'default' => DB::getDefault('widget', 'height')],
 				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
@@ -323,8 +324,8 @@ class CDashboard extends CApiService {
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
 				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X],
 				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y],
-				'width' =>				['type' => API_INT32, 'in' => '1:12'],
-				'height' =>				['type' => API_INT32, 'in' => '2:32'],
+				'width' =>				['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS],
+				'height' =>				['type' => API_INT32, 'in' => '2:'.DASHBOARD_WIDGET_MAX_ROWS],
 				'fields' =>				['type' => API_OBJECTS, 'fields' => [
 					'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $widget_field_types)],
 					'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget_field', 'name'), 'default' => DB::getDefault('widget_field', 'name')],
@@ -562,8 +563,8 @@ class CDashboard extends CApiService {
 						}
 					}
 
-					if ($widget['x'] + $widget['width'] - 1 > self::MAX_X
-							|| $widget['y'] + $widget['height'] - 1 > self::MAX_Y) {
+					if ($widget['x'] + $widget['width'] > DASHBOARD_MAX_COLUMNS
+							|| $widget['y'] + $widget['height'] > DASHBOARD_MAX_ROWS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Dashboard "%1$s" widget in cell X - %2$s Y - %3$s is out of bounds.',
 								$dashboard['name'], $widget['x'], $widget['y']
@@ -576,9 +577,9 @@ class CDashboard extends CApiService {
 	}
 
 	/**
-	 * Rweturns widget field name by field type.
+	 * Returns widget field name by field type.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	private static function getFieldNamesByType() {
 		return [

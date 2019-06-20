@@ -24,6 +24,11 @@
  */
 class CDateSelector extends CTag {
 	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'calendar-control';
+
+	/**
 	 * Default date format.
 	 *
 	 * @var string
@@ -71,6 +76,7 @@ class CDateSelector extends CTag {
 
 		$this->name = $name;
 		$this->value = $value;
+		$this->addClass(static::ZBX_STYLE_CLASS);
 	}
 
 	/**

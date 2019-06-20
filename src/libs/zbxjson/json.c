@@ -41,14 +41,8 @@ const char	*zbx_json_strerror(void)
 	return zbx_json_strerror_message;
 }
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_set_json_strerror(fmt, ...) __zbx_zbx_set_json_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_set_json_strerror __zbx_zbx_set_json_strerror
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static void	__zbx_zbx_set_json_strerror(const char *fmt, ...)
+static void	zbx_set_json_strerror(const char *fmt, ...)
 {
 	va_list	args;
 
@@ -172,6 +166,8 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 		{
 			case '"':  /* quotation mark */
 			case '\\': /* reverse solidus */
+			/* We do not escape '/' (solidus). https://www.rfc-editor.org/errata_search.php?rfc=4627 */
+			/* says: "/" and "\/" are both allowed and both produce the same result. */
 			case '\b': /* backspace */
 			case '\f': /* formfeed */
 			case '\n': /* newline */
@@ -180,7 +176,8 @@ static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 				len += 2;
 				break;
 			default:
-				if (0 != iscntrl(*sptr))
+				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
+				if (0x1f >= (unsigned char)*sptr)
 					len += 6;
 				else
 					len++;
@@ -236,6 +233,8 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = '\\';
 				*p++ = '\\';
 				break;
+			/* We do not escape '/' (solidus). https://www.rfc-editor.org/errata_search.php?rfc=4627 */
+			/* says: "/" and "\/" are both allowed and both produce the same result. */
 			case '\b':		/* backspace */
 				*p++ = '\\';
 				*p++ = 'b';
@@ -257,14 +256,15 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 				*p++ = 't';
 				break;
 			default:
-				if (0 != iscntrl(*sptr))
+				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
+				if (0x1f >= (unsigned char)*sptr)
 				{
 					*p++ = '\\';
 					*p++ = 'u';
 					*p++ = '0';
 					*p++ = '0';
-					*p++ = zbx_num2hex((*sptr >> 4) & 0xf);
-					*p++ = zbx_num2hex(*sptr & 0xf);
+					*p++ = zbx_num2hex((((unsigned char)*sptr) >> 4) & 0xf);
+					*p++ = zbx_num2hex(((unsigned char)*sptr) & 0xf);
 				}
 				else
 					*p++ = *sptr;
@@ -492,6 +492,10 @@ static zbx_json_type_t	__zbx_json_type(const char *p)
 		return ZBX_JSON_TYPE_OBJECT;
 	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
 		return ZBX_JSON_TYPE_NULL;
+	if ('t' == p[0] && 'r' == p[1] && 'u' == p[2] && 'e' == p[3])
+		return ZBX_JSON_TYPE_TRUE;
+	if ('f' == p[0] && 'a' == p[1] && 'l' == p[2] && 's' == p[3] && 'e' == p[4])
+		return ZBX_JSON_TYPE_FALSE;
 
 	zbx_set_json_strerror("invalid type of JSON value \"%.64s\"", p);
 
@@ -667,14 +671,6 @@ const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 		}
 		p++;
 	}
-
-	return NULL;
-}
-
-static const char	*zbx_json_decodenull(const char *p)
-{
-	if ('n' == p[0] && 'u' == p[1] && 'l' == p[2] && 'l' == p[3])
-		return p + 4;
 
 	return NULL;
 }
@@ -871,6 +867,9 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
 {
 	char	*start = out;
 
+	if (0 == size)
+		return NULL;
+
 	p++;
 
 	while ('\0' != *p)
@@ -910,7 +909,7 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
  *                                                                            *
  * Function: zbx_json_copy_value                                              *
  *                                                                            *
- * Purpose: copies json value                                                 *
+ * Purpose: copies unquoted (numeric, boolean) json value                     *
  *                                                                            *
  * Parameters: p     - [IN] a pointer to the next character in string         *
  *             len   - [IN] the value length                                  *
@@ -920,85 +919,87 @@ static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
  * Return value: A pointer to the next character in input string or NULL if   *
  *               string copying failed.                                       *
  *                                                                            *
- * Comments: String values are converted (leading/trailing " dropped and      *
- *           escape sequences translated) while other values are simply       *
- *           copied.                                                          *
- *                                                                            *
  ******************************************************************************/
-static const char	*zbx_json_copy_value(const char *p, size_t len, char *out, size_t size)
+static const char	*zbx_json_copy_unquoted_value(const char *p, size_t len, char *out, size_t size)
 {
-	if (ZBX_JSON_TYPE_STRING == __zbx_json_type(p))
-	{
-		if (NULL == zbx_json_copy_string(p, out, size))
-			return NULL;
-	}
-	else
-		zbx_strlcpy(out, p, MIN(size, len + 1));
+	if (size < len + 1)
+		return NULL;
+
+	memcpy(out, p, len);
+	out[len] = '\0';
 
 	return p + len;
 }
 
-const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, int *is_null)
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_json_type_t *type)
 {
-	size_t	len;
+	size_t		len;
+	zbx_json_type_t	type_local;
 
-	switch (__zbx_json_type(p))
+	switch (type_local = __zbx_json_type(p))
 	{
-		case ZBX_JSON_TYPE_STRING:
-		case ZBX_JSON_TYPE_INT:
-			if (NULL != is_null)
-				*is_null = 0;
-
+		case ZBX_JSON_TYPE_ARRAY:
+		case ZBX_JSON_TYPE_OBJECT:
+		case ZBX_JSON_TYPE_UNKNOWN:
+			/* only primitive values are decoded */
+			return NULL;
+		default:
 			if (0 == (len = json_parse_value(p, NULL)))
 				return NULL;
+	}
 
-			return zbx_json_copy_value(p, len, string, size);
+	if (NULL != type)
+		*type = type_local;
+
+	switch (type_local)
+	{
+		case ZBX_JSON_TYPE_STRING:
+			return zbx_json_copy_string(p, string, size);
 		case ZBX_JSON_TYPE_NULL:
-			if (NULL != is_null)
-				*is_null = 1;
+			if (0 == size)
+				return NULL;
 			*string = '\0';
-			return zbx_json_decodenull(p);
-		default:
-			return NULL;
+			return p + len;
+		default: /* ZBX_JSON_TYPE_INT, ZBX_JSON_TYPE_TRUE, ZBX_JSON_TYPE_FALSE */
+			return zbx_json_copy_unquoted_value(p, len, string, size);
 	}
 }
 
-static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, int *is_null)
+const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *string_alloc, zbx_json_type_t *type)
 {
-	size_t	len;
+	size_t		len;
+	zbx_json_type_t	type_local;
 
-	switch (__zbx_json_type(p))
+	switch (type_local = __zbx_json_type(p))
 	{
-		case ZBX_JSON_TYPE_STRING:
-		case ZBX_JSON_TYPE_INT:
-			if (NULL != is_null)
-				*is_null = 0;
-
+		case ZBX_JSON_TYPE_ARRAY:
+		case ZBX_JSON_TYPE_OBJECT:
+		case ZBX_JSON_TYPE_UNKNOWN:
+			/* only primitive values are decoded */
+			return NULL;
+		default:
 			if (0 == (len = json_parse_value(p, NULL)))
 				return NULL;
+	}
 
-			if (*string_alloc <= len)
-			{
-				*string_alloc = len + 1;
-				*string = (char *)zbx_realloc(*string, *string_alloc);
-			}
+	if (*string_alloc <= len)
+	{
+		*string_alloc = len + 1;
+		*string = (char *)zbx_realloc(*string, *string_alloc);
+	}
 
-			return zbx_json_copy_value(p, len, *string, *string_alloc);
+	if (NULL != type)
+		*type = type_local;
+
+	switch (type_local)
+	{
+		case ZBX_JSON_TYPE_STRING:
+			return zbx_json_copy_string(p, *string, *string_alloc);
 		case ZBX_JSON_TYPE_NULL:
-			if (NULL != is_null)
-				*is_null = 1;
-
-			if (*string_alloc < 1)
-			{
-				*string_alloc = 1;
-				*string = (char *)zbx_realloc(*string, *string_alloc);
-			}
-
 			**string = '\0';
-
-			return zbx_json_decodenull(p);
-		default:
-			return NULL;
+			return p + len;
+		default: /* ZBX_JSON_TYPE_INT, ZBX_JSON_TYPE_TRUE, ZBX_JSON_TYPE_FALSE */
+			return zbx_json_copy_unquoted_value(p, len, *string, *string_alloc);
 	}
 }
 
@@ -1057,12 +1058,13 @@ const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *n
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null)
+const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len,
+		zbx_json_type_t *type)
 {
 	if (NULL == (p = zbx_json_next(jp, p)))
 		return NULL;
 
-	return zbx_json_decodevalue(p, string, len, is_null);
+	return zbx_json_decodevalue(p, string, len, type);
 }
 
 /******************************************************************************
@@ -1071,12 +1073,12 @@ const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, 
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_json_next_value_dyn(const struct zbx_json_parse *jp, const char *p, char **string,
-		size_t *string_alloc, int *is_null)
+		size_t *string_alloc, zbx_json_type_t *type)
 {
 	if (NULL == (p = zbx_json_next(jp, p)))
 		return NULL;
 
-	return zbx_json_decodevalue_dyn(p, string, string_alloc, is_null);
+	return zbx_json_decodevalue_dyn(p, string, string_alloc, type);
 }
 
 /******************************************************************************
@@ -1237,7 +1239,7 @@ static int	zbx_jsonpath_error(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_jsonpath_next                                                *
+ * Function: jsonpath_next                                                    *
  *                                                                            *
  * Purpose: returns next component of json path                               *
  *                                                                            *
@@ -1251,7 +1253,7 @@ static int	zbx_jsonpath_error(const char *path)
  *               FAIL    - json path parsing error                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
+static int	jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
 {
 	const char	*next = *pnext;
 	size_t		pos;
@@ -1358,7 +1360,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 	do
 	{
-		if (FAIL == zbx_jsonpath_next(path, &next, &loc, &type))
+		if (FAIL == jsonpath_next(path, &next, &loc, &type))
 			return FAIL;
 
 		if (ZBX_JSONPATH_ARRAY_INDEX == type)
@@ -1447,7 +1449,7 @@ int	zbx_json_path_check(const char *path, char * error, size_t errlen)
 
 	do
 	{
-		if (SUCCEED != zbx_jsonpath_next(path, &next, &loc, &type))
+		if (SUCCEED != jsonpath_next(path, &next, &loc, &type))
 		{
 			zbx_snprintf(error, errlen, "json path not valid: %s", zbx_json_strerror());
 			return FAIL;
@@ -1457,3 +1459,6 @@ int	zbx_json_path_check(const char *path, char * error, size_t errlen)
 
 	return SUCCEED;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/libs/zbxjson/jsonpath_next_test.c"
+#endif

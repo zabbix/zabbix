@@ -722,13 +722,15 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
  * @param int   $problem_options['show_suppressed']  Whether to show triggers with suppressed problems.
  * @param int   $problem_options['min_severity']     (optional) Minimal problem severity.
  * @param int   $problem_options['time_from']        (optional) The time starting from which the problems were created.
+ * @param bool  $problem_options['acknowledged']     (optional) Whether to show triggers with acknowledged problems.
  *
  * @return array
  */
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null
+		'time_from' => null,
+		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -736,7 +738,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE
+				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
 			$problem_triggerids[] = $triggerid;
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
@@ -745,9 +748,13 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 	if ($problem_triggerids) {
 		$problems = API::Problem()->get([
-			'output' => ['objectid', 'severity'],
+			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
+			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
+			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
+				? false
+				: null,
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -756,15 +763,23 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		foreach ($problems as $problem) {
 			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
+				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
+				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
 			}
 			$objectids[$problem['objectid']] = true;
 		}
 
 		foreach ($triggers as $triggerid => $trigger) {
-			if (!array_key_exists($triggerid, $objectids)) {
+			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+				continue;
+			}
+
+			if (!array_key_exists('only_true', $trigger_options)
+					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
+				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
 				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
 			}
-			elseif ($trigger['priority'] < $problem_options['min_severity']) {
+			else {
 				unset($triggers[$triggerid]);
 			}
 		}
@@ -830,12 +845,17 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				$trcounter[$host['name']][$trigger_name] = 0;
 			}
 
-			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = [
+			$trigger_data = [
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
 				'priority' => $trigger['priority']
 			];
+			if (array_key_exists('problem', $trigger)) {
+				$trigger_data['problem'] = $trigger['problem'];
+			}
+
+			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = $trigger_data;
 			$trcounter[$host['name']][$trigger_name]++;
 		}
 	}
@@ -927,6 +947,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 	$ack = null;
 	$css = null;
 	$desc = null;
+	$eventid = 0;
 	$acknowledge = [];
 
 	if ($trigger) {
@@ -936,25 +957,11 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			$event = getTriggerLastProblems([$trigger['triggerid']], ['eventid', 'acknowledged']);
+			if (array_key_exists('problem', $trigger)) {
+				$eventid = $trigger['problem']['eventid'];
+				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
 
-			if ($event) {
-				$event = reset($event);
-
-				if ($screenid !== null) {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile.'?screenid='.$screenid
-					];
-				}
-				else {
-					$acknowledge = [
-						'eventid' => $event['eventid'],
-						'backurl' => $pageFile
-					];
-				}
-
-				if ($event['acknowledged'] == 1) {
+				if ($trigger['problem']['acknowledged'] == 1) {
 					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 				}
 			}
@@ -985,7 +992,7 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $acknowledge));
+		$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid, $acknowledge));
 	}
 
 	return $column;
@@ -1183,7 +1190,7 @@ function make_trigger_details($trigger) {
 	]);
 
 	if (count($hosts) > 1) {
-		order_result($hosts, 'name', ZBX_SORT_UP);
+		order_result($hosts, 'name');
 	}
 
 	foreach ($hosts as $host) {
@@ -1199,7 +1206,9 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			new CCol(_('Trigger')),
-			new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
+			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+			)
 		])
 		->addRow([
 			_('Severity'),
@@ -1246,26 +1255,28 @@ function make_trigger_details($trigger) {
  * Analyze an expression and returns expression html tree.
  *
  * @param string $expression  Trigger expression or recovery expression string.
- * @param int $type           Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
+ * @param int    $type        Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array
+ * @return array|bool
  */
 function analyzeExpression($expression, $type) {
-	if (empty($expression)) {
+	if ($expression === '') {
 		return ['', null];
 	}
 
-	$expressionData = new CTriggerExpression();
-	if (!$expressionData->parse($expression)) {
-		error($expressionData->error);
+	$expression_data = new CTriggerExpression();
+	if (!$expression_data->parse($expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
 
 	$next = [];
-	$letterNum = 0;
-	return buildExpressionHtmlTree($expressionTree, $next, $letterNum, 0, null, $type);
+	$letter_num = 0;
+
+	return buildExpressionHtmlTree($expression_tree, $next, $letter_num, 0, null, $type);
 }
 
 /**
@@ -1429,12 +1440,13 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$image = $next[$i] ? 'top_right_bottom' : 'top_right';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right';
 		}
 		else {
-			$image = $next[$i] ? 'top_bottom' : 'space';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty';
 		}
-		$expr[] = new CImg('images/general/tr_'.$image.'.gif', 'tr', 12, 12);
+
+		$expr[] = (new CSpan(''))->addClass($class_name);
 	}
 	return $expr;
 }
@@ -1507,9 +1519,10 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
 					}
 					break;
 				case '{':
-					foreach ($expressionData->expressions as $exprPart) {
-						if ($exprPart['pos'] == $i) {
-							$i += strlen($exprPart['expression']) - 1;
+					// Skip any previously found tokens starting with brace.
+					foreach ($expressionData->result->getTokens() as $expression_token) {
+						if ($expression_token['pos'] == $i) {
+							$i += $expression_token['length'] - 1;
 							break;
 						}
 					}
@@ -1604,39 +1617,42 @@ function getExpressionTree(CTriggerExpression $expressionData, $start, $end) {
  * Recreate an expression depending on action.
  *
  * Supported action values:
- * - and	- add an expression using "and";
- * - or		- add an expression using "or";
- * - r 		- replace;
- * - R		- remove.
+ * - and - add an expression using "and";
+ * - or  - add an expression using "or";
+ * - r   - replace;
+ * - R   - remove.
  *
  * @param string $expression
- * @param string $expressionId  element identifier like "0_55"
- * @param string $action        action to perform
- * @param string $newExpression expression for AND, OR or replace actions
+ * @param string $expression_id   Element identifier like "0_55".
+ * @param string $action          Action to perform.
+ * @param string $new_expression  Expression for AND, OR or replace actions.
  *
- * @return bool                 returns new expression or false if expression is incorrect
+ * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expressionId, $action, $newExpression) {
-	if (empty($expression)) {
+function remakeExpression($expression, $expression_id, $action, $new_expression) {
+	if ($expression === '') {
 		return false;
 	}
 
-	$expressionData = new CTriggerExpression();
-	if ($action != 'R' && !$expressionData->parse($newExpression)) {
-		error($expressionData->error);
+	$expression_data = new CTriggerExpression();
+	if ($action !== 'R' && !$expression_data->parse($new_expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	if (!$expressionData->parse($expression)) {
-		error($expressionData->error);
+	if (!$expression_data->parse($expression)) {
+		error($expression_data->error);
+
 		return false;
 	}
 
-	$expressionTree[] = getExpressionTree($expressionData, 0, strlen($expressionData->expression) - 1);
+	$expression_tree[] = getExpressionTree($expression_data, 0, strlen($expression_data->expression) - 1);
 
-	if (rebuildExpressionTree($expressionTree, $expressionId, $action, $newExpression)) {
-		$expression = makeExpression($expressionTree);
+	if (rebuildExpressionTree($expression_tree, $expression_id, $action, $new_expression)) {
+		$expression = makeExpression($expression_tree);
 	}
+
 	return $expression;
 }
 
@@ -2077,6 +2093,13 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 	return $result;
 }
 
+/**
+ * Converts a string representation of various time and byte measures into corresponding SI unit value.
+ *
+ * @param string $value  String value with byte or time suffix.
+ *
+ * @return string|int  Corresponding SI unit value.
+ */
 function convert($value) {
 	$value = trim($value);
 
@@ -2088,16 +2111,16 @@ function convert($value) {
 	$value = $arr['value'];
 	switch ($arr['mult']) {
 		case 'T':
-			$value *= 1024 * 1024 * 1024 * 1024;
+			$value = bcmul($value, bcmul(ZBX_KIBIBYTE, ZBX_GIBIBYTE));
 			break;
 		case 'G':
-			$value *= 1024 * 1024 * 1024;
+			$value = bcmul($value, ZBX_GIBIBYTE);
 			break;
 		case 'M':
-			$value *= 1024 * 1024;
+			$value = bcmul($value, ZBX_MEBIBYTE);
 			break;
 		case 'K':
-			$value *= 1024;
+			$value = bcmul($value, ZBX_KIBIBYTE);
 			break;
 		case 'm':
 			$value *= 60;
@@ -2292,13 +2315,19 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			$host_name = (new CLinkAction($host['name']))
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 
-			// Add maintenance icon with hint if host is in maintenance.
-			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& array_key_exists($host['maintenanceid'], $db_maintenances)) {
-				$maintenance = $db_maintenances[$host['maintenanceid']];
-				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
-					$maintenance['description']
-				);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$maintenance = $db_maintenances[$host['maintenanceid']];
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+						$maintenance['description']
+					);
+				}
+				else {
+					$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'),
+						''
+					);
+				}
+
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 

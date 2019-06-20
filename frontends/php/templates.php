@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -429,6 +428,14 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['template.ma
 
 	if ($result) {
 		uncheckTableRows();
+	}
+	else {
+		$templateids = API::Template()->get([
+			'output' => [],
+			'templateids' => $templates,
+			'editable' => true
+		]);
+		uncheckTableRows(null, zbx_objectValues($templateids, 'templateid'));
 	}
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
 }

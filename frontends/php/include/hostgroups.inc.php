@@ -280,12 +280,19 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 		$url->setArgument('filter_hostids', [$hostid]);
 		$host_name = new CLink($host_data['host'], $url->getUrl());
 
-		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-				&& array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
-			$maintenance = $db_maintenances[$host_data['maintenanceid']];
-			$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], $maintenance['name'],
-				$maintenance['description']
-			);
+		if ($host_data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			if (array_key_exists($host_data['maintenanceid'], $db_maintenances)) {
+				$maintenance = $db_maintenances[$host_data['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
+			}
+			else {
+				$maintenance_icon = makeMaintenanceIcon($host_data['maintenance_type'], _('Inaccessible maintenance'),
+					''
+				);
+			}
+
 			$host_name = [$host_name, $maintenance_icon];
 		}
 
@@ -309,4 +316,49 @@ function makeProblemHostsHintBox(array $hosts, array $data, CUrl $url) {
 	}
 
 	return $table_inf;
+}
+
+/**
+ * Enriches host groups array by parent groups.
+ *
+ * @param array  $groups
+ * @param string $groups[<groupid>]['groupid']
+ * @param string $groups[<groupid>]['name']
+ * @param array  $options                        HostGroup API call parameters.
+ *
+ * @return array
+ */
+function enrichParentGroups(array $groups, array $options = []) {
+	$parents = [];
+	foreach ($groups as $group) {
+		$parent = explode('/', $group['name']);
+		while (array_pop($parent) && $parent) {
+			$parents[implode('/', $parent)] = true;
+		}
+	}
+
+	if ($parents) {
+		foreach ($groups as $group) {
+			if (array_key_exists($group['name'], $parents)) {
+				unset($parents[$group['name']]);
+			}
+		}
+	}
+
+	if ($parents) {
+		if (!array_key_exists('output', $options)) {
+			$options['output'] = ['groupid', 'name'];
+		}
+
+		if (!array_key_exists('filter', $options)) {
+			$options['filter'] = [];
+		}
+
+		$options['filter']['name'] = array_keys($parents);
+
+		$options['preservekeys'] = true;
+		$groups += API::HostGroup()->get($options);
+	}
+
+	return $groups;
 }

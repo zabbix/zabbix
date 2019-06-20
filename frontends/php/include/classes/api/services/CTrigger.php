@@ -446,7 +446,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// return count for post SQL filtered result sets
 		if ($options['countOutput']) {
-			return count($result);
+			return (string) count($result);
 		}
 
 		if ($result) {
@@ -990,7 +990,7 @@ class CTrigger extends CTriggerGeneral {
 			$depTemplateIds = zbx_toHash(zbx_objectValues($triggerDependencyTemplates, 'templateid'));
 
 			// run the check only if a templated trigger has dependencies on other templates
-			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'hostid'));
+			$triggerTemplateIds = zbx_toHash(zbx_objectValues($triggerTemplates, 'templateid'));
 			$tdiff = array_diff($depTemplateIds, $triggerTemplateIds);
 			if (!empty($triggerTemplateIds) && !empty($depTemplateIds) && !empty($tdiff)) {
 				$affectedTemplateIds = zbx_array_merge($triggerTemplateIds, $depTemplateIds);
