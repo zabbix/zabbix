@@ -289,7 +289,7 @@ ZBX_Notifications.prototype.consumeAlarmState = function(alarm_state) {
 		alarm_state.timeout = 0;
 	}
 	// Playback has happened.
-	else if (alarm_state.start === alarm_state.end) {
+	else if (alarm_state.start + '_' + alarm_state.severity === alarm_state.end) {
 		alarm_state.timeout = 0;
 	}
 	// Regardless if this is new/unitialized playback or not, recalculate this user setting.
@@ -822,7 +822,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
 	this.player.seek(this.alarm_state.seek);
 
 	if (this.alarm_state.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
-		this.alarm_state.end = this.alarm_state.start;
+		this.alarm_state.end = this.alarm_state.start + '_' + this.alarm_state.severity;
 		this.player.once();
 	}
 	else {
@@ -831,7 +831,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
 			 * It is not checked again here if this bound instance is active or not, because if it isn't active, player has been
 			 * rerendered as stopped and this promise is never resolved.
 			 */
-			this.alarm_state.end = this.alarm_state.start;
+			this.alarm_state.end = this.alarm_state.start + '_' + this.alarm_state.severity;
 			this.pushAlarmState(this.alarm_state);
 		}.bind(this));
 	}
