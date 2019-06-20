@@ -1991,6 +1991,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	if (OCI_SUCCESS != rc)
 	{
+		ub4	rows_fetched;
+		ub4	sizep = sizeof(ub4);
+
 		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
 				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 		{
@@ -2006,6 +2009,14 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			case 3114:	/* ORA-03114: not connected to ORACLE */
 				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
 				return NULL;
+			default:
+				OCIAttrGet(result->stmthp, OCI_HTYPE_STMT, (dvoid *) &rows_fetched, (ub4 *) &sizep,
+						OCI_ATTR_ROWS_FETCHED, oracle.errhp);
+				if (1 != rows_fetched)
+				{
+					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
+					return NULL;
+				}
 		}
 	}
 
