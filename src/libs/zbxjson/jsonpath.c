@@ -2104,10 +2104,13 @@ static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
  *                                                                            *
  * Purpose: apply jsonpath function to the extracted object list              *
  *                                                                            *
- * Parameters: objects - [IN] pointers to the objects/arrays/values in json   *
- *                            data                                            *
- *             type    - [IN] the function type                               *
- *             output  - [OUT] the output value                               *
+ * Parameters: objects       - [IN] pointers to the objects/arrays/values in  *
+ *                                  json data                                 *
+ *             type          - [IN] the function type                         *
+ *             definite_path - [IN] 1 - if the path is definite (pointing at  *
+ *                                      single object                         *
+ *                                  0 - otherwise                             *
+ *             output        - [OUT] the output value                         *
  *                                                                            *
  * Return value: SUCCEED - the function was applied successfully              *
  *               FAIL    - invalid input data for the function or internal    *
@@ -2119,7 +2122,7 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 {
 	int			i, ret = FAIL;
 	zbx_vector_str_t	objects_tmp;
-	double			result, value;
+	double			result;
 
 	zbx_vector_str_create(&objects_tmp);
 
@@ -2170,12 +2173,14 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 	}
 
 	if (FAIL == jsonpath_extract_numeric_value(objects->values[0], &result))
-		return FAIL;
+		goto out;
 
 	for (i = 1; i < objects->values_num; i++)
 	{
+		double	value;
+
 		if (FAIL == jsonpath_extract_numeric_value(objects->values[i], &value))
-			return FAIL;
+			goto out;
 
 		switch (type)
 		{
