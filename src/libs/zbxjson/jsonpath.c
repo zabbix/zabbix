@@ -395,7 +395,7 @@ static int	jsonpath_next(const char **pnext)
 static int	jsonpath_parse_substring(const char *start, int *len)
 {
 	const char	*ptr;
-	int		quotes;
+	char		quotes;
 
 	for (quotes = *start, ptr = start + 1; '\0' != *ptr; ptr++)
 	{
