@@ -1889,7 +1889,7 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
  *                                                                            *
  * Function: jsonpath_match_index                                             *
  *                                                                            *
- * Purpose: match array element element against segment index list            *
+ * Purpose: match array element against segment index list                    *
  *                                                                            *
  * Parameters: jp_root      - [IN] the document root                          *
  *             pnext        - [IN] a pointer to an array element              *
@@ -1907,7 +1907,6 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
 static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char *pnext,
 		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_str_t *objects)
 {
-	int				query_index;
 	zbx_jsonpath_segment_t		*segment;
 	zbx_jsonpath_list_node_t	*node;
 
@@ -1919,7 +1918,9 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
 
 	for (node = segment->data.list.values; NULL != node; node = node->next)
 	{
-		memcpy(&query_index, node->data, 4);
+		int	query_index;
+
+		memcpy(&query_index, node->data, sizeof(query_index));
 
 		if ((query_index >= 0 && index == query_index) || index == elements_num + query_index)
 		{
@@ -1936,7 +1937,7 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
  *                                                                            *
  * Function: jsonpath_match_range                                             *
  *                                                                            *
- * Purpose: match array element element against segment index range           *
+ * Purpose: match array element against segment index range                   *
  *                                                                            *
  * Parameters: jp_root      - [IN] the document root                          *
  *             pnext        - [IN] a pointer to an array element              *
@@ -2002,7 +2003,7 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
 
 	segment = &jsonpath->segments[path_depth];
 
-	for (pnext = NULL; NULL != (pnext = zbx_json_next(jp, pnext));)
+	while (NULL != (pnext = zbx_json_next(jp, pnext)))
 		elements_num++;
 
 	while (NULL != (pnext = zbx_json_next(jp, pnext)) && SUCCEED == ret)
@@ -2042,11 +2043,11 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
  *                                                                            *
  * Purpose: extract JSON element value from data                              *
  *                                                                            *
- * Parameters: ptr   - [IN] pointer to the element to extract                 *
- *             value - [OUT] the extracted element                            *
+ * Parameters: ptr     - [IN] pointer to the element to extract               *
+ *             element - [OUT] the extracted element                          *
  *                                                                            *
  * Return value: SUCCEED - the element was extracted successfully             *
- *               FAIL    - the pointer was not pointing JSON element          *
+ *               FAIL    - the pointer was not pointing to an JSON element    *
  *                                                                            *
  * Comments: String value element is unquoted, other elements are copied as   *
  *           is.                                                              *
@@ -2054,13 +2055,15 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
  ******************************************************************************/
 static int	jsonpath_extract_element(const char *ptr, char **element)
 {
-	size_t		element_size = 0;
-	struct zbx_json_parse	jp;
+	size_t	element_size = 0;
 
 	if (NULL == zbx_json_decodevalue_dyn(ptr, element, &element_size, NULL))
 	{
+		struct zbx_json_parse	jp;
+
 		if (SUCCEED != zbx_json_brackets_open(ptr, &jp))
 			return FAIL;
+
 		*element = jsonpath_strndup(jp.start, jp.end - jp.start + 1);
 	}
 
