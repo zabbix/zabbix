@@ -24,6 +24,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
+#include "zbxmockjson.h"
 
 #define _FAIL(file, line, prefix, message, ...)						\
 											\

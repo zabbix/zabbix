@@ -256,12 +256,12 @@ static void	jsonpath_token_free(zbx_jsonpath_token_t *token)
  ******************************************************************************/
 static void	jsonpath_reserve(zbx_jsonpath_t *jsonpath, int num)
 {
-	if (jsonpath->segments_num + num >= jsonpath->segments_alloc)
+	if (jsonpath->segments_num + num > jsonpath->segments_alloc)
 	{
 		int	old_alloc = jsonpath->segments_alloc;
 
-		if (0 == jsonpath->segments_alloc)
-			jsonpath->segments_alloc = num;
+		if (jsonpath->segments_alloc < num)
+			jsonpath->segments_alloc = jsonpath->segments_num + num;
 		else
 			jsonpath->segments_alloc *= 2;
 
