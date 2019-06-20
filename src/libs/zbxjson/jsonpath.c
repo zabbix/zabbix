@@ -141,7 +141,6 @@ static void	jsonpath_unquote(char *value, const char *start, size_t len)
 	*value = '\0';
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: jsonpath_unquote_dyn                                             *
@@ -166,7 +165,6 @@ static char	*jsonpath_unquote_dyn(const char *start, size_t len)
 	return value;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: jsonpath_list_create_item                                        *
@@ -190,7 +188,7 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 {
 	zbx_jsonpath_list_node_t	*item = list;
 
-	while(NULL != list)
+	while (NULL != list)
 	{
 		item = list;
 		list = list->next;
@@ -204,14 +202,14 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
  *                                                                            *
  * Purpose: create jsonpath expression token                                  *
  *                                                                            *
- * Parameters: type - [IN] the token type                                     *
- *             data - [IN] the token data (optional, can be NULL)             *
- *             len  - [IN] the token data length                              *
+ * Parameters: type       - [IN] the token type                               *
+ *             expression - [IN] the expression                               *
+ *             loc        - [IN] the token location in the expression         *
  *                                                                            *
  * Return value: The created token (must be freed by the caller).             *
  *                                                                            *
  ******************************************************************************/
-static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *expression, zbx_strloc_t *loc)
+static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *expression, const zbx_strloc_t *loc)
 {
 	zbx_jsonpath_token_t	*token;
 
