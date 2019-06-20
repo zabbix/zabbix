@@ -108,6 +108,7 @@ typedef struct
 	int			trends_num;
 	int			trends_last_cleanup_hour;
 	int			history_num_total;
+	int			history_sync_ts;
 }
 ZBX_DC_CACHE;
 
@@ -3196,23 +3197,31 @@ static void	sync_history_cache_full(void)
 
 void	zbx_log_sync_history_cache_progress(void)
 {
-	int	history_num, history_num_total;
+	int	history_num, history_num_total, sec;
 
 	LOCK_CACHE;
+
+	if (ZBX_HC_SYNC_TIME_MAX > (sec = time(NULL)) - cache->history_sync_ts)
+	{
+		UNLOCK_CACHE;
+		return;
+	}
+
+	cache->history_sync_ts = sec;
 
 	if (0 == cache->history_num_total)
 		cache->history_num_total = cache->history_num;
 
-	history_num = cache->history_num;
 	history_num_total = cache->history_num_total;
+	history_num = cache->history_num;
 
 	UNLOCK_CACHE;
 
-	if (0 != history_num_total)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-				100 * (double)(history_num_total - history_num) / history_num_total);
-	}
+	if (0 == history_num_total)
+		return;
+
+	zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+			100 * (double)(history_num_total - history_num) / history_num_total);
 }
 
 /******************************************************************************
@@ -4197,6 +4206,7 @@ static int	init_trend_cache(char **error)
 	cache->trends_num = 0;
 	cache->trends_last_cleanup_hour = 0;
 	cache->history_num_total = 0;
+	cache->history_sync_ts = 0;
 
 #define INIT_HASHSET_SIZE	100	/* Should be calculated dynamically based on trends size? */
 					/* Still does not make sense to have it more than initial */
