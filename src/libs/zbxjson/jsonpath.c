@@ -1136,10 +1136,7 @@ static int	jsonpath_parse_bracket_segment(const char *start, zbx_jsonpath_t *jso
 	}
 	else if ('*' == *ptr)
 	{
-		zbx_jsonpath_segment_t	*segment;
-
-		segment = &jsonpath->segments[jsonpath->segments_num++];
-		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_ALL;
+		jsonpath->segments[jsonpath->segments_num++].type = ZBX_JSONPATH_SEGMENT_MATCH_ALL;
 		jsonpath->definite = 0;
 		*next = ptr + 1;
 		ret = SUCCEED;
