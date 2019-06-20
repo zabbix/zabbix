@@ -1246,9 +1246,7 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 	for (i = 0; i < jsonpath.segments_num; i++)
 	{
 		const char		*p;
-		zbx_jsonpath_segment_t	*segment;
-
-		segment = &jsonpath.segments[i];
+		zbx_jsonpath_segment_t	*segment = &jsonpath.segments[i];
 
 		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
 		{

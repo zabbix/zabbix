@@ -51,14 +51,11 @@ static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_o
 	switch (token->type)
 	{
 		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
-			break;
+			ZBX_FALLTHROUGH;
 		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
-			break;
+			ZBX_FALLTHROUGH;
 		case ZBX_JSONPATH_TOKEN_CONST_STR:
-			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
-			break;
+			ZBX_FALLTHROUGH;
 		case ZBX_JSONPATH_TOKEN_CONST_NUM:
 			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
 			break;
@@ -116,8 +113,7 @@ static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_o
 	}
 }
 
-
-static char	*segment_data_to_str(zbx_jsonpath_segment_t *segment)
+static char	*segment_data_to_str(const zbx_jsonpath_segment_t *segment)
 {
 	const char			*functions[] = {"unknown", "min()", "max()", "avg()", "length()", "first()"};
 	char				*data = NULL;
@@ -188,11 +184,11 @@ static char	*segment_data_to_str(zbx_jsonpath_segment_t *segment)
 }
 
 static void	validate_segment(int index, const char *segment_type, const char *segment_data, int detached,
-		zbx_jsonpath_segment_t *segment)
+		const zbx_jsonpath_segment_t *segment)
 {
-	int			type;
-	char			prefix[MAX_STRING_LEN];
-	char			*data = NULL;
+	int	type;
+	char	prefix[MAX_STRING_LEN];
+	char	*data = NULL;
 
 	zbx_snprintf(prefix, sizeof(prefix), "jsonpath segment #%d type", index + 1);
 	type = mock_str_to_segment_type(segment_type);
@@ -259,6 +255,3 @@ void	zbx_mock_test_entry(void **state)
 	else
 		zbx_mock_assert_str_ne("zbx_jsonpath_compile() error", "", zbx_json_strerror());
 }
-
-
-

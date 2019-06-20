@@ -23,8 +23,6 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "log.h"
 
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
