@@ -118,8 +118,8 @@ static char	*jsonpath_strndup(const char *source, size_t len)
  *                                                                            *
  * Function: jsonpath_unquote                                                 *
  *                                                                            *
- * Purpose: unquote string by stripping leading/trailing quotes and           *
- *          unescaping backspace sequences                                    *
+ * Purpose: unquote single or double quoted string by stripping               *
+ *          leading/trailing quotes and unescaping backslash sequences        *
  *                                                                            *
  * Parameters: value - [OUT] the output value, must have at least len bytes   *
  *             start - [IN] a single or double quoted string to unquote       *
