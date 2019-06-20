@@ -92,6 +92,7 @@ jQuery(function ($) {
 			hbox = graph.data('hintbox') || null;
 
 		if (hbox !== null && data.isHintBoxFrozen === false) {
+			removeFromOverlaysStack(graph.hintboxid);
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
 			hbox.remove();
