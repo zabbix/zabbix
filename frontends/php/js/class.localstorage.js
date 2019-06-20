@@ -186,7 +186,7 @@ ZBX_LocalStorage.prototype.toAbsKey = function(key) {
 ZBX_LocalStorage.prototype.addKey = function(relative_key) {
 	var absolute_key = this.toAbsKey(relative_key);
 
-	this.rel_keys[relative_key] = new ZBX_LocalStorageKey(relative_key, absolute_key);
+	this.rel_keys[relative_key] = new ZBX_LocalStorageKey(relative_key);
 	this.abs_keys[absolute_key] = this.rel_keys[relative_key];
 
 	// DEBUG
@@ -244,20 +244,6 @@ ZBX_LocalStorage.prototype.keepAlive = function() {
 
 	sessions[ZBX_LocalStorage.sessionid] = timestamp;
 	localStorage.setItem(ZBX_LocalStorage.defines.KEY_SESSIONS, ZBX_LocalStorage.stringify(sessions));
-};
-
-/**
- * Callback gets passed a reference of object under this key. The reference then is written back into local storage.
- *
- * @param {string} key
- * @param {callable} callback
- */
-ZBX_LocalStorage.prototype.mutateObject = function(key, callback) {
-	ZBX_LocalStorage.DEBUG(key, callback);
-	var obj = this.readKey(key);
-
-	callback(obj);
-	this.writeKey(key, obj);
 };
 
 /**
@@ -319,7 +305,7 @@ ZBX_LocalStorage.prototype.ensureKey = function(key) {
  */
 ZBX_LocalStorage.stringify = function(value) {
 	return window.Prototype ? Object.toJSON(value) : JSON.stringify(value);
-}
+};
 
 /**
  * This whole design of signed payloads exists only because of IE11.
@@ -371,10 +357,8 @@ ZBX_LocalStorage.prototype.truncateBackup = function() {
 
 /**
  * Removes all local storage and creates default objects. Backup keys are not removed.
- *
- * @param {callable} filter_cb  Optional callback which return true if key should be removed.
  */
-ZBX_LocalStorage.prototype.truncate = function(filter_cb) {
+ZBX_LocalStorage.prototype.truncate = function() {
 	this.eachKey(function(key) {
 		key.truncate();
 	});
@@ -419,7 +403,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	}
 
 	if (value.signature === ZBX_LocalStorage.signature) {
-		// Internet expoler just dispatched storage event onto current instance.
+		// Internet explorer just dispatched storage event onto current instance.
 		return;
 	}
 
@@ -474,7 +458,7 @@ ZBX_LocalStorage.prototype.readKey = function(key, fallback) {
 	return null;
 };
 
-function ZBX_LocalStorageKey(relative_key, absolute_key) {
+function ZBX_LocalStorageKey(relative_key) {
 	this.backup_store = sessionStorage;
 	this.primary_store = localStorage;
 

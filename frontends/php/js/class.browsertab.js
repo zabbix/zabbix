@@ -18,7 +18,6 @@
 **/
 
 
-
 ZBX_BrowserTab.DEBUG_DEBOUNCE = 0;
 ZBX_BrowserTab.DEBUG_GRPS = [];
 ZBX_BrowserTab.DEBUG_GRP = function(log) {
@@ -164,16 +163,13 @@ ZBX_BrowserTab.prototype.handlePushedLastseen = function(lastseen) {
 ZBX_BrowserTab.prototype.handleKeepAliveTick = function() {
 	this.lastseen[this.uid] = Math.floor(+new Date / 1000);
 
-	var since = this.lastseen[this.uid] - (ZBX_BrowserTab.keep_alive_interval - 1) * 2,
-		crashed_tabids = this.findCrashedTabsSince(since);
-
-	crashed_tabids.forEach(function(tabid) {
+	this.findCrashedTabs().forEach(function(tabid) {
 		delete this.lastseen[tabid];
 		this.handleCrashed(tabid);
 	}.bind(this));
 
 	this.pushLastseen();
-}
+};
 
 /**
  * Writes own ID in `store.tabs` object. Registers unload event to remove own ID from `store.tabs.lastseen`.
@@ -191,12 +187,13 @@ ZBX_BrowserTab.prototype.bindEventHandlers = function() {
 };
 
 /**
- * @param {int} since  Unix time in past.
+ * @return {array} List of IDs of crashed tabs.
  */
-ZBX_BrowserTab.prototype.findCrashedTabsSince = function(since) {
+ZBX_BrowserTab.prototype.findCrashedTabs = function() {
 	ZBX_BrowserTab.DEBUG(this.getAllTabIds());
 
-	var crashed_tabids = [];
+	var since = this.lastseen[this.uid] - (ZBX_BrowserTab.keep_alive_interval - 1) * 2,
+		crashed_tabids = [];
 
 	for (var tabid in this.lastseen) {
 		if (this.lastseen[tabid] < since) {
@@ -264,7 +261,7 @@ ZBX_BrowserTab.prototype.handleUnload = function(e) {
 
 	delete this.lastseen[this.uid];
 
-	this.on_before_unload_cbs.forEach(function(c) {c(this, this.getAllTabIds())}.bind(this));
+	this.on_before_unload_cbs.forEach(function(c) {c(this, this.getAllTabIds());}.bind(this));
 	this.pushLastseen();
 
 	window.removeEventListener('unload', this.handleUnload.bind(this));

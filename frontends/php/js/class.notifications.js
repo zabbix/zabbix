@@ -145,10 +145,10 @@ ZBX_Notifications.DEBUG = function() {
 };
 
 /**
- * Fetches and renders notifications. Server always returns actual, full list of notifications that this class will
- * render into DOM. Last focused instance is the active one. Active instance is the only one that polls server,
- * meanwhile other instances are inactive. This is achieved by synchronizing via ZBX_LocalStorage and responding to
- * it's change event.
+ * Fetches and renders notifications. Server always returns full list of actual notifications that this class will
+ * render into DOM. Last focused ZBX_BrowserTab instance is the active one. Active ZBX_BrowserTab instance is the only
+ * one that polls server, meanwhile other instances are inactive. This is achieved by synchronizing state of active tab
+ * via ZBX_LocalStorage and responding to it's change event.
  *
  * Only methods prefixed with <push> are the "action dispatchers", methods prefixed with <handlePushed> responds to
  * these "actions" by passing the new received state value through a method prefixed with <consume> that will adjust
@@ -198,7 +198,7 @@ function ZBX_Notifications(store, tab) {
 		this.becomeActive();
 	}
 	else {
-		this.becomeInActive();
+		this.becomeInactive();
 	}
 
 	/*
@@ -467,7 +467,7 @@ ZBX_Notifications.prototype.stopMainLoop = function() {
 	if (this._main_loop_id) {
 		clearInterval(this._main_loop_id);
 	}
-}
+};
 
 /**
  * Sets interval for main loop. Tick is immediately executed.
@@ -495,7 +495,7 @@ ZBX_Notifications.prototype.debounceRender = function(ms) {
 	this._render_timeoutid = setTimeout(this.render.bind(this), ms);
 
 	ZBX_Notifications.DEBUG(ms);
-}
+};
 
 /**
  * TODO below is {WIP}
@@ -572,7 +572,7 @@ ZBX_Notifications.prototype.becomeActive = function() {
 
 	this.pushActiveTabid(this.tab.uid);
 	this.renderAudio();
-}
+};
 
 /**
  * Notification instance may only ever become inactive when another instance becomes active. At single tab unload case
@@ -580,7 +580,7 @@ ZBX_Notifications.prototype.becomeActive = function() {
  *
  * (TODO is it possible to just call this method at unload).
  */
-ZBX_Notifications.prototype.becomeInActive = function() {
+ZBX_Notifications.prototype.becomeInactive = function() {
 	document.title = "Ina";
 	document.title += (+new Date) - 1560000000000;
 
@@ -627,7 +627,7 @@ ZBX_Notifications.prototype.dropStore = function() {
 	this.store.eachKeyRegex('^notifications\\.', function(key) {
 		key.truncatePrimary();
 	});
-}
+};
 
 /**
  * @param {object} user_settings
@@ -660,7 +660,7 @@ ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
  * @param {string} tabid
  */
 ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
-	tabid === this.tab.uid ? this.becomeActive() : this.becomeInActive();
+	tabid === this.tab.uid ? this.becomeActive() : this.becomeInactive();
 };
 
 /**
@@ -678,7 +678,7 @@ ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids
 	ZBX_Notifications.DEBUG(removed_tab, other_tabids);
 
 	if (this.active && other_tabids.length) {
-		this.becomeInActive();
+		this.becomeInactive();
 		this.pushActiveTabid(other_tabids[0]);
 	}
 	else if (this.active) {

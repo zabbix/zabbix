@@ -66,6 +66,8 @@ ZBX_Notification.prototype.getRaw = function() {
  * raw object is assumed to be just received.
  *
  * @param {object} raw  An object in format that is used in store. All keys are optional.
+ *
+ * @return {ZBX_Notification}
  */
 ZBX_Notification.prototype.updateRaw = function(raw) {
 	ZBX_Notifications.DEBUG(raw);
@@ -82,7 +84,7 @@ ZBX_Notification.prototype.updateRaw = function(raw) {
 };
 
 /**
- * Notification body is not updated if server changed it's name, this is to be less confuzing.
+ * Notification body is not updated if server changed it's name, this is to be less confusing.
  *
  * @param {object} severity_styles  Object of class names keyed by severity id.
  */
@@ -91,7 +93,7 @@ ZBX_Notification.prototype.render = function(severity_styles) {
 
 	var title_prefix = this._raw.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON;
 
-	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title)
+	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title);
 	this.node.indicator.className = 'notif-indic ' + severity_styles[this._raw.resolved ? -1 : this._raw.severity];
 	this.node.snooze_icon.style.opacity = this._raw.snoozed ? 1 : 0;
 };
@@ -136,7 +138,7 @@ ZBX_Notification.prototype.makeNode = function() {
 	node.snooze_icon.className = 'notif-indic-snooze';
 	node.snooze_icon.style.opacity = 0;
 
-	node.indicator.appendChild(node.snooze_icon)
+	node.indicator.appendChild(node.snooze_icon);
 
 	return node;
 };

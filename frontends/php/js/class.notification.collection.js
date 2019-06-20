@@ -119,7 +119,7 @@ ZBX_NotificationCollection.prototype.consumeList = function(list) {
 	}
 
 	for (var id in this._list_obj) {
-		if (new_list_sequence.indexOf(id) === -1) {
+		if (new_list_sequence.indexOf(id) == -1) {
 			this._dangling_nodes.push(this._list_obj[id].node);
 			delete this._list_obj[id];
 		}
@@ -176,6 +176,8 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
  *
  * @param {object} attrs_inactive  Attribute key-value object to be mapped on renderState(true).
  * @param {object} attrs_active    Attribute key-value object to be mapped on renderState(false).
+ *
+ * @return {HTMLElement} DOM button element.
  */
 ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, attrs_active) {
 	ZBX_Notifications.DEBUG(attrs_inactive, attrs_active);
@@ -244,7 +246,7 @@ ZBX_NotificationCollection.prototype.hide = function() {
 };
 
 /**
- * @return {integer}
+ * @return {boolean}
  */
 ZBX_NotificationCollection.prototype.isEmpty = function() {
 	ZBX_Notifications.DEBUG();
@@ -315,4 +317,4 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 	this.removeDanglingNodes();
 
 	this.node.style.display === 'none' && this.show();
-}
+};
