@@ -3201,19 +3201,26 @@ void	zbx_log_sync_history_cache_progress(void)
 
 	LOCK_CACHE;
 
-	if (ZBX_HC_SYNC_TIME_MAX > (sec = time(NULL)) - cache->history_sync_ts)
-	{
-		UNLOCK_CACHE;
-		return;
-	}
-
-	cache->history_sync_ts = sec;
-
 	if (0 == cache->history_num_total)
 		cache->history_num_total = cache->history_num;
 
 	history_num_total = cache->history_num_total;
 	history_num = cache->history_num;
+
+	sec = time(NULL);
+
+	if (0 == cache->history_num)
+		cache->history_num_total = 0;
+	else
+	{
+		if (ZBX_HC_SYNC_TIME_MAX > sec - cache->history_sync_ts)
+		{
+			UNLOCK_CACHE;
+			return;
+		}
+	}
+
+	cache->history_sync_ts = sec;
 
 	UNLOCK_CACHE;
 
