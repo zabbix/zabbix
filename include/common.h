@@ -1457,7 +1457,6 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 zbx_log_value_t	*zbx_log_value_dup(const zbx_log_value_t *src);
 
-
 typedef union
 {
 	zbx_uint64_t	ui64;
