@@ -1744,8 +1744,8 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 			case ZBX_JSONPATH_TOKEN_OP_AND:
 				jsonpath_variant_to_boolean(left);
 				jsonpath_variant_to_boolean(right);
-				if (SUCCEED != zbx_double_compare(left->data.dbl, 0) &&
-						SUCCEED != zbx_double_compare(right->data.dbl, 0))
+				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) &&
+						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
 				{
 					res = 1;
 				}
@@ -1758,8 +1758,8 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 			case ZBX_JSONPATH_TOKEN_OP_OR:
 				jsonpath_variant_to_boolean(left);
 				jsonpath_variant_to_boolean(right);
-				if (SUCCEED != zbx_double_compare(left->data.dbl, 0) ||
-						SUCCEED != zbx_double_compare(right->data.dbl, 0))
+				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) ||
+						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
 				{
 					res = 1;
 				}
@@ -1790,7 +1790,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 	}
 
 	zbx_variant_convert(&stack.values[0], ZBX_VARIANT_DBL);
-	if (SUCCEED != zbx_double_compare(stack.values[0].data.dbl, 0))
+	if (SUCCEED != zbx_double_compare(stack.values[0].data.dbl, 0.0))
 		ret = jsonpath_query_next_segment(jp_root, pnext, jsonpath, path_depth, objects);
 out:
 	for (i = 0; i < stack.values_num; i++)
