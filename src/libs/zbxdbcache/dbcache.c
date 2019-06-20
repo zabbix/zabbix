@@ -3195,6 +3195,13 @@ static void	sync_history_cache_full(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_sync_history_cache_progress                              *
+ *                                                                            *
+ * Purpose: log progress of syncing history data                              *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_log_sync_history_cache_progress(void)
 {
 	int	history_num, history_num_total, sec;
