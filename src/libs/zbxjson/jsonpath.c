@@ -324,7 +324,7 @@ static int	jsonpath_next(const char **pnext)
 		{
 			start = next;
 
-			while (0 != isalnum(*next) || '_' == *next)
+			while (0 != isalnum((unsigned char)*next) || '_' == *next)
 				next++;
 
 			if (start == next)
@@ -341,11 +341,11 @@ static int	jsonpath_next(const char **pnext)
 	SKIP_WHITESPACE_NEXT(next);
 
 	/* process array index component */
-	if (0 != isdigit(*next))
+	if (0 != isdigit((unsigned char)*next))
 	{
 		size_t	pos;
 
-		for (pos = 1; 0 != isdigit(next[pos]); pos++)
+		for (pos = 1; 0 != isdigit((unsigned char)next[pos]); pos++)
 			;
 
 		next += pos;
@@ -480,10 +480,10 @@ static int	jsonpath_parse_number(const char *start, int *len)
 		if ('-' == *ptr || '+' == *ptr)
 			ptr++;
 
-		if (0 == isdigit(*ptr))
+		if (0 == isdigit((unsigned char)*ptr))
 			return FAIL;
 
-		while (0 != isdigit(*ptr))
+		while (0 != isdigit((unsigned char)*ptr))
 			ptr++;
 	}
 
