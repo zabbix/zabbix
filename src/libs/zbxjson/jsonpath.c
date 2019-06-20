@@ -1609,7 +1609,6 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 	zbx_vector_var_t	stack;
 	int			i, ret = SUCCEED;
 	zbx_jsonpath_segment_t	*segment;
-	zbx_jsonpath_token_t	*token;
 	zbx_variant_t		value, *left, *right;
 	double			res;
 
@@ -1622,30 +1621,30 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 
 	for (i = 0; i < segment->data.expression.tokens.values_num; i++)
 	{
-		token = (zbx_jsonpath_token_t *)segment->data.expression.tokens.values[i];
+		zbx_jsonpath_token_t	*token = (zbx_jsonpath_token_t *)segment->data.expression.tokens.values[i];
 
-		if (ZBX_JSONPATH_TOKEN_GROUP_OPERATOR1 == jsonpath_token_group(token->type))
+		switch (jsonpath_token_group(token->type))
 		{
-			if (1 > stack.values_num)
-			{
-				jsonpath_set_expression_error(&segment->data.expression);
-				ret = FAIL;
-				goto out;
-			}
-			right = &stack.values[stack.values_num - 1];
-		}
+			case ZBX_JSONPATH_TOKEN_GROUP_OPERATOR2:
+				if (2 > stack.values_num)
+				{
+					jsonpath_set_expression_error(&segment->data.expression);
+					ret = FAIL;
+					goto out;
+				}
 
-		if (ZBX_JSONPATH_TOKEN_GROUP_OPERATOR2 == jsonpath_token_group(token->type))
-		{
-			if (2 > stack.values_num)
-			{
-				jsonpath_set_expression_error(&segment->data.expression);
-				ret = FAIL;
-				goto out;
-			}
-
-			left = &stack.values[stack.values_num - 2];
-			right = &stack.values[stack.values_num - 1];
+				left = &stack.values[stack.values_num - 2];
+				right = &stack.values[stack.values_num - 1];
+				break;
+			case ZBX_JSONPATH_TOKEN_GROUP_OPERATOR1:
+				if (1 > stack.values_num)
+				{
+					jsonpath_set_expression_error(&segment->data.expression);
+					ret = FAIL;
+					goto out;
+				}
+				right = &stack.values[stack.values_num - 1];
+				break;
 		}
 
 		switch (token->type)
