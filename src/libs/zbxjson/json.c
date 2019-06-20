@@ -1228,11 +1228,9 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
  ******************************************************************************/
 int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
 {
-	const char		*p;
-	int			index, i, ret = FAIL;
+	int			i, ret = FAIL;
 	struct zbx_json_parse	object;
 	zbx_jsonpath_t		jsonpath;
-	zbx_jsonpath_segment_t	*segment;
 
 	object = *jp;
 
@@ -1241,6 +1239,9 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 	for (i = 0; i < jsonpath.segments_num; i++)
 	{
+		const char		*p;
+		zbx_jsonpath_segment_t	*segment;
+
 		segment = &jsonpath.segments[i];
 
 		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
@@ -1251,6 +1252,8 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 		if (ZBX_JSONPATH_LIST_INDEX == segment->data.list.type)
 		{
+			int	index;
+
 			if ('[' != *object.start)
 				goto out;
 
