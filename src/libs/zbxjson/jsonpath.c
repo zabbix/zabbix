@@ -1533,7 +1533,7 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
  * Parameters: expression - [IN] the jsonpath exprssion                       *
  *                                                                            *
  * Comments: This function is used to set error message when expression       *
- *           evaluation fails expression in error message.                    *
+ *           evaluation fails                                                 *
  *                                                                            *
  ******************************************************************************/
 static void	jsonpath_set_expression_error(zbx_jsonpath_expression_t *expression)
@@ -1567,12 +1567,16 @@ static void	jsonpath_variant_to_boolean(zbx_variant_t *value)
 			res = (0 != value->data.ui64 ? 1 : 0);
 			break;
 		case ZBX_VARIANT_DBL:
-			res = (SUCCEED != zbx_double_compare(value->data.dbl, 0) ? 1 : 0);
+			res = (SUCCEED != zbx_double_compare(value->data.dbl, 0.0) ? 1 : 0);
 			break;
 		case ZBX_VARIANT_STR:
 			res = ('\0' != *value->data.str ? 1 : 0);
 			break;
 		case ZBX_VARIANT_NONE:
+			res = 0;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 			res = 0;
 			break;
 	}
