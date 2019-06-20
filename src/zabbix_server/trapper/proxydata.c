@@ -124,7 +124,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 
 	if (!ZBX_IS_RUNNING())
 	{
-		error = zbx_strdup(error, "shutdown in progress");
+		error = zbx_strdup(error, "Zabbix server shutdown in progress");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from active proxy at \"%s\": %s",
 				sock->peer, error);
 		ret = status = FAIL;

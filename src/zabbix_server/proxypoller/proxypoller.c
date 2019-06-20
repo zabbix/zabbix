@@ -194,11 +194,11 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 					if (0 != (s.protocol & ZBX_TCP_COMPRESS))
 						flags |= ZBX_TCP_COMPRESS;
 
-					zbx_send_response_ext(&s, FAIL, "shutdown in progress", NULL, flags,
-							CONFIG_TIMEOUT);
+					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
+							flags, CONFIG_TIMEOUT);
 
 					zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from passive proxy at"
-							" \"%s\": shutdown in progress", s.peer);
+							" \"%s\": Zabbix server shutdown in progress", s.peer);
 					ret = FAIL;
 				}
 				else
