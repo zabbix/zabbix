@@ -978,8 +978,8 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 {
 	zbx_jsonpath_segment_t		*segment;
 	const char			*end, *start = NULL;
-	int				ret = FAIL, type = ZBX_JSONPATH_SEGMENT_UNKNOWN, parsed_index = 0, value;
-	unsigned int			flags = 0;
+	int				ret = FAIL, type = ZBX_JSONPATH_SEGMENT_UNKNOWN;
+	unsigned int			flags = 0, parsed_index = 0;
 	zbx_jsonpath_list_node_t	*head = NULL, *node;
 
 	for (end = list; ; end++)
@@ -1004,6 +1004,8 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 
 		if (NULL != start)
 		{
+			int	value;
+
 			if ('-' == *start && end == start + 1)
 			{
 				ret = zbx_jsonpath_error(start);
@@ -1123,9 +1125,8 @@ out:
  ******************************************************************************/
 static int	jsonpath_parse_bracket_segment(const char *start, zbx_jsonpath_t *jsonpath, const char **next)
 {
-	const char		*ptr = start;
-	int			ret;
-	zbx_jsonpath_segment_t	*segment;
+	const char	*ptr = start;
+	int		ret;
 
 	SKIP_WHITESPACE(ptr);
 
@@ -1135,6 +1136,8 @@ static int	jsonpath_parse_bracket_segment(const char *start, zbx_jsonpath_t *jso
 	}
 	else if ('*' == *ptr)
 	{
+		zbx_jsonpath_segment_t	*segment;
+
 		segment = &jsonpath->segments[jsonpath->segments_num++];
 		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_ALL;
 		jsonpath->definite = 0;
@@ -1227,7 +1230,6 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		}
 	}
 
-
 	if (0 < (len = ptr - start))
 	{
 		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_LIST;
@@ -1250,7 +1252,7 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
  *          json parse structure                                              *
  *                                                                            *
  * Parameters: pnext - [IN] a pointer to object/array/value data              *
- *             jp    - [OU] json parse data with start/end set                *
+ *             jp    - [OUT] json parse data with start/end set               *
  *                                                                            *
  * Return value: SUCCEED - pointer was converted successfully                 *
  *               FAIL    - otherwise                                          *
@@ -1391,9 +1393,9 @@ static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char 
  *                                                                            *
  * Purpose: extract value from json data by the specified path                *
  *                                                                            *
- * Parameters: jp       - [IN] the parent object                              *
- *             jsonpath - [IN] the jsonpath (definite)                        *
- *             value    - [OUT] the extracted value                           *
+ * Parameters: jp    - [IN] the parent object                                 *
+ *             path  - [IN] the jsonpath (definite)                           *
+ *             value - [OUT] the extracted value                              *
  *                                                                            *
  * Return value: SUCCEED - the value was extracted successfully               *
  *               FAIL    - in the case of errors or if there was no value to  *
