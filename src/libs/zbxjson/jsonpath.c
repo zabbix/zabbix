@@ -82,7 +82,7 @@ static int	jsonpath_token_group(int type)
  *                                                                            *
  * Function: zbx_jsonpath_error                                               *
  *                                                                            *
- * Purpose: set json error message and returns FAIL                           *
+ * Purpose: set json error message and return FAIL                            *
  *                                                                            *
  * Comments: This function is used to return from json path parsing functions *
  *           in the case of failure.                                          *
@@ -118,12 +118,11 @@ static char	*jsonpath_strndup(const char *source, size_t len)
  *                                                                            *
  * Function: jsonpath_unquote                                                 *
  *                                                                            *
- * Purpose: unquote string stripping leading/trailing quotes and unescaping   *
- *          backspace sequences                                               *
+ * Purpose: unquote string by stripping leading/trailing quotes and           *
+ *          unescaping backspace sequences                                    *
  *                                                                            *
  * Parameters: value - [OUT] the output value, must have at least len bytes   *
- *             start - [IN] the string to unquote including leading and       *
- *                          trailing quotes                                   *
+ *             start - [IN] a single or double quoted string to unquote       *
  *             len   - [IN] the length of the input string                    *
  *                                                                            *
  ******************************************************************************/

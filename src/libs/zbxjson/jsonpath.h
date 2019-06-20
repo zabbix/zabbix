@@ -75,7 +75,7 @@ typedef struct
 }
 zbx_jsonpath_range_t;
 
-/* expression tokens in posfix notation */
+/* expression tokens in postfix notation */
 typedef struct
 {
 	zbx_vector_ptr_t	tokens;
