@@ -411,7 +411,6 @@ static int	jsonpath_parse_substring(const char *start, int *len)
 				return FAIL;
 			ptr++;
 		}
-
 	}
 
 	return FAIL;
@@ -435,9 +434,9 @@ static int	jsonpath_parse_substring(const char *start, int *len)
  ******************************************************************************/
 static int	jsonpath_parse_path(const char *start, int *len)
 {
-	const char	*ptr;
+	const char	*ptr = start + 1;
 
-	for (ptr = start + 1; '[' == *ptr || '.' == *ptr;)
+	while ('[' == *ptr || '.' == *ptr)
 	{
 		if (FAIL == jsonpath_next(&ptr))
 			return FAIL;
@@ -453,7 +452,7 @@ static int	jsonpath_parse_path(const char *start, int *len)
  *                                                                            *
  * Purpose: parse number value                                                *
  *                                                                            *
- * Parameters: start - [IN] the numbeer start                                 *
+ * Parameters: start - [IN] the number start                                  *
  *             len   - [OUT] the number length                                *
  *                                                                            *
  * Return value: SUCCEED - the number was parsed successfully                 *
@@ -654,11 +653,11 @@ out:
  *                                                                            *
  * Purpose: parse jsonpath filter expression in format                        *
  *                                                                            *
- * Parameters: start    - [IN] the expression, including opening and closing  *
- *                             parenthesis                                    *
- *             jsonpath - [IN/OUT] the jsonpath                               *
- *             next     - [OUT] a pointer to the next character after parsed  *
- *                              expression                                    *
+ * Parameters: expression - [IN] the expression, including opening and        *
+ *                               closing parenthesis                          *
+ *             jsonpath   - [IN/OUT] the jsonpath                             *
+ *             next       - [OUT] a pointer to the next character after       *
+ *                                parsed expression                           *
  *                                                                            *
  * Return value: SUCCEED - the expression was parsed successfully             *
  *               FAIL    - otherwise                                          *
@@ -836,7 +835,6 @@ out:
 		jsonpath->definite = 0;
 	}
 cleanup:
-
 	if (SUCCEED != ret)
 	{
 		zbx_vector_ptr_clear_ext(&operators, (zbx_clean_func_t)jsonpath_token_free);
@@ -875,7 +873,7 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 	zbx_jsonpath_segment_t		*segment;
 	int				ret = FAIL, parsed_name = 0;
 	const char			*end, *start = NULL;
-	zbx_jsonpath_list_node_t	*head = NULL, *node = NULL;
+	zbx_jsonpath_list_node_t	*head = NULL;
 
 	for (end = list; ']' != *end || NULL != start; end++)
 	{
@@ -889,6 +887,8 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 				}
 				else if (*start == *end)
 				{
+					zbx_jsonpath_list_node_t	*node;
+
 					if (start + 1 == end)
 					{
 						ret = zbx_jsonpath_error(start);
