@@ -1246,7 +1246,13 @@ int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct
 
 		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
 		{
-			zbx_set_json_strerror("Only name or index based paths can be used to locate single object");
+			zbx_set_json_strerror("only name or index based paths can be used to locate single object");
+			goto out;
+		}
+
+		if (NULL != segment->data.list.values->next)
+		{
+			zbx_set_json_strerror("cannot use multiple names or indexes to locate single object");
 			goto out;
 		}
 

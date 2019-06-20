@@ -369,4 +369,32 @@ in:
 out:
   result: succeed
   value: "𐀀𐀀𐀀𐀀"
+---
+test case: 'Invalid path $.*.b in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $.*.b
+out:
+  result: fail
+---
+test case: 'Invalid path $.a.b[?(@.x == "10")] in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $.a.b[?(@.x == "10")]
+out:
+  result: fail
+---
+test case: 'Invalid path $["a", "x"].b in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $['a', 'x'].b
+out:
+  result: fail
+---
+test case: 'Invalid path $.a.b[1,2] in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $.a.b[1,2]
+out:
+  result: fail
 ...
