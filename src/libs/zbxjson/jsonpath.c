@@ -2362,13 +2362,14 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 {
 	int				ret = FAIL;
 	const char			*ptr = path, *next;
-	zbx_jsonpath_segment_t		*segment;
 	zbx_jsonpath_segment_type_t	segment_type, last_segment_type = ZBX_JSONPATH_SEGMENT_UNKNOWN;
-	char				prefix;
 	zbx_jsonpath_t			jpquery;
 
 	if ('$' != *ptr || '\0' == ptr[1])
-		return zbx_jsonpath_error(ptr);
+	{
+		zbx_set_json_strerror("JSONPath query must start with the root object/element $.");
+		return FAIL;
+	}
 
 	memset(&jpquery, 0, sizeof(zbx_jsonpath_t));
 	jsonpath_reserve(&jpquery, 4);
@@ -2376,6 +2377,8 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 
 	for (ptr++; '\0' != *ptr; ptr = next)
 	{
+		char	prefix;
+
 		jsonpath_reserve(&jpquery, 1);
 
 		if ('.' == (prefix = *ptr))
@@ -2383,7 +2386,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 			if ('.' == *(++ptr))
 			{
 				/* mark next segment as detached */
-				segment = &jpquery.segments[jpquery.segments_num];
+				zbx_jsonpath_segment_t	*segment = &jpquery.segments[jpquery.segments_num];
 
 				if (1 != segment->detached)
 				{
