@@ -601,5 +601,13 @@ in:
 out:
   return: SUCCEED
   value: '[1002]'
+---
+test case: Query $.books[?(@.title =~ "[a-z")].title
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.books[?(@.title =~ "[a-z")].title
+out:
+  return: FAIL
 ...
 

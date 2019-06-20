@@ -818,7 +818,7 @@ out:
 
 			if (ZBX_JSONPATH_TOKEN_PAREN_LEFT == optoken->type)
 			{
-				zbx_set_json_strerror("Mismatched () brackets in expression: %s", expression);
+				zbx_set_json_strerror("mismatched () brackets in expression: %s", expression);
 				ret = FAIL;
 				goto cleanup;
 			}
@@ -1541,7 +1541,7 @@ static void	jsonpath_set_expression_error(zbx_jsonpath_expression_t *expression)
 	char	*text;
 
 	text = jsonpath_expression_to_str(expression);
-	zbx_set_json_strerror("Invalid compiled expression: %s", text);
+	zbx_set_json_strerror("invalid compiled expression: %s", text);
 	zbx_free(text);
 }
 
@@ -1583,6 +1583,36 @@ static void	jsonpath_variant_to_boolean(zbx_variant_t *value)
 
 	zbx_variant_clear(value);
 	zbx_variant_set_dbl(value, res);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: jsonpath_regexp_match                                            *
+ *                                                                            *
+ * Purpose: match text against regular expression                             *
+ *                                                                            *
+ * Parameters: text    - [IN] the text to match                               *
+ *             pattern - [IN] the regular expression                          *
+ *             result  - [OUT] 1.0 if match succeeded, 0.0 otherwise          *
+ *                                                                            *
+ * Return value: SUCCEED - regular expression match was performed             *
+ *               FAIL    - regular expression error                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	jsonpath_regexp_match(const char *text, const char *pattern, double *result)
+{
+	zbx_regexp_t	*rxp;
+	const char	*error = NULL;
+
+	if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+	{
+		zbx_set_json_strerror("invalid regular expression in JSON path: %s", error);
+		return FAIL;
+	}
+	*result = (0 == zbx_regexp_match_precompiled(text, rxp) ? 1.0 : 0.0);
+	zbx_regexp_free(rxp);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1696,42 +1726,42 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_EQ:
-				res = (0 == zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 == zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_NE:
-				res = (0 != zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 != zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_GT:
-				res = (0 < zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 < zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_GE:
-				res = (0 <= zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 <= zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_LT:
-				res = (0 > zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 > zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_LE:
-				res = (0 >= zbx_variant_compare(left, right) ? 1 : 0);
+				res = (0 >= zbx_variant_compare(left, right) ? 1.0 : 0.0);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
 				zbx_variant_set_dbl(left, res);
@@ -1747,10 +1777,10 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) &&
 						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
 				{
-					res = 1;
+					res = 1.0;
 				}
 				else
-					res = 0;
+					res = 0.0;
 				zbx_variant_set_dbl(left, res);
 				zbx_variant_clear(right);
 				stack.values_num--;
@@ -1761,10 +1791,10 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) ||
 						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
 				{
-					res = 1;
+					res = 1.0;
 				}
 				else
-					res = 0;
+					res = 0.0;
 				zbx_variant_set_dbl(left, res);
 				zbx_variant_clear(right);
 				stack.values_num--;
@@ -1772,9 +1802,13 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 			case ZBX_JSONPATH_TOKEN_OP_REGEXP:
 				zbx_variant_convert(left, ZBX_VARIANT_STR);
 				zbx_variant_convert(right, ZBX_VARIANT_STR);
-				res = (NULL != zbx_regexp_match(left->data.str, right->data.str, NULL) ? 1 : 0);
+				ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
 				zbx_variant_clear(left);
 				zbx_variant_clear(right);
+
+				if (FAIL == ret)
+					goto out;
+
 				zbx_variant_set_dbl(left, res);
 				stack.values_num--;
 				break;
@@ -1848,7 +1882,7 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
 			ret = jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, objects);
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -2096,7 +2130,7 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 		{
 			/* all functions can be applied only to arrays        */
 			/* attempt to apply a function to non-array will fail */
-			zbx_set_json_strerror("Cannot apply function to non-array JSON element");
+			zbx_set_json_strerror("cannot apply function to non-array JSON element");
 			goto out;
 		}
 
@@ -2128,7 +2162,7 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 
 	if (0 == objects->values_num)
 	{
-		zbx_set_json_strerror("Cannot apply aggregation function to empty array");
+		zbx_set_json_strerror("cannot apply aggregation function to empty array");
 		goto out;
 	}
 
