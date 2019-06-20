@@ -313,8 +313,6 @@ static void	jsonpath_segment_clear(zbx_jsonpath_segment_t *segment)
 static int	jsonpath_next(const char **pnext)
 {
 	const char	*next = *pnext, *start;
-	size_t		pos;
-	char		quotes;
 
 	/* process dot notation component */
 	if ('.' == *next)
@@ -345,6 +343,8 @@ static int	jsonpath_next(const char **pnext)
 	/* process array index component */
 	if (0 != isdigit(*next))
 	{
+		size_t	pos;
+
 		for (pos = 1; 0 != isdigit(next[pos]); pos++)
 			;
 
@@ -353,6 +353,8 @@ static int	jsonpath_next(const char **pnext)
 	}
 	else
 	{
+		char	quotes;
+
 		if ('\'' != *next && '"' != *next)
 			return zbx_jsonpath_error(*pnext);
 
