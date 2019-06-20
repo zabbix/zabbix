@@ -2194,7 +2194,7 @@ static int	jsonpath_apply_functions(const struct zbx_json_parse *jp_root, const 
 
 	zbx_vector_str_create(&input);
 
-	/* when functions are applied direclty to the json document (at the start of the jsonpath ) */
+	/* when functions are applied directly to the json document (at the start of the jsonpath ) */
 	/* it makes all document as input object                                                    */
 	if (0 == path_depth)
 		zbx_vector_str_append(&input, (char *)jp_root->start);

@@ -397,4 +397,18 @@ in:
   path: $.a.b[1,2]
 out:
   result: fail
+---
+test case: 'Invalid path $.a.b.length() in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $.a.b.length()
+out:
+  result: fail
+---
+test case: 'Invalid path $..b in {"a":{"b": [{"x":10}, 2, 3] }}'
+in:
+  json: '{"a":{"b": [{"x":10}, 2, 3] }}'
+  path: $..b
+out:
+  result: fail
 ...
