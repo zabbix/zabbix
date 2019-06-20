@@ -178,6 +178,7 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 
 void	zbx_on_exit(int ret)
 {
+	ZBX_UNUSED(ret);
 }
 
 /* test itself */

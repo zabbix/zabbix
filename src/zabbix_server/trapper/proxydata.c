@@ -132,6 +132,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	}
 	else
 		zbx_send_proxy_data_response(&proxy, sock, error);
+
 out:
 	if (FAIL == ret)
 	{
