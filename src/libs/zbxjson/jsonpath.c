@@ -1459,14 +1459,11 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 		switch (token->type)
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
-				break;
+				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
-				break;
+				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
-				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
-				break;
+				ZBX_FALLTHROUGH;
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
 				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
 				break;
