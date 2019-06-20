@@ -1213,15 +1213,6 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 	return num;
 }
 
-
-/*
- * limited JSONPath support
- */
-
-#define ZBX_JSONPATH_COMPONENT_DOT	0
-#define ZBX_JSONPATH_COMPONENT_BRACKET	1
-#define ZBX_JSONPATH_ARRAY_INDEX	2
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_json_path_open                                               *
