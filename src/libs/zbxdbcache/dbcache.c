@@ -3239,7 +3239,7 @@ void	zbx_log_sync_history_cache_progress(void)
 	UNLOCK_CACHE;
 
 	if (0 == ts_last)
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data in progress ... ");
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data in progress... ");
 
 	if (-1.0 != pcnt)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%", pcnt);
