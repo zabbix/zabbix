@@ -25,8 +25,6 @@
  * It holds infinite loop, so it allows us easily adjust timeout during playback.
  */
 function ZBX_NotificationsAudio() {
-	ZBX_Notifications.DEBUG();
-
 	this.audio = new Audio();
 
 	this.audio.volume = 0;
@@ -51,8 +49,6 @@ function ZBX_NotificationsAudio() {
  * @return int  Interval ID.
  */
 ZBX_NotificationsAudio.prototype.listen = function() {
-	ZBX_Notifications.DEBUG();
-
 	var ms_step = 10;
 
 	return setInterval(function(){
@@ -85,8 +81,6 @@ ZBX_NotificationsAudio.prototype.listen = function() {
  * @return {ZBX_NotificationsAudio}
  */
 ZBX_NotificationsAudio.prototype.file = function(file) {
-	ZBX_Notifications.DEBUG(file);
-
 	if (this.wave == file) {
 		return this;
 	}
@@ -111,8 +105,6 @@ ZBX_NotificationsAudio.prototype.file = function(file) {
  * @return {ZBX_NotificationsAudio}
  */
 ZBX_NotificationsAudio.prototype.seek = function(seconds) {
-	ZBX_Notifications.DEBUG(seconds);
-
 	if (this.audio.readyState > 0) {
 		this.audio.currentTime = seconds;
 	}
@@ -126,8 +118,6 @@ ZBX_NotificationsAudio.prototype.seek = function(seconds) {
  * @return {Promise}
  */
 ZBX_NotificationsAudio.prototype.once = function() {
-	ZBX_Notifications.DEBUG();
-
 	if (this.play_once_on_ready && this.audio.readyState >= 3) {
 		this.play_once_on_ready = false;
 
@@ -145,8 +135,6 @@ ZBX_NotificationsAudio.prototype.once = function() {
  * @return {ZBX_NotificationsAudio}
  */
 ZBX_NotificationsAudio.prototype.stop = function() {
-	ZBX_Notifications.DEBUG();
-
 	return this.timeout(0);
 };
 
@@ -156,8 +144,6 @@ ZBX_NotificationsAudio.prototype.stop = function() {
  * @return {Promise}
  */
 ZBX_NotificationsAudio.prototype.resetPromise = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.timeout_promise = new Promise(function(resolve, reject) {
 		this._resolve_timeout = resolve;
 	}.bind(this));
@@ -174,8 +160,6 @@ ZBX_NotificationsAudio.prototype.resetPromise = function() {
  * @return {Promise}
  */
 ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
-	ZBX_Notifications.DEBUG(seconds);
-
 	if (seconds == -1) {
 		return this.once();
 	}
@@ -191,8 +175,6 @@ ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
  * @return {float}  Amount of seconds.
  */
 ZBX_NotificationsAudio.prototype.getSeek = function() {
-	ZBX_Notifications.DEBUG();
-
 	return this.audio.currentTime;
 };
 
@@ -210,8 +192,6 @@ ZBX_NotificationsAudio.prototype.getTimeout = function() {
  * policy error occurs.
  */
 ZBX_NotificationsAudio.prototype.handleOnloadeddata = function() {
-	ZBX_Notifications.DEBUG();
-
 	var promise = this.audio.play();
 
 	// Internet explorer does not return promise.

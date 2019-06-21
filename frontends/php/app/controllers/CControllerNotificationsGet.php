@@ -49,6 +49,7 @@ class CControllerNotificationsGet extends CController {
 	public function setResponse() {
 		/* $this->listid = time(); */
 		/* array_splice($this->notifications, 1, 2); */
+		/* $this->notifications = []; */
 		sdFile(time());
 		sdFile('RESP: this->notifications');
 		sdFile($this->notifications);
