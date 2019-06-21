@@ -2010,8 +2010,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
 				return NULL;
 			default:
-				OCIAttrGet(result->stmthp, OCI_HTYPE_STMT, (dvoid *) &rows_fetched, (ub4 *) &sizep,
-						OCI_ATTR_ROWS_FETCHED, oracle.errhp);
+				OCIAttrGet((void *)result->stmthp, (ub4)OCI_HTYPE_STMT, (void *)&rows_fetched,
+						(ub4 *)&sizep, (ub4)OCI_ATTR_ROWS_FETCHED, (OCIError *)oracle.errhp);
+
 				if (1 != rows_fetched)
 				{
 					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
