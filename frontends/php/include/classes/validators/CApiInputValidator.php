@@ -177,6 +177,8 @@ class CApiInputValidator {
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
+			case API_FLOAT:
+			case API_FLOATS:
 			case API_ID:
 			case API_BOOLEAN:
 			case API_FLAG:
@@ -458,14 +460,12 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_float($data) && !is_string($data))
-				|| 1 != preg_match('/^\-?([0-9]{1,12}+)(\.[0-9]{1,4}+)?$/', strval($data))) {
+		if (is_int($data) || (is_string($data) && 1 == preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data))) {
+			$data = (float) $data;
+		}
+		elseif (!is_float($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
-		}
-
-		if (!is_float($data)) {
-			$data = (float) $data;
 		}
 
 		return true;
