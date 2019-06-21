@@ -91,6 +91,12 @@ class CApiInputValidator {
 			case API_INTS32:
 				return self::validateInts32($rule, $data, $path, $error);
 
+			case API_UINT64:
+				return self::validateUInt64($rule, $data, $path, $error);
+
+			case API_UINTS64:
+				return self::validateUInts64($rule, $data, $path, $error);
+
 			case API_FLOAT:
 				return self::validateFloat($rule, $data, $path, $error);
 
@@ -177,6 +183,8 @@ class CApiInputValidator {
 			case API_MULTIPLE:
 			case API_STRING_UTF8:
 			case API_INT32:
+			case API_UINT64:
+			case API_UINTS64:
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
@@ -422,7 +430,7 @@ class CApiInputValidator {
 		}
 
 		if ((!is_int($data) && !is_string($data)) || 1 != preg_match('/^\-?[0-9]+$/', strval($data))) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
 		}
 
@@ -438,6 +446,94 @@ class CApiInputValidator {
 		if (is_string($data)) {
 			$data = (int) $data;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Unsigned integers validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_ALLOW_NULL
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUInt64($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (!is_scalar($data) || is_bool($data) || is_double($data) || !ctype_digit(strval($data))) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an unsigned integer is expected'));
+			return false;
+		}
+
+		if (bccomp($data, ZBX_MAX_UINT64) > 0) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
+			return false;
+		}
+
+		$data = (string) $data;
+
+		if ($data[0] === '0') {
+			$data = ltrim($data, '0');
+
+			if ($data === '') {
+				$data = '0';
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Array of unsigned integers validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUInts64($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateUInt64([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_UINT64];
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}
@@ -464,7 +560,7 @@ class CApiInputValidator {
 			$data = (float) $data;
 		}
 		elseif (!is_float($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a floating point value is expected'));
 			return false;
 		}
 
