@@ -4884,3 +4884,24 @@ table.preprocessing-test-results .rel-container {
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
+
+.by-severity-widget {
+  width: 100%;
+  height: 100%; }
+  .by-severity-widget tr td {
+    vertical-align: middle;
+    padding: 0 10px; }
+    .by-severity-widget tr td span {
+      font-size: 16px; }
+  .by-severity-widget tr td:before {
+    content: '';
+    position: static;
+    display: block;
+    min-width: 65px;
+    min-height: 0; }
+  .by-severity-widget.by-severity-layout-horizontal tr td {
+    text-align: center; }
+    .by-severity-widget.by-severity-layout-horizontal tr td span {
+      display: block; }
+  .by-severity-widget.by-severity-layout-vertical tr td span {
+    margin-right: 5px; }

@@ -1739,6 +1739,11 @@ define('ZBX_STYLE_COLUMN_95', 'column-95');
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
+// Widget "Host availability" styles.
+define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL', 'by-severity-layout-horizontal');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL', 'by-severity-layout-vertical');
+
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
 

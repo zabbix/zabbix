@@ -6792,6 +6792,54 @@ table.preprocessing-test-results {
 	}
 }
 
+.by-severity-widget {
+	width: 100%;
+	height: 100%;
+
+	tr td {
+		vertical-align: middle;
+		padding: 0 10px;
+
+		span {
+			font-size: 16px;
+		}
+	}
+	tr td:before {
+		content: '';
+		position: static;
+		display: block;
+		min-width: 65px;
+		min-height: 0;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		tr td {
+			text-align: center;
+
+			span {
+				display: block;
+			}
+		}
+	}
+	&.by-severity-layout-vertical tr td span {
+		margin-right: 5px;
+	}
+}
+
+@if $theme_name == 'hc-light' or $theme_name == 'hc-dark' {
+	.by-severity-widget tr td {
+		border-left-width: 34px;
+		border-left-style: solid;
+	}
+	.by-severity-widget tr td:after {
+		margin: auto;
+		top: 0;
+		bottom: 0;
+		left: -28px;
+	}
+}
+
 @if $theme_name == 'dev' {
 
 /*doc

@@ -155,7 +155,12 @@ class CWidgetTableProblemsBySv {
 	private function getSeverityTotals() {
 		$goups_info = $this->aggregateData($this->data['groups']);
 
-		$table = new CTableInfo();
+		$table = (new CTableInfo())
+			->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
+			->addClass(($this->filter['layout'] == STYLE_HORIZONTAL)
+				? ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL
+				: ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL
+			);
 
 		foreach ($goups_info as $group) {
 			$row = $this->getGroupSeverity([], $group, true, $table);
@@ -205,21 +210,20 @@ class CWidgetTableProblemsBySv {
 						$this->data['actions'], $this->severity_names, $this->filter
 					));
 			}
-			$unackTriggersNum = [$unackTriggersNum, $severity_name];
 
 			switch ($this->ext_ack) {
 				case EXTACK_OPTION_ALL:
-					$row[] = getSeverityCell($severity, null, [$allTriggersNum, $severity_name]);
+					$row[] = getSeverityCell($severity, null, [new CSpan($allTriggersNum), $severity_name]);
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$row[] = getSeverityCell($severity, null, $unackTriggersNum);
+					$row[] = getSeverityCell($severity, null, [new CSpan($unackTriggersNum), $severity_name]);
 					break;
 
 				case EXTACK_OPTION_BOTH:
 					if ($stat['count_unack'] != 0 || $aggregate) {
 						$row[] = getSeverityCell($severity, $this->severity_names, [
-							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
+							new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]), $severity_name
 						]);
 					}
 					else {
