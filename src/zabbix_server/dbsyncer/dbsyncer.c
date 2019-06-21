@@ -85,12 +85,12 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		/* clear timer trigger queue to avoid processing time triggers at exit */
 		if (!ZBX_IS_RUNNING())
+		{
 			zbx_dc_clear_timer_queue();
+			zbx_log_sync_history_cache_progress();
+		}
 
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
-
-		if (!ZBX_IS_RUNNING())
-			zbx_log_sync_history_cache_progress();
 
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
@@ -130,6 +130,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	zbx_log_sync_history_cache_progress();
 
 	zbx_free(stats);
 	DBclose();
