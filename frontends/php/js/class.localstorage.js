@@ -458,6 +458,9 @@ ZBX_LocalStorage.prototype.readKey = function(key, fallback) {
 	return null;
 };
 
+/**
+ * @param {string} relative_key
+ */
 function ZBX_LocalStorageKey(relative_key) {
 	this.backup_store = sessionStorage;
 	this.primary_store = localStorage;
@@ -468,6 +471,11 @@ function ZBX_LocalStorageKey(relative_key) {
 	this.on_update_cbs = [];
 }
 
+/**
+ * @throw
+ *
+ * @param {string} string
+ */
 ZBX_LocalStorageKey.prototype.writePrimary = function(string) {
 	if (string.constructor != String || string[0] != '{') {
 		throw 'Corrupted input.';
@@ -475,6 +483,11 @@ ZBX_LocalStorageKey.prototype.writePrimary = function(string) {
 	this.primary_store.setItem(this.absolute_key, string);
 };
 
+/**
+ * @throw
+ *
+ * @param {string} string
+ */
 ZBX_LocalStorageKey.prototype.writeBackup = function(string) {
 	if (string.constructor != String || string[0] != '{') {
 		throw 'Corrupted input.';
@@ -482,40 +495,73 @@ ZBX_LocalStorageKey.prototype.writeBackup = function(string) {
 	this.backup_store.setItem(this.absolute_key, string);
 };
 
+/**
+ * @param {string} string
+ */
 ZBX_LocalStorageKey.prototype.write = function(string) {
 	this.writeBackup(string);
 	this.writePrimary(string);
 };
 
+/**
+ * Fetch key value.
+ *
+ * @return {string|null}  Null is retuned if key is deleted.
+ */
 ZBX_LocalStorageKey.prototype.fetchPrimary = function() {
 	return this.primary_store.getItem(this.absolute_key);
 };
 
+/**
+ * Fetch key value.
+ *
+ * @return {string|null}  Null is retuned if key is deleted.
+ */
 ZBX_LocalStorageKey.prototype.fetchBackup = function() {
 	return this.backup_store.getItem(this.absolute_key);
 };
 
+/**
+ * Fetch key value.
+ *
+ * @return {string|null}  Null is retuned if key is deleted.
+ */
 ZBX_LocalStorageKey.prototype.fetch = function() {
 	return this.fetchPrimary() || this.fetchBackup();
 };
 
+/**
+ * Removes current key data from backup store.
+ */
 ZBX_LocalStorageKey.prototype.truncateBackup = function() {
 	this.backup_store.removeItem(this.absolute_key);
 };
 
+/**
+ * Removes current key data from primary store.
+ */
 ZBX_LocalStorageKey.prototype.truncatePrimary = function() {
 	this.primary_store.removeItem(this.absolute_key);
 };
 
+/**
+ * Removes current key data from stores.
+ */
 ZBX_LocalStorageKey.prototype.truncate = function() {
 	this.truncateBackup();
 	this.truncatePrimary();
 };
 
+/**
+ * @param {callable} callback
+ */
 ZBX_LocalStorageKey.prototype.subscribe = function(callback) {
 	this.on_update_cbs.push(callback);
 };
 
+/**
+ * @param {object} payload
+ */
 ZBX_LocalStorageKey.prototype.publish = function(payload) {
 	this.on_update_cbs.forEach(function(callback) {
 		callback(payload);
