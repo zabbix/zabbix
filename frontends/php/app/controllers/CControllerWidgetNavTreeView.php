@@ -228,19 +228,19 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 								);
 
 								if ($problems !== null) {
-									$response[$itemid] = CArrayHelper::sumArrayValues($response[$itemid], $problems);
+									$response[$itemid] = self::sumArrayValues($response[$itemid], $problems);
 								}
 							}
 						}
 
 						// Count problems occurred in triggers which are related to links.
 						foreach ($map['links'] as $link) {
-							$uncounted = array_diff_key(
+							$uncounted_problem_triggers = array_diff_key(
 								array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
 								$problems_counted
 							);
 
-							foreach ($uncounted as $triggerid => $_) {
+							foreach ($uncounted_problem_triggers as $triggerid => $var) {
 								$problems_to_add = $problems_per_trigger[$triggerid];
 								$problems_counted[$triggerid] = true;
 
@@ -253,9 +253,9 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 									}
 								}
 
-								$response[$itemid] = CArrayHelper::sumArrayValues($response[$itemid], $problems_to_add);
+								$response[$itemid] = self::sumArrayValues($response[$itemid], $problems_to_add);
 							}
-							unset($uncounted);
+							unset($uncounted_problem_triggers);
 						}
 					}
 				}
@@ -284,26 +284,29 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 				if (($element = reset($selement['elements'])) !== false) {
 					if (array_key_exists($element['groupid'], $triggers_per_host_groups)) {
-						$uncounted = array_diff_key($triggers_per_host_groups[$element['groupid']], $problems_counted);
-						foreach ($uncounted as $triggerid => $_) {
+						$uncounted_problem_triggers = array_diff_key($triggers_per_host_groups[$element['groupid']],
+							$problems_counted
+						);
+						foreach ($uncounted_problem_triggers as $triggerid => $var) {
 							$problems_counted[$triggerid] = true;
-							$problems = CArrayHelper::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+							$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
 						}
-						unset($uncounted);
+						unset($uncounted_problem_triggers);
 					}
 				}
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$problems = $this->problems_per_severity_tpl;
-				$uncounted = array_diff_key(array_flip(zbx_objectValues($selement['elements'], 'triggerid')),
+				$uncounted_problem_triggers = array_diff_key(
+					array_flip(zbx_objectValues($selement['elements'], 'triggerid')),
 					$problems_counted
 				);
-				foreach ($uncounted as $triggerid => $_) {
+				foreach ($uncounted_problem_triggers as $triggerid => $var) {
 					$problems_counted[$triggerid] = true;
-					$problems = CArrayHelper::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+					$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
 				}
-				unset($uncounted);
+				unset($uncounted_problem_triggers);
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_HOST:
@@ -311,12 +314,14 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 
 				if (($element = reset($selement['elements'])) !== false) {
 					if (array_key_exists($element['hostid'], $triggers_per_hosts)) {
-						$uncounted = array_diff_key($triggers_per_hosts[$element['hostid']], $problems_counted);
-						foreach ($uncounted as $triggerid => $_) {
+						$uncounted_problem_triggers = array_diff_key($triggers_per_hosts[$element['hostid']],
+							$problems_counted
+						);
+						foreach ($uncounted_problem_triggers as $triggerid => $var) {
 							$problems_counted[$triggerid] = true;
-							$problems = CArrayHelper::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+							$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
 						}
-						unset($uncounted);
+						unset($uncounted_problem_triggers);
 					}
 				}
 				break;
@@ -348,13 +353,14 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 						if (array_key_exists($sysmapid, $sysmaps)) {
 							foreach ($sysmaps[$sysmapid]['selements'] as $submap_selement) {
 								if ($submap_selement['permission'] >= PERM_READ) {
-									$problems_in_submap = $this->getElementProblems($submap_selement, $problems_per_trigger,
-										$sysmaps, $submaps_relations, $sysmaps[$sysmapid]['severity_min'],
-										$problems_counted, $triggers_per_hosts, $triggers_per_host_groups
+									$problems_in_submap = $this->getElementProblems($submap_selement,
+										$problems_per_trigger, $sysmaps, $submaps_relations,
+										$sysmaps[$sysmapid]['severity_min'], $problems_counted, $triggers_per_hosts,
+										$triggers_per_host_groups
 									);
 
 									if ($problems_in_submap !== null) {
-										$problems = CArrayHelper::sumArrayValues($problems, $problems_in_submap);
+										$problems = self::sumArrayValues($problems, $problems_in_submap);
 									}
 								}
 							}
@@ -364,15 +370,15 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 						if (array_key_exists($sysmapid, $sysmaps)) {
 							foreach ($sysmaps[$sysmapid]['links'] as $link) {
 								if ($link['permission'] >= PERM_READ) {
-									$uncounted = array_diff_key(
+									$uncounted_problem_triggers = array_diff_key(
 										array_flip(zbx_objectValues($link['linktriggers'], 'triggerid')),
 										$problems_counted
 									);
-									foreach ($uncounted as $triggerid => $_) {
+									foreach ($uncounted_problem_triggers as $triggerid => $var) {
 										$problems_counted[$triggerid] = true;
-										$problems = CArrayHelper::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
+										$problems = self::sumArrayValues($problems, $problems_per_trigger[$triggerid]);
 									}
-									unset($uncounted);
+									unset($uncounted_problem_triggers);
 								}
 							}
 						}
@@ -495,5 +501,27 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	/**
+	 * Function is used to sum problems in 2 arrays.
+	 *
+	 * Example:
+	 * $a1 = [1 => 0, 2 => 5, 3 => 10];
+	 * $a2 = [1 => 1, 2 => 2, 3 => 3];
+	 * self::sumArrayValues($a1, $a2); // returns [1 => 1, 2 => 7, 3 => 13]
+	 *
+	 * @param array $a1  Array containing severity as key and number of problems as value.
+	 * @param array $a2  Array containing severity as key and number of problems as value.
+	 *
+	 * @return array  Array containing problems in both arrays summed.
+	 */
+	protected static function sumArrayValues(array $a1, array $a2) {
+		foreach ($a1 as $key => &$value) {
+			$value += $a2[$key];
+		}
+		unset($value);
+
+		return $a1;
 	}
 }
