@@ -109,9 +109,10 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
-
-	if (!ZBX_IS_RUNNING())
+	}
+	else if (!ZBX_IS_RUNNING())
 	{
 		info = zbx_strdup(info, "Zabbix server shutdown in progress");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer, info);
@@ -141,9 +142,10 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
-
-	if (!ZBX_IS_RUNNING())
+	}
+	else if (!ZBX_IS_RUNNING())
 	{
 		info = zbx_strdup(info, "Zabbix server shutdown in progress");
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
