@@ -146,7 +146,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 	if (!ZBX_IS_RUNNING())
 	{
 		info = zbx_strdup(info, "Zabbix server shutdown in progress");
-		zabbix_log(LOG_LEVEL_WARNING, "received process sender data from \"%s\": %s", sock->peer, info);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 		ret = FAIL;
 	}
 
