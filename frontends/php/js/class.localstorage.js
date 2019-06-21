@@ -111,9 +111,7 @@ ZBX_LocalStorage.DEBUG = function() {
 ZBX_LocalStorage.defines = {
 	PREFIX_SEPARATOR: ':',
 	KEEP_ALIVE_INTERVAL: 30,
-	KEY_SESSIONS: 'sessions',
-	EVT_CHANGE: 1,
-	EVT_MAP: 2
+	KEY_SESSIONS: 'sessions'
 };
 
 /**
@@ -132,9 +130,6 @@ function ZBX_LocalStorage(version, prefix) {
 	if (ZBX_LocalStorage.instance) {
 		return ZBX_LocalStorage.instance;
 	}
-
-	ZBX_LocalStorage.master = localStorage;
-	ZBX_LocalStorage.slave = sessionStorage;
 
 	ZBX_LocalStorage.sessionid = prefix;
 	ZBX_LocalStorage.prefix = prefix + ZBX_LocalStorage.defines.PREFIX_SEPARATOR;
@@ -155,9 +150,6 @@ function ZBX_LocalStorage(version, prefix) {
 		this.truncate();
 		this.writeKey('version', version);
 	}
-
-	this.keepAlive();
-	setInterval(this.keepAlive, ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL * 1000);
 
 	this.register();
 }
@@ -188,62 +180,48 @@ ZBX_LocalStorage.prototype.addKey = function(relative_key) {
 
 	this.rel_keys[relative_key] = new ZBX_LocalStorageKey(relative_key);
 	this.abs_keys[absolute_key] = this.rel_keys[relative_key];
-
-	// DEBUG
-	var properties = {};
-	var that = this;
-	var kk = '_' + relative_key.replace('.', '_').replace('.', '_')
-	properties[kk] = properties[relative_key] = {
-		set: function(k) {
-			return function(value) {
-				return that.writeKey(k, value);
-			}
-		}(relative_key),
-
-		get: function(k) {
-			return function() {
-				return that.readKey(k);
-			}
-		}(relative_key)
-	}
-	Object.defineProperties(this, properties);
 };
 
 /**
- * TODO test after this refactoring.
- *
+ * @param {Store} store
+ * @param {string} sessionid
+ */
+ZBX_LocalStorage.prototype.freeSession = function(store, sessionid) {
+	var len = store.length,
+		mathces = [],
+		abs_key;
+
+	for (var i = 0; i < len; i ++) {
+		abs_key = store.key(i);
+		if (abs_key.match('^' + sessionid)) {
+			mathces.push(abs_key);
+		}
+	}
+
+	mathces.forEach(function(abs_key) {
+		store.removeItem(abs_key);
+	});
+};
+
+/**
  * Keeps alive local storage sessions. Removes inactive session.
  */
 ZBX_LocalStorage.prototype.keepAlive = function() {
-	ZBX_LocalStorage.DEBUG();
-	var timestamp = Math.floor(+new Date / 1000),
-		sessions = JSON.parse(localStorage.getItem(ZBX_LocalStorage.defines.KEY_SESSIONS) || '{}'),
-		alive_ids = [],
-		expired_timestamp = timestamp - 2 * ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL,
-		id,
-		i;
+	var store = localStorage,
+		lastseen = JSON.parse(store.getItem(ZBX_LocalStorage.defines.KEY_SESSIONS) || '{}'),
+		timestamp = (+new Date / 1000) >> 0,
+		expired_timestamp = timestamp - 2 * ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL;
 
-	for (id in sessions) {
-		if (sessions[id] < expired_timestamp) {
-			delete sessions[id];
-		}
-		else {
-			alive_ids.push(id);
+	lastseen[ZBX_LocalStorage.sessionid] = (+new Date() / 1000) >> 0;
+
+	for (var sessionid in lastseen) {
+		if (lastseen[sessionid] < expired_timestamp) {
+			this.freeSession(store, sessionid);
+			delete lastseen[sessionid];
 		}
 	}
 
-	for (i = 0; i < localStorage.length; i++) {
-		var pts = localStorage.key(i).split(ZBX_LocalStorage.defines.PREFIX_SEPARATOR);
-		if (pts.length < 2) {
-			continue;
-		}
-		if (alive_ids.indexOf(pts[0]) == -1) {
-			localStorage.removeItem(localStorage.key(i));
-		}
-	}
-
-	sessions[ZBX_LocalStorage.sessionid] = timestamp;
-	localStorage.setItem(ZBX_LocalStorage.defines.KEY_SESSIONS, ZBX_LocalStorage.stringify(sessions));
+	store.setItem(ZBX_LocalStorage.defines.KEY_SESSIONS, JSON.stringify(lastseen));
 };
 
 /**
@@ -282,8 +260,6 @@ ZBX_LocalStorage.prototype.hasKey = function(key) {
  * @param {string} key  Key to test.
  */
 ZBX_LocalStorage.prototype.ensureKey = function(key) {
-	// ZBX_LocalStorage.DEBUG(key);
-
 	if (typeof key !== 'string') {
 		throw 'Key must be a string, ' + (typeof key) + ' given instead.';
 	}
@@ -364,21 +340,26 @@ ZBX_LocalStorage.prototype.truncate = function() {
 	});
 };
 
+/**
+ * Adds event handlers.
+ */
 ZBX_LocalStorage.prototype.register = function() {
-	window.addEventListener('storage', function(event) {
-		// This key is for internal use only.
-		// TODO can be made as one of keys
-		if (event.key === ZBX_LocalStorage.defines.KEY_SESSIONS) {
-			return;
-		}
-
-		this.handleStorageEvent(event);
-	}.bind(this));
+	window.addEventListener('storage', this.handleStorageEvent.bind(this));
+	this.keepAlive();
+	setInterval(this.keepAlive.bind(this), ZBX_LocalStorage.defines.KEEP_ALIVE_INTERVAL * 1000);
 };
 
+/**
+ * @param {StorageEvent} event
+ */
 ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	if (event.constructor != StorageEvent) {
 		throw 'Unmatched method signature!';
+	}
+
+	// Internal usage key.
+	if (event.key === ZBX_LocalStorage.defines.KEY_SESSIONS) {
+		return;
 	}
 
 	// This means, storage has been truncated.
