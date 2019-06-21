@@ -228,7 +228,7 @@ class testHistory extends CAPITest {
 					]
 				],
 				'expected_result' => null,
-				'expected_error' => 'Invalid parameter "/filter/value/1": a number is expected.'
+				'expected_error' => 'Invalid parameter "/filter/value/1": a floating point value is expected.'
 			]
 		];
 	}
