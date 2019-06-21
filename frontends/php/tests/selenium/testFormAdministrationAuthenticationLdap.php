@@ -111,19 +111,19 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 						'User password' => 'password'
 					],
 					'db_check' => [
-						'authentication_type'	=> '1',
-						'ldap_host'				=> 'ldap.forumsys.com',
-						'ldap_port'				=> '389',
-						'ldap_base_dn'			=> 'dc=example,dc=com',
-						'ldap_bind_dn'			=> 'cn=read-only-admin,dc=example,dc=com',
-						'ldap_bind_password'	=> 'password',
-						'ldap_search_attribute'	=> 'uid',
-						'http_auth_enabled'		=> '0',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1',
-						'ldap_configured'		=> '1',
-						'ldap_case_sensitive'	=> '1'
+						'authentication_type' => '1',
+						'ldap_host' => 'ldap.forumsys.com',
+						'ldap_port' => '389',
+						'ldap_base_dn' => 'dc=example,dc=com',
+						'ldap_bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
+						'ldap_bind_password' => 'password',
+						'ldap_search_attribute' => 'uid',
+						'http_auth_enabled' => '0',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1',
+						'ldap_configured' => '1',
+						'ldap_case_sensitive' => '1'
 					]
 				]
 			]
@@ -161,9 +161,9 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$this->assertTrue($message->isGood());
 			$this->assertEquals('Authentication settings updated', $message->getTitle());
 			// Check DB configuration.
-			$sql = 'SELECT authentication_type, ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, '.
-					'ldap_search_attribute, http_auth_enabled, http_login_form, http_strip_domains, '.
-					'http_case_sensitive, ldap_configured, ldap_case_sensitive'.
+			$sql = 'SELECT authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
+					'ldap_search_attribute,http_auth_enabled,http_login_form,http_strip_domains,http_case_sensitive,'.
+					'ldap_configured,ldap_case_sensitive'.
 					' FROM config';
 			$result = CDBHelper::getRow($sql);
 			$this->assertEquals($data['db_check'], $result);

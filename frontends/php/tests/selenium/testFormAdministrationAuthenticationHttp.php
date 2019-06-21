@@ -68,10 +68,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '0',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '0',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -117,10 +117,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -177,10 +177,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -235,10 +235,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '1',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '1',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -277,10 +277,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '1',
-						'http_strip_domains'	=> 'local.com',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '1',
+						'http_strip_domains' => 'local.com',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -337,10 +337,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '1',
-						'http_strip_domains'	=> 'local.com',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '1',
+						'http_strip_domains' => 'local.com',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -393,10 +393,10 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '1',
-						'http_strip_domains'	=> 'local.com',
-						'http_case_sensitive'	=> '1'
+						'http_auth_enabled' => '1',
+						'http_login_form' => '1',
+						'http_strip_domains' => 'local.com',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -417,11 +417,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'error' => 'You are not logged in',
 						]
 					],
-					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '1'
+					'db_check'  => [
+						'http_auth_enabled' => '1',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '1'
 					]
 				]
 			],
@@ -443,11 +443,11 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						]
 					],
-					'db_check' => [
-						'http_auth_enabled'		=> '1',
-						'http_login_form'		=> '0',
-						'http_strip_domains'	=> '',
-						'http_case_sensitive'	=> '0'
+					'db_check'  => [
+						'http_auth_enabled' => '1',
+						'http_login_form' => '0',
+						'http_strip_domains' => '',
+						'http_case_sensitive' => '0'
 					]
 				]
 			]
@@ -535,8 +535,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 			// Check user data in DB after login.
 			$session = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
-			$user_data = DBfetch(DBselect('SELECT alias FROM users WHERE userid = ('.
-					'SELECT DISTINCT userid FROM sessions WHERE sessionid='.zbx_dbstr($session['value']).')'));
+			$user_data = DBfetch(DBselect(
+				'SELECT u.alias'.
+				' FROM users u,sessions s'.
+				' WHERE u.userid=s.userid'.
+					' AND sessionid='.zbx_dbstr($session['value'])
+			));
 			if (array_key_exists('user_case_sensitive', $data)) {
 				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
 			}
@@ -603,19 +607,19 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 		// Check DB configuration.
 		$defautl_values = [
-			'authentication_type'	=> '0',
-			'ldap_host'				=> '',
-			'ldap_port'				=> '389',
-			'ldap_base_dn'			=> '',
-			'ldap_bind_dn'			=> '',
-			'ldap_bind_password'	=> '',
-			'ldap_search_attribute'	=> '',
-			'ldap_configured'		=> '0',
-			'ldap_case_sensitive'	=> '1'
+			'authentication_type' => '0',
+			'ldap_host' => '',
+			'ldap_port' => '389',
+			'ldap_base_dn' => '',
+			'ldap_bind_dn' => '',
+			'ldap_bind_password' => '',
+			'ldap_search_attribute' => '',
+			'ldap_configured' => '0',
+			'ldap_case_sensitive' => '1'
 		];
-		$sql = 'SELECT authentication_type, ldap_host, ldap_port, ldap_base_dn, ldap_bind_dn, ldap_bind_password, '.
-				'ldap_search_attribute, ldap_configured, ldap_case_sensitive, http_auth_enabled, http_login_form, '.
-				'http_strip_domains, http_case_sensitive'.
+		$sql = 'SELECT authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
+				'ldap_search_attribute,ldap_configured,ldap_case_sensitive,http_auth_enabled,http_login_form,'.
+				'http_strip_domains,http_case_sensitive'.
 				' FROM config';
 		$result = CDBHelper::getRow($sql);
 		$this->assertEquals(array_merge($defautl_values, $data['db_check']), $result);
