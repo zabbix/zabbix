@@ -3173,24 +3173,26 @@ static void	sync_history_cache_full(void)
 	}
 
 	if (0 != hc_queue_get_size())
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
-	while (0 != hc_queue_get_size())
-	{
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			sync_server_history(&values_num, &triggers_num, &more);
-		else
-			sync_proxy_history(&values_num, &more);
+		do
+		{
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				sync_server_history(&values_num, &triggers_num, &more);
+			else
+				sync_proxy_history(&values_num, &more);
 
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-				(double)values_num / (cache->history_num + values_num) * 100);
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+					(double)values_num / (cache->history_num + values_num) * 100);
+		}
+		while (0 != hc_queue_get_size());
+
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
 
 	zbx_binary_heap_destroy(&cache->history_queue);
 	cache->history_queue = tmp_history_queue;
-
-	if (0 != values_num)
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
