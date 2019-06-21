@@ -52,7 +52,8 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_MACRO => _('Macro'),
 		AUDIT_RESOURCE_TEMPLATE => _('Template'),
 		AUDIT_RESOURCE_ICON_MAP => _('Icon mapping'),
-		AUDIT_RESOURCE_CORRELATION => _('Event correlation')
+		AUDIT_RESOURCE_CORRELATION => _('Event correlation'),
+		AUDIT_RESOURCE_DASHBOARD => _('Dashboard')
 	];
 
 	if (is_null($resource_type)) {
