@@ -49,7 +49,6 @@ ZBX_Notifications.ALARM_ONCE_SERVER = -1;
  * @param {ZBX_BrowserTab} tab
  */
 function ZBX_Notifications(store, tab) {
-	N = this;
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
 	}
