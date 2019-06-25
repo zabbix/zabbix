@@ -22,8 +22,6 @@
  * Represents DOM node for notification list. Stores the collection of ZBX_Notification objects.
  */
 function ZBX_NotificationCollection() {
-	ZBX_Notifications.DEBUG();
-
 	this._dangling_nodes = [];
 
 	this._list_sequence = [];
@@ -39,8 +37,6 @@ function ZBX_NotificationCollection() {
  * @return {array}
  */
 ZBX_NotificationCollection.prototype.getIds = function() {
-	ZBX_Notifications.DEBUG();
-
 	return this._list_sequence;
 };
 
@@ -48,8 +44,6 @@ ZBX_NotificationCollection.prototype.getIds = function() {
  * @param {callable} callback
  */
 ZBX_NotificationCollection.prototype.map = function(callback) {
-	ZBX_Notifications.DEBUG(callback);
-
 	var len = this._list_sequence.length;
 
 	while (-- len > -1) {
@@ -63,8 +57,6 @@ ZBX_NotificationCollection.prototype.map = function(callback) {
  * @return {array}
  */
 ZBX_NotificationCollection.prototype.filterList = function(callback) {
-	ZBX_Notifications.DEBUG();
-
 	var list = [],
 		len = this._list_sequence.length;
 
@@ -80,8 +72,6 @@ ZBX_NotificationCollection.prototype.filterList = function(callback) {
  * @return {array} List of raw notification objects.
  */
 ZBX_NotificationCollection.prototype.getRawList = function() {
-	ZBX_Notifications.DEBUG();
-
 	return this.filterList(function(notif) {
 		return notif.getRaw();
 	});
@@ -95,8 +85,6 @@ ZBX_NotificationCollection.prototype.getRawList = function() {
  * @param {array} list List of raw/recoverable notification objects.
  */
 ZBX_NotificationCollection.prototype.consumeList = function(list) {
-	ZBX_Notifications.DEBUG(list);
-
 	var new_list_sequence = [];
 
 	while (raw = list.pop()) {
@@ -132,8 +120,6 @@ ZBX_NotificationCollection.prototype.consumeList = function(list) {
  * Creates detatched DOM nodes.
  */
 ZBX_NotificationCollection.prototype.makeNodes = function() {
-	ZBX_Notifications.DEBUG();
-
 	var header = document.createElement('div'),
 		controls = document.createElement('ul');
 
@@ -180,8 +166,6 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
  * @return {HTMLElement} DOM button element.
  */
 ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, attrs_active) {
-	ZBX_Notifications.DEBUG(attrs_inactive, attrs_active);
-
 	var button = document.createElement('button');
 	button.renderState = function(is_active) {
 		var attrs = is_active ? attrs_active : attrs_inactive,
@@ -202,8 +186,6 @@ ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, at
  * @param {string} id
  */
 ZBX_NotificationCollection.prototype.removeById = function(id) {
-	ZBX_Notifications.DEBUG(id);
-
 	this._list_sequence.splice(this._list_sequence.indexOf(id), 1);
 
 	if (this._list_obj[id]) {
@@ -218,8 +200,6 @@ ZBX_NotificationCollection.prototype.removeById = function(id) {
  * @return {ZBX_Notification}
  */
 ZBX_NotificationCollection.prototype.getById = function(id) {
-	ZBX_Notifications.DEBUG(id);
-
 	return this._list_obj[id];
 };
 
@@ -229,8 +209,6 @@ ZBX_NotificationCollection.prototype.getById = function(id) {
  * @return {Promise}
  */
 ZBX_NotificationCollection.prototype.show = function() {
-	ZBX_Notifications.DEBUG();
-
 	return ZBX_Notifications.util.fadeIn(this.node);
 };
 
@@ -240,8 +218,6 @@ ZBX_NotificationCollection.prototype.show = function() {
  * @return {Promise}
  */
 ZBX_NotificationCollection.prototype.hide = function() {
-	ZBX_Notifications.DEBUG();
-
 	return ZBX_Notifications.util.fadeOut(this.node);
 };
 
@@ -249,8 +225,6 @@ ZBX_NotificationCollection.prototype.hide = function() {
  * @return {boolean}
  */
 ZBX_NotificationCollection.prototype.isEmpty = function() {
-	ZBX_Notifications.DEBUG();
-
 	return !this._list_sequence.length;
 };
 
@@ -258,8 +232,6 @@ ZBX_NotificationCollection.prototype.isEmpty = function() {
  * Animates slide-up-remove on dangling nodes one by one.
  */
 ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
-	ZBX_Notifications.DEBUG();
-
 	var duration = this._dangling_nodes.length > 4 ? 200 : 500;
 	var first = true;
 
@@ -278,8 +250,6 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * @param {object} alarm_state
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
-	ZBX_Notifications.DEBUG(severity_styles, alarm_state);
-
 	this.btn_snooze.renderState(alarm_state.snoozed);
 	this.btn_mute.renderState(alarm_state.muted);
 

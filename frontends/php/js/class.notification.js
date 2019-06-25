@@ -30,8 +30,6 @@ ZBX_Notification.max_timeout = Math.pow(2, 30);
  * @param {object} raw  A server or LS format of this notification.
  */
 function ZBX_Notification(raw) {
-	ZBX_Notifications.DEBUG(raw);
-
 	/*
 	 * These are pseudo that properties will cycle back into store, to be reused when rendering next time.
 	 * If `received_at` property has not been set it is first render. This property might be updated to a new client time
@@ -70,8 +68,6 @@ ZBX_Notification.prototype.getRaw = function() {
  * @return {ZBX_Notification}
  */
 ZBX_Notification.prototype.updateRaw = function(raw) {
-	ZBX_Notifications.DEBUG(raw);
-
 	if (!this._raw.resolved && raw.resolved) {
 		this._raw.received_at = (+new Date / 1000);
 	}
@@ -89,8 +85,6 @@ ZBX_Notification.prototype.updateRaw = function(raw) {
  * @param {object} severity_styles  Object of class names keyed by severity id.
  */
 ZBX_Notification.prototype.render = function(severity_styles) {
-	ZBX_Notifications.DEBUG(':render', this._raw);
-
 	var title_prefix = this._raw.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON;
 
 	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title);
@@ -102,8 +96,6 @@ ZBX_Notification.prototype.render = function(severity_styles) {
  * @return {float}  Zero or more milliseconds.
  */
 ZBX_Notification.prototype.calcDisplayTimeout = function(user_settings) {
-	ZBX_Notifications.DEBUG(user_settings);
-
 	var time_local = (+new Date / 1000),
 		timeout = this._raw.resolved ? user_settings.msg_recovery_timeout : user_settings.msg_timeout,
 		ttl = (this._raw.received_at - time_local) + timeout;
@@ -117,8 +109,6 @@ ZBX_Notification.prototype.calcDisplayTimeout = function(user_settings) {
  * @return {HTMLElement}  Detached DOM node.
  */
 ZBX_Notification.prototype.makeNode = function() {
-	ZBX_Notifications.DEBUG();
-
 	var node = document.createElement('li'),
 		indicator = document.createElement('div'),
 		title_node = document.createElement('h4');
@@ -150,7 +140,5 @@ ZBX_Notification.prototype.makeNode = function() {
  * @return {bool}
  */
 ZBX_Notification.prototype.isNodeConnected = function() {
-	ZBX_Notifications.DEBUG(!!(this.node.isConnected || this.node.parentNode));
-
 	return !!(this.node.isConnected || this.node.parentNode);
 };

@@ -28,124 +28,6 @@ ZBX_Notifications.ALARM_INFINITE_SERVER = -1;
 ZBX_Notifications.ALARM_ONCE_PLAYER = 1;
 ZBX_Notifications.ALARM_ONCE_SERVER = -1;
 
-ZBX_Notifications.DEBUG_DEBOUNCE = 0;
-ZBX_Notifications.DEBUG_GRPS = [];
-ZBX_Notifications.DEBUG_GRP = function(log) {
-	clearTimeout(ZBX_Notifications.DEBUG_DEBOUNCE);
-	ZBX_Notifications.DEBUG_GRPS.push(log);
-	ZBX_Notifications.DEBUG_DEBOUNCE = setTimeout(function() {
-		var d = new Date();
-		var time = ("00" + d.getHours()).slice(-2) + ":" +
-		("00" + d.getMinutes()).slice(-2) + ":" +
-		("00" + d.getSeconds()).slice(-2);
-
-		console.groupCollapsed("%cNOTIF: " + time + ' [' + ZBX_Notifications.DEBUG_GRPS.length + ']', 'color:cadetblue');
-		ZBX_Notifications.DEBUG_GRPS.forEach(function(log) {
-			console.groupCollapsed.apply(console, log.title);
-			log.args.forEach(function(arg) {
-				console.dir(arg)
-			});
-
-			console.groupEnd();
-		});
-
-		ZBX_Notifications.DEBUG_GRPS = [];
-
-		console.groupEnd();
-	}, 500);
-};
-
-ZBX_Notifications.DEBUG = function() {
-	// return;
-	if (ZBX_Notifications.DEBUG.halt) {
-		!ZBX_Notifications.DEBUG.halted && console.warn("debug halt")
-		ZBX_Notifications.DEBUG.halted = 1
-		return;
-	}
-	var stack = new Error().stack;
-	trace = stack.split('\n');
-	var pos = trace[2].match('at (.*) .*')[1];
-
-	var style = 'color:red;';
-
-	if (pos.match('\\.handlePushed')) {
-		console.info('%c<< ' + pos, 'color:red');
-	}
-
-	if (pos.match('\\.consume')) {
-		console.info('%c[!]' + pos, 'color:gold');
-	}
-
-	if (pos.match('\\.push')) {
-		console.info('%c>> ' + pos, 'color:green');
-	}
-
-	if (pos.match('Collection\\.') || pos.match('Collection$')) {
-		style = 'color:darkgoldenrod;';
-	}
-
-	if (pos.match('Notification\\.') || pos.match('Notification$')) {
-		style = 'color:darkkhaki;';
-	}
-
-	if (pos.match('Notifications\\.') || pos.match('Notifications$')) {
-		style = 'color:crimson;';
-	}
-
-	if (pos.match('Audio\\.') || pos.match('Audio$')) {
-		style = 'color:antiquewhite;';
-	}
-
-	if (pos.match('^new ')) {
-		style += 'background:black;font-size:14px';
-	}
-	// if (trace.length > 6) return;
-
-	var log = {
-		title: [trace.length + '-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
-		args: [],
-	}
-
-	// console.info(...log.title);
-	// return;
-
-	var len = arguments.length;
-	for (var i = 0; i < len; i ++) {
-		var a = arguments[i];
-
-		if (typeof a === 'string' && a[0] === ':') {
-			log.title[0] += '%c' + a;
-			log.title.push('color: white;');
-			continue;
-		}
-
-
-		if (
-			(a instanceof ZBX_Notifications) ||
-			(a instanceof ZBX_Notification) ||
-			(a instanceof ZBX_BrowserTab) ||
-			(a instanceof ZBX_NotificationsAudio) ||
-			(a instanceof ZBX_NotificationCollection) ||
-			(a instanceof ZBX_LocalStorage)
-		) {
-			log.args.push(a);
-		}
-		else if (typeof a === 'object' && a !== null) {
-			try {
-				log.args.push(JSON.parse(Object.toJSON(a)));
-			} catch (e) {
-				log.args.push("FAIL");
-				console.warn("FAIL", log, a, e);
-			}
-		}
-		else {
-			log.args.push(a);
-		}
-	}
-
-	ZBX_Notifications.DEBUG_GRP(log);
-};
-
 /**
  * Fetches and renders notifications. Server always returns full list of actual notifications that this class will
  * render into DOM. Last focused ZBX_BrowserTab instance is the active one. Active ZBX_BrowserTab instance is the only
@@ -168,8 +50,6 @@ ZBX_Notifications.DEBUG = function() {
  */
 function ZBX_Notifications(store, tab) {
 	N = this;
-	ZBX_Notifications.DEBUG();
-
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
 	}
@@ -220,8 +100,6 @@ function ZBX_Notifications(store, tab) {
  * Binds to click events, LS update events and tab events.
  */
 ZBX_Notifications.prototype.bindEventHandlers = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.tab.onUnload(this.handleTabUnload.bind(this));
 	this.tab.onFocus(this.handleTabFocusIn.bind(this));
 	this.tab.onCrashed(this.handleTabFocusIn.bind(this));
@@ -254,8 +132,6 @@ ZBX_Notifications.prototype.fetchUpdates = function() {
  * @param {string} id
  */
 ZBX_Notifications.prototype.removeById = function(id) {
-	ZBX_Notifications.DEBUG(id);
-
 	this.collection.removeById(id);
 };
 
@@ -265,8 +141,6 @@ ZBX_Notifications.prototype.removeById = function(id) {
  * @return {ZBX_Notification}
  */
 ZBX_Notifications.prototype.getById = function(id) {
-	ZBX_Notifications.DEBUG(id);
-
 	return this.collection.getById(id);
 };
 
@@ -274,8 +148,6 @@ ZBX_Notifications.prototype.getById = function(id) {
  * @param {object} alarm_state
  */
 ZBX_Notifications.prototype.consumeAlarmState = function(alarm_state) {
-	ZBX_Notifications.DEBUG(alarm_state);
-
 	this.alarm.consume(alarm_state, this.getById(alarm_state.start));
 };
 
@@ -328,8 +200,6 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
  * @param {array} list  Ordered list of raw notification objects.
  */
 ZBX_Notifications.prototype.consumeList = function(list) {
-	ZBX_Notifications.DEBUG(list);
-
 	this.collection.consumeList(list);
 	this.list = this.collection.getRawList();
 
@@ -342,31 +212,6 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 			this.removeById(notif.getId());
 			this.debounceRender();
 		}.bind(this), notif.calcDisplayTimeout(this.user_settings));
-
-		// DEBUG-T
-		var ttld = (notif.calcDisplayTimeout(this.user_settings) / 1000).toFixed();
-		if (notif.__) {
-			clearTimeout(notif.__);
-		}
-		if (!notif.node._id) {
-			notif.node._id = document.createElement('span');
-			notif.node._id.style.float = 'right';
-			notif.node._id.style.marginTop = '-30px';
-			notif.node._id.style.fontSize = '9px';
-			notif.node.appendChild(notif.node._id);
-		}
-		notif.node._id.innerHTML = 'ID: ' + notif.getId();
-		if (!notif.node._timer) {
-			notif.node._timer = document.createElement('span');
-			notif.node._timer.style.float = 'right';
-			notif.node._timer.style.marginTop = '-57px';
-			notif.node.appendChild(notif.node._timer);
-		}
-		notif.__ = setInterval(function() {
-			notif.node._timer.innerHTML = ttld --;
-		}.bind(this), 1000);
-		// DEBUG-T
-
 	}.bind(this));
 };
 
@@ -409,8 +254,6 @@ ZBX_Notifications.prototype.debounceRender = function(ms) {
  * consumption it came clear that alarm has to be updated, only if that happened, alarm will be pushed.
  */
 ZBX_Notifications.prototype.pushUpdates = function() {
-	ZBX_Notifications.DEBUG();
-
 	if (this.active) {
 		this.pushActiveTabid(this.tab.uid);
 	}
@@ -426,8 +269,6 @@ ZBX_Notifications.prototype.pushUpdates = function() {
  * @param {array} list
  */
 ZBX_Notifications.prototype.pushList = function(list) {
-	ZBX_Notifications.DEBUG(list);
-
 	this.store.writeKey('notifications.list', list);
 };
 
@@ -435,8 +276,6 @@ ZBX_Notifications.prototype.pushList = function(list) {
  * @param {object} user_settings
  */
 ZBX_Notifications.prototype.pushUserSettings = function(user_settings) {
-	ZBX_Notifications.DEBUG(user_settings);
-
 	this.store.writeKey('notifications.user_settings', user_settings);
 };
 
@@ -444,8 +283,6 @@ ZBX_Notifications.prototype.pushUserSettings = function(user_settings) {
  * @param {object} alarm
  */
 ZBX_Notifications.prototype.pushAlarmState = function(alarm_state) {
-	ZBX_Notifications.DEBUG(alarm_state);
-
 	this.store.writeKey('notifications.alarm_state', alarm_state);
 };
 
@@ -453,8 +290,6 @@ ZBX_Notifications.prototype.pushAlarmState = function(alarm_state) {
  * @param {string} tabid
  */
 ZBX_Notifications.prototype.pushActiveTabid = function(tabid) {
-	ZBX_Notifications.DEBUG(tabid);
-
 	this.store.writeKey('notifications.active_tabid', tabid);
 };
 
@@ -463,14 +298,9 @@ ZBX_Notifications.prototype.pushActiveTabid = function(tabid) {
  * or at new instance creation depending on context (for example single tab scenario without receiving focusIn event).
  */
 ZBX_Notifications.prototype.becomeActive = function() {
-	document.title = "Act";
-	document.title += (+new Date) - 1560000000000;
-
 	if (this.active) {
 		return;
 	}
-
-	ZBX_Notifications.DEBUG();
 
 	this.active_tabid = this.tab.uid;
 	this.active = true;
@@ -486,11 +316,6 @@ ZBX_Notifications.prototype.becomeActive = function() {
  * (TODO is it possible to just call this method at unload).
  */
 ZBX_Notifications.prototype.becomeInactive = function() {
-	document.title = "Ina";
-	document.title += (+new Date) - 1560000000000;
-
-	ZBX_Notifications.DEBUG();
-
 	if (this.active) {
 		// No need to push everything.
 		this.pushAlarmState(this.alarm.produce());
@@ -506,8 +331,6 @@ ZBX_Notifications.prototype.becomeInactive = function() {
  * Backup store still remains, this is used mainly for single instance session case on tab unload event.
  */
 ZBX_Notifications.prototype.dropStore = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.store.eachKeyRegex('^notifications\\.', function(key) {
 		key.truncatePrimary();
 	});
@@ -534,8 +357,6 @@ ZBX_Notifications.prototype.handlePushedList = function(list) {
  * @param {object} alarm_state
  */
 ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
-	ZBX_Notifications.DEBUG(alarm_state);
-
 	this.alarm.refresh();
 	this.consumeAlarmState(alarm_state);
 	this.render();
@@ -560,8 +381,6 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
  */
 ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids) {
-	ZBX_Notifications.DEBUG(removed_tab, other_tabids);
-
 	if (this.active && other_tabids.length) {
 		this.becomeInactive();
 		this.pushActiveTabid(other_tabids[0]);
@@ -582,8 +401,6 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
-	ZBX_Notifications.DEBUG();
-
 	this.fetch('notifications.read', {ids: this.getEventIds()})
 		.catch(console.error)
 		.then(function(resp) {
@@ -602,8 +419,6 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
-	ZBX_Notifications.DEBUG();
-
 	if (this.alarm.snoozed) {
 		return;
 	}
@@ -622,8 +437,6 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
-	ZBX_Notifications.DEBUG();
-
 	this.fetch('notifications.mute', {mute: this.alarm.muted ? 0 : 1})
 		.catch(console.error)
 		.then(function(resp) {
@@ -641,8 +454,6 @@ ZBX_Notifications.prototype.handleMuteClicked = function(e) {
  * @param {object} resp  Server response object. Contains settings and list of notifications.
  */
 ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
-	ZBX_Notifications.DEBUG(resp);
-
 	if (resp.error) {
 		this.stopMainLoop();
 		this.store.truncateBackup();
@@ -662,8 +473,6 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
  * @param {ZBX_NotificationsAlarm} alarm_state
  */
 ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
-	ZBX_Notifications.DEBUG(alarm_state.produce(), 'into', alarm_state);
-
 	this.pushAlarmState(alarm_state.produce());
 };
 
@@ -673,8 +482,6 @@ ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
  * user configuration, the list state to be rendered, has been consumed by collection before.
  */
 ZBX_Notifications.prototype.renderCollection = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.collection.render(this.user_settings.severity_styles, this.alarm);
 };
 
@@ -682,8 +489,6 @@ ZBX_Notifications.prototype.renderCollection = function() {
  * Render everything. Any painting optimization may be considered levels deeper.
  */
 ZBX_Notifications.prototype.render = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.renderCollection();
 	this.renderAudio();
 };
@@ -694,12 +499,8 @@ ZBX_Notifications.prototype.render = function() {
 ZBX_Notifications.prototype.renderAudio = function() {
 	if (this.active) {
 		this.alarm.render(this.user_settings);
-
-		ZBX_Notifications.DEBUG(':play?', this.user_settings, this.alarm.produce());
-
 	}
 	else {
-		ZBX_Notifications.DEBUG(':stop');
 		this.alarm.stop();
 	}
 };

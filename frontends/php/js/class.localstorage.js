@@ -18,96 +18,6 @@
 **/
 
 
-ZBX_LocalStorage.DEBUG_DEBOUNCE = 0;
-ZBX_LocalStorage.DEBUG_GRPS = [];
-ZBX_LocalStorage.DEBUG_GRP = function(log) {
-	clearTimeout(ZBX_LocalStorage.DEBUG_DEBOUNCE);
-	ZBX_LocalStorage.DEBUG_GRPS.push(log);
-	ZBX_LocalStorage.DEBUG_DEBOUNCE = setTimeout(function() {
-		var d = new Date();
-		var time = ("00" + d.getHours()).slice(-2) + ":" +
-		("00" + d.getMinutes()).slice(-2) + ":" +
-		("00" + d.getSeconds()).slice(-2);
-
-		console.groupCollapsed("%cLS/BT: " + time + ' [' + ZBX_LocalStorage.DEBUG_GRPS.length + ']', 'color:grey');
-		ZBX_LocalStorage.DEBUG_GRPS.forEach(function(log) {
-			console.groupCollapsed.apply(console, log.title);
-			log.args.forEach(function(arg) {
-				console.dir(arg)
-			});
-
-			console.groupEnd();
-		});
-
-		ZBX_LocalStorage.DEBUG_GRPS = [];
-
-		console.groupEnd();
-	}, 100);
-};
-
-ZBX_LocalStorage.DEBUG = function() {
-	return;
-	if (IE) return;
-	// return
-	var stack = new Error().stack;
-	trace = stack.split('\n');
-	var pos = trace[2].match('at (.*) .*')[1];
-
-	var style = 'color:red;';
-
-	if (pos.match('BrowserTab\\.') || pos.match('BrowserTab')) {
-		style = 'color:darkgoldenrod;';
-	}
-
-	if (pos.match('LocakStorage\\.') || pos.match('LocakStorage$')) {
-		style = 'color:darkkhaki;';
-	}
-
-	// if (pos.match('^new ')) {
-	// 	style += 'background:black;font-size:14px';
-	// }
-	// // if (trace.length > 6) return;
-
-	var log = {
-		title: ['-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
-		args: [],
-	}
-
-	var len = arguments.length;
-	for (var i = 0; i < len; i ++) {
-		var a = arguments[i];
-
-		if (typeof a === 'string' && a[0] === ':') {
-			log.title[0] += '%c' + a;
-			log.title.push('color: white;');
-			continue;
-		}
-
-		if (
-			(a instanceof ZBX_LocalStorage) ||
-			(a instanceof ZBX_Notification) ||
-			(a instanceof ZBX_NotificationCollection) ||
-			(a instanceof ZBX_LocalStorage)
-		) {
-			log.args.push(a);
-		}
-		else if (typeof a === 'object' && a !== null) {
-			try {
-				log.args.push(JSON.parse(Object.toJSON(a)));
-			} catch (e) {
-				log.args.push("FAIL");
-				console.warn("FAIL", log, a, e);
-			}
-		}
-		else {
-			log.args.push(a);
-		}
-		// log.args.push(stack);
-	}
-
-	ZBX_LocalStorage.DEBUG_GRP(log);
-};
-
 ZBX_LocalStorage.defines = {
 	PREFIX_SEPARATOR: ':',
 	KEEP_ALIVE_INTERVAL: 30,
@@ -121,8 +31,6 @@ ZBX_LocalStorage.defines = {
  * @param {string} prefix   Used to distinct keys between sessions within same domain.
  */
 function ZBX_LocalStorage(version, prefix) {
-	ZBX_LocalStorage.DEBUG(version, prefix);
-
 	if (!version || !prefix) {
 		throw 'Local storage instantiation must be versioned, and prefixed.';
 	}
@@ -364,7 +272,6 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 
 	// This means, storage has been truncated.
 	if (event.key === null || event.key === '') {
-		// return this.mapCallback(callback);
 		return;
 	}
 
