@@ -237,7 +237,9 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 
 	while (node = this._dangling_nodes.pop()) {
 		ZBX_Notifications.util.slideUp(node, first && 500 || duration, this._dangling_nodes.length * duration)
-			.then(function(node) {node.remove();});
+			.then(function(node) {
+				node.parentNode && node.remove();
+			});
 		first &= false;
 	}
 };
