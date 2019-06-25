@@ -34,7 +34,7 @@ class CControllerNotificationsGet extends CController {
 		$timeout = (int) timeUnitToSeconds($this->settings['timeout']);
 		$this->settings['timeout'] = $timeout;
 		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);
-		$this->settings['show_recovered'] = (int) $this->settings['triggers.recovery'];
+		$this->settings['show_recovered'] = (bool) $this->settings['triggers.recovery'];
 		if (!$this->settings['triggers.severities']) {
 			$this->settings['enabled'] = true;
 		}
@@ -111,10 +111,17 @@ class CControllerNotificationsGet extends CController {
 		// Append selected events to notifications array.
 		$problems_by_triggerid = [];
 		foreach ($events as $eventid => $event) {
-			// Filter by problem start, because that is not done by API if show_recovered is enabled.
-			if ($this->settings['show_recovered'] && $event['clock'] < $this->time_from
-					&& !in_array($eventid, $resolved_events)) {
-				continue;
+			if ($this->settings['show_recovered']) {
+				if (array_key_exists('r_clock', $event) && $event['r_clock'] >= $this->time_from) {
+					/**
+					 * This happens if trigger is recovered and is already removed from the list of known eventids.
+					 * Do nothing here. This statement is needed just to catch specific case before next IF statement.
+					 */
+				}
+				// Filter by problem start time, because that is not done by API if show_recovered is enabled.
+				elseif ($event['clock'] < $this->time_from && !in_array($eventid, $resolved_events)) {
+					continue;
+				}
 			}
 
 			// Trigger API is used to select hostname only for notifications that client cannot recover from cache.

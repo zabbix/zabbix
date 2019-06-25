@@ -29,7 +29,7 @@ class CControllerNotificationsRead extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data = CJs::encodeJson(['error' => _('Invalid request.')]);
+			$data = CJs::encodeJson(['error' => true]);
 			$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 		}
 
@@ -44,11 +44,22 @@ class CControllerNotificationsRead extends CController {
 		$msg_settings = getMessageSettings();
 
 		$events = API::Event()->get([
-			'output'    => ['clock'],
+			'output'    => ['clock', 'r_eventid'],
 			'eventids'  => $this->input['ids'],
-			'sortfield' => ['clock', 'eventid'],
-			'sortorder' => 'DESC',
 			'preservekeys' => true
+		]);
+
+		$recovery_eventids = array_filter(zbx_objectValues($events, 'r_eventid'));
+		if ($recovery_eventids) {
+			$events += API::Event()->get([
+				'output'    => ['clock'],
+				'eventids'  => $recovery_eventids,
+				'preservekeys' => true
+			]);
+		}
+
+		CArrayHelper::sort($events, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN]
 		]);
 
 		$last_event = reset($events);

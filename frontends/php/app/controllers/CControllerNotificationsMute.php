@@ -29,7 +29,7 @@ class CControllerNotificationsMute extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data = CJs::encodeJson(['error' => _('Invalid request.')]);
+			$data = CJs::encodeJson(['error' => true]);
 			$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 		}
 
