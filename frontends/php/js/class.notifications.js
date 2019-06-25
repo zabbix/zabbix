@@ -877,7 +877,7 @@ ZBX_Notifications.prototype.mainLoop = function() {
 		return;
 	}
 
-	this.fetch('notifications.get', {validate_eventids: this.getEventIds()})
+	this.fetch('notifications.get', {known_eventids: this.getEventIds()})
 		.catch(console.error)
 		.then(this.handleMainLoopResp.bind(this));
 };

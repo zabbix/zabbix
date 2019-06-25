@@ -29,7 +29,7 @@ class CControllerNotificationsRead extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$data = json_encode(['error' => _('Invalid request.')]);
+			$data = CJs::encodeJson(['error' => _('Invalid request.')]);
 			$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 		}
 
@@ -56,7 +56,7 @@ class CControllerNotificationsRead extends CController {
 		$msg_settings['last.clock'] = $last_event['clock'] + 1;
 		updateMessageSettings($msg_settings);
 
-		$data = json_encode(['ids' => array_keys($events)]);
+		$data = CJs::encodeJson(['ids' => array_keys($events)]);
 		$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 	}
 }
