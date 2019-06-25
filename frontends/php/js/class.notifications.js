@@ -52,12 +52,11 @@ ZBX_Notifications.DEBUG_GRP = function(log) {
 		ZBX_Notifications.DEBUG_GRPS = [];
 
 		console.groupEnd();
-	}, 100);
+	}, 500);
 };
 
 ZBX_Notifications.DEBUG = function() {
-	// return
-	if (IE) return;
+	// return;
 	if (ZBX_Notifications.DEBUG.halt) {
 		!ZBX_Notifications.DEBUG.halted && console.warn("debug halt")
 		ZBX_Notifications.DEBUG.halted = 1
@@ -70,15 +69,15 @@ ZBX_Notifications.DEBUG = function() {
 	var style = 'color:red;';
 
 	if (pos.match('\\.handlePushed')) {
-		// console.info('%c<< ' + pos, 'color:red');
+		console.info('%c<< ' + pos, 'color:red');
 	}
 
 	if (pos.match('\\.consume')) {
-		// console.info('%c[!]' + pos, 'color:gold');
+		console.info('%c[!]' + pos, 'color:gold');
 	}
 
 	if (pos.match('\\.push')) {
-		// console.info('%c>> ' + pos, 'color:green');
+		console.info('%c>> ' + pos, 'color:green');
 	}
 
 	if (pos.match('Collection\\.') || pos.match('Collection$')) {
@@ -103,9 +102,12 @@ ZBX_Notifications.DEBUG = function() {
 	// if (trace.length > 6) return;
 
 	var log = {
-		title: ['-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
+		title: [trace.length + '-'.repeat(trace.length) + '%c' + pos + ' [' + (arguments.length) + ']', style],
 		args: [],
 	}
+
+	// console.info(...log.title);
+	// return;
 
 	var len = arguments.length;
 	for (var i = 0; i < len; i ++) {
@@ -166,7 +168,7 @@ ZBX_Notifications.DEBUG = function() {
  */
 function ZBX_Notifications(store, tab) {
 	N = this;
-	ZBX_Notifications.DEBUG(store, tab);
+	ZBX_Notifications.DEBUG();
 
 	if (!(store instanceof ZBX_LocalStorage) || !(tab instanceof ZBX_BrowserTab)) {
 		throw 'Unmatched signature!';
@@ -179,12 +181,11 @@ function ZBX_Notifications(store, tab) {
 	this.store = store;
 	this.tab = tab;
 
-	this.player = new ZBX_NotificationsAudio();
 	this.collection = new ZBX_NotificationCollection();
-
-	this.bindEventHandlers();
+	this.alarm = new ZBX_NotificationsAlarm(new ZBX_NotificationsAudio());
 
 	this.fetchUpdates();
+
 	this.consumeList(this.list);
 	this.consumeUserSettings(this.user_settings);
 	this.consumeAlarmState(this.alarm_state);
@@ -211,6 +212,8 @@ function ZBX_Notifications(store, tab) {
 
 	this.pushUpdates();
 	this.restartMainLoop();
+
+	this.bindEventHandlers();
 }
 
 /**
@@ -231,26 +234,18 @@ ZBX_Notifications.prototype.bindEventHandlers = function() {
 	this.store.onKeyUpdate('notifications.list', this.handlePushedList.bind(this));
 	this.store.onKeyUpdate('notifications.user_settings', this.handlePushedUserSettings.bind(this));
 	this.store.onKeyUpdate('notifications.alarm_state', this.handlePushedAlarmState.bind(this));
+
+	this.alarm.onChange(this.handleAlarmStateChanged.bind(this));
 };
 
 /**
  * Reads all from store.
  */
 ZBX_Notifications.prototype.fetchUpdates = function() {
-	var default_alarm_state = {
-		severity: -2,
-		start: '',
-		end: '',
-		seek: 0,
-		timeout: 0,
-		muted: true,
-		snoozed: false
-	};
-
 	this.list = this.store.readKey('notifications.list', []);
 	this.user_settings = this.store.readKey('notifications.user_settings', {});
 	this.active_tabid = this.store.readKey('notifications.active_tabid', '');
-	this.alarm_state = this.store.readKey('notifications.alarm_state', default_alarm_state);
+	this.alarm_state = this.store.readKey('notifications.alarm_state', this.alarm.produce());
 };
 
 /**
@@ -276,60 +271,12 @@ ZBX_Notifications.prototype.getById = function(id) {
 };
 
 /**
- * TODO very complex, uncomprehensible method...
- * TODO maybe this primitive object `alarm_state` should be wrapped because it looks like contains behaviour.
- *
  * @param {object} alarm_state
  */
 ZBX_Notifications.prototype.consumeAlarmState = function(alarm_state) {
 	ZBX_Notifications.DEBUG(alarm_state);
 
-	// Nothing to play.
-	if (!alarm_state.start) {
-		alarm_state.timeout = 0;
-	}
-	// Playback has happened.
-	else if (alarm_state.start + '_' + alarm_state.severity === alarm_state.end) {
-		alarm_state.timeout = 0;
-	}
-	// Regardless if this is new/unitialized playback or not, recalculate this user setting.
-	else if (this.user_settings.alarm_timeout == ZBX_Notifications.ALARM_INFINITE_SERVER) {
-		var display_timeout = this.getById(alarm_state.start).calcDisplayTimeout(this.user_settings);
-		alarm_state.timeout = parseInt(display_timeout / 1000);
-	}
-	// New playback.
-	else if (alarm_state.timeout == 0) {
-		// Player instance will know length of timeout, only then it will pass actual time into alarm_state.
-		if (this.user_settings.alarm_timeout == ZBX_Notifications.ALARM_ONCE_SERVER) {
-			// TODO these values are flipped - server side should have user settings -2 for msg_timeout and -1 for once
-			alarm_state.timeout = ZBX_Notifications.ALARM_ONCE_PLAYER;
-		}
-		// New playback has arbitrary user setting timeout (most likely 10 seconds)
-		else {
-			alarm_state.timeout = this.user_settings.alarm_timeout;
-		}
-	}
-	else {
-		// Timeout cycles through LS across tabs.
-	}
-
-	ZBX_Notifications.DEBUG(alarm_state);
-	this.alarm_state = alarm_state;
-
-	// DEBUG-T
-	if (ZBX_Notifications._playin) { try { ZBX_Notifications._playin.node._playin.remove(); } catch(e){} }
-	if (this.alarm_state.start) {
-		if (this.getById(this.alarm_state.start)) {
-			ZBX_Notifications._playin = this.getById(this.alarm_state.start);
-			ZBX_Notifications._playin.node._playin = document.createElement('span');
-			ZBX_Notifications._playin.node._playin.style.float = 'right';
-			ZBX_Notifications._playin.node._playin.style.marginTop = '-43px';
-			ZBX_Notifications._playin.node.appendChild(ZBX_Notifications._playin.node._playin);
-			var file = this.user_settings.files[this.alarm_state.severity];
-			var pf = '(' + this.user_settings.alarm_timeout + ')🔊';
-			ZBX_Notifications._playin.node._playin.innerHTML = file + ' ' + pf;
-		}
-	}
+	this.alarm.consume(alarm_state, this.getById(alarm_state.start));
 };
 
 /**
@@ -341,8 +288,6 @@ ZBX_Notifications.prototype.consumeAlarmState = function(alarm_state) {
  * @return {integer}
  */
 ZBX_Notifications.prototype.calcPollInterval = function(user_settings) {
-	ZBX_Notifications.DEBUG(user_settings);
-
 	var min_timeout = Math.floor(user_settings.msg_timeout / 2);
 
 	if (min_timeout < 1) {
@@ -359,8 +304,6 @@ ZBX_Notifications.prototype.calcPollInterval = function(user_settings) {
  * @param {objects} user_settings
  */
 ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
-	ZBX_Notifications.DEBUG(user_settings);
-
 	var poll_interval = this.calcPollInterval(user_settings);
 	if (this.poll_interval != poll_interval) {
 		this.poll_interval = poll_interval;
@@ -370,37 +313,15 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
 	this.user_settings = user_settings;
 
 	if (this.user_settings.disabled) {
-		// this.resetAlarmState();
-		// this.pushAlarmState();
-		// this.dropStore();
-	}
-};
-
-/**
- * Appends notification to alarm_state context.
- *
- * @param {ZBX_Notification} notif
- */
-ZBX_Notifications.prototype.consumeNotifAlarmCtx = function(notif) {
-	ZBX_Notifications.DEBUG(notif);
-
-	var raw = notif.getRaw(),
-		severity = raw.resolved ? ZBX_Notifications.ALARM_SEVERITY_RESOLVED : raw.severity,
-		notifid = notif.getId();
-
-	if (this.alarm_state.snoozed && !raw.snoozed) {
-		this.alarm_state.snoozed = false;
-	}
-
-	if (this.alarm_state.severity < severity) {
-		this.alarm_state.severity = severity;
-		this.alarm_state.start = notifid;
+		this.alarm.stop();
+		this.pushAlarmState(this.alarm.produce());
+		this.dropStore();
 	}
 };
 
 /**
  * Consumes list into virtual DOM (collection). Computes and resets display timeouts for notification objects.
- * After display timeout collection is mutated and rendered. This loop is reused (consumeNotifAlarmCtx) to choose
+ * After display timeout collection is mutated and rendered. This loop is reused (acceptNotification) to choose
  * a notification to be played - most recent, most severe. Then it is written into alarm_state that once consumed,
  * will know if this notification has been played or not.
  *
@@ -412,15 +333,9 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 	this.collection.consumeList(list);
 	this.list = this.collection.getRawList();
 
-	/*
-	 * These values are zeroed out for case of empty list. The same notification id is computed again if lesser priority
-	 * notification resolves, while consuming this new list.
-	 */
-	this.alarm_state.start = '';
-	this.alarm_state.severity = -2;
-
+	this.alarm.reset();
 	this.collection.map(function(notif) {
-		this.consumeNotifAlarmCtx(notif);
+		this.alarm.acceptNotification(notif);
 
 		notif.display_timeoutid && clearTimeout(notif.display_timeoutid);
 		notif.display_timeoutid = setTimeout(function() {
@@ -441,7 +356,6 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 			notif.node.appendChild(notif.node._id);
 		}
 		notif.node._id.innerHTML = 'ID: ' + notif.getId();
-
 		if (!notif.node._timer) {
 			notif.node._timer = document.createElement('span');
 			notif.node._timer.style.float = 'right';
@@ -454,16 +368,12 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 		// DEBUG-T
 
 	}.bind(this));
-
-	this.consumeAlarmState(this.alarm_state);
 };
 
 /**
  * Stops ticking.
  */
 ZBX_Notifications.prototype.stopMainLoop = function() {
-	ZBX_Notifications.DEBUG();
-
 	if (this._main_loop_id) {
 		clearInterval(this._main_loop_id);
 	}
@@ -473,8 +383,6 @@ ZBX_Notifications.prototype.stopMainLoop = function() {
  * Sets interval for main loop. Tick is immediately executed.
  */
 ZBX_Notifications.prototype.restartMainLoop = function() {
-	ZBX_Notifications.DEBUG(':this.poll_interval: ' + this.poll_interval);
-
 	this.stopMainLoop();
 	this._main_loop_id = setInterval(this.mainLoop.bind(this), this.poll_interval * 1000);
 	this.mainLoop();
@@ -486,22 +394,19 @@ ZBX_Notifications.prototype.restartMainLoop = function() {
  * @param {integer} ms  Optional milliseconds for debounce.
  */
 ZBX_Notifications.prototype.debounceRender = function(ms) {
-
 	ms = ms || 50;
 	if (this._render_timeoutid) {
 		clearTimeout(this._render_timeoutid);
 	}
 
 	this._render_timeoutid = setTimeout(this.render.bind(this), ms);
-
-	ZBX_Notifications.DEBUG(ms);
 };
 
 /**
  * TODO below is {WIP}
  *
  * Write ZBX_LocalStorage only values that were updated by <consume> methods. For example, during a new user_settings
- * consumption it came clear that alarm_state has to be updated, only if that happened, alarm_state will be pushed.
+ * consumption it came clear that alarm has to be updated, only if that happened, alarm will be pushed.
  */
 ZBX_Notifications.prototype.pushUpdates = function() {
 	ZBX_Notifications.DEBUG();
@@ -514,7 +419,7 @@ ZBX_Notifications.prototype.pushUpdates = function() {
 	// TODO in consume<domain> methods construct a "change object", based on that push only needded stuff.
 	this.pushUserSettings(this.user_settings);
 	this.pushList(this.collection.getRawList());
-	this.pushAlarmState(this.alarm_state);
+	this.pushAlarmState(this.alarm.produce());
 };
 
 /**
@@ -536,7 +441,7 @@ ZBX_Notifications.prototype.pushUserSettings = function(user_settings) {
 };
 
 /**
- * @param {object} alarm_state
+ * @param {object} alarm
  */
 ZBX_Notifications.prototype.pushAlarmState = function(alarm_state) {
 	ZBX_Notifications.DEBUG(alarm_state);
@@ -588,34 +493,13 @@ ZBX_Notifications.prototype.becomeInactive = function() {
 
 	if (this.active) {
 		// No need to push everything.
-		this.alarm_state = this.getAlarmState();
-		this.consumeAlarmState(this.alarm_state);
-		this.pushAlarmState(this.alarm_state);
+		this.pushAlarmState(this.alarm.produce());
 	}
 
 	this.active_tabid = '';
 	this.active = false;
 
 	this.renderAudio();
-};
-
-/**
- * Collects how alarm_state looks at this time (during playback).
- *
- * @return {object}
- */
-ZBX_Notifications.prototype.getAlarmState = function() {
-	ZBX_Notifications.DEBUG();
-
-	return {
-		start: this.alarm_state.start,
-		end: this.alarm_state.end,
-		muted: this.alarm_state.muted,
-		snoozed: this.alarm_state.snoozed,
-		severity: this.alarm_state.severity,
-		seek: this.player.getSeek(),
-		timeout: this.player.getTimeout()
-	};
 };
 
 /**
@@ -652,6 +536,7 @@ ZBX_Notifications.prototype.handlePushedList = function(list) {
 ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
 	ZBX_Notifications.DEBUG(alarm_state);
 
+	this.alarm.refresh();
 	this.consumeAlarmState(alarm_state);
 	this.render();
 };
@@ -690,8 +575,6 @@ ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids
  * Responds when this instance tab receives focus event.
  */
 ZBX_Notifications.prototype.handleTabFocusIn = function() {
-	ZBX_Notifications.DEBUG();
-
 	this.becomeActive();
 };
 
@@ -710,7 +593,7 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 				this.debounceRender();
 			}.bind(this));
 
-			this.alarm_state.start = '';
+			this.alarm.reset();
 			this.pushUpdates();
 		}.bind(this));
 };
@@ -721,12 +604,9 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
 	ZBX_Notifications.DEBUG();
 
-	if (this.alarm_state.snoozed) {
+	if (this.alarm.snoozed) {
 		return;
 	}
-
-	this.alarm_state.snoozed = true;
-	this.consumeAlarmState(this.alarm_state);
 
 	this.collection.map(function(notif) {
 		notif.updateRaw({snoozed: true});
@@ -744,14 +624,12 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 	ZBX_Notifications.DEBUG();
 
-	this.fetch('notifications.mute', {mute: this.alarm_state.muted ? 0 : 1})
+	this.fetch('notifications.mute', {mute: this.alarm.muted ? 0 : 1})
 		.catch(console.error)
 		.then(function(resp) {
 
-			this.alarm_state.muted = resp.mute;
-			this.consumeAlarmState(this.alarm_state);
-
-			this.pushAlarmState(this.alarm_state);
+			this.alarm.consume({muted: resp.mute});
+			this.pushUpdates();
 			this.render();
 
 		}.bind(this));
@@ -781,13 +659,23 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 };
 
 /**
+ * @param {ZBX_NotificationsAlarm} alarm_state
+ */
+ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
+	ZBX_Notifications.DEBUG(alarm_state.produce(), 'into', alarm_state);
+
+	this.pushAlarmState(alarm_state.produce());
+};
+
+
+/**
  * Collection renders whole list of notifications and snooze, and mute buttons, not all state is passed down here, just
  * user configuration, the list state to be rendered, has been consumed by collection before.
  */
 ZBX_Notifications.prototype.renderCollection = function() {
 	ZBX_Notifications.DEBUG();
 
-	this.collection.render(this.user_settings.severity_styles, this.alarm_state);
+	this.collection.render(this.user_settings.severity_styles, this.alarm);
 };
 
 /**
@@ -801,41 +689,19 @@ ZBX_Notifications.prototype.render = function() {
 };
 
 /**
- * Updates player instance to match with this.alarm_state.
- *
- * @return {Promise}  Resolved once playback has reached timeout (only during playback in action).
+ * Alarm is stopped for inactive instance.
  */
 ZBX_Notifications.prototype.renderAudio = function() {
-	ZBX_Notifications.DEBUG();
+	if (this.active) {
+		this.alarm.render(this.user_settings);
 
-	var playback_ended = !this.alarm_state.start || (this.alarm_state.start === this.alarm_state.end),
-		playback_suppressed = this.alarm_state.muted || this.alarm_state.snoozed;
+		ZBX_Notifications.DEBUG(':play?', this.user_settings, this.alarm.produce());
 
-	if (!this.active || playback_ended || playback_suppressed) {
-		// return this.player.fadeStop(100);
-		return this.player.stop();
-	}
-
-	var file = this.user_settings.files[this.alarm_state.severity];
-
-	this.player.file(file);
-	this.player.seek(this.alarm_state.seek);
-
-	if (this.alarm_state.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
-		this.alarm_state.end = this.alarm_state.start + '_' + this.alarm_state.severity;
-		this.player.once();
 	}
 	else {
-		this.player.timeout(this.alarm_state.timeout).then(function(player) {
-			/*
-			 * It is not checked again here if this bound instance is active or not, because if it isn't active, player has been
-			 * rerendered as stopped and this promise is never resolved.
-			 */
-			this.alarm_state.end = this.alarm_state.start + '_' + this.alarm_state.severity;
-			this.pushAlarmState(this.alarm_state);
-		}.bind(this));
+		ZBX_Notifications.DEBUG(':stop');
+		this.alarm.stop();
 	}
-
 };
 
 /**
@@ -845,8 +711,6 @@ ZBX_Notifications.prototype.renderAudio = function() {
  * @return {Promise}  For IE11 ZBX_Promise poly-fill is returned.
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
-	ZBX_Notifications.DEBUG(resource, params);
-
 	// TODO the sendAjaxData will call a `success` method for you on network error! Not in the scope of this task.
 	return new Promise(function(resolve, reject) {
 		sendAjaxData('zabbix.php?action=' + resource, {
@@ -861,8 +725,6 @@ ZBX_Notifications.prototype.fetch = function(resource, params) {
  * @return {array}
  */
 ZBX_Notifications.prototype.getEventIds = function() {
-	ZBX_Notifications.DEBUG();
-
 	return this.collection.getIds();
 };
 
@@ -871,8 +733,6 @@ ZBX_Notifications.prototype.getEventIds = function() {
  * and rendered.
  */
 ZBX_Notifications.prototype.mainLoop = function() {
-	ZBX_Notifications.DEBUG('this.poll_interval: ' + this.poll_interval, 'active: ' + this.active);
-
 	if (!this.active) {
 		return;
 	}
@@ -1023,6 +883,206 @@ ZBX_Notifications.util.slideUp = function(node, duration, delay) {
 	return new Promise(function(resolved, failed) {
 		setTimeout(resolved.bind(null, node), delay + duration);
 	});
+};
+
+
+/**
+ * @param {ZBX_NotificationsAudio} player
+ */
+function ZBX_NotificationsAlarm(player) {
+	this.player = player;
+
+	this.severity = -2;
+	this.start = '';
+	this.end = '';
+	this.seek = 0;
+	this.timeout = 0;
+	this.muted = true;
+	this.snoozed = true;
+	this.notif = null;
+	this.on_changed_cbs = [];
+
+	this.old_id = this.getId();
+}
+
+/**
+ * An alarm is identified by notification and it's current severity.
+ *
+ * @return {string}
+ */
+ZBX_NotificationsAlarm.prototype.getId = function() {
+	if (this.notif) {
+		return this.notif.getId() + '_' + this.severity;
+	}
+
+	return '';
+};
+
+/**
+ * Invokes callbacks.
+ */
+ZBX_NotificationsAlarm.prototype.dispatchChanged = function() {
+	this.on_changed_cbs.forEach(function(callback) {
+		callback(this);
+	}.bind(this));
+};
+
+/**
+ * This mechanism exists to prevent or explicitly allow seek position to be applied at render.
+ */
+ZBX_NotificationsAlarm.prototype.refresh = function() {
+	this.old_id = '';
+};
+
+/**
+ * Subscribes a callback.
+ */
+ZBX_NotificationsAlarm.prototype.onChange = function(callback) {
+	this.on_changed_cbs.push(callback);
+};
+
+/**
+ * Calculated property.
+ */
+ZBX_NotificationsAlarm.prototype.markAsPlayed = function() {
+	this.end = this.getId();
+};
+
+/**
+ * @return {bool}
+ */
+ZBX_NotificationsAlarm.prototype.isPlayed = function() {
+	return this.getId() === this.end;
+};
+
+/**
+ * @return {bool}
+ */
+ZBX_NotificationsAlarm.prototype.isStopped = function() {
+	return !this.getId() || this.muted || this.snoozed;
+};
+
+/**
+ * @param {object} alarm_state
+ * @param {ZBX_Notification} notif
+ */
+ZBX_NotificationsAlarm.prototype.consume = function(alarm_state, notif) {
+
+	if (notif) {
+		this.notif = notif;
+	}
+
+	for (var field in alarm_state) {
+		this[field] = alarm_state[field];
+	}
+};
+
+/**
+ * Does not update state, just renders player stopped.
+ */
+ZBX_NotificationsAlarm.prototype.stop = function() {
+	this.player.stop();
+};
+
+/**
+ * @param {object} user_settings
+ */
+ZBX_NotificationsAlarm.prototype.render = function(user_settings) {
+
+	if (this.isStopped() || this.isPlayed()) {
+		return this.player.stop();
+	}
+
+	this.player.file(user_settings.files[this.severity]);
+
+	if (this.old_id !== this.getId()) {
+		this.player.seek(this.seek);
+	}
+
+	if (this.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
+		this.markAsPlayed();
+		this.player.once();
+	}
+	else {
+		this.player.timeout(this.calcTimeout(user_settings)).then(function(player) {
+			this.markAsPlayed();
+			this.dispatchChanged();
+		}.bind(this));
+	}
+};
+
+/**
+ * @param {object} user_settings
+ *
+ * @return {integer}
+ */
+ZBX_NotificationsAlarm.prototype.calcTimeout = function(user_settings) {
+
+	if (user_settings.alarm_timeout == ZBX_Notifications.ALARM_INFINITE_SERVER) {
+		return (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0;
+	}
+
+	if (user_settings.alarm_timeout == ZBX_Notifications.ALARM_ONCE_SERVER) {
+		// TODO these values are flipped - server side should have user settings -2 for msg_timeout and -1 for once
+		return ZBX_Notifications.ALARM_ONCE_PLAYER;
+	}
+
+	if (this.timeout == 0) {
+		return user_settings.alarm_timeout;
+	}
+
+	return this.timeout;
+};
+
+/**
+ * @return {object}
+ */
+ZBX_NotificationsAlarm.prototype.produce = function() {
+	return {
+		start: this.start,
+		end: this.end,
+		muted: this.muted,
+		snoozed: this.snoozed,
+		severity: this.severity,
+		seek: this.player.getSeek(),
+		timeout: this.player.getTimeout()
+	};
+};
+
+/*
+ * Resets crucial fields to accept notifications.
+ */
+ZBX_NotificationsAlarm.prototype.reset = function() {
+	this.old_id = this.getId();
+	this.start = '';
+	this.severity = -2;
+	this.snoozed = true;
+	this.timeout = 0;
+	this.notif = null;
+};
+
+/**
+ * Appends notification to state in context.
+ *
+ * @param {ZBX_Notification} notif
+ */
+ZBX_NotificationsAlarm.prototype.acceptNotification = function(notif) {
+	var raw = notif.getRaw(),
+		severity = raw.resolved ? ZBX_Notifications.ALARM_SEVERITY_RESOLVED : raw.severity;
+
+	if (this.snoozed && !raw.snoozed) {
+		this.snoozed = false;
+	}
+
+	if (raw.snoozed) {
+		return;
+	}
+
+	if (this.severity < severity) {
+		this.severity = severity;
+		this.notif = notif;
+		this.start = notif.getId();
+	}
 };
 
 /**
