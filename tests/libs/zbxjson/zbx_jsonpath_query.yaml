@@ -124,7 +124,7 @@ out:
   return: SUCCEED
   value: '["c", "d", "e" ]'
 ---
-test case: Query $.tags[:3]
+test case: Query $.tags[:2]
 include: &include zbx_jsonpath_query.inc.yaml
 in:
   data: *include
