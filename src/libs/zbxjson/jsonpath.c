@@ -1636,7 +1636,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 	zbx_vector_var_t	stack;
 	int			i, ret = SUCCEED;
 	zbx_jsonpath_segment_t	*segment;
-	zbx_variant_t		value, *left, *right;
+	zbx_variant_t		value, *right;
 	double			res;
 
 	if (SUCCEED != jsonpath_pointer_to_jp(pnext, &jp))
@@ -1648,30 +1648,134 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 
 	for (i = 0; i < segment->data.expression.tokens.values_num; i++)
 	{
+		zbx_variant_t		*left;
 		zbx_jsonpath_token_t	*token = (zbx_jsonpath_token_t *)segment->data.expression.tokens.values[i];
 
-		switch (jsonpath_token_group(token->type))
+		if (ZBX_JSONPATH_TOKEN_GROUP_OPERATOR2 == jsonpath_token_group(token->type))
 		{
-			case ZBX_JSONPATH_TOKEN_GROUP_OPERATOR2:
-				if (2 > stack.values_num)
-				{
-					jsonpath_set_expression_error(&segment->data.expression);
-					ret = FAIL;
-					goto out;
-				}
+			if (2 > stack.values_num)
+			{
+				jsonpath_set_expression_error(&segment->data.expression);
+				ret = FAIL;
+				goto out;
+			}
 
-				left = &stack.values[stack.values_num - 2];
-				right = &stack.values[stack.values_num - 1];
-				break;
-			case ZBX_JSONPATH_TOKEN_GROUP_OPERATOR1:
-				if (1 > stack.values_num)
-				{
-					jsonpath_set_expression_error(&segment->data.expression);
-					ret = FAIL;
-					goto out;
-				}
-				right = &stack.values[stack.values_num - 1];
-				break;
+			left = &stack.values[stack.values_num - 2];
+			right = &stack.values[stack.values_num - 1];
+
+			switch (token->type)
+			{
+				case ZBX_JSONPATH_TOKEN_OP_PLUS:
+					zbx_variant_convert(left, ZBX_VARIANT_DBL);
+					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					left->data.dbl += right->data.dbl;
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_MINUS:
+					zbx_variant_convert(left, ZBX_VARIANT_DBL);
+					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					left->data.dbl -= right->data.dbl;
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_MULT:
+					zbx_variant_convert(left, ZBX_VARIANT_DBL);
+					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					left->data.dbl *= right->data.dbl;
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_DIV:
+					zbx_variant_convert(left, ZBX_VARIANT_DBL);
+					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					left->data.dbl /= right->data.dbl;
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_EQ:
+					res = (0 == zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_NE:
+					res = (0 != zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_GT:
+					res = (0 < zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_GE:
+					res = (0 <= zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_LT:
+					res = (0 > zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_LE:
+					res = (0 >= zbx_variant_compare(left, right) ? 1.0 : 0.0);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_AND:
+					jsonpath_variant_to_boolean(left);
+					jsonpath_variant_to_boolean(right);
+					if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) &&
+							SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
+					{
+						res = 1.0;
+					}
+					else
+						res = 0.0;
+					zbx_variant_set_dbl(left, res);
+					zbx_variant_clear(right);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_OR:
+					jsonpath_variant_to_boolean(left);
+					jsonpath_variant_to_boolean(right);
+					if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) ||
+							SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
+					{
+						res = 1.0;
+					}
+					else
+						res = 0.0;
+					zbx_variant_set_dbl(left, res);
+					zbx_variant_clear(right);
+					stack.values_num--;
+					break;
+				case ZBX_JSONPATH_TOKEN_OP_REGEXP:
+					zbx_variant_convert(left, ZBX_VARIANT_STR);
+					zbx_variant_convert(right, ZBX_VARIANT_STR);
+					ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
+					zbx_variant_clear(left);
+					zbx_variant_clear(right);
+
+					if (FAIL == ret)
+						goto out;
+
+					zbx_variant_set_dbl(left, res);
+					stack.values_num--;
+					break;
+				default:
+					break;
+			}
+			continue;
 		}
 
 		switch (token->type)
@@ -1698,116 +1802,16 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				zbx_variant_set_dbl(&value, atof(token->data));
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
-			case ZBX_JSONPATH_TOKEN_OP_PLUS:
-				zbx_variant_convert(left, ZBX_VARIANT_DBL);
-				zbx_variant_convert(right, ZBX_VARIANT_DBL);
-				left->data.dbl += right->data.dbl;
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_MINUS:
-				zbx_variant_convert(left, ZBX_VARIANT_DBL);
-				zbx_variant_convert(right, ZBX_VARIANT_DBL);
-				left->data.dbl -= right->data.dbl;
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_MULT:
-				zbx_variant_convert(left, ZBX_VARIANT_DBL);
-				zbx_variant_convert(right, ZBX_VARIANT_DBL);
-				left->data.dbl *= right->data.dbl;
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_DIV:
-				zbx_variant_convert(left, ZBX_VARIANT_DBL);
-				zbx_variant_convert(right, ZBX_VARIANT_DBL);
-				left->data.dbl /= right->data.dbl;
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_EQ:
-				res = (0 == zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_NE:
-				res = (0 != zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_GT:
-				res = (0 < zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_GE:
-				res = (0 <= zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_LT:
-				res = (0 > zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_LE:
-				res = (0 >= zbx_variant_compare(left, right) ? 1.0 : 0.0);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
-				break;
 			case ZBX_JSONPATH_TOKEN_OP_NOT:
+				if (1 > stack.values_num)
+				{
+					jsonpath_set_expression_error(&segment->data.expression);
+					ret = FAIL;
+					goto out;
+				}
+				right = &stack.values[stack.values_num - 1];
 				jsonpath_variant_to_boolean(right);
 				right->data.dbl = 1 - right->data.dbl;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_AND:
-				jsonpath_variant_to_boolean(left);
-				jsonpath_variant_to_boolean(right);
-				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) &&
-						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
-				{
-					res = 1.0;
-				}
-				else
-					res = 0.0;
-				zbx_variant_set_dbl(left, res);
-				zbx_variant_clear(right);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_OR:
-				jsonpath_variant_to_boolean(left);
-				jsonpath_variant_to_boolean(right);
-				if (SUCCEED != zbx_double_compare(left->data.dbl, 0.0) ||
-						SUCCEED != zbx_double_compare(right->data.dbl, 0.0))
-				{
-					res = 1.0;
-				}
-				else
-					res = 0.0;
-				zbx_variant_set_dbl(left, res);
-				zbx_variant_clear(right);
-				stack.values_num--;
-				break;
-			case ZBX_JSONPATH_TOKEN_OP_REGEXP:
-				zbx_variant_convert(left, ZBX_VARIANT_STR);
-				zbx_variant_convert(right, ZBX_VARIANT_STR);
-				ret = jsonpath_regexp_match(left->data.str, right->data.str, &res);
-				zbx_variant_clear(left);
-				zbx_variant_clear(right);
-
-				if (FAIL == ret)
-					goto out;
-
-				zbx_variant_set_dbl(left, res);
-				stack.values_num--;
 				break;
 			default:
 				break;
