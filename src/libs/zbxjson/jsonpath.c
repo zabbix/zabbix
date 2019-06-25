@@ -2048,7 +2048,7 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
  *             element - [OUT] the extracted element                          *
  *                                                                            *
  * Return value: SUCCEED - the element was extracted successfully             *
- *               FAIL    - the pointer was not pointing to an JSON element    *
+ *               FAIL    - the pointer was not pointing to a JSON element     *
  *                                                                            *
  * Comments: String value element is unquoted, other elements are copied as   *
  *           is.                                                              *
@@ -2109,7 +2109,7 @@ static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
  *                                  json data                                 *
  *             type          - [IN] the function type                         *
  *             definite_path - [IN] 1 - if the path is definite (pointing at  *
- *                                      single object                         *
+ *                                      single object)                        *
  *                                  0 - otherwise                             *
  *             output        - [OUT] the output value                         *
  *                                                                            *
