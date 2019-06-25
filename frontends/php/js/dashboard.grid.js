@@ -22,7 +22,6 @@
 	"use strict"
 
 	function makeWidgetDiv($obj, data, widget) {
-
 		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head'}).append(
 			$('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
@@ -30,7 +29,7 @@
 			.append(
 				$('<ul>', {'class': 'dashbrd-grid-widget-actions'})
 					.append(
-						data['options']['editable']
+						(data['options']['editable'] && data['options']['kioskmode'] !== true)
 							? $('<li>').append(
 								$('<button>', {
 									'type': 'button',
@@ -65,7 +64,7 @@
 							})
 						))
 					.append(
-						data['options']['editable']
+						(data['options']['editable'] && data['options']['kioskmode'] !== true)
 							? $('<li>').hide().append(
 								$('<button>', {
 									'type': 'button',
