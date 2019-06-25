@@ -110,18 +110,19 @@ class CControllerNotificationsGet extends CController {
 
 		// Append selected events to notifications array.
 		$problems_by_triggerid = [];
-		foreach ($events as $num => $event) {
+		foreach ($events as $eventid => $event) {
 			// Filter by problem start, because that is not done by API if show_recovered is enabled.
-			if ($this->settings['show_recovered'] && $event['clock'] < $this->time_from) {
+			if ($this->settings['show_recovered'] && $event['clock'] < $this->time_from
+					&& !in_array($eventid, $resolved_events)) {
 				continue;
 			}
 
 			// Trigger API is used to select hostname only for notifications that client cannot recover from cache.
 			if (!array_key_exists($event['eventid'], $this->known_eventids)) {
-				$problems_by_triggerid[$event['objectid']][] = $num;
+				$problems_by_triggerid[$event['objectid']][] = $eventid;
 			}
 
-			$this->notifications[$num] = [
+			$this->notifications[$eventid] = [
 				'eventid'  => $event['eventid'],
 				'resolved' => (int) ($event['r_eventid'] != 0),
 				'severity' => (int) $event['severity'],
@@ -140,7 +141,7 @@ class CControllerNotificationsGet extends CController {
 				'preservekeys' => true
 			]);
 
-			foreach ($problems_by_triggerid as $triggerid => $notification_nums) {
+			foreach ($problems_by_triggerid as $triggerid => $notification_eventids) {
 				$trigger = $triggers[$triggerid];
 
 				$url_problems = (new CUrl('zabbix.php'))
@@ -157,8 +158,8 @@ class CControllerNotificationsGet extends CController {
 
 				$url_trigger_events_pt = (new CUrl('tr_events.php'))->setArgument('triggerid', $triggerid);
 
-				foreach ($notification_nums as $num) {
-					$notification = &$this->notifications[$num];
+				foreach ($notification_eventids as $eventid) {
+					$notification = &$this->notifications[$eventid];
 
 					$url_trigger_events = $url_trigger_events_pt
 						->setArgument('eventid', $notification['eventid'])
