@@ -1215,9 +1215,9 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_path_open                                               *
+ * Function: zbx_json_open_path                                               *
  *                                                                            *
- * Purpose: opens an object by json path                                      *
+ * Purpose: opens an object by definite json path                             *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
@@ -1226,7 +1226,7 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
  *           is supported.                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_path_open(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
 {
 	int			i, ret = FAIL;
 	struct zbx_json_parse	object;

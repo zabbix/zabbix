@@ -1413,7 +1413,7 @@ static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const char *p
 		path = tmp_path;
 	}
 
-	if (FAIL == zbx_json_path_open(jp, path, &jp_child))
+	if (FAIL == zbx_json_open_path(jp, path, &jp_child))
 		goto out;
 
 	if (NULL == zbx_json_decodevalue_dyn(jp_child.start, &data, &data_alloc, NULL))
