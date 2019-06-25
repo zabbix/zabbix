@@ -248,8 +248,6 @@ ZBX_Notifications.prototype.debounceRender = function(ms) {
 };
 
 /**
- * TODO below is {WIP}
- *
  * Write ZBX_LocalStorage only values that were updated by <consume> methods. For example, during a new user_settings
  * consumption it came clear that alarm has to be updated, only if that happened, alarm will be pushed.
  */
@@ -258,8 +256,6 @@ ZBX_Notifications.prototype.pushUpdates = function() {
 		this.pushActiveTabid(this.tab.uid);
 	}
 
-	// TODO optimize - not always needed to write them, if they not changed.
-	// TODO in consume<domain> methods construct a "change object", based on that push only needded stuff.
 	this.pushUserSettings(this.user_settings);
 	this.pushList(this.collection.getRawList());
 	this.pushAlarmState(this.alarm.produce());
@@ -312,8 +308,6 @@ ZBX_Notifications.prototype.becomeActive = function() {
 /**
  * Notification instance may only ever become inactive when another instance becomes active. At single tab unload case
  * various artifacts like seek position are transfered explicitly.
- *
- * (TODO is it possible to just call this method at unload).
  */
 ZBX_Notifications.prototype.becomeInactive = function() {
 	if (this.active) {
@@ -512,7 +506,6 @@ ZBX_Notifications.prototype.renderAudio = function() {
  * @return {Promise}  For IE11 ZBX_Promise poly-fill is returned.
  */
 ZBX_Notifications.prototype.fetch = function(resource, params) {
-	// TODO the sendAjaxData will call a `success` method for you on network error! Not in the scope of this task.
 	return new Promise(function(resolve, reject) {
 		sendAjaxData('zabbix.php?action=' + resource, {
 			data: params || {},
@@ -544,9 +537,7 @@ ZBX_Notifications.prototype.mainLoop = function() {
 };
 
 /**
- * Utilities..
- *
- * TODO could these be removed if we use scss and some class toggling?
+ * Utilities.
  */
 ZBX_Notifications.util = {};
 
@@ -824,7 +815,6 @@ ZBX_NotificationsAlarm.prototype.calcTimeout = function(user_settings) {
 	}
 
 	if (user_settings.alarm_timeout == ZBX_Notifications.ALARM_ONCE_SERVER) {
-		// TODO these values are flipped - server side should have user settings -2 for msg_timeout and -1 for once
 		return ZBX_Notifications.ALARM_ONCE_PLAYER;
 	}
 
