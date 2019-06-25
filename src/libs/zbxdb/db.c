@@ -113,7 +113,7 @@ zbx_oracle_db_handle_t;
 
 static zbx_oracle_db_handle_t	oracle;
 
-static ub4	OCI_DBserver_status();
+static ub4	OCI_DBserver_status(void);
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
@@ -2289,7 +2289,7 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 
 #ifdef HAVE_ORACLE
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-static ub4	OCI_DBserver_status()
+static ub4	OCI_DBserver_status(void)
 {
 	sword	err;
 	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
