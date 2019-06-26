@@ -439,7 +439,7 @@ ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 	this.fetch('notifications.mute', {mute: this.alarm.muted ? 0 : 1})
 		.catch(console.error)
 		.then(function(resp) {
-
+			this._cached_user_settings.muted = resp.mute;
 			this.alarm.consume({muted: resp.mute});
 			this.pushUpdates();
 			this.render();
@@ -778,6 +778,7 @@ ZBX_NotificationsAlarm.prototype.consume = function(alarm_state, notif) {
  * Does not update state, just renders player stopped.
  */
 ZBX_NotificationsAlarm.prototype.stop = function() {
+	this.notif = null;
 	this.player.stop();
 };
 
@@ -785,6 +786,7 @@ ZBX_NotificationsAlarm.prototype.stop = function() {
  * @param {object} user_settings
  */
 ZBX_NotificationsAlarm.prototype.render = function(user_settings) {
+	this.muted = user_settings.muted;
 
 	if (this.isStopped() || this.isPlayed()) {
 		return this.player.stop();
