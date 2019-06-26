@@ -65,13 +65,13 @@ function ZBX_Notifications(store, tab) {
 
 	this.fetchUpdates();
 
-	this.consumeList(this.list);
-	this.consumeUserSettings(this.user_settings);
-	this.consumeAlarmState(this.alarm_state);
+	this.consumeList(this._cached_list);
+	this.consumeUserSettings(this._cached_user_settings);
+	this.consumeAlarmState(this._cached_alarm_state);
 
 	// Latest data page is being reloaded in background.
 	var all_tabids = this.tab.getAllTabIds(),
-		any_active_tab = (all_tabids.indexOf(this.active_tabid) !== -1);
+		any_active_tab = (all_tabids.indexOf(this._cached_active_tabid) !== -1);
 
 	// If pages are opened in background, and has never yet received focusIn event.
 	if (!any_active_tab || document.hasFocus()) {
@@ -119,15 +119,13 @@ ZBX_Notifications.prototype.bindEventHandlers = function() {
  * Reads all from store.
  */
 ZBX_Notifications.prototype.fetchUpdates = function() {
-	this.list = this.store.readKey('notifications.list', []);
-	this.user_settings = this.store.readKey('notifications.user_settings', {});
-	this.active_tabid = this.store.readKey('notifications.active_tabid', '');
-	this.alarm_state = this.store.readKey('notifications.alarm_state', this.alarm.produce());
+	this._cached_list = this.store.readKey('notifications.list', []);
+	this._cached_user_settings = this.store.readKey('notifications.user_settings', {});
+	this._cached_active_tabid = this.store.readKey('notifications.active_tabid', '');
+	this._cached_alarm_state = this.store.readKey('notifications.alarm_state', this.alarm.produce());
 };
 
 /**
- * This does not bother for this.list property as it is not used for render or push.
- *
  * @param {string} id
  */
 ZBX_Notifications.prototype.removeById = function(id) {
@@ -185,9 +183,9 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
 		this._main_loop_id && this.restartMainLoop();
 	}
 
-	this.user_settings = user_settings;
+	this._cached_user_settings = user_settings;
 
-	if (this.user_settings.disabled) {
+	if (this._cached_user_settings.disabled) {
 		this.alarm.stop();
 		this.pushAlarmState(this.alarm.produce());
 		this.dropStore();
@@ -204,7 +202,7 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
  */
 ZBX_Notifications.prototype.consumeList = function(list) {
 	this.collection.consumeList(list);
-	this.list = this.collection.getRawList();
+	this._cached_list = this.collection.getRawList();
 
 	this.alarm.reset();
 	this.collection.map(function(notif) {
@@ -214,7 +212,7 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 		notif.display_timeoutid = setTimeout(function() {
 			this.removeById(notif.getId());
 			this.debounceRender();
-		}.bind(this), notif.calcDisplayTimeout(this.user_settings));
+		}.bind(this), notif.calcDisplayTimeout(this._cached_user_settings));
 	}.bind(this));
 };
 
@@ -259,7 +257,7 @@ ZBX_Notifications.prototype.pushUpdates = function() {
 		this.pushActiveTabid(this.tab.uid);
 	}
 
-	this.pushUserSettings(this.user_settings);
+	this.pushUserSettings(this._cached_user_settings);
 	this.pushList(this.collection.getRawList());
 	this.pushAlarmState(this.alarm.produce());
 };
@@ -301,7 +299,7 @@ ZBX_Notifications.prototype.becomeActive = function() {
 		return;
 	}
 
-	this.active_tabid = this.tab.uid;
+	this._cached_active_tabid = this.tab.uid;
 	this.active = true;
 
 	this.pushActiveTabid(this.tab.uid);
@@ -318,7 +316,7 @@ ZBX_Notifications.prototype.becomeInactive = function() {
 		this.pushAlarmState(this.alarm.produce());
 	}
 
-	this.active_tabid = '';
+	this._cached_active_tabid = '';
 	this.active = false;
 
 	this.renderAudio();
@@ -479,7 +477,7 @@ ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
  * user configuration, the list state to be rendered, has been consumed by collection before.
  */
 ZBX_Notifications.prototype.renderCollection = function() {
-	this.collection.render(this.user_settings.severity_styles, this.alarm);
+	this.collection.render(this._cached_user_settings.severity_styles, this.alarm);
 };
 
 /**
@@ -495,7 +493,7 @@ ZBX_Notifications.prototype.render = function() {
  */
 ZBX_Notifications.prototype.renderAudio = function() {
 	if (this.active) {
-		this.alarm.render(this.user_settings);
+		this.alarm.render(this._cached_user_settings);
 	}
 	else {
 		this.alarm.stop();
