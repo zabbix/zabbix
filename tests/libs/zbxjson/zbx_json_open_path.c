@@ -44,13 +44,13 @@ void	zbx_mock_test_entry(void **state)
 
 	if (FAIL == (ret = zbx_json_open_path(&jp, path, &jp_out)))
 	{
-		printf("zbx_json_path_open() error: %s\n", zbx_json_strerror());
-		zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "fail");
+		printf("zbx_json_open_path() error: %s\n", zbx_json_strerror());
+		zbx_mock_assert_str_eq("Invalid zbx_json_open_path() return value", result, "fail");
 		return;
 	}
 
-	zbx_mock_assert_result_eq("Invalid zbx_json_path_open() return value", SUCCEED, ret);
-	zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "succeed");
+	zbx_mock_assert_result_eq("Invalid zbx_json_open_path() return value", SUCCEED, ret);
+	zbx_mock_assert_str_eq("Invalid zbx_json_open_path() return value", result, "succeed");
 
 	zbx_json_value_dyn(&jp_out, &buffer, &size);
 
