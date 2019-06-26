@@ -7,6 +7,13 @@ out:
   return: SUCCEED
   value: a
 ---
+test case: Query $[4] from ["a", "b"]
+in:
+  data: '["a", "b"]'
+  path: $[4]
+out:
+  return: SUCCEED
+---
 test case: Query $[1] from ["a", "b"] 
 in:
   data: '["a", "b"]'
@@ -28,7 +35,6 @@ in:
   path: $[2].* 
 out:
   return: SUCCEED
-  values: '[]'
 ---
 test case: Query $.filters.price
 include: &include zbx_jsonpath_query.inc.yaml
@@ -573,7 +579,6 @@ in:
   path: $.books[?(@.category == $.filters.xyz)].title
 out:
   return: SUCCEED
-  value: '[]'
 ---
 test case: Query $.filters['no filters']
 include: &include zbx_jsonpath_query.inc.yaml

@@ -2294,11 +2294,11 @@ static int	jsonpath_format_query_result(const zbx_vector_str_t *objects, zbx_jso
 	size_t	output_offset = 0, output_alloc;
 	int	i;
 
+	if (0 == objects->values_num)
+		return SUCCEED;
+
 	if (1 == jsonpath->definite)
 	{
-		if (0 == objects->values_num)
-			return SUCCEED;
-
 		return jsonpath_extract_element(objects->values[0], output);
 	}
 
