@@ -1370,6 +1370,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 		case ZBX_PREPROC_JSONPATH:
 			if (FAIL == (ret = zbx_jsonpath_compile(pp->params, &jsonpath)))
 				zbx_strlcpy(err, zbx_json_strerror(), sizeof(err));
+			else
+				zbx_jsonpath_clear(&jsonpath);
 			break;
 		case ZBX_PREPROC_XPATH:
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
