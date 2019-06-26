@@ -415,7 +415,7 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
-	if (this.alarm.snoozed) {
+	if (this.alarm.isSnoozed(this._cached_list)) {
 		return;
 	}
 
@@ -494,7 +494,7 @@ ZBX_Notifications.prototype.render = function() {
  */
 ZBX_Notifications.prototype.renderAudio = function() {
 	if (this.active) {
-		this.alarm.render(this._cached_user_settings);
+		this.alarm.render(this._cached_user_settings, this._cached_list);
 	}
 	else {
 		this.alarm.stop();
@@ -692,7 +692,6 @@ function ZBX_NotificationsAlarm(player) {
 	this.seek = 0;
 	this.timeout = 0;
 	this.muted = true;
-	this.snoozed = true;
 	this.notif = null;
 	this.on_changed_cbs = [];
 
@@ -750,10 +749,25 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 };
 
 /**
+ * @param {array} list  List of raw notifications.
+ *
+ * @return {bool}
+ */
+ZBX_NotificationsAlarm.prototype.isSnoozed = function(list) {
+	for (var i = 0; i < list.length; i ++) {
+		if (!list[i].snoozed) {
+			return false;
+		}
+	}
+
+	return list.length == 0 ? false : true;
+};
+
+/**
  * @return {bool}
  */
 ZBX_NotificationsAlarm.prototype.isStopped = function() {
-	return !this.getId() || this.muted || this.snoozed;
+	return !this.getId() || this.muted;
 };
 
 /**
@@ -781,11 +795,12 @@ ZBX_NotificationsAlarm.prototype.stop = function() {
 
 /**
  * @param {object} user_settings
+ * @param {array} list  List of raw notification objects.
  */
-ZBX_NotificationsAlarm.prototype.render = function(user_settings) {
+ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	this.muted = user_settings.muted;
 
-	if (this.isStopped() || this.isPlayed()) {
+	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list)) {
 		return this.player.stop();
 	}
 
@@ -837,7 +852,6 @@ ZBX_NotificationsAlarm.prototype.produce = function() {
 		start: this.start,
 		end: this.end,
 		muted: this.muted,
-		snoozed: this.snoozed,
 		severity: this.severity,
 		seek: this.player.getSeek(),
 		timeout: this.player.getTimeout()
@@ -851,7 +865,6 @@ ZBX_NotificationsAlarm.prototype.reset = function() {
 	this.old_id = this.getId();
 	this.start = '';
 	this.severity = -2;
-	this.snoozed = true;
 	this.timeout = 0;
 	this.notif = null;
 };
@@ -864,10 +877,6 @@ ZBX_NotificationsAlarm.prototype.reset = function() {
 ZBX_NotificationsAlarm.prototype.acceptNotification = function(notif) {
 	var raw = notif.getRaw(),
 		severity = raw.resolved ? ZBX_Notifications.ALARM_SEVERITY_RESOLVED : raw.severity;
-
-	if (this.snoozed && !raw.snoozed) {
-		this.snoozed = false;
-	}
 
 	if (raw.snoozed) {
 		return;

@@ -255,10 +255,10 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
  *
  * @param {object} severity_styles
- * @param {object} alarm_state
+ * @param {ZBX_NotificationsAlarm} alarm_state
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
-	this.btn_snooze.renderState(alarm_state.snoozed);
+	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList()));
 	this.btn_mute.renderState(alarm_state.muted);
 
 	var list_node = this.list_node,
