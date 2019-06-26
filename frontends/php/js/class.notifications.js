@@ -352,9 +352,6 @@ ZBX_Notifications.prototype.handlePushedList = function(list) {
  * @param {object} alarm_state
  */
 ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
-	if (this.active) {
-		return;
-	}
 
 	this.alarm.refresh();
 	this.consumeAlarmState(alarm_state);
