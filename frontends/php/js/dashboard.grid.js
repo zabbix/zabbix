@@ -29,7 +29,7 @@
 			.append(
 				$('<ul>', {'class': 'dashbrd-grid-widget-actions'})
 					.append(
-						(data['options']['editable'] && data['options']['kioskmode'] !== true)
+						(data['options']['editable'] && !data['options']['kioskmode'])
 							? $('<li>').append(
 								$('<button>', {
 									'type': 'button',
@@ -64,7 +64,7 @@
 							})
 						))
 					.append(
-						(data['options']['editable'] && data['options']['kioskmode'] !== true)
+						(data['options']['editable'] && !data['options']['kioskmode'])
 							? $('<li>').hide().append(
 								$('<button>', {
 									'type': 'button',
