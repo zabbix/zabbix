@@ -380,8 +380,8 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  */
 ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids) {
 	if (this.active && other_tabids.length) {
-		this.becomeInactive();
 		this.pushActiveTabid(other_tabids[0]);
+		this.becomeInactive();
 	}
 	else if (this.active) {
 		this.pushAlarmState(this.alarm.produce());
