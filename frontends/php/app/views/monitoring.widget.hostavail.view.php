@@ -21,14 +21,21 @@
 
 $table = (new CTag('table', true))->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET);
 
-$available_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_TRUE]), _('Available')]))
-	->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
-$not_available_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_FALSE]), _('Not available')]))
-	->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
-$unknown_row = (new CCol([new CSpan($data['hosts'][HOST_AVAILABLE_UNKNOWN]), _('Unknown')]))
-	->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
-$total_row = (new CCol([new CSpan($data['total']), _('Total')]))
-	->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
+$available_row = (new CCol([
+	(new CSpan($data['hosts'][HOST_AVAILABLE_TRUE]))->addClass(ZBX_STYLE_HOST_AVAIL_COUNT), _('Available')
+]))->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
+
+$not_available_row = (new CCol([
+	(new CSpan($data['hosts'][HOST_AVAILABLE_FALSE]))->addClass(ZBX_STYLE_HOST_AVAIL_COUNT), _('Not available')
+]))->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
+
+$unknown_row = (new CCol([
+	(new CSpan($data['hosts'][HOST_AVAILABLE_UNKNOWN]))->addClass(ZBX_STYLE_HOST_AVAIL_COUNT), _('Unknown')
+]))->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
+
+$total_row = (new CCol([
+	(new CSpan($data['total']))->addClass(ZBX_STYLE_HOST_AVAIL_COUNT), _('Total')
+]))->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
 
 if ($data['layout'] == STYLE_HORIZONTAL) {
 	$table
@@ -36,7 +43,8 @@ if ($data['layout'] == STYLE_HORIZONTAL) {
 		->addClass(ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL);
 }
 else {
-	$table->addItem(new CRow($available_row))
+	$table
+		->addItem(new CRow($available_row))
 		->addItem(new CRow($not_available_row))
 		->addItem(new CRow($unknown_row))
 		->addItem(new CRow($total_row))

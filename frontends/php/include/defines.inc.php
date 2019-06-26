@@ -1743,10 +1743,11 @@ define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
 define('ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL', 'host-avail-layout-horizontal');
 define('ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL', 'host-avail-layout-vertical');
-define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-col-true');
-define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-col-false');
-define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-col-unknown');
-define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-col-total');
+define('ZBX_STYLE_HOST_AVAIL_COUNT', 'host-avail-count');
+define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
+define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
+define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
+define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

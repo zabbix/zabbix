@@ -36,7 +36,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		$this->fields[$field_groups->getName()] = $field_groups;
 
 		// Layout.
-		$field_style = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 			STYLE_HORIZONTAL => _('Horizontal'),
 			STYLE_VERTICAL => _('Vertical')
 		]))
@@ -44,10 +44,10 @@ class CWidgetFormHostAvail extends CWidgetForm {
 			->setModern(true);
 
 		if (array_key_exists('layout', $this->data)) {
-			$field_style->setValue($this->data['layout']);
+			$field_layout->setValue($this->data['layout']);
 		}
 
-		$this->fields[$field_style->getName()] = $field_style;
+		$this->fields[$field_layout->getName()] = $field_layout;
 
 		// Show hosts in maintenance.
 		$field_maintenance = (new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))

@@ -2357,8 +2357,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: #fff;
   border: 1px solid #9f9f9f;
   padding-bottom: 8px; }
-  .dashbrd-grid-widget-container.dashbrd-grid-widget-container-without-padding {
-    padding-bottom: 0; }
 
 .dashbrd-grid-widget-head {
   position: relative;
@@ -3103,6 +3101,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .middle {
   vertical-align: middle; }
+
+.no-padding {
+  padding: 0; }
 
 .graph-selection {
   position: absolute;
@@ -4899,19 +4900,29 @@ table.preprocessing-test-results .rel-container {
   width: 100%;
   height: 100%;
   table-layout: fixed; }
-  .host-avail-widget tr td {
-    vertical-align: middle;
-    padding: 0 10px; }
-    .host-avail-widget tr td span {
-      font-size: 16px; }
+  .host-avail-widget td {
+    padding: 0 10px;
+    vertical-align: middle; }
+  .host-avail-widget .host-avail-count {
+    font-size: 16px; }
   .host-avail-widget.host-avail-layout-horizontal {
     min-width: 305px; }
-    .host-avail-widget.host-avail-layout-horizontal tr td {
+    .host-avail-widget.host-avail-layout-horizontal td {
       text-align: center; }
-      .host-avail-widget.host-avail-layout-horizontal tr td span {
-        display: block; }
-  .host-avail-widget.host-avail-layout-vertical tr td span {
+    .host-avail-widget.host-avail-layout-horizontal .host-avail-count {
+      display: block; }
+  .host-avail-widget.host-avail-layout-vertical td {
+    padding-top: 3px; }
+  .host-avail-widget.host-avail-layout-vertical .host-avail-count {
     margin-right: 5px; }
+  .host-avail-widget .host-avail-true {
+    background: #86cc89; }
+  .host-avail-widget .host-avail-false {
+    background: #e45959; }
+  .host-avail-widget .host-avail-unknown {
+    background: #97aab3; }
+  .host-avail-widget .host-avail-total {
+    background: transparent; }
 
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
@@ -5591,3 +5602,15 @@ td.inactive-bg {
   .overrides-options-list > li > div > .subfilter-disable-btn {
     border: none !important;
     top: 0; }
+
+.host-avail-widget tr {
+  border-top: 1px solid #9f9f9f; }
+.host-avail-widget.host-avail-layout-horizontal td:not(:last-of-type) {
+  border-right: 1px solid #9f9f9f; }
+.host-avail-widget .host-avail-count {
+  font-weight: bold; }
+.host-avail-widget .host-avail-true,
+.host-avail-widget .host-avail-false,
+.host-avail-widget .host-avail-unknown,
+.host-avail-widget .host-avail-total {
+  background: transparent; }

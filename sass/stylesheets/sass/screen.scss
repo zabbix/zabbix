@@ -3453,10 +3453,6 @@ $form-icon-btn: (
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 	padding-bottom: 8px;
-
-	&.dashbrd-grid-widget-container-without-padding {
-		padding-bottom: 0;
-	}
 }
 
 .dashbrd-grid-widget-head {
@@ -4541,6 +4537,9 @@ $form-icon-btn: (
 	vertical-align: middle;
 }
 
+.no-padding {
+	padding: 0;
+}
 
 .graph-selection {
 	position: absolute;
@@ -6804,6 +6803,7 @@ $range-input-width: 31px;
 }
 
 table.preprocessing-test-results {
+
 	td {
 		vertical-align: top !important;
 	}
@@ -6820,52 +6820,59 @@ table.preprocessing-test-results {
 	}
 }
 
+// WIDGET HOST AVAILABILITY
+
 .host-avail-widget {
 	width: 100%;
 	height: 100%;
 	table-layout: fixed;
 
-	tr td {
-		vertical-align: middle;
+	td {
 		padding: 0 10px;
+		vertical-align: middle;
+	}
 
-		span {
-			font-size: 16px;
-		}
+	.host-avail-count {
+		font-size: 16px;
 	}
 
 	&.host-avail-layout-horizontal {
 		min-width: 305px;
 
-		tr td {
+		td {
 			text-align: center;
+		}
 
-			span {
-				display: block;
-			}
+		.host-avail-count {
+			display: block;
 		}
 	}
-	&.host-avail-layout-vertical tr td span {
-		margin-right: 5px;
+
+	&.host-avail-layout-vertical {
+
+		td {
+			padding-top: 3px;
+		}
+
+		.host-avail-count {
+			margin-right: 5px;
+		}
 	}
 
-	@if $theme_name == 'blue' or $theme_name == 'dark' {
-		.host-avail-col-true {
-			color: darken($font-color, 100%);
-			background: $host-avail-true-bg-color;
-		}
-		.host-avail-col-false {
-			color: darken($font-color, 100%);
-			background: $host-avail-false-bg-color;
-		}
-		.host-avail-col-unknown {
-			color: darken($font-color, 100%);
-			background: $host-avail-unknown-bg-color;
-		}
-		.host-avail-col-total {
-			color: $font-color;
-			background: $host-avail-total-bg-color;
-		}
+	.host-avail-true {
+		background: $host-avail-true-bg-color;
+	}
+
+	.host-avail-false {
+		background: $host-avail-false-bg-color;
+	}
+
+	.host-avail-unknown {
+		background: $host-avail-unknown-bg-color;
+	}
+
+	.host-avail-total {
+		background: $host-avail-total-bg-color;
 	}
 }
 
