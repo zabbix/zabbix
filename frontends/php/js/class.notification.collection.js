@@ -186,7 +186,13 @@ ZBX_NotificationCollection.prototype.makeToggleBtn = function(attrs_inactive, at
  * @param {string} id
  */
 ZBX_NotificationCollection.prototype.removeById = function(id) {
-	this._list_sequence.splice(this._list_sequence.indexOf(id), 1);
+	var index = this._list_sequence.indexOf(id);
+
+	if (index === -1) {
+		return;
+	}
+
+	this._list_sequence.splice(index, 1);
 
 	if (this._list_obj[id]) {
 		this._dangling_nodes.push(this._list_obj[id].node);

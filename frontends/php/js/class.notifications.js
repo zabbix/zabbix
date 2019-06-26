@@ -131,6 +131,10 @@ ZBX_Notifications.prototype.fetchUpdates = function() {
  * @param {string} id
  */
 ZBX_Notifications.prototype.removeById = function(id) {
+	if (id.constructor != String) {
+		id += '';
+	}
+
 	this.collection.removeById(id);
 };
 
