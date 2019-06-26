@@ -89,7 +89,9 @@ function ZBX_Notifications(store, tab) {
 		this.render();
 	}
 
-	this.pushUpdates();
+	if (this.active) {
+		this.pushUpdates();
+	}
 	this.restartMainLoop();
 
 	this.bindEventHandlers();
@@ -382,6 +384,7 @@ ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids
 		this.pushActiveTabid(other_tabids[0]);
 	}
 	else if (this.active) {
+		this.pushAlarmState(this.alarm.produce());
 		this.dropStore();
 	}
 };
@@ -865,7 +868,6 @@ ZBX_NotificationsAlarm.prototype.reset = function() {
 	this.old_id = this.getId();
 	this.start = '';
 	this.severity = -2;
-	this.timeout = 0;
 	this.notif = null;
 };
 
