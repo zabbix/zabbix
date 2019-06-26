@@ -1324,8 +1324,10 @@ else {
 		]);
 	}
 
-	// get proxy host IDs that that are not 0
+	// Get proxy host IDs that are not 0 and maintenance IDs.
 	$proxyHostIds = [];
+	$maintenanceids = [];
+
 	foreach ($hosts as &$host) {
 		// Sort interfaces to be listed starting with one selected as 'main'.
 		CArrayHelper::sort($host['interfaces'], [
@@ -1334,6 +1336,10 @@ else {
 
 		if ($host['proxy_hostid']) {
 			$proxyHostIds[$host['proxy_hostid']] = $host['proxy_hostid'];
+		}
+
+		if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenanceids[$host['maintenanceid']] = true;
 		}
 	}
 	unset($host);
@@ -1358,6 +1364,16 @@ else {
 		$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
 	}
 
+	$db_maintenances = [];
+
+	if ($maintenanceids) {
+		$db_maintenances = API::Maintenance()->get([
+			'output' => ['name', 'description'],
+			'maintenanceids' => array_keys($maintenanceids),
+			'preservekeys' => true
+		]);
+	}
+
 	$data = [
 		'pageFilter' => $pageFilter,
 		'hosts' => $hosts,
@@ -1368,6 +1384,7 @@ else {
 		'groupId' => $pageFilter->groupid,
 		'config' => $config,
 		'templates' => $templates,
+		'maintenances' => $db_maintenances,
 		'writable_templates' => $writable_templates,
 		'proxies' => $proxies,
 		'proxies_ms' => $proxies_ms,

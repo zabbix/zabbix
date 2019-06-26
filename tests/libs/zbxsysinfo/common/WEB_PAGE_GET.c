@@ -143,6 +143,7 @@ CURLcode	__wrap_curl_easy_perform(CURL *easyhandle)
 	ZBX_UNUSED(easyhandle);
 
 	cb_ptr(req_url, 1, strlen(req_url), page_data);
+	zbx_free(req_url);
 
 	return CURLE_OK;
 }
