@@ -112,8 +112,8 @@
 				{
 					title: t('S_APPLY'),
 					action: function() {
-						var value = $.trim($textarea.val());
-						obj.$input.val(value.split("\n")[0]);
+						var value = $textarea.val();
+						obj.$input.val($.trim(value).split("\n")[0]);
 						obj.$hidden.val(value);
 					},
 					enabled: !obj.options.readonly
@@ -226,9 +226,8 @@
 					var $this = $(this),
 						obj = $this.data('multilineInput');
 
-					value = $.trim(value);
 					obj.$hidden.val(value);
-					obj.$input.val(value.split("\n")[0]);
+					obj.$input.val($.trim(value).split("\n")[0]);
 					$this.trigger('change');
 				});
 			}

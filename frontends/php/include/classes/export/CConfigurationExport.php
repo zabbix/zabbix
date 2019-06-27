@@ -139,16 +139,28 @@ class CConfigurationExport {
 	public function export() {
 		$this->gatherData();
 
+		$simple_triggers = [];
+
 		if ($this->data['groups']) {
 			$this->builder->buildGroups($this->data['groups']);
 		}
 
+		if ($this->data['triggers']) {
+			foreach ($this->data['triggers'] as $triggerid => $trigger) {
+				if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+						&& $trigger['items'][0]['templateid'] == 0) {
+					$simple_triggers[] = $trigger;
+					unset($this->data['triggers'][$triggerid]);
+				}
+			}
+		}
+
 		if ($this->data['templates']) {
-			$this->builder->buildTemplates($this->data['templates']);
+			$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
 		}
 
 		if ($this->data['hosts']) {
-			$this->builder->buildHosts($this->data['hosts']);
+			$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
 		}
 
 		if ($this->data['triggers']) {
@@ -458,6 +470,7 @@ class CConfigurationExport {
 		$items = $this->prepareItems($items);
 
 		foreach ($items as $item) {
+			$item['host'] = $hosts[$item['hostid']]['host'];
 			$hosts[$item['hostid']]['items'][] = $item;
 		}
 
@@ -558,6 +571,10 @@ class CConfigurationExport {
 				}
 
 				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+			}
+
+			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
+				$discovery_rule['itemPrototypes'][$itemid]['host'] = $hosts[$discovery_rule['hostid']]['host'];
 			}
 
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
@@ -961,7 +978,7 @@ class CConfigurationExport {
 				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
-			'selectItems' => ['itemid', 'flags', 'type'],
+			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],

@@ -1627,7 +1627,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			(new CDiv(
 				(new CButton('preproc_test_all', _('Test all steps')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addStyle(($i > 1) ? null : 'display: none')
+					->addStyle(($i > 0) ? null : 'display: none')
 			))->addClass('step-action')
 		]))->addClass('preprocessing-list-foot')
 	);

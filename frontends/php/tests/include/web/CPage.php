@@ -148,6 +148,17 @@ class CPage {
 	}
 
 	/**
+	 * Logout from frontend and clean cookies.
+	 */
+	public function logout() {
+		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
+		$this->waitUntilReady();
+
+		$this->driver->manage()->deleteAllCookies();
+		self::$cookie = null;
+	}
+
+	/**
 	 * Open specified URL.
 	 *
 	 * @param string $url   URL to be opened.
@@ -235,6 +246,29 @@ class CPage {
 	 */
 	public function waitUntilReady() {
 		return (new CElementQuery(null))->waitUntilReady();
+	}
+
+	/**
+	 * Check if alert is present.
+	 *
+	 * @return boolean
+	 */
+	public function isAlertPresent() {
+		return ($this->getAlertText() !== null);
+	}
+
+	/**
+	 * Get alert text.
+	 *
+	 * @return string|null
+	 */
+	public function getAlertText() {
+		try {
+			return $this->driver->switchTo()->alert()->getText();
+		}
+		catch (NoAlertOpenException $exception) {
+			return null;
+		}
 	}
 
 	/**

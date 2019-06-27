@@ -31,6 +31,7 @@
 #include "zbxjson.h"
 #include "zbxembed.h"
 #include "zbxprometheus.h"
+#include "preproc_history.h"
 
 #include "item_preproc.h"
 
@@ -1875,6 +1876,78 @@ int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *
 			return FAIL;
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_item_preproc_test                                            *
+ *                                                                            *
+ * Purpose: test preprocessing steps                                          *
+ *                                                                            *
+ * Parameters: value_type    - [IN] the item value type                       *
+ *             value         - [IN/OUT] the value to process                  *
+ *             ts            - [IN] the value timestamp                       *
+ *             steps         - [IN] the preprocessing steps to execute        *
+ *             steps_num     - [IN] the number of preprocessing steps         *
+ *             history_in    - [IN] the preprocessing history                 *
+ *             history_out   - [OUT] the new preprocessing history            *
+ *             results       - [OUT] the preprocessing step results           *
+ *             results_num   - [OUT] the number of step results               *
+ *             error         - [OUT] error message                            *
+ *                                                                            *
+ * Return value: SUCCEED - the preprocessing steps finished successfully      *
+ *               FAIL - otherwise, error contains the error message           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
+		zbx_preproc_result_t *results, int *results_num, char **error)
+{
+	int	i, ret = SUCCEED;
+
+	for (i = 0; i < steps_num; i++)
+	{
+		zbx_preproc_op_t	*op = &steps[i];
+		zbx_variant_t		history_value;
+		zbx_timespec_t		history_ts;
+
+		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
+
+		if (FAIL == (ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, error)))
+		{
+			results[i].action = op->error_handler;
+			results[i].error = zbx_strdup(NULL, *error);
+			ret = zbx_item_preproc_handle_error(value, op, error);
+		}
+		else
+		{
+			results[i].action = ZBX_PREPROC_FAIL_DEFAULT;
+			results[i].error = NULL;
+		}
+
+		if (SUCCEED != ret)
+		{
+			zbx_variant_set_none(&results[i].value);
+			zbx_variant_clear(&history_value);
+			break;
+		}
+
+		zbx_variant_set_variant(&results[i].value, value);
+
+		if (ZBX_VARIANT_NONE != history_value.type)
+		{
+			/* the value is byte copied to history_out vector and doesn't have to be cleared */
+			zbx_preproc_history_add_value(history_out, i, &history_value, &history_ts);
+		}
+
+		if (ZBX_VARIANT_NONE == value->type)
+			break;
+	}
+
+	*results_num = (i == steps_num ? i : i + 1);
+
+	return ret;
+}
+
 #ifdef HAVE_TESTS
 #	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
 #endif

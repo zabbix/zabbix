@@ -466,7 +466,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// 	Script media type.
 			[
 				[
-					'name' => 'Script',
+					'name' => 'Test script',
 					'form' => [
 						'Send to' => '/../"'
 					],
@@ -487,6 +487,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * Check Test form of media type.
 	 *
 	 * @dataProvider getTestFormData
+	 * @depends testPageAdministrationMediaTypes_Enable
 	 */
 	public function testPageAdministrationMediaTypes_TestMediaType($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');

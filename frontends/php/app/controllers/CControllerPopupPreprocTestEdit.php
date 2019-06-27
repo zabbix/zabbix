@@ -32,7 +32,8 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'steps' => 'required|array',
 			'delay' => 'string',
 			'data' => 'array',
-			'step_obj' => 'required|int32'
+			'step_obj' => 'required|int32',
+			'show_final_result' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -118,6 +119,7 @@ class CControllerPopupPreprocTestEdit extends CControllerPopupPreprocTest {
 			'value_type' => $this->getInput('value_type'),
 			'test_type' => $this->getInput('test_type'),
 			'step_obj' => $this->getInput('step_obj'),
+			'show_final_result' => $this->getInput('show_final_result'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
