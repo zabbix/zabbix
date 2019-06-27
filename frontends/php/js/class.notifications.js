@@ -122,7 +122,9 @@ ZBX_Notifications.prototype.bindEventHandlers = function() {
  */
 ZBX_Notifications.prototype.fetchUpdates = function() {
 	this._cached_list = this.store.readKey('notifications.list', []);
-	this._cached_user_settings = this.store.readKey('notifications.user_settings', {});
+	this._cached_user_settings = this.store.readKey('notifications.user_settings', {
+		msg_timeout: ZBX_Notifications.POLL_INTERVAL * 2
+	});
 	this._cached_active_tabid = this.store.readKey('notifications.active_tabid', '');
 	this._cached_alarm_state = this.store.readKey('notifications.alarm_state', this.alarm.produce());
 };
