@@ -61,25 +61,25 @@ class CWidgetConfig {
 	 */
 	private static function getDefaultDimensions() {
 		return [
-			WIDGET_ACTION_LOG			=> ['width' => 6, 'height' => 5],
-			WIDGET_CLOCK				=> ['width' => 2, 'height' => 3],
-			WIDGET_DATA_OVER			=> ['width' => 6, 'height' => 5],
-			WIDGET_DISCOVERY			=> ['width' => 3, 'height' => 3],
-			WIDGET_FAV_GRAPHS			=> ['width' => 2, 'height' => 3],
-			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
-			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
-			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
-			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
-			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
-			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
-			WIDGET_PROBLEM_HOSTS		=> ['width' => 6, 'height' => 5],
-			WIDGET_PROBLEMS				=> ['width' => 6, 'height' => 5],
-			WIDGET_PROBLEMS_BY_SV		=> ['width' => 6, 'height' => 5],
-			WIDGET_SVG_GRAPH			=> ['width' => 6, 'height' => 5],
-			WIDGET_SYSTEM_INFO			=> ['width' => 6, 'height' => 5],
-			WIDGET_TRIG_OVER			=> ['width' => 6, 'height' => 5],
-			WIDGET_URL					=> ['width' => 6, 'height' => 5],
-			WIDGET_WEB					=> ['width' => 3, 'height' => 3]
+			WIDGET_ACTION_LOG			=> ['width' => 12, 'height' => 5],
+			WIDGET_CLOCK				=> ['width' => 4, 'height' => 3],
+			WIDGET_DATA_OVER			=> ['width' => 12, 'height' => 5],
+			WIDGET_DISCOVERY			=> ['width' => 6, 'height' => 3],
+			WIDGET_FAV_GRAPHS			=> ['width' => 4, 'height' => 3],
+			WIDGET_FAV_MAPS				=> ['width' => 4, 'height' => 3],
+			WIDGET_FAV_SCREENS			=> ['width' => 4, 'height' => 3],
+			WIDGET_GRAPH				=> ['width' => 12, 'height' => 5],
+			WIDGET_MAP					=> ['width' => 18, 'height' => 5],
+			WIDGET_NAV_TREE				=> ['width' => 6, 'height' => 5],
+			WIDGET_PLAIN_TEXT			=> ['width' => 6, 'height' => 3],
+			WIDGET_PROBLEM_HOSTS		=> ['width' => 12, 'height' => 5],
+			WIDGET_PROBLEMS				=> ['width' => 12, 'height' => 5],
+			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12, 'height' => 5],
+			WIDGET_SVG_GRAPH			=> ['width' => 12, 'height' => 5],
+			WIDGET_SYSTEM_INFO			=> ['width' => 12, 'height' => 5],
+			WIDGET_TRIG_OVER			=> ['width' => 12, 'height' => 5],
+			WIDGET_URL					=> ['width' => 12, 'height' => 5],
+			WIDGET_WEB					=> ['width' => 6, 'height' => 3]
 		];
 	}
 

@@ -1996,8 +1996,6 @@
 			var default_options = {
 				'widget-height': 70,
 				'widget-min-rows': 2,
-				'max-rows': 64,
-				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
 				'editable': true,

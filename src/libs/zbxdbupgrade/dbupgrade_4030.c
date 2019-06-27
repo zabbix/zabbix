@@ -48,6 +48,18 @@ static int	DBpatch_4030002(void)
 	return DBmodify_field_type("host_discovery", &field, NULL);
 }
 
+static int	DBpatch_4030003(void)
+{
+	int	res;
+
+    res = DBexecute("update widget set x=x*2, width=width*2;");
+
+    if (ZBX_DB_OK > res)
+        return FAIL;
+
+    return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -57,5 +69,6 @@ DBPATCH_START(4030)
 DBPATCH_ADD(4030000, 0, 1)
 DBPATCH_ADD(4030001, 0, 1)
 DBPATCH_ADD(4030002, 0, 1)
+DBPATCH_ADD(4030003, 0, 1)
 
 DBPATCH_END()
