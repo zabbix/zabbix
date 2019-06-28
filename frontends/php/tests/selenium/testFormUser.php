@@ -556,37 +556,44 @@ class testFormUser extends CLegacyWebTest {
 	 * Login as user and check user profile parameters in UI.
 	 */
 	private function assertUserParameters($data) {
-		$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
-		// Log in with the created or updated user.
-		$this->page->logout();
-		$this->query('id:name')->waitUntilVisible()->one()->fill($data['fields']['Alias']);
-		$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-		$this->query('id:password')->one()->fill($password);
-		$this->query('button:Sign in')->one()->click();
+		try {
+			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+			// Logout.
+			$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
+			$this->webDriver->manage()->deleteAllCookies();
+			// Log in with the created or updated user.
+			$this->query('id:name')->waitUntilVisible()->one()->fill($data['fields']['Alias']);
+			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
+			$this->query('id:password')->one()->fill($password);
+			$this->query('button:Sign in')->one()->click();
 
-		// Verification of URL after login.
-		$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
+			// Verification of URL after login.
+			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 
-		// Verification of the number of rows per page parameter.
-		$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
-		$this->assertEquals($data['fields']['Rows per page'], $rows->count());
+			// Verification of the number of rows per page parameter.
+			$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
+			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
 
-		// Verification of default theme.
-		$color = $this->query('tag:body')->one()->getCSSValue('background-color');
-		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
-		$file = explode('/', $stylesheet->getAttribute('href'));
-		if ($data['fields']['Theme'] === 'Dark') {
-			$this->assertEquals('dark-theme', $db_theme);
-			$this->assertEquals('dark-theme.css', end($file));
-			$this->assertEquals('rgba(14, 16, 18, 1)', $color);
+			// Verification of default theme.
+			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
+			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
+			$file = explode('/', $stylesheet->getAttribute('href'));
+			if ($data['fields']['Theme'] === 'Dark') {
+				$this->assertEquals('dark-theme', $db_theme);
+				$this->assertEquals('dark-theme.css', end($file));
+				$this->assertEquals('rgba(14, 16, 18, 1)', $color);
+			}
+			else if ($data['fields']['Theme'] === 'High-contrast light') {
+				$this->assertEquals('hc-light', $db_theme);
+				$this->assertEquals('hc-light.css', end($file));
+				$this->assertEquals('rgba(255, 255, 255, 1)', $color);
+			}
+			$this->page->logout();
 		}
-		else if ($data['fields']['Theme'] === 'High-contrast light') {
-			$this->assertEquals('hc-light', $db_theme);
-			$this->assertEquals('hc-light.css', end($file));
-			$this->assertEquals('rgba(255, 255, 255, 1)', $color);
+		catch (\Exception $e) {
+			$this->page->logout();
+			throw $e;
 		}
-		// Set session to status active to execute remaining tests.
-		$this->page->logout();
 	}
 
 	public function getUpdateData() {
@@ -943,24 +950,30 @@ class testFormUser extends CLegacyWebTest {
 			'Password (once again)' => $data['new_password']
 		]);
 		$form_update->submit();
-		$this->page->logout();
+		try {
+			$this->query('class:top-nav-signout')->one()->click();
+			$this->webDriver->manage()->deleteAllCookies();
 
-		// Atempt to sign in with old password.
-		$this->query('id:name')->waitUntilVisible()->one()->fill($data['alias']);
-		$this->query('id:password')->one()->fill($data['old_password']);
-		$this->query('button:Sign in')->one()->click();
-		$message = $this->query('class:red')->one()->getText();
-		$this->assertEquals($message, $data['error_message']);
+			// Atempt to sign in with old password.
+			$this->query('id:name')->waitUntilVisible()->one()->fill($data['alias']);
+			$this->query('id:password')->one()->fill($data['old_password']);
+			$this->query('button:Sign in')->one()->click();
+			$message = $this->query('class:red')->one()->getText();
+			$this->assertEquals($message, $data['error_message']);
 
-		// Sign in with new password.
-		$this->query('id:name')->one()->fill($data['alias']);
-		$this->query('id:password')->one()->fill($data['new_password']);
-		$this->query('button:Sign in')->one()->click();
-		$attempt_message = CMessageElement::find()->one();
-		$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
-
-		// Logout to execute remaining tests.
-		$this->page->logout();
+			// Sign in with new password.
+			$this->query('id:name')->one()->fill($data['alias']);
+			$this->query('id:password')->one()->fill($data['new_password']);
+			$this->query('button:Sign in')->one()->click();
+			$attempt_message = CMessageElement::find()->one();
+			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
+			$this->page->logout();
+		}
+		catch (\Exception $e) {
+			// Logout to execute remaining tests.
+			$this->page->logout();
+			throw $e;
+		}
 	}
 
 	public function getDeleteData() {
