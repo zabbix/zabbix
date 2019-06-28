@@ -73,7 +73,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test1',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
@@ -85,18 +85,18 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test2',
 						'Groups' => 'Zabbix administrators'
 					],
 					'error_details' => 'Incorrect value for field "passwd": cannot be empty.'
 				]
 			],
-			// Empty 'Password (one again)' field.
+			// Empty 'Password (once again)' field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test3',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix'
 					],
@@ -108,7 +108,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test4',
 						'Groups' => 'Zabbix administrators',
 						'Password (once again)' => 'zabbix'
 					],
@@ -120,7 +120,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test5',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'PaSSwOrD',
 						'Password (once again)' => 'password'
@@ -133,7 +133,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test6',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -147,7 +147,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test7',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -161,11 +161,37 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test8',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '3601'
+					],
+					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Negative_Test_2h',
+						'Groups' => 'Zabbix administrators',
+						'Password' => 'zabbix',
+						'Password (once again)' => 'zabbix',
+						'Refresh' => '2h'
+					],
+					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Negative_Test_61m',
+						'Groups' => 'Zabbix administrators',
+						'Password' => 'zabbix',
+						'Password (once again)' => 'zabbix',
+						'Refresh' => '61m'
 					],
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
@@ -175,7 +201,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test9',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -189,7 +215,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test10',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -204,7 +230,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test11',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
@@ -219,7 +245,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test12',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -231,12 +257,28 @@ class testFormUser extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Negative_Test12_1m',
+						'Groups' => 'Zabbix administrators',
+						'Password' => 'zabbix',
+						'Password (once again)' => 'zabbix'
+					],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '1m'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
 			// 'Autologout' above maximal value.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test13',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -248,12 +290,44 @@ class testFormUser extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Negative_Test13_1441m',
+						'Groups' => 'Zabbix administrators',
+						'Password' => 'zabbix',
+						'Password (once again)' => 'zabbix'
+					],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '1441m'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Negative_Test13_25h',
+						'Groups' => 'Zabbix administrators',
+						'Password' => 'zabbix',
+						'Password (once again)' => 'zabbix'
+					],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '25h'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
 			// 'Autologout' with a non-numeric value.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test14',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -270,7 +344,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test15',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
@@ -287,11 +361,11 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test16',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'www.goo gle.com'
+						'URL (after login)' => 'www.zab bix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -301,11 +375,11 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test17',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'google.com'
+						'URL (after login)' => 'zabbix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -315,11 +389,11 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test18',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'screenconf'
+						'URL (after login)' => 'sysmaps'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -329,11 +403,11 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Alias' => 'Negative_Test',
+						'Alias' => 'Negative_Test19',
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'snmp://google.com'
+						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -358,16 +432,16 @@ class testFormUser extends CLegacyWebTest {
 						'Alias' => 'Оверлорд',
 						'Name' => 'Антон Антонович',
 						'Surname' => 'Антонов',
-						'Groups' => 'Zabbix administrators',
-						'Password' => '123',
-						'Password (once again)' => '123',
-						'Language' => 'Russian (ru_RU)',
+						'Groups' => ['Zabbix administrators'],
+						'Password' => 'абв',
+						'Password (once again)' => 'абв',
 						'Theme' => 'High-contrast dark',
 						'Auto-login' => false,
-						'Refresh' => '10m',
+						'Refresh' => '0',
 						'Rows per page' => '999999',
-						'URL (after login)' => 'https://google.com'
-					]
+						'URL (after login)' => 'https://zabbix.com'
+					],
+					'check_form' => true
 				]
 			],
 			// Creating a user with punctuation symbols in password and optional parameters specified.
@@ -387,15 +461,16 @@ class testFormUser extends CLegacyWebTest {
 						'Language' => 'English (en_US)',
 						'Theme' => 'Dark',
 						'Auto-login' => true,
-						'Refresh' => '10s',
-						'Rows per page' => '5',
-						'URL (after login)' => 'screenconf.php'
+						'Refresh' => '3600s',
+						'Rows per page' => '1',
+						'URL (after login)' => 'sysmaps.php'
 					],
-					'check_user' => true,
 					'auto_logout' => [
 						'checked' => true,
-						'value' => '10m'
-					]
+						'value' => '1d'
+					],
+					'check_form' => true,
+					'check_user' => true
 				]
 			],
 			// Verification that field password is not mandatory for users with LDAP authentification.
@@ -427,115 +502,120 @@ class testFormUser extends CLegacyWebTest {
 	public function testFormUser_Create($data) {
 		$good_title = 'User added';
 		$bad_title = 'Cannot add user';
+		$sql = 'SELECT * FROM users';
+		$old_hash = CDBHelper::getHash($sql);
+
 		$this->page->login()->open('users.php?form=create');
 		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('auto_logout', $data)) {
-			$auto_logout = $form->getFieldElements('Auto-logout');
-			$auto_logout->get(0)->asCheckbox()->set($data['auto_logout']['checked']);
-			if (array_key_exists('value', $data['auto_logout'])) {
-				$auto_logout->get(3)->overwrite($data['auto_logout']['value']);
-			}
-			//verify that Auto-login is unchecked after setting Auto-logout
-			$this->assertTrue($form->getField('Auto-login')->isChecked(false));
+			$this->setAutoLogout($data['auto_logout']);
 		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
 		// Verify that the user was created.
-		$this->assertUserMessage($data, $message, $good_title, $bad_title);
+		$this->assertUserMessage($data, $good_title, $bad_title);
+		if ($data['expected'] === TEST_BAD) {
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
+		if (array_key_exists('check_form', $data)) {
+			$this->assertFormFields($data);
+		}
 		if (array_key_exists('check_user', $data)) {
-			// Check that the parameters were actually updated.
 			$this->assertUserParameters($data);
 		}
 	}
 
-	private function assertUserParameters($data) {
-		// Verify that fields are updated.
-		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($data['fields']['Alias']));
-		$this->page->open('users.php?form=update&userid=' . $userid);
+	/*
+	 * Check the field values after creating or updating user.
+	 */
+	private function assertFormFields($data) {
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+		$this->page->open('users.php?form=update&userid='.$userid);
 		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
-		$this->assertEquals($data['fields']['Alias'], $form_update->getField('Alias')->getValue());
-		$this->assertEquals($data['fields']['Name'], $form_update->getField('Name')->getValue());
-		$this->assertEquals($data['fields']['Surname'], $form_update->getField('Surname')->getValue());
-		$this->assertEquals($data['fields']['Language'], $form_update->getField('Language')->getValue());
-		$this->assertEquals($data['fields']['Refresh'], $form_update->getField('Refresh')->getValue());
-		$groups = $form_update->getField('Groups')->asMultiselect()->getSelected();
-		$this->assertEquals($data['fields']['Groups'], $groups);
-		if (array_key_exists('auto_logout', $data)) {
-			$this->assertFalse($form_update->getField('Auto-login')->isChecked($data['fields']['Auto-login']));
+
+		// Verify that fields are updated.
+		$check_fields = ['Alias', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
+		foreach ($check_fields as $field_name) {
+			if (array_key_exists($field_name, $data['fields'])) {
+				$this->assertEquals($data['fields'][$field_name], $form_update->getField($field_name)->getValue());
+			}
+		}
+		$this->assertEquals($data['fields']['Groups'], $form_update->getField('Groups')->getSelected());
+		if (array_key_exists('auto_logout', $data) && $data['auto_logout']['checked'] === true) {
+			$this->assertTrue($form_update->getField('Auto-login')->isChecked(false));
 		}
 		else {
 			$this->assertTrue($form_update->getField('Auto-login')->isChecked($data['fields']['Auto-login']));
 		}
-		// Log in with the created user
-		$this->query('class:top-nav-signout')->one()->click();
-		$this->webDriver->manage()->deleteAllCookies();
+	}
+
+	/*
+	 * Login as user and check user profile parameters in UI.
+	 */
+	private function assertUserParameters($data) {
+		$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+		// Log in with the created or updated user.
+		$this->page->logout();
 		$this->query('id:name')->waitUntilVisible()->one()->fill($data['fields']['Alias']);
-		if (array_key_exists('Password', $data['fields'])) {
-			$this->query('id:password')->one()->fill($data['fields']['Password']);
-		}
-		else {
-			$this->query('id:password')->one()->fill('zabbix');
-		}
+		$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
+		$this->query('id:password')->one()->fill($password);
 		$this->query('button:Sign in')->one()->click();
 
 		// Verification of URL after login.
 		$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 
 		// Verification of the number of rows per page parameter.
-		$rows = $this->query('name:screenForm')->asTable()->one()->getRows();
+		$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
 		$this->assertEquals($data['fields']['Rows per page'], $rows->count());
 
 		// Verification of default theme.
-		$sql_theme = 'SELECT theme FROM users WHERE alias =' . zbx_dbstr($data['fields']['Alias']);
-		if ($data['fields']['URL (after login)'] === 'Dark') {
-			$this->assertEquals('dark-theme', CDBHelper::getValue($sql_theme));
-		}
-		else if ($data['fields']['URL (after login)'] === 'High-contrast light') {
-			$this->assertEquals('hc-light', CDBHelper::getValue($sql_theme));
-		}
+		$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 		$file = explode('/', $stylesheet->getAttribute('href'));
-		if (CDBHelper::getValue($sql_theme) === 'dark-theme') {
+		if ($data['fields']['Theme'] === 'Dark') {
+			$this->assertEquals('dark-theme', $db_theme);
 			$this->assertEquals('dark-theme.css', end($file));
-			$body = $this->query('tag:body')->one();
-			$this->assertEquals('rgba(14, 16, 18, 1)', $body->getCSSValue('background-color'));
+			$this->assertEquals('rgba(14, 16, 18, 1)', $color);
 		}
-		else if (CDBHelper::getValue($sql_theme) === 'hc-light') {
+		else if ($data['fields']['Theme'] === 'High-contrast light') {
+			$this->assertEquals('hc-light', $db_theme);
 			$this->assertEquals('hc-light.css', end($file));
-			$body = $this->query('tag:body')->one();
-			$this->assertEquals('rgba(255, 255, 255, 1)', $body->getCSSValue('background-color'));
+			$this->assertEquals('rgba(255, 255, 255, 1)', $color);
 		}
 		// Set session to status active to execute remaining tests.
-		DBexecute(
-				'UPDATE sessions' .
-				' SET status = ' . ZBX_SESSION_ACTIVE .
-				' WHERE sessionid=' . zbx_dbstr('09e7d4286dfdca4ba7be15e0f3b2b55a')
-		);
+		$this->page->logout();
 	}
 
 	public function getUpdateData() {
 		return [
+			// Alias is already taken by another user.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Alias' => 'Admin'
+					],
+					'error_details' => 'User with alias "Admin" already exists.'
+				]
+			],
 			// Empty 'Group' field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => '',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Groups' => ''
 					],
 					'error_details' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
 				]
 			],
-			// Empty 'Password (one again)' field.
+			// Empty 'Password (once again)' field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix'
 					],
 					'error_title' => 'Cannot update user. Both passwords must be equal.'
@@ -546,7 +626,6 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
 						'Password (once again)' => 'zabbix'
 					],
 					'error_title' => 'Cannot update user. Both passwords must be equal.'
@@ -582,9 +661,6 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
 						'Refresh' => '123abc'
 					],
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
@@ -595,10 +671,16 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
 						'Refresh' => '3601'
+					],
+					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Refresh' => '61m'
 					],
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
@@ -608,9 +690,6 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
 						'Refresh' => '00000000000001'
 					],
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
@@ -621,9 +700,6 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
 						'Rows per page' => '0'
 					],
 					'error_title' => 'Page received incorrect data',
@@ -635,9 +711,6 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
 						'Rows per page' => 'abc123'
 					],
 					'error_title' => 'Page received incorrect data',
@@ -648,11 +721,7 @@ class testFormUser extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
-					],
+					'fields' => [],
 					'auto_logout' => [
 						'checked' => true,
 						'value' => '89'
@@ -664,14 +733,43 @@ class testFormUser extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
-					],
+					'fields' => [],
 					'auto_logout' => [
 						'checked' => true,
 						'value' => '86401'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '1m'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '1441m'
+					],
+					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '25h'
 					],
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
@@ -680,11 +778,7 @@ class testFormUser extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
-					],
+					'fields' => [],
 					'auto_logout' => [
 						'checked' => true,
 						'value' => 'ninety'
@@ -696,11 +790,7 @@ class testFormUser extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
-					],
+					'fields' => [],
 					'auto_logout' => [
 						'checked' => true,
 						'value' => ''
@@ -713,10 +803,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'www.goo gle.com'
+						'URL (after login)' => 'www.zab bix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -726,10 +813,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'google.com'
+						'URL (after login)' => 'zabbix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -739,10 +823,7 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'screenconf'
+						'URL (after login)' => 'sysmaps'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
@@ -752,15 +833,37 @@ class testFormUser extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => 'Zabbix administrators',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix',
-						'URL (after login)' => 'snmp://google.com'
+						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
 			// Updating all fields (except password) of an existing user.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'user_to_update' => 'disabled-user',
+					'fields' => [
+						'Alias' => 'Updated_user_1',
+						'Name' => 'Test_Name',
+						'Surname' => 'Test_Surname',
+						'Groups' => [
+							'Selenium user group'
+						],
+						'Language' => 'English (en_US)',
+						'Theme' => 'Dark',
+						'Auto-login' => true,
+						'Refresh' => '60m',
+						'Rows per page' => '1',
+						'URL (after login)' => 'sysmaps.php'
+					],
+					'auto_logout' => [
+						'checked' => true,
+						'value' => '24h'
+					],
+					'check_form' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -774,10 +877,11 @@ class testFormUser extends CLegacyWebTest {
 						'Language' => 'English (en_US)',
 						'Theme' => 'High-contrast light',
 						'Auto-login' => true,
-						'Refresh' => '60s',
-						'Rows per page' => '2',
-						'URL (after login)' => 'screenconf.php'
+						'Refresh' => '1h',
+						'Rows per page' => '1',
+						'URL (after login)' => 'sysmaps.php'
 					],
+					'check_form' => true,
 					'check_user' => true
 				]
 			]
@@ -788,29 +892,34 @@ class testFormUser extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormUser_Update($data) {
-		$update_user = 'Tag-user';
+		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
 		$good_title = 'User updated';
 		$bad_title = 'Cannot update user';
+		$sql = 'SELECT * FROM users';
+		$old_hash = CDBHelper::getHash($sql);
+
 		$this->page->login()->open('users.php?ddreset=1');
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 		// Update user parameters.
 		$form = $this->query('name:userForm')->asForm()->one();
-		$form->query('button:Change password')->one()->click();
+		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
+			$form->query('button:Change password')->one()->click();
+		}
 		$form->fill($data['fields']);
 		if (array_key_exists('auto_logout', $data)) {
-			$auto_logout = $form->getFieldElements('Auto-logout');
-			$auto_logout->get(0)->asCheckbox()->set($data['auto_logout']['checked']);
-			if (array_key_exists('value', $data['auto_logout'])) {
-				$auto_logout->get(3)->overwrite($data['auto_logout']['value']);
-			}
+			$this->setAutoLogout($data['auto_logout']);
 		}
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
 		// Verify if the user was updated.
-		$this->assertUserMessage($data, $message, $good_title, $bad_title);
+		$this->assertUserMessage($data, $good_title, $bad_title);
+		if ($data['expected'] === TEST_BAD) {
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+		}
 		if (array_key_exists('check_user', $data)) {
-			// Check that the parameters were actually updated.
+			$this->assertFormFields($data);
+		}
+		if (array_key_exists('check_user', $data)) {
 			$this->assertUserParameters($data);
 		}
 	}
@@ -834,8 +943,7 @@ class testFormUser extends CLegacyWebTest {
 			'Password (once again)' => $data['new_password']
 		]);
 		$form_update->submit();
-		$this->query('class:top-nav-signout')->one()->click();
-		$this->webDriver->manage()->deleteAllCookies();
+		$this->page->logout();
 
 		// Atempt to sign in with old password.
 		$this->query('id:name')->waitUntilVisible()->one()->fill($data['alias']);
@@ -851,48 +959,25 @@ class testFormUser extends CLegacyWebTest {
 		$attempt_message = CMessageElement::find()->one();
 		$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 
-		// Set session to status active to execute remaining tests.
-		DBexecute(
-				'UPDATE sessions' .
-				' SET status = ' . ZBX_SESSION_ACTIVE .
-				' WHERE sessionid=' . zbx_dbstr('09e7d4286dfdca4ba7be15e0f3b2b55a')
-		);
+		// Logout to execute remaining tests.
+		$this->page->logout();
 	}
 
 	public function getDeleteData() {
 		return [
-			// User to be deleted from users view.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Alias' => 'User_2B_Deleted',
-						'Groups' => 'Guests',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
-					],
-					'delete_from_users_view' => true
-				]
-			],
-			// User to be deleted from user update view.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Alias' => 'User_2B_Deleted',
-						'Groups' => 'Guests',
-						'Password' => 'zabbix',
-						'Password (once again)' => 'zabbix'
+						'Alias' => 'no-access-to-the-frontend'
 					]
 				]
 			],
-			// Attempt by Admin user to delete himself.
+			// Admin has disabled button.
 			[
 				[
-					'expected' => TEST_BAD,
 					'username' => 'Admin',
-					'self-deletion' => true,
-					'error_details' => 'User is not allowed to delete himself.'
+					'self-deletion' => true
 				]
 			],
 			// Attempt to delete internal user guest.
@@ -962,14 +1047,6 @@ class testFormUser extends CLegacyWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormUser_Delete($data) {
-		$this->page->login()->open('users.php');
-		// Create a user to delete.
-		if (array_key_exists('fields', $data)) {
-			$this->query('button:Create user')->one()->click();
-			$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
-			$form->fill($data['fields']);
-			$form->submit();
-		}
 		// Defined required variables.
 		$good_title = 'User deleted';
 		$bad_title = 'Cannot delete user';
@@ -979,47 +1056,33 @@ class testFormUser extends CLegacyWebTest {
 		else {
 			$username = $data['fields']['Alias'];
 		}
+
+		$this->page->login()->open('users.php');
+		$this->query('link', $username)->one()->click();
+		// Verify that delete button is disabled when user opens himself.
+		if (array_key_exists('self-deletion', $data)) {
+			$this->assertTrue($this->query('button:Delete')->one()->isEnabled(false));
+
+			return;
+		}
+
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
 		// Link user with map, screen, slideshow, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
-					'UPDATE ' . $data['parameters']['DB_table'] .
-					' SET userid = ' . zbx_dbstr($userid) .
-					' WHERE ' . $data['parameters']['column'] . '=' . zbx_dbstr($data['parameters']['value'])
+					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid)
+					. ' WHERE '.$data['parameters']['column'].'='.zbx_dbstr($data['parameters']['value'])
 			);
 		}
 		// Attempt to delete the user from user update view and verify result.
-		if (!array_key_exists('delete_from_users_view', $data)) {
-			$this->query('link', $username)->one()->click();
-			// Verify that delete button is disabled when user opens himself.
-			if (array_key_exists('self-deletion', $data)) {
-				$delete = $this->query('button:Delete')->one();
-				$this->assertTrue($delete->isEnabled(false));
-				$this->page->open('users.php');
-			}
-			else {
-				$this->query('button:Delete')->one()->click();
-				$this->webDriver->switchTo()->alert()->accept();
-				$this->page->waitUntilReady();
-				$message = CMessageElement::find()->one();
-				// Validate if the user was deleted.
-				$this->assertUserMessage($data, $message, $good_title, $bad_title);
-			}
-		}
-		// Attempt to delete the user from users view.
-		if (array_key_exists('delete_from_users_view', $data) || $data['expected'] === TEST_BAD) {
-			$table = $this->query('class:list-table')->asTable()->one();
-			$row = $table->findRow('Alias', $username)->select();
-			$this->query('button:Delete')->one()->click();
-			$this->webDriver->switchTo()->alert()->accept();
-		}
+		$this->query('button:Delete')->one()->click();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
-		// Verify if user was deleted.
-		$this->assertUserMessage($data, $message, $good_title, $bad_title);
+		// Validate if the user was deleted.
+		$this->assertUserMessage($data, $good_title, $bad_title);
+
 		if ($data['expected'] === TEST_BAD) {
-			$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
-			$this->assertTrue($user_count === 1);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username)));
 		}
 	}
 
@@ -1042,31 +1105,45 @@ class testFormUser extends CLegacyWebTest {
 		$this->assertContains('users.php?cancel=1', $cancel_url);
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
 
-		//Check Cancellation when updating users.
+		// Check Cancellation when updating users.
 		$this->page->open('users.php?form=update&userid=1');
 		$this->query('id:name')->one()->fill('Boris');
 		$this->query('button:Cancel')->one()->click();
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
 	}
 
-	private function assertUserMessage($data, $message, $good_title, $bad_title) {
-		if ($data['expected'] === TEST_GOOD) {
-			$this->assertTrue($message->isGood());
-			$this->assertEquals($good_title, $message->getTitle());
-			$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE alias =' . zbx_dbstr($data['fields']['Alias']));
-			if ($good_title === 'User deleted') {
-				$this->assertTrue($user_count === 0);
-			}
-			else {
-				$this->assertTrue($user_count === 1);
-			}
+	private function assertUserMessage($data, $good_title, $bad_title) {
+		$message = CMessageElement::find()->one();
+		switch ($data['expected']) {
+			case TEST_GOOD:
+				$this->assertTrue($message->isGood());
+				$this->assertEquals($good_title, $message->getTitle());
+				$user_count = CDBHelper::getCount('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
+				if ($good_title === 'User deleted') {
+					$this->assertTrue($user_count === 0);
+				}
+				else {
+					$this->assertTrue($user_count === 1);
+				}
+				break;
+			case TEST_BAD:
+				$this->assertTrue($message->isBad());
+				$this->assertEquals(CTestArrayHelper::get($data, 'error_title', $data['error_title'] = $bad_title), $message->getTitle());
+				if (array_key_exists('error_details', $data)) {
+					$this->assertTrue($message->hasLine($data['error_details']));
+				}
+				break;
 		}
-		else {
-			$this->assertTrue($message->isBad());
-			$this->assertEquals(CTestArrayHelper::get($data, 'error_title', $data['error_title'] = $bad_title), $message->getTitle());
-			if (array_key_exists('error_details', $data)) {
-				$this->assertTrue($message->hasLine($data['error_details']));
-			}
+	}
+
+	private function setAutoLogout($data) {
+		$form = $this->query('name:userForm')->asForm()->one();
+		$auto_logout = $form->getFieldElements('Auto-logout');
+		$auto_logout->get(0)->asCheckbox()->set($data['checked']);
+		if (array_key_exists('value', $data)) {
+			$auto_logout->get(3)->overwrite($data['value']);
 		}
+		// Verify that Auto-login is unchecked after setting Auto-logout.
+		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
 	}
 }

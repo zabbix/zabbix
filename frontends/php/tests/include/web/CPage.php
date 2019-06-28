@@ -154,6 +154,10 @@ class CPage {
 		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
 		$this->waitUntilReady();
 
+		if (self::$cookie !== null) {
+			DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(self::$cookie['value']));
+		}
+
 		$this->driver->manage()->deleteAllCookies();
 		self::$cookie = null;
 	}
