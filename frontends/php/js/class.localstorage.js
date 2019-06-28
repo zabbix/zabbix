@@ -99,7 +99,7 @@ ZBX_LocalStorage.prototype.freeSession = function(store, sessionid) {
 		mathces = [],
 		abs_key;
 
-	for (var i = 0; i < len; i ++) {
+	for (var i = 0; i < len; i++) {
 		abs_key = store.key(i);
 		if (abs_key.match('^' + sessionid)) {
 			mathces.push(abs_key);

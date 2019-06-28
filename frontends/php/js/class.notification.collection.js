@@ -46,7 +46,7 @@ ZBX_NotificationCollection.prototype.getIds = function() {
 ZBX_NotificationCollection.prototype.map = function(callback) {
 	var len = this._list_sequence.length;
 
-	while (-- len > -1) {
+	while (--len > -1) {
 		var ret = callback(this.getById(this._list_sequence[len]), len);
 	}
 };
@@ -60,7 +60,7 @@ ZBX_NotificationCollection.prototype.filterList = function(callback) {
 	var list = [],
 		len = this._list_sequence.length;
 
-	while (-- len > -1) {
+	while (--len > -1) {
 		var ret = callback(this.getById(this._list_sequence[len]));
 		(ret !== false) && list.push(ret);
 	}

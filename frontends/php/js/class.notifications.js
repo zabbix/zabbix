@@ -365,7 +365,7 @@ ZBX_Notifications.prototype.handlePushedAlarmState = function(alarm_state) {
  * @param {string} tabid
  */
 ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
-	tabid === this.tab.uid ? this.becomeActive() : this.becomeInactive();
+	(tabid === this.tab.uid) ? this.becomeActive() : this.becomeInactive();
 };
 
 /**
@@ -758,13 +758,13 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
  * @return {bool}
  */
 ZBX_NotificationsAlarm.prototype.isSnoozed = function(list) {
-	for (var i = 0; i < list.length; i ++) {
+	for (var i = 0; i < list.length; i++) {
 		if (!list[i].snoozed) {
 			return false;
 		}
 	}
 
-	return list.length == 0 ? false : true;
+	return (list.length == 0) ? false : true;
 };
 
 /**
@@ -779,7 +779,6 @@ ZBX_NotificationsAlarm.prototype.isStopped = function() {
  * @param {ZBX_Notification} notif
  */
 ZBX_NotificationsAlarm.prototype.consume = function(alarm_state, notif) {
-
 	if (notif) {
 		this.notif = notif;
 	}

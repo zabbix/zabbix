@@ -32,8 +32,8 @@ ZBX_Notification.max_timeout = Math.pow(2, 30);
 function ZBX_Notification(raw) {
 	/*
 	 * These are pseudo that properties will cycle back into store, to be reused when rendering next time.
-	 * If `received_at` property has not been set it is first render. This property might be updated to a new client time
-	 * when it's raw state changes from unresolved into resolved.
+	 * If `received_at` property has not been set it is first render. This property might be updated to a new client
+	 * time when it's raw state changes from unresolved into resolved.
 	 */
 	this._raw = {
 		snoozed: false,
@@ -133,7 +133,7 @@ ZBX_Notification.prototype.makeNode = function() {
 	return node;
 };
 
-/*
+/**
  * Since there is loaded prototype.js and it extends DOM's native 'remove' method, explicitly check
  * if node is connected. Also, in case of IE11 there is no 'isConnected' getter.
  *
