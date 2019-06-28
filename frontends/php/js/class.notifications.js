@@ -25,8 +25,8 @@ ZBX_Notifications.POLL_INTERVAL = 30;
 
 ZBX_Notifications.ALARM_SEVERITY_RESOLVED = -1;
 ZBX_Notifications.ALARM_INFINITE_SERVER = -1;
-ZBX_Notifications.ALARM_ONCE_PLAYER = 1;
-ZBX_Notifications.ALARM_ONCE_SERVER = -1;
+ZBX_Notifications.ALARM_ONCE_PLAYER = -1;
+ZBX_Notifications.ALARM_ONCE_SERVER = 1;
 
 /**
  * Fetches and renders notifications. Server always returns full list of actual notifications that this class will
