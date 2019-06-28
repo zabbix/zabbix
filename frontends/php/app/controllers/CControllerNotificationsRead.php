@@ -44,16 +44,16 @@ class CControllerNotificationsRead extends CController {
 		$msg_settings = getMessageSettings();
 
 		$events = API::Event()->get([
-			'output'    => ['clock', 'r_eventid'],
-			'eventids'  => $this->input['ids'],
+			'output' => ['clock', 'r_eventid'],
+			'eventids' => $this->input['ids'],
 			'preservekeys' => true
 		]);
 
 		$recovery_eventids = array_filter(zbx_objectValues($events, 'r_eventid'));
 		if ($recovery_eventids) {
 			$events += API::Event()->get([
-				'output'    => ['clock'],
-				'eventids'  => $recovery_eventids,
+				'output' => ['clock'],
+				'eventids' => $recovery_eventids,
 				'preservekeys' => true
 			]);
 		}

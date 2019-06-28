@@ -79,15 +79,15 @@ class CControllerNotificationsGet extends CController {
 	protected function loadNotifications() {
 		// Select problem events.
 		$options = [
-			'output'          => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
-			'source'          => EVENT_SOURCE_TRIGGERS,
-			'object'          => EVENT_OBJECT_TRIGGER,
-			'severities'      => array_keys($this->settings['triggers.severities']),
-			'show_suppressed' => !$this->settings['show_suppressed'] ? false : null,
-			'sortorder'       => ZBX_SORT_DOWN,
-			'sortfield'       => 'eventid',
-			'limit'           => 15,
-			'preservekeys'    => true
+			'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'severities' => array_keys($this->settings['triggers.severities']),
+			'show_suppressed' => $this->settings['show_suppressed'] ? null : false,
+			'sortorder' => ZBX_SORT_DOWN,
+			'sortfield' => 'eventid',
+			'limit' => 15,
+			'preservekeys' => true
 		];
 
 		$options += $this->settings['show_recovered']
@@ -98,22 +98,24 @@ class CControllerNotificationsGet extends CController {
 
 		// Select latest status for already known events that are no longer available in problems table.
 		$resolved_events = array_diff(array_keys($this->known_eventids), array_keys($events));
+
 		if ($resolved_events) {
 			$events += API::Event()->get([
-				'output'        => ['eventid', 'r_eventid', 'clock', 'severity'],
-				'eventids'      => $resolved_events,
-				'sortfield'     => 'clock',
-				'sortorder'     => ZBX_SORT_DOWN,
-				'preservekeys'  => true
+				'output' => ['eventid', 'r_eventid', 'clock', 'severity'],
+				'eventids' => $resolved_events,
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN,
+				'preservekeys' => true
 			]);
 		}
 
 		// Append selected events to notifications array.
 		$problems_by_triggerid = [];
+
 		foreach ($events as $eventid => $event) {
 			if ($this->settings['show_recovered']) {
 				if (array_key_exists('r_clock', $event) && $event['r_clock'] >= $this->time_from) {
-					/**
+					/*
 					 * This happens if trigger is recovered and is already removed from the list of known eventids.
 					 * Do nothing here. This statement is needed just to catch specific case before next IF statement.
 					 */
@@ -130,11 +132,11 @@ class CControllerNotificationsGet extends CController {
 			}
 
 			$this->notifications[$eventid] = [
-				'eventid'  => $event['eventid'],
+				'eventid' => $event['eventid'],
 				'resolved' => (int) ($event['r_eventid'] != 0),
 				'severity' => (int) $event['severity'],
-				'clock'    => (int) $event['r_eventid'] == 0 ? $event['clock'] : $event['r_clock'],
-				'name'     => array_key_exists('name', $event) ? $event['name'] : '',
+				'clock' => ((int) $event['r_eventid'] == 0) ? $event['clock'] : $event['r_clock'],
+				'name' => array_key_exists('name', $event) ? $event['name'] : ''
 			];
 		}
 
@@ -173,13 +175,14 @@ class CControllerNotificationsGet extends CController {
 						->getUrl();
 
 					$notification += [
-						'title'    => sprintf('[url=%s]%s[/url]', $url_problems,
+						'title' => sprintf('[url=%s]%s[/url]', $url_problems,
 							CHtml::encode($trigger['hosts'][0]['name'])
 						),
-						'body'     => [
-							'[url=' . $url_events . ']' . CHtml::encode($notification['name']) . '[/url]',
-							'[url=' . $url_trigger_events . ']' .
-								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']) . '[/url]',
+						'body' => [
+							'[url='.$url_events.']'.CHtml::encode($notification['name']).'[/url]',
+							'[url='.$url_trigger_events.']'.
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']).
+							'[/url]',
 						]
 					];
 				}
@@ -216,22 +219,22 @@ class CControllerNotificationsGet extends CController {
 				'msg_timeout' => $this->settings['timeout'],
 				'muted' => (bool) $this->settings['sounds.mute'],
 				'severity_styles' => [
-					-1                              => ZBX_STYLE_NORMAL_BG,
-					TRIGGER_SEVERITY_AVERAGE        => ZBX_STYLE_AVERAGE_BG,
-					TRIGGER_SEVERITY_DISASTER       => ZBX_STYLE_DISASTER_BG,
-					TRIGGER_SEVERITY_HIGH           => ZBX_STYLE_HIGH_BG,
-					TRIGGER_SEVERITY_INFORMATION    => ZBX_STYLE_INFO_BG,
+					-1 => ZBX_STYLE_NORMAL_BG,
+					TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
+					TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
+					TRIGGER_SEVERITY_HIGH  => ZBX_STYLE_HIGH_BG,
+					TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG,
-					TRIGGER_SEVERITY_WARNING        => ZBX_STYLE_WARNING_BG
+					TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG
 				],
 				'files' => [
-					-1                              => $this->settings['sounds.recovery'],
-					TRIGGER_SEVERITY_AVERAGE        => $this->settings['sounds.3'],
-					TRIGGER_SEVERITY_DISASTER       => $this->settings['sounds.5'],
-					TRIGGER_SEVERITY_HIGH           => $this->settings['sounds.4'],
-					TRIGGER_SEVERITY_INFORMATION    => $this->settings['sounds.1'],
-					TRIGGER_SEVERITY_NOT_CLASSIFIED => $this->settings['sounds.0'],
-					TRIGGER_SEVERITY_WARNING        => $this->settings['sounds.2']
+					-1 => $this->settings['sounds.recovery'],
+					TRIGGER_SEVERITY_AVERAGE => $this->settings['sounds.'.TRIGGER_SEVERITY_AVERAGE],
+					TRIGGER_SEVERITY_DISASTER => $this->settings['sounds.'.TRIGGER_SEVERITY_DISASTER],
+					TRIGGER_SEVERITY_HIGH => $this->settings['sounds.'.TRIGGER_SEVERITY_HIGH],
+					TRIGGER_SEVERITY_INFORMATION => $this->settings['sounds.'.TRIGGER_SEVERITY_INFORMATION],
+					TRIGGER_SEVERITY_NOT_CLASSIFIED => $this->settings['sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED],
+					TRIGGER_SEVERITY_WARNING => $this->settings['sounds.'.TRIGGER_SEVERITY_WARNING]
 				]
 			]
 		]);
