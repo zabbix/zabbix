@@ -901,11 +901,11 @@ ZABBIX.namespace('instances.notifications', new ZBX_Notifications(
 ));
 
 /**
- * Appends list node to DOM when document is ready, then makes it draggable.
+ * Appends list node to DOM when document is ready, then make it draggable.
  */
 jQuery(function() {
 	var notifications_node = ZABBIX.namespace('instances.notifications.collection.node');
 
 	document.body.appendChild(notifications_node);
-	jQuery(notifications_node).draggable();
+	jQuery(notifications_node).draggable({handle: '>.dashbrd-widget-head'});
 });
