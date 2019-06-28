@@ -86,7 +86,7 @@ ZBX_BrowserTab.prototype.bindEventHandlers = function() {
 	setInterval(this.handleKeepAliveTick.bind(this), ZBX_BrowserTab.keep_alive_interval * 1000);
 
 	// If beforeunload event is used, it is dispatched twice if navigating across domain in chrome, because unload event.
-	window.addEventListener('unload', this.handleUnload.bind(this));
+	window.addEventListener('beforeunload', this.handleUnload.bind(this));
 	window.addEventListener('focus', this.handleFocus.bind(this));
 	this.store.onKeyUpdate('tabs.lastseen', this.handlePushedLastseen.bind(this));
 };
@@ -160,7 +160,7 @@ ZBX_BrowserTab.prototype.handleUnload = function(e) {
 	this.on_before_unload_cbs.forEach(function(c) {c(this, this.getAllTabIds());}.bind(this));
 	this.pushLastseen();
 
-	window.removeEventListener('unload', this.handleUnload.bind(this));
+	window.removeEventListener('beforeunload', this.handleUnload.bind(this));
 	window.removeEventListener('focus', this.handleFocus.bind(this));
 };
 

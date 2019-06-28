@@ -51,7 +51,7 @@ function ZBX_NotificationsAudio() {
 ZBX_NotificationsAudio.prototype.listen = function() {
 	var ms_step = 10;
 
-	return setInterval(function(){
+	function checkAudioState() {
 		if (this.play_once_on_ready) {
 			return this.once();
 		}
@@ -68,8 +68,10 @@ ZBX_NotificationsAudio.prototype.listen = function() {
 
 		this.audio.muted = false;
 		this.audio.volume = 1;
+	}
 
-	}.bind(this), ms_step);
+	checkAudioState.call(this);
+	return setInterval(checkAudioState.bind(this), ms_step);
 };
 
 /**
