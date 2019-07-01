@@ -3,6 +3,7 @@ Changes for 4.0.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.10
