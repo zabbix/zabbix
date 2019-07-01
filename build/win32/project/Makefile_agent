@@ -58,6 +58,9 @@ OBJS = \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
 	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxhttp\http.o \
+	..\..\..\src\libs\zbxhttp\punycode.o \
+	..\..\..\src\libs\zbxhttp\urlencode.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\common\common.o \
 	..\..\..\src\libs\zbxsysinfo\common\cpu.o \

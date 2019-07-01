@@ -29,6 +29,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
@@ -59,11 +60,19 @@ WEB_PAGE_GET_SOURCES = \
 	WEB_PAGE_GET.c \
 	$(COMMON_SRC_FILES)
 
+if HAVE_LIBCURL
+WEB_PAGE_GET_WRAP_FUNCS = \
+	-Wl,--wrap=curl_easy_init \
+	-Wl,--wrap=curl_easy_setopt \
+	-Wl,--wrap=curl_easy_perform \
+	-Wl,--wrap=curl_easy_cleanup
+else
 WEB_PAGE_GET_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_tcp_connect \
 	-Wl,--wrap=zbx_tcp_send_ext \
 	-Wl,--wrap=zbx_tcp_recv_raw_ext \
 	-Wl,--wrap=zbx_tcp_close
+endif
 
 WEB_PAGE_GET_LDADD = \
 	$(COMMON_LIB_FILES)
