@@ -14,6 +14,13 @@ Bug fixes:
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 
 --------------------------------------------------------------------------------
+Changes for 4.2.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.2.4
 
 4.2.4rc2 was released as 4.2.4 without any changes
@@ -460,6 +467,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.11rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.10
