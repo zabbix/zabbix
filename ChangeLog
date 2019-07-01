@@ -1,6 +1,19 @@
+Changes for 4.0.11rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.10
+
+4.0.10rc1 was released as 4.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-2880] added access to vmware datastore at vmware vCenter level (MVekslers)
 ..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
