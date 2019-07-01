@@ -1,10 +1,32 @@
-Changes for 4.0.9rc1
+Changes for 4.0.11rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.10
+
+4.0.10rc1 was released as 4.0.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.10rc1
+
+New features:
+.......PS. [ZBXNEXT-2880] added access to vmware datastore at vmware vCenter level (MVekslers)
+..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
+..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+...G...PS. [ZBX-9867] improved Zabbix daemon termination by not using signal unsafe functions in signal handler; improved Zabbix server and Zabbix proxy process termination by stopping data collection and waiting for history syncers to finish (vso)
+..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
+..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
+...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
+..F....... [ZBX-16073] fixed horizontal scrolling in map (vasilijs)
+........S. [ZBX-15943] fixed discovered hosts are not removed from table "dhosts" after removing and adding the corresponding discovery check (akozlovs)
+..F....... [ZBX-15875] fixed colors for the multiselect disabled elements (ashubin)
 ..F....... [ZBX-10948] 'IT Services --> Service Time --> Note' infinite stretching (rlataria)
 ...G...... [ZBX-16142] fixed missing sys/ioctl.h from src/libs/zbxsysinfo/openbsd/net.c; thanks to Andrea Biscuola for the patch (akozlovs)
 .......PS. [ZBX-16166] fixed Zabbix fping feature detection does not work with fping builds since 10 Feb 2017 (akozlovs)
@@ -26,6 +48,12 @@ A.F....... [ZBX-15049] fixed to host group limited global scripts to be usable i
 ..F....... [ZBX-15585] fixed web scenarios pair manager issue when fields are duplicating on post type toggle (talbergs)
 ........S. [ZBX-16150] fixed inactive, unmounted, unaccessible VMware datastore causes unknown column nan insertion in field list (akozlovs)
 A......... [ZBX-16122] fixed api validation of trigger dependency (averza)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.9
+
+Bug fixes:
+..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.8
