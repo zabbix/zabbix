@@ -89,7 +89,7 @@ ZBX_NotificationCollection.prototype.consumeList = function(list) {
 
 	while (raw = list.pop()) {
 		/*
-		 * Case if server responds with "recoved" notification type, that cannot be recovered by client.
+		 * Case if server returns with "recovered" notification type, that cannot be recovered by client.
 		 * This should never happen.
 		 */
 		if (!raw.body && !this._list_obj[raw.eventid]) {
@@ -195,6 +195,7 @@ ZBX_NotificationCollection.prototype.removeById = function(id) {
 	this._list_sequence.splice(index, 1);
 
 	if (this._list_obj[id]) {
+		this._list_obj[id].display_timeoutid && clearTimeout(this._list_obj[id].display_timeoutid);
 		this._dangling_nodes.push(this._list_obj[id].node);
 		delete this._list_obj[id];
 	}
