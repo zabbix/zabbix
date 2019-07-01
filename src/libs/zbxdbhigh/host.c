@@ -5069,7 +5069,6 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-extern unsigned char	process_type;
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port)
 {
