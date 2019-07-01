@@ -25,8 +25,8 @@
 #include "sigcommon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
-int	sig_parent_pid = -1;
-int	sig_exiting = 0;
+int			sig_parent_pid = -1;
+volatile sig_atomic_t	sig_exiting;
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
@@ -43,7 +43,7 @@ static void	exit_with_failure(void)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();
 #endif
-	exit(EXIT_FAILURE);
+	_exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -104,22 +104,24 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig ?
+		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig || SIGTERM == sig ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. %s ...",
+				"reason:%d]. Exiting ...",
 				sig, get_signal_name(sig),
 				SIG_CHECKED_FIELD(siginfo, si_pid),
 				SIG_CHECKED_FIELD(siginfo, si_uid),
-				SIG_CHECKED_FIELD(siginfo, si_code),
-				SIGINT == sig ? "Ignoring" : "Exiting");
+				SIG_CHECKED_FIELD(siginfo, si_code));
 
-		/* ignore interrupt signal in children - the parent */
+		/* ignore terminate signal in children - the parent */
 		/* process will send terminate signals instead      */
-		if (SIGINT == sig)
+		if (sig_parent_pid != SIG_CHECKED_FIELD(siginfo, si_pid))
 			return;
 
-		exit_with_failure();
+		if (SIGQUIT == sig)
+			exit_with_failure();
+
+		sig_exiting = 1;
 	}
 	else
 	{
@@ -138,7 +140,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
 #endif
-			zbx_on_exit();
+			zbx_on_exit(SUCCEED);
 		}
 	}
 }
@@ -166,7 +168,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_free_on_signal();
 #endif
-		zbx_on_exit();
+		zbx_on_exit(FAIL);
 	}
 }
 
