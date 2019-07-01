@@ -21,7 +21,6 @@
 #define ZABBIX_SIGCOMMON_H
 
 extern int	sig_parent_pid;
-extern int	sig_exiting;
 
 #define SIG_CHECKED_FIELD(siginfo, field)		(NULL == siginfo ? -1 : (int)siginfo->field)
 #define SIG_CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
