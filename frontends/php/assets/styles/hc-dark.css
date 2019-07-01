@@ -2014,6 +2014,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .icon-ackn::before {
     background: url(../img/icon-sprite.svg) no-repeat -45px -693px; }
 
+.icon-none {
+  margin-left: 18px; }
+
 .icon-tree-top-bottom {
   margin: 0 12px 0 0; }
   .icon-tree-top-bottom::before {
@@ -4030,6 +4033,8 @@ svg {
   margin: 4px 0; }
   .sysmap-scroll-container .map-container {
     display: table; }
+  .sysmap-scroll-container .flickerfreescreen {
+    display: inline-block; }
   .sysmap-scroll-container .table-forms-container, .sysmap-scroll-container .browser-warning-container {
     display: table;
     margin: 0;

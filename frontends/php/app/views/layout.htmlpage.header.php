@@ -48,7 +48,7 @@ $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU')
 	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) ? 1 : null;
 
 $pageHeader
-	->addCssFile('styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsBeforeScripts(
 		'var PHP_TZ_OFFSET = '.date('Z').','.
 			'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
