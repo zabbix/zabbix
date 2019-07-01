@@ -5069,6 +5069,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+extern unsigned char	process_type;
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port)
 {
@@ -5079,8 +5080,12 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 	unsigned char	main_ = 1, db_main, db_useip;
 	unsigned short	db_port;
 	const char	*db_ip, *db_dns;
+	zbx_flag_type_t	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	flags = (zbx_flag_type_t)(useip >> 4);
+	useip &= 0xf;
 
 	result = DBselect(
 			"select interfaceid,useip,ip,dns,port,main"
@@ -5091,6 +5096,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int update = 0;
+
 		db_useip = (unsigned char)atoi(row[1]);
 		db_ip = row[2];
 		db_dns = row[3];
@@ -5098,23 +5105,38 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		if (1 == db_main)
 			main_ = 0;
 
-		if (db_useip != useip)
-			continue;
+		if (FLAG_TYPE_DEFAULT == flags)
+		{
+			if (db_useip != useip)
+				continue;
+			if (useip && 0 != strcmp(db_ip, ip))
+				continue;
 
-		if (useip && 0 != strcmp(db_ip, ip))
-			continue;
+			if (!useip && 0 != strcmp(db_dns, dns))
+				continue;
 
-		if (!useip && 0 != strcmp(db_dns, dns))
-			continue;
-
-		zbx_free(tmp);
-		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
-				&tmp, MACRO_TYPE_COMMON, NULL, 0);
-		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+			zbx_free(tmp);
+			tmp = strdup(row[4]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+					&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+				continue;
+		}
+		else if (1 == db_main)
+		{
+			update = 1;
+		}
+		else
 			continue;
 
 		ZBX_STR2UINT64(interfaceid, row[0]);
+
+		if (1 == update)
+				DBexecute("update interface"
+						" set useip=%d,ip='%s',dns='%s',port=%d"
+						" where interfaceid=" ZBX_FS_UI64,
+						useip,ip,dns,port,interfaceid);
+
 		break;
 	}
 	DBfree_result(result);

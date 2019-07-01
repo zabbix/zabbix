@@ -26,6 +26,8 @@ extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOSTNAME;
 extern char	*CONFIG_HOST_METADATA;
 extern char	*CONFIG_HOST_METADATA_ITEM;
+extern char	*CONFIG_HOST_INTERFACE;
+extern char	*CONFIG_HOST_INTERFACE_ITEM;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
@@ -40,6 +42,7 @@ extern int	CONFIG_LISTEN_PORT;
 #define	MAX_VALUE_LINES_MULTIPLIER	10
 
 #define HOST_METADATA_LEN	255	/* UTF-8 characters, not bytes */
+#define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 
 /* Windows event types for `eventlog' check */
 #ifdef _WINDOWS

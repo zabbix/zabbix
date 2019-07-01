@@ -31,6 +31,8 @@ char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
 char	*CONFIG_HOST_METADATA_ITEM	= NULL;
+char	*CONFIG_HOST_INTERFACE		= NULL;
+char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
@@ -573,6 +575,12 @@ static void	set_defaults(void)
 				CONFIG_HOST_METADATA);
 	}
 
+	if (NULL != CONFIG_HOST_INTERFACE && NULL != CONFIG_HOST_INTERFACE_ITEM)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "both HostInterface and HostInterfaceItem defined, using [%s]",
+				CONFIG_HOST_INTERFACE);
+	}
+
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
@@ -629,6 +637,13 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
 				" %d characters", HOST_METADATA_LEN);
+		err = 1;
+	}
+
+	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer than"
+				" %d characters", HOST_INTERFACE_LEN);
 		err = 1;
 	}
 
@@ -712,6 +727,10 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"HostMetadata",		&CONFIG_HOST_METADATA,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostMetadataItem",		&CONFIG_HOST_METADATA_ITEM,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostInterface",		&CONFIG_HOST_INTERFACE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostInterfaceItem",		&CONFIG_HOST_INTERFACE_ITEM,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
 			PARM_OPT,	2,			65535},

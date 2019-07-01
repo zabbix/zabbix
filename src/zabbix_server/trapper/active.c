@@ -43,23 +43,44 @@ extern unsigned char	program_type;
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
  ******************************************************************************/
-static void	db_register_host(const char *host, const char *ip, unsigned short port, const char *host_metadata)
+static void	db_register_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
+		zbx_flag_type_t flag, const char *interface)
 {
-	char	dns[INTERFACE_DNS_LEN_MAX];
+	char		dns[INTERFACE_DNS_LEN_MAX];
+	char		ip_addr[INTERFACE_IP_LEN_MAX];
+	const char		*p;
+	const char		*p_ip, *p_dns;
 
-	if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
-		ip += 7;
+	p_ip = ip;
+	p_dns = dns;
+
+	if (FLAG_TYPE_DEFAULT == flag)
+		p = ip;
+	else if (FLAG_TYPE_IP  == flag)
+		p_ip = p = interface;
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
-	zbx_gethost_by_ip(ip, dns, sizeof(dns));
+	if (FLAG_TYPE_DEFAULT == flag || FLAG_TYPE_IP  == flag)
+	{
+		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == is_ip4(p + 7))
+			p += 7;
+
+		zbx_gethost_by_ip(p, dns, sizeof(dns));
+	}
+	else if (FLAG_TYPE_DNS == flag)
+	{
+		zbx_getip_by_host(interface, ip_addr, sizeof(ip_addr));
+		p_ip = ip_addr;
+		p_dns = interface;
+	}
 	zbx_alarm_off();
 
 	DBbegin();
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
+		DBregister_host(0, host, p_ip, p_dns, port, host_metadata, (unsigned short)flag, (int)time(NULL));
 	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		DBproxy_register_host(host, ip, dns, port, host_metadata);
+		DBproxy_register_host(host, p_ip, p_dns, port, host_metadata, (unsigned short)flag);
 
 	DBcommit();
 }
@@ -82,12 +103,16 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_uint64_t *hostid, char *error)
+		const char *host_metadata, zbx_flag_type_t flag, const char *interface, zbx_uint64_t *hostid,
+		char *error)
 {
-	char		*host_esc, *ch_error, *old_metadata;
+	char		*host_esc, *ch_error, *old_metadata, *old_ip, *old_dns, *old_flag, *old_port;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
+	unsigned short	old_port_v;
+	int		tls_offset = 0;
+	zbx_flag_type_t	old_flag_v;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -104,7 +129,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		DBselect(
 			"select h.hostid,h.status,h.tls_accept,h.tls_issuer,h.tls_subject,h.tls_psk_identity,"
-			"a.host_metadata"
+			"a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,a.flags"
 			" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid is null and a.host=h.host"
@@ -115,7 +140,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 #else
 		DBselect(
-			"select h.hostid,h.status,h.tls_accept,a.host_metadata"
+			"select h.hostid,h.status,h.tls_accept,a.host_metadata,a.listen_ip,a.listen_dns,a.listen_port,"
+			"a.flags"
 			" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid is null and a.host=h.host"
@@ -186,14 +212,22 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 		}
 #endif
-		old_metadata = row[6];
-#else
-		old_metadata = row[3];
+		tls_offset = 3;
 #endif
+		old_metadata = row[3 + tls_offset];
+		old_ip = row[4 + tls_offset];
+		old_dns = row[5 + tls_offset];
+		old_port = row[6 + tls_offset];
+		old_flag = row[7 + tls_offset];
+		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
+		old_flag_v = (zbx_flag_type_t)(SUCCEED == DBis_null(old_flag)) ? FLAG_TYPE_DEFAULT : atoi(old_flag);
 		/* metadata is available only on Zabbix server */
-		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata))
+		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata) ||
+				(FLAG_TYPE_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
+				(FLAG_TYPE_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
+				(old_flag_v != flag))
 		{
-			db_register_host(host, ip, port, host_metadata);
+			db_register_host(host, ip, port, host_metadata, flag, interface);
 		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
@@ -208,7 +242,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	else
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
-		db_register_host(host, ip, port, host_metadata);
+		db_register_host(host, ip, port, host_metadata, flag, interface);
 	}
 done:
 	DBfree_result(result);
@@ -281,7 +315,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	}
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",  &hostid, error))
 		goto out;
 
 	zbx_vector_uint64_create(&itemids);
@@ -458,13 +492,15 @@ out:
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
-				error[MAX_STRING_LEN], *host_metadata = NULL;
+				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
+	zbx_flag_type_t		flag = FLAG_TYPE_DEFAULT;
 
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
@@ -488,6 +524,26 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		*host_metadata = '\0';
 	}
 
+	interface = (char *)zbx_malloc(interface, interface_alloc);
+
+	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_INTERFACE, &interface, &interface_alloc))
+	{
+		*interface = '\0';
+	}
+	else if (SUCCEED == is_ip(interface))
+	{
+		flag = FLAG_TYPE_IP;
+	}
+	else if (SUCCEED == zbx_validate_hostname(interface))
+	{
+		flag = FLAG_TYPE_DNS;
+	}
+	else
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid IP or DNS", interface);
+		goto error;
+	}
+
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 		strscpy(ip, sock->peer);
 
@@ -507,7 +563,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, error))
 		goto error;
 
 	zbx_vector_uint64_create(&itemids);
@@ -658,6 +714,7 @@ out:
 	zbx_vector_ptr_destroy(&regexps);
 
 	zbx_free(host_metadata);
+	zbx_free(interface);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

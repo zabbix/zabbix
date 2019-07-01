@@ -1152,6 +1152,7 @@ FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|proxy_hostid
 
@@ -1163,6 +1164,7 @@ FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|clock
 
 TABLE|dhosts|dhostid|0

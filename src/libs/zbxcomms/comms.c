@@ -183,6 +183,56 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	zbx_strlcpy(host, hst->h_name, hostlen);
 }
 #endif	/* HAVE_IPV6 */
+
+#ifdef HAVE_IPV6
+void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
+{
+	struct addrinfo	hints, *ai = NULL;
+
+	assert(ip);
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+
+	if (0 != getaddrinfo(host, NULL, &hints, &ai))
+	{
+		ip[0] = '\0';
+		return;
+	}
+
+	switch(ai->ai_addr->sa_family) {
+		case AF_INET:
+			inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, iplen);
+			break;
+		case AF_INET6:
+			inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, iplen);
+			break;
+		default:
+			ip[0] = '\0';
+			return;
+	}
+}
+#else
+void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
+{
+	struct in_addr	*addr;
+	struct hostent  *hst;
+
+	assert(host);
+
+	if (NULL == (hst = gethostbyname(host)))
+	{
+		ip[0] = '\0';
+		return;
+	}
+
+	addr = (struct in_addr *)hst->h_addr_list[0];
+
+	zbx_strlcpy(ip , inet_ntoa(*addr),iplen);
+}
+#endif	/* HAVE_IPV6 */
+
+
 #endif	/* _WINDOWS */
 
 #ifdef _WINDOWS

@@ -524,6 +524,58 @@ out:
 	return ret;
 }
 
+static void process_config_item(struct zbx_json *json, char *config, size_t length, char *proto)
+{
+	char		**value;
+	AGENT_RESULT	result;
+	char		*config_name;
+	char		*config_type;
+
+	if (CONFIG_HOST_METADATA_ITEM == config)
+	{
+		config_name = "HostMetadataItem";
+		config_type = "metadata";
+	}
+	else if (CONFIG_HOST_INTERFACE_ITEM == config)
+	{
+		config_name = "HostInterfaceItem";
+		config_type = "interface";
+	}
+
+	init_result(&result);
+
+	if (SUCCEED == process(config, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
+			NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+	{
+		if (SUCCEED != zbx_is_utf8(*value))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
+					" \"%s\" configuration parameter: returned value is not"
+					" an UTF-8 string",config_type, config, config_name);
+		}
+		else
+		{
+			if (length < zbx_strlen_utf8(*value))
+			{
+				size_t	bytes;
+
+				zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
+						" \"%s\" configuration parameter is too long,"
+						" using first %d characters", config, config_name, (int)length);
+
+				bytes = zbx_strlen_utf8_nchars(*value, length);
+				(*value)[bytes] = '\0';
+			}
+			zbx_json_addstring(json, proto, *value, ZBX_JSON_TYPE_STRING);
+		}
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
+				" \"%s\" configuration parameter",config_type, config,config_name);
+
+	free_result(&result);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: refresh_active_checks                                            *
@@ -562,42 +614,16 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
-		char		**value;
-		AGENT_RESULT	result;
+		process_config_item(&json,CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+	}
 
-		init_result(&result);
-
-		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
-		{
-			if (SUCCEED != zbx_is_utf8(*value))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
-						" \"HostMetadataItem\" configuration parameter: returned value is not"
-						" an UTF-8 string", CONFIG_HOST_METADATA_ITEM);
-			}
-			else
-			{
-				if (HOST_METADATA_LEN < zbx_strlen_utf8(*value))
-				{
-					size_t	bytes;
-
-					zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
-							" \"HostMetadataItem\" configuration parameter is too long,"
-							" using first %d characters", CONFIG_HOST_METADATA_ITEM,
-							HOST_METADATA_LEN);
-
-					bytes = zbx_strlen_utf8_nchars(*value, HOST_METADATA_LEN);
-					(*value)[bytes] = '\0';
-				}
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
-			}
-		}
-		else
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
-					" \"HostMetadataItem\" configuration parameter", CONFIG_HOST_METADATA_ITEM);
-
-		free_result(&result);
+	if (NULL != CONFIG_HOST_INTERFACE)
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INTERFACE, CONFIG_HOST_INTERFACE, ZBX_JSON_TYPE_STRING);
+	}
+	else if (NULL != CONFIG_HOST_INTERFACE_ITEM)
+	{
+		process_config_item(&json,CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)
