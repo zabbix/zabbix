@@ -13,6 +13,7 @@ Bug fixes:
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 ..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+..F....... [ZBX-16204] fix undefined offset in CControllerWidgetProblemHostsView (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.5rc1
@@ -21,6 +22,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+..F....... [ZBX-16204] fix undefined offset in CControllerWidgetProblemHostsView (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.4
