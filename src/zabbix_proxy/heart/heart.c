@@ -95,7 +95,7 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 
 	zbx_setproctitle("%s [sending heartbeat message]", get_process_type_string(process_type));
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -140,5 +140,9 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }
