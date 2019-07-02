@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.10');
-define('ZABBIX_API_VERSION',	'4.0.10');
+define('ZABBIX_VERSION',		'4.0.11rc1');
+define('ZABBIX_API_VERSION',	'4.0.11');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -1403,6 +1403,13 @@ define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');
 define('HISTORY_VALUES', 'showvalues');
 define('HISTORY_LATEST', 'showlatest');
+
+// Item history and trends storage modes.
+define('ITEM_STORAGE_OFF',		0);
+define('ITEM_STORAGE_CUSTOM',	1);
+
+// Item history and trends storage value to define 0 storage period.
+define('ITEM_NO_STORAGE_VALUE',	0);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
