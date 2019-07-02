@@ -62,9 +62,6 @@ class CXmlExportWriter extends CExportWriter {
 				$this->xmlWriter->startElement($newName);
 			}
 			else {
-				if (is_int($name)) {
-					var_dump($name);
-				}
 				$this->xmlWriter->startElement($name);
 			}
 
