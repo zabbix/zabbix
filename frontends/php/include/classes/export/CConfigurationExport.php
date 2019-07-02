@@ -139,53 +139,17 @@ class CConfigurationExport {
 	public function export() {
 		$this->gatherData();
 
-		$simple_triggers = [];
-
-		if ($this->data['groups']) {
-			$this->builder->buildGroups($this->data['groups']);
-		}
-
-		if ($this->data['triggers']) {
-			foreach ($this->data['triggers'] as $triggerid => $trigger) {
-				if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
-						&& $trigger['items'][0]['templateid'] == 0) {
-					$simple_triggers[] = $trigger;
-					unset($this->data['triggers'][$triggerid]);
-				}
-			}
-		}
-
-		if ($this->data['templates']) {
-			$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
-		}
-
-		if ($this->data['hosts']) {
-			$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
-		}
-
-		if ($this->data['triggers']) {
-			$this->builder->buildTriggers($this->data['triggers']);
-		}
-
-		if ($this->data['graphs']) {
-			$this->builder->buildGraphs($this->data['graphs']);
-		}
-
-		if ($this->data['screens']) {
-			$this->builder->buildScreens($this->data['screens']);
-		}
-
 		if ($this->data['images']) {
 			$this->builder->buildImages($this->data['images']);
 		}
-
+		if ($this->data['screens']) {
+			$this->builder->buildScreens($this->data['screens']);
+		}
 		if ($this->data['maps']) {
 			$this->builder->buildMaps($this->data['maps']);
 		}
 
-		if ($this->data['valueMaps']) {
-			$this->builder->buildValueMaps($this->data['valueMaps']);
-		}
+		$this->builder->buildWrapper($this->data);
 
 		return $this->writer->write($this->builder->getExport());
 	}
@@ -388,6 +352,7 @@ class CConfigurationExport {
 		}
 
 		if ($proxy_hostids) {
+			// TODO: rewrite via API
 			$db_proxies = DBfetchArray(DBselect(
 				'SELECT h.hostid,h.host'.
 				' FROM hosts h'.
@@ -555,6 +520,7 @@ class CConfigurationExport {
 		]);
 
 		$itemids = [];
+		// TODO: Remove key from foreach
 		foreach ($hosts as $hostid => $host_data) {
 			foreach ($host_data['items'] as $item) {
 				$itemids[$item['itemid']] = $item['key_'];

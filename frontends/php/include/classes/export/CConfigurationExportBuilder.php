@@ -26,6 +26,18 @@ class CConfigurationExportBuilder {
 	 */
 	protected $data = [];
 
+	protected $tag_map = [
+		'groups' => 'CXmlTagGroup',
+		'triggers' => 'CXmlTagTrigger',
+		'templates' => 'CXmlTagTemplate',
+		'hosts' => 'CXmlTagHost',
+		'graphs' => 'CXmlTagGraph',
+		// 'screens' => 'CXmlTagScreen',
+		// 'images' => 'CXmlTag',
+		// 'maps' => 'CXmlTag',
+		'valueMaps' => 'CXmlTagValueMap',
+	];
+
 	/**
 	 * @param $version  current export version
 	 */
@@ -43,104 +55,116 @@ class CConfigurationExportBuilder {
 		return ['zabbix_export' => $this->data];
 	}
 
-	/**
-	 * Format groups.
-	 *
-	 * @param array $groups
-	 */
-	public function buildGroups(array $groups) {
-		$this->data['groups'] = $this->formatGroups($groups);
-	}
+	public function buildWrapper(array $data)
+	{
+		// Create triggers.
+		$simple_triggers = [];
 
-	/**
-	 * Format templates.
-	 *
-	 * @param array $templates
-	 * @param array $simple_triggers
-	 */
-	public function buildTemplates(array $templates, array $simple_triggers) {
-		$this->data['templates'] = [];
+		if ($data['triggers']) {
+			$simple_triggers = $this->createTriggers($data['triggers']);
+		}
 
-		CArrayHelper::sort($templates, ['host']);
+		foreach (['graphs', 'groups', 'hosts', /* 'images', 'maps', 'screens', */ 'templates', 'triggers', 'valueMaps'] as $tag) {
+			if (!$data[$tag]) {
+				continue;
+			}
 
-		foreach ($templates as $template) {
-			$this->data['templates'][] = [
-				'template' => $template['host'],
-				'name' => $template['name'],
-				'description' => $template['description'],
-				'groups' => $this->formatGroups($template['groups']),
-				'applications' => $this->formatApplications($template['applications']),
-				'items' => $this->formatItems($template['items'], $simple_triggers),
-				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
-				'httptests' => $this->formatHttpTests($template['httptests']),
-				'macros' => $this->formatMacros($template['macros']),
-				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'screens' => $this->formatScreens($template['screens']),
-				'tags' => $this->formatTags($template['tags'])
-			];
+			$tag_class = new $this->tag_map[$tag];
+			$xml_tag = $tag_class->getTag();
+			$data[$tag] = $tag_class->prepareData($data[$tag]);
+			$xml_schema = $tag_class->getSchema();
+			$this->data[$xml_tag] = $this->build($xml_schema, $data[$tag], $simple_triggers);
 		}
 	}
 
-	/**
-	 * Format hosts.
-	 *
-	 * @param array $hosts
-	 * @param array $simple_triggers
-	 */
-	public function buildHosts(array $hosts, array $simple_triggers) {
-		$this->data['hosts'] = [];
+	protected function build(array $xml_schema, array $data, $simple_triggers = null, $indexed = false)
+	{
+		$result = [];
 
-		CArrayHelper::sort($hosts, ['host']);
+		$n = 0;
+		foreach ($data as $row) {
+			foreach ($xml_schema as $field_key => $field_val) {
 
-		foreach ($hosts as $host) {
-			$host = $this->createInterfaceReferences($host);
+				$is_required = $field_val['type'] & CXmlDefine::REQUIRED;
+				$is_array = $field_val['type'] & CXmlDefine::ARRAY;
+				$is_indexed_array = $field_val['type'] & CXmlDefine::INDEXED_ARRAY;
+				$data_key = array_key_exists('key', $field_val) ? $field_val['key'] : $field_key;
+				$has_value = array_key_exists('value', $field_val);
+				$has_data = isset($row[$data_key]);
 
-			$this->data['hosts'][] = [
-				'host' => $host['host'],
-				'name' => $host['name'],
-				'description' => $host['description'],
-				'proxy' => $host['proxy'],
-				'status' => $host['status'],
-				'ipmi_authtype' => $host['ipmi_authtype'],
-				'ipmi_privilege' => $host['ipmi_privilege'],
-				'ipmi_username' => $host['ipmi_username'],
-				'ipmi_password' => $host['ipmi_password'],
-				'tls_connect' => $host['tls_connect'],
-				'tls_accept' => $host['tls_accept'],
-				'tls_issuer' => $host['tls_issuer'],
-				'tls_subject' => $host['tls_subject'],
-				'tls_psk_identity' => $host['tls_psk_identity'],
-				'tls_psk' => $host['tls_psk'],
-				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
-				'groups' => $this->formatGroups($host['groups']),
-				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
-				'applications' => $this->formatApplications($host['applications']),
-				'items' => $this->formatItems($host['items'], $simple_triggers),
-				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
-				'httptests' => $this->formatHttpTests($host['httptests']),
-				'macros' => $this->formatMacros($host['macros']),
-				'inventory' => $this->formatHostInventory($host['inventory']),
-				'tags' => $this->formatTags($host['tags'])
-			];
+				if (!$is_required && !$has_value && !$has_data) {
+					continue;
+				}
+
+				if ($data_key == 'screenitems') {
+					usleep(1);
+				}
+
+				if (!$has_data && $has_value) {
+					$value = $field_val['value'];
+				} else  {
+					$value = $row[$data_key];
+				}
+
+				if (!$is_required && !$has_value && !$value) {
+					continue;
+				}
+
+				if (!$is_required && $has_value && $field_val['value'] == $value) {
+					continue;
+				}
+
+				if (($is_array || $is_indexed_array) && $has_data) {
+					$temp_data = $this->build($field_val['schema'], $is_indexed_array ? [$row[$data_key]] : $row[$data_key], null, $is_indexed_array);
+					if ($is_required || count($temp_data) > 0) {
+						$result[$n][$field_key] = $temp_data;
+					}
+					continue;
+				}
+
+				if (array_key_exists('range', $field_val)) {
+					if (is_callable($field_val['range'])) {
+						$field_val['range'] = $field_val['range']($row);
+					}
+
+					if (!in_array($value, array_keys($field_val['range']))) {
+						// FIXME: throw exception
+						continue;
+					}
+
+					if ($indexed) {
+						$result[$field_key] = $field_val['range'][$value];
+					} else {
+						$result[$n][$field_key] = $field_val['range'][$value];
+					}
+				} else {
+					if ($indexed) {
+						$result[$field_key] = $value;
+					} else {
+						$result[$n][$field_key] = $value;
+					}
+				}
+			}
+
+			$n++;
 		}
+
+		return $result;
 	}
 
-	/**
-	 * Format graphs.
-	 *
-	 * @param array $graphs
-	 */
-	public function buildGraphs(array $graphs) {
-		$this->data['graphs'] = $this->formatGraphs($graphs);
-	}
+	public function createTriggers(array $triggers)
+	{
+		$simple_triggers = [];
 
-	/**
-	 * Format triggers.
-	 *
-	 * @param array $triggers
-	 */
-	public function buildTriggers(array $triggers) {
-		$this->data['triggers'] = $this->formatTriggers($triggers);
+		foreach ($triggers as $triggerid => $trigger) {
+			if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+					&& $trigger['items'][0]['templateid'] == 0) {
+				$simple_triggers[] = $trigger;
+				unset($triggers[$triggerid]);
+			}
+		}
+
+		return $simple_triggers;
 	}
 
 	/**
@@ -220,688 +244,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format mappings.
-	 *
-	 * @param array $mappings
-	 *
-	 * @return array
-	 */
-	protected function formatMappings(array $mappings) {
-		$result = [];
-
-		CArrayHelper::sort($mappings, ['value']);
-
-		foreach ($mappings as $mapping) {
-			$result[] = [
-				'value' => $mapping['value'],
-				'newvalue' => $mapping['newvalue']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format value maps.
-	 *
-	 * @param array $valuemaps
-	 */
-	public function buildValueMaps(array $valuemaps) {
-		$this->data['value_maps'] = [];
-
-		CArrayHelper::sort($valuemaps, ['name']);
-
-		foreach ($valuemaps as $valuemap) {
-			$this->data['value_maps'][] = [
-				'name' => $valuemap['name'],
-				'mappings' => $this->formatMappings($valuemap['mappings'])
-			];
-		}
-	}
-
-	/**
-	 * For each host interface an unique reference must be created and then added for all items, discovery rules
-	 * and item prototypes that use the interface.
-	 *
-	 * @param array $host
-	 *
-	 * @return array
-	 */
-	protected function createInterfaceReferences(array $host) {
-		$references = [
-			'num' => 1,
-			'refs' => []
-		];
-
-		// create interface references
-		foreach ($host['interfaces'] as &$interface) {
-			$refNum = $references['num']++;
-			$referenceKey = 'if'.$refNum;
-			$interface['interface_ref'] = $referenceKey;
-			$references['refs'][$interface['interfaceid']] = $referenceKey;
-		}
-		unset($interface);
-
-		foreach ($host['items'] as &$item) {
-			if ($item['interfaceid']) {
-				$item['interface_ref'] = $references['refs'][$item['interfaceid']];
-			}
-		}
-		unset($item);
-
-		foreach ($host['discoveryRules'] as &$discoveryRule) {
-			if ($discoveryRule['interfaceid']) {
-				$discoveryRule['interface_ref'] = $references['refs'][$discoveryRule['interfaceid']];
-			}
-
-			foreach ($discoveryRule['itemPrototypes'] as &$prototype) {
-				if ($prototype['interfaceid']) {
-					$prototype['interface_ref'] = $references['refs'][$prototype['interfaceid']];
-				}
-			}
-			unset($prototype);
-		}
-		unset($discoveryRule);
-
-		return $host;
-	}
-
-	/**
-	 * Format discovery rules.
-	 *
-	 * @param array $discoveryRules
-	 *
-	 * @return array
-	 */
-	protected function formatDiscoveryRules(array $discoveryRules) {
-		$result = [];
-
-		CArrayHelper::sort($discoveryRules, ['key_']);
-
-		$simple_trigger_prototypes = [];
-
-		foreach ($discoveryRules as $discoveryRule) {
-			foreach ($discoveryRule['triggerPrototypes'] as $i => $trigger_prototype) {
-				if (count($trigger_prototype['items']) == 1) {
-					$simple_trigger_prototypes[] = $trigger_prototype;
-					unset($discoveryRule['triggerPrototypes'][$i]);
-				}
-			}
-
-			$data = [
-				'name' => $discoveryRule['name'],
-				'type' => $discoveryRule['type'],
-				'snmp_community' => $discoveryRule['snmp_community'],
-				'snmp_oid' => $discoveryRule['snmp_oid'],
-				'key' => $discoveryRule['key_'],
-				'delay' => $discoveryRule['delay'],
-				'status' => $discoveryRule['status'],
-				'allowed_hosts' => $discoveryRule['trapper_hosts'],
-				'snmpv3_contextname' => $discoveryRule['snmpv3_contextname'],
-				'snmpv3_securityname' => $discoveryRule['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $discoveryRule['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $discoveryRule['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $discoveryRule['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $discoveryRule['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $discoveryRule['snmpv3_privpassphrase'],
-				'params' => $discoveryRule['params'],
-				'ipmi_sensor' => $discoveryRule['ipmi_sensor'],
-				'authtype' => $discoveryRule['authtype'],
-				'username' => $discoveryRule['username'],
-				'password' => $discoveryRule['password'],
-				'publickey' => $discoveryRule['publickey'],
-				'privatekey' => $discoveryRule['privatekey'],
-				'port' => $discoveryRule['port'],
-				'filter' => $discoveryRule['filter'],
-				'lifetime' => $discoveryRule['lifetime'],
-				'description' => $discoveryRule['description'],
-				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
-				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
-				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
-				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes']),
-				'jmx_endpoint' => $discoveryRule['jmx_endpoint'],
-				'timeout' => $discoveryRule['timeout'],
-				'url' => $discoveryRule['url'],
-				'query_fields' => $discoveryRule['query_fields'],
-				'posts' => $discoveryRule['posts'],
-				'status_codes' => $discoveryRule['status_codes'],
-				'follow_redirects' => $discoveryRule['follow_redirects'],
-				'post_type' => $discoveryRule['post_type'],
-				'http_proxy' => $discoveryRule['http_proxy'],
-				'headers' => $discoveryRule['headers'],
-				'retrieve_mode' => $discoveryRule['retrieve_mode'],
-				'request_method' => $discoveryRule['request_method'],
-				'allow_traps' => $discoveryRule['allow_traps'],
-				'ssl_cert_file' => $discoveryRule['ssl_cert_file'],
-				'ssl_key_file' => $discoveryRule['ssl_key_file'],
-				'ssl_key_password' => $discoveryRule['ssl_key_password'],
-				'verify_peer' => $discoveryRule['verify_peer'],
-				'verify_host' => $discoveryRule['verify_host'],
-				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
-				'preprocessing' => $discoveryRule['preprocessing']
-			];
-
-			if (isset($discoveryRule['interface_ref'])) {
-				$data['interface_ref'] = $discoveryRule['interface_ref'];
-			}
-
-			if ($discoveryRule['query_fields']) {
-				$query_fields = [];
-
-				foreach ($discoveryRule['query_fields'] as $query_field) {
-					$query_fields[] = [
-						'name' => key($query_field),
-						'value' => reset($query_field)
-					];
-				}
-
-				$data['query_fields'] = $query_fields;
-			}
-
-			if ($discoveryRule['headers']) {
-				$headers = [];
-
-				foreach ($discoveryRule['headers'] as $name => $value) {
-					$headers[] = compact('name', 'value');
-				}
-
-				$data['headers'] = $headers;
-			}
-
-			$data['master_item'] = ($discoveryRule['type'] == ITEM_TYPE_DEPENDENT)
-				? ['key' => $discoveryRule['master_item']['key_']]
-				: [];
-
-			$result[] = $data;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format web scenarios.
-	 *
-	 * @param array $httptests
-	 *
-	 * @return array
-	 */
-	protected function formatHttpTests(array $httptests) {
-		$result = [];
-
-		order_result($httptests, 'name');
-
-		foreach ($httptests as $httptest) {
-			$result[] = [
-				'name' => $httptest['name'],
-				'application' => $httptest['application'],
-				'delay' => $httptest['delay'],
-				'attempts' => $httptest['retries'],
-				'agent' => $httptest['agent'],
-				'http_proxy' => $httptest['http_proxy'],
-				'variables' => $httptest['variables'],
-				'headers' => $httptest['headers'],
-				'status' => $httptest['status'],
-				'authentication' => $httptest['authentication'],
-				'http_user' => $httptest['http_user'],
-				'http_password' => $httptest['http_password'],
-				'verify_peer' => $httptest['verify_peer'],
-				'verify_host' => $httptest['verify_host'],
-				'ssl_cert_file' => $httptest['ssl_cert_file'],
-				'ssl_key_file' => $httptest['ssl_key_file'],
-				'ssl_key_password' => $httptest['ssl_key_password'],
-				'steps' => $this->formatHttpSteps($httptest['steps'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format web scenario steps.
-	 *
-	 * @param array $httpsteps
-	 *
-	 * @return array
-	 */
-	protected function formatHttpSteps(array $httpsteps) {
-		$result = [];
-
-		order_result($httpsteps, 'no');
-
-		foreach ($httpsteps as $httpstep) {
-			$result[] = [
-				'name' => $httpstep['name'],
-				'url' => $httpstep['url'],
-				'query_fields' => $httpstep['query_fields'],
-				'posts' => $httpstep['posts'],
-				'variables' => $httpstep['variables'],
-				'headers' => $httpstep['headers'],
-				'follow_redirects' => $httpstep['follow_redirects'],
-				'retrieve_mode' => $httpstep['retrieve_mode'],
-				'timeout' => $httpstep['timeout'],
-				'required' => $httpstep['required'],
-				'status_codes' => $httpstep['status_codes']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format host inventory.
-	 *
-	 * @param array $inventory
-	 *
-	 * @return array
-	 */
-	protected function formatHostInventory(array $inventory) {
-		unset($inventory['hostid']);
-
-		return $inventory;
-	}
-
-	/**
-	 * Format graphs.
-	 *
-	 * @param array $graphs
-	 *
-	 * @return array
-	 */
-	protected function formatGraphs(array $graphs) {
-		$result = [];
-
-		CArrayHelper::sort($graphs, ['name']);
-
-		foreach ($graphs as $graph) {
-			$result[] = [
-				'name' => $graph['name'],
-				'width' => $graph['width'],
-				'height' => $graph['height'],
-				'yaxismin' => $graph['yaxismin'],
-				'yaxismax' => $graph['yaxismax'],
-				'show_work_period' => $graph['show_work_period'],
-				'show_triggers' => $graph['show_triggers'],
-				'type' => $graph['graphtype'],
-				'show_legend' => $graph['show_legend'],
-				'show_3d' => $graph['show_3d'],
-				'percent_left' => $graph['percent_left'],
-				'percent_right' => $graph['percent_right'],
-				'ymin_type_1' => $graph['ymin_type'],
-				'ymax_type_1' => $graph['ymax_type'],
-				'ymin_item_1' => $graph['ymin_itemid'],
-				'ymax_item_1' => $graph['ymax_itemid'],
-				'graph_items' => $this->formatGraphItems($graph['gitems'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format host prototypes.
-	 *
-	 * @param array $hostPrototypes
-	 *
-	 * @return array
-	 */
-	protected function formatHostPrototypes(array $hostPrototypes) {
-		$result = [];
-
-		CArrayHelper::sort($hostPrototypes, ['host']);
-
-		foreach ($hostPrototypes as $hostPrototype) {
-			$result[] = [
-				'host' => $hostPrototype['host'],
-				'name' => $hostPrototype['name'],
-				'status' => $hostPrototype['status'],
-				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
-				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format group links.
-	 *
-	 * @param array $groupLinks
-	 *
-	 * @return array
-	 */
-	protected function formatGroupLinks(array $groupLinks) {
-		$result = [];
-
-		CArrayHelper::sort($groupLinks, ['name']);
-
-		foreach ($groupLinks as $groupLink) {
-			$result[] = [
-				'group' => $groupLink['groupid'],
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format group prototypes.
-	 *
-	 * @param array $groupPrototypes
-	 *
-	 * @return array
-	 */
-	protected function formatGroupPrototypes(array $groupPrototypes) {
-		$result = [];
-
-		CArrayHelper::sort($groupPrototypes, ['name']);
-
-		foreach ($groupPrototypes as $groupPrototype) {
-			$result[] = [
-				'name' => $groupPrototype['name']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format template linkage.
-	 *
-	 * @param array $templates
-	 *
-	 * @return array
-	 */
-	protected function formatTemplateLinkage(array $templates) {
-		$result = [];
-
-		CArrayHelper::sort($templates, ['host']);
-
-		foreach ($templates as $template) {
-			$result[] = [
-				'name' => $template['host']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format triggers.
-	 *
-	 * @param array $triggers
-	 *
-	 * @return array
-	 */
-	protected function formatTriggers(array $triggers) {
-		$result = [];
-
-		CArrayHelper::sort($triggers, ['description', 'expression', 'recovery_expression']);
-
-		foreach ($triggers as $trigger) {
-			$result[] = [
-				'expression' => $trigger['expression'],
-				'recovery_mode' => $trigger['recovery_mode'],
-				'recovery_expression' => $trigger['recovery_expression'],
-				'name' => $trigger['description'],
-				'correlation_mode' => $trigger['correlation_mode'],
-				'correlation_tag' => $trigger['correlation_tag'],
-				'url' => $trigger['url'],
-				'status' => $trigger['status'],
-				'priority' => $trigger['priority'],
-				'description' => $trigger['comments'],
-				'type' => $trigger['type'],
-				'manual_close' => $trigger['manual_close'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies']),
-				'tags' => $this->formatTags($trigger['tags'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format host interfaces.
-	 *
-	 * @param array $interfaces
-	 *
-	 * @return array
-	 */
-	protected function formatHostInterfaces(array $interfaces) {
-		$result = [];
-
-		CArrayHelper::sort($interfaces, ['type', 'ip', 'dns', 'port']);
-
-		foreach ($interfaces as $interface) {
-			$result[] = [
-				'default' => $interface['main'],
-				'type' => $interface['type'],
-				'useip' => $interface['useip'],
-				'ip' => $interface['ip'],
-				'dns' => $interface['dns'],
-				'port' => $interface['port'],
-				'bulk' => $interface['bulk'],
-				'interface_ref' => $interface['interface_ref']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format groups.
-	 *
-	 * @param array $groups
-	 *
-	 * @return array
-	 */
-	protected function formatGroups(array $groups) {
-		$result = [];
-
-		CArrayHelper::sort($groups, ['name']);
-
-		foreach ($groups as $group) {
-			$result[] = [
-				'name' => $group['name']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format items.
-	 *
-	 * @param array $items
-	 * @param array $simple_triggers
-	 *
-	 * @return array
-	 */
-	protected function formatItems(array $items, array $simple_triggers) {
-		$result = [];
-		$expression_data = $simple_triggers ? new CTriggerExpression() : null;
-
-		CArrayHelper::sort($items, ['key_']);
-
-		foreach ($items as $item) {
-			$data = [
-				'name' => $item['name'],
-				'type' => $item['type'],
-				'snmp_community' => $item['snmp_community'],
-				'snmp_oid' => $item['snmp_oid'],
-				'key' => $item['key_'],
-				'delay' => $item['delay'],
-				'history' => $item['history'],
-				'trends' => $item['trends'],
-				'status' => $item['status'],
-				'value_type' => $item['value_type'],
-				'allowed_hosts' => $item['trapper_hosts'],
-				'units' => $item['units'],
-				'snmpv3_contextname' => $item['snmpv3_contextname'],
-				'snmpv3_securityname' => $item['snmpv3_securityname'],
-				'snmpv3_securitylevel' => $item['snmpv3_securitylevel'],
-				'snmpv3_authprotocol' => $item['snmpv3_authprotocol'],
-				'snmpv3_authpassphrase' => $item['snmpv3_authpassphrase'],
-				'snmpv3_privprotocol' => $item['snmpv3_privprotocol'],
-				'snmpv3_privpassphrase' => $item['snmpv3_privpassphrase'],
-				'params' => $item['params'],
-				'ipmi_sensor' => $item['ipmi_sensor'],
-				'authtype' => $item['authtype'],
-				'username' => $item['username'],
-				'password' => $item['password'],
-				'publickey' => $item['publickey'],
-				'privatekey' => $item['privatekey'],
-				'port' => $item['port'],
-				'description' => $item['description'],
-				'inventory_link' => $item['inventory_link'],
-				'applications' => $this->formatApplications($item['applications']),
-				'valuemap' => $item['valuemap'],
-				'logtimefmt' => $item['logtimefmt'],
-				'preprocessing' => $item['preprocessing'],
-				'jmx_endpoint' => $item['jmx_endpoint'],
-				'timeout' => $item['timeout'],
-				'url' => $item['url'],
-				'query_fields' => $item['query_fields'],
-				'posts' => $item['posts'],
-				'status_codes' => $item['status_codes'],
-				'follow_redirects' => $item['follow_redirects'],
-				'post_type' => $item['post_type'],
-				'http_proxy' => $item['http_proxy'],
-				'headers' => $item['headers'],
-				'retrieve_mode' => $item['retrieve_mode'],
-				'request_method' => $item['request_method'],
-				'output_format' => $item['output_format'],
-				'allow_traps' => $item['allow_traps'],
-				'ssl_cert_file' => $item['ssl_cert_file'],
-				'ssl_key_file' => $item['ssl_key_file'],
-				'ssl_key_password' => $item['ssl_key_password'],
-				'verify_peer' => $item['verify_peer'],
-				'verify_host' => $item['verify_host']
-			];
-
-			$master_item = ($item['type'] == ITEM_TYPE_DEPENDENT) ? ['key' => $item['master_item']['key_']] : [];
-
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
-			}
-
-			$data['master_item'] = $master_item;
-
-			if (isset($item['interface_ref'])) {
-				$data['interface_ref'] = $item['interface_ref'];
-			}
-
-			if ($item['query_fields']) {
-				$query_fields = [];
-
-				foreach ($item['query_fields'] as $query_field) {
-					$query_fields[] = [
-						'name' => key($query_field),
-						'value' => reset($query_field)
-					];
-				}
-
-				$data['query_fields'] = $query_fields;
-			}
-
-			if ($item['headers']) {
-				$headers = [];
-
-				foreach ($item['headers'] as $name => $value) {
-					$headers[] = compact('name', 'value');
-				}
-
-				$data['headers'] = $headers;
-			}
-
-			if ($simple_triggers) {
-				$triggers = [];
-				$prefix_length = strlen($item['host'].':'.$item['key_'].'.');
-
-				foreach ($simple_triggers as $simple_trigger) {
-					if (bccomp($item['itemid'], $simple_trigger['items'][0]['itemid']) == 0) {
-						if ($expression_data->parse($simple_trigger['expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['expression'] = substr_replace($simple_trigger['expression'], '',
-										$expression['pos'] + 1, $prefix_length
-									);
-								}
-							}
-						}
-
-						if ($simple_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-								&& $expression_data->parse($simple_trigger['recovery_expression'])) {
-							foreach (array_reverse($expression_data->expressions) as $expression) {
-								if ($expression['host'] === $item['host'] && $expression['item'] === $item['key_']) {
-									$simple_trigger['recovery_expression'] = substr_replace(
-										$simple_trigger['recovery_expression'], '', $expression['pos'] + 1,
-										$prefix_length
-									);
-								}
-							}
-						}
-
-						$triggers[] = $simple_trigger;
-					}
-				}
-
-				if ($triggers) {
-					$key = array_key_exists('discoveryRule', $item) ? 'trigger_prototypes' : 'triggers';
-					$data[$key] = $this->formatTriggers($triggers);
-				}
-			}
-
-			$result[] = $data;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format applications.
-	 *
-	 * @param array $applications
-	 *
-	 * @return array
-	 */
-	protected function formatApplications(array $applications) {
-		$result = [];
-
-		CArrayHelper::sort($applications, ['name']);
-
-		foreach ($applications as $application) {
-			$result[] = [
-				'name' => $application['name']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format macros.
-	 *
-	 * @param array $macros
-	 *
-	 * @return array
-	 */
-	protected function formatMacros(array $macros) {
-		$result = [];
-
-		$macros = order_macros($macros, 'macro');
-
-		foreach ($macros as $macro) {
-			$result[] = [
-				'macro' => $macro['macro'],
-				'value' => $macro['value']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Format screens.
 	 *
 	 * @param array $screens
@@ -919,51 +261,6 @@ class CConfigurationExportBuilder {
 				'hsize' => $screen['hsize'],
 				'vsize' => $screen['vsize'],
 				'screen_items' => $this->formatScreenItems($screen['screenitems'])
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format trigger dependencies.
-	 *
-	 * @param array $dependencies
-	 *
-	 * @return array
-	 */
-	protected function formatDependencies(array $dependencies) {
-		$result = [];
-
-		CArrayHelper::sort($dependencies, ['description', 'expression', 'recovery_expression']);
-
-		foreach ($dependencies as $dependency) {
-			$result[] = [
-				'name' => $dependency['description'],
-				'expression' => $dependency['expression'],
-				'recovery_expression' => $dependency['recovery_expression']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format tags.
-	 *
-	 * @param array $tags
-	 *
-	 * @return array
-	 */
-	protected function formatTags(array $tags) {
-		$result = [];
-
-		CArrayHelper::sort($tags, ['tag', 'value']);
-
-		foreach ($tags as $tag) {
-			$result[] = [
-				'tag' => $tag['tag'],
-				'value' => $tag['value']
 			];
 		}
 
@@ -1001,33 +298,6 @@ class CConfigurationExportBuilder {
 				'resource' => $screenItem['resourceid'],
 				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
-			];
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Format graph items.
-	 *
-	 * @param array $graphItems
-	 *
-	 * @return array
-	 */
-	protected function formatGraphItems(array $graphItems) {
-		$result = [];
-
-		CArrayHelper::sort($graphItems, ['sortorder']);
-
-		foreach ($graphItems as $graphItem) {
-			$result[] = [
-				'sortorder'=> $graphItem['sortorder'],
-				'drawtype'=> $graphItem['drawtype'],
-				'color'=> $graphItem['color'],
-				'yaxisside'=> $graphItem['yaxisside'],
-				'calc_fnc'=> $graphItem['calc_fnc'],
-				'type'=> $graphItem['type'],
-				'item'=> $graphItem['itemid']
 			];
 		}
 

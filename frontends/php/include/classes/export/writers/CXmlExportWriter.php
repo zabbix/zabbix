@@ -62,6 +62,9 @@ class CXmlExportWriter extends CExportWriter {
 				$this->xmlWriter->startElement($newName);
 			}
 			else {
+				if (is_int($name)) {
+					var_dump($name);
+				}
 				$this->xmlWriter->startElement($name);
 			}
 
@@ -133,7 +136,8 @@ class CXmlExportWriter extends CExportWriter {
 			'shapes' => 'shape',
 			'lines' => 'line',
 			'headers' => 'header',
-			'lld_macro_paths' => 'lld_macro_path'
+			'lld_macro_paths' => 'lld_macro_path',
+			'tls_accept' => 'option',
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;
