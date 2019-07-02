@@ -785,8 +785,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			// Selecting items.
 			if ($itemids) {
 				if ($options['html']) {
-					$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,i.state,id.parent_itemid'.
+					$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,ir.state,id.parent_itemid'.
 						' FROM items i'.
+							' LEFT JOIN item_rtdata ir ON i.itemid=ir.itemid'.
 							' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
 						' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
 				}

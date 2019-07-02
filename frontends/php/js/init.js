@@ -147,40 +147,87 @@ jQuery(function($) {
 	}
 
 	/**
+	 * Create preloader elements for the menu popup.
+	 */
+	function createMenuPopupPreloader() {
+		return $('<div>', {
+			'id': 'menu-popup-preloader',
+			'class': 'preloader-container menu-popup-preloader'
+		})
+			.append($('<div>').addClass('preloader'))
+			.appendTo($('body'))
+			.on('click', function(e) {
+				e.stopPropagation();
+			})
+			.hide();
+	}
+
+	/**
+	 * Event handler for the preloader elements destroy.
+	 */
+	function menuPopupPreloaderCloseHandler(event) {
+		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+	}
+
+	/**
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var $obj = $(this),
-			data = $obj.data('menu-popup');
+			data = $obj.data('menu-popup'),
+			position_target = event.target;
 
-		if (event.type === 'keydown') {
-			if (event.which != 13) {
-				return;
-			}
-
-			event.preventDefault();
-			event.target = this;
+		if (event.type === 'keydown' && event.which != 13) {
+			return;
+		}
+		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
+			|| event.originalEvent.detail !== 0) {
+			position_target = event;
 		}
 
-		var	url = new Curl('zabbix.php'),
-			ajax_data = {
-				data: data.data
-			};
+		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
+		if ($('#menu-popup-preloader').length) {
+			$(document).trigger('click');
+		}
+
+		var	$preloader = createMenuPopupPreloader(),
+			url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'menu.popup');
 		url.setArgument('type', data.type);
 
-		$.ajax({
+		var xhr = $.ajax({
 			url: url.getUrl(),
 			method: 'POST',
-			data: ajax_data,
+			data: {
+				data: data.data
+			},
 			dataType: 'json',
+			beforeSend: function() {
+				$('.menu-popup-top').menuPopup('close');
+				setTimeout(function(){
+					$preloader
+						.fadeIn(200)
+						.position({
+							of: position_target,
+							my: 'left top',
+							at: 'left bottom'
+						});
+				}, 500);
+			},
 			success: function(resp) {
+				overlayPreloaderDestroy($preloader.prop('id'));
 				showMenuPopup($obj, resp.data, event);
 			},
 			error: function() {
 			}
 		});
+
+		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+
+		$(document)
+			.off('click', menuPopupPreloaderCloseHandler)
+			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 
 		return false;
 	});

@@ -18,11 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 define('ZABBIX_VERSION',		'4.4.0alpha1');
 define('ZABBIX_API_VERSION',	'4.4.0');
-define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4030002);
+define('ZABBIX_EXPORT_VERSION',	'4.4');
+define('ZABBIX_DB_VERSION',	4030009);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -870,9 +869,10 @@ define('PARAM_TYPE_COUNTS',		1);
 define('ZBX_DEFAULT_AGENT', 'Zabbix');
 define('ZBX_AGENT_OTHER', -1);
 
-define('HTTPTEST_AUTH_NONE',	0);
-define('HTTPTEST_AUTH_BASIC',	1);
-define('HTTPTEST_AUTH_NTLM',	2);
+define('HTTPTEST_AUTH_NONE',		0);
+define('HTTPTEST_AUTH_BASIC',		1);
+define('HTTPTEST_AUTH_NTLM',		2);
+define('HTTPTEST_AUTH_KERBEROS',	3);
 
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
@@ -1444,6 +1444,13 @@ define('HISTORY_BATCH_GRAPH', 'batchgraph');
 define('HISTORY_VALUES', 'showvalues');
 define('HISTORY_LATEST', 'showlatest');
 
+// Item history and trends storage modes.
+define('ITEM_STORAGE_OFF',		0);
+define('ITEM_STORAGE_CUSTOM',	1);
+
+// Item history and trends storage value to define 0 storage period.
+define('ITEM_NO_STORAGE_VALUE',	0);
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
@@ -1574,6 +1581,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_NONE', 'icon-none');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');

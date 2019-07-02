@@ -83,6 +83,13 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
+		/* clear timer trigger queue to avoid processing time triggers at exit */
+		if (!ZBX_IS_RUNNING())
+		{
+			zbx_dc_clear_timer_queue();
+			zbx_log_sync_history_cache_progress();
+		}
+
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
@@ -114,10 +121,19 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			last_stat_time = time(NULL);
 		}
 
+		if (ZBX_SYNC_MORE == more)
+			continue;
+
+		if (!ZBX_IS_RUNNING())
+			break;
+
 		zbx_sleep_loop(sleeptime);
 	}
 
-	zbx_free(stats);
+	zbx_log_sync_history_cache_progress();
 
+	zbx_free(stats);
+	DBclose();
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

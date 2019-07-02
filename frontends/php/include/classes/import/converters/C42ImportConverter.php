@@ -19,25 +19,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
+/**
+ * Converter for converting import data from 4.2 to 4.4.
+ */
+class C42ImportConverter extends CConverter {
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
+	public function convert($data) {
+		$data['zabbix_export']['version'] = '4.4';
 
-$page['title'] = _('ZABBIX');
-$page['file'] = 'cachewarning.php';
-
-if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
-	redirect('index.php');
-
-	exit;
+		return $data;
+	}
 }
-
-(new CView('general.warning', [
-	'header' => _('Insufficient file system permissions.'),
-	'messages' => [
-		_('Assets cache directory is not writable.')
-	],
-	'theme' => ZBX_DEFAULT_THEME
-]))->render();

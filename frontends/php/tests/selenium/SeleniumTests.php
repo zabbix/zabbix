@@ -66,6 +66,8 @@ require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
 require_once dirname(__FILE__).'/testFormAction.php';
+require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
+require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
@@ -187,6 +189,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testFormAction');
+		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
+		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');

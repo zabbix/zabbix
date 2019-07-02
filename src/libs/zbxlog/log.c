@@ -236,6 +236,7 @@ static void	lock_log(void)
 	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGTERM);	/* block SIGTERM, SIGINT to prevent deadlock on log file mutex */
 	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
@@ -351,7 +352,7 @@ void	zabbix_close_log(void)
 		closelog();
 #endif
 	}
-	else if (LOG_TYPE_FILE == log_type || LOG_TYPE_CONSOLE == log_type)
+	else if (LOG_TYPE_FILE == log_type || LOG_TYPE_CONSOLE == log_type || LOG_TYPE_UNDEFINED == log_type)
 	{
 		zbx_mutex_destroy(&log_access);
 	}

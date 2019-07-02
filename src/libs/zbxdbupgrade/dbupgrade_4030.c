@@ -48,6 +48,66 @@ static int	DBpatch_4030002(void)
 	return DBmodify_field_type("host_discovery", &field, NULL);
 }
 
+static int	DBpatch_4030003(void)
+{
+	const ZBX_TABLE table =
+		{"item_rtdata", "itemid", 0,
+			{
+				{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lastlogsize", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
+				{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"mtime", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4030004(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_rtdata", 1, &field);
+}
+
+static int	DBpatch_4030005(void)
+{
+	if (ZBX_DB_OK <= DBexecute("insert into item_rtdata (itemid,lastlogsize,state,mtime,error)"
+			" select i.itemid,i.lastlogsize,i.state,i.mtime,i.error"
+			" from items i"
+			" join hosts h on i.hostid=h.hostid"
+			" where h.status in (%d,%d) and i.flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_4030006(void)
+{
+	return DBdrop_field("items", "lastlogsize");
+}
+
+static int	DBpatch_4030007(void)
+{
+	return DBdrop_field("items", "state");
+}
+
+static int	DBpatch_4030008(void)
+{
+	return DBdrop_field("items", "mtime");
+}
+
+static int	DBpatch_4030009(void)
+{
+	return DBdrop_field("items", "error");
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -57,5 +117,12 @@ DBPATCH_START(4030)
 DBPATCH_ADD(4030000, 0, 1)
 DBPATCH_ADD(4030001, 0, 1)
 DBPATCH_ADD(4030002, 0, 1)
+DBPATCH_ADD(4030003, 0, 1)
+DBPATCH_ADD(4030004, 0, 1)
+DBPATCH_ADD(4030005, 0, 1)
+DBPATCH_ADD(4030006, 0, 1)
+DBPATCH_ADD(4030007, 0, 1)
+DBPATCH_ADD(4030008, 0, 1)
+DBPATCH_ADD(4030009, 0, 1)
 
 DBPATCH_END()

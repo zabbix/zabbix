@@ -12,6 +12,7 @@ libzbxcommon_a_SOURCES = \
 	file.c \
 	setproctitle.c \
 	iprange.c \
-	variant.c
+	variant.c \
+	variant_misc.c
 
 libzbxcommon_a_CFLAGS = @ICONV_CFLAGS@

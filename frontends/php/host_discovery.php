@@ -198,19 +198,23 @@ $fields = [
 									null
 								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
+									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
+										HTTPTEST_AUTH_KERBEROS
+									]),
 									null
 								],
 	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Username')
 								],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
