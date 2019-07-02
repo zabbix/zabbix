@@ -21,6 +21,7 @@ Changes for 4.2.5rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-16263] fixed preprocessing step history is not reset when "on fail" "set value" action triggers (akozlovs)
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
 ...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
 ..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
