@@ -407,27 +407,28 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		if (value_type < ITEM_VALUE_TYPE_MAX)
 		{
 			rule = rules + value_type;
-			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
-			{
-				tmp = zbx_strdup(tmp, row[2]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
-						MACRO_TYPE_COMMON, NULL, 0);
 
-				if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
-							tmp, row[0]);
-				}
-				else if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'",
-							row[0]);
-				}
-				else
-					hk_history_item_update(rule, now, itemid, history);
+			tmp = zbx_strdup(tmp, row[2]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
+					MACRO_TYPE_COMMON, NULL, 0);
+
+			if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period '%s' for itemid '%s'",
+						tmp, row[0]);
+				continue;
 			}
-			else
-				hk_history_item_update(rule, now, itemid, *rule->poption);
+
+			if (0 != history && (ZBX_HK_HISTORY_MIN > history || ZBX_HK_PERIOD_MAX < history))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for itemid '%s'", row[0]);
+				continue;
+			}
+
+			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
+				history = *rule->poption;
+
+			hk_history_item_update(rule, now, itemid, history);
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
@@ -435,27 +436,26 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			rule = rules + (value_type == ITEM_VALUE_TYPE_FLOAT ?
 					HK_UPDATE_CACHE_OFFSET_TREND_FLOAT : HK_UPDATE_CACHE_OFFSET_TREND_UINT);
 
-			if (ZBX_HK_OPTION_DISABLED == *rule->poption_global)
-			{
-				tmp = zbx_strdup(tmp, row[3]);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
-						MACRO_TYPE_COMMON, NULL, 0);
+			tmp = zbx_strdup(tmp, row[3]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, &tmp,
+					MACRO_TYPE_COMMON, NULL, 0);
 
-				if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
-							tmp, row[0]);
-				}
-				else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'",
-							row[0]);
-				}
-				else
-					hk_history_item_update(rule, now, itemid, trends);
+			if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period '%s' for itemid '%s'",
+						tmp, row[0]);
+				continue;
 			}
-			else
-				hk_history_item_update(rule, now, itemid, *rule->poption);
+			else if (0 != trends && (ZBX_HK_TRENDS_MIN > trends || ZBX_HK_PERIOD_MAX < trends))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'", row[0]);
+				continue;
+			}
+
+			if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
+				trends = *rule->poption;
+
+			hk_history_item_update(rule, now, itemid, trends);
 		}
 	}
 	DBfree_result(result);
@@ -1046,7 +1046,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 
@@ -1054,6 +1054,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 			zbx_sleep_forever();
 		else
 			zbx_sleep_loop(sleeptime);
+
+		if (!ZBX_IS_RUNNING())
+			break;
 
 		time_now = zbx_time();
 		time_slept = time_now - sec;
@@ -1115,4 +1118,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		if (0 != CONFIG_HOUSEKEEPING_FREQUENCY)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }
