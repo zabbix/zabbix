@@ -19,6 +19,7 @@ Bug fixes:
 Changes for 4.2.5rc1
 
 New features:
+..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
 .......PS. [ZBX-16263] fixed preprocessing step history is not reset when "on fail" "set value" action triggers (akozlovs)
@@ -481,6 +482,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.11rc1
 
 New features:
+..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)

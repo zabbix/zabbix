@@ -1216,6 +1216,8 @@ output {
           margin: 3px 0; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
+    .table-forms .table-forms-td-right .wrap-multiple-controls {
+      display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
   .table-forms h4 {
