@@ -9,6 +9,7 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
+..F....... [ZBXNEXT-5249] New dashboard widget "Host availability" (rlataria)
 
 Bug fixes:
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
