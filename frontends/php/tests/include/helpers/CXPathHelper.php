@@ -33,14 +33,20 @@ class CXPathHelper {
 	 * @throws Exception
 	 */
 	public static function escapeQuotes($text) {
-		if (strpos($text, '"') !== false) {
-			return '\''.$text.'\'';
-		}
-		elseif (strpos($text, '\'') === false) {
+		if (strpos($text, '"') === false) {
 			return '"'.$text.'"';
 		}
+		elseif (strpos($text, '\'') === false) {
+			return '\''.$text.'\'';
+		}
 
-		throw new Exception('Cannot escape XPath param containing both quote and apostrophe characters.');
+		$parts = explode('"', $text);
+		foreach ($parts as &$part) {
+			$part = '"'.$part.'"';
+		}
+		unset ($part);
+
+		return 'concat('.implode(',\'"\',', $parts).')';
 	}
 
 	/**

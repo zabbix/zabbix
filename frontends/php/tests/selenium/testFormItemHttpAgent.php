@@ -557,7 +557,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -572,7 +572,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -586,7 +586,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: XML is empty.'
+						'Invalid parameter "posts": XML is expected.'
 					]
 				]
 			],
@@ -601,7 +601,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
 					]
 				]
 			],
@@ -616,7 +616,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: (73) expected \'>\''
+						'Invalid parameter "posts": (73) expected \'>\''
 					]
 				]
 			],
@@ -749,7 +749,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'JSON data',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -757,7 +757,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Cannot read XML: XML is empty.'
+						'Invalid parameter "posts": XML is expected.'
 					]
 				]
 			],
@@ -768,7 +768,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Cannot read XML: (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
 					]
 				]
 			],
