@@ -5131,10 +5131,18 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		ZBX_STR2UINT64(interfaceid, row[0]);
 
 		if (1 == update)
-				DBexecute("update interface"
-						" set useip=%d,ip='%s',dns='%s',port=%d"
-						" where interfaceid=" ZBX_FS_UI64,
-						useip,ip,dns,port,interfaceid);
+		{
+			ip_esc = DBdyn_escape_field("interface", "ip", ip);
+			dns_esc = DBdyn_escape_field("interface", "dns", dns);
+
+			DBexecute("update interface"
+					" set useip=%d,ip='%s',dns='%s',port=%d"
+					" where interfaceid=" ZBX_FS_UI64,
+					useip,ip_esc,dns_esc,port,interfaceid);
+
+			zbx_free(dns_esc);
+			zbx_free(ip_esc);
+		}
 
 		break;
 	}

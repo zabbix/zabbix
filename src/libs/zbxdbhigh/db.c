@@ -1474,7 +1474,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 						"flags=%hu,"
 						"proxy_hostid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc,autoreg_host->flag,
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->flag,
 				DBsql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
@@ -1540,7 +1540,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 	host_metadata_esc = DBdyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata, flags)"
+			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata,flags)"
 			" values"
 			" (%d,'%s','%s','%s',%d,'%s',%d)",
 			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc, (int)flag);
