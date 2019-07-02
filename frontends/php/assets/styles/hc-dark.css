@@ -3116,6 +3116,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .middle {
   vertical-align: middle; }
 
+.no-padding {
+  padding: 0; }
+
 .graph-selection {
   position: absolute;
   z-index: 98;
@@ -4907,6 +4910,34 @@ table.preprocessing-test-results .rel-container {
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 
+.host-avail-widget {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed; }
+  .host-avail-widget td {
+    padding: 0 10px;
+    vertical-align: middle; }
+  .host-avail-widget .host-avail-count {
+    font-size: 16px; }
+  .host-avail-widget.host-avail-layout-horizontal {
+    min-width: 305px; }
+    .host-avail-widget.host-avail-layout-horizontal td {
+      text-align: center; }
+    .host-avail-widget.host-avail-layout-horizontal .host-avail-count {
+      display: block; }
+  .host-avail-widget.host-avail-layout-vertical td {
+    padding-top: 3px; }
+  .host-avail-widget.host-avail-layout-vertical .host-avail-count {
+    margin-right: 5px; }
+  .host-avail-widget .host-avail-true {
+    background: #86cc89; }
+  .host-avail-widget .host-avail-false {
+    background: #e45959; }
+  .host-avail-widget .host-avail-unknown {
+    background: #97aab3; }
+  .host-avail-widget .host-avail-total {
+    background: transparent; }
+
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
@@ -5636,3 +5667,15 @@ td.inactive-bg {
   .overrides-options-list > li > div > .subfilter-disable-btn {
     border: none !important;
     top: 0; }
+
+.host-avail-widget tr {
+  border-top: 1px solid #444; }
+.host-avail-widget.host-avail-layout-horizontal td:not(:last-of-type) {
+  border-right: 1px solid #444; }
+.host-avail-widget .host-avail-count {
+  font-weight: bold; }
+.host-avail-widget .host-avail-true,
+.host-avail-widget .host-avail-false,
+.host-avail-widget .host-avail-unknown,
+.host-avail-widget .host-avail-total {
+  background: transparent; }

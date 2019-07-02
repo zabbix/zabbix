@@ -1343,6 +1343,7 @@ define('WIDGET_FAV_MAPS',		'favmaps');
 define('WIDGET_FAV_SCREENS',	'favscreens');
 define('WIDGET_SVG_GRAPH',		'svggraph');
 define('WIDGET_GRAPH',			'graph');
+define('WIDGET_HOST_AVAIL',		'hostavail');
 define('WIDGET_MAP',			'map');
 define('WIDGET_NAV_TREE',		'navtree');
 define('WIDGET_PLAIN_TEXT',		'plaintext');
@@ -1743,6 +1744,16 @@ define('ZBX_STYLE_COLUMN_95', 'column-95');
 // column visual options
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
+
+// Widget "Host availability" styles.
+define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL', 'host-avail-layout-horizontal');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL', 'host-avail-layout-vertical');
+define('ZBX_STYLE_HOST_AVAIL_COUNT', 'host-avail-count');
+define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
+define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
+define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
+define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

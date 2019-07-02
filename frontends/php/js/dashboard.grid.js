@@ -83,7 +83,8 @@
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
 			.append(widget['content_header'])
 			.append(widget['content_body'])
-			.append(widget['content_script']);
+			.append(widget['content_script'])
+			.toggleClass('no-padding', !widget['padding']);
 
 		return $('<div>', {
 			'class': 'dashbrd-grid-widget',

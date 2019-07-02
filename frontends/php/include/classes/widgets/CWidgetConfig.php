@@ -37,6 +37,8 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> _('Favourite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
+			WIDGET_GRAPH				=> _('Graph (classic)'),
+			WIDGET_HOST_AVAIL			=> _('Host availability'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
 			WIDGET_PLAIN_TEXT			=> _('Plain text'),
@@ -44,7 +46,6 @@ class CWidgetConfig {
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
 			WIDGET_SVG_GRAPH			=> _('Graph'),
-			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
@@ -69,6 +70,7 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
 			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
+			WIDGET_HOST_AVAIL			=> ['width' => 3, 'height' => 2],
 			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 3, 'height' => 3],
@@ -132,6 +134,7 @@ class CWidgetConfig {
 			case WIDGET_FAV_GRAPHS:
 			case WIDGET_FAV_MAPS:
 			case WIDGET_FAV_SCREENS:
+			case WIDGET_HOST_AVAIL:
 			case WIDGET_MAP:
 			case WIDGET_NAV_TREE:
 			case WIDGET_SYSTEM_INFO:
@@ -204,6 +207,26 @@ class CWidgetConfig {
 	}
 
 	/**
+	 * Detect if widget has bottom padding or not
+	 *
+	 * @static
+	 *
+	 * @param string $type Widget type
+	 *
+	 * @return bool
+	 */
+	public static function hasPadding($type)
+	{
+		switch ($type) {
+			case WIDGET_HOST_AVAIL:
+				return false;
+
+			default:
+				return true;
+		}
+	}
+
+	/**
 	 * Return Form object for widget with provided data.
 	 *
 	 * @static
@@ -226,6 +249,9 @@ class CWidgetConfig {
 
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
+
+			case WIDGET_HOST_AVAIL:
+				return new CWidgetFormHostAvail($data);
 
 			case WIDGET_MAP:
 				return new CWidgetFormMap($data);
