@@ -69,7 +69,6 @@ out:
 ---
 
 # Valid definite jsonpaths
-
 test case: Compile success "$.a" 
 in:
   path: $.a
@@ -642,7 +641,7 @@ out:
 ---
 test case: Compile fail $.div()
 in:
-  path: $.min(1)
+  path: $.div()
 out:
   result: FAIL 
 ---
@@ -651,6 +650,12 @@ in:
   path: $.avg().data
 out:
   result: FAIL 
+---
+test case: Compile fail $.len()
+in:
+  path: $.len()
+out:
+  result: FAIL
 ---
 test case: Compile success $.min()
 in:
@@ -691,16 +696,6 @@ out:
   segments:
     - type: ZBX_JSONPATH_SEGMENT_FUNCTION
       data: "length()"
----
-test case: Compile success $.avg( )
-in:
-  path: $.avg( )
-out:
-  result: SUCCEED 
-  definite: 1
-  segments:
-    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
-      data: "avg()"
 ---
 test case: Compile success $.first().max()
 in:

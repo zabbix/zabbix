@@ -1208,15 +1208,15 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		SKIP_WHITESPACE(end);
 		if (')' == *end)
 		{
-			if (0 == strncmp(start, "min", ptr - start))
+			if (ZBX_CONST_STRLEN("min") == ptr - start && 0 == strncmp(start, "min", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MIN;
-			else if (0 == strncmp(start, "max", ptr - start))
+			else if (ZBX_CONST_STRLEN("max") == ptr - start && 0 == strncmp(start, "max", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MAX;
-			else if (0 == strncmp(start, "avg", ptr - start))
+			else if (ZBX_CONST_STRLEN("avg") == ptr - start && 0 == strncmp(start, "avg", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_AVG;
-			else if (0 == strncmp(start, "length", ptr - start))
+			else if (ZBX_CONST_STRLEN("length") == ptr - start && 0 == strncmp(start, "length", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_LENGTH;
-			else if (0 == strncmp(start, "first", ptr - start))
+			else if (ZBX_CONST_STRLEN("first") == ptr - start && 0 == strncmp(start, "first", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_FIRST;
 			else
 				return zbx_jsonpath_error(start);
