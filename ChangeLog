@@ -1,3 +1,21 @@
+Changes for 4.0.11rc1
+
+New features:
+..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
+
+Bug fixes:
+..F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
+.......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
+...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
+..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+..F....... [ZBX-16204] fix undefined offset in CControllerWidgetProblemHostsView (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.10
+
+4.0.10rc1 was released as 4.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.10rc1
 
 New features:
@@ -8,6 +26,8 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
+........S. [ZBX-16315] fixed Zabbix server not to cause foreign key constraint failure on Zabbix proxy when changing and sending configuration at the same time (vso)
+...G...PS. [ZBX-9867] improved Zabbix daemon termination by not using signal unsafe functions in signal handler; improved Zabbix server and Zabbix proxy process termination by stopping data collection and waiting for history syncers to finish (vso)
 ..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)

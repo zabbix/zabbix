@@ -153,56 +153,62 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 
 		// Process problems.
 		foreach ($problems as $problem) {
-			$host = $hosts[$triggers[$problem['objectid']]['hosts'][0]['hostid']];
-
-			// Prepare hosts data for tables displayed in hintboxes.
-			if (!array_key_exists($host['hostid'], $hosts_data)) {
-				$hosts_data[$host['hostid']] = [
-					'host' => $host['name'],
-					'hostid' => $host['hostid'],
-					'maintenanceid' => $host['maintenanceid'],
-					'maintenance_status' => $host['maintenance_status'],
-					'maintenance_type' => $host['maintenance_type'],
-					'severities' => array_fill_keys($filter_severities, 0)
-				];
-			}
-
-			// Count number of host problems per severity.
-			$hosts_data[$host['hostid']]['severities'][$problem['severity']]++;
-
-			// Propagate problem to all host groups in which host is added.
-			foreach ($host['groups'] as $group) {
-				$groupid = $group['groupid'];
-
-				if (!array_key_exists($groupid, $groups)) {
+			foreach ($triggers[$problem['objectid']]['hosts'] as $trigger_host) {
+				if (!array_key_exists($trigger_host['hostid'], $hosts)) {
 					continue;
 				}
 
-				// Searches for the highest severity set for filtered problems in particular host group.
-				if ($problem['severity'] > $groups[$groupid]['highest_severity']) {
-					$groups[$groupid]['highest_severity'] = $problem['severity'];
+				$host = $hosts[$trigger_host['hostid']];
+
+				// Prepare hosts data for tables displayed in hintboxes.
+				if (!array_key_exists($host['hostid'], $hosts_data)) {
+					$hosts_data[$host['hostid']] = [
+						'host' => $host['name'],
+						'hostid' => $host['hostid'],
+						'maintenanceid' => $host['maintenanceid'],
+						'maintenance_status' => $host['maintenance_status'],
+						'maintenance_type' => $host['maintenance_type'],
+						'severities' => array_fill_keys($filter_severities, 0)
+					];
 				}
 
-				/**
-				 * Counts:
-				 *  - problematic hosts (hosts with events in 'problem' state);
-				 *  - unacknowledged problematic hosts (hosts with unacknowledged events in 'problem' state).
-				 *
-				 * Creates a list of problematic hosts and unacknowledged problematic hosts for each host group.
-				 *
-				 * Each host need to be counted only one time in each host group.
-				 * Host name is added for sorting.
-				 */
-				if ($filter_ext_ack != EXTACK_OPTION_UNACK
-						&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_list'])) {
-					$groups[$groupid]['hosts_problematic_list'][$host['hostid']]['name'] = $host['name'];
-					$groups[$groupid]['hosts_problematic_count']++;
-				}
+				// Count number of host problems per severity.
+				$hosts_data[$host['hostid']]['severities'][$problem['severity']]++;
 
-				if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
-						&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_unack_list'])) {
-					$groups[$groupid]['hosts_problematic_unack_list'][$host['hostid']]['name'] = $host['name'];
-					$groups[$groupid]['hosts_problematic_unack_count']++;
+				// Propagate problem to all host groups in which host is added.
+				foreach ($host['groups'] as $group) {
+					$groupid = $group['groupid'];
+
+					if (!array_key_exists($groupid, $groups)) {
+						continue;
+					}
+
+					// Searches for the highest severity set for filtered problems in particular host group.
+					if ($problem['severity'] > $groups[$groupid]['highest_severity']) {
+						$groups[$groupid]['highest_severity'] = $problem['severity'];
+					}
+
+					/**
+					 * Counts:
+					 *  - problematic hosts (hosts with events in 'problem' state);
+					 *  - unacknowledged problematic hosts (hosts with unacknowledged events in 'problem' state).
+					 *
+					 * Creates a list of problematic hosts and unacknowledged problematic hosts for each host group.
+					 *
+					 * Each host need to be counted only one time in each host group.
+					 * Host name is added for sorting.
+					 */
+					if ($filter_ext_ack != EXTACK_OPTION_UNACK
+							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_list'])) {
+						$groups[$groupid]['hosts_problematic_list'][$host['hostid']]['name'] = $host['name'];
+						$groups[$groupid]['hosts_problematic_count']++;
+					}
+
+					if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED
+							&& !array_key_exists($host['hostid'], $groups[$groupid]['hosts_problematic_unack_list'])) {
+						$groups[$groupid]['hosts_problematic_unack_list'][$host['hostid']]['name'] = $host['name'];
+						$groups[$groupid]['hosts_problematic_unack_count']++;
+					}
 				}
 			}
 		}
