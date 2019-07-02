@@ -3893,6 +3893,8 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_INTERFACE, tmp, sizeof(tmp)))
 		{
 			flag = (zbx_flag_type_t)atoi(tmp);
+			if (FLAG_TYPE_DNS != flag && FLAG_TYPE_IP != flag)
+				flag = FLAG_TYPE_DEFAULT;
 		}
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
