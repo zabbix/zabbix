@@ -229,6 +229,7 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 		{
 			results[i].action = op->error_handler;
 			ret = zbx_item_preproc_handle_error(value, op, error);
+			zbx_variant_clear(&history_value);
 		}
 		else
 			results[i].action = ZBX_PREPROC_FAIL_DEFAULT;
@@ -254,7 +255,6 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 
 		if (SUCCEED != ret)
 		{
-			zbx_variant_clear(&history_value);
 			break;
 		}
 
@@ -441,7 +441,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_PREPROCESSING, SEC_PER_MIN, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannozbx_item_preproct connect to preprocessing service: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -456,7 +456,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -482,7 +482,10 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_ipc_message_clean(&message);
 	}
 
-	zbx_es_destroy(&es_engine);
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	return 0;
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
+
+	zbx_es_destroy(&es_engine);
 }

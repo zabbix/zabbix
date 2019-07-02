@@ -1829,6 +1829,10 @@ output {
 			}
 		}
 
+		.wrap-multiple-controls {
+			display: flex;
+		}
+
 		.table-forms-separator {
 			.radio-segmented + .multiselect-wrapper {
 				margin-top: 5px;
@@ -3442,6 +3446,23 @@ $form-icon-btn: (
 .dashbrd-grid-widget {
 	display: flex;
 	position: absolute;
+
+	.dashbrd-grid-widget-actions {
+		@include opacity(0);
+		@include transition(opacity .2s ease-out);
+	}
+}
+
+.dashbrd-grid-container {
+
+	&.dashbrd-mode-edit .dashbrd-grid-widget,
+	.dashbrd-grid-widget-focus,
+	.dashbrd-grid-widget:hover {
+
+		.dashbrd-grid-widget-actions {
+			@include opacity(1);
+		}
+	}
 }
 
 .dashbrd-grid-widget-container {
