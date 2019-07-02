@@ -24,6 +24,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
 .......PS. [ZBX-16263] fixed preprocessing step history is not reset when "on fail" "set value" action triggers (akozlovs)
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
 ...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
@@ -487,6 +488,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
 ...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
 
