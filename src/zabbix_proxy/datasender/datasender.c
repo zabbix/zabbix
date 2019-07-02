@@ -133,7 +133,9 @@ static int	proxy_data_sender(int *more, int now)
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+		/* retry till have a connection */
+		if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY))
+			goto clean;
 
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
@@ -188,7 +190,7 @@ static int	proxy_data_sender(int *more, int now)
 
 		disconnect_server(&sock);
 	}
-
+clean:
 	zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	zbx_vector_ptr_destroy(&tasks);
 
@@ -226,7 +228,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
 		zbx_update_env(time_now);
@@ -244,7 +246,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			time_now = zbx_time();
 			time_diff = time_now - time_start;
 		}
-		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN);
+		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN && ZBX_IS_RUNNING());
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, time_diff,
@@ -253,4 +255,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

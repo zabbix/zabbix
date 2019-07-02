@@ -36,6 +36,7 @@ require_once dirname(__FILE__).'/elements/CSegmentedRadioElement.php';
 require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
+require_once dirname(__FILE__).'/elements/CMultilineElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -453,7 +454,8 @@ class CElementQuery implements IWaitable {
 				'/table',
 				'/*[@class="table-forms-separator"]/table'
 			],
-			'CRangeControlElement'		=> '/div[@class="range-control"]'
+			'CRangeControlElement'		=> '/div[@class="range-control"]',
+			'CMultilineElement'			=> '/div[@class="multilineinput-control"]'
 		];
 
 		if ($class !== null) {
