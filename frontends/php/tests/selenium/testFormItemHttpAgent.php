@@ -1022,7 +1022,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'SSL verify host' => false,
 				'Type of information' => 'Numeric (unsigned)',
 				'Update interval' => '30s',
-				'History storage period' => '90d',
 				'Show value' => 'As is',
 				'Enable trapping' => false,
 				'Populates host inventory field' => '-None-',

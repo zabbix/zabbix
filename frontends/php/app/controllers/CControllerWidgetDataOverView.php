@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
-
 class CControllerWidgetDataOverView extends CControllerWidget {
 
 	public function __construct() {
