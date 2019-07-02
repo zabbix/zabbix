@@ -1,6 +1,7 @@
 Changes for 4.0.11rc1
 
 New features:
+..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
