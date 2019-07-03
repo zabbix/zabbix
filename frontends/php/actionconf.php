@@ -278,7 +278,10 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 					}
 				}
 				else {
-					if ($newCondition['value'] == $condition['value']) {
+					if ((array_key_exists('value2', $newCondition) && $newCondition['value2'] == $condition['value2']
+							&& $newCondition['value'] == $condition['value'])
+								|| (!array_key_exists('value2', $newCondition)
+									&& $newCondition['value'] == $condition['value'])) {
 						$newCondition['value'] = null;
 					}
 				}
