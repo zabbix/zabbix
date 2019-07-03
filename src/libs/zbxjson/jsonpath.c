@@ -1782,7 +1782,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
 				if (FAIL == jsonpath_extract_value(jp_root, token->data, &value))
-					goto out;
+					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
@@ -1791,7 +1791,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 					goto out;
 
 				if (FAIL == jsonpath_extract_value(&jp, token->data, &value))
-					goto out;
+					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
@@ -1824,7 +1824,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 		goto out;
 	}
 
-	zbx_variant_convert(&stack.values[0], ZBX_VARIANT_DBL);
+	jsonpath_variant_to_boolean(&stack.values[0]);
 	if (SUCCEED != zbx_double_compare(stack.values[0].data.dbl, 0.0))
 		ret = jsonpath_query_next_segment(jp_root, pnext, jsonpath, path_depth, objects);
 out:

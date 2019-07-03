@@ -81,9 +81,15 @@ void	zbx_mock_test_entry(void **state)
 	{
 		printf("\tzbx_jsonpath_query() query result: %s\n", ZBX_NULL2EMPTY_STR(output));
 		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.value", &handle))
+		{
+			zbx_mock_assert_ptr_ne("Query result", NULL, output);
 			check_definite_path_result(handle, output);
+		}
 		else if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("out.values", &handle))
+		{
+			zbx_mock_assert_ptr_ne("Query result", NULL, output);
 			check_indefinite_path_result(handle, output);
+		}
 		else
 			zbx_mock_assert_ptr_eq("Query result", NULL, output);
 	}
