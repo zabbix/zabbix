@@ -524,6 +524,18 @@ out:
 	return ret;
 }
 
+/*********************************************************************************
+ *                                                                               *
+ * Function: process_config_item                                                 *
+ *                                                                               *
+ * Purpose: process configuration item and set it value to respective parameter  *
+ *                                                                               *
+ * Parameters: json   - pointer to JSON structure where to put resulting value   *
+ *             config - pointer to configuration parameter                       *
+ *             length - length of configuration parameter                        *
+ *             proto  - configuration parameter prototype                        *
+ *                                                                               *
+ ********************************************************************************/
 static void process_config_item(struct zbx_json *json, char *config, size_t length, char *proto)
 {
 	char		**value;

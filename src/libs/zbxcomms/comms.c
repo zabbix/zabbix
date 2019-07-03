@@ -184,6 +184,13 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 }
 #endif	/* HAVE_IPV6 */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_getip_by_host                                                *
+ *                                                                            *
+ * Purpose: retrieve IP addres by host name                                   *
+ *                                                                            *
+ ******************************************************************************/
 #ifdef HAVE_IPV6
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {

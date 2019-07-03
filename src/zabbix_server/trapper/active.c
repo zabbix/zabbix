@@ -39,6 +39,8 @@ extern unsigned char	program_type;
  *             ip            - [IN] IP address of the host                    *
  *             port          - [IN] port of the host                          *
  *             host_metadata - [IN] host metadata                             *
+ *             flag          - [IN] flag describing interface type            *
+ *             interface     - [IN] interface value if flag is not default    *
  *                                                                            *
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
