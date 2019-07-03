@@ -12,6 +12,7 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ..F....... [ZBXNEXT-5249] New dashboard widget "Host availability" (rlataria)
 
 Bug fixes:
+A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
@@ -25,6 +26,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
 ..F....... [ZBX-15969] fixed displaying of very small values that are more than 2 decimal points in latest data (Ivo)
 ..F....... [ZBX-16280] fixed when Plain Text Widgets do not display as HTML when option is selected (vasilijs)
 A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
@@ -491,6 +493,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
 ..F....... [ZBX-15969] fixed displaying of very small values that are more than 2 decimal points in latest data (Ivo)
 ..F....... [ZBX-16280] fixed when Plain Text Widgets do not display as HTML when option is selected (vasilijs)
 A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
