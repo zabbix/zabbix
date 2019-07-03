@@ -108,6 +108,17 @@ static int	DBpatch_4030009(void)
 	return DBdrop_field("items", "error");
 }
 
+static int	DBpatch_4030010(void)
+{
+	/* 8 - SCREEN_RESOURCE_SCREEN */
+	const char	*sql = "DELETE FROM screens_items WHERE resourcetype = 8";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -124,5 +135,6 @@ DBPATCH_ADD(4030006, 0, 1)
 DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
+DBPATCH_ADD(4030010, 0, 1)
 
 DBPATCH_END()
