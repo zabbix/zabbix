@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-02 01:43+0300\n"
+"POT-Creation-Date: 2019-06-17 13:10+0300\n"
 "PO-Revision-Date: 2019-03-13 13:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -46,7 +46,7 @@ msgstr "ожидается пара \"узел сети:ключ\""
 msgid "%1$d characters exceeds maximum length of %2$d characters"
 msgstr "%1$d символов превышают максимальную длину в %2$d символов"
 
-#: include/func.inc.php:509
+#: include/func.inc.php:510
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
@@ -323,7 +323,7 @@ msgstr "И"
 msgid "Acceptable SLA"
 msgstr "Допустимый уровень SLA"
 
-#: include/func.inc.php:1824
+#: include/func.inc.php:1825
 msgid "Access denied"
 msgstr "Доступ запрещен"
 
@@ -406,7 +406,7 @@ msgstr "Подтвержденные РЕШЁННЫЕ события"
 #: include/views/configuration.host.discovery.edit.php:516
 #: include/views/configuration.host.discovery.edit.php:615
 #: include/views/configuration.host.edit.php:546
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.httpconf.edit.php:202
 #: include/views/configuration.item.edit.php:699
 #: include/views/configuration.item.edit.php:936
@@ -598,9 +598,9 @@ msgstr "Активно до"
 #: include/views/configuration.host.edit.php:608
 #: include/views/configuration.host.edit.php:821
 #: include/views/configuration.hostgroups.edit.php:51
-#: include/views/configuration.host.prototype.edit.php:209
-#: include/views/configuration.host.prototype.edit.php:308
-#: include/views/configuration.host.prototype.edit.php:444
+#: include/views/configuration.host.prototype.edit.php:210
+#: include/views/configuration.host.prototype.edit.php:309
+#: include/views/configuration.host.prototype.edit.php:445
 #: include/views/configuration.httpconf.edit.php:122
 #: include/views/configuration.httpconf.edit.php:140
 #: include/views/configuration.httpconf.edit.php:208
@@ -622,8 +622,8 @@ msgstr "Активно до"
 #: include/views/configuration.maintenance.edit.php:224
 #: include/views/configuration.maintenance.edit.php:295
 #: include/views/configuration.services.edit.php:155
-#: include/views/configuration.services.edit.php:322
-#: include/views/configuration.services.edit.php:359
+#: include/views/configuration.services.edit.php:324
+#: include/views/configuration.services.edit.php:361
 #: include/views/configuration.template.edit.php:408
 #: include/views/configuration.template.edit.php:460
 #: include/views/configuration.trigger.prototype.edit.php:87
@@ -1017,7 +1017,7 @@ msgstr "Группа элементов данных с applicationid \"%1$s\" �
 #: include/views/configuration.application.list.php:23
 #: include/views/configuration.host.edit.php:304
 #: include/views/configuration.host.list.php:129
-#: include/views/configuration.host.list.php:320
+#: include/views/configuration.host.list.php:333
 #: include/views/configuration.item.edit.php:886
 #: include/views/configuration.item.list.php:70
 #: include/views/configuration.item.prototype.edit.php:734
@@ -1101,14 +1101,6 @@ msgstr "Как простой текст"
 msgid "Asset tag"
 msgstr "Этикетка владельца"
 
-#: cachewarning.php:40
-msgid "Assets cache directory is not writable."
-msgstr ""
-
-#: include/classes/setup/CFrontendSetup.php:672
-msgid "Assets cache directory permissions"
-msgstr ""
-
 #: include/maintenances.inc.php:76
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
@@ -1156,7 +1148,7 @@ msgstr "Должен существовать по крайней мере од�
 msgid "At least one maintenance period must be created."
 msgstr "Должен быть создан по крайней мере один период обслуживания."
 
-#: include/classes/setup/CFrontendSetup.php:256
+#: include/classes/setup/CFrontendSetup.php:255
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "Должна поддерживаться по крайней мере одна база данных из MySQL, PostgreSQL, Oracle или IBM DB2."
 
@@ -1232,7 +1224,7 @@ msgid "Authentication"
 msgstr "Аутентификация"
 
 #: include/views/configuration.host.edit.php:664
-#: include/views/configuration.host.prototype.edit.php:327
+#: include/views/configuration.host.prototype.edit.php:328
 msgid "Authentication algorithm"
 msgstr "Алгоритм аутентификации"
 
@@ -1316,7 +1308,7 @@ msgstr "Период хранения данных о событиях авто�
 #: include/views/configuration.action.edit.php:1075
 #: include/views/configuration.host.edit.php:693
 #: include/views/configuration.host.massupdate.php:275
-#: include/views/configuration.host.prototype.edit.php:367
+#: include/views/configuration.host.prototype.edit.php:368
 msgid "Automatic"
 msgstr "Автоматически"
 
@@ -1402,7 +1394,7 @@ msgstr "Мигание"
 msgid "Blocked"
 msgstr "Заблокирован"
 
-#: include/classes/core/ZBase.php:284
+#: include/classes/core/ZBase.php:265
 msgid "Blue"
 msgstr "Голубая"
 
@@ -1473,14 +1465,14 @@ msgstr "По шаблону триггера"
 
 #: app/views/administration.proxy.list.php:119
 #: app/views/administration.proxy.list.php:132
-#: include/views/configuration.host.list.php:287
-#: include/views/configuration.host.list.php:307
-#: include/views/configuration.host.list.php:310
+#: include/views/configuration.host.list.php:300
+#: include/views/configuration.host.list.php:320
+#: include/views/configuration.host.list.php:323
 msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:1002
+#: include/classes/graph/CSvgGraph.php:977
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -2979,11 +2971,11 @@ msgstr "Регистрозависимое имя входа"
 msgid "Catalan (ca_ES)"
 msgstr "Каталонский (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:929
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Отлов всех SNMP трапов, которые совпадают с регулярным выражением. Если регулярное выражение не задано, под условие попадают все трапы."
 
-#: include/classes/items/CHelpItems.php:905
+#: include/classes/items/CHelpItems.php:925
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных snmptrap[]."
 
@@ -2998,8 +2990,8 @@ msgstr "По центру"
 #: include/views/configuration.host.edit.php:777
 #: include/views/configuration.host.massupdate.php:324
 #: include/views/configuration.host.massupdate.php:332
-#: include/views/configuration.host.prototype.edit.php:380
-#: include/views/configuration.host.prototype.edit.php:396
+#: include/views/configuration.host.prototype.edit.php:381
+#: include/views/configuration.host.prototype.edit.php:397
 msgid "Certificate"
 msgstr "Сертификат"
 
@@ -3211,7 +3203,7 @@ msgstr "Часы"
 #: include/views/configuration.host.discovery.edit.php:693
 #: include/views/configuration.host.edit.php:812
 #: include/views/configuration.hostgroups.edit.php:58
-#: include/views/configuration.host.prototype.edit.php:436
+#: include/views/configuration.host.prototype.edit.php:437
 #: include/views/configuration.httpconf.edit.php:237
 #: include/views/configuration.item.edit.php:1060
 #: include/views/configuration.item.prototype.edit.php:894
@@ -3225,7 +3217,7 @@ msgstr "Часы"
 msgid "Clone"
 msgstr "Клонировать"
 
-#: include/func.inc.php:1938 include/views/js/monitoring.sysmaps.js.php:274
+#: include/func.inc.php:1939 include/views/js/monitoring.sysmaps.js.php:274
 #: include/views/js/monitoring.sysmaps.js.php:422
 #: include/views/js/monitoring.sysmaps.js.php:542
 #: include/views/js/monitoring.sysmaps.js.php:637
@@ -3386,7 +3378,7 @@ msgstr "Дубликаты условий для корреляции \"%1$s\"."
 msgid "Configuration"
 msgstr "Настройка"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1011
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Статистика конфигурационного кэша. Кэш - буфер (режимы: pfree, total, used, free)."
 
@@ -3633,7 +3625,7 @@ msgstr "Соединения"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:327
-#: include/views/configuration.host.prototype.edit.php:384
+#: include/views/configuration.host.prototype.edit.php:385
 msgid "Connections from host"
 msgstr "Соединения с узла сети"
 
@@ -3643,7 +3635,7 @@ msgstr "Соединения с прокси"
 
 #: include/views/configuration.host.edit.php:757
 #: include/views/configuration.host.massupdate.php:320
-#: include/views/configuration.host.prototype.edit.php:376
+#: include/views/configuration.host.prototype.edit.php:377
 msgid "Connections to host"
 msgstr "Подключения к узлу сети"
 
@@ -4142,7 +4134,7 @@ msgstr "DNS имя"
 msgid "Daily"
 msgstr "Ежедневно"
 
-#: include/classes/core/ZBase.php:285
+#: include/classes/core/ZBase.php:266
 msgid "Dark"
 msgstr "Темная"
 
@@ -4204,7 +4196,7 @@ msgstr "Пунктирная линия"
 msgid "Data"
 msgstr "Данные"
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1055
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trends (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
@@ -4300,7 +4292,7 @@ msgstr "Дата покупки HW"
 msgid "Day"
 msgstr "День"
 
-#: include/func.inc.php:2693
+#: include/func.inc.php:2694
 msgid "Day before yesterday"
 msgstr "За день до вчера"
 
@@ -4434,7 +4426,7 @@ msgstr "Задерживается на"
 #: include/views/configuration.graph.list.php:152
 #: include/views/configuration.host.discovery.list.php:156
 #: include/views/configuration.hostgroups.list.php:156
-#: include/views/configuration.host.list.php:361
+#: include/views/configuration.host.list.php:374
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.httpconf.list.php:170
 #: include/views/configuration.item.list.php:252
@@ -4601,7 +4593,7 @@ msgstr "Удалить выбранные группы?"
 msgid "Delete selected host groups?"
 msgstr "Удалить выбранные группы узлов сети?"
 
-#: include/views/configuration.host.prototype.edit.php:428
+#: include/views/configuration.host.prototype.edit.php:429
 msgid "Delete selected host prototype?"
 msgstr "Удалить выбранный прототип узлов сети?"
 
@@ -4613,7 +4605,7 @@ msgstr "Удалить выбранные прототипы узлов сети
 msgid "Delete selected host?"
 msgstr "Удалить выбранный узел сети?"
 
-#: include/views/configuration.host.list.php:361
+#: include/views/configuration.host.list.php:374
 msgid "Delete selected hosts?"
 msgstr "Удалить выбранные узлы сети?"
 
@@ -4763,7 +4755,7 @@ msgstr "Разделитель"
 msgid "Deny"
 msgstr "Запрещено"
 
-#: include/views/configuration.services.edit.php:339
+#: include/views/configuration.services.edit.php:341
 #: include/views/configuration.trigger.prototype.edit.php:587
 #: include/views/configuration.trigger.prototype.edit.php:622
 #: include/views/configuration.triggers.edit.php:615
@@ -4817,7 +4809,7 @@ msgid "Description updated"
 msgstr "Описание обновлено"
 
 #: app/views/administration.mediatype.list.php:68 include/blocks.inc.php:427
-#: include/func.inc.php:1893
+#: include/func.inc.php:1894
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
@@ -4849,11 +4841,6 @@ msgstr "Критерий уникальности устройства"
 msgid "Dimension (cols x rows)"
 msgstr "Размер (столбцов x строк)"
 
-#: include/classes/setup/CFrontendSetup.php:676
-#, c-format
-msgid "Directory \"%1$s\" must be writable."
-msgstr ""
-
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:587
 msgid "Directory size (in bytes). Returns integer"
@@ -4867,7 +4854,7 @@ msgstr "Размер директории (в байтах). Возвращае�
 #: include/views/configuration.correlation.list.php:127
 #: include/views/configuration.discovery.list.php:97
 #: include/views/configuration.host.discovery.list.php:152
-#: include/views/configuration.host.list.php:358
+#: include/views/configuration.host.list.php:371
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.list.php:245
 #: include/views/configuration.triggers.list.php:300
@@ -4886,7 +4873,7 @@ msgstr "Деактивировать режим отладки у выбранн
 msgid "Disable host"
 msgstr "Деактивировать узел сети"
 
-#: include/views/configuration.host.list.php:190
+#: include/views/configuration.host.list.php:196
 msgid "Disable host?"
 msgstr "Деактивировать узел сети?"
 
@@ -4924,7 +4911,7 @@ msgstr "Деактивировать выбранные правила обна�
 msgid "Disable selected groups?"
 msgstr "Деактивировать выбранные группы?"
 
-#: include/views/configuration.host.list.php:358
+#: include/views/configuration.host.list.php:371
 msgid "Disable selected hosts?"
 msgstr "Деактивировать выбранные узлы сети?"
 
@@ -4965,10 +4952,10 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: include/views/configuration.correlation.list.php:96
 #: include/views/configuration.discovery.list.php:45
 #: include/views/configuration.host.edit.php:691
-#: include/views/configuration.host.list.php:194
+#: include/views/configuration.host.list.php:200
 #: include/views/configuration.host.massupdate.php:186
 #: include/views/configuration.host.massupdate.php:273
-#: include/views/configuration.host.prototype.edit.php:365
+#: include/views/configuration.host.prototype.edit.php:366
 #: include/views/js/monitoring.sysmaps.js.php:233
 msgid "Disabled"
 msgstr "Деактивировано"
@@ -5000,7 +4987,7 @@ msgstr "Обнаруженные элементы данных"
 #: include/forms.inc.php:476 include/forms.inc.php:867 include/menu.inc.php:98
 #: include/menu.inc.php:224 include/views/configuration.action.list.php:33
 #: include/views/configuration.host.list.php:133
-#: include/views/configuration.host.list.php:336
+#: include/views/configuration.host.list.php:349
 #: include/views/configuration.template.list.php:91
 #: include/views/configuration.template.list.php:204
 #: include/views/inventory.host.view.php:157
@@ -5145,13 +5132,13 @@ msgid "Display stacked graph"
 msgstr "Показать стэкируемый график"
 
 #: include/actions.inc.php:1792 include/actions.inc.php:1864
-#: include/actions.inc.php:1955 include/func.inc.php:1702 jsLoader.php:294
+#: include/actions.inc.php:1955 include/func.inc.php:1703 jsLoader.php:294
 #: queue.php:298 search.php:256 search.php:356 search.php:498
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Отображено %1$s из %2$s найденных"
 
-#: include/func.inc.php:1705
+#: include/func.inc.php:1706
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "Отображено с %1$s до %2$s из %3$s найденных"
@@ -5191,7 +5178,7 @@ msgstr "Загрузить конфигурационный файл"
 #: app/views/report.services.php:68 app/views/report.services.php:69
 #: include/classes/screens/CScreenDiscovery.php:120
 #: include/views/configuration.services.edit.php:183
-#: include/views/configuration.services.edit.php:229
+#: include/views/configuration.services.edit.php:231
 msgid "Downtime"
 msgstr "Недоступен"
 
@@ -5553,7 +5540,7 @@ msgstr "Пустой ID комплексного экрана."
 #: include/views/configuration.correlation.list.php:126
 #: include/views/configuration.discovery.list.php:96
 #: include/views/configuration.host.discovery.list.php:149
-#: include/views/configuration.host.list.php:357
+#: include/views/configuration.host.list.php:370
 #: include/views/configuration.httpconf.list.php:165
 #: include/views/configuration.item.list.php:244
 #: include/views/configuration.triggers.list.php:299
@@ -5584,7 +5571,7 @@ msgstr "Активировать режим отладки для выбранн
 msgid "Enable host"
 msgstr "Активировать узел сети"
 
-#: include/views/configuration.host.list.php:196
+#: include/views/configuration.host.list.php:202
 msgid "Enable host?"
 msgstr "Активировать узел сети?"
 
@@ -5630,7 +5617,7 @@ msgid "Enable selected groups?"
 msgstr "Активировать выбранные группы?"
 
 #: include/views/configuration.hostgroups.list.php:152
-#: include/views/configuration.host.list.php:357
+#: include/views/configuration.host.list.php:370
 msgid "Enable selected hosts?"
 msgstr "Активировать выбранные узлы сети?"
 
@@ -5685,7 +5672,7 @@ msgstr "Активировать трапы"
 #: include/views/configuration.discovery.list.php:44
 #: include/views/configuration.host.discovery.edit.php:584
 #: include/views/configuration.host.edit.php:280
-#: include/views/configuration.host.list.php:186
+#: include/views/configuration.host.list.php:194
 #: include/views/configuration.host.massupdate.php:185
 #: include/views/configuration.httpconf.edit.php:150
 #: include/views/configuration.item.edit.php:927
@@ -5697,7 +5684,7 @@ msgstr "Активировано"
 #: app/views/administration.proxy.list.php:66
 #: include/views/configuration.host.edit.php:802
 #: include/views/configuration.host.massupdate.php:367
-#: include/views/configuration.host.prototype.edit.php:421
+#: include/views/configuration.host.prototype.edit.php:422
 msgid "Encryption"
 msgstr "Шифрование"
 
@@ -5731,7 +5718,7 @@ msgstr "Ошибка"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Ошибка в запросе поиска в таблицу \"%1$s\"."
 
-#: include/func.inc.php:1932
+#: include/func.inc.php:1933
 msgid "Error message"
 msgstr "Сообщение об ошибке"
 
@@ -5889,7 +5876,7 @@ msgid "Exploded"
 msgstr "Расширенный круговой"
 
 #: include/views/administration.general.valuemapping.list.php:73
-#: include/views/configuration.host.list.php:359
+#: include/views/configuration.host.list.php:372
 #: include/views/configuration.template.list.php:221
 #: include/views/monitoring.screen.list.php:116
 #: include/views/monitoring.sysmap.list.php:91
@@ -6215,7 +6202,7 @@ msgstr "Финиш"
 msgid "Finnish (fi_FI)"
 msgstr "Финский (fi_FI)"
 
-#: include/func.inc.php:1662
+#: include/func.inc.php:1663
 msgctxt "page navigation"
 msgid "First"
 msgstr "Первая"
@@ -6293,8 +6280,8 @@ msgstr "Пятница"
 
 #: app/views/report.services.php:68 include/classes/html/CFilter.php:282
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
-#: include/views/configuration.services.edit.php:243
-#: include/views/configuration.services.edit.php:289
+#: include/views/configuration.services.edit.php:245
+#: include/views/configuration.services.edit.php:291
 #: include/views/js/monitoring.sysmaps.js.php:669 report4.php:195
 #: services.php:47 services.php:182
 msgid "From"
@@ -6414,7 +6401,7 @@ msgstr "Вернуться к %1$s"
 msgid "Go to"
 msgstr "Перейти к"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1837
+#: app/views/system.warning.php:26 include/func.inc.php:1838
 msgid "Go to dashboard"
 msgstr "Перейти на ПАНЕЛЬ"
 
@@ -6606,7 +6593,7 @@ msgstr "График с таким же именем, но другого тип
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:387
 #: include/views/configuration.host.list.php:132
-#: include/views/configuration.host.list.php:332
+#: include/views/configuration.host.list.php:345
 #: include/views/configuration.template.edit.php:196
 #: include/views/configuration.template.list.php:89
 #: include/views/configuration.template.list.php:196
@@ -6712,7 +6699,7 @@ msgstr "Имя группы"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "Прототип группы не может основываться на обнаруженной группе узлов сети \"%1$s\"."
 
-#: include/views/configuration.host.prototype.edit.php:217
+#: include/views/configuration.host.prototype.edit.php:218
 msgid "Group prototypes"
 msgstr "Прототипы групп"
 
@@ -6727,8 +6714,8 @@ msgstr "Сгруппировать по"
 #: include/views/administration.users.edit.php:80
 #: include/views/administration.users.list.php:87
 #: include/views/configuration.host.edit.php:73
-#: include/views/configuration.host.prototype.edit.php:183
-#: include/views/configuration.host.prototype.edit.php:219
+#: include/views/configuration.host.prototype.edit.php:184
+#: include/views/configuration.host.prototype.edit.php:220
 #: include/views/configuration.template.edit.php:89
 #: include/views/conf.import.php:28
 msgid "Groups"
@@ -6862,11 +6849,11 @@ msgstr "Иерархия"
 msgid "High"
 msgstr "Высокая"
 
-#: include/classes/core/ZBase.php:287
+#: include/classes/core/ZBase.php:268
 msgid "High-contrast dark"
 msgstr "Высококонтрастная тёмная"
 
-#: include/classes/core/ZBase.php:286
+#: include/classes/core/ZBase.php:267
 msgid "High-contrast light"
 msgstr "Высококонтрастная светлая"
 
@@ -7134,7 +7121,7 @@ msgstr "Интерфейс узла сети"
 #: app/views/monitoring.problem.view.php:282 hostinventories.php:26
 #: include/views/common.filter.trigger.php:123
 #: include/views/configuration.host.edit.php:753
-#: include/views/configuration.host.prototype.edit.php:372
+#: include/views/configuration.host.prototype.edit.php:373
 #: include/views/inventory.host.list.php:23
 #: include/views/inventory.host.view.php:214 jsLoader.php:251
 msgid "Host inventory"
@@ -7386,7 +7373,7 @@ msgstr "Диапазон IP \"%1$s\" превышает допустимый л�
 #: include/views/configuration.action.edit.php:2156
 #: include/views/configuration.host.edit.php:662
 #: include/views/configuration.host.massupdate.php:361
-#: include/views/configuration.host.prototype.edit.php:342
+#: include/views/configuration.host.prototype.edit.php:343
 msgid "IPMI"
 msgstr "IPMI"
 
@@ -7501,7 +7488,7 @@ msgstr "Иконки"
 msgid "Identification of the system. Returns string"
 msgstr "Идентификация системы. Возвращает строку"
 
-#: include/func.inc.php:1827 include/func.inc.php:1846
+#: include/func.inc.php:1828 include/func.inc.php:1847
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Если вы считаете это сообщение ошибкой, пожалуйста, свяжитесь с вашими администраторами для получения прав доступа."
 
@@ -7591,7 +7578,7 @@ msgstr "Импортировано успешно"
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Невозможно отфильтровать по несуществующему полю инвентарных данных \"%s\"."
 
-#: include/html.inc.php:324 include/views/configuration.host.list.php:182
+#: include/html.inc.php:324
 msgid "In maintenance"
 msgstr "В обслуживании"
 
@@ -7605,6 +7592,7 @@ msgid "Inaccessible graph"
 msgstr "Недоступный график"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:239
+#: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Недоступная группа"
 
@@ -7618,6 +7606,7 @@ msgstr "Недоступный элемент данных"
 
 #: include/classes/screens/CScreenProblem.php:414
 #: include/hostgroups.inc.php:291 include/triggers.inc.php:2326
+#: include/views/configuration.host.list.php:190
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr "Недоступное обслуживание"
@@ -8781,10 +8770,6 @@ msgstr "Инсталляция"
 msgid "Installer name"
 msgstr "Имя установщика"
 
-#: cachewarning.php:38
-msgid "Insufficient file system permissions."
-msgstr ""
-
 #: app/views/administration.proxy.edit.php:70 disc_prototypes.php:39
 #: host_discovery.php:47 include/views/configuration.host.list.php:135
 #: items.php:38
@@ -9199,7 +9184,7 @@ msgstr "Проблема"
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:793
 #: include/views/configuration.host.massupdate.php:340
-#: include/views/configuration.host.prototype.edit.php:410
+#: include/views/configuration.host.prototype.edit.php:411
 msgid "Issuer"
 msgstr "Издатель"
 
@@ -9446,7 +9431,7 @@ msgstr "Элемент данных с ключом \"%1$s\" уже сущест
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:327
 #: include/views/configuration.host.list.php:130
-#: include/views/configuration.host.list.php:324
+#: include/views/configuration.host.list.php:337
 #: include/views/configuration.item.edit.php:22
 #: include/views/configuration.item.list.php:25
 #: include/views/configuration.item.massupdate.php:22
@@ -9662,12 +9647,12 @@ msgstr "Язык"
 msgid "Language \"%1$s\" is not supported."
 msgstr ""
 
-#: include/func.inc.php:1689
+#: include/func.inc.php:1690
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Последняя"
 
-#: include/func.inc.php:2746
+#: include/func.inc.php:2747
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
@@ -9675,7 +9660,7 @@ msgstr[0] "Последний %1$d день"
 msgstr[1] "Последние %1$d дня"
 msgstr[2] "Последние %1$d дней"
 
-#: include/func.inc.php:2740
+#: include/func.inc.php:2741
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
@@ -9683,7 +9668,7 @@ msgstr[0] "Последний %1$d час"
 msgstr[1] "Последние %1$d часа"
 msgstr[2] "Последние %1$d часов"
 
-#: include/func.inc.php:2733
+#: include/func.inc.php:2734
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
@@ -9691,7 +9676,7 @@ msgstr[0] "Последняя %1$d минута"
 msgstr[1] "Последние %1$d минуты"
 msgstr[2] "Последние %1$d минут"
 
-#: include/func.inc.php:2749
+#: include/func.inc.php:2750
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
@@ -9699,7 +9684,7 @@ msgstr[0] "Последний %1$d месяц"
 msgstr[1] "Последние %1$d месяца"
 msgstr[2] "Последние %1$d месяцев"
 
-#: include/func.inc.php:2726
+#: include/func.inc.php:2727
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
@@ -9707,7 +9692,7 @@ msgstr[0] "Последняя %1$d секунда"
 msgstr[1] "Последние %1$d секунды"
 msgstr[2] "Последние %1$d секунд"
 
-#: include/func.inc.php:2752
+#: include/func.inc.php:2753
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
@@ -9857,7 +9842,7 @@ msgid "Link indicators"
 msgstr "Индикаторы связи"
 
 #: include/views/configuration.host.edit.php:613
-#: include/views/configuration.host.prototype.edit.php:313
+#: include/views/configuration.host.prototype.edit.php:314
 #: include/views/configuration.template.edit.php:413
 msgid "Link new templates"
 msgstr "Соединить с новыми шаблонами"
@@ -9892,8 +9877,8 @@ msgstr "Связанная карта"
 
 #: include/views/configuration.host.edit.php:583
 #: include/views/configuration.host.edit.php:633
-#: include/views/configuration.host.prototype.edit.php:244
-#: include/views/configuration.host.prototype.edit.php:283
+#: include/views/configuration.host.prototype.edit.php:245
+#: include/views/configuration.host.prototype.edit.php:284
 #: include/views/configuration.template.edit.php:382
 #: include/views/configuration.template.edit.php:419
 #: include/views/configuration.template.list.php:32
@@ -10007,7 +9992,7 @@ msgid "Log unmatched SNMP traps"
 msgstr "Журналировать не совпадающие SNMP трапы"
 
 #: app/views/administration.authentication.edit.php:123 auditlogs.php:138
-#: include/func.inc.php:1834 include/func.inc.php:1849
+#: include/func.inc.php:1835 include/func.inc.php:1850
 #: include/menu.inc.php:292 include/views/administration.auditlogs.list.php:44
 #: include/views/administration.users.list.php:89 index_http.php:91
 msgid "Login"
@@ -10106,7 +10091,7 @@ msgstr "Макроса с hostmacroid \"%1$s\" не существует."
 #: include/views/administration.general.macros.edit.php:25
 #: include/views/administration.general.macros.edit.php:80
 #: include/views/configuration.host.edit.php:685
-#: include/views/configuration.host.prototype.edit.php:359
+#: include/views/configuration.host.prototype.edit.php:360
 #: include/views/configuration.template.edit.php:437
 msgid "Macros"
 msgstr "Макросы"
@@ -10212,7 +10197,7 @@ msgstr "Пропущен обязательный параметр."
 #: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.edit.php:692
 #: include/views/configuration.host.massupdate.php:274
-#: include/views/configuration.host.prototype.edit.php:366
+#: include/views/configuration.host.prototype.edit.php:367
 msgid "Manual"
 msgstr "Вручную"
 
@@ -10342,7 +10327,7 @@ msgid "Mask"
 msgstr "Маска"
 
 #: include/classes/screens/CScreenProblem.php:1111
-#: include/views/configuration.host.list.php:360
+#: include/views/configuration.host.list.php:373
 #: include/views/configuration.item.list.php:251
 #: include/views/configuration.item.massupdate.php:717
 #: include/views/configuration.trigger.prototype.list.php:162
@@ -10561,32 +10546,32 @@ msgstr "По середине"
 msgid "Min"
 msgstr "Мин"
 
-#: include/classes/setup/CFrontendSetup.php:129
+#: include/classes/setup/CFrontendSetup.php:128
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
 msgstr "Минимально требуемый лимит памяти в PHP - %s (опция конфигурации \"memory_limit\")."
 
-#: include/classes/setup/CFrontendSetup.php:165
+#: include/classes/setup/CFrontendSetup.php:164
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
 msgstr "Минимально требуемый размер загружаемого файла в PHP - %s (опция конфигурации \"upload_max_filesize\")."
 
-#: include/classes/setup/CFrontendSetup.php:111
+#: include/classes/setup/CFrontendSetup.php:110
 #, c-format
 msgid "Minimum required PHP version is %s."
 msgstr "Минимально требуемая версия PHP - %s."
 
-#: include/classes/setup/CFrontendSetup.php:195
+#: include/classes/setup/CFrontendSetup.php:194
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
 msgstr "Минимально требуемый лимит выполнения PHP скриптов - %s (опция конфигурации \"max_execution_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:216
+#: include/classes/setup/CFrontendSetup.php:215
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
 msgstr "Минимально требуемый лимит времени разбора входящих данных для PHP скриптов - %s (опция конфигурации \"max_input_time\")."
 
-#: include/classes/setup/CFrontendSetup.php:147
+#: include/classes/setup/CFrontendSetup.php:146
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
 msgstr "Минимально требуемый размер PHP post - %s (опция конфигурации \"post_max_size\")."
@@ -10836,8 +10821,8 @@ msgstr "NTLM"
 #: include/views/configuration.hostgroups.list.php:57
 #: include/views/configuration.host.list.php:59
 #: include/views/configuration.host.list.php:128
-#: include/views/configuration.host.prototype.edit.php:227
-#: include/views/configuration.host.prototype.edit.php:255
+#: include/views/configuration.host.prototype.edit.php:228
+#: include/views/configuration.host.prototype.edit.php:256
 #: include/views/configuration.host.prototype.list.php:53
 #: include/views/configuration.httpconf.edit.php:59
 #: include/views/configuration.httpconf.edit.php:119
@@ -11003,7 +10988,7 @@ msgstr "Новая операция"
 msgid "New regular expression"
 msgstr "Новое регулярное выражение"
 
-#: include/views/configuration.services.edit.php:319
+#: include/views/configuration.services.edit.php:321
 msgid "New service time"
 msgstr "Новый интервал времени услуги"
 
@@ -11221,8 +11206,8 @@ msgstr "ID правил обнаружения не указаны."
 #: include/views/configuration.host.edit.php:769
 #: include/views/configuration.host.massupdate.php:322
 #: include/views/configuration.host.massupdate.php:330
-#: include/views/configuration.host.prototype.edit.php:378
-#: include/views/configuration.host.prototype.edit.php:388
+#: include/views/configuration.host.prototype.edit.php:379
+#: include/views/configuration.host.prototype.edit.php:389
 msgid "No encryption"
 msgstr "Без шифрования"
 
@@ -11509,7 +11494,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1802 items.php:1403 items.php:1586 services.php:84
+#: include/func.inc.php:1803 items.php:1403 items.php:1586 services.php:84
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Нет прав доступа к запрашиваемому объекту или он не существует!"
 
@@ -11594,10 +11579,10 @@ msgstr "Не-логические флаги устарели."
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.usergroups.edit.php:159
 #: include/views/configuration.host.discovery.edit.php:284
-#: include/views/configuration.host.list.php:275
-#: include/views/configuration.host.list.php:281
-#: include/views/configuration.host.list.php:293
-#: include/views/configuration.host.list.php:296
+#: include/views/configuration.host.list.php:288
+#: include/views/configuration.host.list.php:294
+#: include/views/configuration.host.list.php:306
+#: include/views/configuration.host.list.php:309
 #: include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.edit.php:880
 #: include/views/configuration.item.edit.php:894
@@ -11663,7 +11648,7 @@ msgstr "Не поддерживается"
 
 #: app/views/popup.services.php:67
 #: include/views/configuration.services.edit.php:170
-#: include/views/configuration.services.edit.php:237
+#: include/views/configuration.services.edit.php:239
 #: include/views/configuration.services.parent.list.php:57
 msgid "Note"
 msgstr "Заметка"
@@ -11707,7 +11692,7 @@ msgstr "Ноябрь"
 msgid "Number of CPUs. Returns integer"
 msgstr "Количество CPU. Возвращает целое число"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of enabled items on the host."
 msgstr "Количество активированных элементов данных у узла сети."
 
@@ -11719,25 +11704,25 @@ msgstr "Количество узлов сети (активированных/�
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Количество элементов данных (активированных/деактивированных/неподдерживаемых)"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:983
 msgid "Number of items in Zabbix database."
 msgstr "Количество элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:1003
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые еще не были отправлены на сервер"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:1007
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Количество элементов данных в очереди, которые задерживаются от и до секунд, включительно."
 
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:659
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1023
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:979
 msgid "Number of monitored hosts"
 msgstr "Количество наблюдаемых узлов сети"
 
@@ -11754,15 +11739,15 @@ msgstr "Количество проблем"
 msgid "Number of problems and expand most critical one"
 msgstr "Количество проблем и раскрывать наиболее критичную"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:763
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество ядер процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:767
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество потоков процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Количество процессоров виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -11787,15 +11772,15 @@ msgstr "Количество шагов"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Количество триггеров (активированных/деактивированных [проблема/ок])"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1035
 msgid "Number of triggers in Zabbix database."
 msgstr "Количество триггеров в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:987
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Количество неподдерживаемых элементов данных в базе данных Zabbix."
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of unsupported items on the host."
 msgstr "Количество неподдерживаемых элементов данных у узла сети."
 
@@ -11808,35 +11793,35 @@ msgstr "Количество пользователей (в сети)"
 msgid "Number of users logged in. Returns integer"
 msgstr "Количество пользователей в системе. Возвращает число"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:939
 msgid "Number of values stored in table HISTORY."
 msgstr "Количество значений записанных в таблице HISTORY."
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:943
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Количество значений записанных в таблице HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:947
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Количество значений записанных в таблице HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:951
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Количество значений записанных в таблице HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Количество значений записанных в таблице HISTORY_UINT."
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1027
 msgid "Number of values stored in table TRENDS."
 msgstr "Количество значений записанных в таблице TRENDS."
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1031
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Количество значений записанных в таблице TRENDS_UINT."
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
@@ -11988,7 +11973,7 @@ msgid "One time only"
 msgstr "Единовременно"
 
 #: include/views/configuration.services.edit.php:189
-#: include/views/configuration.services.edit.php:230
+#: include/views/configuration.services.edit.php:232
 msgid "One-time downtime"
 msgstr "Однократная недоступность"
 
@@ -12293,152 +12278,152 @@ msgstr "Обзор по прокси"
 msgid "Owner"
 msgstr "Владелец"
 
-#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:556
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
 
-#: include/classes/setup/CFrontendSetup.php:561
+#: include/classes/setup/CFrontendSetup.php:560
 #: include/classes/validators/CLdapAuthValidator.php:69
 msgid "PHP LDAP extension missing."
 msgstr "Отсутствует расширение PHP LDAP."
 
-#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:310
 msgid "PHP bcmath"
 msgstr "PHP bcmath"
 
-#: include/classes/setup/CFrontendSetup.php:315
+#: include/classes/setup/CFrontendSetup.php:314
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "Расширение PHP bcmath отсутствует (параметр конфигурации PHP --enable-bcmath)."
 
-#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:583
 msgid "PHP ctype"
 msgstr "PHP ctype"
 
-#: include/classes/setup/CFrontendSetup.php:588
+#: include/classes/setup/CFrontendSetup.php:587
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "Расширение PHP ctype отсутствует (параметр конфигурации PHP --enable-ctype)."
 
-#: include/classes/setup/CFrontendSetup.php:252
+#: include/classes/setup/CFrontendSetup.php:251
 msgid "PHP databases support"
 msgstr "Поддержка баз данных PHP"
 
-#: include/classes/setup/CFrontendSetup.php:412
+#: include/classes/setup/CFrontendSetup.php:411
 msgid "PHP gd"
 msgstr "PHP gd"
 
-#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:482
 msgid "PHP gd FreeType support"
 msgstr "Поддержка PHP gd FreeType"
 
-#: include/classes/setup/CFrontendSetup.php:487
+#: include/classes/setup/CFrontendSetup.php:486
 msgid "PHP gd FreeType support missing."
 msgstr "Поддержка PHP gd FreeType отсутствует."
 
-#: include/classes/setup/CFrontendSetup.php:464
+#: include/classes/setup/CFrontendSetup.php:463
 msgid "PHP gd JPEG image support missing."
 msgstr "Поддержка PHP gd JPEG изображений отсутствует."
 
-#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:459
 msgid "PHP gd JPEG support"
 msgstr "Поддержка PHP gd JPEG"
 
-#: include/classes/setup/CFrontendSetup.php:439
+#: include/classes/setup/CFrontendSetup.php:438
 msgid "PHP gd PNG image support missing."
 msgstr "Поддержка PHP gd PNG изображений отсутствует."
 
-#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:434
 msgid "PHP gd PNG support"
 msgstr "Поддержка PHP gd PNG"
 
-#: include/classes/setup/CFrontendSetup.php:416
+#: include/classes/setup/CFrontendSetup.php:415
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)."
 msgstr "Отсутствует расширение PHP gd (параметр конфигурации PHP --with-gd)."
 
-#: include/classes/setup/CFrontendSetup.php:635
+#: include/classes/setup/CFrontendSetup.php:634
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/classes/setup/CFrontendSetup.php:639
+#: include/classes/setup/CFrontendSetup.php:638
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
 msgstr "Отсутствует расширение PHP gettext (параметр конфигурации PHP --with-gettext). Переводы недоступны."
 
-#: include/classes/setup/CFrontendSetup.php:506
+#: include/classes/setup/CFrontendSetup.php:505
 msgid "PHP libxml"
 msgstr "PHP libxml"
 
-#: include/classes/setup/CFrontendSetup.php:510
+#: include/classes/setup/CFrontendSetup.php:509
 msgid "PHP libxml extension missing."
 msgstr "Расширение PHP libxml отсутствует."
 
-#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:327
 msgid "PHP mbstring"
 msgstr "PHP mbstring"
 
-#: include/classes/setup/CFrontendSetup.php:332
+#: include/classes/setup/CFrontendSetup.php:331
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)."
 msgstr "Расширение PHP mbstring отсутствует (параметр конфигурации PHP --enable-mbstring)."
 
-#: include/classes/setup/CFrontendSetup.php:125
-#: include/classes/setup/CFrontendSetup.php:143
-#: include/classes/setup/CFrontendSetup.php:161
-#: include/classes/setup/CFrontendSetup.php:191
-#: include/classes/setup/CFrontendSetup.php:212
-#: include/classes/setup/CFrontendSetup.php:229
-#: include/classes/setup/CFrontendSetup.php:349
-#: include/classes/setup/CFrontendSetup.php:370
-#: include/classes/setup/CFrontendSetup.php:618
-#: include/classes/setup/CFrontendSetup.php:652
+#: include/classes/setup/CFrontendSetup.php:124
+#: include/classes/setup/CFrontendSetup.php:142
+#: include/classes/setup/CFrontendSetup.php:160
+#: include/classes/setup/CFrontendSetup.php:190
+#: include/classes/setup/CFrontendSetup.php:211
+#: include/classes/setup/CFrontendSetup.php:228
+#: include/classes/setup/CFrontendSetup.php:348
+#: include/classes/setup/CFrontendSetup.php:369
+#: include/classes/setup/CFrontendSetup.php:617
+#: include/classes/setup/CFrontendSetup.php:651
 #, c-format
 msgid "PHP option \"%1$s\""
 msgstr "PHP опция \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:374
-#: include/classes/setup/CFrontendSetup.php:656
+#: include/classes/setup/CFrontendSetup.php:373
+#: include/classes/setup/CFrontendSetup.php:655
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
 msgstr "PHP опция \"%1$s\" должна быть задана равной \"%2$s\""
 
-#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:600
 msgid "PHP session"
 msgstr "PHP session"
 
-#: include/classes/setup/CFrontendSetup.php:622
+#: include/classes/setup/CFrontendSetup.php:621
 msgid "PHP session auto start must be disabled (PHP directive \"session.auto_start\")."
 msgstr "Автоматический старт сессий в PHP должен быть отключен (PHP директива \"session.auto_start\")."
 
-#: include/classes/setup/CFrontendSetup.php:605
+#: include/classes/setup/CFrontendSetup.php:604
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)."
 msgstr "Расширение PHP session отсутствует (параметр конфигурации PHP --enable-session)."
 
-#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:386
 msgid "PHP sockets"
 msgstr "PHP sockets"
 
-#: include/classes/setup/CFrontendSetup.php:391
+#: include/classes/setup/CFrontendSetup.php:390
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)."
 msgstr "Расширение PHP sockets отсутствует (параметр конфигурации PHP --enable-sockets)."
 
-#: include/classes/setup/CFrontendSetup.php:353
+#: include/classes/setup/CFrontendSetup.php:352
 msgid "PHP string function overloading must be disabled."
 msgstr "Перегрузка функции PHP string должна быть отключена."
 
-#: include/classes/setup/CFrontendSetup.php:107
+#: include/classes/setup/CFrontendSetup.php:106
 msgid "PHP version"
 msgstr "Версия PHP"
 
-#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:539
 msgid "PHP xmlreader"
 msgstr "PHP xmlreader"
 
-#: include/classes/setup/CFrontendSetup.php:544
+#: include/classes/setup/CFrontendSetup.php:543
 msgid "PHP xmlreader extension missing."
 msgstr "Расширение PHP xmlreader отсутствует."
 
-#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:522
 msgid "PHP xmlwriter"
 msgstr "PHP xmlwriter"
 
-#: include/classes/setup/CFrontendSetup.php:527
+#: include/classes/setup/CFrontendSetup.php:526
 msgid "PHP xmlwriter extension missing."
 msgstr "Расширение PHP xmlwriter отсутствует."
 
@@ -12448,7 +12433,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:997
+#: include/classes/graph/CSvgGraph.php:972
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:991
 #: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:340
@@ -12472,22 +12457,22 @@ msgstr "Режим генерации событий ПРОБЛЕМА"
 #: include/views/configuration.host.edit.php:760
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.edit.php:788
-#: include/views/configuration.host.list.php:284
-#: include/views/configuration.host.list.php:300
-#: include/views/configuration.host.list.php:303
+#: include/views/configuration.host.list.php:297
+#: include/views/configuration.host.list.php:313
+#: include/views/configuration.host.list.php:316
 #: include/views/configuration.host.massupdate.php:323
 #: include/views/configuration.host.massupdate.php:331
 #: include/views/configuration.host.massupdate.php:337
-#: include/views/configuration.host.prototype.edit.php:379
-#: include/views/configuration.host.prototype.edit.php:392
-#: include/views/configuration.host.prototype.edit.php:405
+#: include/views/configuration.host.prototype.edit.php:380
+#: include/views/configuration.host.prototype.edit.php:393
+#: include/views/configuration.host.prototype.edit.php:406
 msgid "PSK"
 msgstr "PSK"
 
 #: app/views/administration.proxy.edit.php:101
 #: include/views/configuration.host.edit.php:782
 #: include/views/configuration.host.massupdate.php:334
-#: include/views/configuration.host.prototype.edit.php:400
+#: include/views/configuration.host.prototype.edit.php:401
 msgid "PSK identity"
 msgstr "Идентификатор PSK"
 
@@ -12580,7 +12565,7 @@ msgstr "Пассивный"
 #: include/views/configuration.host.discovery.edit.php:459
 #: include/views/configuration.host.discovery.edit.php:487
 #: include/views/configuration.host.edit.php:670
-#: include/views/configuration.host.prototype.edit.php:338
+#: include/views/configuration.host.prototype.edit.php:339
 #: include/views/configuration.httpconf.edit.php:166
 #: include/views/configuration.item.edit.php:343
 #: include/views/configuration.item.edit.php:599
@@ -12653,7 +12638,7 @@ msgstr "Период"
 
 #: include/forms.inc.php:1864
 #: include/views/configuration.maintenance.edit.php:77
-#: include/views/configuration.services.edit.php:226
+#: include/views/configuration.services.edit.php:228
 msgid "Period type"
 msgstr "Тип периода"
 
@@ -12823,15 +12808,15 @@ msgstr "Шаги предобработки"
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: include/func.inc.php:2696
+#: include/func.inc.php:2697
 msgid "Previous month"
 msgstr "Предыдущий месяц"
 
-#: include/func.inc.php:2695
+#: include/func.inc.php:2696
 msgid "Previous week"
 msgstr "Предыдущая неделя"
 
-#: include/func.inc.php:2697
+#: include/func.inc.php:2698
 msgid "Previous year"
 msgstr "Предыдущий год"
 
@@ -12897,7 +12882,7 @@ msgid "Private key file"
 msgstr "Файл приватного ключа"
 
 #: include/views/configuration.host.edit.php:665
-#: include/views/configuration.host.prototype.edit.php:331
+#: include/views/configuration.host.prototype.edit.php:332
 msgid "Privilege level"
 msgstr "Уровень привилегий"
 
@@ -13123,7 +13108,7 @@ msgid "Queue of items to be updated"
 msgstr "Очередь элементов данных ожидающих обновления"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:993
+#: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:977
 #: include/classes/screens/CScreenProblem.php:1138 include/events.inc.php:345
@@ -13381,7 +13366,7 @@ msgstr "Удаленная команда"
 #: include/views/configuration.maintenance.edit.php:193
 #: include/views/configuration.maintenance.edit.php:213
 #: include/views/configuration.services.edit.php:134
-#: include/views/configuration.services.edit.php:206
+#: include/views/configuration.services.edit.php:208
 #: include/views/configuration.trigger.prototype.edit.php:219
 #: include/views/configuration.trigger.prototype.edit.php:414
 #: include/views/configuration.trigger.prototype.edit.php:502
@@ -13554,7 +13539,7 @@ msgstr "Требуемые права доступа к узлам сети"
 msgid "Required performance (vps)"
 msgstr "Требуемое быстродействие (знч/сек)"
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1015
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Требуемая производительность Zabbix сервера, в ожидаемом количестве новых значений в секунду."
 
@@ -13687,15 +13672,15 @@ msgstr "Получение содержимого файла. Возвращае
 msgid "Retry"
 msgstr "Повтор"
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1075
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "Возвращает JSON объект, который описывает MBean объекты или их атрибуты. Может быть использовано LLD правилом."
 
-#: include/classes/items/CHelpItems.php:1041
+#: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Возвращает первую колонку первой строки результата SQL запрос."
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1071
 msgid "Return value of an attribute of MBean object."
 msgstr "Возвращает значение атрибута MBean объекта."
 
@@ -13705,23 +13690,23 @@ msgstr "Получение времени ответа на ICMP ping в сек�
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1019
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:971
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "Возвращается JSON объект, описывающий сетевые интерфейсы хоста, добавленного в Zabbix. Может быть использовано LLD правилом."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Получение доступности определенного типа проверок на узле сети. Значение этого элемента данных соответствует иконкам доступности в списке узлов сети. Допустимые типы: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:967
 msgid "Returns current maintenance status of the host."
 msgstr "Получение текущего состояния обслуживания узла сети."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:991
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Возвращает информацию относящуюся к Zabbix Java gateway. Допустимые параметры: ping, version."
 
@@ -14461,7 +14446,7 @@ msgid "Server time"
 msgstr "Время на сервере"
 
 #: app/views/popup.services.php:42 include/actions.inc.php:74
-#: include/audit.inc.php:42 include/views/configuration.services.edit.php:338
+#: include/audit.inc.php:42 include/views/configuration.services.edit.php:340
 #: include/views/configuration.services.parent.list.php:35 services.php:354
 #: srv_status.php:145
 msgid "Service"
@@ -14530,7 +14515,7 @@ msgstr "Порт сервиса"
 msgid "Service start time must be less than end time."
 msgstr "Время начала должно быть меньше чем время окончания."
 
-#: include/views/configuration.services.edit.php:217
+#: include/views/configuration.services.edit.php:219
 msgid "Service times"
 msgstr "Интервалы времени услуги"
 
@@ -15042,7 +15027,7 @@ msgstr "Начинать в"
 msgid "Starting TLS failed."
 msgstr "Ошибка при включении TLS."
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:935
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Время запуска Zabbix сервера, Unix timestamp."
 
@@ -15214,7 +15199,7 @@ msgstr "Тема"
 #: app/views/administration.proxy.edit.php:114
 #: include/views/configuration.host.edit.php:797
 #: include/views/configuration.host.massupdate.php:343
-#: include/views/configuration.host.prototype.edit.php:415
+#: include/views/configuration.host.prototype.edit.php:416
 msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Субъект"
@@ -15227,7 +15212,7 @@ msgstr "Подкарта"
 msgid "Success Audit"
 msgstr "Аудит успеха"
 
-#: include/func.inc.php:1932
+#: include/func.inc.php:1933
 msgid "Success message"
 msgstr "Сообщение об успехе"
 
@@ -15293,7 +15278,7 @@ msgstr "Время загрузки системы. Возвращает цел�
 msgid "System default"
 msgstr "Системная по умолчанию"
 
-#: include/func.inc.php:1959
+#: include/func.inc.php:1960
 msgid "System error occurred. Please contact Zabbix administrator."
 msgstr "Произошла системная ошибка. Пожалуйста, свяжитесь с администратором Zabbix."
 
@@ -15564,7 +15549,7 @@ msgstr "Шаблонные элементы данных"
 #: include/views/configuration.host.list.php:65
 #: include/views/configuration.host.list.php:136
 #: include/views/configuration.host.massupdate.php:360
-#: include/views/configuration.host.prototype.edit.php:320
+#: include/views/configuration.host.prototype.edit.php:321
 #: include/views/configuration.host.prototype.list.php:54
 #: include/views/configuration.template.edit.php:22
 #: include/views/configuration.template.list.php:51
@@ -15719,7 +15704,7 @@ msgstr "Группа элементов данных веб-сценария п�
 msgid "Theme"
 msgstr "Тема"
 
-#: include/func.inc.php:2694
+#: include/func.inc.php:2695
 msgid "This day last week"
 msgstr "Этот день прошлой недели"
 
@@ -15728,11 +15713,11 @@ msgstr "Этот день прошлой недели"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Это поле автоматически заполняется элементом данных \"%s\"."
 
-#: include/func.inc.php:2702 srv_status.php:41
+#: include/func.inc.php:2703 srv_status.php:41
 msgid "This month"
 msgstr "Этот месяц"
 
-#: include/func.inc.php:2703
+#: include/func.inc.php:2704
 msgid "This month so far"
 msgstr "В этом месяце"
 
@@ -15744,19 +15729,19 @@ msgstr "Колонка комплексного экрана не пустая. 
 msgid "This screen row is not empty. Delete it?"
 msgstr "Строка комплексного экрана не пустая. Удалить её?"
 
-#: include/func.inc.php:2700 srv_status.php:40
+#: include/func.inc.php:2701 srv_status.php:40
 msgid "This week"
 msgstr "Эта неделя"
 
-#: include/func.inc.php:2701
+#: include/func.inc.php:2702
 msgid "This week so far"
 msgstr "На этой неделе"
 
-#: include/func.inc.php:2704 srv_status.php:42
+#: include/func.inc.php:2705 srv_status.php:42
 msgid "This year"
 msgstr "Этот год"
 
-#: include/func.inc.php:2705
+#: include/func.inc.php:2706
 msgid "This year so far"
 msgstr "В этом году"
 
@@ -15774,8 +15759,8 @@ msgid "Thursday"
 msgstr "Четверг"
 
 #: app/views/report.services.php:68
-#: include/views/configuration.services.edit.php:250
-#: include/views/configuration.services.edit.php:303 report4.php:195
+#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:305 report4.php:195
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "До"
@@ -15800,9 +15785,9 @@ msgstr "До"
 #: include/events.inc.php:447 include/events.inc.php:453
 #: include/views/administration.auditacts.list.php:56
 #: include/views/administration.auditlogs.list.php:70
-#: include/views/configuration.services.edit.php:293
-#: include/views/configuration.services.edit.php:307
-#: include/views/configuration.services.edit.php:340
+#: include/views/configuration.services.edit.php:295
+#: include/views/configuration.services.edit.php:309
+#: include/views/configuration.services.edit.php:342
 msgid "Time"
 msgstr "Время"
 
@@ -15814,11 +15799,11 @@ msgstr "Время (в порядке возрастания)"
 msgid "Time (descending)"
 msgstr "Время (в порядке убывания)"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:995
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Время конкретного процесса Zabbix или группы процессов (задаётся <типом> и <режимом>) проведённое в <состоянии> в процентах."
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:999
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Время последнего доступа к прокси. Имя - имя прокси. Параметр - lastaccess. Unix timestamp."
 
@@ -15844,7 +15829,7 @@ msgstr "Сдвиг по времени"
 msgid "Time type"
 msgstr "Тип времени"
 
-#: include/classes/setup/CFrontendSetup.php:233
+#: include/classes/setup/CFrontendSetup.php:232
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")."
 msgstr "Часовой пояс для PHP не задан (параметр конфигурации \"date.timezone\")."
 
@@ -15876,12 +15861,12 @@ msgstr "К"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Чтобы задать интерфейс узла сети выберите один тип элемента данных из всех элементов данных"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2698
+#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2699
 #: srv_status.php:39
 msgid "Today"
 msgstr "Сегодня"
 
-#: include/func.inc.php:2699
+#: include/func.inc.php:2700
 msgid "Today so far"
 msgstr "Сегодня до сих пор"
 
@@ -15923,7 +15908,7 @@ msgstr "Всего затрачено времени: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Транзакция не была закрыта. Откат..."
 
-#: include/classes/items/CHelpItems.php:1045
+#: include/classes/items/CHelpItems.php:1065
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Преобразование результата SQL запроса в объект JSON для низкоуровневого обнаружения."
 
@@ -16206,7 +16191,7 @@ msgstr "Триггер обновлен"
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
 #: include/views/configuration.host.list.php:131
-#: include/views/configuration.host.list.php:328
+#: include/views/configuration.host.list.php:341
 #: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.list.php:192
 #: include/views/configuration.template.edit.php:175
@@ -16557,7 +16542,7 @@ msgid "Unlimited"
 msgstr "Неограничено"
 
 #: include/views/configuration.host.edit.php:564
-#: include/views/configuration.host.prototype.edit.php:272
+#: include/views/configuration.host.prototype.edit.php:273
 #: include/views/configuration.template.edit.php:363
 msgid "Unlink"
 msgstr "Отсоединить"
@@ -16683,14 +16668,14 @@ msgstr "Доступен"
 #: include/views/configuration.host.edit.php:810
 #: include/views/configuration.hostgroups.edit.php:57
 #: include/views/configuration.host.massupdate.php:371
-#: include/views/configuration.host.prototype.edit.php:434
+#: include/views/configuration.host.prototype.edit.php:435
 #: include/views/configuration.httpconf.edit.php:253
 #: include/views/configuration.item.edit.php:1082
 #: include/views/configuration.item.massupdate.php:721
 #: include/views/configuration.item.prototype.edit.php:893
 #: include/views/configuration.maintenance.edit.php:134
 #: include/views/configuration.maintenance.edit.php:285
-#: include/views/configuration.services.edit.php:353
+#: include/views/configuration.services.edit.php:355
 #: include/views/configuration.template.edit.php:443
 #: include/views/configuration.trigger.prototype.edit.php:635
 #: include/views/configuration.trigger.prototype.massupdate.php:188
@@ -16763,11 +16748,11 @@ msgstr "Карты верхнего уровня"
 
 #: include/classes/screens/CScreenDiscovery.php:120
 #: include/views/configuration.services.edit.php:177
-#: include/views/configuration.services.edit.php:228
+#: include/views/configuration.services.edit.php:230
 msgid "Uptime"
 msgstr "Доступен"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1039
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Время работы процесса Zabbix сервера в секундах."
 
@@ -17045,7 +17030,7 @@ msgstr "Пользователь/Получатель"
 #: app/views/administration.mediatype.edit.php:158
 #: app/views/administration.mediatype.list.php:93 disc_prototypes.php:218
 #: host_discovery.php:201 include/views/configuration.host.edit.php:666
-#: include/views/configuration.host.prototype.edit.php:335
+#: include/views/configuration.host.prototype.edit.php:336
 #: include/views/general.login.php:60 index.php:33 items.php:185
 msgid "Username"
 msgstr "Имя пользователя"
@@ -17070,7 +17055,7 @@ msgstr "Пользователи"
 msgid "Users unblocked"
 msgstr "Разблокированные пользователи"
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика VMware кэша. Возможные режимы: total, free, pfree, used и pused."
 
@@ -17078,87 +17063,104 @@ msgstr "Статистика VMware кэша. Возможные режимы: t
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Состояние кластера VMware, <url> - URL службы VMware, <name> - имя кластера VMware"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Статистика пространства на VMware хранилище в байтах или в процентах от общего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
+
+#: include/classes/items/CHelpItems.php:723
+msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:711
+msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:719
+msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:703
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Uuid BIOS гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер ballooned памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя кластера VMware гипервизора, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика чтения из хранилища данных гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <datastore> - имя хранилища данных, <mode> - задержка"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Статистика записи в хранилище данных гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <datastore> - имя хранилища данных, <mode> - задержка"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:747
+msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика входящего трафика сетевого интервейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Статистика исходящего трафика сетевого интерфейса гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Частота процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Модель процессора гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Использование процессора гипервизора VMware в Гц, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Состояние гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Общий размер памяти гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Время работы гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Размер памяти используемой гипервизором VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Имя поставщика гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Версия гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware"
 
@@ -17166,99 +17168,99 @@ msgstr "Версия гипервизора VMware, <url> - URL службы VMw
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "Полное имя сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Версия сервиса VMware, <url> - URL службы VMware"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер ballooned памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер сжатой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика чтения дискового устройства виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Статистика записи на дисковое устройство виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр дискового устройства, <mode> - bps/ops - байт/операций в секунду"
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Статистика файловой системы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <fsname> - имя файловой системы, <mode> - total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти гостевой виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование памяти виртуальной машиной VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртуальной машины гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Имя виртульной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика входящего трафика сетевого интерфейса витруальной машниы VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Статистика исходящего трафика сетевого интерфейса виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <instance> - экземпляр сетевого интерфейса, <mode> - bps/pps - байт/пакетов в секунду"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Счетчик производительности виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware, <path> - путь к счетчику производительности, <instance> - экземпляр счетчика производительности"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Состояние питания витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер частной памяти витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Время готовности процессора виртуальной машины VMware в мс, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Использование процессора виртуальной машины VMware в Гц , <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер разделяемой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер памяти выгруженной в файл подкачки витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Общий размер памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Объем не записанных данных на хранилище данных виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Размер неразделяемого пространства хранилища виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Время работы виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
@@ -17339,11 +17341,11 @@ msgstr "Значение \"%2$s\" \"%1$s\" содержит слишком мн�
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Значение \"%2$s\" \"%1$s\" слишком длинное: оно не может содержать более чем %3$s цифр до дробного разделителя и более чем %4$s цифр после дробного разделителя."
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1047
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Эффективность кэша значений. Допустимые параметры: requests, hits и misses."
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1043
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Статистика кэша значений. Допустимые значения: total, free, pfree, used и pused."
 
@@ -17488,7 +17490,7 @@ msgid "We are sorry, the maximum possible number of elements to remember has bee
 msgstr "Приносим свои извинения, достигнуто максимально возможное количество элементов."
 
 #: include/menu.inc.php:63 include/views/configuration.host.list.php:134
-#: include/views/configuration.host.list.php:340
+#: include/views/configuration.host.list.php:353
 #: include/views/configuration.template.list.php:92
 #: include/views/configuration.template.list.php:208
 #: include/views/inventory.host.view.php:124
@@ -17796,8 +17798,8 @@ msgstr "Y2"
 #: include/forms.inc.php:2084
 #: include/views/configuration.maintenance.edit.php:57
 #: include/views/configuration.maintenance.edit.php:63
-#: include/views/configuration.services.edit.php:246
-#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:248
+#: include/views/configuration.services.edit.php:255
 msgid "YYYY-MM-DD hh:mm"
 msgstr "YYYY-MM-DD hh:mm"
 
@@ -17838,11 +17840,11 @@ msgstr "Ежегодно"
 msgid "Yes"
 msgstr "Да"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2692
+#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2693
 msgid "Yesterday"
 msgstr "Вчера"
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1827
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "Вы вошли под именем \"%1$s\"."
@@ -17851,7 +17853,7 @@ msgstr "Вы вошли под именем \"%1$s\"."
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Вы не можете выбрать некоторые языки, т.к. локали для них не установлены на вашем веб-сервере."
 
-#: include/func.inc.php:1843 index_http.php:88
+#: include/func.inc.php:1844 index_http.php:88
 msgid "You are not logged in"
 msgstr "Вы не выполнили вход"
 
@@ -17904,7 +17906,7 @@ msgstr "У вас нет полномочий для выполнения это
 msgid "You do not have permissions to create users."
 msgstr "У вас нет полномочий для создания пользователей."
 
-#: include/func.inc.php:1826
+#: include/func.inc.php:1827
 msgid "You have no permissions to access this page."
 msgstr "У вас нет полномочий для доступа к этой странице."
 
@@ -17912,7 +17914,7 @@ msgstr "У вас нет полномочий для доступа к этой 
 msgid "You have unsaved changes."
 msgstr "У вас имеются несохраненные изменения."
 
-#: include/func.inc.php:1845
+#: include/func.inc.php:1846
 msgid "You must login to view this page."
 msgstr "Для просмотра этой страницы вы должны войти в систему."
 
@@ -17920,7 +17922,7 @@ msgstr "Для просмотра этой страницы вы должны в
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Ваша база данных работает некорректно. Пожалуйста, подождите пару минут и попробуйте повторить это действие. Если проблема сохраняется, пожалуйста, обратитесь к системному администратору. Эта проблема может быть вызвана долго выполняющейся транзакцией или блокировкой ну уровне строк в вашей системе управления базой данных."
 
-#: cachewarning.php:28 index.php:28
+#: index.php:28
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -18356,7 +18358,7 @@ msgstr "содержит"
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr "count() - Количество успешно полученных значений V (которым удовлетворяет оператор О) за период Т"
 
-#: include/func.inc.php:621 jsLoader.php:128
+#: include/func.inc.php:622 jsLoader.php:128
 msgctxt "day short"
 msgid "d"
 msgstr "д"
@@ -18487,13 +18489,13 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "глобальные настройки очистки истории"
 
-#: include/func.inc.php:622 jsLoader.php:129
+#: include/func.inc.php:623 jsLoader.php:129
 msgctxt "hour short"
 msgid "h"
 msgstr "ч"
 
-#: include/views/configuration.services.edit.php:270
-#: include/views/configuration.services.edit.php:280
+#: include/views/configuration.services.edit.php:272
+#: include/views/configuration.services.edit.php:282
 msgid "hh"
 msgstr "чч"
 
@@ -18670,12 +18672,12 @@ msgstr "logsource() - Источник журнала последней зап�
 msgid "low-level discovery rule"
 msgstr "правило низкоуровневого обнаружения"
 
-#: include/func.inc.php:623 jsLoader.php:103 jsLoader.php:130 jsLoader.php:295
+#: include/func.inc.php:624 jsLoader.php:103 jsLoader.php:130 jsLoader.php:295
 msgctxt "minute short"
 msgid "m"
 msgstr "м"
 
-#: include/func.inc.php:620 jsLoader.php:127
+#: include/func.inc.php:621 jsLoader.php:127
 msgctxt "month short"
 msgid "m"
 msgstr "м"
@@ -18747,12 +18749,12 @@ msgstr "min() - Минимальное значение за период Т"
 msgid "minimum length is %1$s characters"
 msgstr "минимальная длина %1$s символов"
 
-#: include/views/configuration.services.edit.php:275
-#: include/views/configuration.services.edit.php:285
+#: include/views/configuration.services.edit.php:277
+#: include/views/configuration.services.edit.php:287
 msgid "mm"
 msgstr "мм"
 
-#: include/func.inc.php:625
+#: include/func.inc.php:626
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "мс"
@@ -18853,25 +18855,25 @@ msgstr "число"
 msgid "of"
 msgstr "из"
 
-#: include/classes/setup/CFrontendSetup.php:253
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
+#: include/classes/setup/CFrontendSetup.php:252
+#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:349
 #: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:351
+#: include/classes/setup/CFrontendSetup.php:370
 #: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:372
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:484
-#: include/classes/setup/CFrontendSetup.php:524
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:585
-#: include/classes/setup/CFrontendSetup.php:602
+#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:618
 #: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:620
-#: include/classes/setup/CFrontendSetup.php:636
+#: include/classes/setup/CFrontendSetup.php:635
 #: include/views/administration.users.edit.php:287
 msgid "off"
 msgstr "выкл"
@@ -18880,21 +18882,21 @@ msgstr "выкл"
 msgid "old event tag"
 msgstr "тег старого события"
 
-#: include/classes/setup/CFrontendSetup.php:312
-#: include/classes/setup/CFrontendSetup.php:329
-#: include/classes/setup/CFrontendSetup.php:350
-#: include/classes/setup/CFrontendSetup.php:371
-#: include/classes/setup/CFrontendSetup.php:388
-#: include/classes/setup/CFrontendSetup.php:436
-#: include/classes/setup/CFrontendSetup.php:461
-#: include/classes/setup/CFrontendSetup.php:484
-#: include/classes/setup/CFrontendSetup.php:524
-#: include/classes/setup/CFrontendSetup.php:541
-#: include/classes/setup/CFrontendSetup.php:558
-#: include/classes/setup/CFrontendSetup.php:585
-#: include/classes/setup/CFrontendSetup.php:602
-#: include/classes/setup/CFrontendSetup.php:619
-#: include/classes/setup/CFrontendSetup.php:636
+#: include/classes/setup/CFrontendSetup.php:311
+#: include/classes/setup/CFrontendSetup.php:328
+#: include/classes/setup/CFrontendSetup.php:349
+#: include/classes/setup/CFrontendSetup.php:370
+#: include/classes/setup/CFrontendSetup.php:387
+#: include/classes/setup/CFrontendSetup.php:435
+#: include/classes/setup/CFrontendSetup.php:460
+#: include/classes/setup/CFrontendSetup.php:483
+#: include/classes/setup/CFrontendSetup.php:523
+#: include/classes/setup/CFrontendSetup.php:540
+#: include/classes/setup/CFrontendSetup.php:557
+#: include/classes/setup/CFrontendSetup.php:584
+#: include/classes/setup/CFrontendSetup.php:601
+#: include/classes/setup/CFrontendSetup.php:618
+#: include/classes/setup/CFrontendSetup.php:635
 #: include/views/administration.users.edit.php:287
 #: include/views/monitoring.hostscreen.php:33
 msgid "on"
@@ -18978,7 +18980,7 @@ msgstr "root"
 msgid "ruleid of dependent item and master item should match"
 msgstr "ruleid зависимого элемента данных и основного элемента данных должны совпадать"
 
-#: include/func.inc.php:624
+#: include/func.inc.php:625
 msgctxt "second short"
 msgid "s"
 msgstr "с"
@@ -18996,7 +18998,7 @@ msgstr "ожидается второй параметр"
 msgid "selected"
 msgstr "выбрано"
 
-#: include/views/configuration.services.edit.php:240
+#: include/views/configuration.services.edit.php:242
 msgid "short description"
 msgstr "краткое описание"
 
@@ -19193,9 +19195,9 @@ msgstr "неожиданный текст \"%1$s\""
 msgid "unexpected value \"%1$s\""
 msgstr "неожиданное значение \"%1$s\""
 
-#: include/classes/setup/CFrontendSetup.php:230
-#: include/classes/setup/CFrontendSetup.php:407
-#: include/classes/setup/CFrontendSetup.php:501
+#: include/classes/setup/CFrontendSetup.php:229
+#: include/classes/setup/CFrontendSetup.php:406
+#: include/classes/setup/CFrontendSetup.php:500
 msgid "unknown"
 msgstr "неизвестно"
 
@@ -19293,7 +19295,7 @@ msgstr "ошибочный тип правила обнаружения"
 msgid "wrong item type"
 msgstr "ошибочный тип элемента данных"
 
-#: include/func.inc.php:619 jsLoader.php:126
+#: include/func.inc.php:620 jsLoader.php:126
 msgctxt "year short"
 msgid "y"
 msgstr "г"
