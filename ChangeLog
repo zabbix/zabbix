@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+..F....... [ZBX-16169] improved performance of map navigation tree widget (miks)
 ..F....... [ZBX-16288] fixed when unknown resource logged in audit log when working with dashboards (vasilijs)
 A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
 ..F....... [ZBX-15969] fixed displaying of very small values that are more than 2 decimal points in latest data (Ivo)
