@@ -128,6 +128,8 @@ tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_path_open
 tests/libs/zbxjson/jsonpath_next
+tests/libs/zbxjson/zbx_json_decodevalue
+tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxprometheus/prometheus_filter_init
 tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
@@ -145,6 +147,7 @@ tests/libs/zbxsysinfo/linux/SYSTEM_BOOTTIME
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_INTR
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
+tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/libs/zbxcommon/zbx_user_macro_parse

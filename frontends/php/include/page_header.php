@@ -180,7 +180,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
-	$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
+	$pageHeader->addCssFile('assets/styles/'.CHtml::encode($theme).'.css');
 
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');

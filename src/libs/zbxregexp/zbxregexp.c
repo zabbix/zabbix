@@ -358,7 +358,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
  *             offset    - [IN/OUT] offset for writing                        *
  *             src       - [IN] copied string                                 *
  *             n         - [IN] maximum number of bytes to copy               *
- *             l         - [IN] maximum number of bytes to be allocated       *
+ *             limit     - [IN] maximum number of bytes to be allocated       *
  *                                                                            *
  ******************************************************************************/
 static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n, size_t limit)
@@ -458,20 +458,32 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 	if ('\0' != *pstart)
 		strncpy_alloc(&ptr, &size, &offset, pstart, strlen(pstart), limit);
 out:
-	if (NULL != ptr && 0 != limit)
+	if (NULL != ptr)
 	{
-		size = offset;
-		offset--;
-
-		/* ensure that the string is not cut in the middle of UTF-8 sequence */
-		if (0x80 <= (0xc0 & ptr[offset]))
+		if (0 != limit && offset >= limit)
 		{
-			while (0x80 == (0xc0 & ptr[offset]) && 0 < offset)
-				offset--;
+			size = offset;
+			offset--;
 
-			if (zbx_utf8_char_len(&ptr[offset]) != size - offset)
-				ptr[offset] = '\0';
+			/* ensure that the string is not cut in the middle of UTF-8 sequence */
+			if (0x80 <= (0xc0 & ptr[offset]))
+			{
+				while (0x80 == (0xc0 & ptr[offset]) && 0 < offset)
+					offset--;
+
+				if (zbx_utf8_char_len(&ptr[offset]) != size - offset)
+					ptr[offset] = '\0';
+			}
 		}
+
+		/* Some regexp and output template combinations can produce invalid UTF-8 sequences. */
+		/* For example, regexp "(.)(.)" and output template "\1 \2" produce a valid UTF-8 sequence */
+		/* for single-byte UTF-8 characters and invalid sequence for multi-byte characters. */
+		/* Using (*UTF) modifier (e.g. "(*UTF)(.)(.)") solves the problem for multi-byte characters */
+		/* but it is up to user to add the modifier. To prevent producing invalid UTF-8 sequences do */
+		/* output sanitization. */
+
+		zbx_replace_invalid_utf8(ptr);
 	}
 
 	return ptr;

@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.8rc1');
-define('ZABBIX_API_VERSION',	'4.0.8');
+define('ZABBIX_VERSION',		'4.0.11rc1');
+define('ZABBIX_API_VERSION',	'4.0.11');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -106,10 +106,6 @@ define('EXTACK_OPTION_BOTH',	2);
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
-
-define('ZBX_ACK_STS_ANY',				1);
-define('ZBX_ACK_STS_WITH_UNACK',		2);
-define('ZBX_ACK_STS_WITH_LAST_UNACK',	3);
 
 define('ZBX_FONT_NAME', 'DejaVuSans');
 
@@ -1408,6 +1404,13 @@ define('HISTORY_BATCH_GRAPH', 'batchgraph');
 define('HISTORY_VALUES', 'showvalues');
 define('HISTORY_LATEST', 'showlatest');
 
+// Item history and trends storage modes.
+define('ITEM_STORAGE_OFF',		0);
+define('ITEM_STORAGE_CUSTOM',	1);
+
+// Item history and trends storage value to define 0 storage period.
+define('ITEM_NO_STORAGE_VALUE',	0);
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
@@ -1536,6 +1539,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_NONE', 'icon-none');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
