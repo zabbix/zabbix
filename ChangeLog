@@ -10,8 +10,8 @@ A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML
 A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
 ...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
-..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
-..F....... [ZBX-16204] fix undefined offset in CControllerWidgetProblemHostsView (rlataria)
+..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.10
