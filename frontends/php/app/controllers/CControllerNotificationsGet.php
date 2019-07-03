@@ -116,14 +116,14 @@ class CControllerNotificationsGet extends CController {
 		foreach ($events as $eventid => $event) {
 			if ($this->settings['show_recovered']) {
 				if (array_key_exists('r_clock', $event) && $event['r_clock'] >= $this->time_from) {
-					/**
+					/*
 					 * This happens if trigger is recovered and is already removed from the list of known eventids.
 					 * Do nothing here. This statement is needed just to catch specific case before next IF statement.
 					 */
 				}
 				elseif (array_key_exists($event['eventid'], $this->known_eventids)
 						&& $event['clock'] < $this->timeout_time) {
-					/**
+					/*
 					 * This exception is needed to add notifications that are delayed in front-end, for example, in case
 					 * if user has logged in between 30th and 60th second after event was generated. Since notification
 					 * is still in response, front-end will remove that message using client side timeout.
