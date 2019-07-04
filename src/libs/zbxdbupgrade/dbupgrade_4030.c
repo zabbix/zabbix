@@ -22,6 +22,7 @@
 #include "dbupgrade.h"
 
 extern unsigned char	program_type;
+
 /*
  * 4.4 development database patches
  */
