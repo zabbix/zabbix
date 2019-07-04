@@ -95,7 +95,7 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
  *                                                                            *
  * Function: terminate_signal_handler                                         *
  *                                                                            *
- * Purpose: handle terminate signals: SIGQUIT, SIGINT, SIGTERM                *
+ * Purpose: handle terminate signals: SIGQUIT, SIGINT, SIGTERM, SIGUSR2       *
  *                                                                            *
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
@@ -104,24 +104,13 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig || SIGTERM == sig ?
-				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
-				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. Exiting ...",
-				sig, get_signal_name(sig),
-				SIG_CHECKED_FIELD(siginfo, si_pid),
-				SIG_CHECKED_FIELD(siginfo, si_uid),
-				SIG_CHECKED_FIELD(siginfo, si_code));
-
-		/* ignore terminate signal in children - the parent */
-		/* process will send terminate signals instead      */
-		if (sig_parent_pid != SIG_CHECKED_FIELD(siginfo, si_pid))
-			return;
-
+		/* the parent process can either politely ask a child process to finish it's work and perform cleanup */
+		/* by sending SIGUSR2 or terminate child process immediately without cleanup by sending SIGQUIT       */
 		if (SIGQUIT == sig)
 			exit_with_failure();
 
-		sig_exiting = 1;
+		if (SIGUSR2 == sig)
+			sig_exiting = 1;
 	}
 	else
 	{
@@ -192,6 +181,7 @@ void	zbx_set_common_signal_handlers(void)
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGUSR2, &phan, NULL);
 
 	phan.sa_sigaction = fatal_signal_handler;
 	sigaction(SIGILL, &phan, NULL);
