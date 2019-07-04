@@ -110,15 +110,14 @@ static int	DBpatch_4030009(void)
 
 static int	DBpatch_4030010(void)
 {
-	/* 8 - SCREEN_RESOURCE_SCREEN */
-	const char	*sql = "DELETE FROM screens_items WHERE resourcetype = 8";
-
-	if (ZBX_DB_OK <= DBexecute("%s", sql))
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return FAIL;
-}
+	if (ZBX_DB_OK > DBexecute("delete from screens_items where resourcetype=8"))
+		return FAIL;
 
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4030)
