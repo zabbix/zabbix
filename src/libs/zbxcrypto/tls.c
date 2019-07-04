@@ -2722,12 +2722,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGUSR2);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2918,12 +2919,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGUSR2);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -3208,12 +3210,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGUSR2);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
