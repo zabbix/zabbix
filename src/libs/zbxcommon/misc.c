@@ -2135,9 +2135,12 @@ void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
  *                                                                            *
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
-		const zbx_custom_interval_t *custom_intervals, time_t now)
+		const zbx_custom_interval_t *custom_intervals, time_t now, int *prohibited_interval)
 {
 	int	nextcheck = 0;
+
+	if (NULL != prohibited_interval)
+		*prohibited_interval = 0;
 
 	/* special processing of active items to see better view in queue */
 	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
@@ -2188,7 +2191,11 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 				}
 			}
 			else
+			{
 				nextcheck = ZBX_JAN_2038;
+				if (NULL != prohibited_interval)
+					*prohibited_interval = 1;
+			}
 
 			if (NULL == custom_intervals)
 				break;
