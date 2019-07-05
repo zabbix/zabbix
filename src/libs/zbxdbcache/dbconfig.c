@@ -319,7 +319,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, int *custom_start, char **error)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -358,14 +358,14 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, i
 			/* supported items and items that could not have been scheduled previously, but had their */
 			/* update interval fixed, should be scheduled using their update intervals */
 			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
-					now, custom_start);
+					now);
 		}
 		else
 		{
 			/* use refresh_unsupported interval for new items that have a valid update interval of their */
 			/* own, but were synced from the database in ITEM_STATE_NOTSUPPORTED state */
 			item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported,
-					NULL, now, custom_start);
+					NULL, now);
 		}
 
 		zbx_custom_interval_free(custom_intervals);
@@ -373,7 +373,7 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, i
 	else	/* for items notsupported for other reasons use refresh_unsupported interval */
 	{
 		item->nextcheck = calculate_item_nextcheck(seed, item->type, config->config->refresh_unsupported, NULL,
-				now, custom_start);
+				now);
 	}
 
 	item->schedulable = 1;
@@ -2771,7 +2771,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, NULL, &error))
+				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -7569,14 +7569,9 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
-	int		unreach_nextcheck = 0;
-	int		custom_start;
 
 	old_nextcheck = dc_item->nextcheck;
-	unreach_nextcheck = DCget_disable_until(dc_item, dc_host);
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, &custom_start, NULL);
-	if (0 == custom_start && 0 != unreach_nextcheck && 0 != (flags & ZBX_HOST_UNREACHABLE))
-		dc_item->nextcheck = unreach_nextcheck;
+	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -11317,7 +11312,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL, NULL);
+			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
 	}
 
 	UNLOCK_CACHE;

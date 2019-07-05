@@ -672,22 +672,16 @@ static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
-static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *flex_intervals, time_t now,
-		int *custom_interval)
+static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *flex_intervals, time_t now)
 {
 	int		current_delay = -1;
 
-	*custom_interval = 0;
-
 	while (NULL != flex_intervals)
 	{
-		if (SUCCEED == check_time_period(flex_intervals->period, localtime(&now)))
+		if ((-1 == current_delay || flex_intervals->delay < current_delay) &&
+				SUCCEED == check_time_period(flex_intervals->period, localtime(&now)))
 		{
-			*custom_interval = 1;
-			if (-1 == current_delay || flex_intervals->delay < current_delay)
-			{
-				current_delay = flex_intervals->delay;
-			}
+			current_delay = flex_intervals->delay;
 		}
 
 		flex_intervals = flex_intervals->next;
@@ -2141,12 +2135,9 @@ void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
  *                                                                            *
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
-		const zbx_custom_interval_t *custom_intervals, time_t now, int *custom_start)
+		const zbx_custom_interval_t *custom_intervals, time_t now)
 {
 	int	nextcheck = 0;
-
-	if (NULL != custom_start)
-		*custom_start = 0;
 
 	/* special processing of active items to see better view in queue */
 	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
@@ -2164,6 +2155,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		/* first try to parse out and calculate scheduled intervals */
 		if (NULL != custom_intervals)
 			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now);
+
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
 		/* possible to check the item within a year, fail. */
@@ -2175,17 +2167,9 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		{
 			/* calculate 'nextcheck' value for the current interval */
 			if (NULL != custom_intervals)
-			{
-				int flex_interval;
-				current_delay = get_current_delay(simple_interval, custom_intervals->flexible, t,
-						&flex_interval);
-				if (0 != flex_interval && NULL != custom_start)
-					*custom_start = 1;
-			}
+				current_delay = get_current_delay(simple_interval, custom_intervals->flexible, t);
 			else
 				current_delay = simple_interval;
-
-
 
 			if (0 != current_delay)
 			{
@@ -2204,9 +2188,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 				}
 			}
 			else
-			{
 				nextcheck = ZBX_JAN_2038;
-			}
 
 			if (NULL == custom_intervals)
 				break;
@@ -2219,7 +2201,6 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 				/* 'nextcheck' is beyond the current interval */
 				t = next_interval;
 				attempt++;
-
 			}
 			else
 				break;	/* nextcheck is within the current interval */
@@ -2227,8 +2208,6 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 		if (0 != scheduled_check && scheduled_check < nextcheck)
 			nextcheck = (int)scheduled_check;
-			if (NULL != custom_start)
-				*custom_start = 1;
 	}
 
 	return nextcheck;
