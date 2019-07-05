@@ -371,7 +371,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'gui_access not valid value',
 					'gui_access' => 1.2
 				],
-				'expected_error' => 'Invalid parameter "/1/gui_access": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/gui_access": an integer is expected.'
 			],
 			[
 				'group' => [
@@ -385,7 +385,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'users_status not valid value',
 					'users_status' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/users_status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/users_status": an integer is expected.'
 			],
 			[
 				'group' => [
@@ -399,7 +399,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'debug_mode not valid value',
 					'debug_mode' => 0.1
 				],
-				'expected_error' => 'Invalid parameter "/1/debug_mode": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/debug_mode": an integer is expected.'
 			],
 			// Check group users.
 			[
@@ -509,7 +509,7 @@ class testUserGroup extends CAPITest {
 						'permission' => '',
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
 			],
 			[
 				'group' => [
@@ -519,7 +519,7 @@ class testUserGroup extends CAPITest {
 						'permission' => '1.1',
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
 			],
 			[
 				'group' => [
