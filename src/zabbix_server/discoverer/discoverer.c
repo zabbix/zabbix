@@ -726,7 +726,7 @@ static int	process_discovery(void)
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
 
-	while (NULL != (row = DBfetch(result)))
+	while (ZBX_IS_RUNNING() && NULL != (row = DBfetch(result)))
 	{
 		int		now, delay;
 		zbx_uint64_t	druleid;
@@ -852,7 +852,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -894,5 +894,9 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_sleep_loop(sleeptime);
 	}
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }
