@@ -666,5 +666,14 @@ out:
         "id": 4
       }
     ]
+---
+test case: Query $.books[*].price.sum()
+include: &include zbx_jsonpath_query.inc.yaml
+in:
+  data: *include
+  path: $.books[*].price.sum()
+out:
+  return: SUCCEED
+  value: 53.92
 ...
 

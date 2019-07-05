@@ -1218,6 +1218,8 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_LENGTH;
 			else if (ZBX_CONST_STRLEN("first") == ptr - start && 0 == strncmp(start, "first", ptr - start))
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_FIRST;
+			else if (ZBX_CONST_STRLEN("sum") == ptr - start && 0 == strncmp(start, "sum", ptr - start))
+				segment->data.function.type = ZBX_JSONPATH_FUNCTION_SUM;
 			else
 				return zbx_jsonpath_error(start);
 
@@ -2194,6 +2196,7 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 					result = value;
 				break;
 			case ZBX_JSONPATH_FUNCTION_AVG:
+			case ZBX_JSONPATH_FUNCTION_SUM:
 				result += value;
 				break;
 			default:
