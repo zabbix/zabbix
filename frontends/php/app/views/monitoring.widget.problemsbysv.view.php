@@ -20,9 +20,14 @@
 
 
 $backurl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
+$data['backurl'] = $backurl->getUrl();
 
-$table = (new CWidgetTableProblemsBySv($data['filter'], $data['data'], $data['config'], $backurl->getUrl()))
-	->getTable();
+if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+	$table = getSeverityTotals($data);
+}
+else {
+	$table = getSeveritiesByGroops($data);
+}
 
 $output = [
 	'header' => $data['name'],
