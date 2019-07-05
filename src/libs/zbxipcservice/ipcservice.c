@@ -613,6 +613,7 @@ static void	ipc_client_pop_tx_message(zbx_ipc_client_t *client)
 	client->tx_header[ZBX_IPC_MESSAGE_CODE] = message->code;
 	client->tx_header[ZBX_IPC_MESSAGE_SIZE] = message->size;
 	client->tx_data = message->data;
+	zbx_free(message);
 }
 
 /******************************************************************************

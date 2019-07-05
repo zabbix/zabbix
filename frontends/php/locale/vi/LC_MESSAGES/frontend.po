@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-16 01:43+0300\n"
+"POT-Creation-Date: 2019-06-17 13:10+0300\n"
 "PO-Revision-Date: 2019-03-12 09:36+0300\n"
 "Last-Translator: Quang <quangnh@tnmt.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2863,11 +2863,11 @@ msgstr "Đăng nhập phân biệt chữ hoa/thường"
 msgid "Catalan (ca_ES)"
 msgstr "Catalan (ca_ES)"
 
-#: include/classes/items/CHelpItems.php:909
+#: include/classes/items/CHelpItems.php:929
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr "Chọn tất cả các trap SNMP phù hợp với regex. Nếu regrexp không được chỉ định, chọn bất kỳ trap nào."
 
-#: include/classes/items/CHelpItems.php:905
+#: include/classes/items/CHelpItems.php:925
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "Chọn tất cả các trap SNMP không bị chọn bởi bất kỳ item snmptrap [] nào."
 
@@ -3270,7 +3270,7 @@ msgstr "Điều kiện trùng lặp cho tương quan \"%1$s\"."
 msgid "Configuration"
 msgstr "Cấu hình"
 
-#: include/classes/items/CHelpItems.php:991
+#: include/classes/items/CHelpItems.php:1011
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Cấu hình thống kê cache. Cache - buffer (chế độ:  pfree, total, used, free)."
 
@@ -4082,7 +4082,7 @@ msgstr "Dashed line"
 msgid "Data"
 msgstr "Dữ liệu"
 
-#: include/classes/items/CHelpItems.php:1035
+#: include/classes/items/CHelpItems.php:1055
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Thống kê dữ liệu bộ nhớ cache. Cache - một trong các giá trị (các chế độ: all, float, uint, str, log, text), lịch sử (Các chế độ: pfree, total, used, free), xu hướng (Các chế độ: pfree, total, used, free), văn bản (Các chế độ: pfree, total, used, free)."
 
@@ -11528,7 +11528,7 @@ msgstr "Tháng 11"
 msgid "Number of CPUs. Returns integer"
 msgstr "Số lượng CPU. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:939
+#: include/classes/items/CHelpItems.php:959
 msgid "Number of enabled items on the host."
 msgstr "Số lượng item kích hoạt trên máy chủ."
 
@@ -11540,25 +11540,25 @@ msgstr "Số lượng máy chủ (Kích hoạt/vô hiệu hóa/mẫu)"
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "Số lượng item (Kích hoạt/vô hiệu hóa/không hỗ trợ)"
 
-#: include/classes/items/CHelpItems.php:963
+#: include/classes/items/CHelpItems.php:983
 msgid "Number of items in Zabbix database."
 msgstr "Số lượng item trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:983
+#: include/classes/items/CHelpItems.php:1003
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Số lượng itrm trong lịch sử proxy mà chưa được gửi đến máy chủ"
 
-#: include/classes/items/CHelpItems.php:987
+#: include/classes/items/CHelpItems.php:1007
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Số lượng item trong hàng đợi mà đang bị trễ từ giây thứ, bao gồm."
 
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:659
-#: include/classes/items/CHelpItems.php:1003
+#: include/classes/items/CHelpItems.php:1023
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:959
+#: include/classes/items/CHelpItems.php:979
 msgid "Number of monitored hosts"
 msgstr "Số lượng host được giám sát"
 
@@ -11575,15 +11575,15 @@ msgstr "Số lượng vấn đề"
 msgid "Number of problems and expand most critical one"
 msgstr "Số lượng vấn đề và mở rộng nghiêm trọng nhất"
 
-#: include/classes/items/CHelpItems.php:743
+#: include/classes/items/CHelpItems.php:763
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:747
+#: include/classes/items/CHelpItems.php:767
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:811
+#: include/classes/items/CHelpItems.php:831
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
@@ -11608,15 +11608,15 @@ msgstr "Số bước"
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "Số lượng trigger (Kích hoạt/vô hiệu hóa [Problem/ok]"
 
-#: include/classes/items/CHelpItems.php:1015
+#: include/classes/items/CHelpItems.php:1035
 msgid "Number of triggers in Zabbix database."
 msgstr "Số lượng trigger trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:967
+#: include/classes/items/CHelpItems.php:987
 msgid "Number of unsupported items in Zabbix database."
 msgstr "Số lượng item không được hỗ trợ trong cơ sở dữ liệu Zabbix."
 
-#: include/classes/items/CHelpItems.php:943
+#: include/classes/items/CHelpItems.php:963
 msgid "Number of unsupported items on the host."
 msgstr "Số lượng item không được hỗ trợ trên máy chủ."
 
@@ -11629,35 +11629,35 @@ msgstr "Số lượng người dùng (trực tuyến)"
 msgid "Number of users logged in. Returns integer"
 msgstr "Số lượng người dùng đăng nhập được. Trả về kiểu integer"
 
-#: include/classes/items/CHelpItems.php:919
+#: include/classes/items/CHelpItems.php:939
 msgid "Number of values stored in table HISTORY."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY."
 
-#: include/classes/items/CHelpItems.php:923
+#: include/classes/items/CHelpItems.php:943
 msgid "Number of values stored in table HISTORY_LOG."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_LOG."
 
-#: include/classes/items/CHelpItems.php:927
+#: include/classes/items/CHelpItems.php:947
 msgid "Number of values stored in table HISTORY_STR."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_STR."
 
-#: include/classes/items/CHelpItems.php:931
+#: include/classes/items/CHelpItems.php:951
 msgid "Number of values stored in table HISTORY_TEXT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_TEXT."
 
-#: include/classes/items/CHelpItems.php:935
+#: include/classes/items/CHelpItems.php:955
 msgid "Number of values stored in table HISTORY_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng HISTORY_UNIT."
 
-#: include/classes/items/CHelpItems.php:1007
+#: include/classes/items/CHelpItems.php:1027
 msgid "Number of values stored in table TRENDS."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS."
 
-#: include/classes/items/CHelpItems.php:1011
+#: include/classes/items/CHelpItems.php:1031
 msgid "Number of values stored in table TRENDS_UINT."
 msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS_UNIT."
 
-#: include/classes/items/CHelpItems.php:799
+#: include/classes/items/CHelpItems.php:819
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Số lượng máy ảo trên VMware hypervisor, <url> - dịch vụ VMware URl, <uuid> - tên host VMware hypervisor"
 
@@ -13369,7 +13369,7 @@ msgstr "Quyền truy cập host được yêu cầu"
 msgid "Required performance (vps)"
 msgstr "Hiệu năng cần thiết (vps)"
 
-#: include/classes/items/CHelpItems.php:995
+#: include/classes/items/CHelpItems.php:1015
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Hiệu năng cần thiết của máy chủ Zabbix, trong các giá trị mới được dự tính trên mỗi giây."
 
@@ -13502,15 +13502,15 @@ msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 msgid "Retry"
 msgstr "Thử lại"
 
-#: include/classes/items/CHelpItems.php:1055
+#: include/classes/items/CHelpItems.php:1075
 msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
 msgstr "Trả về một đối tượng JSON mô tả các đối tượng MBean hoặc các thuộc tính của chúng. Có thể được sử dụng cho LLD."
 
-#: include/classes/items/CHelpItems.php:1041
+#: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Trả về cột đầu tiên của hàng đầu tiên của kết quả truy vấn SQL."
 
-#: include/classes/items/CHelpItems.php:1051
+#: include/classes/items/CHelpItems.php:1071
 msgid "Return value of an attribute of MBean object."
 msgstr "Trả về giá trị của một thuộc tính của đối tượng MBean."
 
@@ -13520,23 +13520,23 @@ msgstr "Trả về thời gian đáp ứng ICMP ping trong vài giây. Ví
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
-#: include/classes/items/CHelpItems.php:999
+#: include/classes/items/CHelpItems.php:1019
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
 
-#: include/classes/items/CHelpItems.php:951
+#: include/classes/items/CHelpItems.php:971
 msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
 msgstr "Trả về một đối tượng JSON mô tả các giao diện mạng máy chủ được cấu hình trong Zabbix. Có thể được sử dụng cho LLD."
 
-#: include/classes/items/CHelpItems.php:955
+#: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "Trả về tính sẵn sàng của một loại hình cụ thể của kiểm tra trên máy chủ. Giá trị của item này tương ứng với các biểu tượng có sẵn trên danh sách host. Các loại hợp lệ là: agent, snmp, ipmi, jmx."
 
-#: include/classes/items/CHelpItems.php:947
+#: include/classes/items/CHelpItems.php:967
 msgid "Returns current maintenance status of the host."
 msgstr "Trả về trạng thái bảo trì hiện tại của máy chủ."
 
-#: include/classes/items/CHelpItems.php:971
+#: include/classes/items/CHelpItems.php:991
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
 msgstr "Trả về thông tin liên quan đến Zabbiz Java gateway. Các tham số hợp lệ là: ping, version."
 
@@ -14855,7 +14855,7 @@ msgstr "Bắt đầu"
 msgid "Starting TLS failed."
 msgstr "TLS Bắt đầu thất bại."
 
-#: include/classes/items/CHelpItems.php:915
+#: include/classes/items/CHelpItems.php:935
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr "Thời gian bắt đầu khởi động của của máy chủ Zabbix, Unix timestamp."
 
@@ -15623,11 +15623,11 @@ msgstr "Thời gian (tăng dần)"
 msgid "Time (descending)"
 msgstr "Thời gian (giảm dần)"
 
-#: include/classes/items/CHelpItems.php:975
+#: include/classes/items/CHelpItems.php:995
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các quy trình (được xác định bởi <type> và <mode>) được chi tiêu theo <state> theo tỷ lệ phần trăm."
 
-#: include/classes/items/CHelpItems.php:979
+#: include/classes/items/CHelpItems.php:999
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
 msgstr "Thời gian của truy cập proxy lần cuối cùng. Tên - tên proxy. Tham số - truy cập cuối cùng. Nhãn thời gian UNIX."
 
@@ -15732,7 +15732,7 @@ msgstr "Tổng thời gian: %1$s"
 msgid "Transaction has not been closed. Aborting..."
 msgstr "Giao dịch chưa được đóng lại. Đang hủy bỏ..."
 
-#: include/classes/items/CHelpItems.php:1045
+#: include/classes/items/CHelpItems.php:1065
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Chuyển đổi kết quả truy vấn SQL thành một đối tượng JSON để khám phá mức độ thấp."
 
@@ -16568,7 +16568,7 @@ msgstr "Các bản đồ ở mức cao hơn"
 msgid "Uptime"
 msgstr "Thời gian chạy"
 
-#: include/classes/items/CHelpItems.php:1019
+#: include/classes/items/CHelpItems.php:1039
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Thời gian hoạt động của tiến trình máy chủ Zabbix trong vài giây."
 
@@ -16867,7 +16867,7 @@ msgstr "Các người dùng"
 msgid "Users unblocked"
 msgstr "Các người dùng không bị khóa"
 
-#: include/classes/items/CHelpItems.php:1031
+#: include/classes/items/CHelpItems.php:1051
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê bộ nhớ VMware. Các chế độ hợp lệ: total, free, pfree, used và pused."
 
@@ -16875,87 +16875,104 @@ msgstr "Thống kê bộ nhớ VMware. Các chế độ hợp lệ: tota
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "Trạng thái VMware cluster, <url> - Dịch vụ VMware URL, <name> - Tên VMware cluster"
 
-#: include/classes/items/CHelpItems.php:723
+#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:739
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Thống kê dung lượng kho dữ liệu VMware theo byte hoặc theo tỷ lệ phần trăm trên tổng số. Trả về kiểu integer cho byte; float cho tỷ lệ phần trăm"
+
+#: include/classes/items/CHelpItems.php:723
+msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:711
+msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:719
+msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:703
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "Log sự kiện VMware, <url> - URL dịch vụ VMware, <mode> - tất cả (mặc định), bỏ qua - bỏ qua xử lý dữ liệu cũ hơn"
 
-#: include/classes/items/CHelpItems.php:759
+#: include/classes/items/CHelpItems.php:779
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor BIOS uuid, <url> - Dịch vụ VMwareURL, <uuid> - Tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:767
+#: include/classes/items/CHelpItems.php:787
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:711
+#: include/classes/items/CHelpItems.php:727
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:719
+#: include/classes/items/CHelpItems.php:735
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/items/CHelpItems.php:727
+#: include/classes/items/CHelpItems.php:743
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
-#: include/classes/items/CHelpItems.php:755
+#: include/classes/items/CHelpItems.php:747
+msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:775
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:731
+#: include/classes/items/CHelpItems.php:751
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:775
+#: include/classes/items/CHelpItems.php:795
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:779
+#: include/classes/items/CHelpItems.php:799
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
 
-#: include/classes/items/CHelpItems.php:783
+#: include/classes/items/CHelpItems.php:803
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
 
-#: include/classes/items/CHelpItems.php:735
+#: include/classes/items/CHelpItems.php:755
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:739
+#: include/classes/items/CHelpItems.php:759
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:715
+#: include/classes/items/CHelpItems.php:731
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:787
+#: include/classes/items/CHelpItems.php:807
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:751
+#: include/classes/items/CHelpItems.php:771
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:791
+#: include/classes/items/CHelpItems.php:811
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:771
+#: include/classes/items/CHelpItems.php:791
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:763
+#: include/classes/items/CHelpItems.php:783
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
-#: include/classes/items/CHelpItems.php:795
+#: include/classes/items/CHelpItems.php:815
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
 
@@ -16963,99 +16980,99 @@ msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> -
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "tên đầy đù của dịch vụ VMware hypervisor VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/items/CHelpItems.php:803
+#: include/classes/items/CHelpItems.php:823
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "Phiên bản dịch vụ VMware, <url> - dịch vụ VMware URL"
 
-#: include/classes/items/CHelpItems.php:827
+#: include/classes/items/CHelpItems.php:847
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:875
+#: include/classes/items/CHelpItems.php:895
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:831
+#: include/classes/items/CHelpItems.php:851
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:891
+#: include/classes/items/CHelpItems.php:911
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
-#: include/classes/items/CHelpItems.php:895
+#: include/classes/items/CHelpItems.php:915
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/ số lần thao tác trên giây "
 
-#: include/classes/items/CHelpItems.php:899
+#: include/classes/items/CHelpItems.php:919
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> -  tên host máy ảo VMware, <fsname> - tên hệ thống tập tin, <mode> -  total/free/used/pfree/pused"
 
-#: include/classes/items/CHelpItems.php:847
+#: include/classes/items/CHelpItems.php:867
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:851
+#: include/classes/items/CHelpItems.php:871
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:823
+#: include/classes/items/CHelpItems.php:843
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:807
+#: include/classes/items/CHelpItems.php:827
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:859
+#: include/classes/items/CHelpItems.php:879
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/items/CHelpItems.php:863
+#: include/classes/items/CHelpItems.php:883
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
-#: include/classes/items/CHelpItems.php:867
+#: include/classes/items/CHelpItems.php:887
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
 
-#: include/classes/items/CHelpItems.php:871
+#: include/classes/items/CHelpItems.php:891
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:835
+#: include/classes/items/CHelpItems.php:855
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:815
+#: include/classes/items/CHelpItems.php:835
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Bộ xử lý máy ảo VMware thời gian sẵn sàng ms, <url> - URL dịch vụ VMware, <uuid> - Tên máy chủ máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:819
+#: include/classes/items/CHelpItems.php:839
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:839
+#: include/classes/items/CHelpItems.php:859
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:843
+#: include/classes/items/CHelpItems.php:863
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:855
+#: include/classes/items/CHelpItems.php:875
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:879
+#: include/classes/items/CHelpItems.php:899
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:883
+#: include/classes/items/CHelpItems.php:903
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
-#: include/classes/items/CHelpItems.php:887
+#: include/classes/items/CHelpItems.php:907
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Thời gian hoạt động của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
 
@@ -17136,11 +17153,11 @@ msgstr "Giá trị %2$s của %1$s có quá nhiều chữ số trước d
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 msgstr "Giá trị %2$s của %1$s quá dài: nó không thể có nhiều hơn %3$s chữ số trước dấu thập phân và nhiều hơn %4$s chữ số sau dấu thập phân."
 
-#: include/classes/items/CHelpItems.php:1027
+#: include/classes/items/CHelpItems.php:1047
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Giá trị có hiệu lực của cache. các tham số hợp lệ là: requests, hits and misses."
 
-#: include/classes/items/CHelpItems.php:1023
+#: include/classes/items/CHelpItems.php:1043
 msgid "Value cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "Thống kê giá trị của cache. Các chế độ hợp lệ là: total, free, pfree, used and pused."
 
