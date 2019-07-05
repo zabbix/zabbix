@@ -134,60 +134,65 @@ class CConfigurationExport {
 	 * The resulting export format depends on the export writer that was set,
 	 * the export structure depends on the builder that was set.
 	 *
-	 * @return string
+	 * @return string result or false on insufficient user permissions.
 	 */
 	public function export() {
-		$this->gatherData();
+		try {
+			$this->gatherData();
 
-		$simple_triggers = [];
+			$simple_triggers = [];
 
-		if ($this->data['groups']) {
-			$this->builder->buildGroups($this->data['groups']);
-		}
+			if ($this->data['groups']) {
+				$this->builder->buildGroups($this->data['groups']);
+			}
 
-		if ($this->data['triggers']) {
-			foreach ($this->data['triggers'] as $triggerid => $trigger) {
-				if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
-						&& $trigger['items'][0]['templateid'] == 0) {
-					$simple_triggers[] = $trigger;
-					unset($this->data['triggers'][$triggerid]);
+			if ($this->data['triggers']) {
+				foreach ($this->data['triggers'] as $triggerid => $trigger) {
+					if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+							&& $trigger['items'][0]['templateid'] == 0) {
+						$simple_triggers[] = $trigger;
+						unset($this->data['triggers'][$triggerid]);
+					}
 				}
 			}
-		}
 
-		if ($this->data['templates']) {
-			$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
-		}
+			if ($this->data['templates']) {
+				$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
+			}
 
-		if ($this->data['hosts']) {
-			$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
-		}
+			if ($this->data['hosts']) {
+				$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
+			}
 
-		if ($this->data['triggers']) {
-			$this->builder->buildTriggers($this->data['triggers']);
-		}
+			if ($this->data['triggers']) {
+				$this->builder->buildTriggers($this->data['triggers']);
+			}
 
-		if ($this->data['graphs']) {
-			$this->builder->buildGraphs($this->data['graphs']);
-		}
+			if ($this->data['graphs']) {
+				$this->builder->buildGraphs($this->data['graphs']);
+			}
 
-		if ($this->data['screens']) {
-			$this->builder->buildScreens($this->data['screens']);
-		}
+			if ($this->data['screens']) {
+				$this->builder->buildScreens($this->data['screens']);
+			}
 
-		if ($this->data['images']) {
-			$this->builder->buildImages($this->data['images']);
-		}
+			if ($this->data['images']) {
+				$this->builder->buildImages($this->data['images']);
+			}
 
-		if ($this->data['maps']) {
-			$this->builder->buildMaps($this->data['maps']);
-		}
+			if ($this->data['maps']) {
+				$this->builder->buildMaps($this->data['maps']);
+			}
 
-		if ($this->data['valueMaps']) {
-			$this->builder->buildValueMaps($this->data['valueMaps']);
-		}
+			if ($this->data['valueMaps']) {
+				$this->builder->buildValueMaps($this->data['valueMaps']);
+			}
 
-		return $this->writer->write($this->builder->getExport());
+			return $this->writer->write($this->builder->getExport());
+		}
+		catch (CConfigurationExportException $e) {
+			return false;
+		}
 	}
 
 	/**
@@ -1361,6 +1366,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		// Access denied for some objects?
+		if (count($groups) != count($groupIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($groups as &$group) {
 			$group = ['name' => $group['name']];
 		}
@@ -1385,6 +1395,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		// Access denied for some objects?
+		if (count($hosts) != count($hostIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($hosts as $id => $host) {
 			$ids[$id] = ['host' => $host['host']];
 		}
@@ -1408,6 +1423,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		// Access denied for some objects?
+		if (count($screens) != count($screenIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($screens as $id => $screen) {
 			$ids[$id] = ['name' => $screen['name']];
 		}
@@ -1430,6 +1450,11 @@ class CConfigurationExport {
 			'output' => ['name'],
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($maps) != count($mapIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($maps as $id => $map) {
 			$ids[$id] = ['name' => $map['name']];
@@ -1455,6 +1480,11 @@ class CConfigurationExport {
 			'preservekeys' => true,
 			'filter' => ['flags' => null]
 		]);
+
+		// Access denied for some objects?
+		if (count($graphs) != count($graphIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($graphs as $id => $graph) {
 			$host = reset($graph['hosts']);
@@ -1487,6 +1517,11 @@ class CConfigurationExport {
 			'filter' => ['flags' => null]
 		]);
 
+		// Access denied for some objects?
+		if (count($items) != count($itemIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($items as $id => $item) {
 			$host = reset($item['hosts']);
 
@@ -1514,6 +1549,11 @@ class CConfigurationExport {
 			'triggerids' => $triggerIds,
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($triggers) != count($triggerIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
@@ -1545,6 +1585,11 @@ class CConfigurationExport {
 			'imageids' => $imageIds,
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($images) != count($imageIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($images as $id => $image) {
 			$ids[$id] = ['name' => $image['name']];
