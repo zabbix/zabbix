@@ -218,7 +218,6 @@ class CScreenHistory extends CScreenBase {
 
 					if (in_array($items[$history_row['itemid']]['value_type'],
 							[ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])) {
-						$value = rtrim($value, " \t\r\n");
 						$value = '"'.str_replace('"', '""', htmlspecialchars($value, ENT_NOQUOTES)).'"';
 					}
 					elseif ($items[$history_row['itemid']]['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
@@ -374,9 +373,6 @@ class CScreenHistory extends CScreenBase {
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 						sscanf($value, '%f', $value);
 					}
-					else {
-						$value = rtrim($value, " \t\r\n");
-					}
 
 					if ($item['valuemapid']) {
 						$value = applyValueMap($value, $item['valuemapid']);
@@ -458,11 +454,8 @@ class CScreenHistory extends CScreenBase {
 					foreach ($items as $item) {
 						$value = array_key_exists($item['itemid'], $values) ? $values[$item['itemid']] : '';
 
-						if ($value && $item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
+						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							sscanf($value, '%f', $value);
-						}
-						else {
-							$value = rtrim($value, " \t\r\n");
 						}
 
 						if ($item['valuemapid']) {
