@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__) . '/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * @backup users
  */
-class testFormUser extends CLegacyWebTest {
+class testFormUser extends CWebTest {
 
 	public function getCreateData() {
 		return [
@@ -500,30 +500,25 @@ class testFormUser extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormUser_Create($data) {
-		$good_title = 'User added';
-		$bad_title = 'Cannot add user';
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
-
 		$this->page->login()->open('users.php?form=create');
 		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
-
 		if (array_key_exists('auto_logout', $data)) {
 			$this->setAutoLogout($data['auto_logout']);
 		}
-
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Verify that the user was created.
-		$this->assertUserMessage($data, $good_title, $bad_title);
+		$this->assertUserMessage($data, 'User added', 'Cannot add user');
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
-		if (array_key_exists('check_form', $data)) {
+		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->assertFormFields($data);
 		}
-		if (array_key_exists('check_user', $data)) {
+		if (CTestArrayHelper::get($data, 'check_user', false)) {
 			$this->assertUserParameters($data);
 		}
 	}
@@ -535,7 +530,6 @@ class testFormUser extends CLegacyWebTest {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 		$this->page->open('users.php?form=update&userid='.$userid);
 		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
-
 		// Verify that fields are updated.
 		$check_fields = ['Alias', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
 		foreach ($check_fields as $field_name) {
@@ -544,7 +538,7 @@ class testFormUser extends CLegacyWebTest {
 			}
 		}
 		$this->assertEquals($data['fields']['Groups'], $form_update->getField('Groups')->getSelected());
-		if (array_key_exists('auto_logout', $data) && $data['auto_logout']['checked'] === true) {
+		if (CTestArrayHelper::get($data, 'auto_logout.checked', false)) {
 			$this->assertTrue($form_update->getField('Auto-login')->isChecked(false));
 		}
 		else {
@@ -560,20 +554,15 @@ class testFormUser extends CLegacyWebTest {
 			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 			// Logout.
 			$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
-			$this->webDriver->manage()->deleteAllCookies();
+			$this->page->logout();
 			// Log in with the created or updated user.
-			$this->query('id:name')->waitUntilVisible()->one()->fill($data['fields']['Alias']);
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-			$this->query('id:password')->one()->fill($password);
-			$this->query('button:Sign in')->one()->click();
-
+			$this->userLogin($data['fields']['Alias'],$password);
 			// Verification of URL after login.
 			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
-
 			// Verification of the number of rows per page parameter.
 			$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
 			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
-
 			// Verification of default theme.
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
@@ -891,6 +880,16 @@ class testFormUser extends CLegacyWebTest {
 					'check_form' => true,
 					'check_user' => true
 				]
+			],
+			// User update without any actual changes.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Alias' => 'test-user'
+					],
+					'blank_update' => true
+				]
 			]
 		];
 	}
@@ -899,9 +898,12 @@ class testFormUser extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormUser_Update($data) {
-		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
-		$good_title = 'User updated';
-		$bad_title = 'Cannot update user';
+		if (CTestArrayHelper::get($data, 'blank_update', false) === true) {
+			$update_user = CTestArrayHelper::get($data, 'fields.Alias');
+		}
+		else {
+			$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
+		}
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
 
@@ -912,21 +914,23 @@ class testFormUser extends CLegacyWebTest {
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
-		$form->fill($data['fields']);
-		if (array_key_exists('auto_logout', $data)) {
-			$this->setAutoLogout($data['auto_logout']);
+		if (CTestArrayHelper::get($data, 'blank_update', false) === false) {
+			$form->fill($data['fields']);
+			if (array_key_exists('auto_logout', $data)) {
+				$this->setAutoLogout($data['auto_logout']);
+			}
 		}
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Verify if the user was updated.
-		$this->assertUserMessage($data, $good_title, $bad_title);
-		if ($data['expected'] === TEST_BAD) {
+		$this->assertUserMessage($data, 'User updated', 'Cannot update user');
+		if ($data['expected'] === TEST_BAD || CTestArrayHelper::get($data, 'blank_update', false) == true) {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
-		if (array_key_exists('check_user', $data)) {
+		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->assertFormFields($data);
 		}
-		if (array_key_exists('check_user', $data)) {
+		if (CTestArrayHelper::get($data, 'check_user', false)) {
 			$this->assertUserParameters($data);
 		}
 	}
@@ -952,19 +956,15 @@ class testFormUser extends CLegacyWebTest {
 		$form_update->submit();
 		try {
 			$this->query('class:top-nav-signout')->one()->click();
-			$this->webDriver->manage()->deleteAllCookies();
+			$this->page->logout();
 
 			// Atempt to sign in with old password.
-			$this->query('id:name')->waitUntilVisible()->one()->fill($data['alias']);
-			$this->query('id:password')->one()->fill($data['old_password']);
-			$this->query('button:Sign in')->one()->click();
+			$this->userLogin($data['alias'],$data['old_password']);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 
 			// Sign in with new password.
-			$this->query('id:name')->one()->fill($data['alias']);
-			$this->query('id:password')->one()->fill($data['new_password']);
-			$this->query('button:Sign in')->one()->click();
+			$this->userLogin($data['alias'],$data['new_password']);
 			$attempt_message = CMessageElement::find()->one();
 			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 			$this->page->logout();
@@ -984,13 +984,6 @@ class testFormUser extends CLegacyWebTest {
 					'fields' => [
 						'Alias' => 'no-access-to-the-frontend'
 					]
-				]
-			],
-			// Admin has disabled button.
-			[
-				[
-					'username' => 'Admin',
-					'self-deletion' => true
 				]
 			],
 			// Attempt to delete internal user guest.
@@ -1061,42 +1054,36 @@ class testFormUser extends CLegacyWebTest {
 	 */
 	public function testFormUser_Delete($data) {
 		// Defined required variables.
-		$good_title = 'User deleted';
-		$bad_title = 'Cannot delete user';
 		if (array_key_exists('username', $data)) {
 			$username = $data['username'];
 		}
 		else {
 			$username = $data['fields']['Alias'];
 		}
-
 		$this->page->login()->open('users.php');
 		$this->query('link', $username)->one()->click();
-		// Verify that delete button is disabled when user opens himself.
-		if (array_key_exists('self-deletion', $data)) {
-			$this->assertTrue($this->query('button:Delete')->one()->isEnabled(false));
-
-			return;
-		}
-
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
 		// Link user with map, screen, slideshow, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
-					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid)
-					. ' WHERE '.$data['parameters']['column'].'='.zbx_dbstr($data['parameters']['value'])
+					'UPDATE '.$data['parameters']['DB_table'].' SET userid ='.zbx_dbstr($userid).
+					' WHERE '.$data['parameters']['column'].'='.zbx_dbstr($data['parameters']['value'])
 			);
 		}
 		// Attempt to delete the user from user update view and verify result.
 		$this->query('button:Delete')->one()->click();
-		$this->webDriver->switchTo()->alert()->accept();
+		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		// Validate if the user was deleted.
-		$this->assertUserMessage($data, $good_title, $bad_title);
-
+		$this->assertUserMessage($data, 'User deleted', 'Cannot delete user');
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username)));
 		}
+	}
+
+	public function testFormUser_SelfDeletion() {
+		$this->page->login()->open('users.php?form=update&userid=1');
+		$this->assertTrue($this->query('button:Delete')->one()->isEnabled(false));
 	}
 
 	public function testFormUser_Cancel() {
@@ -1152,11 +1139,22 @@ class testFormUser extends CLegacyWebTest {
 	private function setAutoLogout($data) {
 		$form = $this->query('name:userForm')->asForm()->one();
 		$auto_logout = $form->getFieldElements('Auto-logout');
+		/*
+		 * Auto-logout fields consists of multiple elements, the following of which will be used:
+		 *		0 - Checkbox element
+		 *		3 - Text input element
+		 */
 		$auto_logout->get(0)->asCheckbox()->set($data['checked']);
 		if (array_key_exists('value', $data)) {
 			$auto_logout->get(3)->overwrite($data['value']);
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
+	}
+
+	private function userLogin($alias,$password) {
+		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
+		$this->query('id:password')->one()->fill($password);
+		$this->query('button:Sign in')->one()->click();
 	}
 }
