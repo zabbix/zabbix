@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-5249] added new dashboard widget "Host availability" (rlataria)
 ..F....... [ZBXNEXT-5238] added edit control for the widget in dashboard view mode (ashubin)
 A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
 A.F.I..PS. [ZBXNEXT-5040,ZBXNEXT-5219] moved item real-time data to a new, seperate table in database (rlataria, viktors)
@@ -8,7 +9,6 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ....I..PS. [ZBXNEXT-5211] increased the maximum Hosts name character length from 64 to 128 for autoregistration and LLD (akozlovs)
 ...G...... [ZBXNEXT-1302] added low-level discovery of block devices (asestakovs)
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
-..F....... [ZBXNEXT-5249] New dashboard widget "Host availability" (rlataria)
 
 Bug fixes:
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
