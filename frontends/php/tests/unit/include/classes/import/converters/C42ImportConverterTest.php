@@ -27,7 +27,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 				[
 					'screens' => [
 						[
-							'name' => 'Parent screen',
+							'name' => 'Parent screen 1',
 							'hsize' => 1,
 							'vsize' => 4,
 							'screen_items' => [
@@ -64,6 +64,28 @@ class C42ImportConverterTest extends CImportConverterTest {
 							]
 						],
 						[
+							'name' => 'Parent screen 2',
+							'hsize' => 1,
+							'vsize' => 4,
+							'screen_items' => [
+								'0' => [
+									'resourcetype' => 8,
+									'width' => 500,
+									'height' => 100,
+									'x' => 0,
+									'y' => 0,
+									'colspan' => 1,
+									'rowspan' => 1,
+									'valign' => 0,
+									'halign' => 0,
+									'resource' => [
+										'name' => 'Child screen'
+									],
+									'max_columns' => 3
+								]
+							]
+						],
+						[
 							'name' => 'Child screen',
 							'hsize' => 1,
 							'vsize' => 4,
@@ -90,7 +112,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 				[
 					'screens' => [
 						[
-							'name' => 'Parent screen',
+							'name' => 'Parent screen 1',
 							'hsize' => 1,
 							'vsize' => 4,
 							'screen_items' => [
@@ -110,6 +132,12 @@ class C42ImportConverterTest extends CImportConverterTest {
 									'max_columns' => 3
 								]
 							]
+						],
+						[
+							'name' => 'Parent screen 2',
+							'hsize' => 1,
+							'vsize' => 4,
+							'screen_items' => []
 						],
 						[
 							'name' => 'Child screen',
