@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+..F....... [ZBX-16135] fixed error messages in XML export files (averza)
 A......... [ZBX-16213] fixed PostgreSQL bad performance on history tables (averza)
 ..F....... [ZBX-16176] preserve trailing spaces in history values (averza)
 ..F....... [ZBX-16169] improved performance of map navigation tree widget (miks)
