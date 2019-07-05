@@ -1501,4 +1501,8 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
+#ifdef _WINDOWS
+#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#endif
+
 #endif
