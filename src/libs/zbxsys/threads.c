@@ -63,7 +63,7 @@ void	zbx_child_fork(pid_t *pid)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGINT);
 	sigaddset(&mask, SIGCHLD);
-	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGABRT);
 
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 

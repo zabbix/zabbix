@@ -934,7 +934,7 @@ int	DBcheck_version(void)
 			sigaddset(&mask, SIGTERM);
 			sigaddset(&mask, SIGUSR2);
 			sigaddset(&mask, SIGINT);
-			sigaddset(&mask, SIGQUIT);
+			sigaddset(&mask, SIGABRT);
 
 			if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 				zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");

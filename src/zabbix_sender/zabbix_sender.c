@@ -467,7 +467,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 #if !defined(_WINDOWS)
 	signal(SIGINT,  send_signal_handler);
 	signal(SIGTERM, send_signal_handler);
-	signal(SIGQUIT, send_signal_handler);
+	signal(SIGABRT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
 	switch (configured_tls_connect_mode)

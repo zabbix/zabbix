@@ -57,7 +57,7 @@ const char	*get_signal_name(int sig)
 		case SIGFPE:	return "SIGFPE";
 		case SIGSEGV:	return "SIGSEGV";
 		case SIGBUS:	return "SIGBUS";
-		case SIGQUIT:	return "SIGQUIT";
+		case SIGABRT:	return "SIGABRT";
 		case SIGINT:	return "SIGINT";
 		case SIGTERM:	return "SIGTERM";
 		case SIGPIPE:	return "SIGPIPE";
