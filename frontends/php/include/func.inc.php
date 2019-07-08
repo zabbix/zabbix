@@ -1995,6 +1995,38 @@ function getMessages($good = false, $title = null) {
 	return $message_box;
 }
 
+/**
+ * Returns raw messages, clearing the message stack. Used in pair with unstash_messages().
+ *
+ * @return array a list of messages for using with unstash_messages().
+ */
+function stash_messages()
+{
+	global $ZBX_MESSAGES;
+
+	$messages = (isset($ZBX_MESSAGES) && $ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
+
+	$ZBX_MESSAGES = [];
+
+	return $messages;
+}
+
+/**
+ * Sets the raw messages before already existing ones. Used in pair with stash_messages().
+ *
+ * @param array $messages a list of messages returned by stash_messages().
+ */
+function unstash_messages(array $messages = [])
+{
+	global $ZBX_MESSAGES;
+
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
+	}
+
+	$ZBX_MESSAGES = array_merge($messages, $ZBX_MESSAGES);
+}
+
 function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 

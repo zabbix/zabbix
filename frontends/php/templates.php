@@ -80,12 +80,19 @@ function prepare_page_header($type) {
 	}
 }
 
-$fields_error = check_fields_raw($fields);
-if ($fields_error & ZBX_VALID_ERROR) {
+// Get fields warning and error flags.
+$fields_flags = check_fields_raw($fields);
+
+// Stash generated warnings and errors unless the page_header.php is loaded.
+$fields_messages = stash_messages();
+
+if ($fields_flags & ZBX_VALID_ERROR) {
 	// Halt on a HTML page with errors.
 
 	prepare_page_header('html');
 	require_once dirname(__FILE__).'/include/page_header.php';
+
+	unstash_messages($fields_messages);
 
 	invalid_url();
 }
@@ -151,6 +158,15 @@ if (hasRequest('action') && getRequest('action') === 'template.export' && hasReq
 // Using HTML for the rest of functions.
 prepare_page_header('html');
 require_once dirname(__FILE__).'/include/page_header.php';
+
+// Unstash generated warnings and errors if any.
+unstash_messages($fields_messages);
+
+if ($fields_flags != ZBX_VALID_OK) {
+	// Warnings only, since errors already processed.
+
+	show_messages(false, null, _('Page received incorrect data'));
+}
 
 // remove inherited macros data (actions: 'add', 'update' and 'form')
 if (hasRequest('macros')) {
