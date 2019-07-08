@@ -61,9 +61,10 @@ void	zbx_child_fork(pid_t *pid)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGCHLD);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGCHLD);
 
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
