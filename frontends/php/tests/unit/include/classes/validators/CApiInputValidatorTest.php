@@ -312,25 +312,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_INT32],
 				'foo',
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32],
 				[],
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32],
 				true,
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32],
 				null,
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32, 'flags' => API_ALLOW_NULL],
@@ -342,13 +342,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_INT32],
 				0.0,
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32],
 				1.23E+11,
 				'/1/int',
-				'Invalid parameter "/1/int": a number is expected.'
+				'Invalid parameter "/1/int": an integer is expected.'
 			],
 			[
 				['type' => API_INT32, 'in' => '0,1,2'],
@@ -504,7 +504,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_INTS32],
 				[0, []],
 				'/output',
-				'Invalid parameter "/output/2": a number is expected.'
+				'Invalid parameter "/output/2": an integer is expected.'
 			],
 			[
 				['type' => API_INTS32, 'in' => '1:100'],
@@ -523,6 +523,378 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				[55, 55, 101],
 				'/output',
 				'Invalid parameter "/output/2": value (55) already exists.'
+			],
+			[
+				['type' => API_UINT64],
+				0,
+				'/1/int',
+				'0'
+			],
+			[
+				['type' => API_UINT64],
+				12345,
+				'/1/int',
+				'12345'
+			],
+			[
+				['type' => API_UINT64],
+				-12345,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				'012345',
+				'/1/int',
+				'12345'
+			],
+			[
+				['type' => API_UINT64],
+				'-012345',
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				'18446744073709551615',
+				'/1/int',
+				'18446744073709551615'
+			],
+			[
+				['type' => API_UINT64],
+				'18446744073709551616',
+				'/1/int',
+				'Invalid parameter "/1/int": a number is too large.'
+			],
+			[
+				['type' => API_UINT64],
+				'foo',
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				[],
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				true,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				null,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/int',
+				null
+			],
+			[
+				['type' => API_UINT64],
+				0.0,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINT64],
+				1.23E+11,
+				'/1/int',
+				'Invalid parameter "/1/int": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_UINTS64],
+				[0, 1],
+				'/output',
+				['0', '1']
+			],
+			[
+				['type' => API_UINTS64],
+				['0', '1'],
+				'/output',
+				['0', '1']
+			],
+			[
+				['type' => API_UINTS64],
+				['a' => 0, 'b' => 1],
+				'/output',
+				['0', '1']
+			],
+			[
+				['type' => API_UINTS64],
+				[],
+				'/output',
+				[]
+			],
+			[
+				['type' => API_UINTS64, 'flags' => API_NOT_EMPTY],
+				[],
+				'/output',
+				'Invalid parameter "/output": cannot be empty.'
+			],
+			[
+				['type' => API_UINTS64],
+				'',
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_UINTS64],
+				true,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_UINTS64],
+				123,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_UINTS64, 'flags' => API_NORMALIZE],
+				123,
+				'/output',
+				['123']
+			],
+			[
+				['type' => API_UINTS64],
+				123.5,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_UINTS64],
+				null,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_UINTS64, 'flags' => API_ALLOW_NULL],
+				null,
+				'/output',
+				null
+			],
+			[
+				['type' => API_UINTS64],
+				[0, []],
+				'/output',
+				'Invalid parameter "/output/2": an unsigned integer is expected.'
+			],
+			[
+				['type' => API_FLOAT],
+				0,
+				'/1/float',
+				0.0
+			],
+			[
+				['type' => API_FLOAT],
+				0.5,
+				'/1/float',
+				0.5
+			],
+			[
+				['type' => API_FLOAT],
+				-0.5,
+				'/1/float',
+				-0.5
+			],
+			[
+				['type' => API_FLOAT],
+				12345,
+				'/1/float',
+				12345.0
+			],
+			[
+				['type' => API_FLOAT],
+				-12345,
+				'/1/float',
+				-12345.0
+			],
+			[
+				['type' => API_FLOAT],
+				'012345',
+				'/1/float',
+				12345.0
+			],
+			[
+				['type' => API_FLOAT],
+				'-12345',
+				'/1/float',
+				-12345.0
+			],
+			[
+				['type' => API_FLOAT],
+				'-012345',
+				'/1/float',
+				-12345.0
+			],
+			[
+				['type' => API_FLOAT],
+				'-2147483648',
+				'/1/float',
+				-2147483648.0
+			],
+			[
+				['type' => API_FLOAT],
+				'2147483647',
+				'/1/float',
+				2147483647.0
+			],
+			[
+				['type' => API_FLOAT],
+				'-2147483649',
+				'/1/float',
+				-2147483649.0
+			],
+			[
+				['type' => API_FLOAT],
+				'2147483648',
+				'/1/float',
+				2147483648.0
+			],
+			[
+				['type' => API_FLOAT],
+				'foo',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT],
+				[],
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT],
+				true,
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT],
+				null,
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/float',
+				null
+			],
+			[
+				['type' => API_FLOAT],
+				1.23E+11,
+				'/1/float',
+				1.23E+11,
+			],
+			[
+				['type' => API_FLOAT],
+				'1.23E+11',
+				'/1/float',
+				1.23E+11,
+			],
+			[
+				['type' => API_FLOAT],
+				'1.23e+11',
+				'/1/float',
+				1.23E+11,
+			],
+			[
+				['type' => API_FLOAT],
+				'-1.23e+11',
+				'/1/float',
+				-1.23E+11,
+			],
+			[
+				['type' => API_FLOAT],
+				'.23E11',
+				'/1/float',
+				0.23E+11,
+			],
+			[
+				['type' => API_FLOATS],
+				[0, 1],
+				'/output',
+				[0.0, 1.0]
+			],
+			[
+				['type' => API_FLOATS],
+				['0', '1'],
+				'/output',
+				[0.0, 1.0]
+			],
+			[
+				['type' => API_FLOATS],
+				['a' => 0, 'b' => 1],
+				'/output',
+				[0.0, 1.0]
+			],
+			[
+				['type' => API_FLOATS],
+				[],
+				'/output',
+				[]
+			],
+			[
+				['type' => API_FLOATS, 'flags' => API_NOT_EMPTY],
+				[],
+				'/output',
+				'Invalid parameter "/output": cannot be empty.'
+			],
+			[
+				['type' => API_FLOATS],
+				'',
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_FLOATS],
+				true,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_FLOATS],
+				123,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_FLOATS, 'flags' => API_NORMALIZE],
+				123,
+				'/output',
+				[123.0]
+			],
+			[
+				['type' => API_FLOATS],
+				123.5,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_FLOATS],
+				null,
+				'/output',
+				'Invalid parameter "/output": an array is expected.'
+			],
+			[
+				['type' => API_FLOATS, 'flags' => API_ALLOW_NULL],
+				null,
+				'/output',
+				null
+			],
+			[
+				['type' => API_FLOATS],
+				[0, []],
+				'/output',
+				'Invalid parameter "/output/2": a floating point value is expected.'
 			],
 			[
 				['type' => API_ID],
@@ -1172,7 +1544,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 					['type' => '2', 'value' => 'a125']
 				],
 				'/',
-				'Invalid parameter "/2/value": a number is expected.'
+				'Invalid parameter "/2/value": an integer is expected.'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [

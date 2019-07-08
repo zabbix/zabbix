@@ -511,7 +511,7 @@ foreach ($items as $key => $item) {
 	}
 
 	// change
-	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
+	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
 	if ($lastHistory && $prevHistory
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
@@ -664,7 +664,7 @@ foreach ($items as $item) {
 	}
 
 	// column "change"
-	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
+	$digits = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT : 0;
 	if (isset($lastHistory['value']) && isset($prevHistory['value'])
 			&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
