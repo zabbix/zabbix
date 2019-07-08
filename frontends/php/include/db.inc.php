@@ -787,7 +787,7 @@ function check_db_fields($dbFields, &$args) {
  * @return string
  */
 function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true, $quote = true, $zero_to_null = false) {
-	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (<id1>,<id2>,...,<idN>)"
 	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
 	if (is_bool(reset($values))) {

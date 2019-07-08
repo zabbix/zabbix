@@ -232,9 +232,11 @@ static void	lock_log(void)
 {
 	sigset_t	mask;
 
+	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGTERM);	/* block SIGTERM, SIGINT to prevent deadlock on log file mutex */
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGINT);
 	sigaddset(&mask, SIGQUIT);
 
