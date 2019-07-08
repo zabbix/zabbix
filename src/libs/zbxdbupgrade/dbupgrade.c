@@ -936,7 +936,6 @@ int	DBcheck_version(void)
 			/* block signals to prevent interruption of statements that cause an implicit commit */
 			sigemptyset(&mask);
 			sigaddset(&mask, SIGTERM);
-			sigaddset(&mask, SIGUSR2);
 			sigaddset(&mask, SIGINT);
 			sigaddset(&mask, SIGQUIT);
 

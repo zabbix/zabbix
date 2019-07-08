@@ -2710,13 +2710,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2904,13 +2905,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -3192,13 +3194,14 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGQUIT to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGQUIT and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
