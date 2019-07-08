@@ -49,6 +49,7 @@ static	void	block_signals(void)
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");

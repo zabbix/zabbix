@@ -465,7 +465,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 #endif
 
 #if !defined(_WINDOWS)
-	signal(SIGINT,  send_signal_handler);
+	signal(SIGINT, send_signal_handler);
+	signal(SIGQUIT, send_signal_handler);
 	signal(SIGTERM, send_signal_handler);
 	signal(SIGABRT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);

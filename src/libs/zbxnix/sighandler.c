@@ -179,6 +179,7 @@ void	zbx_set_common_signal_handlers(void)
 
 	phan.sa_sigaction = terminate_signal_handler;
 	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGABRT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGUSR2, &phan, NULL);

@@ -2729,6 +2729,7 @@ void	zbx_tls_init_child(void)
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2926,6 +2927,7 @@ void	zbx_tls_init_child(void)
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -3217,6 +3219,7 @@ void	zbx_tls_init_child(void)
 	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
