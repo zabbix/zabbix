@@ -100,8 +100,6 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
 	if (!SIG_PARENT_PROCESS)
 	{
 		/* the parent process can either politely ask a child process to finish it's work and perform cleanup */
@@ -114,6 +112,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 	else
 	{
+		SIG_CHECK_PARAMS(sig, siginfo, context);
+
 		if (0 == sig_exiting)
 		{
 			sig_exiting = 1;
