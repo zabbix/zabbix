@@ -221,7 +221,7 @@ if (hasRequest('action') && getRequest('action') === 'host.export' && hasRequest
 prepare_page_header('html');
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// Unstash generated warnings and errors if any.
+// Warnings only, since errors already processed.
 unstash_messages($fields_messages);
 
 if ($fields_flags != ZBX_VALID_OK) {
