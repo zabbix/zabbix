@@ -502,22 +502,28 @@ class testFormUser extends CWebTest {
 	public function testFormUser_Create($data) {
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
+
 		$this->page->login()->open('users.php?form=create');
 		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
+
 		if (array_key_exists('auto_logout', $data)) {
 			$this->setAutoLogout($data['auto_logout']);
 		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Verify that the user was created.
 		$this->assertUserMessage($data, 'User added', 'Cannot add user');
+
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
+
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->assertFormFields($data);
 		}
+
 		if (CTestArrayHelper::get($data, 'check_user', false)) {
 			$this->assertUserParameters($data);
 		}
@@ -530,6 +536,7 @@ class testFormUser extends CWebTest {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 		$this->page->open('users.php?form=update&userid='.$userid);
 		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+
 		// Verify that fields are updated.
 		$check_fields = ['Alias', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
 		foreach ($check_fields as $field_name) {
@@ -537,7 +544,9 @@ class testFormUser extends CWebTest {
 				$this->assertEquals($data['fields'][$field_name], $form_update->getField($field_name)->getValue());
 			}
 		}
+
 		$this->assertEquals($data['fields']['Groups'], $form_update->getField('Groups')->getSelected());
+
 		if (CTestArrayHelper::get($data, 'auto_logout.checked', false)) {
 			$this->assertTrue($form_update->getField('Auto-login')->isChecked(false));
 		}
@@ -551,22 +560,22 @@ class testFormUser extends CWebTest {
 	 */
 	private function assertUserParameters($data) {
 		try {
-			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
-			// Logout.
-			$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
 			$this->page->logout();
 			// Log in with the created or updated user.
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
-			$this->userLogin($data['fields']['Alias'],$password);
+			$this->userLogin($data['fields']['Alias'], $password);
 			// Verification of URL after login.
 			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 			// Verification of the number of rows per page parameter.
 			$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
 			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
+
 			// Verification of default theme.
+			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 			$file = explode('/', $stylesheet->getAttribute('href'));
+
 			if ($data['fields']['Theme'] === 'Dark') {
 				$this->assertEquals('dark-theme', $db_theme);
 				$this->assertEquals('dark-theme.css', end($file));
@@ -577,6 +586,7 @@ class testFormUser extends CWebTest {
 				$this->assertEquals('hc-light.css', end($file));
 				$this->assertEquals('rgba(255, 255, 255, 1)', $color);
 			}
+
 			$this->page->logout();
 		}
 		catch (\Exception $e) {
@@ -880,16 +890,6 @@ class testFormUser extends CWebTest {
 					'check_form' => true,
 					'check_user' => true
 				]
-			],
-			// User update without any actual changes.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Alias' => 'test-user'
-					],
-					'blank_update' => true
-				]
 			]
 		];
 	}
@@ -898,43 +898,64 @@ class testFormUser extends CWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormUser_Update($data) {
-		if (CTestArrayHelper::get($data, 'blank_update', false) === true) {
-			$update_user = CTestArrayHelper::get($data, 'fields.Alias');
-		}
-		else {
-			$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
-		}
+		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('users.php?ddreset=1');
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
+
 		// Update user parameters.
 		$form = $this->query('name:userForm')->asForm()->one();
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
-		if (CTestArrayHelper::get($data, 'blank_update', false) === false) {
-			$form->fill($data['fields']);
-			if (array_key_exists('auto_logout', $data)) {
-				$this->setAutoLogout($data['auto_logout']);
-			}
+		$form->fill($data['fields']);
+		if (array_key_exists('auto_logout', $data)) {
+			$this->setAutoLogout($data['auto_logout']);
 		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
+
 		// Verify if the user was updated.
 		$this->assertUserMessage($data, 'User updated', 'Cannot update user');
-		if ($data['expected'] === TEST_BAD || CTestArrayHelper::get($data, 'blank_update', false) == true) {
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
+
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->assertFormFields($data);
 		}
+
 		if (CTestArrayHelper::get($data, 'check_user', false)) {
 			$this->assertUserParameters($data);
 		}
 	}
 
+	/**
+	 * Test update without any modification of user data.
+	 */
+	public function testFormUser_SimpleUpdate() {
+		$sql_hash = 'SELECT * FROM users ORDER BY userid';
+		$old_hash = CDBHelper::getHash($sql_hash);
+
+		$this->page->login()->open('users.php?ddreset=1');
+		$this->query('link', 'test-user')->waitUntilVisible()->one()->click();
+
+		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form->submit();
+		$this->page->waitUntilReady();
+		$message = CMessageElement::find()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('User updated', $message->getTitle());
+
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+	}
+
+	/**
+	 * Test user password change and sign in with new password.
+	 */
 	public function testFormUser_PasswordUpdate() {
 		$data = [
 			'alias' => 'user-zabbix',
@@ -945,7 +966,7 @@ class testFormUser extends CWebTest {
 		];
 		$this->page->login()->open('users.php?ddreset=1');
 		$this->query('link', $data['alias'])->waitUntilVisible()->one()->click();
-		$form_update = $this->query('name:userForm')->asForm()->one();
+		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form_update->query('button:Change password')->one()->click();
 
 		// Change user password and log out.
@@ -954,8 +975,8 @@ class testFormUser extends CWebTest {
 			'Password (once again)' => $data['new_password']
 		]);
 		$form_update->submit();
+
 		try {
-			$this->query('class:top-nav-signout')->one()->click();
 			$this->page->logout();
 
 			// Atempt to sign in with old password.
@@ -1060,9 +1081,11 @@ class testFormUser extends CWebTest {
 		else {
 			$username = $data['fields']['Alias'];
 		}
+
 		$this->page->login()->open('users.php');
 		$this->query('link', $username)->one()->click();
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
+
 		// Link user with map, screen, slideshow, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
 			DBexecute(
@@ -1070,6 +1093,7 @@ class testFormUser extends CWebTest {
 					' WHERE '.$data['parameters']['column'].'='.zbx_dbstr($data['parameters']['value'])
 			);
 		}
+
 		// Attempt to delete the user from user update view and verify result.
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
@@ -1081,9 +1105,12 @@ class testFormUser extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check that user can't delete himself.
+	 */
 	public function testFormUser_SelfDeletion() {
 		$this->page->login()->open('users.php?form=update&userid=1');
-		$this->assertTrue($this->query('button:Delete')->one()->isEnabled(false));
+		$this->assertTrue($this->query('button:Delete')->waitUntilVisible()->one()->isEnabled(false));
 	}
 
 	public function testFormUser_Cancel() {
@@ -1126,6 +1153,7 @@ class testFormUser extends CWebTest {
 					$this->assertTrue($user_count === 1);
 				}
 				break;
+
 			case TEST_BAD:
 				$this->assertTrue($message->isBad());
 				$this->assertEquals(CTestArrayHelper::get($data, 'error_title', $data['error_title'] = $bad_title), $message->getTitle());
@@ -1152,7 +1180,8 @@ class testFormUser extends CWebTest {
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
 	}
 
-	private function userLogin($alias,$password) {
+	private function userLogin($alias, $password) {
+		$this->page->open('index.php');
 		$this->query('id:name')->waitUntilVisible()->one()->fill($alias);
 		$this->query('id:password')->one()->fill($password);
 		$this->query('button:Sign in')->one()->click();
