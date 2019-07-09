@@ -73,7 +73,7 @@
 	#define zbx_sleep(sec) sleep((sec))
 
 	#define zbx_thread_kill(h) kill(h, SIGUSR2)
-	#define zbx_thread_kill_fatal(h) kill(h, SIGQUIT)
+	#define zbx_thread_kill_fatal(h) kill(h, SIGABRT)
 #endif	/* _WINDOWS */
 
 typedef struct
