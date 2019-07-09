@@ -125,7 +125,6 @@ class CControllerAcknowledgeCreate extends CController {
 							foreach ($related_problems as $problems) {
 								$problem_eventids = $this->groupEventsByActionsAllowed($problems);
 
-								$test = 5;
 								while ($problem_eventids['readable'] && $result) {
 									$data = $this->getAcknowledgeOptions($problem_eventids);
 
