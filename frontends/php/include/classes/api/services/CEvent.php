@@ -620,23 +620,13 @@ class CEvent extends CApiService {
 
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
-			'select_acknowledges' => $has_close_action ? ['action'] : null,
-			'selectRelatedObject' => $has_close_action ? ['manual_close'] : null,
+			'select_acknowledges' => $has_close_action? ['action'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);
-
-		$editable_triggers = $events
-			? API::Trigger()->get([
-				'output' => [],
-				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
 
 		$ack_eventids = [];
 		$sev_change_eventids = [];
@@ -650,8 +640,7 @@ class CEvent extends CApiService {
 			$message = '';
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
-			if ($has_close_action && $event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-					&& array_key_exists($event['objectid'], $editable_triggers) && !$this->isEventClosed($event)) {
+			if ($has_close_action && !$this->isEventClosed($event)) {
 				$action |= ZBX_PROBLEM_UPDATE_CLOSE;
 			}
 
@@ -834,7 +823,7 @@ class CEvent extends CApiService {
 		 * If at least one of following is given, API call should not be processed:
 		 *   - eventid for OK event
 		 *   - eventid with source, that is not trigger
-		 *   - in case of problem severity change, related trigger is not writable
+		 *   - no read rights for related trigger
 		 *   - unexisting eventid
 		 */
 		if (count($data['eventids']) != count($events)) {
@@ -871,26 +860,21 @@ class CEvent extends CApiService {
 	 * @param int   $editable_events_count  Count of editable events.
 	 *
 	 * @throws APIException                 Throws an exception:
-	 *                                        - If none of passed events is editable;
-	 *                                        - If none of passed trigger is configured to be closed manually.
+	 *                                        - If at least one event is not editable;
+	 *                                        - If any of given event can be closed manually according the triggers
+	 *                                          configuration.
 	 */
 	protected function checkCanBeManuallyClosed(array $events, $editable_events_count) {
-		if ($editable_events_count == 0) {
+		if (count($events) != $editable_events_count) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$manually_closable = false;
 		foreach ($events as $event) {
-			if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
-				$manually_closable = true;
-				break;
+			if ($event['relatedObject']['manual_close'] != ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
+				);
 			}
-		}
-
-		if (!$manually_closable) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_s('Cannot close problem: %1$s.', _('trigger does not allow manual closing'))
-			);
 		}
 	}
 
