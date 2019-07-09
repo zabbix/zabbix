@@ -60,7 +60,7 @@ int	get_cpu_num_win32(void)
 
 	if (NULL == get_lpiex)
 	{
-		get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(L"kernel32.dll"),
 				"GetLogicalProcessorInformationEx");
 	}
 
@@ -97,7 +97,7 @@ int	get_cpu_num_win32(void)
 
 fallback:
 	if (NULL == get_act)
-		get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
+		get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetActiveProcessorCount");
 
 	if (NULL != get_act)
 		return (int)get_act(ALL_PROCESSOR_GROUPS);
@@ -129,7 +129,7 @@ int	get_cpu_group_num_win32(void)
 
 	if (NULL == get_act)
 	{
-		get_act = (GETACTIVEPGC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		get_act = (GETACTIVEPGC)GetProcAddress(GetModuleHandle(L"kernel32.dll"),
 				"GetActiveProcessorGroupCount");
 	}
 

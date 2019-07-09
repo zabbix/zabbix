@@ -135,12 +135,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef _WINDOWS
-	cpe.szMachineName = NULL;
-	cpe.szObjectName = get_counter_name(PCI_PROCESSOR);
-	cpe.szInstanceName = cpu;
-	cpe.szParentInstance = NULL;
-	cpe.dwInstanceIndex = (DWORD)-1;
-	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
+	cpe.szMachineName	= NULL;
+	cpe.szObjectName	= get_counter_name(get_builtin_counter_index(PCI_PROCESSOR));
+	cpe.szInstanceName	= cpu;
+	cpe.szParentInstance	= NULL;
+	cpe.dwInstanceIndex	= (DWORD)-1;
+	cpe.szCounterName	= get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_TIME));
 
 	/* 64 logical CPUs (threads) is a hard limit for 32-bit Windows systems and some old 64-bit versions,  */
 	/* such as Windows Vista. Systems with <= 64 threads will always have one processor group, which means */
@@ -151,18 +151,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	/* the group. So, for 72-thread system there will be two groups with 36 threads each and Windows will  */
 	/* report counters "\Processor Information(0, n)" with 0 <= n <= 31 and "\Processor Information(1,n)". */
 
-	/* We might use "\Processor Information" for all systems (even with less than 64 threads) and to       */
-	/* fall back to "\Processor" only when "\Processor Information" is not available (it's the case        */
-	/* for very old OSes like Windows 2003) but the corresponding index may be occupied by a third-party   */
-	/* object and we would need to resolve the ambiguity somehow. Another way would be using names instead */
-	/* of indices but then we would have to deal with localized counters. */
-
 	if (pcpus->count <= 64)
 	{
 		for (idx = 0; idx <= pcpus->count; idx++)
 		{
 			if (0 == idx)
-				StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+				StringCchPrintf(cpu, ARRSIZE(cpu), L"_Total");
 			else
 				_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
 
@@ -180,9 +174,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
 
-		cpe.szObjectName = get_counter_name(PCI_PROCESSOR_INFORMATION);
-		cpu_groups = get_cpu_group_num_win32();
-		cpus_per_group = pcpus->count / cpu_groups;
+		cpe.szObjectName	= get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_INFORMATION));
+		cpu_groups		= get_cpu_group_num_win32();
+		cpus_per_group		= pcpus->count / cpu_groups;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "cpu_groups = %d, cpus_per_group = %d, cpus = %d", cpu_groups,
 				cpus_per_group, pcpus->count);
@@ -195,11 +189,11 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				{
 					if (0 != gidx)
 						continue;
-					StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
+					StringCchPrintf(cpu, ARRSIZE(cpu), L"_Total");
 				}
 				else
 				{
-					StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("%d,%d"), gidx, idx - 1);
+					StringCchPrintf(cpu, ARRSIZE(cpu), L"%d,%d", gidx, idx - 1);
 				}
 
 				if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
@@ -214,9 +208,9 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		}
 	}
 
-	cpe.szObjectName = get_counter_name(PCI_SYSTEM);
-	cpe.szInstanceName = NULL;
-	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_QUEUE_LENGTH);
+	cpe.szObjectName	= get_counter_name(get_builtin_counter_index(PCI_SYSTEM));
+	cpe.szInstanceName	= NULL;
+	cpe.szCounterName	= get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_QUEUE_LENGTH));
 
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 		goto clean;
