@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+...G...... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 ...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
 .......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
 ..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
