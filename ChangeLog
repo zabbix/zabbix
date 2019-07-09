@@ -24,6 +24,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+.......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
 ..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
 ..F....... [ZBX-16329] fixed duplicate value checking in trigger action conditions (Ivo)
 A......... [ZBX-15562] reworked history.get API method; fixed output as well as other known issues in history API (miks, Sasha)
@@ -500,6 +501,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+.......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
 ..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
 ..F....... [ZBX-16329] fixed duplicate value checking in trigger action conditions (Ivo)
 A......... [ZBX-15562] reworked history.get API method; fixed output as well as other known issues in history API (miks, Sasha)
