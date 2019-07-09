@@ -90,6 +90,11 @@ class CControllerAcknowledgeCreate extends CController {
 					$updated_events_count += count($data['eventids']);
 				}
 
+				// Do not continue if acknowledge validation fails.
+				if (!$result) {
+					break;
+				}
+
 				// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
 				if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
 					// Get trigger IDs for selected events.
@@ -121,7 +126,7 @@ class CControllerAcknowledgeCreate extends CController {
 								$problem_eventids = $this->groupEventsByActionsAllowed($problems);
 
 								$test = 5;
-								while ($problem_eventids['readable']) {
+								while ($problem_eventids['readable'] && $result) {
 									$data = $this->getAcknowledgeOptions($problem_eventids);
 
 									// Acknowledge events.
