@@ -115,6 +115,7 @@ static int	DBpatch_4030010(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	/* 8 - SCREEN_RESOURCE_SCREEN */
 	if (ZBX_DB_OK > DBexecute("delete from screens_items where resourcetype=8"))
 		return FAIL;
 
