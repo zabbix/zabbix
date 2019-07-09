@@ -780,12 +780,11 @@ function check_db_fields($dbFields, &$args) {
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
- * @param bool   $sort			values mandatory must be sorted
  * @param bool   $zero_to_null
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true, $zero_to_null = false) {
+function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null = false) {
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (<id1>,<id2>,...,<idN>)"
 
 	if (is_bool(reset($values))) {
@@ -802,12 +801,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
 	}
 
 	$values = array_keys($values);
-
-	if ($sort) {
-		natsort($values);
-
-		$values = array_values($values);
-	}
+	natsort($values);
+	$values = array_values($values);
 
 	foreach ($values as $i => $value) {
 		if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
@@ -857,12 +852,11 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
- * @param bool   $sort			values mandatory must be sorted
  *
  * @return string
  */
-function dbConditionId($fieldName, array $values, $notIn = false, $sort = true) {
-	return dbConditionInt($fieldName, $values, $notIn, $sort, true);
+function dbConditionId($fieldName, array $values, $notIn = false) {
+	return dbConditionInt($fieldName, $values, $notIn, true);
 }
 
 /**
