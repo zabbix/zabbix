@@ -107,6 +107,8 @@ typedef struct
 	int			history_num;
 	int			trends_num;
 	int			trends_last_cleanup_hour;
+	int			history_num_total;
+	int			history_progress_ts;
 }
 ZBX_DC_CACHE;
 
@@ -3170,25 +3172,80 @@ static void	sync_history_cache_full(void)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
-
-	while (0 != hc_queue_get_size())
+	if (0 != hc_queue_get_size())
 	{
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			sync_server_history(&values_num, &triggers_num, &more);
-		else
-			sync_proxy_history(&values_num, &more);
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-				(double)values_num / (cache->history_num + values_num) * 100);
+		do
+		{
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				sync_server_history(&values_num, &triggers_num, &more);
+			else
+				sync_proxy_history(&values_num, &more);
+
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+					(double)values_num / (cache->history_num + values_num) * 100);
+		}
+		while (0 != hc_queue_get_size());
+
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
 
 	zbx_binary_heap_destroy(&cache->history_queue);
 	cache->history_queue = tmp_history_queue;
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_sync_history_cache_progress                              *
+ *                                                                            *
+ * Purpose: log progress of syncing history data                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_log_sync_history_cache_progress(void)
+{
+	double		pcnt = -1.0;
+	int		ts_last, ts_next, sec;
+
+	LOCK_CACHE;
+
+	if (INT_MAX == cache->history_progress_ts)
+	{
+		UNLOCK_CACHE;
+		return;
+	}
+
+	ts_last = cache->history_progress_ts;
+	sec = time(NULL);
+
+	if (0 == cache->history_progress_ts)
+	{
+		cache->history_num_total = cache->history_num;
+		cache->history_progress_ts = sec;
+	}
+
+	if (ZBX_HC_SYNC_TIME_MAX <= sec - cache->history_progress_ts || 0 == cache->history_num)
+	{
+		if (0 != cache->history_num_total)
+			pcnt = 100 * (double)(cache->history_num_total - cache->history_num) / cache->history_num_total;
+
+		cache->history_progress_ts = (0 == cache->history_num ? INT_MAX : sec);
+	}
+
+	ts_next = cache->history_progress_ts;
+
+	UNLOCK_CACHE;
+
+	if (0 == ts_last)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data in progress... ");
+
+	if (-1.0 != pcnt)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%", pcnt);
+
+	if (INT_MAX == ts_next)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 }
 
 /******************************************************************************
@@ -3205,7 +3262,7 @@ static void	sync_history_cache_full(void)
  ******************************************************************************/
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 {
-	const char		*__function_name = "zbx_sync_history_cache";
+	const char	*__function_name = "zbx_sync_history_cache";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -4230,6 +4287,9 @@ int	init_database_cache(char **error)
 		if (SUCCEED != (ret = init_trend_cache(error)))
 			goto out;
 	}
+
+	cache->history_num_total = 0;
+	cache->history_progress_ts = 0;
 
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
