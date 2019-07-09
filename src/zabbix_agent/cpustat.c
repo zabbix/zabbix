@@ -127,7 +127,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	char				*error = NULL;
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
-	TCHAR				cpu[16];
+	wchar_t				cpu[16];
 	int				gidx, cpu_groups, cpus_per_group;
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;

@@ -243,6 +243,23 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 	return builtin_counter_map[counter_ref].pdhIndex;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_all_counter_eng_names                                        *
+ *                                                                            *
+ * Purpose: helper function for init_builtin_counter_indexes()                *
+ *                                                                            *
+ * Parameters: reg_value_name    - [IN] name of the registry value            *
+ *                                                                            *
+ * Return value: wchar_t* buffer with list of strings on success,             *
+ *               NULL on failure                                              *
+ *                                                                            *
+ * Comments: This function should be normally called with L"Counter"          *
+ *           parameter. It returns list of null-terminated string pairs.      *
+ *           Last string is followed by an additional null-terminator.        *
+ *           The return buffer must be freed by the caller.                   *
+ *                                                                            *
+ ******************************************************************************/
 static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
 {
 	const char	*__function_name = "get_all_counter_eng_names";
@@ -276,18 +293,32 @@ cleanup:
 	return buffer;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: init_builtin_counter_indexes                                     *
+ *                                                                            *
+ * Purpose: scans registry key with all performance counter english names     *
+ *          and obtains system-dependent PDH counter indexes for further      *
+ *          use by corresponding items                                        *
+ *                                                                            *
+ * Return value: SUCCEED/FAIL                                                 *
+ *                                                                            *
+ * Comments: This function should be normally called during agent             *
+ *           initialization from init_perf_collector().                       *
+ *                                                                            *
+ ******************************************************************************/
 int	init_builtin_counter_indexes(void)
 {
 	const char	*__function_name = "init_builtin_counter_indexes";
 	int 		ret = FAIL, i;
-	wchar_t 	*counter_text;
+	wchar_t 	*counter_text, *saved_ptr;
 	DWORD 		counter_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* get string holding a text list of perf. counter indexes and english counter names */
-	/* L"Counter" stores names, L"Help" stores descriptions */
-	if (NULL == (counter_text = get_all_counter_eng_names(L"Counter")))
+	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used) */
+	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
 		goto cleanup;
 
 	/* bypass first pair of counter data elements - these contain number of records */
@@ -309,6 +340,8 @@ int	init_builtin_counter_indexes(void)
 
 	ret = SUCCEED;
 cleanup:
+	zbx_free(saved_ptr);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
