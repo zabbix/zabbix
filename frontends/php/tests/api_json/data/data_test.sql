@@ -151,6 +151,30 @@ INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_st
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (4, 33, NULL);
 INSERT INTO opcommand (operationid, type, scriptid, execute_on, port, authtype, username, password, publickey, privatekey, command) VALUES (33, 4, 11, 0, '', 0, '', '', '', '', '');
 
+-- scripts / inherited hostgroups
+INSERT INTO usrgrp (usrgrpid,name) VALUES (90000,'90000 Eur group write except one');
+INSERT INTO users (userid,alias,passwd,type) VALUES (90000,'90000','5fce1b3e34b520afeffb37ce08c7cd66',2);
+INSERT INTO users_groups (id,usrgrpid,userid) VALUES (90000,90000,90000);
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (90020,'90020','90020',0,'');
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (90021,'90021','90021',0,'');
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (90022,'90022','90022',0,'');
+INSERT INTO hosts (hostid,host,name,status,description) VALUES (90023,'90023','90023',0,'');
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90020,'90000Eur',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90021,'90000Eur/LV',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90022,'90000Eur/LV/Rix',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (90023,'90000Eur/LV/Skipped/Rix',0);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (90000,90000,3,90020);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (90001,90000,2,90021);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (90002,90000,3,90022);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (90003,90000,3,90023);
+INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90020,90020,90020);
+INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90021,90021,90021);
+INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90022,90022,90022);
+INSERT INTO hosts_groups (hostid,groupid,hostgroupid) VALUES (90023,90023,90023);
+INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90020,90020,2,'90020-acc-read','date',NULL,'');
+INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90021,90021,3,'90021-acc-write','date',NULL,'');
+INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
+
 -- global macro
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
 INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update');
@@ -739,3 +763,56 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, key_) VALUES
 INSERT INTO triggers (triggerid, expression, description, priority, flags, comments, value) VALUES (30004,'{99003}>0','Trigger eth0', 2, 4, '', 1);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (99003, 40074, 30004, 'last', '');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
+
+-- testHistory
+INSERT INTO hstgrp (groupid, name) VALUES (1004, 'history.get/hosts');
+
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (120005, 'history.get.host.1', 'history.get.host.1', 1, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1017, 120005, 1004);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (1010, 120005, 1, '127.0.0.1', 1, '10050', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133758, 120005, 'item1', 2, 'item1', 3, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_uint (itemid, clock, value, ns) VALUES
+(133758, 1549350893, 1, 885479055),
+(133758, 1549350907, 2, 762947342),
+(133758, 1549350908, 3, 727124125),
+(133758, 1549350909, 4, 710589839),
+(133758, 1549350910, 5, 369715624),
+(133758, 1549350910, 5, 738923458),
+(133758, 1549350917, 5, 257150200),
+(133758, 1549350917, 5, 762668985),
+(133758, 1549350918, 5, 394517718),
+(133758, 1549350922, 6, 347073267),
+(133758, 1549350923, 7, 882834269),
+(133758, 1549350926, 8, 410826674),
+(133758, 1549350927, 9, 938887279),
+(133758, 1549350944, 0, 730916425);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133759, 120005, 'item2', 2, 'item2', 0, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history (itemid, clock, value, ns) VALUES
+(133759, 1549350947, 0.0000, 441606890),
+(133759, 1549350948, 0.0000, 544936503),
+(133759, 1549350950, 0.0000, 866715049),
+(133759, 1549350953, 1.0000, 154942891),
+(133759, 1549350955, 1.0000, 719111385),
+(133759, 1549350957, 1.0000, 594538048),
+(133759, 1549350958, 1.5000, 594538048),
+(133759, 1549350959, 1.0001, 594538048),
+(133759, 1549350960, 1.5000, 594538048),
+(133759, 1549350961, -1.0000, 594538048),
+(133759, 1549350962, -1.5000, 594538048);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133760, 120005, 'item3', 2, 'item3', 1, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_str (itemid, clock, value, ns) VALUES
+(133760, 1549350960, '1', 754460948),
+(133760, 1549350962, '1', 919404393),
+(133760, 1549350965, '1', 512878374);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133761, 120005, 'item4', 2, 'item4', 2, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_log (itemid, clock, timestamp, source, severity, value, logeventid, ns) VALUES
+(133761, 1549350969, 0, '', 0, '1', 0, 506909535),
+(133761, 1549350973, 0, '', 0, '2', 0, 336068358),
+(133761, 1549350976, 0, '', 0, '3', 0, 2798098),
+(133761, 1549350987, 0, '', 0, '4', 0, 755363307),
+(133761, 1549350992, 0, '', 0, '5', 0, 242736233);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers) VALUES (133762, 120005, 'item5', 2, 'item5', 4, '90d', 0, NULL, NULL, '', '', '', '');
+INSERT INTO history_text (itemid, clock, value, ns) VALUES
+(133762, 1549350998, '1', 450920469),
+(133762, 1549350999, '2', 882825407),
+(133762, 1549351001, '3', 242835912);

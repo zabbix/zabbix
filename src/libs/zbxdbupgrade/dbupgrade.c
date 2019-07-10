@@ -929,10 +929,11 @@ int	DBcheck_version(void)
 			if (db_optional >= patches[i].version)
 				continue;
 
-			/* block SIGTERM, SIGINT to prevent interruption of statements that cause an implicit commit */
+			/* block signals to prevent interruption of statements that cause an implicit commit */
 			sigemptyset(&mask);
 			sigaddset(&mask, SIGTERM);
 			sigaddset(&mask, SIGINT);
+			sigaddset(&mask, SIGQUIT);
 
 			if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 				zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the user signal");

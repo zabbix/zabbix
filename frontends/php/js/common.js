@@ -493,11 +493,11 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} dialogueid	Unique overlay element identifier.
- * @param {object} element		UI element which must be focused when overlay UI element will be closed.
- * @param {object} type			Type of overlay UI element.
- * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
- *								type 'popup' only.
+ * @param {string} id       Unique overlay element identifier.
+ * @param {object} element  UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type     Type of overlay UI element.
+ * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
+ *                          type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
 	var index = null,
@@ -549,9 +549,14 @@ function closeDialogHandler(event) {
 					hintBox.hideHint(dialog.element, true);
 					break;
 
-				// Close context menu overlays.
-				case 'contextmenu':
-					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+				// Close popup menu overlays.
+				case 'menu-popup':
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close context menu preloader.
+				case 'preloader':
+					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
 					break;
 
 				// Close overlay time picker.
