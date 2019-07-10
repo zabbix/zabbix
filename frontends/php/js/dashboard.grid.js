@@ -126,10 +126,7 @@
 	}
 
 	function removeWidgetInfoButtons($content_header) {
-		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').each(function() {
-			$(this).find('[data-hintbox=1]').trigger('remove');
-			$(this).remove();
-		});
+		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
 	}
 
 	/**
