@@ -3466,10 +3466,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->port, service->status, service->value);
 
 		if (0 == service->dcheckid)
-		{
-			services_num = i;
 			break;
-		}
 
 		zbx_vector_uint64_append(&dcheckids, service->dcheckid);
 	}
@@ -3502,6 +3499,8 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 
 		goto fail;
 	}
+
+	services_num = i;
 
 	if (0 == *processed_num && 0 == ip_idx)
 	{
@@ -3790,44 +3789,6 @@ json_parse_return:
 	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: process_discovery_data                                           *
- *                                                                            *
- * Purpose: update discovery data, received from proxy                        *
- *                                                                            *
- * Parameters: jp           - [IN] JSON with historical data                  *
- *             ts           - [IN] timestamp when the proxy connection was    *
- *                                 established                                *
- *             error        - [OUT] address of a pointer to the info string   *
- *                                  (should be freed by the caller)           *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-int	process_discovery_data(struct zbx_json_parse *jp, zbx_timespec_t *ts, char **error)
-{
-	int			ret;
-	struct zbx_json_parse	jp_data;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto out;
-	}
-
-	ret = process_discovery_data_contents(&jp_data, error);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

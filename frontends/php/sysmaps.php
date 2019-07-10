@@ -24,23 +24,6 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'map.export' && hasRequest('maps')) {
-	$page['file'] = 'zbx_export_maps.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	$isExportData = true;
-}
-else {
-	$page['title'] = _('Configuration of network maps');
-	$page['file'] = 'sysmaps.php';
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['scripts'] = ['multiselect.js'];
-
-	$isExportData = false;
-}
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
@@ -95,7 +78,31 @@ $fields = [
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-check_fields($fields);
+
+function prepare_page_header($type) {
+	global $page;
+
+	if ($type === 'html') {
+		$page['title'] = _('Configuration of network maps');
+		$page['file'] = 'sysmaps.php';
+		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+		$page['scripts'] = ['multiselect.js'];
+	}
+	elseif ($type === 'xml') {
+		$page['file'] = 'zbx_export_maps.xml';
+		$page['type'] = detect_page_type(PAGE_TYPE_XML);
+	}
+}
+
+$fields_error = check_fields_raw($fields);
+if ($fields_error & ZBX_VALID_ERROR) {
+	// Halt on a HTML page with errors.
+
+	prepare_page_header('html');
+	require_once dirname(__FILE__).'/include/page_header.php';
+
+	invalid_url();
+}
 
 /*
  * Permissions
@@ -110,6 +117,11 @@ if (hasRequest('sysmapid')) {
 		'selectUserGroups' => ['usrgrpid', 'permission']
 	]);
 	if (empty($sysmap)) {
+		// Halt on a HTML page with errors.
+
+		prepare_page_header('html');
+		require_once dirname(__FILE__).'/include/page_header.php';
+
 		access_deny();
 	}
 	else {
@@ -120,21 +132,41 @@ else {
 	$sysmap = [];
 }
 
-if ($isExportData) {
+/*
+ * Export
+ */
+if (hasRequest('action') && getRequest('action') === 'map.export' && hasRequest('maps')) {
 	$export = new CConfigurationExport(['maps' => getRequest('maps', [])]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
 
-	if (hasErrorMesssages()) {
+	$export_data = $export->export();
+
+	if ($export_data === false) {
+		prepare_page_header('html');
+		require_once dirname(__FILE__).'/include/page_header.php';
+
+		access_deny();
+	}
+	elseif (hasErrorMesssages()) {
+		prepare_page_header('html');
+		require_once dirname(__FILE__).'/include/page_header.php';
+
 		show_messages();
 	}
 	else {
-		echo $exportData;
+		prepare_page_header('xml');
+		require_once dirname(__FILE__).'/include/page_header.php';
+
+		print($export_data);
 	}
 
 	exit;
 }
+
+// Using HTML for the rest of functions.
+prepare_page_header('html');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 /*
  * Actions

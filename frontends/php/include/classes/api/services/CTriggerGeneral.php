@@ -495,17 +495,24 @@ abstract class CTriggerGeneral extends CApiService {
 
 		switch (get_class($this)) {
 			case 'CTrigger':
+				$error_duplicate = _('Duplicate trigger with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger "%2$s".');
 				break;
 
 			case 'CTriggerPrototype':
+				$error_duplicate = _('Duplicate trigger prototype with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger prototype "%2$s".');
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
+		$duplicate = CArrayHelper::findDuplicate($triggers, 'description', 'expression');
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s($error_duplicate, $duplicate['description']));
 		}
 
 		$triggerDbFields = [

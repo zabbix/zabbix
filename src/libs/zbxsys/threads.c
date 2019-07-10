@@ -57,12 +57,14 @@ void	zbx_child_fork(pid_t *pid)
 {
 	sigset_t	mask, orig_mask;
 
-	/* block SIGTERM, SIGINT and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
+	/* block signals during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGINT);
-	sigaddset(&mask, SIGCHLD);
 	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGCHLD);
 
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 

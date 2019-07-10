@@ -687,14 +687,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '☺'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/authentication": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '0.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/authentication": an integer is expected.'
 			],
 			// Check web delay.
 			[
@@ -874,28 +874,28 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty retries',
 					'retries' => '',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '1.5',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '1s',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -948,21 +948,21 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty status',
 					'status' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong status',
 					'status' => '☺'
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong status',
 					'status' => '0.0'
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1077,14 +1077,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty verify_host',
 					'verify_host' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1098,7 +1098,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '1.5'
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1113,14 +1113,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty verify_peer',
 					'verify_peer' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1134,7 +1134,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '1.5'
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [

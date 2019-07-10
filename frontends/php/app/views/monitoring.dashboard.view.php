@@ -151,7 +151,7 @@ else {
 		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
 		'editable' => $data['dashboard']['editable'],
 		'edit_mode' => $data['dashboard_edit_mode'],
-		'kioskmode' => $web_layout_mode === ZBX_LAYOUT_KIOSKMODE
+		'kioskmode' => ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE)
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];
