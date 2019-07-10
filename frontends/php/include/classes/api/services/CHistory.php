@@ -196,7 +196,7 @@ class CHistory extends CApiService {
 
 		// itemids
 		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids'], false, true, false);
+			$sql_parts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
 		}
 
 		// time_from

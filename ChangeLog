@@ -24,6 +24,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
 ....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 .......PS. [ZBX-16207] fixed compilation warining related to possible use of uninitialised variable; thanks to Glebs Ivanovskis for the patch (viktors)
 .......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
@@ -503,6 +504,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
 ....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 ...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
 .......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
