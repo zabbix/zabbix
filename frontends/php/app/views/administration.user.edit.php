@@ -196,28 +196,23 @@ $tabs->addTab('mediaTab', _('Media'), $user_media_form_list);
 // Permissions tab.
 $permissions_form_list = new CFormList('permissionsFormList');
 
-$user_type_combobox = new CComboBox('user_type', $data['user_type'], 'submit()', [
-	USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
-	USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
-	USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
-]);
+$type_combobox = new CComboBox('type', $data['type'], 'submit()', user_type2str());
 
 if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-	$user_type_combobox->setEnabled(false);
+	$type_combobox->setEnabled(false);
 	$permissions_form_list->addRow(_('User type'),
-		[$user_type_combobox, SPACE, new CSpan(_('User can\'t change type for himself'))]
+		[$type_combobox, ' ', new CSpan(_('User can\'t change type for himself'))]
 	);
-	$user_form->addItem((new CVar('user_type', $data['user_type']))->removeId());
 }
 else {
-	$permissions_form_list->addRow(_('User type'), $user_type_combobox);
+	$permissions_form_list->addRow(_('User type'), $type_combobox);
 }
 
 $permissions_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host group'), _('Permissions')]);
 
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+if ($data['type'] == USER_TYPE_SUPER_ADMIN) {
 	$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
 }
 else {

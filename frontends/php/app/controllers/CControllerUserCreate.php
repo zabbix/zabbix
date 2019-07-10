@@ -32,7 +32,7 @@ class CControllerUserCreate extends CController {
 			'surname' =>			'db users.surname',
 			'password1' =>			'required|db users.passwd',
 			'password2' =>			'required|db users.passwd',
-			'user_type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'type' =>				'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>		'required|array_id|not_empty',
 			'user_medias' =>		'array',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
@@ -83,11 +83,10 @@ class CControllerUserCreate extends CController {
 		$user = [];
 
 		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'theme', 'refresh', 'rows_per_page',
-			'lang'
+			'lang', 'type'
 		]);
 		$user['autologout'] = $this->hasInput('autologout_visible') ? $this->getInput('autologout') : '0';
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
-		$user['type'] = $this->getInput('user_type');
 		$user_medias = $this->getInput('user_medias', []);
 
 		if ($this->getInput('password1', '') !== '') {

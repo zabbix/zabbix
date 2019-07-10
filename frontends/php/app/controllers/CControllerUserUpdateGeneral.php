@@ -137,7 +137,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		$this->user['autologout'] = $this->hasInput('autologout_visible') ? $this->getInput('autologout') : '0';
 
 		if (bccomp(CWebUser::$data['userid'], $this->getInput('userid')) != 0) {
-			$this->user['type'] = $this->getInput('user_type');
+			$this->user['type'] = $this->getInput('type');
 		}
 
 		if (trim($this->getInput('password1', '')) !== '') {

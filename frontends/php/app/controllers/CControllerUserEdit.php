@@ -29,7 +29,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'alias' =>			'db users.alias',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'user_type' =>		'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'array_id|not_empty',
 			'user_medias' =>	'array',
 			'new_media' =>		'array',
@@ -49,24 +49,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$this->options['output'][] = 'type';
 		$this->options['selectMedias'] = ['mediatypeid', 'period', 'sendto', 'severity', 'active'];
 
-		if (parent::checkPermissions()) {
-			if ($this->userid != 0) {
-				$this->user['user_type'] = $this->user['type'];
-				unset($this->user['type']);
-			}
-
-			return true;
-		}
-		else {
-			return false;
-		}
+		return parent::checkPermissions();
 	}
 
 	/**
 	 * Get user type, user groups and medias from DB.
 	 */
 	protected function getDBData() {
-		$this->data['user_type'] = $this->user['user_type'];
+		$this->data['type'] = $this->user['type'];
 		$user_groups = API::UserGroup()->get([
 			'output' => ['usrgrpid'],
 			'userids' => [$this->userid]
@@ -88,7 +78,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		]);
 		order_result($this->data['groups'], 'name');
 
-		if ($this->data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+		if ($this->data['type'] == USER_TYPE_SUPER_ADMIN) {
 			$this->data['groups_rights'] = [
 				'0' => [
 					'permission' => PERM_READ_WRITE,
@@ -109,10 +99,10 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'user_medias' => [],
 			'new_media' => [],
 			'user_groups' => [],
-			'user_type' => $this->db_defaults['type']
+			'type' => $this->db_defaults['type']
 		];
 
-		$this->fields = ['alias', 'name', 'surname', 'user_type', 'user_groups', 'user_medias', 'new_media'];
+		$this->fields = ['alias', 'name', 'surname', 'type', 'user_groups', 'user_medias', 'new_media'];
 		$this->title = _('Configuration of users');
 
 		parent::doAction();

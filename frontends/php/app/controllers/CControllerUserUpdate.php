@@ -29,7 +29,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'alias' =>			'required|db users.alias|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'user_type' =>		'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>	'required|array_id|not_empty'
 		]);
 
