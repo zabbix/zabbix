@@ -176,8 +176,15 @@ Please, locate Oracle directories using --with-oracle or \
         dnl
         AC_MSG_CHECKING([for Oracle OCI headers in $oracle_include_dir])
 
+        dnl Starting with Oracle version 18c macros OCI_MAJOR_VERSION and OCI_MINOR_VERSION are moved to ociver.h
+        if test -f "$oracle_include_dir/ociver.h"; then
+            oracle_version_file="ociver.h"
+        else
+            oracle_version_file="oci.h"
+        fi
+
         AC_COMPILE_IFELSE([
-            AC_LANG_PROGRAM([[@%:@include <oci.h>]],
+            AC_LANG_PROGRAM([[@%:@include <$oracle_version_file>]],
                 [[
 #if defined(OCI_MAJOR_VERSION)
 #if OCI_MAJOR_VERSION == 10 && OCI_MINOR_VERSION == 2
@@ -187,7 +194,7 @@ Please, locate Oracle directories using --with-oracle or \
 // OK, older Oracle detected
 // TODO - mloskot: find better macro to check for older versions;
 #else
-#  error Oracle oci.h header not found
+#  error Oracle $oracle_version_file header not found
 #endif
                 ]]
             )],
@@ -214,12 +221,12 @@ Please, locate Oracle directories using --with-oracle or \
 
         if test "$oci_header_found" = "yes"; then
 
-            oracle_version_major=`cat $oracle_include_dir/oci.h \
+            oracle_version_major=`cat $oracle_include_dir/$oracle_version_file \
                                  | grep '#define.*OCI_MAJOR_VERSION.*' \
                                  | sed -e 's/#define OCI_MAJOR_VERSION  *//' \
                                  | sed -e 's/  *\/\*.*\*\///'`
 
-            oracle_version_minor=`cat $oracle_include_dir/oci.h \
+            oracle_version_minor=`cat $oracle_include_dir/$oracle_version_file \
                                  | grep '#define.*OCI_MINOR_VERSION.*' \
                                  | sed -e 's/#define OCI_MINOR_VERSION  *//' \
                                  | sed -e 's/  *\/\*.*\*\///'`
