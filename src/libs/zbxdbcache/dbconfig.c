@@ -11812,9 +11812,22 @@ void	zbx_dc_cleanup_data_sessions(void)
 	UNLOCK_CACHE;
 }
 
-zbx_binary_heap_t	*DCconfig_get_poller_queue(unsigned char poller_type)
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_poller_queue_num                                    *
+ *                                                                            *
+ * Purpose: return element count of queue                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_poller_queue_num(unsigned char poller_type)
 {
-	return &config->queues[poller_type];
+	int size;
+
+	WRLOCK_CACHE;
+	size = config->queues[poller_type].elems_num;
+	UNLOCK_CACHE;
+
+	return size;
 }
 
 #ifdef HAVE_TESTS

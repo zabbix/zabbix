@@ -652,7 +652,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int max_items_count, DC
 int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
-zbx_binary_heap_t *DCconfig_get_poller_queue(unsigned char poller_type);
+int	DCconfig_get_poller_queue_num(unsigned char poller_type);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
