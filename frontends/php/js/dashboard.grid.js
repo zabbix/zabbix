@@ -101,7 +101,7 @@
 			});
 	}
 
-	function makeWidgetInfoButtons($content_header, buttons) {
+	function addWidgetInfoButtons($content_header, buttons) {
 		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
 		buttons.each(function(button) {
@@ -1252,7 +1252,7 @@
 
 				removeWidgetInfoButtons(widget['content_header']);
 				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
-					makeWidgetInfoButtons(widget['content_header'], resp.info);
+					addWidgetInfoButtons(widget['content_header'], resp.info);
 				}
 
 				// Creates new script elements and removes previous ones to force their re-execution.
