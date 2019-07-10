@@ -50,8 +50,9 @@ class CControllerUserCreate extends CController {
 		$error = $this->GetValidationError();
 
 		if ($ret) {
-			if ($this->getInput('password1', '') !== $this->getInput('password2', '')) {
-				error(_('Cannot add user. Both passwords must be equal.'));
+			if ($this->getInput('password1') !== $this->getInput('password2')) {
+				error(_('Both passwords must be equal.'));
+				$error = self::VALIDATION_ERROR;
 				$ret = false;
 			}
 		}
@@ -59,7 +60,6 @@ class CControllerUserCreate extends CController {
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
-				case self::VALIDATION_OK:
 					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
 					$response->setFormData($this->getInputAll());
 					$response->setMessageError(_('Cannot add user'));

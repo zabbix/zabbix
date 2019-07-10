@@ -64,13 +64,13 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'password1' => 'abc',
 				'password2' => 'def',
-				'error_msg' => 'Cannot update user. Both passwords must be equal.'
+				'error_msg' => 'Both passwords must be equal.'
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'password1' => '12345',
 				'password2' => '123456',
-				'error_msg' => 'Cannot update user. Both passwords must be equal.'
+				'error_msg' => 'Both passwords must be equal.'
 			]],
 			[[
 				'expected' => TEST_GOOD,
