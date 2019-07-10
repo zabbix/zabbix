@@ -76,17 +76,16 @@ abstract class CControllerUserEditGeneral extends CController {
 	public function __construct() {
 		parent::__construct();
 
+		$locales = array_keys(getLocales());
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-
-		$supported_locales = array_keys(getLocales());
 
 		$this->fields = [
 			'userid' =>				'db users.userid',
 			'password1' =>			'db users.passwd',
 			'password2' =>			'db users.passwd',
 			'change_password' =>	'string',
-			'lang' =>				'db users.lang|in '.implode(',', $supported_locales),
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',

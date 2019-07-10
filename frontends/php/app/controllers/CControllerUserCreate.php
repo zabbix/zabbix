@@ -22,10 +22,9 @@
 class CControllerUserCreate extends CController {
 
 	protected function checkInput() {
+		$locales = array_keys(getLocales());
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-
-		$supported_locales = array_keys(getLocales());
 
 		$fields = [
 			'alias' =>				'required|db users.alias|not_empty',
@@ -36,7 +35,7 @@ class CControllerUserCreate extends CController {
 			'user_type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
 			'user_groups' =>		'required|array_id|not_empty',
 			'user_medias' =>		'array',
-			'lang' =>				'db users.lang|in '.implode(',', $supported_locales),
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
