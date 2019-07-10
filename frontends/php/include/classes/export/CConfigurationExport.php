@@ -1127,7 +1127,6 @@ class CConfigurationExport {
 	 * @param array $exportScreens
 	 */
 	protected function prepareScreenExport(array &$exportScreens) {
-		$screenIds = [];
 		$sysmapIds = [];
 		$groupIds = [];
 		$hostIds = [];
@@ -1176,7 +1175,6 @@ class CConfigurationExport {
 			}
 		}
 
-		$screens = $this->getScreensReferences($screenIds);
 		$sysmaps = $this->getMapsReferences($sysmapIds);
 		$groups = $this->getGroupsReferences($groupIds);
 		$hosts = $this->getHostsReferences($hostIds);
@@ -1379,29 +1377,6 @@ class CConfigurationExport {
 
 		foreach ($hosts as $id => $host) {
 			$ids[$id] = ['host' => $host['host']];
-		}
-
-		return $ids;
-	}
-
-	/**
-	 * Get screens references by screen ids.
-	 *
-	 * @param array $screenIds
-	 *
-	 * @return array
-	 */
-	protected function getScreensReferences(array $screenIds) {
-		$ids = [];
-
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-
-		foreach ($screens as $id => $screen) {
-			$ids[$id] = ['name' => $screen['name']];
 		}
 
 		return $ids;

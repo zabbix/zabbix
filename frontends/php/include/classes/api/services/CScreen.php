@@ -190,7 +190,7 @@ class CScreen extends CApiService {
 			while ($db_screen_item = DBfetch($db_screen_items)) {
 				if (!array_key_exists($db_screen_item['screenid'], $screens)) {
 					$screens[$db_screen_item['screenid']] = [
-						'groups' => [], 'hosts' => [], 'graphs' => [], 'items' => [], 'maps' => [], 'screens' => []
+						'groups' => [], 'hosts' => [], 'graphs' => [], 'items' => [], 'maps' => []
 					];
 				}
 
@@ -347,31 +347,6 @@ class CScreen extends CApiService {
 
 				foreach ($maps as $sysmapid => $resources) {
 					if (!array_key_exists($sysmapid, $db_maps)) {
-						foreach ($resources as $screenid => $foo) {
-							unset($screens[$screenid], $result[$screenid]);
-						}
-					}
-				}
-			}
-
-			// screens
-			$_screens = [];
-
-			foreach ($screens as $screenid => $resources) {
-				foreach ($resources['screens'] as $_screenid => $foo) {
-					$_screens[$_screenid][$screenid] = true;
-				}
-			}
-
-			if ($_screens) {
-				$db_screens = API::Screen()->get([
-					'output' => [],
-					'screenids' => array_keys($_screens),
-					'preservekeys' => true
-				]);
-
-				foreach ($_screens as $_screenid => $resources) {
-					if (!array_key_exists($_screenid, $db_screens)) {
 						foreach ($resources as $screenid => $foo) {
 							unset($screens[$screenid], $result[$screenid]);
 						}
