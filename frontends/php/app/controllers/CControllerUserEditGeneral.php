@@ -89,7 +89,6 @@ abstract class CControllerUserEditGeneral extends CController {
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
-			'autologout_visible' =>	'in 0,1',
 			'url' =>				'string',
 			'refresh' =>			'string',
 			'rows_per_page' =>		'int32|ge 1|le 999999',
@@ -169,8 +168,7 @@ abstract class CControllerUserEditGeneral extends CController {
 			'lang' => $this->db_defaults['lang'],
 			'theme' => $this->db_defaults['theme'],
 			'autologin' => $this->db_defaults['autologin'],
-			'autologout' => $this->db_defaults['autologout'],
-			'autologout_visible' => 0,
+			'autologout' => '0',
 			'refresh' => $this->db_defaults['refresh'],
 			'rows_per_page' => $this->db_defaults['rows_per_page'],
 			'action' => $this->getAction()
@@ -251,9 +249,6 @@ abstract class CControllerUserEditGeneral extends CController {
 			$this->data['password2'] = null;
 			$this->data['autologin'] = $this->user['autologin'];
 			$this->data['autologout'] = $this->user['autologout'];
-			$this->data['autologout_visible']	= (!$this->hasInput('form_refresh')
-				&& (bool) timeUnitToSeconds($this->user['autologout'])
-			);
 			$this->data['lang'] = $this->user['lang'];
 			$this->data['theme'] = $this->user['theme'];
 			$this->data['refresh'] = $this->user['refresh'];
@@ -262,7 +257,7 @@ abstract class CControllerUserEditGeneral extends CController {
 
 		// Merge form specific fiels with common fields.
 		$this->fields += array_merge($this->fields, ['url', 'password1', 'password2', 'change_password', 'autologin',
-			'autologout', 'autologout_visible', 'lang', 'theme', 'refresh', 'rows_per_page', 'refresh', 'form_refresh'
+			'autologout', 'lang', 'theme', 'refresh', 'rows_per_page', 'refresh', 'form_refresh'
 		]);
 
 		// Overwrite with input variables.

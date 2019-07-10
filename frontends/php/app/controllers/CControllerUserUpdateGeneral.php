@@ -68,7 +68,6 @@ abstract class CControllerUserUpdateGeneral extends CController {
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
-			'autologout_visible' =>	'in 0,1',
 			'url' =>				'string',
 			'refresh' =>			'required|string|not_empty',
 			'rows_per_page' =>		'required|int32|not_empty|ge 1|le 999999',
@@ -134,7 +133,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		// Overwrite with input variables.
 		$this->getInputs($this->user, $this->fields);
 
-		$this->user['autologout'] = $this->hasInput('autologout_visible') ? $this->getInput('autologout') : '0';
+		$this->user['autologout'] = $this->getInput('autologout', '0');
 
 		if (bccomp(CWebUser::$data['userid'], $this->getInput('userid')) != 0) {
 			$this->user['type'] = $this->getInput('type');

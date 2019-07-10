@@ -556,22 +556,18 @@ function commonUserform(CForm $user_form, CFormList $user_form_list, array $data
 	$user_form_list->addRow(_('Theme'), $themes_combobox);
 
 	// Append auto-login & auto-logout to form list.
-	$autologout_checkbox = (new CCheckBox('autologout_visible'))->setChecked($data['autologout_visible']);
-	if ($data['autologout_visible']) {
-		$autologout_textbox = (new CTextBox('autologout', $data['autologout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
-	}
-	else {
-		$autologout_textbox = (new CTextBox('autologout', DB::getDefault('users', 'autologout')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('disabled', 'disabled');
-	}
-
 	if ($data['alias'] != ZBX_GUEST_USER) {
+		$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
+
 		$user_form_list->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($data['autologin']));
 		$user_form_list->addRow(_('Auto-logout'), [
-			$autologout_checkbox,
+			(new CCheckBox(null))
+				->setId('autologout_visible')
+				->setChecked($data['autologout'] !== '0'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			$autologout_textbox
+			(new CTextBox('autologout', $autologout))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setEnabled($data['autologout'] !== '0')
 		]);
 	}
 
