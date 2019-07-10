@@ -64,6 +64,7 @@ $availableJScripts = [
 	'chkbxrange.js' => '',
 	'csvggraphwidget.js' => '',
 	'layout.mode.js' => '',
+	'textareaflexible.js' => '',
 	// vendors
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',

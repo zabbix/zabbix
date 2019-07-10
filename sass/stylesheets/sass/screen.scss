@@ -4212,6 +4212,30 @@ $form-icon-btn: (
 	}
 }
 
+// Flexible textarea.
+.textarea-flexible-container {
+
+	td {
+		line-height: 22px;
+
+		&.textarea-flexible-parent {
+			vertical-align: top;
+		}
+
+		button {
+			line-height: normal;
+		}
+	}
+}
+
+.textarea-flexible {
+	display: block;
+	min-height: 24px;
+	overflow: hidden;
+	resize: none;
+	word-break: break-all;
+}
+
 // Map widget back to parent button.
 .btn-back-map-container {
 	text-align: left;
