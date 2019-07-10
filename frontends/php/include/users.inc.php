@@ -559,15 +559,17 @@ function commonUserform(CForm $user_form, CFormList $user_form_list, array $data
 	if ($data['alias'] != ZBX_GUEST_USER) {
 		$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
-		$user_form_list->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($data['autologin']));
+		$user_form_list->addRow(_('Auto-login'),
+			(new CCheckBox('autologin'))
+				->setUncheckedValue('0')
+				->setChecked($data['autologin'])
+		);
 		$user_form_list->addRow(_('Auto-logout'), [
 			(new CCheckBox(null))
 				->setId('autologout_visible')
 				->setChecked($data['autologout'] !== '0'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CTextBox('autologout', $autologout))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setEnabled($data['autologout'] !== '0')
+			(new CTextBox('autologout', $autologout))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 		]);
 	}
 

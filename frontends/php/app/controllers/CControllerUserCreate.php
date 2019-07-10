@@ -81,11 +81,10 @@ class CControllerUserCreate extends CController {
 	protected function doAction() {
 		$user = [];
 
-		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'theme', 'refresh', 'rows_per_page',
-			'lang', 'type'
+		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
+			'rows_per_page', 'lang', 'type'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
-		$user['autologout'] = $this->getInput('autologout', '0');
 		$user_medias = $this->getInput('user_medias', []);
 
 		if ($this->getInput('password1', '') !== '') {

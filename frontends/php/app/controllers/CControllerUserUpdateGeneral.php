@@ -128,12 +128,12 @@ abstract class CControllerUserUpdateGeneral extends CController {
 
 	protected function doAction() {
 		// Merge form specific fiels with common fields.
-		$this->fields += array_merge($this->fields, ['url', 'autologin', 'theme', 'refresh', 'rows_per_page', 'lang']);
+		$this->fields += array_merge($this->fields, [
+			'url', 'autologin', 'autologout', 'theme', 'refresh', 'rows_per_page', 'lang'
+		]);
 
 		// Overwrite with input variables.
 		$this->getInputs($this->user, $this->fields);
-
-		$this->user['autologout'] = $this->getInput('autologout', '0');
 
 		if (bccomp(CWebUser::$data['userid'], $this->getInput('userid')) != 0) {
 			$this->user['type'] = $this->getInput('type');
