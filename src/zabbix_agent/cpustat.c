@@ -23,7 +23,8 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */
-extern int get_cpu_group_num_win32();
+extern int get_cpu_group_num_win32(void);
+extern int get_numa_node_num_win32(void);
 #endif
 #include "mutexs.h"
 #include "log.h"
@@ -128,7 +129,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[16];
-	int				gidx, cpu_groups, cpus_per_group;
+	int				gidx, cpu_groups, cpus_per_group, numa_nodes;
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -175,7 +176,13 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
 
 		cpe.szObjectName	= get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_INFORMATION));
-		cpu_groups		= get_cpu_group_num_win32();
+
+		/* This doesn't seem to be well documented but it looks like Windows treats Processor Information */
+		/* object differently on NUMA-enabled systems. First index for the object may either mean logical */
+		/* processor group on non-NUMA systems or NUMA node number when NUMA is available. There may be more */
+		/* NUMA nodes than processor groups. */
+		numa_nodes		= get_numa_node_num_win32();
+		cpu_groups		= numa_nodes == 1 ? get_cpu_group_num_win32() : numa_nodes;
 		cpus_per_group		= pcpus->count / cpu_groups;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "cpu_groups = %d, cpus_per_group = %d, cpus = %d", cpu_groups,

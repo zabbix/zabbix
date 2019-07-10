@@ -226,17 +226,33 @@ close_query:
 	return pdh_status;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_builtin_counter_index                                        *
+ *                                                                            *
+ * Purpose: get performance counter index by reference value described by     *
+ *          zbx_builtin_counter_ref_t enum                                    *
+ *                                                                            *
+ * Parameters: counter_ref    - [IN] built-inperformance counter              *
+ *                                                                            *
+ * Return value: PDH performance counter index or 0 on failure                *
+ *                                                                            *
+ * Comments: Performance counter index values can differ across Windows       *
+ *           installations for the same names                                 *
+ *                                                                            *
+ ******************************************************************************/
 DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
-	static int first_error = 1;
-
-	if (counter_ref > PCI_MAX_INDEX)
+	if (PCI_MAX_INDEX < counter_ref)
 	{
+		static int first_error = 1;
+
 		if (first_error)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			first_error = 0;
 		}
+
 		return 0;
 	}
 
@@ -276,18 +292,18 @@ static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
 	if (ERROR_SUCCESS != status)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed at getting buffer size, 0x%x", status);
-		goto cleanup;
+		goto finish;
 	}
 
-	buffer = (wchar_t*)zbx_malloc(buffer, buffer_size);
+	buffer = (wchar_t*)zbx_malloc(buffer, (size_t)buffer_size);
 	status = RegQueryValueEx(reg_key, reg_value_name, NULL, NULL, (LPBYTE)buffer, &buffer_size);
 	if (ERROR_SUCCESS != status)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed with 0x%x", status);
 		zbx_free(buffer);
-		goto cleanup;
+		goto finish;
 	}
-cleanup:
+finish:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return buffer;
@@ -316,7 +332,7 @@ int	init_builtin_counter_indexes(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* get string holding a text list of perf. counter indexes and english counter names */
+	/* get buffer holding a text list of perf. counter indexes and english counter names */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used) */
 	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
 		goto cleanup;

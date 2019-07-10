@@ -23,6 +23,13 @@
 #include "stats.h"
 #include "perfstat.h"
 
+/* shortcut to avoid extra verbosity */
+typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
+
+/* pointer to GetLogicalProcessorInformationEx(), it's not guaranteed to be available */
+typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
+static GETLPIEX		get_lpiex;
+
 /******************************************************************************
  *                                                                            *
  * Function: get_cpu_num_win32                                                *
@@ -34,18 +41,15 @@
  ******************************************************************************/
 int	get_cpu_num_win32(void)
 {
-	/* shortcut to avoid extra verbosity */
-	typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
-	/* define function pointer types for the GetActiveProcessorCount() and GetLogicalProcessorInformationEx() API */
+	/* pointer to GetActiveProcessorCount() */
 	typedef DWORD (WINAPI *GETACTIVEPC)(WORD);
-	typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
 
 	static GETACTIVEPC	get_act;
-	static GETLPIEX		get_lpiex;
-	SYSTEM_INFO	sysInfo;
-	DWORD		buffer_length;
-	PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX buffer = NULL;
-	int		cpu_count = 0;
+	SYSTEM_INFO		sysInfo;
+	DWORD			buffer_length;
+	PSYS_LPI_EX		buffer = NULL;
+	int			cpu_count = 0;
+	unsigned		i;
 
 	/* The rationale for checking dynamically if specific functions are implemented */
 	/* in kernel32.lib because these may not be available in certain Windows versions. */
@@ -69,14 +73,17 @@ int	get_cpu_num_win32(void)
 		buffer_length = 0;
 
 		/* first run with empty arguments to figure the buffer length */
-		if (get_lpiex(RelationAll, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
+		if (get_lpiex(RelationProcessorCore, NULL, &buffer_length) ||
+				ERROR_INSUFFICIENT_BUFFER != GetLastError())
+		{
 			goto fallback;
+		}
 
 		buffer = (PSYS_LPI_EX)zbx_malloc(buffer, (size_t)buffer_length);
 
-		if (NULL != buffer && get_lpiex(RelationProcessorCore, buffer, &buffer_length))
+		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
-			for (unsigned i = 0; i < buffer_length;)
+			for (i = 0; i < buffer_length;)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
@@ -87,12 +94,8 @@ int	get_cpu_num_win32(void)
 				i += (unsigned)ptr->Size;
 			}
 
-			zbx_free(buffer);
-			zabbix_log(LOG_LEVEL_DEBUG, "logical CPU count %d", cpu_count);
-			return cpu_count;
+			goto finish;
 		}
-
-		zbx_free(buffer);
 	}
 
 fallback:
@@ -100,13 +103,21 @@ fallback:
 		get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetActiveProcessorCount");
 
 	if (NULL != get_act)
-		return (int)get_act(ALL_PROCESSOR_GROUPS);
+	{
+		cpu_count = (int)get_act(ALL_PROCESSOR_GROUPS);
+		goto finish;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount()");
+	zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorCount() not supported, fall back to GetNativeSystemInfo()");
 
 	GetNativeSystemInfo(&sysInfo);
+	cpu_count = (int)sysInfo.dwNumberOfProcessors;
+finish:
+	zbx_free(buffer);
 
-	return (int)sysInfo.dwNumberOfProcessors;
+	zabbix_log(LOG_LEVEL_DEBUG, "logical CPU count %d", cpu_count);
+
+	return cpu_count;
 }
 
 /******************************************************************************
@@ -120,9 +131,8 @@ fallback:
  ******************************************************************************/
 int	get_cpu_group_num_win32(void)
 {
-	/* Define a function pointer type for the GetActiveProcessorGroupCount API */
+	/* pointer type for the GetActiveProcessorGroupCount() */
 	typedef WORD (WINAPI *GETACTIVEPGC)();
-
 	static GETACTIVEPGC	get_act;
 
 	/* please see comments in get_cpu_num_win32() */
@@ -139,6 +149,55 @@ int	get_cpu_group_num_win32(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() not supported, assuming 1");
 
 	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_numa_node_count_win32                                        *
+ *                                                                            *
+ * Purpose: returns the number of NUMA nodes                                  *
+ *                                                                            *
+ * Return value: number of NUMA nodes, 1 if NUMA not supported                *
+ *                                                                            *
+ ******************************************************************************/
+int	get_numa_node_num_win32(void)
+{
+	DWORD		buffer_length;
+	PSYS_LPI_EX	buffer = NULL;
+	int		numa_node_count = 1;
+	unsigned	i;
+
+	if (NULL == get_lpiex)
+	{
+		get_lpiex = (GETLPIEX)GetProcAddress(GetModuleHandle(L"kernel32.dll"),
+				"GetLogicalProcessorInformationEx");
+	}
+
+	if (NULL != get_lpiex)
+	{
+		buffer_length = 0;
+
+		/* first run with empty arguments to figure the buffer length */
+		if (get_lpiex(RelationNumaNode, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			goto finish;
+
+		buffer = (PSYS_LPI_EX)zbx_malloc(buffer, (size_t)buffer_length);
+
+		if (get_lpiex(RelationNumaNode, buffer, &buffer_length))
+		{
+			for (i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
+			{
+				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+				i += (unsigned)ptr->Size;
+			}
+		}
+	}
+finish:
+	zbx_free(buffer);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "NUMA node count %d", numa_node_count);
+
+	return numa_node_count;
 }
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
