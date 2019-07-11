@@ -113,7 +113,7 @@ zbx_oracle_db_handle_t;
 
 static zbx_oracle_db_handle_t	oracle;
 
-static ub4	OCI_DBserver_status();
+static ub4	OCI_DBserver_status(void);
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
@@ -1991,6 +1991,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	if (OCI_SUCCESS != rc)
 	{
+		ub4	rows_fetched;
+		ub4	sizep = sizeof(ub4);
+
 		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
 				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 		{
@@ -2006,6 +2009,15 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			case 3114:	/* ORA-03114: not connected to ORACLE */
 				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
 				return NULL;
+			default:
+				rc = OCIAttrGet((void *)result->stmthp, (ub4)OCI_HTYPE_STMT, (void *)&rows_fetched,
+						(ub4 *)&sizep, (ub4)OCI_ATTR_ROWS_FETCHED, (OCIError *)oracle.errhp);
+
+				if (OCI_SUCCESS != rc || 1 != rows_fetched)
+				{
+					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
+					return NULL;
+				}
 		}
 	}
 
@@ -2277,7 +2289,7 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 
 #ifdef HAVE_ORACLE
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-static ub4	OCI_DBserver_status()
+static ub4	OCI_DBserver_status(void)
 {
 	sword	err;
 	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
