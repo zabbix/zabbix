@@ -163,6 +163,9 @@ pre {
   .disabled [disabled] {
     opacity: 1 !important; }
 
+.monospace-font {
+  font-family: "Courier New", Courier, monospace; }
+
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
@@ -2829,7 +2832,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       border-color: #acbbc2;
       color: #1f2c33; }
     .multilineinput-control input[type=text].monospace-font {
-      font-family: "Courier New", Courier, monospace;
       padding-top: 1px; }
   .multilineinput-control.editable {
     background-color: #fff !important;
@@ -2877,7 +2879,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     bottom: 0; }
     .multilineinput-modal .multilineinput-line-numbers li {
       color: #768d99;
-      font-family: "Courier New", Courier, monospace;
       line-height: 18px;
       text-align: right;
       min-width: 24px; }
@@ -2901,9 +2902,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     color: #768d99;
     float: left;
     line-height: 24px; }
-  .multilineinput-modal.monospace-font .multilineinput-textarea,
-  .multilineinput-modal.monospace-font .multilineinput-label {
-    font-family: "Courier New", Courier, monospace; }
 
 .btn-back-map-container {
   text-align: left;
