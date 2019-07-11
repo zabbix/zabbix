@@ -101,36 +101,32 @@
 			});
 	}
 
-	function makeWidgetInfoBtns(btns) {
-		var info_btns = [];
+	function addWidgetInfoButtons($content_header, buttons) {
+		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
-		if (btns.length) {
-			btns.each(function(btn) {
-				info_btns.push(
-					$('<button>', {
-						'type': 'button',
-						'data-hintbox': 1,
-						'data-hintbox-static': 1
-					})
-						.addClass(btn.icon)
+		buttons.each(function(button) {
+			$widget_actions.prepend(
+				$('<li>', {'class': 'widget-info-button'})
+					.append(
+						$('<button>', {
+							'type': 'button',
+							'class': button.icon,
+							'data-hintbox': 1,
+							'data-hintbox-static': 1
+							})
+						)
+					.append(
+						$('<div>', {
+							'class': 'hint-box',
+							'html': button.hint
+						}).hide()
+					)
 				);
-				info_btns.push(
-					$('<div></div>')
-						.html(btn.hint)
-						.addClass('hint-box')
-						.hide()
-				);
-			});
-		}
-
-		return info_btns.length ? info_btns : null;
+		});
 	}
 
-	function removeWidgetInfoBtns($content_header) {
-		$content_header.find('[data-hintbox=1]')
-			.trigger('remove')
-			.next('.hint-box')
-			.remove();
+	function removeWidgetInfoButtons($content_header) {
+		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
 	}
 
 	/**
@@ -1253,10 +1249,10 @@
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 				}
-				removeWidgetInfoBtns(widget['content_header']);
 
+				removeWidgetInfoButtons(widget['content_header']);
 				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
-					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
+					addWidgetInfoButtons(widget['content_header'], resp.info);
 				}
 
 				// Creates new script elements and removes previous ones to force their re-execution.
@@ -1795,6 +1791,7 @@
 	function setWidgetModeEdit($obj, data, widget) {
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
+		removeWidgetInfoButtons(widget['content_header']);
 		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
