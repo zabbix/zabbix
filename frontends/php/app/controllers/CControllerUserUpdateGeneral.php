@@ -60,18 +60,18 @@ abstract class CControllerUserUpdateGeneral extends CController {
 		$themes[] = THEME_DEFAULT;
 
 		$this->fields = [
-			'userid' =>				'fatal|required|db users.userid',
-			'password1' =>			'db users.passwd',
-			'password2' =>			'db users.passwd',
-			'user_medias' =>		'array',
-			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'theme' =>				'db users.theme|in '.implode(',', $themes),
-			'autologin' =>			'db users.autologin|in 0,1',
-			'autologout' =>			'db users.autologout',
-			'url' =>				'string',
-			'refresh' =>			'required|string|not_empty',
-			'rows_per_page' =>		'required|int32|not_empty|ge 1|le 999999',
-			'form_refresh' =>		'int32'
+			'userid' =>			'fatal|required|db users.userid',
+			'password1' =>		'db users.passwd',
+			'password2' =>		'db users.passwd',
+			'user_medias' =>	'array',
+			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'theme' =>			'db users.theme|in '.implode(',', $themes),
+			'autologin' =>		'db users.autologin|in 0,1',
+			'autologout' =>		'db users.autologout',
+			'url' =>			'string',
+			'refresh' =>		'required|string|not_empty',
+			'rows_per_page' =>	'required|int32|not_empty|ge 1|le 999999',
+			'form_refresh' =>	'int32'
 		];
 	}
 
