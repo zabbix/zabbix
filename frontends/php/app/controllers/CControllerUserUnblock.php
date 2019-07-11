@@ -23,7 +23,7 @@ class CControllerUserUnblock extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'group_userid' =>	'required|array_db users.userid'
+			'userids' =>	'required|array_db users.userid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,24 +42,24 @@ class CControllerUserUnblock extends CController {
 
 		$users = API::User()->get([
 			'countOutput' => true,
-			'userids' => $this->getInput('group_userid'),
+			'userids' => $this->getInput('userids'),
 			'editable' => true
 		]);
 
-		return ($users == count($this->getInput('group_userid')));
+		return ($users == count($this->getInput('userids')));
 	}
 
 	protected function doAction() {
-		$group_userid = $this->getInput('group_userid');
+		$userids = $this->getInput('userids');
 
 		DBstart();
 
-		$result = unblock_user_login($group_userid);
+		$result = unblock_user_login($userids);
 
 		if ($result) {
 			$users = API::User()->get([
 				'output' => ['alias', 'name', 'surname'],
-				'userids' => $group_userid
+				'userids' => $userids
 
 			]);
 
@@ -73,7 +73,7 @@ class CControllerUserUnblock extends CController {
 
 		$result = DBend($result);
 
-		$unblocked = count($group_userid);
+		$unblocked = count($userids);
 
 		$response = new CControllerResponseRedirect('zabbix.php?action=user.list&uncheck=1');
 

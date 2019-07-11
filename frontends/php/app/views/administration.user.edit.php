@@ -246,7 +246,7 @@ if ($data['userid'] != 0) {
 	];
 
 	$delete_btn = (new CRedirectButton(_('Delete'),
-		'zabbix.php?action=user.delete&sid='.$data['sid'].'&group_userid[]='.$data['userid'],
+		'zabbix.php?action=user.delete&sid='.$data['sid'].'&userids[]='.$data['userid'],
 		_('Delete selected user?')
 	))->setId('delete');
 

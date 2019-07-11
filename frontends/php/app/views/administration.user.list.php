@@ -84,7 +84,7 @@ $form = (new CForm())
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'group_userid');")
+			(new CCheckBox('all_users'))->onClick("checkAll('".$form->getName()."', 'all_users', 'userids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Alias'), 'alias', $data['sort'], $data['sortorder']),
 		make_sorting_header(_x('Name', 'user first name'), 'name', $data['sort'], $data['sortorder']),
@@ -122,7 +122,7 @@ foreach ($data['users'] as $user) {
 	}
 
 	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
-		? (new CLink(_('Blocked'), 'zabbix.php?action=user.massunblock&group_userid[]='.$userid))
+		? (new CLink(_('Blocked'), 'zabbix.php?action=user.unblock&userids[]='.$userid))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
 			->addSID()
@@ -168,7 +168,7 @@ foreach ($data['users'] as $user) {
 
 	// Append user to table.
 	$table->addRow([
-		new CCheckBox('group_userid['.$userid.']', $userid),
+		new CCheckBox('userids['.$userid.']', $userid),
 		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
@@ -190,7 +190,7 @@ foreach ($data['users'] as $user) {
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'group_userid', [
+	new CActionButtonList('action', 'userids', [
 		'user.unblock' => ['name' => _('Unblock'), 'confirm' => _('Unblock selected users?')],
 		'user.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected users?')]
 	], 'user')
