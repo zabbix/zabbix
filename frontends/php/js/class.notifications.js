@@ -188,6 +188,7 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
 	}
 
 	this._cached_user_settings = user_settings;
+	this.alarm.muted = this._cached_user_settings.muted;
 
 	if (this._cached_user_settings.disabled) {
 		this.alarm.stop();
