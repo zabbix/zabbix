@@ -512,7 +512,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	num = DCconfig_get_poller_items(poller_type, MAX_POLLER_ITEMS, items);
+	num = DCconfig_get_poller_items(poller_type, items);
 
 	if (0 == num)
 	{

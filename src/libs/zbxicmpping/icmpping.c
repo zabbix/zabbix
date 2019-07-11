@@ -20,7 +20,6 @@
 #include "zbxicmpping.h"
 #include "threads.h"
 #include "comms.h"
-#include "zbxexec.h"
 #include "log.h"
 
 extern char	*CONFIG_SOURCE_IP;
@@ -39,13 +38,6 @@ static const char	*source_ip_option = NULL;
 #ifdef HAVE_IPV6
 static unsigned char	source_ip6_checked = 0;
 static const char	*source_ip6_option = NULL;
-#endif
-
-/* starting with fping (4.x), the packets interval can be 0ms, otherwise minimum value is 10ms */
-#define 		FPING_UNINITIALIZED_INTERVAL	-1
-static int		packet_interval = FPING_UNINITIALIZED_INTERVAL;
-#ifdef HAVE_IPV6
-static int		packet_interval6 = FPING_UNINITIALIZED_INTERVAL;
 #endif
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
@@ -79,54 +71,6 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 	pclose(f);
 
 	*checked = 1;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_get_fping_interval_value                                     *
- *                                                                            *
- * Purpose: return largest value of fping packet interval                     *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: state of interval between sending ping packets (in millisec) *
- ******************************************************************************/
-int	zbx_get_fping_interval_value()
-{
-	if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
-		return packet_interval;
-
-#ifdef HAVE_IPV6
-	if (FPING_UNINITIALIZED_INTERVAL == packet_interval6)
-		return packet_interval;				/* fping may be present without fping6 */
-
-	return packet_interval > packet_interval6 ? packet_interval : packet_interval6;
-#else
-	return packet_interval;
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_interval_option                                              *
- *                                                                            *
- * Purpose: detect minimal possible fping packet interval                     *
- *                                                                            *
- * Parameters: fping - [IN] the the location of fping program                 *
- *             dst   - [IN] the the ip address for test                       *
- *                                                                            *
- * Return value: interval between sending ping packets (in millisec)          *
- ******************************************************************************/
-static int	get_interval_option(const char * fping, const char *dst)
-{
-	char	tmp[MAX_STRING_LEN], error[MAX_STRING_LEN];
-
-	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -i0 %s>/dev/null 2>&1", fping, dst);
-
-	if (SUCCEED == zbx_execute(tmp, NULL, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_ENABLED))
-		return 0;
-	else
-		return 10;
 }
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
@@ -203,30 +147,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
 
 #ifdef HAVE_IPV6
-	if (0 != (fping_existence & FPING_EXISTS))
-	{
-		if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
-			packet_interval = get_interval_option(CONFIG_FPING_LOCATION, "127.0.0.1");
-
-		zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
-	}
-#else
-	if (FPING_UNINITIALIZED_INTERVAL == packet_interval)
-		packet_interval = get_interval_option(CONFIG_FPING_LOCATION, "127.0.0.1");
-
-	zbx_snprintf(params + offset, sizeof(params) - offset, " -i%d", packet_interval);
-#endif	/* HAVE_IPV6 */
-
-#ifdef HAVE_IPV6
 	strscpy(params6, params);
-
-	if (0 != (fping_existence & FPING6_EXISTS))
-	{
-		if (FPING_UNINITIALIZED_INTERVAL == packet_interval6)
-			packet_interval6 = get_interval_option(CONFIG_FPING6_LOCATION, "::1");
-
-		zbx_snprintf(params6 + offset, sizeof(params6) - offset, " -i%d", packet_interval6);
-	}
 #endif	/* HAVE_IPV6 */
 
 	if (NULL != CONFIG_SOURCE_IP)
@@ -444,7 +365,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	if (NOTSUPPORTED == ret)
 		zbx_snprintf(error, max_error_len, "fping failed: %s", tmp);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
