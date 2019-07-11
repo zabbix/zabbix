@@ -2197,3 +2197,9 @@ INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 10011
 
 -- testFormAdministrationMediaTypes
 INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
+
+-- testFormUser
+INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);
+INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
+

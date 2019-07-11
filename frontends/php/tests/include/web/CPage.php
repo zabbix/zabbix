@@ -148,14 +148,20 @@ class CPage {
 	}
 
 	/**
-	 * Logout from frontend and clean cookies.
+	 * Logout and clean cookies.
 	 */
 	public function logout() {
-		$this->query('xpath://a[@class="top-nav-signout"]')->one()->click();
-		$this->waitUntilReady();
+		try {
+			if (self::$cookie !== null) {
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(self::$cookie['value']));
+			}
 
-		$this->driver->manage()->deleteAllCookies();
-		self::$cookie = null;
+			$this->driver->manage()->deleteAllCookies();
+			self::$cookie = null;
+		}
+		catch (\Exception $e) {
+			// Code is not missing here.
+		}
 	}
 
 	/**
