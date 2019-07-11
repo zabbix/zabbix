@@ -2468,26 +2468,30 @@ function getTimeperiodForm(array $data) {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag       (optional)
- * @param string     $value     (optional)
- * @param bool       $readonly  (optional)
+ * @param string     $tag      (optional)
+ * @param string     $value    (optional)
+ * @param array      $options  (optional)
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', $readonly = false) {
+function renderTagTableRow($index, $tag = '', $value = '', array $options = []) {
+	$options = array_merge(['readonly' => false], $options);
+
 	return (new CRow([
-		(new CTextBox('tags['.$index.'][tag]', $tag, $readonly))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tags['.$index.'][value]', $value, $readonly))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
-			->setAttribute('placeholder', _('value')),
-		new CCol(
-			(new CButton('tags['.$index.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->setEnabled(!$readonly)
-		)
+		(new CCol(
+			(new CTextAreaFlexible('tags['.$index.'][tag]', $tag, $options))
+				->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CTextAreaFlexible('tags['.$index.'][value]', $value, $options))
+				->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+				->setAttribute('placeholder', _('value'))
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CButton('tags['.$index.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+			->setEnabled(!$options['readonly'])
 	]))->addClass('form_row');
 }
 
@@ -2502,10 +2506,10 @@ function renderTagTableRow($index, $tag = '', $value = '', $readonly = false) {
  * @return CTable
  */
 function renderTagTable(array $tags, $readonly = false) {
-	$table = new CTable();
+	$table = (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $readonly));
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], ['readonly' => $readonly]));
 	}
 
 	return $table->setFooter(new CCol(

@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
-
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
 	->setControls((new CTag('nav', true,
@@ -39,7 +37,7 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 255))
+	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
@@ -48,7 +46,7 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
+	$value_input = (new CTextAreaFlexible('macros['.$i.'][value]', $macro['value']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
@@ -62,7 +60,10 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	$table->addRow([
-		$macro_input, '&rArr;', $value_input, (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		'&rArr;',
+		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 }
 
@@ -74,8 +75,7 @@ $table->setFooter(new CCol(
 ));
 
 // form list
-$macros_form_list = (new CFormList('macrosFormList'))
-	->addRow($table);
+$macros_form_list = (new CFormList('macrosFormList'))->addRow($table);
 
 $tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
@@ -89,5 +89,7 @@ $form = (new CForm())
 	->addItem($tab_view);
 
 $widget->addItem($form);
+
+require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
 return $widget;

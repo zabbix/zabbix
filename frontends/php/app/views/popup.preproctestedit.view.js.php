@@ -225,6 +225,8 @@ jQuery(document).ready(function($) {
 		grow: 'auto',
 		rows: 0
 	});
+
+	$('.textarea-flexible').textareaFlexible();
 });
 
 <?php return ob_get_clean(); ?>

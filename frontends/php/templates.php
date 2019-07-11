@@ -91,7 +91,7 @@ function prepare_page_header($type) {
 		$page['title'] = _('Configuration of templates');
 		$page['file'] = 'templates.php';
 		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-		$page['scripts'] = ['multiselect.js'];
+		$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
 	}
 	elseif ($type === 'xml') {
 		$page['file'] = 'zbx_export_templates.xml';

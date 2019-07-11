@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of macros');
 $page['file'] = 'adm.macros.php';
+$page['scripts'] = ['textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

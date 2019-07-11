@@ -1,56 +1,78 @@
-<script type="text/x-jquery-tmpl" id="macroRow">
-	<tr class="form_row">
-		<td>
-			<input class="macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="255" placeholder="{$MACRO}">
-		<?php if ($data['show_inherited_macros']): ?>
-			<input id="macros_#{rowNum}_type" type="hidden" value="2" name="macros[#{rowNum}][type]">
-		<?php endif ?>
-		</td>
-		<td>&rArr;</td>
-		<td>
-			<input type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('value') ?>">
-		</td>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
-		</td>
-		<?php if ($data['show_inherited_macros']): ?>
-			<td></td><td><div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px;"></div></td><td></td><td><div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px;"></div></td>
-		<?php endif ?>
-	</tr>
+<script type="text/x-jquery-tmpl" id="macro-row-tmpl">
+	<?= (new CRow([
+			(new CCol([
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->addClass('macro')
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->setAttribute('placeholder', '{$MACRO}'),
+				$data['show_inherited_macros']
+					? new CInput('hidden', 'macros[#{rowNum}][type]', 2)
+					: null
+			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			'&rArr;',
+			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][value]', '', ['add_post_js' => false]))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('value'))
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
+			))->addClass(ZBX_STYLE_NOWRAP),
+			$data['show_inherited_macros']
+				? [
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					),
+					new CCol(),
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					)
+				]
+				: null
+		]))
+			->addClass('form_row')
+			->toString()
+	?>
 </script>
+
 <script type="text/javascript">
 	jQuery(function($) {
-		$('#tbl_macros').dynamicRows({
-			template: '#macroRow'
-		});
+		$('#tbl_macros')
+			.dynamicRows({template: '#macro-row-tmpl'})
+			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
+				if ($(this).hasClass('macro')) {
+					macroToUpperCase(this);
+				}
+				$(this).trigger('input');
+			})
+			.on('click', 'button.element-table-change', function() {
+				var macroNum = $(this).attr('id').split('_')[1];
 
-		$('#tbl_macros').on('click', 'button.element-table-change', function() {
-			var macroNum = $(this).attr('id').split('_')[1];
-
-			if ($('#macros_' + macroNum + '_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
-				$('#macros_' + macroNum + '_type')
-					.val($('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
-				$('#macros_' + macroNum + '_value')
-					.prop('readonly', true)
-					.val($('#macros_' + macroNum + '_inherited_value').val());
-				$('#macros_' + macroNum + '_change')
-					.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
-			}
-			else {
-				$('#macros_' + macroNum + '_type')
-					.val($('#macros_' + macroNum + '_type').val() | <?= ZBX_PROPERTY_OWN ?>);
-				$('#macros_' + macroNum + '_value')
-					.prop('readonly', false)
-					.focus();
-				$('#macros_' + macroNum + '_change')
-					.text(<?= CJs::encodeJson(_('Remove')) ?>);
-			}
-		});
-
-		// Convert macro names to uppercase.
-		$('#tbl_macros').on('blur', 'input.macro', function() {
-			macroToUpperCase(this);
-		});
+				if ($('#macros_' + macroNum + '_type').val() & <?= ZBX_PROPERTY_OWN ?>) {
+					$('#macros_' + macroNum + '_type')
+						.val($('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
+					$('#macros_' + macroNum + '_value')
+						.prop('readonly', true)
+						.val($('#macros_' + macroNum + '_inherited_value').val());
+					$('#macros_' + macroNum + '_change')
+						.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
+				}
+				else {
+					$('#macros_' + macroNum + '_type')
+						.val($('#macros_' + macroNum + '_type').val() | <?= ZBX_PROPERTY_OWN ?>);
+					$('#macros_' + macroNum + '_value')
+						.prop('readonly', false)
+						.focus();
+					$('#macros_' + macroNum + '_change')
+						.text(<?= CJs::encodeJson(_('Remove')) ?>);
+				}
+			});
 
 		$('form[name="hostsForm"], form[name="templatesForm"]').submit(function() {
 			$('input.macro').each(function() {

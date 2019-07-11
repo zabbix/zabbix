@@ -362,7 +362,7 @@ switch ($data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_EVENT_TAG_VALUE:
 		$condition = (new CTextBox('new_condition[value]', ''))
-			->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+			->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 			->setAttribute('placeholder', _('value'));
 
 		$condition2 = (new CTextBox('new_condition[value2]', ''))

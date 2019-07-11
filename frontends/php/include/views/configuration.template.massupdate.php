@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
-
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 // Create form.
@@ -170,5 +168,7 @@ $tabs->setFooter(makeFormFooter(
 $form->addItem($tabs);
 
 $widget->addItem($form);
+
+require_once dirname(__FILE__).'/js/configuration.template.massupdate.js.php';
 
 return $widget;

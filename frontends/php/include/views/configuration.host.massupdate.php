@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
-
 $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
@@ -312,5 +310,7 @@ $hostTab->setFooter(makeFormFooter(
 $hostView->addItem($hostTab);
 
 $hostWidget->addItem($hostView);
+
+require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 
 return $hostWidget;

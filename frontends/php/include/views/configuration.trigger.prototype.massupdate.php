@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
-
 $widget = (new CWidget())->setTitle(_('Trigger prototypes'));
 
 // Append host summary to widget header.
@@ -193,5 +191,7 @@ $tabs->setFooter(makeFormFooter(
 $form->addItem($tabs);
 
 $widget->addItem($form);
+
+require_once dirname(__FILE__).'/js/configuration.trigger.massupdate.js.php';
 
 return $widget;

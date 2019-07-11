@@ -122,11 +122,11 @@ $form_list
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setEnabled(!$data['limited'])
@@ -214,11 +214,11 @@ $form_list
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 1000))
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setEnabled(!$data['limited'])
@@ -734,16 +734,18 @@ else {
 }
 
 foreach ($lld_macro_paths as $i => $lld_macro_path) {
-	$lld_macro = (new CTextBox('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'],
-		$templated, DB::getFieldLength('lld_macro_path', 'lld_macro')
-	))
+	$lld_macro = (new CTextAreaFlexible('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'], [
+		'readonly' => $templated,
+		'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
+	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->setAttribute('placeholder', '{#MACRO}');
 
-	$path = (new CTextBox('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], $templated,
-		DB::getFieldLength('lld_macro_path', 'path')
-	))
+	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], [
+		'readonly' => $templated,
+		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
+	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('$.path.to.node'));
 
@@ -754,7 +756,11 @@ foreach ($lld_macro_paths as $i => $lld_macro_path) {
 			->setEnabled(!$templated)
 	];
 
-	$lld_macro_paths_table->addRow([$lld_macro, $path, (new CCol($remove))->addClass(ZBX_STYLE_NOWRAP)], 'form_row');
+	$lld_macro_paths_table->addRow([
+		(new CCol($lld_macro))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($path))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($remove))->addClass(ZBX_STYLE_NOWRAP)
+	],'form_row');
 }
 
 $lld_macro_paths_table->setFooter((new CCol(
