@@ -130,6 +130,8 @@ static int	get_interval_option(const char * fping, const char *dst)
  ******************************************************************************/
 static int	get_fping_ver(const char * fping)
 {
+#	define VER_STR	"Version "
+
 	int	ver;
 	char	tmp[MAX_STRING_LEN], error[MAX_STRING_LEN], *cmd_result = NULL, *ver_str;
 
@@ -138,8 +140,10 @@ static int	get_fping_ver(const char * fping)
 	if (SUCCEED != zbx_execute(tmp, &cmd_result, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_ENABLED))
 		return FPING_UNINITIALIZED_VERSION;
 
-	if (NULL != (ver_str = strstr(cmd_result, "Version ")))
+	if (NULL != (ver_str = strstr(cmd_result, VER_STR)))
 	{
+		ver_str += sizeof(VER_STR) - 1;
+
 		while (isspace(*ver_str))
 			ver_str++;
 
