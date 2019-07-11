@@ -39,9 +39,9 @@ class CControllerUserCreate extends CController {
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
 			'autologout' =>		'db users.autologout',
-			'url' =>			'string',
-			'refresh' =>		'required|string|not_empty',
-			'rows_per_page' =>	'required|int32|not_empty|ge 1|le 999999',
+			'url' =>			'db users.url',
+			'refresh' =>		'required|db users.refresh|not_empty',
+			'rows_per_page' =>	'required|db users.rows_per_page|ge 1|le 999999',
 			'form_refresh' =>	'int32'
 		];
 
@@ -84,10 +84,10 @@ class CControllerUserCreate extends CController {
 		$this->getInputs($user, ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
 			'rows_per_page', 'lang', 'type'
 		]);
-		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
+		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
 		$user_medias = $this->getInput('user_medias', []);
 
-		if ($this->getInput('password1', '') !== '') {
+		if ($this->getInput('password1') !== '') {
 			$user['passwd'] = $this->getInput('password1');
 		}
 

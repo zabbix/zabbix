@@ -89,9 +89,9 @@ abstract class CControllerUserEditGeneral extends CController {
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
-			'url' =>				'string',
-			'refresh' =>			'string',
-			'rows_per_page' =>		'int32|ge 1|le 999999',
+			'url' =>				'db users.url',
+			'refresh' =>			'db users.refresh',
+			'rows_per_page' =>		'db users.rows_per_page|ge 1|le 999999',
 			'form_refresh' =>		'int32'
 		];
 
