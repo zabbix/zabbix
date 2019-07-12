@@ -46,13 +46,14 @@ class CWidgetHelper {
 	 */
 	public static function createFormList($dialogue_name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		return (new CFormList())
-			->addRow((new CLabel(_('Type'), 'type')),
-				(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types))
-			)
-			->addRow((new CCheckBox('show_header'))
-				->setLabel(_('Show header'))
-				->setId('show_header')
-				->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+			->addRow((new CLabel(_('Type'), 'type')), [
+					(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)),
+					(new CDiv((new CCheckBox('show_header'))
+						->setLabel(_('Show header'))
+						->setId('show_header')
+						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+					))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				]
 			)
 			->addRow(_('Name'),
 				(new CTextBox('name', $dialogue_name))

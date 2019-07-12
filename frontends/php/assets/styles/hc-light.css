@@ -2825,6 +2825,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     max-height: 128px;
     overflow-y: auto;
     margin-left: -10px; }
+  .overlay-dialogue .table-forms-second-column {
+    float: right;
+    line-height: 24px; }
 
 .multilineinput-control {
   display: flex;
