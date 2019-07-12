@@ -824,6 +824,7 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	this.player.file(user_settings.files[this.severity]);
 
 	if (this.old_id !== this.getId()) {
+		this.markAsPlayed();
 		this.player.seek(0);
 	}
 
@@ -886,7 +887,7 @@ ZBX_NotificationsAlarm.prototype.reset = function() {
 	this.start = '';
 	this.severity = -2;
 	this.notif = null;
-	this.player.timeout(0);
+	this.player.stop();
 };
 
 /**
