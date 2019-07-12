@@ -4,11 +4,29 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
-..F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
+A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
+....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
+...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
+.......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
+..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
+..F....... [ZBX-16329] fixed duplicate value checking in trigger action conditions (Ivo)
+A......... [ZBX-15562] reworked history.get API method; fixed output as well as other known issues in history API (miks, Sasha)
+..F....... [ZBX-16135] fixed error messages in XML export files (averza)
+A......... [ZBX-16213] fixed PostgreSQL bad performance on history tables (averza)
+..F....... [ZBX-16176] preserve trailing spaces in history values (averza)
+..F....... [ZBX-16169] improved performance of map navigation tree widget (miks)
+..F....... [ZBX-16288] fixed when unknown resource logged in audit log when working with dashboards (vasilijs)
+A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
+..F....... [ZBX-15969] fixed displaying of very small values that are more than 2 decimal points in latest data (Ivo)
+..F....... [ZBX-16280] fixed when Plain Text Widgets do not display as HTML when option is selected (vasilijs)
+A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
 .......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
+..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
 ...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
-..F....... [ZBX-16153] fix 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
-..F....... [ZBX-16204] fix undefined offset in CControllerWidgetProblemHostsView (rlataria)
+........S. [ZBX-16315] fixed Zabbix server not to cause foreign key constraint failure on Zabbix proxy when changing and sending configuration at the same time (vso)
+..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+...G...PS. [ZBX-9867] improved Zabbix daemon termination by not using signal unsafe functions in signal handler; improved Zabbix server and Zabbix proxy process termination by stopping data collection and waiting for history syncers to finish (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.10
@@ -26,8 +44,6 @@ New features:
 ...G...PS. [ZBXNEXT-5179] added option to specify absolute path in LoadModule; thanks to Glebs Ivanovskis for the patch (asestakovs)
 
 Bug fixes:
-........S. [ZBX-16315] fixed Zabbix server not to cause foreign key constraint failure on Zabbix proxy when changing and sending configuration at the same time (vso)
-...G...PS. [ZBX-9867] improved Zabbix daemon termination by not using signal unsafe functions in signal handler; improved Zabbix server and Zabbix proxy process termination by stopping data collection and waiting for history syncers to finish (vso)
 ..F....... [ZBX-16152] fixed not data loss on saving host prototypes by user with insufficient permissions (averza)
 ..F....... [ZBX-15952] fixed errors when trying to create a graph widget for key system.cpu.util[,iowait] with Y axis placed on the left side of the graph (vasilijs)
 ...G...PS. [ZBX-15899] added output sanitization to prevent invalid UTF-8 sequences in regexp-based text replacement (Andris)
