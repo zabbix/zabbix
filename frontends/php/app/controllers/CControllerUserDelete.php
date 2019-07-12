@@ -36,17 +36,7 @@ class CControllerUserDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$users = API::User()->get([
-			'countOutput' => true,
-			'userids' => $this->getInput('userids'),
-			'editable' => true
-		]);
-
-		return ($users == count($this->getInput('userids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
@@ -56,7 +46,11 @@ class CControllerUserDelete extends CController {
 
 		$deleted = count($userids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=user.list&uncheck=1');
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'user.list')
+			->setArgument('uncheck', '1');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
 
 		if ($result) {
 			$response->setMessageOk(_n('User deleted', 'Users deleted', $deleted));

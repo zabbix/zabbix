@@ -36,17 +36,7 @@ class CControllerUserUnblock extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$users = API::User()->get([
-			'countOutput' => true,
-			'userids' => $this->getInput('userids'),
-			'editable' => true
-		]);
-
-		return ($users == count($this->getInput('userids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
@@ -54,15 +44,15 @@ class CControllerUserUnblock extends CController {
 
 		DBstart();
 
-		$result = unblock_user_login($userids);
+		$users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => $userids,
+			'editable' => true
+		]);
+
+		$result = (count($users) == count($userids) && unblock_user_login($userids));
 
 		if ($result) {
-			$users = API::User()->get([
-				'output' => ['alias', 'name', 'surname'],
-				'userids' => $userids
-
-			]);
-
 			foreach ($users as $user) {
 				info('User '.$user['alias'].' unblocked');
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
@@ -75,7 +65,11 @@ class CControllerUserUnblock extends CController {
 
 		$unblocked = count($userids);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=user.list&uncheck=1');
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'user.list')
+			->setArgument('uncheck', '1');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
 
 		if ($result) {
 			$response->setMessageOk(_n('User unblocked', 'Users unblocked', $unblocked));
