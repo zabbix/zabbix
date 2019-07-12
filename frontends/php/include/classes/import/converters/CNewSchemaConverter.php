@@ -67,7 +67,8 @@ class CNewSchemaConverter extends CConverter {
 		$class_tag = $class->getTag();
 		$schema = $class->buildSchema();
 
-		if ($class instanceof CXmlTagIndexedArray) { // FIXME: rewrite this code piece
+		// If it indexed array getting child tag schema.
+		if ($class instanceof CXmlTagIndexedArray) {
 			$class_tag = CXmlDefine::$subtags[$class->getTag()];
 			$schema = $class->getNextSchema();
 			$schema = $schema[$class_tag]->buildSchema();

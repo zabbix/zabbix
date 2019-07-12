@@ -157,7 +157,7 @@ abstract class CXmlTag {
 	 */
 	public function getConstantByValue($const, $index = 0) {
 		if (!array_key_exists($const, $this->constantids[$index])) {
-			throw new \InvalidArgumentException(_s('Tag "%1$s" constant "%2$s" does not exist.', $this->tag, $const));
+			throw new \InvalidArgumentException(_s('Constant `%1$s` for tag `%2$s` does not exist.', $const, $this->tag));
 		}
 
 		return $this->constantids[$index][$const];
@@ -173,7 +173,7 @@ abstract class CXmlTag {
 	 */
 	public function getConstantValueByName($const, $index = 0) {
 		if (!isset($this->constans_values[$index][$const])) {
-			throw new \InvalidArgumentException(_s('Tag "%1$s" constant "%2$s" does not exist.', $this->tag, $const));
+			throw new \InvalidArgumentException(_s('Constant `%1$s` for tag `%2$s` does not exist.', $const, $this->tag));
 		}
 
 		return $this->constans_values[$index][$const];

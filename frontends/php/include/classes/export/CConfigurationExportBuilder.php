@@ -69,7 +69,7 @@ class CConfigurationExportBuilder {
 
 			$format_method = 'format'.(ucfirst(str_replace('_', '', $key)));
 			if (method_exists($this, $format_method)) {
-				$data[$key] = call_user_func([$this, $format_method ], $data[$key], $simple_triggers);
+				$data[$key] = call_user_func([$this, $format_method], $data[$key], $simple_triggers);
 			}
 
 			$this->data[$tagClass->getTag()] = $this->build($tagClass, $data[$key]);
@@ -101,7 +101,9 @@ class CConfigurationExportBuilder {
 
 				if (!$default_value && !$has_data) {
 					if ($is_require) {
-						throw new CConfigurationExportException(_s('Required tag "%1$s" -> "%2$s" cannot be empty.', $schema_class->getTag(), $tag));
+						throw new CConfigurationExportException(
+							_s('Required tag "%1$s" -> "%2$s" cannot be empty.', $schema_class->getTag(), $tag)
+						);
 					}
 					continue;
 				}

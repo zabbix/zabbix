@@ -42,16 +42,23 @@ class C42ImportConverter extends CConverter {
 		return $data;
 	}
 
-	protected function convertInventoryMode(array $data)
+	/**
+	 * Convert inventory mode.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function convertInventoryMode(array $hosts)
 	{
-		foreach ($data as &$host) {
+		foreach ($hosts as &$host) {
 			if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
 				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 				unset($host['inventory']);
 			}
 		}
 
-		return $data;
+		return $hosts;
 	}
 
 	/**
