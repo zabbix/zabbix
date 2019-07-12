@@ -1228,8 +1228,9 @@
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
-			dataType: 'json',
-			success: function(resp) {
+			dataType: 'json'
+		})
+			.then(function(resp) {
 				stopPreloader(widget);
 				var $content_header = $('h4', widget['content_header']),
 					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
@@ -1273,7 +1274,12 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
-
+			}, function() {
+				// TODO: gentle message about failed update of widget content
+				widget['update_attempts'] = 0;
+				startWidgetRefreshTimer($obj, data, widget, 3);
+			})
+			.then(function() {
 				var callOnDashboardReadyTrigger = false;
 				if (!widget['ready']) {
 					widget['ready'] = true; // leave it before registerDataExchangeCommit.
@@ -1288,13 +1294,7 @@
 				if (callOnDashboardReadyTrigger) {
 					doAction('onDashboardReady', $obj, data, null);
 				}
-			},
-			error: function() {
-				// TODO: gentle message about failed update of widget content
-				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer($obj, data, widget, 3);
-			}
-		});
+			});
 
 		widget['initial_load'] = false;
 	}
