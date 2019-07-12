@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
 A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
 ....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 ...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
