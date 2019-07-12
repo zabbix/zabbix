@@ -38,6 +38,8 @@ function ZBX_NotificationsAudio() {
 
 	this.wave = '';
 	this.ms_timeout = 0;
+	this.is_playing = false;
+	this.messageTimeout = 0;
 
 	this.resetPromise();
 	this.listen();
@@ -51,27 +53,24 @@ function ZBX_NotificationsAudio() {
 ZBX_NotificationsAudio.prototype.listen = function() {
 	var ms_step = 10;
 
-	function checkAudioState() {
+	function resolveAudioState() {
 		if (this.play_once_on_ready) {
 			return this.once();
 		}
 
 		this.ms_timeout -= ms_step;
+		this.is_playing = (this.ms_timeout > 0.0001);
+		this.audio.volume = this.is_playing ? 1 : 0;
 
-		if (this.ms_timeout < 1) {
+		if (this.ms_timeout < 0.0001) {
 			this._resolve_timeout(this);
-			this.audio.muted = true;
-			this.audio.volume = 0;
 			this.ms_timeout = 0;
-			return;
+			this.seek(0);
 		}
-
-		this.audio.muted = false;
-		this.audio.volume = 1;
 	}
 
-	checkAudioState.call(this);
-	return setInterval(checkAudioState.bind(this), ms_step);
+	resolveAudioState.call(this);
+	return setInterval(resolveAudioState.bind(this), ms_step);
 };
 
 /**
@@ -123,7 +122,11 @@ ZBX_NotificationsAudio.prototype.once = function() {
 	if (this.play_once_on_ready && this.audio.readyState >= 3) {
 		this.play_once_on_ready = false;
 
-		return this.seek(0).timeout(this.audio.duration);
+		var timeout = (this.messageTimeout == 0)
+			? this.audio.duration
+			: Math.min(this.messageTimeout, this.audio.duration);
+
+		return this.timeout(timeout);
 	}
 
 	this.play_once_on_ready = true;
@@ -138,6 +141,46 @@ ZBX_NotificationsAudio.prototype.once = function() {
  */
 ZBX_NotificationsAudio.prototype.stop = function() {
 	return this.timeout(0);
+};
+
+/**
+ * Mute player.
+ *
+ * @return {ZBX_NotificationsAudio}
+ */
+ZBX_NotificationsAudio.prototype.mute = function() {
+	this.audio.muted = true;
+	return this;
+};
+
+/**
+ * Unmute player.
+ *
+ * @return {ZBX_NotificationsAudio}
+ */
+ZBX_NotificationsAudio.prototype.unmute = function() {
+	this.audio.muted = false;
+	return this;
+};
+
+/**
+ * Tune player.
+ *
+ * @argument {array}   options
+ * @argument {bool}    options[playOnce]        Player will not play in the loop if set to true.
+ * @argument {number}  options[messageTimeout]  Message display timeout. Used to avoid playing when message box is gone.
+ *
+ * @return {ZBX_NotificationsAudio}
+ */
+ZBX_NotificationsAudio.prototype.tune = function(options) {
+	if (typeof options.playOnce === 'boolean') {
+		this.audio.loop = !options.playOnce;
+	}
+	if (typeof options.messageTimeout === 'number') {
+		this.messageTimeout = options.messageTimeout;
+	}
+
+	return this;
 };
 
 /**
@@ -162,8 +205,14 @@ ZBX_NotificationsAudio.prototype.resetPromise = function() {
  * @return {Promise}
  */
 ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
-	if (seconds == ZBX_Notifications.ALARM_ONCE_PLAYER) {
-		return this.once();
+	if (!this.audio.loop) {
+		if (seconds == ZBX_Notifications.ALARM_ONCE_PLAYER) {
+			return this.once();
+		} else if (this.is_playing) {
+			return this.timeout_promise;
+		} else {
+			this.audio.load();
+		}
 	}
 
 	this.ms_timeout = seconds * 1000;

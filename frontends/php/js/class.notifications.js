@@ -188,7 +188,12 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
 	}
 
 	this._cached_user_settings = user_settings;
-	this.alarm.muted = this._cached_user_settings.muted;
+
+	if (user_settings.muted) {
+		this.alarm.mute();
+	} else {
+		this.alarm.unmute();
+	}
 
 	if (this._cached_user_settings.disabled) {
 		this.alarm.stop();
@@ -438,14 +443,13 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
-	this.fetch('notifications.mute', {mute: this.alarm.muted ? 0 : 1})
+	this.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
 		.catch(console.error)
 		.then(function(resp) {
-			this._cached_user_settings.muted = resp.mute;
-			this.alarm.consume({muted: resp.mute});
+			this._cached_user_settings.muted = (resp.muted == 1);
+			this.alarm.consume({muted: this._cached_user_settings.muted});
 			this.pushUpdates();
 			this.render();
-
 		}.bind(this));
 };
 
@@ -694,7 +698,6 @@ function ZBX_NotificationsAlarm(player) {
 	this.severity = -2;
 	this.start = '';
 	this.end = '';
-	this.seek = 0;
 	this.timeout = 0;
 	this.muted = true;
 	this.notif = null;
@@ -750,7 +753,7 @@ ZBX_NotificationsAlarm.prototype.markAsPlayed = function() {
  * @return {bool}
  */
 ZBX_NotificationsAlarm.prototype.isPlayed = function() {
-	return this.getId() === this.end;
+	return (this.getId() === this.end);
 };
 
 /**
@@ -772,7 +775,7 @@ ZBX_NotificationsAlarm.prototype.isSnoozed = function(list) {
  * @return {bool}
  */
 ZBX_NotificationsAlarm.prototype.isStopped = function() {
-	return !this.getId() || this.muted;
+	return !this.getId();
 };
 
 /**
@@ -797,12 +800,22 @@ ZBX_NotificationsAlarm.prototype.stop = function() {
 	this.player.stop();
 };
 
+ZBX_NotificationsAlarm.prototype.mute = function() {
+	this.muted = true;
+	this.player.mute();
+};
+
+ZBX_NotificationsAlarm.prototype.unmute = function() {
+	this.muted = false;
+	this.player.unmute();
+};
+
 /**
  * @param {object} user_settings
  * @param {array} list  List of raw notification objects.
  */
 ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
-	this.muted = user_settings.muted;
+	user_settings.muted ? this.mute() : this.unmute();
 
 	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list)) {
 		return this.player.stop();
@@ -811,19 +824,22 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	this.player.file(user_settings.files[this.severity]);
 
 	if (this.old_id !== this.getId()) {
-		this.player.seek(this.seek);
+		this.player.seek(0);
 	}
 
 	if (this.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
 		this.markAsPlayed();
-		this.player.once();
 	}
-	else {
-		this.player.timeout(this.calcTimeout(user_settings)).then(function(player) {
-			this.markAsPlayed();
-			this.dispatchChanged();
-		}.bind(this));
-	}
+
+	this.player.tune({
+		playOnce: (this.calcTimeout(user_settings) == ZBX_Notifications.ALARM_ONCE_PLAYER),
+		messageTimeout: (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0
+	});
+
+	this.player.timeout(this.calcTimeout(user_settings)).then(function() {
+		this.markAsPlayed();
+		this.dispatchChanged();
+	}.bind(this));
 };
 
 /**
