@@ -33,7 +33,6 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_HOST_INFO => _('Host info'),
 		SCREEN_RESOURCE_MAP => _('Map'),
 		SCREEN_RESOURCE_PLAIN_TEXT => _('Plain text'),
-		SCREEN_RESOURCE_SCREEN => _('Screen'),
 		SCREEN_RESOURCE_SERVER_INFO => _('System information'),
 		SCREEN_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
 		SCREEN_RESOURCE_HOSTGROUP_TRIGGERS => _('Host group issues'),
@@ -56,26 +55,6 @@ function screen_resources($resource = null) {
 	else {
 		return _('Unknown');
 	}
-}
-
-function check_screen_recursion($mother_screenid, $child_screenid) {
-	if (bccomp($mother_screenid , $child_screenid) == 0) {
-		return true;
-	}
-
-	$db_scr_items = DBselect(
-		'SELECT si.resourceid'.
-		' FROM screens_items si'.
-		' WHERE si.screenid='.zbx_dbstr($child_screenid).
-		' AND si.resourcetype='.SCREEN_RESOURCE_SCREEN
-	);
-	while ($scr_item = DBfetch($db_scr_items)) {
-		if (check_screen_recursion($mother_screenid, $scr_item['resourceid'])) {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 /**

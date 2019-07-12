@@ -1240,6 +1240,8 @@ output {
           margin: 3px 0; }
       .table-forms .table-forms-td-right td:last-child {
         padding-right: 0; }
+    .table-forms .table-forms-td-right .wrap-multiple-controls {
+      display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
   .table-forms h4 {
@@ -2384,6 +2386,18 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-widget {
   display: flex;
   position: absolute; }
+  .dashbrd-grid-widget .dashbrd-grid-widget-actions {
+    opacity: 0;
+    filter: alpha(opacity=0);
+    -webkit-transition: opacity 0.2s ease-out;
+    -moz-transition: opacity 0.2s ease-out;
+    transition: opacity 0.2s ease-out; }
+
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .dashbrd-grid-widget-actions,
+.dashbrd-grid-container .dashbrd-grid-widget-focus .dashbrd-grid-widget-actions,
+.dashbrd-grid-container .dashbrd-grid-widget:hover .dashbrd-grid-widget-actions {
+  opacity: 1;
+  filter: alpha(opacity=100); }
 
 .dashbrd-grid-widget-container {
   display: flex;
@@ -3138,6 +3152,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .middle {
   vertical-align: middle; }
+
+.no-padding {
+  padding: 0; }
 
 .graph-selection {
   position: absolute;
@@ -4939,6 +4956,34 @@ table.preprocessing-test-results .rel-container {
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 
+.host-avail-widget {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed; }
+  .host-avail-widget td {
+    padding: 0 10px;
+    vertical-align: middle; }
+  .host-avail-widget .host-avail-count {
+    font-size: 16px; }
+  .host-avail-widget.host-avail-layout-horizontal {
+    min-width: 305px; }
+    .host-avail-widget.host-avail-layout-horizontal td {
+      text-align: center; }
+    .host-avail-widget.host-avail-layout-horizontal .host-avail-count {
+      display: block; }
+  .host-avail-widget.host-avail-layout-vertical td {
+    padding-top: 3px; }
+  .host-avail-widget.host-avail-layout-vertical .host-avail-count {
+    margin-right: 5px; }
+  .host-avail-widget .host-avail-true {
+    background: #86cc89; }
+  .host-avail-widget .host-avail-false {
+    background: #e45959; }
+  .host-avail-widget .host-avail-unknown {
+    background: #97aab3; }
+  .host-avail-widget .host-avail-total {
+    background: transparent; }
+
 .list-table thead th {
   border-color: #404040; }
 
@@ -4976,3 +5021,8 @@ table.preprocessing-test-results .rel-container {
 
 .icon-actions-number-gray[data-count]::after {
   color: #f2f2f2; }
+
+.host-avail-widget {
+  color: #191919; }
+  .host-avail-widget .host-avail-total {
+    color: #f2f2f2; }

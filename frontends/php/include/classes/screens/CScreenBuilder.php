@@ -219,9 +219,6 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_CLOCK:
 				return new CScreenClock($options);
 
-			case SCREEN_RESOURCE_SCREEN:
-				return new CScreenScreen($options);
-
 			case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 				return new CScreenTriggersOverview($options);
 

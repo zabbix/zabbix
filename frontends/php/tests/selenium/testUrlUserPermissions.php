@@ -156,7 +156,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'screens.php?elementid=200009',
+				'url' => 'screens.php?elementid=200000',
 				'title' =>	'Custom screens [refreshed every 30 sec.]',
 				'no_permissions_to_object' => true,
 				'users' => [

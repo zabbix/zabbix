@@ -3,7 +3,7 @@
 CPU=$(PROCESSOR_ARCHITECTURE)
 !ENDIF
 
-!IF "$(CPU)" == "i386"
+!IF "$(CPU)" == "i386" || "$(CPU)" == "x86"
 TARGETDIR = ..\..\..\bin\win32
 ADD_LFLAGS = /MACHINE:X86
 
