@@ -19,31 +19,6 @@
 **/
 
 
-class CXmlTagFilter extends CXmlTagAbstract
-{
-	protected $tag = 'filter';
+class CXmlTagArray extends CXmlTag {
 
-	public function __construct(array $schema = [])
-	{
-		$schema += [
-			'condition' => [
-				'type' => CXmlDefine::STRING
-			],
-			'evaltype' => [
-				'type' => CXmlDefine::STRING,
-				'value' => CXmlDefine::AND_OR,
-				'range' => [
-					CXmlDefine::AND_OR => 'AND_OR',
-					CXmlDefine::AND => 'AND',
-					CXmlDefine::OR => 'OR',
-					CXmlDefine::FORMULA => 'FORMULA'
-				]
-			],
-			'formula' => [
-				'type' => CXmlDefine::STRING
-			]
-		];
-
-		$this->schema = $schema;
-	}
 }

@@ -22,11 +22,11 @@
 class CXmlDefine
 {
 	// Types.
-	const STRING = 0x01;
-	const ARRAY = 0x02;
-	const INTEGER = 0x03;
-	const INDEXED_ARRAY = 0x04;
-	const REQUIRED = 0x08;
+	// const STRING = 0x01;
+	// const ARRAY = 0x02;
+	// const INTEGER = 0x03;
+	// const INDEXED_ARRAY = 0x04;
+	// const REQUIRED = 0x08;
 
 	// Values.
 	const ENABLED = 0;
@@ -272,4 +272,51 @@ class CXmlDefine
 
 	const CONDITION_MATCHES_REGEX = 8; // Duplicate
 	const CONDITION_NOT_MATCHES_REGEX = 9; // Duplicate
+
+	public static $subtags = [
+		'groups' => 'group',
+		'templates' => 'template',
+		'hosts' => 'host',
+		'interfaces' => 'interface',
+		'applications' => 'application',
+		'items' => 'item',
+		'discovery_rules' => 'discovery_rule',
+		'conditions' => 'condition',
+		'item_prototypes' => 'item_prototype',
+		'application_prototypes' => 'application_prototype',
+		'trigger_prototypes' => 'trigger_prototype',
+		'graph_prototypes' => 'graph_prototype',
+		'host_prototypes' => 'host_prototype',
+		'group_links' => 'group_link',
+		'group_prototypes' => 'group_prototype',
+		'triggers' => 'trigger',
+		'dependencies' => 'dependency',
+		'screen_items' => 'screen_item',
+		'macros' => 'macro',
+		'screens' => 'screen',
+		'images' => 'image',
+		'graphs' => 'graph',
+		'graph_items' => 'graph_item',
+		'maps' => 'map',
+		'urls' => 'url',
+		'selements' => 'selement',
+		'elements' => 'element',
+		'links' => 'link',
+		'linktriggers' => 'linktrigger',
+		'value_maps' => 'value_map',
+		'mappings' => 'mapping',
+		'httptests' => 'httptest',
+		'steps' => 'step',
+		'tags' => 'tag',
+		'preprocessing' => 'step',
+		'headers' => 'header',
+		'variables' => 'variable',
+		'query_fields' => 'query_field',
+		'posts' => 'post_field',
+		'shapes' => 'shape',
+		'lines' => 'line',
+		'headers' => 'header',
+		'lld_macro_paths' => 'lld_macro_path',
+		'tls_accept' => 'option'
+	];
 }

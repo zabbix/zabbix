@@ -252,7 +252,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/include/classes/xml',
-			$this->rootDir.'/include/classes/xml/tags',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
 		];

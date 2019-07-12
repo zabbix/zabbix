@@ -520,8 +520,7 @@ class CConfigurationExport {
 		]);
 
 		$itemids = [];
-		// TODO: Remove key from foreach
-		foreach ($hosts as $hostid => $host_data) {
+		foreach ($hosts as $host_data) {
 			foreach ($host_data['items'] as $item) {
 				$itemids[$item['itemid']] = $item['key_'];
 			}

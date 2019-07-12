@@ -19,18 +19,6 @@
 **/
 
 
-class CXmlTagMasterItem extends CXmlTagAbstract
-{
-	protected $tag = 'master_item';
+class CXmlTagIndexedArray extends CXmlTag {
 
-	public function __construct(array $schema = [])
-	{
-		$schema += [
-			'key' => [
-				'type' => CXmlDefine::STRING | CXmlDefine::REQUIRED
-			]
-		];
-
-		$this->schema = $schema;
-	}
 }

@@ -19,21 +19,6 @@
 **/
 
 
-class CXmlTagGraphItemItem extends CXmlTagAbstract
-{
-	protected $tag = 'item';
+class CXmlTagString extends CXmlTag {
 
-	public function __construct(array $schema = [])
-	{
-		$schema += [
-			'host' => [
-				'type' => CXmlDefine::STRING | CXmlDefine::REQUIRED
-			],
-			'key' => [
-				'type' => CXmlDefine::STRING | CXmlDefine::REQUIRED
-			]
-		];
-
-		$this->schema = $schema;
-	}
 }

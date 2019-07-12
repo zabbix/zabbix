@@ -19,27 +19,14 @@
 **/
 
 
-class CXmlTagDependency extends CXmlTagAbstract
-{
-	protected $tag = 'dependencies';
-
-	protected $data_sort = ['description', 'expression', 'recovery_expression'];
-
-	public function __construct(array $schema = [])
-	{
-		$schema += [
-			'expression' => [
-				'type' => CXmlDefine::STRING | CXmlDefine::REQUIRED
-			],
-			'name' => [
-				'key' => 'description',
-				'type' => CXmlDefine::STRING | CXmlDefine::REQUIRED
-			],
-			'recovery_expression' => [
-				'type' => CXmlDefine::STRING
-			]
-		];
-
-		$this->schema = $schema;
-	}
-}
+return (new CXmlTagIndexedArray('value_maps'))->setKey('valueMaps')->setSchema(
+	(new CXmlTagArray('value_map'))->setSchema(
+		(new CXmlTagString('name'))->setRequired(),
+		(new CXmlTagIndexedArray('mappings'))->setSchema(
+			(new CXmlTagArray('mapping'))->setSchema(
+				(new CXmlTagString('value')),
+				(new CXmlTagString('newvalue'))
+			)
+		)
+	)
+);

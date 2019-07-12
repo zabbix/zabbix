@@ -19,42 +19,8 @@
 **/
 
 
-class CXmlTagScreen extends CXmlTagAbstract
-{
-	protected $tag = 'screens';
-
-	public function __construct(array $schema = [])
-	{
-		$schema += [
-			'name' => [
-				'type' => CXmlDefine::STRING
-			],
-			'hsize' => [
-				'type' => CXmlDefine::STRING
-			],
-			'screen_items' => [
-				'key' => 'screenitems',
-				'type' => CXmlDefine::ARRAY,
-				'schema' => (new CXmlTagScreenItem)->getSchema()
-			],
-			'vsize' => [
-				'type' => CXmlDefine::STRING
-			],
-		];
-
-		$this->schema = $schema;
-	}
-
-	public function prepareData(array $data, $simple_triggers = null)
-	{
-		CArrayHelper::sort($data, ['name']);
-
-		foreach ($data as &$screen) {
-			if ($screen['screenitems']) {
-				$screen['screenitems'] = (new CXmlTagScreenItem)->prepareData($screen['screenitems']);
-			}
-		}
-
-		return $data;
-	}
-}
+return (new CXmlTagIndexedArray('groups'))->setSchema(
+	(new CXmlTagArray('group'))->setSchema(
+		(new CXmlTagString('name'))->setRequired()
+	)
+);

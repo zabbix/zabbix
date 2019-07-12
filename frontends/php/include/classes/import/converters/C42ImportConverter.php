@@ -27,6 +27,26 @@ class C42ImportConverter extends CConverter {
 	public function convert($data) {
 		$data['zabbix_export']['version'] = '4.4';
 
+		if (array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['hosts'] = $this->convertInventoryMode($data['zabbix_export']['hosts']);
+		}
+
+		if (array_key_exists('host_prototypes', $data['zabbix_export'])) {
+			$data['zabbix_export']['host_prototypes'] = $this->convertInventoryMode($data['zabbix_export']['host_prototypes']);
+		}
+
+		return $data;
+	}
+
+	protected function convertInventoryMode(array $data)
+	{
+		foreach ($data as &$host) {
+			if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
+				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+				unset($host['inventory']);
+			}
+		}
+
 		return $data;
 	}
 }
