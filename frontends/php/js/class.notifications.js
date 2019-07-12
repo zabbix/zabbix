@@ -886,6 +886,7 @@ ZBX_NotificationsAlarm.prototype.reset = function() {
 	this.start = '';
 	this.severity = -2;
 	this.notif = null;
+	this.player.timeout(0);
 };
 
 /**

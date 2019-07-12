@@ -140,7 +140,8 @@ ZBX_NotificationsAudio.prototype.once = function() {
  * @return {ZBX_NotificationsAudio}
  */
 ZBX_NotificationsAudio.prototype.stop = function() {
-	return this.timeout(0);
+	this.ms_timeout = 0;
+	return this;
 };
 
 /**
