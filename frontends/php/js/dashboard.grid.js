@@ -2150,7 +2150,8 @@
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
-				'storage': {}
+				'storage': {},
+				'padding': true
 			}, widget);
 
 			return this.each(function() {
