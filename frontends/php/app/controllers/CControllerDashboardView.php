@@ -175,7 +175,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			// Clone dashboard and show as new.
 			$dashboards = API::Dashboard()->get([
 				'output' => ['name', 'private'],
-				'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
+				'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
 				'dashboardids' => $this->getInput('source_dashboardid')
@@ -215,7 +215,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 			if ($dashboardid != 0) {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid'],
-					'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields'],
+					'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields'],
 					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
@@ -446,6 +446,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					'widgetid' => $widgetid,
 					'type' => $widget['type'],
 					'header' => $widget['name'],
+					'view_mode' => $widget['view_mode'],
 					'pos' => [
 						'x' => (int) $widget['x'],
 						'y' => (int) $widget['y'],

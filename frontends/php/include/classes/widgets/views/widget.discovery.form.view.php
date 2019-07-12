@@ -27,7 +27,7 @@ $fields = $data['dialogue']['fields'];
 $form = CWidgetHelper::createForm();
 
 $form->addItem(CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['known_widget_types'], $fields['rf_rate']
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
 ));
 
 return [
