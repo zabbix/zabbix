@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha1
 
 New features:
+A.F.I..... [ZBXNEXT-5250] dropped support of screen element 'Screen' (miks)
 ..F....... [ZBXNEXT-5249] added new dashboard widget "Host availability" (rlataria)
 ..F....... [ZBXNEXT-5238] added edit control for the widget in dashboard view mode (ashubin)
 A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
