@@ -48,11 +48,6 @@ static int		packet_interval = FPING_UNINITIALIZED_INTERVAL;
 static int		packet_interval6 = FPING_UNINITIALIZED_INTERVAL;
 #endif
 
-#ifdef HAVE_IPV6
-#define 		FPING_UNINITIALIZED_VERSION	-1
-static int		fping_ver6 = FPING_UNINITIALIZED_VERSION;
-#endif
-
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
 	FILE	*f;
@@ -116,47 +111,6 @@ static int	get_interval_option(const char * fping, const char *dst)
 
 	return value;
 }
-
-#ifdef HAVE_IPV6
-/******************************************************************************
- *                                                                            *
- * Function: get_fping_ver                                                    *
- *                                                                            *
- * Purpose: return major version of fping                                     *
- *                                                                            *
- * Parameters: fping - [IN] the the location of fping program                 *
- *                                                                            *
- * Return value: fping major version                                          *
- ******************************************************************************/
-static int	get_fping_ver(const char * fping)
-{
-#	define VER_STR	"Version "
-
-	int	ver;
-	char	tmp[MAX_STRING_LEN], error[MAX_STRING_LEN], *cmd_result = NULL, *ver_str;
-
-	zbx_snprintf(tmp, sizeof(tmp), "%s -v", fping);
-
-	if (SUCCEED != zbx_execute(tmp, &cmd_result, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_ENABLED))
-		return FPING_UNINITIALIZED_VERSION;
-
-	if (NULL != (ver_str = strstr(cmd_result, VER_STR)))
-	{
-		ver_str += sizeof(VER_STR) - 1;
-
-		while (isspace(*ver_str))
-			ver_str++;
-
-		ver = atoi(ver_str);
-	}
-	else
-		ver = 3;	/* do not try parse again */
-
-	zbx_free(cmd_result);
-
-	return ver;
-}
-#endif	/* HAVE_IPV6 */
 
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
 		char *error, int max_error_len)
@@ -323,16 +277,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	else
 	{
-		if (FPING_UNINITIALIZED_VERSION == fping_ver6)
-			fping_ver6 = get_fping_ver(CONFIG_FPING6_LOCATION);
-
 		offset = 0;
 
 		if (0 != (fping_existence & FPING_EXISTS))
 			offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
 
-		if (0 != (fping_existence & FPING6_EXISTS) && 4 > fping_ver6)
+		if (0 != (fping_existence & FPING6_EXISTS))
 			zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
 	}
