@@ -39,7 +39,7 @@ function ZBX_NotificationsAudio() {
 	this.wave = '';
 	this.ms_timeout = 0;
 	this.is_playing = false;
-	this.messageTimeout = 0;
+	this.message_timeout = 0;
 
 	this.resetPromise();
 	this.listen();
@@ -122,9 +122,9 @@ ZBX_NotificationsAudio.prototype.once = function() {
 	if (this.play_once_on_ready && this.audio.readyState >= 3) {
 		this.play_once_on_ready = false;
 
-		var timeout = (this.messageTimeout == 0)
+		var timeout = (this.message_timeout == 0)
 			? this.audio.duration
-			: Math.min(this.messageTimeout, this.audio.duration);
+			: Math.min(this.message_timeout, this.audio.duration);
 
 		return this.timeout(timeout);
 	}
@@ -177,7 +177,7 @@ ZBX_NotificationsAudio.prototype.tune = function(options) {
 		this.audio.loop = !options.playOnce;
 	}
 	if (typeof options.messageTimeout === 'number') {
-		this.messageTimeout = options.messageTimeout;
+		this.message_timeout = options.messageTimeout;
 	}
 
 	return this;
