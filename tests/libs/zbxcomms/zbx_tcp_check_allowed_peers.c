@@ -52,6 +52,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	memset(&s, 0, sizeof(zbx_socket_t));
+
 	mock_accept(&s);
 
 	zbx_mock_assert_result_eq("zbx_tcp_check_allowed_peers() return code",
