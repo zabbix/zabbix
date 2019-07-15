@@ -48,12 +48,10 @@ class CControllerUserCreate extends CController {
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret) {
-			if ($this->getInput('password1') !== $this->getInput('password2')) {
-				error(_('Both passwords must be equal.'));
-				$error = self::VALIDATION_ERROR;
-				$ret = false;
-			}
+		if ($ret && $this->getInput('password1') !== $this->getInput('password2')) {
+			error(_('Both passwords must be equal.'));
+			$error = self::VALIDATION_ERROR;
+			$ret = false;
 		}
 
 		if (!$ret) {

@@ -22,20 +22,59 @@
 /**
  * Class containing operations for updating user profile.
  */
-class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
+class CControllerUserProfileUpdate extends CController {
 
 	protected function checkInput() {
-		$this->appendValidationRules(['messages' => 'array']);
+		$locales = array_keys(getLocales());
+		$themes = array_keys(Z::getThemes());
+		$themes[] = THEME_DEFAULT;
 
-		$this->redirect = 'zabbix.php?action=userprofile.edit';
+		$this->fields = [
+			'userid' =>			'fatal|required|db users.userid',
+			'password1' =>		'db users.passwd',
+			'password2' =>		'db users.passwd',
+			'user_medias' =>	'array',
+			'lang' =>			'db users.lang|in '.implode(',', $locales),
+			'theme' =>			'db users.theme|in '.implode(',', $themes),
+			'autologin' =>		'db users.autologin|in 0,1',
+			'autologout' =>		'db users.autologout',
+			'refresh' =>		'db users.refresh|not_empty',
+			'rows_per_page' =>	'db users.rows_per_page|ge 1|le 999999',
+			'url' =>			'db users.url',
+			'messages' =>		'array',
+			'form_refresh' =>	'int32'
+		];
 
-		return parent::checkInput();
+		$ret = $this->validateInput($this->fields);
+		$error = $this->GetValidationError();
+
+		if ($ret && !$this->validatePassword()) {
+			$error = self::VALIDATION_ERROR;
+			$ret = false;
+		}
+
+		if (!$ret) {
+			switch ($error) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update user'));
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
+		}
+
+		return $ret;
 	}
 
 	/**
 	 * Validate password based on current user ID.
 	 */
-	protected function vadidatePassword() {
+	protected function validatePassword() {
 		$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
 
 		if ($auth_type != ZBX_AUTH_INTERNAL) {
@@ -48,7 +87,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		if ($password1 !== null && CWebUser::$data['alias'] != ZBX_GUEST_USER && $password1 === '') {
-			error(_s('Incorrect value for field "%1$s": cannot be empty.', 'passwd'));
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty')));
 			return false;
 		}
 
@@ -61,28 +100,45 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function checkPermissions() {
-		$this->userid = CWebUser::$data['userid'];
-
-		return parent::checkPermissions();
+		return (bool) API::User()->get([
+			'output' => [],
+			'userids' => $this->getInput('userid'),
+			'editable' => true
+		]);
 	}
 
 	protected function doAction() {
-		parent::doAction();
+		$user = [];
 
-		$this->user['userid'] = CWebUser::$data['userid'];
-		$messages = $this->getInput('messages', []);
+		$this->getInputs($user, ['lang', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page', 'url']);
+		$user['userid'] = CWebUser::$data['userid'];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->setUserMedias();
+			$user_medias = $this->getInput('user_medias', []);
+
+			foreach ($user_medias as $media) {
+				$user['user_medias'][] = [
+					'mediatypeid' => $media['mediatypeid'],
+					'sendto' => $media['sendto'],
+					'active' => $media['active'],
+					'severity' => $media['severity'],
+					'period' => $media['period']
+				];
+			}
+		}
+
+		if ($this->getInput('password1', '') !== '') {
+			$user['passwd'] = $this->getInput('password1');
 		}
 
 		DBstart();
-		$result = updateMessageSettings($messages);
-		$result = $result && (bool) API::User()->update($this->user);
+		$result = updateMessageSettings($this->getInput('messages', []));
+		$result = $result && (bool) API::User()->update($user);
 		$result = DBend($result);
 
 		if ($result) {
-			redirect(ZBX_DEFAULT_URL);
+			$response = new CControllerResponseRedirect(ZBX_DEFAULT_URL);
+			$response->setMessageOk(_('User updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
