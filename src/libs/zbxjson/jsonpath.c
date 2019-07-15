@@ -1418,8 +1418,7 @@ static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const char *p
 	if (FAIL == zbx_json_open_path(jp, path, &jp_child))
 		goto out;
 
-	if (NULL == zbx_json_decodevalue_dyn(jp_child.start, &data, &data_alloc, NULL))
-		goto out;
+	zbx_json_value_dyn(&jp_child, &data, &data_alloc);
 
 	zbx_variant_set_str(value, data);
 	ret = SUCCEED;

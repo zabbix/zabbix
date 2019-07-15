@@ -675,5 +675,37 @@ in:
 out:
   return: SUCCEED
   value: 53.92
+---
+test case: Query $[?(@.a)].id from [{"a":{"b":"c"}, "id":1}, {"x":{"y":"z"}, "id":2}]
+in:
+  data: '[{"a":{"b":"c"}, "id":1}, {"x":{"y":"z"}, "id":2}]'
+  path: $[?(@.a)].id
+out:
+  return: SUCCEED
+  values: '[1]'
+---
+test case: Query $[?(!@.a)].id from [{"a":{"b":"c"}, "id":1}, {"x":{"y":"z"}, "id":2}]
+in:
+  data: '[{"a":{"b":"c"}, "id":1}, {"x":{"y":"z"}, "id":2}]'
+  path: $[?(!@.a)].id
+out:
+  return: SUCCEED
+  values: '[2]'
+---
+test case: Query $[?(@.a)].id from [{"a":["b","c"], "id":1}, {"x":["y","z"], "id":2}]
+in:
+  data: '[{"a":["b","c"], "id":1}, {"x":["y","z"], "id":2}]'
+  path: $[?(@.a)].id
+out:
+  return: SUCCEED
+  values: '[1]'
+---
+test case: Query $[?(!@.a)].id from [{"a":["b","c"], "id":1}, {"x":["y","z"], "id":2}]
+in:
+  data: '[{"a":["b","c"], "id":1}, {"x":["y","z"], "id":2}]'
+  path: $[?(!@.a)].id
+out:
+  return: SUCCEED
+  values: '[2]'
 ...
 
