@@ -3471,7 +3471,7 @@ $form-icon-btn: (
 
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				transform: translateY(-100%);
+				transform: translateY(-95%);
 				z-index: 5;
 			}
 
@@ -3494,7 +3494,9 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-head {
-	outline: 1px solid $ui-border-color;
+	border: 1px solid $ui-border-color;
+	border-bottom: none;
+	margin: -1px -1px 0 -1px;
 	position: relative;
 	padding: 8px 65px 8px 10px;
 	min-height: 17px;
@@ -3527,7 +3529,7 @@ $form-icon-btn: (
 	&.dashbrd-grid-widget-hidden-header {
 
 		.dashbrd-grid-widget-container {
-			padding-bottom: 0;
+			padding: 8px 0;
 			position: relative;
 		}
 
@@ -3538,12 +3540,14 @@ $form-icon-btn: (
 			left: 0;
 			right: 0;
 			top: 0;
-			transition: transform .3s, box-shadow .3s;
+			transform: translateY(0%);
+			transition: transform .3s, box-shadow .3s, z-index .3s;
 			z-index: 2;
 		}
 
 		.dashbrd-grid-widget-content {
 			background-color: $ui-bg-color;
+			transition: z-index .3s;
 			z-index: 3;
 		}
 	}
@@ -4609,7 +4613,7 @@ $form-icon-btn: (
 }
 
 .no-padding {
-	padding: 0;
+	padding: 0 !important;
 }
 
 .graph-selection {

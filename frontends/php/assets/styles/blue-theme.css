@@ -2377,7 +2377,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-  transform: translateY(-100%);
+  transform: translateY(-95%);
   z-index: 5; }
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
@@ -2394,7 +2394,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding-bottom: 8px; }
 
 .dashbrd-grid-widget-head {
-  outline: 1px solid #dfe4e7;
+  border: 1px solid #dfe4e7;
+  border-bottom: none;
+  margin: -1px -1px 0 -1px;
   position: relative;
   padding: 8px 65px 8px 10px;
   min-height: 17px; }
@@ -2413,7 +2415,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         margin: 4px 0; }
 
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-container {
-  padding-bottom: 0;
+  padding: 8px 0;
   position: relative; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0);
@@ -2422,10 +2424,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   left: 0;
   right: 0;
   top: 0;
-  transition: transform .3s, box-shadow .3s;
+  transform: translateY(0%);
+  transition: transform .3s, box-shadow .3s, z-index .3s;
   z-index: 2; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   background-color: #fff;
+  transition: z-index .3s;
   z-index: 3; }
 
 @-webkit-keyframes zoom-in-out {
@@ -3158,7 +3162,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   vertical-align: middle; }
 
 .no-padding {
-  padding: 0; }
+  padding: 0 !important; }
 
 .graph-selection {
   position: absolute;

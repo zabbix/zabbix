@@ -207,22 +207,37 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Detect if widget has bottom padding or not
+	 * Detect if widget has padding or not
 	 *
 	 * @static
 	 *
-	 * @param string $type Widget type
+	 * @param string $type  Widget type
+	 * @param int $view_mode Widget view mode. ZBX_WIDGET_VIEW_MODE_NORMAL by default
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type)
+	public static function hasPadding($type, $view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL)
 	{
-		switch ($type) {
-			case WIDGET_HOST_AVAIL:
-				return false;
+		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
+			switch ($type) {
+				case WIDGET_CLOCK:
+				case WIDGET_GRAPH:
+				case WIDGET_MAP:
+				case WIDGET_SVG_GRAPH:
+					return true;
 
-			default:
-				return true;
+				default:
+					return false;
+			}
+		}
+		else {
+			switch ($type) {
+				case WIDGET_HOST_AVAIL:
+					return false;
+
+				default:
+					return true;
+			}
 		}
 	}
 
