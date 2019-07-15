@@ -1,0 +1,41 @@
+---
+test case: "successfully parsed #1"
+in:
+  start_id: 100
+  count: 1
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid=100
+  sqlite_regex: select \* from items where itemid=100
+---
+test case: "successfully parsed #10"
+in:
+  start_id: 100
+  count: 10
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(100,(?:[0-9]+,){8}109\)
+  sqlite_regex: select \* from items where itemid in \(100,(?:[0-9]+,){8}109\)
+---
+test case: "successfully parsed #1000"
+in:
+  start_id: 1000
+  count: 1000
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \(itemid in \(1000,(?:[0-9]+,){948}1949\) or itemid in \(1950,(?:[0-9]+,){48}1999\)\)
+  sqlite_regex: select \* from items where \(\(itemid in \(1000,(?:[0-9]+,){948}1949\)\) or \(itemid in \(1950,(?:[0-9]+,){48}1099\)\)\)
+---
+test case: "successfully parsed #2000"
+in:
+  start_id: 100
+  count: 2000
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \(itemid in \(100,(?:[0-9]+,)+1049\) or itemid in \(1050,(?:[0-9]+,){948}1999\) or itemid in \(2000,(?:[0-9]+,){98}2099\)\)
+  sqlite_regex: select \* from items where \(\(itemid in \(100,(?:[0-9]+,)+1049\)\) or \(itemid in \(1050,(?:[0-9]+,){948}1999\)\) or \(itemid in \(2000,(?:[0-9]+,){98}2099\)\)\)
+...

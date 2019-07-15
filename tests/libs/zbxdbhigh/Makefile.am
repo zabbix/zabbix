@@ -1,11 +1,12 @@
 if SERVER
-noinst_PROGRAMS = DBselect_uint64
+noinst_PROGRAMS = \
+	DBselect_uint64 \
+	DBadd_condition_alloc
 
-DBselect_uint64_SOURCES = \
-	DBselect_uint64.c \
+COMMON_SRC = \
 	../../zbxmocktest.h
 
-DBselect_uint64_LDADD = \
+COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
@@ -69,9 +70,32 @@ DBselect_uint64_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
+COMMON_FLAGS = -I@top_srcdir@/tests
+
+DBselect_uint64_SOURCES = \
+	DBselect_uint64.c \
+	$(COMMON_SRC)
+
+DBselect_uint64_LDADD = \
+	$(COMMON_LIB)
+
 DBselect_uint64_LDADD += @SERVER_LIBS@
 
 DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@
 
-DBselect_uint64_CFLAGS = -I@top_srcdir@/tests
+DBselect_uint64_CFLAGS = $(COMMON_FLAGS)
+
+
+DBadd_condition_alloc_SOURCES = \
+	DBadd_condition_alloc.c \
+	$(COMMON_SRC)
+
+DBadd_condition_alloc_LDADD = \
+	$(COMMON_LIB)
+
+DBadd_condition_alloc_LDADD += @SERVER_LIBS@
+
+DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@
+
+DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 endif
