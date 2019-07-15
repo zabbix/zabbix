@@ -1547,4 +1547,8 @@ char	*zbx_create_token(zbx_uint64_t seed);
 
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 
+#ifdef _WINDOWS
+#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#endif
+
 #endif
