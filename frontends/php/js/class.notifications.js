@@ -222,6 +222,7 @@ ZBX_Notifications.prototype.consumeList = function(list) {
 		notif.display_timeoutid = setTimeout(function() {
 			this.removeById(notif.getId());
 			this.debounceRender();
+			this.pushUpdates();
 		}.bind(this), notif.calcDisplayTimeout(this._cached_user_settings));
 	}.bind(this));
 };

@@ -295,5 +295,5 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 
 	this.removeDanglingNodes();
 
-	this.node.style.display === 'none' && this.show();
+	(this.node.style.display === 'none') && this.show();
 };
