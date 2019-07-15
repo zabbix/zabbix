@@ -23,12 +23,6 @@ if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
 
-$user_group_combobox = (new CComboBox('filter_usrgrpid', $data['filter_usrgrpid'], 'submit()'))->addItem(0, _('All'));
-
-foreach ($data['userGroups'] as $user_group) {
-	$user_group_combobox->addItem($user_group['usrgrpid'], $user_group['name']);
-}
-
 $widget = (new CWidget())
 	->setTitle(_('Users'))
 	->setControls((new CList([
@@ -40,7 +34,7 @@ $widget = (new CWidget())
 				->addItem([
 					new CLabel(_('User group'), 'filter_usrgrpid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					$user_group_combobox
+					new CComboBox('filter_usrgrpid', $data['filter_usrgrpid'], 'submit()', $data['user_groups'])
 				])
 			),
 			(new CTag('nav', true,
@@ -100,7 +94,7 @@ $table = (new CTableInfo())
 
 foreach ($data['users'] as $user) {
 	$userid = $user['userid'];
-	$session = $data['usersSessions'][$userid];
+	$session = $data['sessions'][$userid];
 
 	// Online time.
 	if ($session['lastaccess']) {
@@ -133,6 +127,8 @@ foreach ($data['users'] as $user) {
 	$users_groups = [];
 	$i = 0;
 
+	$url = (new CUrl('usergrps.php'))->setArgument('form', 'update');
+
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
 
@@ -148,23 +144,33 @@ foreach ($data['users'] as $user) {
 
 		$users_groups[] = (new CLink(
 			$user_group['name'],
-			'usergrps.php?form=update&usrgrpid='.$user_group['usrgrpid']))
+			$url->setArgument('usrgrpid', $user_group['usrgrpid'])
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass($user_group['gui_access'] == GROUP_GUI_ACCESS_DISABLED
 					|| $user_group['users_status'] == GROUP_STATUS_DISABLED
-				? ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_RED
-				: ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN);
+				? ZBX_STYLE_RED
+				: ZBX_STYLE_GREEN);
 	}
 
 	// GUI Access style.
-	$gui_access_style = ZBX_STYLE_GREEN;
-	if ($user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$gui_access_style = ZBX_STYLE_ORANGE;
-	}
-	if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$gui_access_style = ZBX_STYLE_GREY;
+	switch ($user['gui_access']) {
+		case GROUP_GUI_ACCESS_INTERNAL:
+			$gui_access_style = ZBX_STYLE_ORANGE;
+			break;
+
+		case GROUP_GUI_ACCESS_DISABLED:
+			$gui_access_style = ZBX_STYLE_GREY;
+			break;
+
+		default:
+			$gui_access_style = ZBX_STYLE_GREEN;
 	}
 
-	$alias = new CLink($user['alias'], 'zabbix.php?action=user.edit&userid='.$userid);
+	$alias = new CLink($user['alias'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'user.edit')
+		->setArgument('userid', $userid)
+	);
 
 	// Append user to table.
 	$table->addRow([
@@ -197,4 +203,6 @@ $form->addItem([
 ]);
 
 // Append form to widget.
-$widget->addItem($form)->show();
+$widget
+	->addItem($form)
+	->show();

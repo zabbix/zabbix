@@ -59,7 +59,6 @@ class CControllerUserList extends CController {
 
 		$sortfield = $this->getInput('sort', CProfile::get('web.user.sort', 'name'));
 		$sortorder = $this->getInput('sortorder', CProfile::get('web.user.sortorder', ZBX_SORT_UP));
-
 		CProfile::update('web.user.sort', $sortfield, PROFILE_TYPE_STR);
 		CProfile::update('web.user.sortorder', $sortorder, PROFILE_TYPE_STR);
 
@@ -87,19 +86,28 @@ class CControllerUserList extends CController {
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
-			'config' => $config,
+			'config' => [
+				'max_in_table' => $config['max_in_table']
+			],
 			'sort' => $sortfield,
 			'sortorder' => $sortorder,
 			'filter' => $filter,
 			'profileIdx' => 'web.user.filter',
 			'active_tab' => CProfile::get('web.user.filter.active', 1),
-			'userGroups' => API::UserGroup()->get([
-				'output' => ['name']
+			'user_groups' => API::UserGroup()->get([
+				'output' => ['name'],
+				'preservekeys' => true
 			]),
-			'filter_usrgrpid' => $filter_usrgrpid
+			'filter_usrgrpid' => $filter_usrgrpid,
+			'sessions' => []
 		];
 
-		order_result($data['userGroups'], 'name');
+		CArrayHelper::sort($data['user_groups'], ['name']);
+
+		foreach ($data['user_groups'] as $usrgrpid => $usrgrp) {
+			$data['user_groups'][$usrgrpid] = $usrgrp['name'];
+		}
+		$data['user_groups'] = [0 => _('All')] + $data['user_groups'];
 
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname', 'type', 'autologout', 'attempt_failed'],
@@ -112,12 +120,12 @@ class CControllerUserList extends CController {
 			'filter' => [
 				'type' => ($filter['type'] == -1) ? null : $filter['type']
 			],
-			'usrgrpids' => ($filter_usrgrpid > 0) ? $filter_usrgrpid : null,
+			'usrgrpids' => ($filter_usrgrpid == 0) ? null : $filter_usrgrpid,
 			'getAccess' => 1,
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		order_result($data['users'], $sortfield, $sortorder);
+		CArrayHelper::sort($data['users'], [['field' => $sortfield, 'order' => $sortorder]]);
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'user.list');
 
@@ -125,18 +133,18 @@ class CControllerUserList extends CController {
 
 		// set default lastaccess time to 0
 		foreach ($data['users'] as $user) {
-			$data['usersSessions'][$user['userid']] = ['lastaccess' => 0];
+			$data['sessions'][$user['userid']] = ['lastaccess' => 0];
 		}
 
-		$dbSessions = DBselect(
+		$db_sessions = DBselect(
 			'SELECT s.userid,MAX(s.lastaccess) AS lastaccess,s.status'.
 			' FROM sessions s'.
 			' WHERE '.dbConditionInt('s.userid', zbx_objectValues($data['users'], 'userid')).
 			' GROUP BY s.userid,s.status'
 		);
-		while ($session = DBfetch($dbSessions)) {
-			if ($data['usersSessions'][$session['userid']]['lastaccess'] < $session['lastaccess']) {
-				$data['usersSessions'][$session['userid']] = $session;
+		while ($db_session = DBfetch($db_sessions)) {
+			if ($data['sessions'][$db_session['userid']]['lastaccess'] < $db_session['lastaccess']) {
+				$data['sessions'][$db_session['userid']] = $db_session;
 			}
 		}
 
