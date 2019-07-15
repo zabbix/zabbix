@@ -206,6 +206,10 @@ ZBX_NotificationsAudio.prototype.resetPromise = function() {
  * @return {Promise}
  */
 ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
+	if (this.message_timeout == 0) {
+		return this.resetPromise();
+	}
+
 	if (!this.audio.loop) {
 		if (seconds == ZBX_Notifications.ALARM_ONCE_PLAYER) {
 			return this.once();
