@@ -1610,6 +1610,7 @@ define('ZBX_STYLE_ACTIONS_NUM_RED', 'icon-actions-number-red');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
+define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
