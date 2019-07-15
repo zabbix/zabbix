@@ -824,7 +824,6 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	this.player.file(user_settings.files[this.severity]);
 
 	if (this.old_id !== this.getId()) {
-		this.markAsPlayed();
 		this.player.seek(0);
 	}
 
