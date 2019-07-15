@@ -43,7 +43,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	 */
 	protected function vadidatePassword() {
 		if ($this->getInput('password1', '') !== $this->getInput('password2', '')) {
-			error(_('Cannot update user. Both passwords must be equal.'));
+			error(_('Both passwords must be equal.'));
 			return false;
 		}
 

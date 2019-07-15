@@ -53,7 +53,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		if ($password1 !== $password2) {
-			error(_('Cannot update user. Both passwords must be equal.'));
+			error(_('Both passwords must be equal.'));
 			return false;
 		}
 
