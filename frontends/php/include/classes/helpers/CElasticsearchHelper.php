@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * A helper class for working with Elasticsearch.
  */
@@ -237,33 +238,31 @@ class CElasticsearchHelper {
 	/**
 	 * Add filters to Elasticsearch query.
 	 *
-	 * @param array $schema     DB schema
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    filtering options
+	 * @param array $schema   DB schema
+	 * @param array $query    Elasticsearch query.
+	 * @param array $options  Filtering options.
 	 *
 	 * @return array    Elasticsearch query with added filtering
 	 */
 	public static function addFilter($schema, $query, $options) {
 		foreach ($options['filter'] as $field => $value) {
 			// Skip missing fields, textual fields (different mapping is needed for exact matching) and empty values.
-			if (!array_key_exists($field, $schema['fields']) || !$value
+			if (!array_key_exists($field, $schema['fields']) || $value === null
 					|| in_array($schema['fields'][$field]['type'], [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_CHAR])) {
 				continue;
 			}
 
-			zbx_value2array($value);
-
 			if ($options['searchByAny']) {
 				$type = 'should';
-				$query["minimum_should_match"] = 1;
+				$query['minimum_should_match'] = 1;
 			}
 			else {
 				$type = 'must';
 			}
 
 			$query['query']['bool'][$type][] = [
-				"terms" => [
-					$field => array_values($value)
+				'terms' => [
+					$field => $value
 				]
 			];
 		}
@@ -289,37 +288,30 @@ class CElasticsearchHelper {
 				$exclude = 'should';
 			}
 
-			$query["minimum_should_match"] = 1;
+			$query['minimum_should_match'] = 1;
 		}
 
 		foreach ($options['search'] as $field => $value) {
 			// Skip missing fields, non textual fields and empty values.
-			if (!array_key_exists($field, $schema['fields']) || !$value
+			if (!array_key_exists($field, $schema['fields']) || $value === null
 					|| !in_array($schema['fields'][$field]['type'], [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_CHAR])) {
 				continue;
 			}
 
-			zbx_value2array($value);
-
 			foreach ($value as $phrase) {
-				// Skip non scalar values.
-				if (!is_scalar($phrase)) {
-					continue;
-				}
-
 				$phrase = str_replace('?', '\\?', $phrase);
 
 				if (!$options['searchWildcardsEnabled']) {
 					$phrase = str_replace('*', '\\*', $phrase);
 					$criteria = [
-						"wildcard" => [
+						'wildcard' => [
 							$field => $start.$phrase.'*'
 						]
 					];
 				}
 				else {
 					$criteria = [
-						"wildcard" => [
+						'wildcard' => [
 							$field => $phrase
 						]
 					];
@@ -340,32 +332,17 @@ class CElasticsearchHelper {
 	/**
 	 * Add sorting criteria to Elasticsearch query.
 	 *
-	 * @param array $columns    columns that can (are allowed) be used for sorting
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    sorting options
+	 * @param array $query    Elasticsearch query.
+	 * @param array $options  Sorting options.
 	 *
 	 * @return array    Elasticsearch query with added sorting options
 	 */
-	public static function addSort($columns, $query, $options) {
-		$options['sortfield'] = is_array($options['sortfield'])
-				? array_unique($options['sortfield'])
-				: [$options['sortfield']];
-
+	public static function addSort($query, $options) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
-			if (!str_in_array($sortfield, $columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
-			}
-
 			// Add sort field to order.
-			$sortorder = '';
-			if (is_array($options['sortorder']) && array_key_exists($i, $options['sortorder'])) {
-				$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
-			}
-			else {
-				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
-			}
+			$sortorder = array_key_exists($i, $options['sortorder']) ? $options['sortorder'][$i] : ZBX_SORT_UP;
 
-			if ($sortorder !== '') {
+			if ($sortorder === ZBX_SORT_DOWN) {
 				$query['sort'][$sortfield] = $sortorder;
 			}
 			else {
