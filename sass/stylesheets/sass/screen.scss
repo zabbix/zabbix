@@ -3453,7 +3453,7 @@ $form-icon-btn: (
 	}
 }
 
-main:not(.layout-kioskmode) .dashbrd-grid-container {
+.dashbrd-grid-container {
 
 	&.dashbrd-mode-edit .dashbrd-grid-widget,
 	.dashbrd-grid-widget-focus,
@@ -3463,6 +3463,9 @@ main:not(.layout-kioskmode) .dashbrd-grid-container {
 			@include opacity(1);
 		}
 	}
+}
+
+main:not(.layout-kioskmode) .dashbrd-grid-container {
 
 	.dashbrd-grid-widget-focus,
 	.dashbrd-grid-widget:hover {

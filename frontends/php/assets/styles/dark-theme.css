@@ -2393,11 +2393,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     -moz-transition: opacity 0.2s ease-out;
     transition: opacity 0.2s ease-out; }
 
-main:not(.layout-kioskmode) .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .dashbrd-grid-widget-actions,
-main:not(.layout-kioskmode) .dashbrd-grid-container .dashbrd-grid-widget-focus .dashbrd-grid-widget-actions,
-main:not(.layout-kioskmode) .dashbrd-grid-container .dashbrd-grid-widget:hover .dashbrd-grid-widget-actions {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .dashbrd-grid-widget-actions,
+.dashbrd-grid-container .dashbrd-grid-widget-focus .dashbrd-grid-widget-actions,
+.dashbrd-grid-container .dashbrd-grid-widget:hover .dashbrd-grid-widget-actions {
   opacity: 1;
   filter: alpha(opacity=100); }
+
 main:not(.layout-kioskmode) .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head,
 main:not(.layout-kioskmode) .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
