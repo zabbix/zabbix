@@ -191,7 +191,7 @@ class CAudit {
 				$object_old = array_filter($object_old, function ($val) {
 					return !is_array($val);
 				});
-				$object  = array_filter($object_old, function ($val) {
+				$object  = array_filter($object, function ($val) {
 					return !is_array($val);
 				});
 
