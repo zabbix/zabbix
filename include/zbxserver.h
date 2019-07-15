@@ -50,13 +50,6 @@
 #define MACRO_TYPE_ALLOWED_HOSTS	0x00800000
 #define MACRO_TYPE_ITEM_TAG		0x01000000
 
-typedef enum
-{
-	FLAG_TYPE_DEFAULT = 0,
-	FLAG_TYPE_IP,
-	FLAG_TYPE_DNS,
-}zbx_flag_type_t;
-
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
 int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end);

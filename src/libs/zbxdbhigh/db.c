@@ -1342,7 +1342,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
-						FLAG_TYPE_DEFAULT != autoreg_host->flag)
+						ZBX_CONN_DEFAULT != autoreg_host->flag)
 				{
 					break;
 				}

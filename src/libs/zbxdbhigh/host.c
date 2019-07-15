@@ -5061,6 +5061,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  *             ip     - [IN] IP address                                       *
  *             dns    - [IN] DNS address                                      *
  *             port   - [IN] port                                             *
+ *             flags  - [IN] the used connection type                         *
  *                                                                            *
  * Return value: upon successful completion return interface identificator    *
  *                                                                            *
@@ -5069,8 +5070,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
-		unsigned char useip, const char *ip, const char *dns, unsigned short port)
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
+		const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -5079,12 +5080,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 	unsigned char	main_ = 1, db_main, db_useip;
 	unsigned short	db_port;
 	const char	*db_ip, *db_dns;
-	zbx_flag_type_t	flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	flags = (zbx_flag_type_t)(useip >> 4);
-	useip &= 0xf;
 
 	result = DBselect(
 			"select interfaceid,useip,ip,dns,port,main"
@@ -5104,7 +5101,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		if (1 == db_main)
 			main_ = 0;
 
-		if (FLAG_TYPE_DEFAULT == flags)
+		if (ZBX_CONN_DEFAULT == flags)
 		{
 			if (db_useip != useip)
 				continue;

@@ -613,8 +613,16 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *
 const char	*DBsql_id_ins(zbx_uint64_t id);
 const char	*DBsql_id_cmp(zbx_uint64_t id);
 
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
-		unsigned char useip, const char *ip, const char *dns, unsigned short port);
+typedef enum
+{
+	ZBX_CONN_DEFAULT = 0,
+	ZBX_CONN_IP,
+	ZBX_CONN_DNS,
+}
+zbx_conn_flags_t;
+
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
+		const char *dns, unsigned short port, zbx_conn_flags_t flags);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 

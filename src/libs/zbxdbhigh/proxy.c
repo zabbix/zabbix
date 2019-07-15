@@ -3858,7 +3858,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_flag_type_t		flag = FLAG_TYPE_DEFAULT;
+	zbx_conn_flags_t		flag = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3892,14 +3892,14 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_INTERFACE, tmp, sizeof(tmp)))
 		{
-			flag = (zbx_flag_type_t)atoi(tmp);
-			if (FLAG_TYPE_DNS != flag && FLAG_TYPE_IP != flag)
-				flag = FLAG_TYPE_DEFAULT;
+			flag = (zbx_conn_flags_t)atoi(tmp);
+			if (ZBX_CONN_DNS != flag && ZBX_CONN_IP != flag)
+				flag = ZBX_CONN_DEFAULT;
 		}
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
 		{
-			if (FLAG_TYPE_DNS == flag)
+			if (ZBX_CONN_DNS == flag)
 			{
 				*ip = '\0';
 				ret = SUCCEED;
