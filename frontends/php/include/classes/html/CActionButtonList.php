@@ -67,14 +67,34 @@ class CActionButtonList extends CObject {
 		$this->name_prefix = $name_prefix ? $name_prefix : null;
 
 		foreach ($buttonsData as $action => $buttonData) {
-			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
+			$button = (new CSubmit($actionName, $buttonData['name']))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->removeAttribute('id')
-				->setAttribute('value', $action);
+				->removeAttribute('id');
+
+			if (array_key_exists('redirect', $buttonData)) {
+				$button
+					// Removing name and value since parameters are managed by the redirecting URL.
+					->removeAttribute('name')
+					->removeAttribute('value')
+
+					->onClick('var $_form = jQuery(this).closest("form"); '.
+						// Save the original form action.
+						'if (!$_form.data("action")) { $_form.data("action", $_form.attr("action")); } '.
+						'$_form.attr("action", '.CJs::encodeJson($buttonData['redirect']).');');
+			}
+			else {
+				$button
+					->setAttribute('value', $action)
+					->onClick('var $_form = jQuery(this).closest("form"); '.
+						// Resatore the original form action, if previously saved.
+						'if ($_form.data("action")) { $_form.attr("action", $_form.data("action")); }');
+			}
 
 			if (array_key_exists('confirm', $buttonData)) {
-				$this->buttons[$action]->setAttribute('confirm', $buttonData['confirm']);
+				$button->setAttribute('confirm', $buttonData['confirm']);
 			}
+
+			$this->buttons[$action] = $button;
 		}
 	}
 
