@@ -48,11 +48,6 @@ zbx_json_decodevalue_LDADD = $(JSON_LIBS)
 if SERVER
 zbx_json_decodevalue_LDADD += @SERVER_LIBS@
 zbx_json_decodevalue_LDFLAGS = @SERVER_LDFLAGS@
-else
-if PROXY
-zbx_json_decodevalue_LDADD += @PROXY_LIBS@
-zbx_json_decodevalue_LDFLAGS = @PROXY_LDFLAGS@
-endif
 endif
 
 zbx_json_decodevalue_CFLAGS = -I@top_srcdir@/tests
@@ -69,11 +64,6 @@ zbx_json_decodevalue_dyn_LDADD = $(JSON_LIBS)
 if SERVER
 zbx_json_decodevalue_dyn_LDADD += @SERVER_LIBS@
 zbx_json_decodevalue_dyn_LDFLAGS = @SERVER_LDFLAGS@
-else
-if PROXY
-zbx_json_decodevalue_dyn_LDADD += @PROXY_LIBS@
-zbx_json_decodevalue_dyn_LDFLAGS = @PROXY_LDFLAGS@
-endif
 endif
 
 zbx_json_decodevalue_dyn_CFLAGS = -I@top_srcdir@/tests
