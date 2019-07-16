@@ -1397,10 +1397,11 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$step = 1;
+
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
@@ -1426,11 +1427,11 @@ abstract class CItemGeneral extends CApiService {
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$item_preprocids[] = $item['itemid'];
+				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
