@@ -5092,8 +5092,6 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		int update = 0;
-
 		db_useip = (unsigned char)atoi(row[1]);
 		db_ip = row[2];
 		db_dns = row[3];
@@ -5117,31 +5115,53 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 					&tmp, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 				continue;
+
+			ZBX_STR2UINT64(interfaceid, row[0]);
+			break;
 		}
-		else if (1 == db_main)
+
+		/* update main interface if explicit connection flags were passed (flags != ZBX_CONN_DEFAULT) */
+		if (1 == db_main)
 		{
-			update = 1;
+			char	*update = NULL, delim = ' ';
+			size_t	update_alloc = 0, update_offset = 0;
+
+			ZBX_STR2UINT64(interfaceid, row[0]);
+
+			if (db_useip != useip)
+			{
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_IP == flags && 0 != strcmp(db_ip, ip))
+			{
+				ip_esc = DBdyn_escape_field("interface", "ip", ip);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
+				zbx_free(ip_esc);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_DNS == flags && 0 != strcmp(db_dns, dns))
+			{
+				dns_esc = DBdyn_escape_field("interface", "dns", dns);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cdns='%s'", delim,
+						dns_esc);
+				zbx_free(dns_esc);
+				delim = ',';
+			}
+
+			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
+
+			if (0 != update_alloc)
+			{
+				DBexecute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
+						interfaceid);
+				zbx_free(update);
+			}
+			break;
 		}
-		else
-			continue;
-
-		ZBX_STR2UINT64(interfaceid, row[0]);
-
-		if (1 == update)
-		{
-			ip_esc = DBdyn_escape_field("interface", "ip", ip);
-			dns_esc = DBdyn_escape_field("interface", "dns", dns);
-
-			DBexecute("update interface"
-					" set useip=%d,ip='%s',dns='%s',port=%d"
-					" where interfaceid=" ZBX_FS_UI64,
-					useip,ip_esc,dns_esc,port,interfaceid);
-
-			zbx_free(dns_esc);
-			zbx_free(ip_esc);
-		}
-
-		break;
 	}
 	DBfree_result(result);
 
