@@ -77,17 +77,17 @@ class CActionButtonList extends CObject {
 					->removeAttribute('name')
 					->removeAttribute('value')
 
-					->onClick('var $_form = jQuery(this).closest("form"); '.
+					->onClick('var $_form = jQuery(this).closest("form");'.
 						// Save the original form action.
-						'if (!$_form.data("action")) { $_form.data("action", $_form.attr("action")); } '.
-						'$_form.attr("action", '.CJs::encodeJson($buttonData['redirect']).');');
+						' if (!$_form.data("action")) { $_form.data("action", $_form.attr("action")); }'.
+						' $_form.attr("action", '.CJs::encodeJson($buttonData['redirect']).');');
 			}
 			else {
 				$button
 					->setAttribute('value', $action)
-					->onClick('var $_form = jQuery(this).closest("form"); '.
+					->onClick('var $_form = jQuery(this).closest("form");'.
 						// Restore the original form action, if previously saved.
-						'if ($_form.data("action")) { $_form.attr("action", $_form.data("action")); }');
+						' if ($_form.data("action")) { $_form.attr("action", $_form.data("action")); }');
 			}
 
 			if (array_key_exists('confirm', $buttonData)) {
