@@ -73,7 +73,7 @@ class CActionButtonList extends CObject {
 
 			if (array_key_exists('redirect', $buttonData)) {
 				$button
-					// Removing name and value since parameters are managed by the redirecting URL.
+					// Removing parameters not to conflict with the redirecting URL.
 					->removeAttribute('name')
 					->removeAttribute('value')
 
@@ -86,7 +86,7 @@ class CActionButtonList extends CObject {
 				$button
 					->setAttribute('value', $action)
 					->onClick('var $_form = jQuery(this).closest("form"); '.
-						// Resatore the original form action, if previously saved.
+						// Restore the original form action, if previously saved.
 						'if ($_form.data("action")) { $_form.attr("action", $_form.data("action")); }');
 			}
 
