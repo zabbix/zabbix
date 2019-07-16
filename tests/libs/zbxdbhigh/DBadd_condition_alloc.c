@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
+#include "config.h"
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
@@ -38,7 +39,7 @@ void	zbx_mock_test_entry(void **state)
 	int			i, count;
 	uint64_t		value_id;
 	char			*sql;
-	size_t			sql_alloc = 64 * ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	ZBX_UNUSED(state);
 
@@ -55,13 +56,23 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_where);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name, in_ids.values, in_ids.values_num);
+	zbx_vector_uint64_destroy(&in_ids);
 
 	if (NULL == zbx_regexp_match(sql, sql_rgx, NULL))
 	{
-		printf("Prepared sql: \"%s\"\n", sql);
-		fail_msg("Regular expression \"%s\" does not much sql", sql_rgx);
-	}
+		int len;
 
-	zbx_vector_uint64_destroy(&in_ids);
-	zbx_free(sql);
+		if (sql_offset > (len = 4 * ZBX_KIBIBYTE) * 2)
+		{
+			printf("Start of prepared sql: \"%.*s\"\n", len, sql);
+			printf("End of prepared sql: \"%s\"\n", &sql[sql_offset - len]);
+		}
+		else
+			printf("Prepared sql: \"%s\"\n", sql);
+
+		zbx_free(sql);
+		fail_msg("Regular expression %s=\"%s\" does not much sql", RESULT, sql_rgx);
+	}
+	else
+		zbx_free(sql);
 }
