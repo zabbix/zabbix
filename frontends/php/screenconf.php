@@ -68,8 +68,6 @@ $fields = [
 ];
 check_fields($fields);
 
-CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
-
 /*
  * Permissions
  */
