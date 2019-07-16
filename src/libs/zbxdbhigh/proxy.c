@@ -116,7 +116,7 @@ static zbx_history_table_t	areg = {
 		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
 		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
-		{"flags",		ZBX_PROTO_TAG_INTERFACE,	ZBX_JSON_TYPE_STRING,	"0"},
+		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
 		{NULL}
 		}
 };
@@ -3890,7 +3890,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			*host_metadata = '\0';
 		}
 
-		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_INTERFACE, tmp, sizeof(tmp)))
+		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_FLAGS, tmp, sizeof(tmp)))
 		{
 			flag = (zbx_conn_flags_t)atoi(tmp);
 			if (ZBX_CONN_DNS != flag && ZBX_CONN_IP != flag)

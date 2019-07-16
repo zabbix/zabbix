@@ -1318,7 +1318,8 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata"
+				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
+					"a.listen_port,a.flags"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
@@ -1342,9 +1343,25 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
-						ZBX_CONN_DEFAULT != autoreg_host->flag)
+						autoreg_host->flag != atoi(row[7]))
 				{
 					break;
+				}
+
+				/* process with auto registration if the connection type was forced and */
+				/* is different from the last registered connection type                */
+				if (ZBX_CONN_DEFAULT != autoreg_host->flag)
+				{
+					unsigned short	port;
+
+					if (FAIL == is_ushort(row[6], &port) || port != autoreg_host->port)
+						break;
+
+					if (ZBX_CONN_IP == autoreg_host->flag && 0 != strcmp(row[4], autoreg_host->ip))
+						break;
+
+					if (ZBX_CONN_DNS == autoreg_host->flag && 0 != strcmp(row[5], autoreg_host->dns))
+						break;
 				}
 
 				zbx_vector_ptr_remove(autoreg_hosts, i);
