@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = zbx_item_preproc 
+SERVER_tests = zbx_item_preproc
 
 if HAVE_LIBXML2
 SERVER_tests +=	item_preproc_xpath
@@ -53,4 +53,5 @@ item_preproc_xpath_LDADD += @SERVER_LIBS@
 item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@
 
 item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
+
 endif
