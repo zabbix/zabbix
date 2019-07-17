@@ -2324,7 +2324,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #888; }
-  .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad {
+  .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad, .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
 
 .dashbrd-grid-widget {
@@ -2558,7 +2558,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #888; }
-  .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad {
+  .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad, .dashbrd-widget .msg-warning {
     margin: 0 10px; }
   .dashbrd-widget.dashbrd-widget-fluid {
     margin-right: 0; }
@@ -2742,6 +2742,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     max-width: 1024px;
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
+  .overlay-dialogue .msg-warning,
   .overlay-dialogue .msg-good {
     position: -webkit-sticky;
     position: sticky;
@@ -3488,6 +3489,49 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   margin-left: 16px;
   margin-top: 2px; }
 
+.msg-warning {
+  color: #000;
+  border: 2px solid #ffc859;
+  background-color: #fff;
+  text-align: left; }
+  .msg-warning .link-action {
+    color: #033003;
+    margin-right: 10px;
+    font-size: 0.85em; }
+    .msg-warning .link-action .arrow-up {
+      border-bottom-color: #033003; }
+    .msg-warning .link-action .arrow-down {
+      border-top-color: #033003; }
+  .msg-warning .overlay-close-btn {
+    color: #333; }
+  .msg-warning ul {
+    border-top-color: #ffc859; }
+  .msg-warning button {
+    background-color: #fff;
+    color: #033003;
+    border-color: #ffc859; }
+
+.msg-warning:before {
+  content: "";
+  background-color: #ffc859;
+  float: left;
+  width: 61px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute; }
+
+.msg-warning:after {
+  content: "";
+  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
+  width: 27px;
+  height: 25px;
+  top: 0;
+  left: 0;
+  position: absolute;
+  margin-left: 16px;
+  margin-top: 2px; }
+
 .msg-bad {
   color: #000;
   border: 2px solid #cc0000;
@@ -3565,7 +3609,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   .msg-buttons button {
     margin: 0 0 0 10px; }
 
-.msg-good, .msg-bad {
+.msg-good, .msg-warning, .msg-bad {
   font-size: 1.167em;
   padding: 6px 10px 6px 75px;
   text-align: left;
@@ -3575,7 +3619,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .msg-good .overlay-close-btn, .msg-bad .overlay-close-btn {
+  .msg-good .overlay-close-btn, .msg-warning .overlay-close-btn, .msg-bad .overlay-close-btn {
     font-size: 1.167em; }
 
 .msg-bad-global {

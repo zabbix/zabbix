@@ -3404,7 +3404,7 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-good, .msg-bad, .msg-warning {
 		margin: 0 10px;
 	}
 }
@@ -3704,7 +3704,7 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-good, .msg-bad, .msg-warning {
 		margin: 0 10px;
 	}
 
@@ -3957,6 +3957,7 @@ $form-icon-btn: (
 	}
 
 	.msg-bad,
+	.msg-warning,
 	.msg-good {
 		position: -webkit-sticky;
 		position: sticky;
@@ -5078,6 +5079,65 @@ td.inactive-bg {
 .msg-good:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
+	width: 27px;
+	height: 25px;
+	top: 0;
+	left: 0;
+	position: absolute;
+	margin-left: 16px;
+	margin-top: 2px;
+}
+
+.msg-warning {
+	color: $font-color;
+	border: 2px solid $alt-yellow;
+	background-color: $ui-bg-color;
+	text-align: left;
+
+	@extend %msg;
+
+	.link-action {
+		color: darken(desaturate($green, 10%), 20%);
+		margin-right: 10px;
+		font-size: $font-msg-reset-size;
+
+		.arrow-up {
+			border-bottom-color: darken(desaturate($green, 10%), 20%);
+		}
+		.arrow-down {
+			border-top-color: darken(desaturate($green, 10%), 20%);
+		}
+	}
+
+	.overlay-close-btn {
+		color: $font-alt-color;
+	}
+
+	ul {
+		border-top-color: $alt-yellow;
+	}
+
+	button {
+		background-color: $white;
+		color: darken(desaturate($green, 10%), 20%);
+		border-color: $alt-yellow;
+	}
+}
+
+.msg-warning:before {
+	content: "";
+	background-color: $alt-yellow;
+	float: left;
+	width: 61px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	position: absolute;
+}
+
+.msg-warning:after {
+	content: "";
+	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;	
 	width: 27px;
 	height: 25px;
 	top: 0;

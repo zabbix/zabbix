@@ -1923,7 +1923,7 @@
 	 * @param {object} data  Data from dashboard grid.
 	 */
 	function showMessageExhausted(data) {
-		$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
+		$('<div class="msg-warning">' + data.options['message-exhausted'] + '</div>').prependTo(
 			data.dialogue.body
 		);
 	}
