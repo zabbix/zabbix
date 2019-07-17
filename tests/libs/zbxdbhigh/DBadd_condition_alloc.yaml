@@ -56,6 +56,6 @@ in:
   field_name: itemid
   sql_where: select * from items where
 out:
-  sql_regex: select \* from items where \((?:itemid in \((?:\d++,)++\d++\) or )++itemid in \(902500\)\)
+  sql_regex: select \* from items where \((?:itemid in \((?:\d++,)++\d++\) or ){950}itemid in \(902500\)\)
   sqlite_regex: select \* from items where \((?:\((?:itemid in \((?:\d++,)++\d++\) or ){949}itemid in \((?:\d++,)++\d++\)\) or ){1}\(itemid in \(902500\)\)\)
 ...
