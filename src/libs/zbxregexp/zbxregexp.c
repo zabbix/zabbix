@@ -208,6 +208,21 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
 	struct pcre_extra		extra, *pextra;
+#if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION) && !defined(_WINDOWS)
+	static unsigned long int	recursion_limit = 0;
+
+	if (0 == recursion_limit)
+	{
+		struct rlimit	rlim;
+
+		/* calculate recursion limit, PCRE man page suggests to reckon on about 500 bytes per recursion */
+		/* but to be on the safe side - reckon on 800 bytes and do not set limit higher than 100000 */
+		if (0 == getrlimit(RLIMIT_STACK, &rlim))
+			recursion_limit = rlim.rlim_cur < 80000000 ? rlim.rlim_cur / 800 : 100000;
+		else
+			recursion_limit = 10000;	/* if stack size cannot be retrieved then assume ~8 MB */
+	}
+#endif
 
 	if (ZBX_REGEXP_GROUPS_MAX < count)
 		ovector = (int *)zbx_malloc(NULL, (size_t)ovecsize * sizeof(int));
@@ -224,7 +239,11 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #if defined(PCRE_EXTRA_MATCH_LIMIT) && defined(PCRE_EXTRA_MATCH_LIMIT_RECURSION)
 	pextra->flags |= PCRE_EXTRA_MATCH_LIMIT | PCRE_EXTRA_MATCH_LIMIT_RECURSION;
 	pextra->match_limit = 1000000;
-	pextra->match_limit_recursion = 1000000;
+#ifdef _WINDOWS
+	pextra->match_limit_recursion = ZBX_PCRE_RECURSION_LIMIT;
+#else
+	pextra->match_limit_recursion = recursion_limit;
+#endif
 #endif
 	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
 	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, strlen(string), flags, 0, ovector, ovecsize)))

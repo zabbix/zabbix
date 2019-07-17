@@ -3,7 +3,7 @@
 CPU=$(PROCESSOR_ARCHITECTURE)
 !ENDIF
 
-!IF "$(CPU)" == "i386"
+!IF "$(CPU)" == "i386" || "$(CPU)" == "x86"
 TARGETDIR = ..\..\..\bin\win32
 ADD_LFLAGS = /MACHINE:X86
 
@@ -31,6 +31,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
@@ -41,11 +42,15 @@ OBJS = \
 	..\..\..\src\libs\zbxcrypto\md5.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
+	..\..\..\src\libs\zbxjson\jsonpath.o \
 	..\..\..\src\libs\zbxlog\log.o \
 	..\..\..\src\libs\zbxsys\mutexs.o \
 	..\..\..\src\libs\zbxsys\symbols.o \
 	..\..\..\src\libs\zbxsys\threads.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \
+	..\..\..\src\libs\zbxalgo\algodefs.o \
+	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\zabbix_sender\zabbix_sender.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib

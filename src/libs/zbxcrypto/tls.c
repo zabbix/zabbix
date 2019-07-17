@@ -2722,11 +2722,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGABRT);
+	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
@@ -2918,11 +2920,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGABRT);
+	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
@@ -3208,11 +3212,13 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
-	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGABRT to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
-	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	/* SIGABRT and unblock it when TLS parameters are good and libraries are initialized. */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGABRT);
+	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
