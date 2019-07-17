@@ -85,5 +85,7 @@ dist-hook:
 	cp $(srcdir)/modules/dummy/*.c $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/Makefile $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/README $(distdir)/modules/dummy/
-## TODO: add go dir
-
+	mkdir $(distdir)/go/cmd
+	mkdir $(distdir)/go/cmd/agent
+	cp $(srcdir)/go/cmd/agent/*.go $(distdir)/go/cmd/agent
+	cp $(srcdir)/go/Makefile $(distdir)/go/
