@@ -3251,23 +3251,22 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 				if (host_prototype->hostid == hostid)
+				{
+					if (FAIL == (i = zbx_vector_uint64_bsearch(&host_prototype->lnk_templateids,
+							templateid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						ZBX_STR2UINT64(hosttemplateid, row[2]);
+						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
+					}
+					else
+						zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
+
 					break;
+				}
 			}
 
 			if (i == host_prototypes->values_num)
-			{
 				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (FAIL == (i = zbx_vector_uint64_bsearch(&host_prototype->lnk_templateids, templateid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				ZBX_STR2UINT64(hosttemplateid, row[2]);
-				zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
-			}
-			else
-				zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
 		}
 		DBfree_result(result);
 	}
@@ -3379,34 +3378,37 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 				if (host_prototype->hostid == hostid)
-					break;
-			}
-
-			if (i == host_prototypes->values_num)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			ZBX_STR2UINT64(group_prototypeid, row[1]);
-			ZBX_DBROW2UINT64(groupid, row[2]);
-
-			for (i = 0; i < host_prototype->group_prototypes.values_num; i++)
-			{
-				group_prototype = (zbx_group_prototype_t *)host_prototype->group_prototypes.values[i];
-
-				if (0 != group_prototype->group_prototypeid)
-					continue;
-
-				if (group_prototype->groupid == groupid && 0 == strcmp(group_prototype->name, row[3]))
 				{
-					group_prototype->group_prototypeid = group_prototypeid;
+					int	k;
+
+					ZBX_STR2UINT64(group_prototypeid, row[1]);
+					ZBX_DBROW2UINT64(groupid, row[2]);
+
+					for (k = 0; k < host_prototype->group_prototypes.values_num; k++)
+					{
+						group_prototype = (zbx_group_prototype_t *)
+								host_prototype->group_prototypes.values[k];
+
+						if (0 != group_prototype->group_prototypeid)
+							continue;
+
+						if (group_prototype->groupid == groupid &&
+								0 == strcmp(group_prototype->name, row[3]))
+						{
+							group_prototype->group_prototypeid = group_prototypeid;
+							break;
+						}
+					}
+
+					if (k == host_prototype->group_prototypes.values_num)
+						zbx_vector_uint64_append(del_group_prototypeids, group_prototypeid);
+
 					break;
 				}
 			}
 
-			if (i == host_prototype->group_prototypes.values_num)
-				zbx_vector_uint64_append(del_group_prototypeids, group_prototypeid);
+			if (i == host_prototypes->values_num)
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		DBfree_result(result);
 	}
