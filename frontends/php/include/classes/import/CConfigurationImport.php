@@ -65,7 +65,7 @@ class CConfigurationImport {
 	 */
 	public function __construct(array $options = [], CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {
-		$this->options = [
+		$default_options = [
 			'groups' => ['createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
@@ -83,7 +83,35 @@ class CConfigurationImport {
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
-		$this->options = array_merge($this->options, $options);
+		$options = array_merge($default_options, $options);
+
+		$object_options = (
+			$options['templateLinkage']['createMissing']
+			|| $options['applications']['createMissing']
+			|| $options['applications']['deleteMissing']
+			|| $options['items']['updateExisting']
+			|| $options['items']['createMissing']
+			|| $options['items']['deleteMissing']
+			|| $options['discoveryRules']['updateExisting']
+			|| $options['discoveryRules']['createMissing']
+			|| $options['discoveryRules']['deleteMissing']
+			|| $options['triggers']['deleteMissing']
+			|| $options['graphs']['deleteMissing']
+			|| $options['httptests']['updateExisting']
+			|| $options['httptests']['createMissing']
+			|| $options['httptests']['deleteMissing']
+		);
+		$options['process_templates'] = (
+			!$options['templates']['updateExisting']
+			&& ($object_options
+				|| $options['templateScreens']['updateExisting']
+				|| $options['templateScreens']['createMissing']
+				|| $options['templateScreens']['deleteMissing']
+			)
+		);
+		$options['process_hosts'] = (!$options['hosts']['updateExisting'] && $object_options);
+
+		$this->options = $options;
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
 	}
@@ -539,8 +567,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates() {
-		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']
+				|| $this->options['process_templates']) {
 			$templates = $this->getFormattedTemplates();
+
 			if ($templates) {
 				$templateImporter = new CTemplateImporter($this->options, $this->referencer,
 					$this->importedObjectContainer
@@ -560,8 +590,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts() {
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']
+				|| $this->options['process_hosts']) {
 			$hosts = $this->getFormattedHosts();
+
 			if ($hosts) {
 				$hostImporter = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$hostImporter->import($hosts);

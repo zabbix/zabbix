@@ -38,12 +38,11 @@ class CTemplateImporter extends CImporter {
 
 		$this->checkCircularTemplateReferences($templates);
 
-		foreach ($templates as &$template) {
-			if (!$this->options['templateLinkage']['createMissing']) {
-				unset($template['templates']);
+		if (!$this->options['templateLinkage']['createMissing']) {
+			foreach ($templates as $name => $template) {
+				unset($templates[$name]['templates']);
 			}
 		}
-		unset($template);
 
 		do {
 			$independentTemplates = $this->getIndependentTemplates($templates);
@@ -64,7 +63,8 @@ class CTemplateImporter extends CImporter {
 					unset($template['templates']);
 				}
 
-				if (array_key_exists('templateid', $template) && $this->options['templates']['updateExisting']) {
+				if (array_key_exists('templateid', $template) && ($this->options['templates']['updateExisting']
+						|| $this->options['process_templates'])) {
 					$templatesToUpdate[] = $template;
 				}
 				else if ($this->options['templates']['createMissing']) {
@@ -94,8 +94,10 @@ class CTemplateImporter extends CImporter {
 				}
 			}
 
-			if ($this->options['templates']['updateExisting'] && $templatesToUpdate) {
-				API::Template()->update($templatesToUpdate);
+			if ($templatesToUpdate) {
+				if ($this->options['templates']['updateExisting']) {
+					API::Template()->update($templatesToUpdate);
+				}
 
 				foreach ($templatesToUpdate as $updatedTemplate) {
 					$this->processedTemplateIds[$updatedTemplate['templateid']] = $updatedTemplate['templateid'];
@@ -111,16 +113,18 @@ class CTemplateImporter extends CImporter {
 		} while (!empty($independentTemplates));
 
 		// if there are templates left in $templates, then they have unresolved references
-		foreach ($templates as $template) {
-			$unresolvedReferences = [];
-			foreach ($template['templates'] as $linkedTemplate) {
-				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
-					$unresolvedReferences[] = $linkedTemplate['name'];
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+			foreach ($templates as $template) {
+				$unresolvedReferences = [];
+				foreach ($template['templates'] as $linkedTemplate) {
+					if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
+						$unresolvedReferences[] = $linkedTemplate['name'];
+					}
 				}
+				throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
+					'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
+					$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
 			}
-			throw new Exception(_n('Cannot import template "%1$s", linked template "%2$s" does not exist.',
-				'Cannot import template "%1$s", linked templates "%2$s" do not exist.',
-				$template['host'], implode(', ', $unresolvedReferences), count($unresolvedReferences)));
 		}
 	}
 
