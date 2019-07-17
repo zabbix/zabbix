@@ -660,6 +660,7 @@ class CWidgetHelper {
 			'type'.SVG_GRAPH_TYPE_LINE => _('Line'),
 			'type'.SVG_GRAPH_TYPE_POINTS => _('Points'),
 			'type'.SVG_GRAPH_TYPE_STAIRCASE => _('Staircase'),
+			'type'.SVG_GRAPH_TYPE_BAR => _('Bar'),
 			'transparency' => _('Transparency'),
 			'fill' => _('Fill'),
 			'pointsize' => _('Point size'),
@@ -702,6 +703,7 @@ class CWidgetHelper {
 						['name' => _('Draw').'/'._('Line'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_LINE]],
 						['name' => _('Draw').'/'._('Points'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_POINTS]],
 						['name' => _('Draw').'/'._('Staircase'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_STAIRCASE]],
+						['name' => _('Draw').'/'._('Bar'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_BAR]],
 
 						['name' => _('Transparency').'/0', 'callback' => 'addOverride', 'args' => ['transparency', 0]],
 						['name' => _('Transparency').'/1', 'callback' => 'addOverride', 'args' => ['transparency', 1]],
@@ -965,12 +967,13 @@ class CWidgetHelper {
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
+									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
 									->onChange('changeDataSetDrawType(this)')
 									->setModern(true)
 							)
 							->addRow(_('Width'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
@@ -995,7 +998,7 @@ class CWidgetHelper {
 							)
 							->addRow(_('Fill'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
@@ -1019,7 +1022,7 @@ class CWidgetHelper {
 									->addValue(_x('Treat as 0', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
 									)
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern(true)
 							)
 							->addRow(_('Y-axis'),
@@ -1109,21 +1112,34 @@ class CWidgetHelper {
 		$scripts = [
 			'function changeDataSetDrawType(obj) {'.
 				'var row_num = obj.id.replace("ds_", "").replace("_type", "");'.
-				'if (jQuery(":checked", jQuery(obj)).val() == '.SVG_GRAPH_TYPE_POINTS.') {'.
-					'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-				'}'.
-				'else {'.
-					'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
+				'switch (jQuery(":checked", jQuery(obj)).val()) {'.
+					'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
+						'break;'.
+					'case "'.SVG_GRAPH_TYPE_BAR.'":'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
+						'break;'.
+					'default:'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
+						'break;'.
 				'}'.
 			'};',
 

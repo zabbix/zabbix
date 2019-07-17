@@ -456,6 +456,7 @@ class CSvgGraph extends CSvg {
 
 		$this->drawMetricsLine();
 		$this->drawMetricsPoint();
+		$this->drawMetricsBar();
 
 		$this->drawProblems();
 
@@ -846,12 +847,12 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			/**
 			 * - Missing data points are calculated only between existing data points;
-			 * - Missing data points are not calculated for SVG_GRAPH_TYPE_POINTS metrics;
+			 * - Missing data points are not calculated for SVG_GRAPH_TYPE_POINTS && SVG_GRAPH_TYPE_BAR metrics;
 			 * - SVG_GRAPH_MISSING_DATA_CONNECTED is default behavior of SVG graphs, so no need to calculate anything
 			 *   here.
 			 */
 			if (array_key_exists($index, $this->points)
-					&& $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS
+					&& !in_array($metric['options']['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR])
 					&& $metric['options']['missingdatafunc'] != SVG_GRAPH_MISSING_DATA_CONNECTED) {
 				$points = &$this->points[$index];
 				$missing_data_points = $this->getMissingData($points, $metric['options']['missingdatafunc']);
@@ -962,6 +963,19 @@ class CSvgGraph extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS && array_key_exists($index, $this->paths)) {
 				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
+			}
+		}
+	}
+
+	/**
+	 * Add metric of type bar to graph.
+	 */
+	protected function drawMetricsBar() {
+		$this->paths = (new CSvgSideBySideFormatter)->format($this->paths, $this->metrics);
+
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $this->paths)) {
+				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric, $this->getCanvasHeight()));
 			}
 		}
 	}

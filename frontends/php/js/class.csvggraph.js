@@ -251,7 +251,9 @@ jQuery(function ($) {
 		for (var i = 0, l = nodes.length; l > i; i++) {
 			var px = -10,
 				py = -10,
-				pv = null;
+				pv = null,
+				pp = 0,
+				ps = 0;
 
 			// Find matching X points.
 			switch (nodes[i].getAttribute('data-set')) {
@@ -271,6 +273,36 @@ jQuery(function ($) {
 						px = point.getAttribute('cx');
 						py = point.getAttribute('cy');
 						pv = point.getAttribute('label');
+					}
+					break;
+
+				case 'bar':
+					var polygons_nodes = nodes[i].querySelectorAll('polygon');
+					var points = [];
+					var pp = 0;
+
+					for (var c = 0, cl = polygons_nodes.length; cl > c; c++) {
+						if (polygons_nodes[c].getAttribute('data-px') == polygons_nodes[c].getAttribute('data-cx')) {
+							if (x >= parseInt(polygons_nodes[c].getAttribute('data-cx'))) {
+								points.push(polygons_nodes[c]);
+							}
+						} else {
+							if (x >= parseInt(polygons_nodes[c].getAttribute('data-px'))) {
+								points.push(polygons_nodes[c]);
+							}
+						}
+					}
+
+					px = 0;
+					py = 0;
+
+					var point = points.slice(-1)[0];
+					if (typeof point !== 'undefined') {
+						px = point.getAttribute('data-cx');
+						py = point.getAttribute('data-cy');
+						pv = point.getAttribute('label');
+						pp = point.getAttribute('data-width');
+						ps = point.getAttribute('data-px');
 					}
 					break;
 
@@ -321,7 +353,7 @@ jQuery(function ($) {
 					break;
 			}
 
-			data_sets.push({g: nodes[i], x: px, y: py, v: pv});
+			data_sets.push({g: nodes[i], x: px, y: py, v: pv, p: pp, s: ps});
 		}
 
 		return data_sets;
@@ -479,9 +511,14 @@ jQuery(function ($) {
 				var rows_added = 0;
 				points.forEach(function(point) {
 					var point_highlight = point.g.querySelectorAll('.svg-point-highlight')[0];
+
 					if (point.v !== null && (xy_point === false || xy_point === point)) {
 						point_highlight.setAttribute('cx', point.x);
 						point_highlight.setAttribute('cy', point.y);
+
+						if (point.p > 0) {
+							point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
+						}
 
 						if (show_hint && data.hintMaxRows > rows_added) {
 							$('<li></li>')

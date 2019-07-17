@@ -234,6 +234,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
 			$this->rootDir.'/include/classes/graph',
+			$this->rootDir.'/include/classes/graph/formatter',
 			$this->rootDir.'/include/classes/graphdraw',
 			$this->rootDir.'/include/classes/import',
 			$this->rootDir.'/include/classes/import/converters',

@@ -44,7 +44,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
+			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 			'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
