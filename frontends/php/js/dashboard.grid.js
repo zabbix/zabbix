@@ -2432,7 +2432,8 @@
 								? 'actionlog'
 								: data.dialogue['widget_type'];
 
-						if (!findEmptyPosition($this, data, type)) {
+						if ($this.children('.dashbrd-grid-new-widget-placeholder').is(':hidden') &&
+								!findEmptyPosition($this, data, type)) {
 							showMessageExhausted(data);
 						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
