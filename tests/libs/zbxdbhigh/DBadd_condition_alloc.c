@@ -64,11 +64,11 @@ void	zbx_mock_test_entry(void **state)
 
 		if (sql_offset > (len = 4 * ZBX_KIBIBYTE) * 2)
 		{
-			printf("Start of prepared sql: \"%.*s\"\n", len, sql);
+			printf("Start of prepared sql (total=%zu): \"%.*s\"\n", sql_offset, len, sql);
 			printf("End of prepared sql: \"%s\"\n", &sql[sql_offset - len]);
 		}
 		else
-			printf("Prepared sql: \"%s\"\n", sql);
+			printf("Prepared sql (total=%zu): \"%s\"\n", sql_offset, sql);
 
 		zbx_free(sql);
 		fail_msg("Regular expression %s=\"%s\" does not much sql", RESULT, sql_rgx);
