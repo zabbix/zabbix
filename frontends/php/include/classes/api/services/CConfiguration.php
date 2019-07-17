@@ -52,7 +52,13 @@ class CConfiguration extends CApiService {
 		$writer->formatOutput(false);
 		$export->setWriter($writer);
 
-		return $export->export();
+		$export_data = $export->export();
+
+		if ($export_data === false) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		return $export_data;
 	}
 
 	/**
