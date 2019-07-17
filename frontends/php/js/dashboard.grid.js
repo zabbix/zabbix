@@ -1322,9 +1322,7 @@
 			else {
 				pos = findEmptyPosition($obj, data, type);
 				if (!pos) {
-					$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
-						data.dialogue.body
-					).fadeOut(5000);
+					showMessageExhausted(data);
 					return;
 				}
 			}
@@ -1920,6 +1918,17 @@
 	}
 
 	/**
+	 * Show message if dashboard free space exhausted.
+	 *
+	 * @param {object} data  Data from dashboard grid.
+	 */
+	function showMessageExhausted(data) {
+		$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
+			data.dialogue.body
+		);
+	}
+
+	/**
 	 * Performs action added by addAction function.
 	 *
 	 * @param {string} hook_name  Name of trigger that is currently being called.
@@ -2421,13 +2430,10 @@
 
 						var type = (data.dialogue['widget_type'] === undefined)
 								? 'actionlog'
-								: data.dialogue['widget_type'],
-							pos = findEmptyPosition($this, data, type);
+								: data.dialogue['widget_type'];
 
-						if (!pos) {
-							$('<div class="msg-bad">' + data.options['message-exhausted'] + '</div>').prependTo(
-								data.dialogue.body
-							).fadeOut(5000);
+						if (!findEmptyPosition($this, data, type)) {
+							showMessageExhausted(data);
 						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					}
