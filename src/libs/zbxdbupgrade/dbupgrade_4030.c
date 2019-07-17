@@ -121,6 +121,49 @@ static int	DBpatch_4030010(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030011(void)
+{
+	const ZBX_FIELD	field = {"autoreg_tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4030012(void)
+{
+	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_4030013(void)
+{
+	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
+static int	DBpatch_4030014(void)
+{
+	const ZBX_TABLE table =
+		{"config_autoreg_tls", "autoreg_tlsid", 0,
+			{
+				{"autoreg_tlsid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_4030015(void)
+{
+	return DBcreate_index("config_autoreg_tls", "config_autoreg_tls_1", "tls_psk_identity", 1);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -138,5 +181,10 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
+DBPATCH_ADD(4030011, 0, 1)
+DBPATCH_ADD(4030012, 0, 1)
+DBPATCH_ADD(4030013, 0, 1)
+DBPATCH_ADD(4030014, 0, 1)
+DBPATCH_ADD(4030015, 0, 1)
 
 DBPATCH_END()
