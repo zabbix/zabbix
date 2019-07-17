@@ -52,7 +52,7 @@ class CActionButtonList extends CObject {
 	 *
 	 * @var CObject
 	 */
-	protected $selectedCountElement = null;
+	protected $selected_count_element = null;
 
 	/**
 	 * @param string       $action_name                 Name of submit buttons.
@@ -112,13 +112,13 @@ class CActionButtonList extends CObject {
 	 * @return CObject
 	 */
 	public function getSelectedCountElement() {
-		if (!$this->selectedCountElement) {
-			$this->selectedCountElement = (new CSpan('0 '._('selected')))
+		if (!$this->selected_count_element) {
+			$this->selected_count_element = (new CSpan('0 '._('selected')))
 				->setId('selected_count')
 				->addClass(ZBX_STYLE_SELECTED_ITEM_COUNT);
 		}
 
-		return $this->selectedCountElement;
+		return $this->selected_count_element;
 	}
 
 	/**
