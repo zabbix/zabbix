@@ -28,15 +28,19 @@
 
 static void	mock_accept(zbx_socket_t *s)
 {
+	const char	*peer;
+
 	if (AF_INET != zbx_mock_str_to_family(zbx_mock_get_parameter_string("in.family")))
 		fail_msg("Unexpected family");
 
-	if (1 != inet_pton(AF_INET, zbx_mock_get_parameter_string("in.peer"),
+	if (1 != inet_pton(AF_INET, (peer = zbx_mock_get_parameter_string("in.peer")),
 			&((struct sockaddr_in *)&s->peer_info)->sin_addr.s_addr))
 	{
 		fail_msg("failed converting address '%s' from textual to binary",
 				zbx_mock_get_parameter_string("in.peer"));
 	}
+
+	zbx_strlcpy(s->peer, peer, sizeof(s->peer));
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -44,8 +48,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_socket_t	s;
 
 	ZBX_UNUSED(state);
-
-	memset(&s, 0, sizeof(zbx_socket_t));
 
 	mock_accept(&s);
 
