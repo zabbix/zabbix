@@ -7,7 +7,8 @@ DIST_SUBDIRS = \
 	zabbix_sender \
 	zabbix_proxy \
 	zabbix_server \
-	zabbix_java
+	zabbix_java \
+	go
 
 if AGENT
 COMMON_SUBDIRS = libs
@@ -64,12 +65,18 @@ JAVA_SUBDIRS = \
 	zabbix_java
 endif
 
+if GO
+GO_SUBDIRS = \
+	go
+endif
+
 SUBDIRS = \
 	$(COMMON_SUBDIRS) \
 	$(AGENT_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(PROXY_SUBDIRS) \
-	$(JAVA_SUBDIRS)
+	$(JAVA_SUBDIRS) \
+	$(GO_SUBDIRS)
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
@@ -78,4 +85,5 @@ dist-hook:
 	cp $(srcdir)/modules/dummy/*.c $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/Makefile $(distdir)/modules/dummy/
 	cp $(srcdir)/modules/dummy/README $(distdir)/modules/dummy/
+## TODO: add go dir
 

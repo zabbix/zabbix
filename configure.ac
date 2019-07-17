@@ -1268,6 +1268,15 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test "x$agent" = "xyes")
 
+AC_ARG_ENABLE(go,[  --enable-go           Turn on build of Zabbix Go agent],
+[case "${enableval}" in
+  yes) go=yes ;;
+  no)  go=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-go]) ;;
+esac],
+[go=no])
+AM_CONDITIONAL(GO, test "x$go" = "xyes")
+
 AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java gateway],
 [case "${enableval}" in
   yes) java=yes ;;
@@ -1689,6 +1698,13 @@ ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
+if test "x$go" = "xyes"; then
+	AC_CHECK_PROGS([GO], [go], [no])
+	if test "x$go" = "xno"; then
+		AC_MSG_ERROR([Unable to find "go" executable in path])
+	fi
+fi
+
 if test "x$java" = "xyes"; then
 	AC_CHECK_PROGS([JAVAC], [javac], [no])
 	if test "x$JAVAC" = "xno"; then
@@ -1933,6 +1949,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
+	src/go/Makefile
 	man/Makefile
 	])
 
@@ -2093,6 +2110,9 @@ echo "  Agent details:
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi
+
+echo "
+  Enable Go agent:       ${go}"
 
 echo "
   Enable Java gateway:   ${java}"
