@@ -104,7 +104,7 @@ class CRouter {
 		'user.create'					=> ['CControllerUserCreate',				null,					null],
 		'user.delete'					=> ['CControllerUserDelete',				null,					null],
 		'user.edit'						=> ['CControllerUserEdit',					'layout.htmlpage',		'administration.user.edit'],
-		'userprofile.edit'				=> ['CControllerUserProfileEdit',			'layout.htmlpage',		'administration.userprofile.edit'],
+		'userprofile.edit'				=> ['CControllerUserProfileEdit',			'layout.htmlpage',		'administration.user.edit'],
 		'user.list'						=> ['CControllerUserList',					'layout.htmlpage',		'administration.user.list'],
 		'user.update'					=> ['CControllerUserUpdate',				null,					null],
 		'userprofile.update'			=> ['CControllerUserProfileUpdate',			null,					null],

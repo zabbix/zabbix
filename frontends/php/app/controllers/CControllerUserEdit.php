@@ -25,19 +25,41 @@
 class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput() {
-		$this->appendValidationRules([
-			'alias' =>			'db users.alias',
-			'name' =>			'db users.name',
-			'surname' =>		'db users.surname',
-			'type' =>			'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
-			'user_groups' =>	'array_id|not_empty',
-			'user_medias' =>	'array',
-			'new_media' =>		'array',
-			'enable_media' =>	'int32',
-			'disable_media' =>	'int32'
-		]);
+		$locales = array_keys(getLocales());
+		$themes = array_keys(Z::getThemes());
+		$themes[] = THEME_DEFAULT;
 
-		return parent::checkInput();
+		$fields = [
+			'userid' =>				'db users.userid',
+			'alias' =>				'db users.alias',
+			'name' =>				'db users.name',
+			'surname' =>			'db users.surname',
+			'user_groups' =>		'array_id|not_empty',
+			'change_password' =>	'in 1',
+			'password1' =>			'db users.passwd',
+			'password2' =>			'db users.passwd',
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'theme' =>				'db users.theme|in '.implode(',', $themes),
+			'autologin' =>			'db users.autologin|in 0,1',
+			'autologout' =>			'db users.autologout',
+			'refresh' =>			'db users.refresh',
+			'rows_per_page' =>		'db users.rows_per_page|ge 1|le 999999',
+			'url' =>				'db users.url',
+			'user_medias' =>		'array',
+			'new_media' =>			'array',
+			'enable_media' =>		'int32',
+			'disable_media' =>		'int32',
+			'type' =>				'db users.type|in '.USER_TYPE_ZABBIX_USER.','.USER_TYPE_ZABBIX_ADMIN.','.USER_TYPE_SUPER_ADMIN,
+			'form_refresh' =>		'int32'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -45,41 +67,104 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			return false;
 		}
 
-		$this->userid = $this->getInput('userid', 0);
-		$this->options['output'][] = 'type';
-		$this->options['selectMedias'] = ['mediatypeid', 'period', 'sendto', 'severity', 'active'];
+		if ($this->getInput('userid', 0) != 0) {
+			$users = API::User()->get([
+				'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
+					'rows_per_page', 'url', 'type'
+				],
+				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
+				'selectUsrgrps' => ['usrgrpid'],
+				'userids' => $this->getInput('userid'),
+				'editable' => true
+			]);
 
-		return parent::checkPermissions();
+			if (!$users) {
+				return false;
+			}
+
+			$this->user = $users[0];
+		}
+
+		return true;
 	}
 
-	/**
-	 * Get user type, user groups and medias from DB.
-	 */
-	protected function getDBData() {
-		$this->data['type'] = $this->user['type'];
-		$user_groups = API::UserGroup()->get([
-			'output' => ['usrgrpid'],
-			'userids' => [$this->userid]
+	protected function doAction() {
+		$db_defaults = DB::getDefaults('users');
+		$config = select_config();
+
+		$data = [
+			'userid' => 0,
+			'alias' => '',
+			'name' => '',
+			'surname' => '',
+			'change_password' => false,
+			'password1' => '',
+			'password2' => '',
+			'lang' => $db_defaults['lang'],
+			'theme' => $db_defaults['theme'],
+			'autologin' => $db_defaults['autologin'],
+			'autologout' => '0',
+			'refresh' => $db_defaults['refresh'],
+			'rows_per_page' => $db_defaults['rows_per_page'],
+			'url' => '',
+			'user_medias' => [],
+			'new_media' => [],
+			'type' => $db_defaults['type'],
+			'config' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
+			'sid' => $this->getUserSID(),
+			'form_refresh' => 0,
+			'action' => $this->getAction()
+		];
+		$user_groups = [];
+
+		if ($this->getInput('userid', 0) != 0) {
+			$data['userid'] = $this->getInput('userid');
+			$data['alias'] = $this->user['alias'];
+			$data['name'] = $this->user['name'];
+			$data['surname'] = $this->user['surname'];
+			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
+			$data['password1'] = '';
+			$data['password2'] = '';
+			$data['lang'] = $this->user['lang'];
+			$data['theme'] = $this->user['theme'];
+			$data['autologin'] = $this->user['autologin'];
+			$data['autologout'] = $this->user['autologout'];
+			$data['refresh'] = $this->user['refresh'];
+			$data['rows_per_page'] = $this->user['rows_per_page'];
+			$data['url'] = $this->user['url'];
+			$data['user_medias'] = $this->user['medias'];
+			$data['type'] = $this->user['type'];
+		}
+
+		// Overwrite with input variables.
+		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
+			'autologout', 'refresh', 'rows_per_page', 'url', 'user_medias', 'form_refresh', 'type'
 		]);
-		$user_group = zbx_objectValues($user_groups, 'usrgrpid');
-		$this->data['user_groups'] = zbx_toHash($user_group);
-		$this->data['user_medias'] = $this->user['medias'];
-	}
+		$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
+		if ($this->hasInput('user_groups')) {
+			$user_groups = $this->getInput('user_groups');
+		}
 
-	/**
-	 * Set user medias, calculate rights and user groups in data.
-	 */
-	protected function setFormData() {
-		$this->setUserMedias();
+		$data = $this->setUserMedias($data);
 
-		$this->data['groups'] = API::UserGroup()->get([
-			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => $this->data['user_groups']
-		]);
-		order_result($this->data['groups'], 'name');
+		$data['groups'] = $user_groups
+			? API::UserGroup()->get([
+				'output' => ['usrgrpid', 'name'],
+				'usrgrpids' => $user_groups
+			])
+			: [];
+		CArrayHelper::sort($data['groups'], ['name']);
+		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
 
-		if ($this->data['type'] == USER_TYPE_SUPER_ADMIN) {
-			$this->data['groups_rights'] = [
+		if ($data['type'] == USER_TYPE_SUPER_ADMIN) {
+			$data['groups_rights'] = [
 				'0' => [
 					'permission' => PERM_READ_WRITE,
 					'name' => '',
@@ -88,23 +173,11 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			];
 		}
 		else {
-			$this->data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($this->data['user_groups']));
+			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($user_groups));
 		}
-	}
 
-	protected function doAction() {
-		$this->data = $this->getDataDefaults();
-
-		$this->data += [
-			'user_medias' => [],
-			'new_media' => [],
-			'user_groups' => [],
-			'type' => $this->db_defaults['type']
-		];
-
-		$this->fields = ['alias', 'name', 'surname', 'type', 'user_groups', 'user_medias', 'new_media'];
-		$this->title = _('Configuration of users');
-
-		parent::doAction();
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of users'));
+		$this->setResponse($response);
 	}
 }

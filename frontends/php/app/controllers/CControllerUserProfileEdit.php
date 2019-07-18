@@ -25,18 +25,41 @@
 class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput() {
-		$this->appendValidationRules(['messages' => 'array']);
+		$locales = array_keys(getLocales());
+		$themes = array_keys(Z::getThemes());
+		$themes[] = THEME_DEFAULT;
+
+		$fields = [
+			'change_password' =>	'in 1',
+			'password1' =>			'db users.passwd',
+			'password2' =>			'db users.passwd',
+			'lang' =>				'db users.lang|in '.implode(',', $locales),
+			'theme' =>				'db users.theme|in '.implode(',', $themes),
+			'autologin' =>			'db users.autologin|in 0,1',
+			'autologout' =>			'db users.autologout',
+			'refresh' =>			'db users.refresh',
+			'rows_per_page' =>		'db users.rows_per_page|ge 1|le 999999',
+			'url' =>				'db users.url',
+			'messages' =>			'array',
+			'form_refresh' =>		'int32'
+		];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->appendValidationRules([
+			$fields += [
 				'user_medias' =>	'array',
 				'new_media' =>		'array',
 				'enable_media' =>	'int32',
 				'disable_media' =>	'int32'
-			]);
+			];
 		}
 
-		return parent::checkInput();
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
@@ -44,54 +67,75 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			return false;
 		}
 
-		$this->userid = CWebUser::$data['userid'];
+		$users = API::User()->get([
+			'output' => ['alias', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
+				'rows_per_page', 'url'
+			],
+			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
+				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
+				: null,
+			'userids' => CWebUser::$data['userid'],
+			'editable' => true
+		]);
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->options['selectMedias'] = ['mediatypeid', 'period', 'sendto', 'severity', 'active'];
+		if (!$users) {
+			return false;
 		}
 
-		return parent::checkPermissions();
-	}
+		$this->user = $users[0];
 
-	/**
-	 * Get user medias from DB if user is at least admin.
-	 */
-	protected function getDBData() {
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->data['user_medias'] = $this->user['medias'];
-		}
+		return true;
 	}
 
 	/**
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
-	protected function setFormData() {
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->setUserMedias();
-		}
-
-		$messages = getMessageSettings();
-		$this->data['messages'] = array_merge($messages, $this->getInput('messages', []));
-	}
-
 	protected function doAction() {
-		$this->data = $this->getDataDefaults();
+		$config = select_config();
+
+		$data = [
+			'userid' => CWebUser::$data['userid'],
+			'alias' => $this->user['alias'],
+			'name' => $this->user['name'],
+			'surname' => $this->user['surname'],
+			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),
+			'password1' => '',
+			'password2' => '',
+			'lang' => $this->user['lang'],
+			'theme' => $this->user['theme'],
+			'autologin' => $this->user['autologin'],
+			'autologout' => $this->user['autologout'],
+			'refresh' => $this->user['refresh'],
+			'rows_per_page' => $this->user['rows_per_page'],
+			'url' => $this->user['url'],
+			'messages' => $this->getInput('messages', []) + getMessageSettings(),
+			'config' => [
+				'severity_name_0' => $config['severity_name_0'],
+				'severity_name_1' => $config['severity_name_1'],
+				'severity_name_2' => $config['severity_name_2'],
+				'severity_name_3' => $config['severity_name_3'],
+				'severity_name_4' => $config['severity_name_4'],
+				'severity_name_5' => $config['severity_name_5']
+			],
+			'form_refresh' => 0,
+			'action' => $this->getAction()
+		];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->data += [
-				'user_medias' => [],
-				'new_media' => [],
-			];
+			$data['user_medias'] = $this->user['medias'];
 		}
 
-		$this->fields = ['messages'];
+		// Overwrite with input variables.
+		$this->getInputs($data, ['password1', 'password2', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
+			'rows_per_page', 'url', 'user_medias', 'form_refresh'
+		]);
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$this->fields = array_merge($this->fields, ['user_medias', 'new_media']);
+			$data = $this->setUserMedias($data);
 		}
 
-		$this->title = _('User profile');
-
-		parent::doAction();
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('User profile'));
+		$this->setResponse($response);
 	}
 }
