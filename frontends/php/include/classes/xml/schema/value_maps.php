@@ -24,8 +24,8 @@ return (new CXmlTagIndexedArray('value_maps'))->setKey('valueMaps')->setSchema(
 		(new CXmlTagString('name'))->setRequired(),
 		(new CXmlTagIndexedArray('mappings'))->setSchema(
 			(new CXmlTagArray('mapping'))->setSchema(
-				(new CXmlTagString('value')),
-				(new CXmlTagString('newvalue'))
+				new CXmlTagString('value'),
+				new CXmlTagString('newvalue')
 			)
 		)
 	)

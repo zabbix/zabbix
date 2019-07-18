@@ -27,7 +27,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 				(new CXmlTagString('name'))->setRequired()
 			)
 		),
-		(new CXmlTagString('description')),
+		new CXmlTagString('description'),
 		(new CXmlTagIndexedArray('discovery_rules'))->setKey('discoveryRules')->setSchema(
 			(new CXmlTagArray('discovery_rule'))->setSchema(
 				(new CXmlTagString('key'))->setRequired()->setKey('key_'),
@@ -57,7 +57,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					}),
 				(new CXmlTagString('delay'))
 					->setDefaultValue('1m'),
-				(new CXmlTagString('description')),
+				new CXmlTagString('description'),
 				(new CXmlTagArray('filter'))->setSchema(
 					(new CXmlTagIndexedArray('conditions'))->setSchema(
 						(new CXmlTagArray('condition'))->setSchema(
@@ -67,7 +67,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 								->setDefaultValue(CXmlDefine::CONDITION_MATCHES_REGEX)
 								->addConstant('MATCHES_REGEX', CXmlDefine::CONDITION_MATCHES_REGEX)
 								->addConstant('NOT_MATCHES_REGEX', CXmlDefine::CONDITION_NOT_MATCHES_REGEX),
-							(new CXmlTagString('value'))
+							new CXmlTagString('value')
 						)
 					),
 					(new CXmlTagString('evaltype'))
@@ -108,7 +108,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 									->addConstant('MAX', CXmlDefine::MAX)
 									->addConstant('ALL', CXmlDefine::ALL)
 									->addConstant('LAST', CXmlDefine::LAST),
-								(new CXmlTagString('color')),
+								new CXmlTagString('color'),
 								(new CXmlTagString('drawtype'))
 									->setDefaultValue(CXmlDefine::SINGLE_LINE)
 									->addConstant('SINGLE_LINE', CXmlDefine::SINGLE_LINE)
@@ -196,7 +196,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							)
 						),
 						(new CXmlTagString('host'))->setRequired(),
-						(new CXmlTagString('name')),
+						new CXmlTagString('name'),
 						(new CXmlTagString('status'))
 							->setDefaultValue(CXmlDefine::ENABLED)
 							->addConstant('ENABLED', CXmlDefine::ENABLED)
@@ -208,9 +208,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 						)
 					)
 				),
-				(new CXmlTagString('http_proxy')),
-				(new CXmlTagString('interface_ref')),
-				(new CXmlTagString('ipmi_sensor')),
+				new CXmlTagString('http_proxy'),
+				new CXmlTagString('interface_ref'),
+				new CXmlTagString('ipmi_sensor'),
 				(new CXmlTagIndexedArray('item_prototypes'))->setKey('itemPrototypes')->setSchema(
 					(new CXmlTagArray('item_prototype'))->setSchema(
 						(new CXmlTagString('key'))->setRequired()->setKey('key_'),
@@ -245,7 +245,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							}),
 						(new CXmlTagString('delay'))
 							->setDefaultValue('1m'),
-						(new CXmlTagString('description')),
+						new CXmlTagString('description'),
 						(new CXmlTagString('follow_redirects'))
 							->setDefaultValue(CXmlDefine::YES)
 							->addConstant('NO', CXmlDefine::NO)
@@ -258,8 +258,8 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 						),
 						(new CXmlTagString('history'))
 							->setDefaultValue('90d'),
-						(new CXmlTagString('http_proxy')),
-						(new CXmlTagString('interface_ref')),
+						new CXmlTagString('http_proxy'),
+						new CXmlTagString('interface_ref'),
 						(new CXmlTagString('inventory_link'))
 							->setDefaultValue(CXmlDefine::NONE)
 							->addConstant('NONE', CXmlDefine::NONE)
@@ -333,9 +333,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('URL_B', CXmlDefine::URL_B)
 							->addConstant('URL_C', CXmlDefine::URL_C)
 							->addConstant('VENDOR', CXmlDefine::VENDOR),
-						(new CXmlTagString('ipmi_sensor')),
-						(new CXmlTagString('jmx_endpoint')),
-						(new CXmlTagString('logtimefmt')),
+						new CXmlTagString('ipmi_sensor'),
+						new CXmlTagString('jmx_endpoint'),
+						new CXmlTagString('logtimefmt'),
 						(new CXmlTagArray('master_item'))->setSchema(
 							(new CXmlTagString('key'))->setRequired()
 						),
@@ -343,15 +343,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->setDefaultValue(CXmlDefine::RAW)
 							->addConstant('RAW', CXmlDefine::RAW)
 							->addConstant('JSON', CXmlDefine::JSON),
-						(new CXmlTagString('params')),
-						(new CXmlTagString('password')),
-						(new CXmlTagString('port')),
+						new CXmlTagString('params'),
+						new CXmlTagString('password'),
+						new CXmlTagString('port'),
 						(new CXmlTagString('post_type'))
 							->setDefaultValue(CXmlDefine::RAW)
 							->addConstant('RAW', CXmlDefine::RAW)
 							->addConstant('JSON', CXmlDefine::JSON)
 							->addConstant('XML', CXmlDefine::XML),
-						(new CXmlTagString('posts')),
+						new CXmlTagString('posts'),
 						(new CXmlTagIndexedArray('preprocessing'))->setSchema(
 							(new CXmlTagArray('step'))->setSchema(
 								(new CXmlTagString('params'))->setRequired(),
@@ -385,15 +385,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 									->addConstant('DISCARD_VALUE', CXmlDefine::DISCARD_VALUE)
 									->addConstant('CUSTOM_VALUE', CXmlDefine::CUSTOM_VALUE)
 									->addConstant('CUSTOM_ERROR', CXmlDefine::CUSTOM_ERROR),
-								(new CXmlTagString('error_handler_params'))
+								new CXmlTagString('error_handler_params')
 							)
 						),
-						(new CXmlTagString('privatekey')),
-						(new CXmlTagString('publickey')),
+						new CXmlTagString('privatekey'),
+						new CXmlTagString('publickey'),
 						(new CXmlTagIndexedArray('query_fields'))->setSchema(
 							(new CXmlTagArray('query_field'))->setSchema(
 								(new CXmlTagString('name'))->setRequired(),
-								(new CXmlTagString('value'))
+								new CXmlTagString('value')
 							)
 						),
 						(new CXmlTagString('request_method'))
@@ -407,15 +407,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('BODY', CXmlDefine::BODY)
 							->addConstant('HEADERS', CXmlDefine::HEADERS)
 							->addConstant('BOTH', CXmlDefine::BOTH),
-						(new CXmlTagString('snmp_community')),
-						(new CXmlTagString('snmp_oid')),
-						(new CXmlTagString('snmpv3_authpassphrase')),
+						new CXmlTagString('snmp_community'),
+						new CXmlTagString('snmp_oid'),
+						new CXmlTagString('snmpv3_authpassphrase'),
 						(new CXmlTagString('snmpv3_authprotocol'))
 							->setDefaultValue(CXmlDefine::SNMPV3_MD5)
 							->addConstant('MD5', CXmlDefine::SNMPV3_MD5)
 							->addConstant('SHA', CXmlDefine::SNMPV3_SHA),
-						(new CXmlTagString('snmpv3_contextname')),
-						(new CXmlTagString('snmpv3_privpassphrase')),
+						new CXmlTagString('snmpv3_contextname'),
+						new CXmlTagString('snmpv3_privpassphrase'),
 						(new CXmlTagString('snmpv3_privprotocol'))
 							->setDefaultValue(CXmlDefine::DES)
 							->addConstant('DES', CXmlDefine::DES)
@@ -425,16 +425,16 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('NOAUTHNOPRIV', CXmlDefine::NOAUTHNOPRIV)
 							->addConstant('AUTHNOPRIV', CXmlDefine::AUTHNOPRIV)
 							->addConstant('AUTHPRIV', CXmlDefine::AUTHPRIV),
-						(new CXmlTagString('snmpv3_securityname')),
-						(new CXmlTagString('ssl_cert_file')),
-						(new CXmlTagString('ssl_key_file')),
-						(new CXmlTagString('ssl_key_password')),
+						new CXmlTagString('snmpv3_securityname'),
+						new CXmlTagString('ssl_cert_file'),
+						new CXmlTagString('ssl_key_file'),
+						new CXmlTagString('ssl_key_password'),
 						(new CXmlTagString('status'))
 							->setDefaultValue(CXmlDefine::ENABLED)
 							->addConstant('ENABLED', CXmlDefine::ENABLED)
 							->addConstant('DISABLED', CXmlDefine::DISABLED),
-						(new CXmlTagString('status_codes')),
-						(new CXmlTagString('timeout')),
+						new CXmlTagString('status_codes'),
+						new CXmlTagString('timeout'),
 						(new CXmlTagString('trends'))
 							->setDefaultValue('365d'),
 						(new CXmlTagString('type'))
@@ -458,9 +458,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('SNMP_TRAP', CXmlDefine::ITEM_TYPE_SNMP_TRAP)
 							->addConstant('DEPENDENT', CXmlDefine::ITEM_TYPE_DEPENDENT)
 							->addConstant('HTTP_AGENT', CXmlDefine::ITEM_TYPE_HTTP_AGENT),
-						(new CXmlTagString('units')),
-						(new CXmlTagString('url')),
-						(new CXmlTagString('username')),
+						new CXmlTagString('units'),
+						new CXmlTagString('url'),
+						new CXmlTagString('username'),
 						(new CXmlTagString('value_type'))
 							->setDefaultValue(CXmlDefine::UNSIGNED)
 							->addConstant('FLOAT', CXmlDefine::FLOAT)
@@ -469,7 +469,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('UNSIGNED', CXmlDefine::UNSIGNED)
 							->addConstant('TEXT', CXmlDefine::TEXT),
 						(new CXmlTagArray('valuemap'))->setSchema(
-							(new CXmlTagString('name'))
+							new CXmlTagString('name')
 						),
 						(new CXmlTagString('verify_host'))
 							->setDefaultValue(CXmlDefine::NO)
@@ -492,12 +492,12 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 									->setDefaultValue(CXmlDefine::TRIGGER_DISABLED)
 									->addConstant('DISABLED', CXmlDefine::TRIGGER_DISABLED)
 									->addConstant('TAG_VALUE', CXmlDefine::TRIGGER_TAG_VALUE),
-								(new CXmlTagString('correlation_tag')),
+								new CXmlTagString('correlation_tag'),
 								(new CXmlTagIndexedArray('dependencies'))->setSchema(
 									(new CXmlTagArray('dependency'))->setSchema(
 										(new CXmlTagString('expression'))->setRequired(),
 										(new CXmlTagString('name'))->setRequired()->setKey('description'),
-										(new CXmlTagString('recovery_expression'))
+										new CXmlTagString('recovery_expression')
 									)
 								),
 								(new CXmlTagString('description'))->setKey('comments'),
@@ -513,7 +513,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 									->addConstant('AVERAGE', CXmlDefine::AVERAGE)
 									->addConstant('HIGH', CXmlDefine::HIGH)
 									->addConstant('DISASTER', CXmlDefine::DISASTER),
-								(new CXmlTagString('recovery_expression')),
+								new CXmlTagString('recovery_expression'),
 								(new CXmlTagString('recovery_mode'))
 									->setDefaultValue(CXmlDefine::TRIGGER_EXPRESSION)
 									->addConstant('EXPRESSION', CXmlDefine::TRIGGER_EXPRESSION)
@@ -526,39 +526,39 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 								(new CXmlTagIndexedArray('tags'))->setSchema(
 									(new CXmlTagArray('tag'))->setSchema(
 										(new CXmlTagString('tag'))->setRequired(),
-										(new CXmlTagString('value'))
+										new CXmlTagString('value')
 									)
 								),
 								(new CXmlTagString('type'))
 									->setDefaultValue(CXmlDefine::SINGLE)
 									->addConstant('SINGLE', CXmlDefine::SINGLE)
 									->addConstant('MULTIPLE', CXmlDefine::MULTIPLE),
-								(new CXmlTagString('url'))
+								new CXmlTagString('url')
 							)
 						)
 					)
 				),
-				(new CXmlTagString('jmx_endpoint')),
+				new CXmlTagString('jmx_endpoint'),
 				(new CXmlTagString('lifetime'))
 					->setDefaultValue('30d'),
 				(new CXmlTagIndexedArray('lld_macro_paths'))->setSchema(
 					(new CXmlTagArray('lld_macro_path'))->setSchema(
-						(new CXmlTagString('lld_macro')),
-						(new CXmlTagString('path'))
+						new CXmlTagString('lld_macro'),
+						new CXmlTagString('path')
 					)
 				),
 				(new CXmlTagArray('master_item'))->setSchema(
 					(new CXmlTagString('key'))->setRequired()
 				),
-				(new CXmlTagString('params')),
-				(new CXmlTagString('password')),
-				(new CXmlTagString('port')),
+				new CXmlTagString('params'),
+				new CXmlTagString('password'),
+				new CXmlTagString('port'),
 				(new CXmlTagString('post_type'))
 					->setDefaultValue(CXmlDefine::RAW)
 					->addConstant('RAW', CXmlDefine::RAW)
 					->addConstant('JSON', CXmlDefine::JSON)
 					->addConstant('XML', CXmlDefine::XML),
-				(new CXmlTagString('posts')),
+				new CXmlTagString('posts'),
 				(new CXmlTagIndexedArray('preprocessing'))->setSchema(
 					(new CXmlTagArray('step'))->setSchema(
 						(new CXmlTagString('params'))->setRequired(),
@@ -592,15 +592,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('DISCARD_VALUE', CXmlDefine::DISCARD_VALUE)
 							->addConstant('CUSTOM_VALUE', CXmlDefine::CUSTOM_VALUE)
 							->addConstant('CUSTOM_ERROR', CXmlDefine::CUSTOM_ERROR),
-						(new CXmlTagString('error_handler_params'))
+						new CXmlTagString('error_handler_params')
 					)
 				),
-				(new CXmlTagString('privatekey')),
-				(new CXmlTagString('publickey')),
+				new CXmlTagString('privatekey'),
+				new CXmlTagString('publickey'),
 				(new CXmlTagIndexedArray('query_fields'))->setSchema(
 					(new CXmlTagArray('query_field'))->setSchema(
 						(new CXmlTagString('name'))->setRequired(),
-						(new CXmlTagString('value'))
+						new CXmlTagString('value')
 					)
 				),
 				(new CXmlTagString('request_method'))
@@ -614,15 +614,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('BODY', CXmlDefine::BODY)
 					->addConstant('HEADERS', CXmlDefine::HEADERS)
 					->addConstant('BOTH', CXmlDefine::BOTH),
-				(new CXmlTagString('snmp_community')),
-				(new CXmlTagString('snmp_oid')),
-				(new CXmlTagString('snmpv3_authpassphrase')),
+				new CXmlTagString('snmp_community'),
+				new CXmlTagString('snmp_oid'),
+				new CXmlTagString('snmpv3_authpassphrase'),
 				(new CXmlTagString('snmpv3_authprotocol'))
 					->setDefaultValue(CXmlDefine::SNMPV3_MD5)
 					->addConstant('MD5', CXmlDefine::SNMPV3_MD5)
 					->addConstant('SHA', CXmlDefine::SNMPV3_SHA),
-				(new CXmlTagString('snmpv3_contextname')),
-				(new CXmlTagString('snmpv3_privpassphrase')),
+				new CXmlTagString('snmpv3_contextname'),
+				new CXmlTagString('snmpv3_privpassphrase'),
 				(new CXmlTagString('snmpv3_privprotocol'))
 					->setDefaultValue(CXmlDefine::DES)
 					->addConstant('DES', CXmlDefine::DES)
@@ -632,16 +632,16 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('NOAUTHNOPRIV', CXmlDefine::NOAUTHNOPRIV)
 					->addConstant('AUTHNOPRIV', CXmlDefine::AUTHNOPRIV)
 					->addConstant('AUTHPRIV', CXmlDefine::AUTHPRIV),
-				(new CXmlTagString('snmpv3_securityname')),
-				(new CXmlTagString('ssl_cert_file')),
-				(new CXmlTagString('ssl_key_file')),
-				(new CXmlTagString('ssl_key_password')),
+				new CXmlTagString('snmpv3_securityname'),
+				new CXmlTagString('ssl_cert_file'),
+				new CXmlTagString('ssl_key_file'),
+				new CXmlTagString('ssl_key_password'),
 				(new CXmlTagString('status'))
 					->setDefaultValue(CXmlDefine::ENABLED)
 					->addConstant('ENABLED', CXmlDefine::ENABLED)
 					->addConstant('DISABLED', CXmlDefine::DISABLED),
-				(new CXmlTagString('status_codes')),
-				(new CXmlTagString('timeout')),
+				new CXmlTagString('status_codes'),
+				new CXmlTagString('timeout'),
 				(new CXmlTagIndexedArray('trigger_prototypes'))->setKey('triggerPrototypes')->setSchema(
 					(new CXmlTagArray('trigger_prototype'))->setSchema(
 						(new CXmlTagString('expression'))->setRequired(),
@@ -650,12 +650,12 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->setDefaultValue(CXmlDefine::TRIGGER_DISABLED)
 							->addConstant('DISABLED', CXmlDefine::TRIGGER_DISABLED)
 							->addConstant('TAG_VALUE', CXmlDefine::TRIGGER_TAG_VALUE),
-						(new CXmlTagString('correlation_tag')),
+						new CXmlTagString('correlation_tag'),
 						(new CXmlTagIndexedArray('dependencies'))->setSchema(
 							(new CXmlTagArray('dependency'))->setSchema(
 								(new CXmlTagString('expression'))->setRequired(),
 								(new CXmlTagString('name'))->setRequired()->setKey('description'),
-								(new CXmlTagString('recovery_expression'))
+								new CXmlTagString('recovery_expression')
 							)
 						),
 						(new CXmlTagString('description'))->setKey('comments'),
@@ -671,7 +671,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('AVERAGE', CXmlDefine::AVERAGE)
 							->addConstant('HIGH', CXmlDefine::HIGH)
 							->addConstant('DISASTER', CXmlDefine::DISASTER),
-						(new CXmlTagString('recovery_expression')),
+						new CXmlTagString('recovery_expression'),
 						(new CXmlTagString('recovery_mode'))
 							->setDefaultValue(CXmlDefine::TRIGGER_EXPRESSION)
 							->addConstant('EXPRESSION', CXmlDefine::TRIGGER_EXPRESSION)
@@ -684,14 +684,14 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 						(new CXmlTagIndexedArray('tags'))->setSchema(
 							(new CXmlTagArray('tag'))->setSchema(
 								(new CXmlTagString('tag'))->setRequired(),
-								(new CXmlTagString('value'))
+								new CXmlTagString('value')
 							)
 						),
 						(new CXmlTagString('type'))
 							->setDefaultValue(CXmlDefine::SINGLE)
 							->addConstant('SINGLE', CXmlDefine::SINGLE)
 							->addConstant('MULTIPLE', CXmlDefine::MULTIPLE),
-						(new CXmlTagString('url'))
+						new CXmlTagString('url')
 					)
 				),
 				(new CXmlTagString('type'))
@@ -715,8 +715,8 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('SNMP_TRAP', CXmlDefine::ITEM_TYPE_SNMP_TRAP)
 					->addConstant('DEPENDENT', CXmlDefine::ITEM_TYPE_DEPENDENT)
 					->addConstant('HTTP_AGENT', CXmlDefine::ITEM_TYPE_HTTP_AGENT),
-				(new CXmlTagString('url')),
-				(new CXmlTagString('username')),
+				new CXmlTagString('url'),
+				new CXmlTagString('username'),
 				(new CXmlTagString('verify_host'))
 					->setDefaultValue(CXmlDefine::NO)
 					->addConstant('NO', CXmlDefine::NO)
@@ -743,16 +743,16 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->setDefaultValue(CXmlDefine::NO)
 							->addConstant('NO', CXmlDefine::NO)
 							->addConstant('YES', CXmlDefine::YES),
-						(new CXmlTagString('headers')),
-						(new CXmlTagString('posts')),
-						(new CXmlTagString('query_fields')),
-						(new CXmlTagString('required')),
+						new CXmlTagString('headers'),
+						new CXmlTagString('posts'),
+						new CXmlTagString('query_fields'),
+						new CXmlTagString('required'),
 						(new CXmlTagString('retrieve_mode'))
 							->setDefaultValue(CXmlDefine::BODY)
 							->addConstant('BODY', CXmlDefine::BODY)
 							->addConstant('HEADERS', CXmlDefine::HEADERS)
 							->addConstant('BOTH', CXmlDefine::BOTH),
-						(new CXmlTagString('status_codes')),
+						new CXmlTagString('status_codes'),
 						(new CXmlTagString('timeout'))
 							->setDefaultValue('15s'),
 						(new CXmlTagString('variables'))
@@ -760,7 +760,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 				),
 				(new CXmlTagString('agent'))
 					->setDefaultValue('Zabbix'),
-				(new CXmlTagIndexedArray('application'))->setSchema(
+				(new CXmlTagArray('application'))->setSchema(
 					(new CXmlTagString('name'))->setRequired()
 				),
 				(new CXmlTagString('attempts'))->setKey('retries')
@@ -772,18 +772,18 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('NTLM', CXmlDefine::NTLM),
 				(new CXmlTagString('delay'))
 					->setDefaultValue('1m'),
-				(new CXmlTagString('headers')),
-				(new CXmlTagString('http_password')),
-				(new CXmlTagString('http_proxy')),
-				(new CXmlTagString('http_user')),
-				(new CXmlTagString('ssl_cert_file')),
-				(new CXmlTagString('ssl_key_file')),
-				(new CXmlTagString('ssl_key_password')),
+				new CXmlTagString('headers'),
+				new CXmlTagString('http_password'),
+				new CXmlTagString('http_proxy'),
+				new CXmlTagString('http_user'),
+				new CXmlTagString('ssl_cert_file'),
+				new CXmlTagString('ssl_key_file'),
+				new CXmlTagString('ssl_key_password'),
 				(new CXmlTagString('status'))
 					->setDefaultValue(CXmlDefine::ENABLED)
 					->addConstant('ENABLED', CXmlDefine::ENABLED)
 					->addConstant('DISABLED', CXmlDefine::DISABLED),
-				(new CXmlTagString('variables')),
+				new CXmlTagString('variables'),
 				(new CXmlTagString('verify_host'))
 					->setDefaultValue(CXmlDefine::NO)
 					->addConstant('NO', CXmlDefine::NO)
@@ -805,9 +805,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->setDefaultValue(CXmlDefine::YES)
 					->addConstant('NO', CXmlDefine::NO)
 					->addConstant('YES', CXmlDefine::YES),
-				(new CXmlTagString('dns')),
-				(new CXmlTagString('ip')),
-				(new CXmlTagString('port')),
+				new CXmlTagString('dns'),
+				new CXmlTagString('ip'),
+				new CXmlTagString('port'),
 				(new CXmlTagString('type'))
 					->setDefaultValue(CXmlDefine::ZABBIX)
 					->addConstant('ZABBIX', CXmlDefine::ZABBIX)
@@ -834,7 +834,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 			->addConstant('STRAIGHT', CXmlDefine::STRAIGHT)
 			->addConstant('OEM', CXmlDefine::OEM)
 			->addConstant('RMCP_PLUS', CXmlDefine::RMCP_PLUS),
-		(new CXmlTagString('ipmi_password')),
+		new CXmlTagString('ipmi_password'),
 		(new CXmlTagString('ipmi_privilege'))
 			->setDefaultValue(CXmlDefine::USER)
 			->addConstant('CALLBACK', CXmlDefine::CALLBACK)
@@ -842,7 +842,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 			->addConstant('OPERATOR', CXmlDefine::OPERATOR)
 			->addConstant('ADMIN', CXmlDefine::ADMIN)
 			->addConstant('OEM', CXmlDefine::OEM),
-		(new CXmlTagString('ipmi_username')),
+		new CXmlTagString('ipmi_username'),
 		(new CXmlTagIndexedArray('items'))->setSchema(
 			(new CXmlTagArray('item'))->setSchema(
 				(new CXmlTagString('key'))->setRequired()->setKey('key_'),
@@ -877,7 +877,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					}),
 				(new CXmlTagString('delay'))
 					->setDefaultValue('1m'),
-				(new CXmlTagString('description')),
+				new CXmlTagString('description'),
 				(new CXmlTagString('follow_redirects'))
 					->setDefaultValue(CXmlDefine::YES)
 					->addConstant('NO', CXmlDefine::NO)
@@ -890,8 +890,8 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 				),
 				(new CXmlTagString('history'))
 					->setDefaultValue('90d'),
-				(new CXmlTagString('http_proxy')),
-				(new CXmlTagString('interface_ref')),
+				new CXmlTagString('http_proxy'),
+				new CXmlTagString('interface_ref'),
 				(new CXmlTagString('inventory_link'))
 					->setDefaultValue(CXmlDefine::NONE)
 					->addConstant('NONE', CXmlDefine::NONE)
@@ -965,9 +965,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('URL_B', CXmlDefine::URL_B)
 					->addConstant('URL_C', CXmlDefine::URL_C)
 					->addConstant('VENDOR', CXmlDefine::VENDOR),
-				(new CXmlTagString('ipmi_sensor')),
-				(new CXmlTagString('jmx_endpoint')),
-				(new CXmlTagString('logtimefmt')),
+				new CXmlTagString('ipmi_sensor'),
+				new CXmlTagString('jmx_endpoint'),
+				new CXmlTagString('logtimefmt'),
 				(new CXmlTagArray('master_item'))->setSchema(
 					(new CXmlTagString('key'))->setRequired()
 				),
@@ -975,15 +975,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->setDefaultValue(CXmlDefine::RAW)
 					->addConstant('RAW', CXmlDefine::RAW)
 					->addConstant('JSON', CXmlDefine::JSON),
-				(new CXmlTagString('params')),
-				(new CXmlTagString('password')),
-				(new CXmlTagString('port')),
+				new CXmlTagString('params'),
+				new CXmlTagString('password'),
+				new CXmlTagString('port'),
 				(new CXmlTagString('post_type'))
 					->setDefaultValue(CXmlDefine::RAW)
 					->addConstant('RAW', CXmlDefine::RAW)
 					->addConstant('JSON', CXmlDefine::JSON)
 					->addConstant('XML', CXmlDefine::XML),
-				(new CXmlTagString('posts')),
+				new CXmlTagString('posts'),
 				(new CXmlTagIndexedArray('preprocessing'))->setSchema(
 					(new CXmlTagArray('step'))->setSchema(
 						(new CXmlTagString('params'))->setRequired(),
@@ -1017,15 +1017,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('DISCARD_VALUE', CXmlDefine::DISCARD_VALUE)
 							->addConstant('CUSTOM_VALUE', CXmlDefine::CUSTOM_VALUE)
 							->addConstant('CUSTOM_ERROR', CXmlDefine::CUSTOM_ERROR),
-						(new CXmlTagString('error_handler_params'))
+						new CXmlTagString('error_handler_params')
 					)
 				),
-				(new CXmlTagString('privatekey')),
-				(new CXmlTagString('publickey')),
+				new CXmlTagString('privatekey'),
+				new CXmlTagString('publickey'),
 				(new CXmlTagIndexedArray('query_fields'))->setSchema(
 					(new CXmlTagArray('query_field'))->setSchema(
 						(new CXmlTagString('name'))->setRequired(),
-						(new CXmlTagString('value'))
+						new CXmlTagString('value')
 					)
 				),
 				(new CXmlTagString('request_method'))
@@ -1039,15 +1039,15 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('BODY', CXmlDefine::BODY)
 					->addConstant('HEADERS', CXmlDefine::HEADERS)
 					->addConstant('BOTH', CXmlDefine::BOTH),
-				(new CXmlTagString('snmp_community')),
-				(new CXmlTagString('snmp_oid')),
-				(new CXmlTagString('snmpv3_authpassphrase')),
+				new CXmlTagString('snmp_community'),
+				new CXmlTagString('snmp_oid'),
+				new CXmlTagString('snmpv3_authpassphrase'),
 				(new CXmlTagString('snmpv3_authprotocol'))
 					->setDefaultValue(CXmlDefine::SNMPV3_MD5)
 					->addConstant('MD5', CXmlDefine::SNMPV3_MD5)
 					->addConstant('SHA', CXmlDefine::SNMPV3_SHA),
-				(new CXmlTagString('snmpv3_contextname')),
-				(new CXmlTagString('snmpv3_privpassphrase')),
+				new CXmlTagString('snmpv3_contextname'),
+				new CXmlTagString('snmpv3_privpassphrase'),
 				(new CXmlTagString('snmpv3_privprotocol'))
 					->setDefaultValue(CXmlDefine::DES)
 					->addConstant('DES', CXmlDefine::DES)
@@ -1057,16 +1057,16 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('NOAUTHNOPRIV', CXmlDefine::NOAUTHNOPRIV)
 					->addConstant('AUTHNOPRIV', CXmlDefine::AUTHNOPRIV)
 					->addConstant('AUTHPRIV', CXmlDefine::AUTHPRIV),
-				(new CXmlTagString('snmpv3_securityname')),
-				(new CXmlTagString('ssl_cert_file')),
-				(new CXmlTagString('ssl_key_file')),
-				(new CXmlTagString('ssl_key_password')),
+				new CXmlTagString('snmpv3_securityname'),
+				new CXmlTagString('ssl_cert_file'),
+				new CXmlTagString('ssl_key_file'),
+				new CXmlTagString('ssl_key_password'),
 				(new CXmlTagString('status'))
 					->setDefaultValue(CXmlDefine::ENABLED)
 					->addConstant('ENABLED', CXmlDefine::ENABLED)
 					->addConstant('DISABLED', CXmlDefine::DISABLED),
-				(new CXmlTagString('status_codes')),
-				(new CXmlTagString('timeout')),
+				new CXmlTagString('status_codes'),
+				new CXmlTagString('timeout'),
 				(new CXmlTagString('trends'))
 					->setDefaultValue('365d'),
 				(new CXmlTagIndexedArray('triggers'))->setSchema(
@@ -1077,12 +1077,12 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->setDefaultValue(CXmlDefine::TRIGGER_DISABLED)
 							->addConstant('DISABLED', CXmlDefine::TRIGGER_DISABLED)
 							->addConstant('TAG_VALUE', CXmlDefine::TRIGGER_TAG_VALUE),
-						(new CXmlTagString('correlation_tag')),
+						new CXmlTagString('correlation_tag'),
 						(new CXmlTagIndexedArray('dependencies'))->setSchema(
 							(new CXmlTagArray('dependency'))->setSchema(
 								(new CXmlTagString('expression'))->setRequired(),
 								(new CXmlTagString('name'))->setRequired()->setKey('description'),
-								(new CXmlTagString('recovery_expression'))
+								new CXmlTagString('recovery_expression')
 							)
 						),
 						(new CXmlTagString('description'))->setKey('comments'),
@@ -1098,7 +1098,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 							->addConstant('AVERAGE', CXmlDefine::AVERAGE)
 							->addConstant('HIGH', CXmlDefine::HIGH)
 							->addConstant('DISASTER', CXmlDefine::DISASTER),
-						(new CXmlTagString('recovery_expression')),
+						new CXmlTagString('recovery_expression'),
 						(new CXmlTagString('recovery_mode'))
 							->setDefaultValue(CXmlDefine::TRIGGER_EXPRESSION)
 							->addConstant('EXPRESSION', CXmlDefine::TRIGGER_EXPRESSION)
@@ -1111,14 +1111,14 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 						(new CXmlTagIndexedArray('tags'))->setSchema(
 							(new CXmlTagArray('tag'))->setSchema(
 								(new CXmlTagString('tag'))->setRequired(),
-								(new CXmlTagString('value'))
+								new CXmlTagString('value')
 							)
 						),
 						(new CXmlTagString('type'))
 							->setDefaultValue(CXmlDefine::SINGLE)
 							->addConstant('SINGLE', CXmlDefine::SINGLE)
 							->addConstant('MULTIPLE', CXmlDefine::MULTIPLE),
-						(new CXmlTagString('url'))
+						new CXmlTagString('url')
 					)
 				),
 				(new CXmlTagString('type'))
@@ -1142,9 +1142,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 					->addConstant('SNMP_TRAP', CXmlDefine::ITEM_TYPE_SNMP_TRAP)
 					->addConstant('DEPENDENT', CXmlDefine::ITEM_TYPE_DEPENDENT)
 					->addConstant('HTTP_AGENT', CXmlDefine::ITEM_TYPE_HTTP_AGENT),
-				(new CXmlTagString('units')),
-				(new CXmlTagString('url')),
-				(new CXmlTagString('username')),
+				new CXmlTagString('units'),
+				new CXmlTagString('url'),
+				new CXmlTagString('username'),
 				(new CXmlTagString('value_type'))
 					->setDefaultValue(CXmlDefine::UNSIGNED)
 					->addConstant('FLOAT', CXmlDefine::FLOAT)
@@ -1168,10 +1168,10 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 		(new CXmlTagIndexedArray('macros'))->setSchema(
 			(new CXmlTagArray('macro'))->setSchema(
 				(new CXmlTagString('macro'))->setRequired(),
-				(new CXmlTagString('value'))
+				new CXmlTagString('value')
 			)
 		),
-		(new CXmlTagString('name')),
+		new CXmlTagString('name'),
 		(new CXmlTagArray('proxy'))->setSchema(
 			(new CXmlTagString('name'))->setRequired()
 		),
@@ -1182,7 +1182,7 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 		(new CXmlTagIndexedArray('tags'))->setSchema(
 			(new CXmlTagArray('tag'))->setSchema(
 				(new CXmlTagString('tag'))->setRequired(),
-				(new CXmlTagString('value'))
+				new CXmlTagString('value')
 			)
 		),
 		(new CXmlTagIndexedArray('templates'))->setKey('parentTemplates')->setSchema(
@@ -1219,9 +1219,9 @@ return (new CXmlTagIndexedArray('hosts'))->setSchema(
 			->addConstant('NO_ENCRYPTION', CXmlDefine::NO_ENCRYPTION)
 			->addConstant('TLS_PSK', CXmlDefine::TLS_PSK)
 			->addConstant('TLS_CERTIFICATE', CXmlDefine::TLS_CERTIFICATE),
-		(new CXmlTagString('tls_issuer')),
-		(new CXmlTagString('tls_psk')),
-		(new CXmlTagString('tls_psk_identity')),
-		(new CXmlTagString('tls_subject'))
+		new CXmlTagString('tls_issuer'),
+		new CXmlTagString('tls_psk'),
+		new CXmlTagString('tls_psk_identity'),
+		new CXmlTagString('tls_subject')
 	)
 );

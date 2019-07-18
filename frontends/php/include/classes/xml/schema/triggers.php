@@ -27,12 +27,12 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 			->setDefaultValue(CXmlDefine::TRIGGER_DISABLED)
 			->addConstant('DISABLED', CXmlDefine::TRIGGER_DISABLED)
 			->addConstant('TAG_VALUE', CXmlDefine::TRIGGER_TAG_VALUE),
-		(new CXmlTagString('correlation_tag')),
+		new CXmlTagString('correlation_tag'),
 		(new CXmlTagIndexedArray('dependencies'))->setSchema(
 			(new CXmlTagArray('dependency'))->setSchema(
 				(new CXmlTagString('expression'))->setRequired(),
 				(new CXmlTagString('name'))->setRequired()->setKey('description'),
-				(new CXmlTagString('recovery_expression'))
+				new CXmlTagString('recovery_expression')
 			)
 		),
 		(new CXmlTagString('description'))->setKey('comments'),
@@ -48,7 +48,7 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 			->addConstant('AVERAGE', CXmlDefine::AVERAGE)
 			->addConstant('HIGH', CXmlDefine::HIGH)
 			->addConstant('DISASTER', CXmlDefine::DISASTER),
-		(new CXmlTagString('recovery_expression')),
+		new CXmlTagString('recovery_expression'),
 		(new CXmlTagString('recovery_mode'))
 			->setDefaultValue(CXmlDefine::TRIGGER_EXPRESSION)
 			->addConstant('EXPRESSION', CXmlDefine::TRIGGER_EXPRESSION)
@@ -61,13 +61,13 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 		(new CXmlTagIndexedArray('tags'))->setSchema(
 			(new CXmlTagArray('tag'))->setSchema(
 				(new CXmlTagString('tag'))->setRequired(),
-				(new CXmlTagString('value'))
+				new CXmlTagString('value')
 			)
 		),
 		(new CXmlTagString('type'))
 			->setDefaultValue(CXmlDefine::SINGLE)
 			->addConstant('SINGLE', CXmlDefine::SINGLE)
 			->addConstant('MULTIPLE', CXmlDefine::MULTIPLE),
-		(new CXmlTagString('url'))
+		new CXmlTagString('url')
 	)
 );

@@ -35,7 +35,7 @@ return (new CXmlTagIndexedArray('graphs'))->setSchema(
 					->addConstant('MAX', CXmlDefine::MAX)
 					->addConstant('ALL', CXmlDefine::ALL)
 					->addConstant('LAST', CXmlDefine::LAST),
-				(new CXmlTagString('color')),
+				new CXmlTagString('color'),
 				(new CXmlTagString('drawtype'))
 					->setDefaultValue(CXmlDefine::SINGLE_LINE)
 					->addConstant('SINGLE_LINE', CXmlDefine::SINGLE_LINE)
