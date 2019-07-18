@@ -404,7 +404,7 @@ if ($data['action'] !== 'user.edit') {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
 				->setLabel(getSeverityName($severity, $data['config']))
-				->setChecked($data['messages']['triggers.severities'][$severity] == 1)
+				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[
 				new CComboBox('messages[sounds.'.$severity.']', $data['messages']['sounds.'.$severity], null, $zbx_sounds),
