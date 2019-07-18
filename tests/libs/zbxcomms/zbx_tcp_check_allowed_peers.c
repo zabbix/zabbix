@@ -28,7 +28,7 @@
 
 static void	mock_accept(zbx_socket_t *s)
 {
-	void	*buf;
+	void		*buf;
 	const char	*peer;
 
 	switch (s->peer_info.ss_family = zbx_mock_str_to_family(zbx_mock_get_parameter_string("in.family")))
