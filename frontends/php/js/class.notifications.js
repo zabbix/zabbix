@@ -191,7 +191,8 @@ ZBX_Notifications.prototype.consumeUserSettings = function(user_settings) {
 
 	if (user_settings.muted) {
 		this.alarm.mute();
-	} else {
+	}
+	else {
 		this.alarm.unmute();
 	}
 
@@ -411,7 +412,6 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 	this.fetch('notifications.read', {ids: this.getEventIds()})
 		.catch(console.error)
 		.then(function(resp) {
-
 			resp.ids.forEach(function(id) {
 				this.removeById(id);
 				this.debounceRender();
@@ -850,7 +850,6 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
  * @return {integer}
  */
 ZBX_NotificationsAlarm.prototype.calcTimeout = function(user_settings) {
-
 	if (user_settings.alarm_timeout == ZBX_Notifications.ALARM_INFINITE_SERVER) {
 		return (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0;
 	}

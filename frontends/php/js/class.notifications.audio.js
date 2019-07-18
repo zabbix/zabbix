@@ -76,6 +76,7 @@ ZBX_NotificationsAudio.prototype.listen = function() {
 	}
 
 	resolveAudioState.call(this);
+
 	return setInterval(resolveAudioState.bind(this), ms_step);
 };
 
@@ -147,6 +148,7 @@ ZBX_NotificationsAudio.prototype.once = function() {
  */
 ZBX_NotificationsAudio.prototype.stop = function() {
 	this.ms_timeout = 0;
+
 	return this;
 };
 
@@ -157,6 +159,7 @@ ZBX_NotificationsAudio.prototype.stop = function() {
  */
 ZBX_NotificationsAudio.prototype.mute = function() {
 	this.audio.muted = true;
+
 	return this;
 };
 
@@ -167,6 +170,7 @@ ZBX_NotificationsAudio.prototype.mute = function() {
  */
 ZBX_NotificationsAudio.prototype.unmute = function() {
 	this.audio.muted = false;
+
 	return this;
 };
 
@@ -183,12 +187,15 @@ ZBX_NotificationsAudio.prototype.tune = function(options) {
 	if (typeof options.playOnce === 'boolean') {
 		this.audio.loop = !options.playOnce;
 	}
+
 	if (typeof options.messageTimeout === 'number') {
 		this.message_timeout = options.messageTimeout;
 	}
+
 	if (typeof options.callback !== 'undefined') {
 		this.callback = options.callback;
 	}
+
 	return this;
 };
 
@@ -221,9 +228,11 @@ ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
 	if (!this.audio.loop) {
 		if (seconds == ZBX_Notifications.ALARM_ONCE_PLAYER) {
 			return this.once();
-		} else if (this.is_playing) {
+		}
+		else if (this.is_playing) {
 			return this.timeout_promise;
-		} else {
+		}
+		else {
 			this.audio.load();
 		}
 	}
