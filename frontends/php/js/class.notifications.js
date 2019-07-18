@@ -834,13 +834,14 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 
 	this.player.tune({
 		playOnce: (this.calcTimeout(user_settings) == ZBX_Notifications.ALARM_ONCE_PLAYER),
-		messageTimeout: (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0
+		messageTimeout: (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0,
+		callback: function() {
+			this.markAsPlayed();
+			this.dispatchChanged();
+		}.bind(this)
 	});
 
-	this.player.timeout(this.calcTimeout(user_settings)).then(function() {
-		this.markAsPlayed();
-		this.dispatchChanged();
-	}.bind(this));
+	this.player.timeout(this.calcTimeout(user_settings));
 };
 
 /**

@@ -40,6 +40,7 @@ function ZBX_NotificationsAudio() {
 	this.ms_timeout = 0;
 	this.is_playing = false;
 	this.message_timeout = 0;
+	this.callback = null;
 
 	this.resetPromise();
 	this.listen();
@@ -66,6 +67,11 @@ ZBX_NotificationsAudio.prototype.listen = function() {
 			this._resolve_timeout(this);
 			this.ms_timeout = 0;
 			this.seek(0);
+
+			if (this.callback !== null) {
+				this.callback();
+				this.callback = null;
+			}
 		}
 	}
 
@@ -180,7 +186,9 @@ ZBX_NotificationsAudio.prototype.tune = function(options) {
 	if (typeof options.messageTimeout === 'number') {
 		this.message_timeout = options.messageTimeout;
 	}
-
+	if (typeof options.callback !== 'undefined') {
+		this.callback = options.callback;
+	}
 	return this;
 };
 
