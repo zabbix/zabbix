@@ -453,6 +453,8 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	DB_RESULT	result;
 
+#define SELECTED_CONFIG_FIELD_COUNT	28	/* number of columns in the following DBselect() */
+
 	if (NULL == (result = DBselect("select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5,"
@@ -462,12 +464,13 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension"
 			" from config"
-			" order by configid")))
+			" order by configid")))	/* if you change number of colums in DBselect(), */
+						/* adjust SELECTED_CONFIG_FIELD_COUNT */
 	{
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 28, NULL);
+	dbsync_prepare(sync, SELECTED_CONFIG_FIELD_COUNT, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -481,6 +484,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return FAIL;
+#undef SELECTED_CONFIG_FIELD_COUNT
 }
 
 /******************************************************************************

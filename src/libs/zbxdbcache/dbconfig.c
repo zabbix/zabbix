@@ -829,9 +829,9 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
-#define SELECTED_FIELD_COUNT	28
-
 	const ZBX_TABLE	*config_table;
+
+	/* do not forget to adjust SELECTED_FIELD_COUNT if you change selected_fields[] */
 	const char	*selected_fields[] = {"refresh_unsupported", "discovery_groupid", "snmptrap_logging",
 					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
 					"severity_name_4", "severity_name_5", "hk_events_mode", "hk_events_trigger",
@@ -840,6 +840,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension"};	/* sync with zbx_dbsync_compare_config() */
+#define SELECTED_FIELD_COUNT	28	/* number of columns in selected_fields[] */
 	const char	*row[SELECTED_FIELD_COUNT];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
