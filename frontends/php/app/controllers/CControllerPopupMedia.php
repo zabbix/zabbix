@@ -35,7 +35,6 @@ class CControllerPopupMedia extends CController {
 		$fields = [
 			'dstfrm' =>			'string|fatal',
 			'media' =>			'int32',
-			'type' =>			'string',
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
 			'sendto_emails'	=>	'array',
@@ -78,15 +77,21 @@ class CControllerPopupMedia extends CController {
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
-			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
-			'type' => $this->getInput('type', '')
+			'sendto_emails' => array_values($this->getInput('sendto_emails', ['']))
 		];
 
 		// Validation before adding Media to user's Media tab.
 		if ($this->hasInput('add')) {
 			$output = [];
 
-			if ($page_options['type'] == MEDIA_TYPE_EMAIL) {
+			$db_mediatypes = API::MediaType()->get([
+				'output' => ['type'],
+				'mediatypeids' => $page_options['mediatypeid']
+			]);
+
+			$type = $db_mediatypes ? $db_mediatypes[0]['type'] : 0;
+
+			if ($type == MEDIA_TYPE_EMAIL) {
 				$email_validator = new CEmailValidator();
 
 				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
@@ -124,7 +129,7 @@ class CControllerPopupMedia extends CController {
 					'dstfrm' => $page_options['dstfrm'],
 					'media' => $this->getInput('media', -1),
 					'mediatypeid' => $page_options['mediatypeid'],
-					'sendto' => $page_options['type'] == MEDIA_TYPE_EMAIL
+					'sendto' => ($type == MEDIA_TYPE_EMAIL)
 									? $page_options['sendto_emails']
 									: $page_options['sendto'],
 					'period' => $page_options['period'],

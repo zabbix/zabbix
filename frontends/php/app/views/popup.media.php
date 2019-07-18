@@ -81,7 +81,6 @@ $form = (new CForm())
 	->addVar('action', 'popup.media')
 	->addVar('add', '1')
 	->addVar('media', $options['media'])
-	->addVar('type', $options['type'])
 	->addVar('dstfrm', $options['dstfrm'])
 	->setId('media_form')
 	->addItem([
