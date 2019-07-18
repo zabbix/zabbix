@@ -1,0 +1,77 @@
+---
+|
+  {
+    "books": [
+      {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95,
+        "id": 1
+      },
+      {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99,
+        "id": 2
+      },
+      {
+        "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99,
+        "id": 3
+      },
+      {
+        "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99,
+        "id": 4
+      }
+    ],
+    "services": {
+      "delivery": {
+        "servicegroup": 1000,
+        "description": "Next day delivery in local town",
+        "active": true,
+        "price": 5
+      },
+      "bookbinding": {
+        "servicegroup": 1001,
+        "description": "Printing and assembling book in A5 format",
+        "active": true,
+        "price": 154.99
+      },
+      "restoration": {
+        "servicegroup": 1002,
+        "description": "Various restoration methods",
+        "active": false,
+        "methods": [
+          {
+            "description": "Checmical cleaning",
+            "price": 46
+          },
+          {
+            "description": "Pressing pages damaged by moisture",
+            "price": 24.5
+          },
+          {
+            "description": "Rebinding torn book",
+            "price": 99.49
+          }
+        ]
+      }
+    },
+    "filters": {
+      "price": 10,
+      "category": "fiction",
+      "no filters": "no \"filters\""
+    },
+    "closed message": "Store is closed",
+    "tags": ["a", "b", "c", "d", "e" ]
+  }
+...

@@ -17,9 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "jsonpath_next_test.h"
+#ifndef ZABBIX_MOCK_JSON_H
+#define ZABBIX_MOCK_JSON_H
 
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
-{
-	return jsonpath_next(path, pnext, loc, type);
-}
+void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,
+		const char *returned_value);
+
+#define zbx_mock_assert_json_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_json_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#endif
