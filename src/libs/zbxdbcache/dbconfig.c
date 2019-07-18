@@ -839,8 +839,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode", "db_extension"};	/* sync with zbx_dbsync_compare_config() */
-#define SELECTED_FIELD_COUNT	28	/* number of columns in selected_fields[] */
+					"default_inventory_mode", "db_extension", "autoreg_tls_accept"};	/* sync with zbx_dbsync_compare_config() */
+#define SELECTED_FIELD_COUNT	29	/* number of columns in 'selected_fields[]' */
 	const char	*row[SELECTED_FIELD_COUNT];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
@@ -905,6 +905,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
 	DCstrpool_replace(found, &config->config->db_extension, row[27]);
+	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);

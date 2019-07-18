@@ -358,6 +358,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	unsigned char	autoreg_tls_accept;
 	char		*db_extension;
 
 	/* housekeeping related configuration data */

@@ -39,6 +39,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%u", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
 	zabbix_log(LOG_LEVEL_TRACE, "db_extension: %s", config->config->db_extension);
+	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept: %hhu", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
 	for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
