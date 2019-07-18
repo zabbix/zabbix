@@ -170,7 +170,7 @@ $user_form_list
 	);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'user.edit' && $data['alias'] !== ZBX_GUEST_USER) {
+if ($data['alias'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),
