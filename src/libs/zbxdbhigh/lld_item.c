@@ -223,8 +223,10 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE			__UINT64_C(0x02)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS			__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE							\
-		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP			__UINT64_C(0x08)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE								\
+		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS |	\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DELETE				__UINT64_C(0x08)
 	zbx_uint64_t	flags;
 }
@@ -2579,6 +2581,13 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE;
 			}
 
+			if (ppdst->step != ppsrc->step)
+			{
+				/* this should never happen */
+				ppdst->step = ppsrc->step;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP;
+			}
+
 			if (SUCCEED != lld_items_preproc_susbstitute_params_macros(ppsrc, item->lld_row, item->itemid,
 					&sub_params, error))
 			{
@@ -3343,6 +3352,12 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctype=%d", delim, preproc_op->type);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstep=%d", delim, preproc_op->step);
 				delim = ',';
 			}
 
