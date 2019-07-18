@@ -679,7 +679,7 @@ class testUsers extends CAPITest {
 					],
 					'autologin' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/autologin": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/autologin": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -829,7 +829,7 @@ class testUsers extends CAPITest {
 					],
 					'type' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -851,7 +851,7 @@ class testUsers extends CAPITest {
 					],
 					'type' => '1.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			// Check user properties, refresh.
 			[
@@ -897,7 +897,7 @@ class testUsers extends CAPITest {
 					],
 					'rows_per_page' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/rows_per_page": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/rows_per_page": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1203,7 +1203,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1220,7 +1220,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1255,7 +1255,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": an integer is expected.'
 			],
 			[
 				'user' => [

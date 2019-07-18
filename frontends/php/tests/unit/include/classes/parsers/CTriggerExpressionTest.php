@@ -3184,29 +3184,52 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			["{host:key.count(\n1,\"\")}=0", null, true],
 			["{host:key.count(\r\n1,\"\")}=0", null, true],
 			["{host:key.count(\t1,\"\")}=0", null, true],
+
+			// Simple trigger expressions.
+			["{host:last()}=0", null, false, ['allow_func_only' => true]],
+			["{item.last()}=0", null, false, ['allow_func_only' => true]],
+			["{.last()}=0", null, false, ['allow_func_only' => true]],
+			["{str(last())}=0", null, false, ['allow_func_only' => true]],
+
+			["{last()}=0", null, true, ['allow_func_only' => true]],
+			['{last()}={$USERMACRO: "host:item.macrocontext"}', null, true, ['allow_func_only' => true]],
+			['{last()}={$USERMACRO: "{host:item.last()}"}', null, true, ['allow_func_only' => true]],
+			['{str("last()")}=0', null, true, ['allow_func_only' => true]],
+			['{str("host:item.last()")}=0', null, true, ['allow_func_only' => true]],
+			['{str("{host:item.last()}")}=0', null, true, ['allow_func_only' => true]],
+
+			["{last(#5)}={#LLDMACRO}", null, false],
+			["{last(#5)}={#LLDMACRO}", null, false, ['lldmacros' => false]],
+			["{last(#5)}={#LLDMACRO}", null, true, ['allow_func_only' => true]]
 		];
 	}
 
 	/**
 	 * @dataProvider provider
+	 *
+	 * @param string      $expression
+	 * @param array|null  $result
+	 * @param bool        $rc
+	 * @param array       $options
+	 * @param bool        $options['lldmacros']
+	 * @param bool        $options['allow_func_only']
 	 */
-	public function test_parse($expression, $result, $rc) {
-		$expressionData = new CTriggerExpression();
+	public function testParseExpression($expression, $result, $rc, array $options = []) {
+		$expression_data = new CTriggerExpression($options);
 
-		if ($expressionData->parse($expression)) {
+		if ($expression_data->parse($expression)) {
 			$this->assertEquals($rc, true);
-			$this->assertEquals($rc, $expressionData->isValid);
+			$this->assertEquals($rc, $expression_data->isValid);
 
 			if (isset($result)) {
-				$this->assertEquals($result['error'], $expressionData->error);
-				$this->assertEquals($result['expressions'], $expressionData->expressions);
+				$this->assertEquals($result['error'], $expression_data->error);
+				$this->assertEquals($result['expressions'], $expression_data->expressions);
 			}
 		}
 		else {
-			$this->assertEquals($rc, false, "\nError with expression $expression: ".$expressionData->error);
+			$this->assertEquals($rc, false, "\nError with expression $expression: ".$expression_data->error);
 		}
 	}
-
 
 	public function testTokens() {
 		$exp = '((-12 + {host:item.str(ГУГЛ)} or {$USERMACRO} and not {TRIGGER.VALUE} or {#LLD} or'.

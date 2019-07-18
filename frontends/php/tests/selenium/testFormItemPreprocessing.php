@@ -603,7 +603,7 @@ class testFormItemPreprocessing extends CWebTest {
 						'Key' => 'item.javascript.multiline.preprocessing'
 					],
 					'preprocessing' => [
-						['type' => 'JavaScript', 'parameter_1' => "Test line 1\nTest line 2\nTest line 3"]
+						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\nTest line 2\nTest line 3  "]
 					]
 				]
 			],

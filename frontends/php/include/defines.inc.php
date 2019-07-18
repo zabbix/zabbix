@@ -18,11 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 define('ZABBIX_VERSION',		'4.4.0alpha1');
 define('ZABBIX_API_VERSION',	'4.4.0');
-define('ZABBIX_EXPORT_VERSION',	'4.2');
-define('ZABBIX_DB_VERSION',	4030010);
+define('ZABBIX_EXPORT_VERSION',	'4.4');
+define('ZABBIX_DB_VERSION',	4030011);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -42,6 +41,7 @@ define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MIN_INT64',			'-9223372036854775808');
 define('ZBX_MAX_INT64',			'9223372036854775807');
+define('ZBX_MAX_UINT64',		'18446744073709551615');
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
@@ -713,7 +713,7 @@ define('SCREEN_RESOURCE_HOST_INFO',		4);
 define('SCREEN_RESOURCE_TRIGGER_INFO',		5);
 define('SCREEN_RESOURCE_SERVER_INFO',		6);
 define('SCREEN_RESOURCE_CLOCK',				7);
-define('SCREEN_RESOURCE_SCREEN',			8);
+define('SCREEN_RESOURCE_SCREEN',			8); // Not supported since Zabbix 4.4.
 define('SCREEN_RESOURCE_TRIGGER_OVERVIEW',	9);
 define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
 define('SCREEN_RESOURCE_URL',				11);
@@ -1227,28 +1227,32 @@ define('API_INT32',				2);
 define('API_ID',				3);
 define('API_BOOLEAN',			4);
 define('API_FLAG',				5);
+define('API_FLOAT',				6);
+define('API_UINT64',			7);
 // arrays
-define('API_OBJECT',			6);
-define('API_IDS',				7);
-define('API_OBJECTS',			8);
-define('API_STRINGS_UTF8',		9);
-define('API_INTS32',			10);
+define('API_OBJECT',			8);
+define('API_IDS',				9);
+define('API_OBJECTS',			10);
+define('API_STRINGS_UTF8',		11);
+define('API_INTS32',			12);
+define('API_FLOATS',			13);
+define('API_UINTS64',			14);
 // specific types
-define('API_HG_NAME',			11);
-define('API_SCRIPT_NAME',		12);
-define('API_USER_MACRO',		13);
-define('API_TIME_PERIOD',		14);
-define('API_REGEX',				15);
-define('API_HTTP_POST',			16);
-define('API_VARIABLE_NAME',		17);
-define('API_OUTPUT',			18);
-define('API_TIME_UNIT',			19);
-define('API_URL',				20);
-define('API_H_NAME',			21);
-define('API_RANGE_TIME',		22);
-define('API_COLOR',				23);
-define('API_NUMERIC',			24);
-define('API_LLD_MACRO',			25);
+define('API_HG_NAME',			15);
+define('API_SCRIPT_NAME',		16);
+define('API_USER_MACRO',		17);
+define('API_TIME_PERIOD',		18);
+define('API_REGEX',				19);
+define('API_HTTP_POST',			20);
+define('API_VARIABLE_NAME',		21);
+define('API_OUTPUT',			22);
+define('API_TIME_UNIT',			23);
+define('API_URL',				24);
+define('API_H_NAME',			25);
+define('API_RANGE_TIME',		26);
+define('API_COLOR',				27);
+define('API_NUMERIC',			28);
+define('API_LLD_MACRO',			29);
 
 // flags
 define('API_REQUIRED',				0x0001);
@@ -1344,6 +1348,7 @@ define('WIDGET_FAV_MAPS',		'favmaps');
 define('WIDGET_FAV_SCREENS',	'favscreens');
 define('WIDGET_SVG_GRAPH',		'svggraph');
 define('WIDGET_GRAPH',			'graph');
+define('WIDGET_HOST_AVAIL',		'hostavail');
 define('WIDGET_MAP',			'map');
 define('WIDGET_NAV_TREE',		'navtree');
 define('WIDGET_PLAIN_TEXT',		'plaintext');
@@ -1444,6 +1449,13 @@ define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');
 define('HISTORY_VALUES', 'showvalues');
 define('HISTORY_LATEST', 'showlatest');
+
+// Item history and trends storage modes.
+define('ITEM_STORAGE_OFF',		0);
+define('ITEM_STORAGE_CUSTOM',	1);
+
+// Item history and trends storage value to define 0 storage period.
+define('ITEM_NO_STORAGE_VALUE',	0);
 
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
@@ -1737,6 +1749,16 @@ define('ZBX_STYLE_COLUMN_95', 'column-95');
 // column visual options
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
+
+// Widget "Host availability" styles.
+define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL', 'host-avail-layout-horizontal');
+define('ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL', 'host-avail-layout-vertical');
+define('ZBX_STYLE_HOST_AVAIL_COUNT', 'host-avail-count');
+define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
+define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
+define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
+define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

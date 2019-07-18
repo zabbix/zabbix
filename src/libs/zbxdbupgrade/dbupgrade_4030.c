@@ -21,6 +21,8 @@
 #include "db.h"
 #include "dbupgrade.h"
 
+extern unsigned char	program_type;
+
 /*
  * 4.4 development database patches
  */
@@ -80,7 +82,7 @@ static int	DBpatch_4030005(void)
 	if (ZBX_DB_OK <= DBexecute("insert into item_rtdata (itemid,lastlogsize,state,mtime,error)"
 			" select i.itemid,i.lastlogsize,i.state,i.mtime,i.error"
 			" from items i"
-			" inner join hosts h on i.hostid=h.hostid"
+			" join hosts h on i.hostid=h.hostid"
 			" where h.status in (%d,%d) and i.flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
@@ -115,6 +117,18 @@ static int	DBpatch_4030010(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	/* 8 - SCREEN_RESOURCE_SCREEN */
+	if (ZBX_DB_OK > DBexecute("delete from screens_items where resourcetype=8"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030011(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter.usrgrpid'"
 				" where idx='web.users.filter.usrgrpid'"))
 		return FAIL;
@@ -129,7 +143,6 @@ static int	DBpatch_4030010(void)
 
 	return SUCCEED;
 }
-
 #endif
 
 DBPATCH_START(4030)
@@ -147,5 +160,6 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
+DBPATCH_ADD(4030011, 0, 1)
 
 DBPATCH_END()
