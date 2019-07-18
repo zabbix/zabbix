@@ -97,7 +97,15 @@
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(widget['container'])
 			.on('focusin focusout', function(event) {
-				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin')
+				if ($(this).hasClass('dashbrd-grid-widget-hidden-header')) {
+					$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
+				}
+				})
+			.on('mouseenter mouseleave', function(event) {
+				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
+				}
 			});
 	}
 

@@ -3453,6 +3453,15 @@ $form-icon-btn: (
 	}
 }
 
+.layout-kioskmode {
+	transition: padding-top .3s 2s;
+
+	&.widget-mouseenter {
+		padding-top: 40px;
+		transition: padding-top .3s;
+	}
+}
+
 .dashbrd-grid-container {
 
 	&.dashbrd-mode-edit .dashbrd-grid-widget,
@@ -3463,9 +3472,6 @@ $form-icon-btn: (
 			@include opacity(1);
 		}
 	}
-}
-
-main:not(.layout-kioskmode) .dashbrd-grid-container {
 
 	.dashbrd-grid-widget-focus,
 	.dashbrd-grid-widget:hover {
@@ -3474,7 +3480,7 @@ main:not(.layout-kioskmode) .dashbrd-grid-container {
 
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				transform: translateY(-95%);
+				transform: translate3d(0, -95%, 0);
 				z-index: 5;
 			}
 
@@ -3543,7 +3549,7 @@ main:not(.layout-kioskmode) .dashbrd-grid-container {
 			left: 0;
 			right: 0;
 			top: 0;
-			transform: translateY(0%);
+			transform: translate3d(0, 0, 0);
 			transition: transform .3s, box-shadow .3s, z-index .3s;
 			z-index: 2;
 		}
