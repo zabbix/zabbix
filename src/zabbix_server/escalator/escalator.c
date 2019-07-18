@@ -1794,6 +1794,8 @@ static const char	*check_escalation_result_string(int result)
 			return "skip";
 		case ZBX_ESCALATION_PROCESS:
 			return "process";
+		case ZBX_ESCALATION_SUPPRESS:
+			return "suppress";
 		default:
 			return "unknown";
 	}
@@ -1810,14 +1812,16 @@ static const char	*check_escalation_result_string(int result)
  *             action     - [IN]  action responsible for the escalation       *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Return value: ZBX_ESCALATION_CANCEL  - the relevant event, item, trigger   *
- *                                        or host is disabled or deleted      *
- *               ZBX_ESCALATION_DELETE  - escalations was created and         *
- *                                        recovered during maintenance        *
- *               ZBX_ESCALATION_SKIP    - escalation is paused during         *
- *                                        maintenance or dependable trigger   *
- *                                        in problem state                    *
- *               ZBX_ESCALATION_PROCESS - otherwise                           *
+ * Return value: ZBX_ESCALATION_CANCEL   - the relevant event, item, trigger  *
+ *                                         or host is disabled or deleted     *
+ *               ZBX_ESCALATION_DELETE   - escalations was created and        *
+ *                                         recovered during maintenance       *
+ *               ZBX_ESCALATION_SKIP     - escalation is paused during        *
+ *                                         maintenance or dependable trigger  *
+ *                                         in problem state                   *
+ *               ZBX_ESCALATION_SUPPRESS - escalation was created before      *
+ *                                         maintenance period                 *
+ *               ZBX_ESCALATION_PROCESS  - otherwise                          *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
@@ -1881,7 +1885,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		}
 
 		/* suppress paused escalations created before maintenance period */
-		/* until maintenance ends or the escalations are recovered   */
+		/* until maintenance ends or the escalations are recovered       */
 		if (0 == escalation->r_eventid)
 		{
 			ret = ZBX_ESCALATION_SUPPRESS;
