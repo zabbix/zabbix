@@ -1,6 +1,7 @@
 Changes for 4.0.11rc1
 
 New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
