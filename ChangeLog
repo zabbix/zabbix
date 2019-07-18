@@ -4,6 +4,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
 .......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
 ...G...PS. [ZBX-16103] reduced PCRE recursion limit (asestakovs)
 ..F....... [ZBX-16289] fixed async dashboard widget update (miks)
