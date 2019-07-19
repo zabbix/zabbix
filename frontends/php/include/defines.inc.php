@@ -1339,26 +1339,27 @@ define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 // dashboard widgets
-define('WIDGET_ACTION_LOG',		'actionlog');
-define('WIDGET_CLOCK',			'clock');
-define('WIDGET_DATA_OVER',		'dataover');
-define('WIDGET_DISCOVERY',		'discovery');
-define('WIDGET_FAV_GRAPHS',		'favgraphs');
-define('WIDGET_FAV_MAPS',		'favmaps');
-define('WIDGET_FAV_SCREENS',	'favscreens');
-define('WIDGET_SVG_GRAPH',		'svggraph');
-define('WIDGET_GRAPH',			'graph');
-define('WIDGET_HOST_AVAIL',		'hostavail');
-define('WIDGET_MAP',			'map');
-define('WIDGET_NAV_TREE',		'navtree');
-define('WIDGET_PLAIN_TEXT',		'plaintext');
-define('WIDGET_PROBLEM_HOSTS',	'problemhosts');
-define('WIDGET_PROBLEMS',		'problems');
-define('WIDGET_PROBLEMS_BY_SV',	'problemsbysv');
-define('WIDGET_SYSTEM_INFO',	'systeminfo');
-define('WIDGET_TRIG_OVER',		'trigover');
-define('WIDGET_URL',			'url');
-define('WIDGET_WEB',			'web');
+define('WIDGET_ACTION_LOG',			'actionlog');
+define('WIDGET_CLOCK',				'clock');
+define('WIDGET_DATA_OVER',			'dataover');
+define('WIDGET_DISCOVERY',			'discovery');
+define('WIDGET_FAV_GRAPHS',			'favgraphs');
+define('WIDGET_FAV_MAPS',			'favmaps');
+define('WIDGET_FAV_SCREENS',		'favscreens');
+define('WIDGET_SVG_GRAPH',			'svggraph');
+define('WIDGET_GRAPH',				'graph');
+define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
+define('WIDGET_HOST_AVAIL',			'hostavail');
+define('WIDGET_MAP',				'map');
+define('WIDGET_NAV_TREE',			'navtree');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
+define('WIDGET_PROBLEMS',			'problems');
+define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
+define('WIDGET_SYSTEM_INFO',		'systeminfo');
+define('WIDGET_TRIG_OVER',			'trigover');
+define('WIDGET_URL',				'url');
+define('WIDGET_WEB',				'web');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);

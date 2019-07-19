@@ -56,6 +56,57 @@ class CWidgetHelper {
 			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
 	}
 
+	public static function appendIteratorFieldsToFormList($form_list) {
+		$fields_spec = [
+			'columns' => [
+				'label' => _('Columns'),
+				'min' => 1,
+				'max' => 12,
+				'default' => 2,
+			],
+			'rows' => [
+				'label' => _('Rows'),
+				'min' => 1,
+				'max' => 12,
+				'default' => 1,
+			],
+		];
+
+		foreach ($fields_spec as $name => $spec) {
+			$field = (new CWidgetFieldIntegerBox($name, $spec['label'], $spec['min'], $spec['max']))
+				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				->setDefault(25)
+			;
+
+			if (array_key_exists('show_lines', $this->data)) {
+				$field_lines->setValue($this->data['show_lines']);
+			}
+
+		}
+		$field_lines = (new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
+			ZBX_MAX_WIDGET_LINES
+		))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setDefault(25);
+
+		if (array_key_exists('show_lines', $this->data)) {
+			$field_lines->setValue($this->data['show_lines']);
+		}
+
+		$this->fields[$field_lines->getName()] = $field_lines;
+
+
+
+
+		$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
+
+		$form_list->addRow(_('Columns'),
+			(new CTextBox('tests'))
+				->setAttribute('placeholder', _('default'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+
 	/**
 	 * Creates label linked to the field.
 	 *

@@ -38,6 +38,7 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> _('Favourite maps'),
 			WIDGET_FAV_SCREENS			=> _('Favourite screens'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
+			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
 			WIDGET_MAP					=> _('Map'),
 			WIDGET_NAV_TREE				=> _('Map navigation tree'),
@@ -70,6 +71,7 @@ class CWidgetConfig {
 			WIDGET_FAV_MAPS				=> ['width' => 2, 'height' => 3],
 			WIDGET_FAV_SCREENS			=> ['width' => 2, 'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 6, 'height' => 5],
+			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 8, 'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 3, 'height' => 2],
 			WIDGET_MAP					=> ['width' => 9, 'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 3, 'height' => 5],
@@ -121,6 +123,7 @@ class CWidgetConfig {
 			case WIDGET_DATA_OVER:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GRAPH:
+			case WIDGET_GRAPH_PROTOTYPE:
 			case WIDGET_PLAIN_TEXT:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
@@ -176,6 +179,7 @@ class CWidgetConfig {
 	public static function usesTimeSelector(array $widget) {
 		switch ($widget['type']) {
 			case WIDGET_GRAPH:
+			case WIDGET_GRAPH_PROTOTYPE:
 				return true;
 
 			case WIDGET_SVG_GRAPH:
@@ -198,11 +202,22 @@ class CWidgetConfig {
 	public static function isScrollable($type) {
 		switch ($type) {
 			case WIDGET_GRAPH:
+			case WIDGET_GRAPH_PROTOTYPE:
 			case WIDGET_SVG_GRAPH:
 				return false;
 
 			default:
 				return true;
+		}
+	}
+
+	public static function isIterator($type) {
+		switch ($type) {
+			case WIDGET_GRAPH_PROTOTYPE:
+				return true;
+
+			default:
+				return false;
 		}
 	}
 
@@ -219,6 +234,7 @@ class CWidgetConfig {
 	{
 		switch ($type) {
 			case WIDGET_HOST_AVAIL:
+			case WIDGET_GRAPH_PROTOTYPE:
 				return false;
 
 			default:
@@ -249,6 +265,9 @@ class CWidgetConfig {
 
 			case WIDGET_GRAPH:
 				return new CWidgetFormGraph($data);
+
+			case WIDGET_GRAPH_PROTOTYPE:
+				return new CWidgetFormGraphPrototype($data);
 
 			case WIDGET_HOST_AVAIL:
 				return new CWidgetFormHostAvail($data);

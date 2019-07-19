@@ -22,28 +22,34 @@
 	"use strict"
 
 	function makeWidgetDiv($obj, data, widget) {
-		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head'}).append(
-			$('<h4>').text(
-				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
+		var _add_class = widget['iterator'] ? ' iterator' : '';
+
+		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head' + _add_class})
+			.append($('<h4>').text((widget['header'] !== '')
+				? widget['header']
+				: data['widget_defaults'][widget['type']]['header']
 			))
-			.append(
-				$('<ul>', {'class': 'dashbrd-grid-widget-actions'})
-					.append(
-						(data['options']['editable'] && !data['options']['kioskmode'])
-							? $('<li>').append(
-								$('<button>', {
-									'type': 'button',
-									'class': 'btn-widget-edit',
-									'title': t('Edit')
-								}).on('click', function() {
-									if (!methods.isEditMode.call($obj)) {
-										showEditMode();
-									}
-									doAction('beforeConfigLoad', $obj, data, widget);
-									methods.editWidget.call($obj, widget, this);
-								}))
-							: ''
+		;
+
+		if (!widget['widget_of_iterator']) {
+			widget['content_header'].append(
+				$('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
+					.append((data['options']['editable'] && !data['options']['kioskmode'])
+						? $('<li>').append(
+							$('<button>', {
+								'type': 'button',
+								'class': 'btn-widget-edit',
+								'title': t('Edit')
+							}).on('click', function() {
+								if (!methods.isEditMode.call($obj)) {
+									showEditMode();
+								}
+								doAction('beforeConfigLoad', $obj, data, widget);
+								methods.editWidget.call($obj, widget, this);
+							})
 						)
+						: ''
+					)
 					.append(
 						$('<li>').append(
 							$('<button>', {
@@ -62,43 +68,66 @@
 									'aria-haspopup': true
 								}
 							})
-						))
-					.append(
-						(data['options']['editable'] && !data['options']['kioskmode'])
-							? $('<li>').hide().append(
-								$('<button>', {
-									'type': 'button',
-									'class': 'btn-widget-delete',
-									'title': t('Delete')
-								}).on('click', function(){
-									methods.deleteWidget.call($obj, widget);
-								}))
-							: ''
 						)
-
+					)
+					.append((data['options']['editable'] && !data['options']['kioskmode'])
+						? $('<li>').hide().append(
+							$('<button>', {
+								'type': 'button',
+								'class': 'btn-widget-delete',
+								'title': t('Delete')
+							}).on('click', function() {
+								methods.deleteWidget.call($obj, widget);
+							})
+						)
+						: ''
+					)
 			);
-		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content'});
+		}
+
+		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + _add_class});
 		widget['content_script'] = $('<div>');
 
-		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
+		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container' + _add_class})
+			.toggleClass('no-padding', !widget['padding'])
+		;
+
+		widget['container']
 			.append(widget['content_header'])
 			.append(widget['content_body'])
-			.append(widget['content_script'])
-			.toggleClass('no-padding', !widget['padding']);
+		;
 
-		return $('<div>', {
-			'class': 'dashbrd-grid-widget',
-			'css': {
-				'min-height': '' + data['options']['widget-height'] + 'px',
-				'min-width': '' + data['options']['widget-width'] + '%'
-			}
-		})
-			.toggleClass('new-widget', !widget['widgetid'].length)
-			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(widget['container'])
+		if (widget['iterator']) {
+			widget['container'].append($('<div>', {'class': 'dashbrd-grid-widget-iterator-too-small'})
+				.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
+			);
+		}
+
+		widget['container']
+			.append(widget['content_script'])
+		;
+
+		var $div = $('<div>', {
+			'class': widget['iterator'] ? 'dashbrd-grid-widget-iterator' : 'dashbrd-grid-widget'
+		}).toggleClass('new-widget', !widget['widgetid'].length);
+
+		if (!widget['widget_of_iterator']) {
+			$div
+				.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
+				.css({
+					'min-height': '' + data['options']['widget-height'] + 'px',
+					'min-width': '' + data['options']['widget-width'] + '%'
+				})
+			;
+		}
+
+		$div.append(widget['container'])
 			.on('focusin focusout', function(event) {
 				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin')
-			});
+			})
+		;
+
+		return $div;
 	}
 
 	function addWidgetInfoButtons($content_header, buttons) {
@@ -183,14 +212,31 @@
 		return ret;
 	}
 
-	function getDivPosition($obj, data, $div) {
-		var pos = $div.position(),
+	function calcDivPosition($obj, data, $div) {
+		var	widget = getWidgetByTarget(data['widgets'], $div),
+			pos = $div.position(),
 			cell_w = data['cell-width'],
-			cell_h = data['options']['widget-height'],
-			place_x = Math.round(pos.left / cell_w),
-			place_y = Math.round(pos.top / cell_h),
-			place_w = Math.round(($div.width() + (pos.left - place_x * cell_w)) / cell_w),
-			place_h = Math.round(($div.height() + (pos.top - place_y * cell_h)) / cell_h);
+			cell_h = data['options']['widget-height']
+		;
+
+		if (widget['iterator'] && widget['div'].hasClass('ui-resizable-resizing')) {
+			var place_w = Math.floor($div.width() / cell_w),
+				place_h = Math.floor($div.height() / cell_h)
+				place_x = widget['div'].hasClass('resizing-left')
+					? (Math.round((pos.left + $div.width()) / cell_w) - place_w)
+					: Math.round(pos.left / cell_w),
+				place_y = widget['div'].hasClass('resizing-top')
+					? (Math.round((pos.top + $div.height()) / cell_h) - place_h)
+					: Math.round(pos.top / cell_h)
+			;
+		}
+		else {
+			var place_w = Math.round($div.width() / cell_w),
+				place_h = Math.round($div.height() / cell_h),
+				place_x = Math.round(pos.left / cell_w),
+				place_y = Math.round(pos.top / cell_h)
+			;
+		}
 
 		if (data['pos-action'] === 'resize') {
 			place_w = Math.min(place_w, place_w + place_x, data['options']['max-columns'] - place_x);
@@ -227,13 +273,17 @@
 		}
 	}
 
-	function startWidgetPositioning($div, data, action) {
+	function startWidgetPositioning($obj, data, widget, action) {
 		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
-		data['placeholder'].show();
 
-		$('.dashbrd-grid-widget-mask', $div).show();
-		$div.addClass('dashbrd-grid-widget-draggable');
+		data['placeholder']
+			.toggleClass('iterator', widget['iterator'])
+			.show()
+		;
+
+		$('.dashbrd-grid-widget-mask', widget['div']).show();
+		widget['div'].addClass('dashbrd-grid-widget-draggable');
 		data.new_widget_placeholder.container.hide();
 		resetCurrentPositions(data['widgets']);
 	}
@@ -836,15 +886,28 @@
 	 */
 	function doWidgetResize($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = getDivPosition($obj, data, $div),
+			pos = calcDivPosition($obj, data, $div),
 			rows = 0;
 
 		if (!posEquals(pos, widget['current_pos'])) {
 			widget['current_pos'] = pos;
 			realignResize(data, widget);
 
+			if (widget['iterator']) {
+				positionWidgetsOfIterator($obj, data, widget, widget['current_pos']);
+			}
+
 			data.widgets.each(function(box) {
 				if (widget.uniqueid !== box.uniqueid) {
+					// Reposition children of the Iterator if size changed.
+					if (box['iterator']) {
+						var box_pos = calcDivPosition($obj, data, box['div']);
+						if (box_pos['width'] !== box['current_pos']['width']
+								|| box_pos['height'] !== box['current_pos']['height']) {
+							positionWidgetsOfIterator($obj, data, box, box['current_pos']);
+						}
+					}
+
 					setDivPosition(box['div'], data, box['current_pos']);
 				}
 
@@ -868,7 +931,7 @@
 	 */
 	function doWidgetPositioning($obj, $div, data) {
 		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = getDivPosition($obj, data, $div),
+			pos = calcDivPosition($obj, data, $div),
 			rows = 0,
 			overflow = false;
 
@@ -958,7 +1021,7 @@
 
 				setResizableState('disable', data.widgets, '');
 				dragPrepare(data.widgets, widget, data['options']['max-rows']);
-				startWidgetPositioning(ui.helper, data, 'drag');
+				startWidgetPositioning($obj, data, widget, 'drag');
 				realignWidget(data.widgets, widget, data.options['max-rows']);
 
 				widget.current_pos = $.extend({}, widget.pos);
@@ -1016,16 +1079,22 @@
 			autoHide: true,
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
-			start: function(event) {
+			start: function(event, ui) {
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
 
 				setResizableState('disable', data.widgets, widget.uniqueid);
-				startWidgetPositioning($(event.target), data, 'resize');
+				startWidgetPositioning($obj, data, widget, 'resize');
 				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				widget.prev_pos.axis_correction = {};
 				doWidgetResize($obj, $(event.target), data);
+
+				var _class = event.currentTarget.className;
+				widget['div']
+					.toggleClass('resizing-top', _class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null)
+					.toggleClass('resizing-left', _class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null)
+				;
 			},
 			resize: function(event, ui) {
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
@@ -1037,8 +1106,6 @@
 					});
 				}
 
-				var $div = $(event.target);
-
 				if (ui.position.left < 0) {
 					ui.size.width += ui.position.left;
 					ui.position.left = 0;
@@ -1049,22 +1116,38 @@
 					ui.position.top = 0;
 				}
 
-				$div.css({
-					top: ui.position.top,
-					left: ui.position.left,
-					height: Math.min(ui.size.height, data.options['widget-max-rows'] * data.options['widget-height']),
-					width: Math.min(ui.size.width,
-						data['cell-width'] * data['options']['max-columns'] - ui.position.left
-					)
+				widget['div'].css({
+					'top': ui.position.top,
+					'left': ui.position.left,
+					'width': ui.size.width,
+					'height': ui.size.height,
+					'max-width': data['cell-width'] * data['options']['max-columns'] - ui.position.left,
+					'max-height': data.options['widget-max-rows'] * data.options['widget-height'],
 				});
 
-				doWidgetResize($obj, $div, data);
+				doWidgetResize($obj, widget['div'], data);
+
+				if (widget['iterator']) {
+					if (getIteratorTooSmallState(widget)) {
+						$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr("style");
+					} else {
+						$('.dashbrd-grid-widget-container.iterator', widget['div']).css({
+							'width': data['placeholder'].width(),
+							'height': data['placeholder'].height()
+						});
+					}
+				}
 			},
 			stop: function(event) {
 				delete widget.prev_pos;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, $(event.target), data);
+
+				if (widget['iterator']) {
+					$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr("style");
+				}
+
 				// Hide resize handles for situation when mouse button was released outside dashboard container area.
 				if (widget['div'].has(event.toElement).length == 0) {
 					widget['div'].find('.ui-resizable-handle').hide();
@@ -1078,6 +1161,12 @@
 						}
 					});
 				}
+
+				if (widget['iterator']) {
+					positionWidgetsOfIterator($obj, data, widget, widget['pos']);
+				}
+
+				widget['div'].removeClass('resizing-top').removeClass('resizing-left');
 
 				// Invoke onResizeEnd on every affected widget.
 				data.widgets.each(function(box) {
@@ -1178,6 +1267,185 @@
 		startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 	}
 
+	function setIteratorTooSmallState(iterator, enabled) {
+		iterator['div'].toggleClass('iterator-too-small', enabled);
+	}
+
+	function getIteratorTooSmallState(iterator) {
+		return iterator['div'].hasClass('iterator-too-small');
+	}
+
+	function isIteratorTooSmall(iterator, pos) {
+		return pos['width'] < iterator['fields']['columns'] || pos['height'] < iterator['fields']['rows'] * 2;
+	}
+
+	function addIteratorPlaceholders(iterator, num_placeholders) {
+		for (var index = 0; index < num_placeholders; index++) {
+			iterator['content_body'].append(
+				$('<div>', {'class': 'dashbrd-grid-widget-iterator-placeholder'}).append('<div>')
+			);
+		}
+	}
+
+	function positionWidgetsOfIterator($obj, data, iterator, pos) {
+		if (isIteratorTooSmall(iterator, pos)) {
+			setIteratorTooSmallState(iterator, true);
+
+			return;
+		}
+
+		setIteratorTooSmallState(iterator, false);
+
+		var $placeholders = iterator['content_body'].find('.dashbrd-grid-widget-iterator-placeholder');
+
+		for (var i = 0, count = iterator['fields']['columns'] * iterator['fields']['rows']; i < count; i++) {
+			var cell_column = i % iterator['fields']['columns'],
+				cell_row = Math.floor(i / iterator['fields']['columns']),
+				cell_width_min = Math.floor(pos['width'] / iterator['fields']['columns']),
+				cell_height_min = Math.floor(pos['height'] / iterator['fields']['rows']),
+				num_enlarged_columns = pos['width'] - cell_width_min * iterator['fields']['columns'],
+				num_enlarged_rows = pos['height'] - cell_height_min * iterator['fields']['rows'],
+				x = cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns),
+				y = cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows),
+				width = cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0),
+				height = cell_height_min + (cell_row < num_enlarged_rows ? 1 : 0),
+				css = {
+					left: (x / pos['width'] * 100) + '%',
+					top: (y * data['options']['widget-height']) + 'px',
+					width: (width / pos['width'] * 100) + '%',
+					height: (height * data['options']['widget-height']) + 'px'
+				}
+			;
+
+			if (i < iterator['widgets_of_iterator'].length) {
+				iterator['widgets_of_iterator'][i]['div'].css(css);
+			}
+			else {
+				$placeholders.eq(i - iterator['widgets_of_iterator'].length).css(css);
+			}
+		}
+	}
+
+	function addWidgetOfIterator($obj, data, iterator, widget_of_iterator) {
+		// If no fields are given, 'fields' will contain empty array instead of simple object.
+		if (widget_of_iterator['fields'].length === 0) {
+			widget_of_iterator['fields'] = {};
+		}
+		widget_of_iterator = $.extend({
+			'widgetid': '',
+			'type': '',
+			'header': '',
+			'preloader_timeout': 10000,	// in milliseconds
+			'preloader_fadespeed': 500,
+			'update_attempts': 0,
+			'update_paused': false,
+			'initial_load': true,
+			'ready': false,
+			'fields': {},
+			'storage': {}
+		}, widget_of_iterator, {
+			'rf_rate': 0,
+			'iterator': false,
+			'widget_of_iterator': true
+		});
+
+		widget_of_iterator['uniqueid'] = generateUniqueId($obj, data);
+		widget_of_iterator['div'] = makeWidgetDiv($obj, data, widget_of_iterator);
+
+		updateWidgetDynamic($obj, data, widget_of_iterator);
+
+		iterator['content_body'].append(widget_of_iterator['div']);
+		iterator['widgets_of_iterator'].push(widget_of_iterator);
+
+		showPreloader(widget_of_iterator);
+	}
+
+	function updateWidgetIteratorCallback($obj, data, iterator, response) {
+		stopPreloader(iterator);
+		var $content_header = $('h4', iterator['content_header']);
+
+		$content_header.text(response.header);
+
+		if (typeof response.aria_label !== 'undefined') {
+			$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
+		}
+
+		iterator['content_body'].empty();
+		iterator['widgets_of_iterator'] = [];
+
+		$.each(response.widgets_of_iterator, function(index, widget_of_iterator) {
+			addWidgetOfIterator($obj, data, iterator, widget_of_iterator);
+		});
+
+		addIteratorPlaceholders(iterator,
+			iterator['fields']['columns'] * iterator['fields']['rows'] - iterator['widgets_of_iterator'].length
+		);
+
+		positionWidgetsOfIterator($obj, data, iterator,
+			(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
+		);
+
+		$.each(iterator['widgets_of_iterator'], function(index, widget_of_iterator) {
+			updateWidgetContent($obj, data, widget_of_iterator);
+		});
+
+		if (iterator['update_attempts'] == 1) {
+			iterator['update_attempts'] = 0;
+			startWidgetRefreshTimer($obj, data, iterator, iterator['rf_rate']);
+			doAction('onContentUpdated', $obj, data, null);
+		}
+		else {
+			iterator['update_attempts'] = 0;
+			updateWidgetContent($obj, data, iterator);
+		}
+	}
+
+	function updateWidgetCallback($obj, data, widget, response) {
+		stopPreloader(widget);
+		var $content_header = $('h4', widget['content_header']),
+			debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
+
+		$content_header.text(response.header);
+
+		if (typeof response.aria_label !== 'undefined') {
+			$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
+		}
+
+		widget['content_body'].empty();
+		if (typeof(response.messages) !== 'undefined') {
+			widget['content_body'].append(response.messages);
+		}
+		widget['content_body'].append(response.body).css('overflow', '');
+
+		if (typeof(response.debug) !== 'undefined') {
+			$(response.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
+		}
+
+		removeWidgetInfoButtons(widget['content_header']);
+		if (typeof(response.info) !== 'undefined' && data['options']['edit_mode'] === false) {
+			addWidgetInfoButtons(widget['content_header'], response.info);
+		}
+
+		// Creates new script elements and removes previous ones to force their re-execution.
+		widget['content_script'].empty();
+		if (typeof(response.script_inline) !== 'undefined') {
+			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
+			var new_script = $('<script>')
+				.text(response.script_inline);
+			widget['content_script'].append(new_script);
+		}
+
+		if (widget['update_attempts'] == 1) {
+			widget['update_attempts'] = 0;
+			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+			doAction('onContentUpdated', $obj, data, null);
+		}
+		else {
+			widget['update_attempts'] = 0;
+			updateWidgetContent($obj, data, widget);
+		}
+	}
+
 	function updateWidgetContent($obj, data, widget) {
 		if (++widget['update_attempts'] > 1) {
 			return;
@@ -1186,6 +1454,17 @@
 			widget['update_attempts'] = 0;
 			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
 			return;
+		}
+
+		if (widget['iterator']) {
+			var pos = (typeof widget['current_pos'] === "object") ? widget['current_pos'] : widget['pos'];
+			if (isIteratorTooSmall(widget, pos)) {
+				setIteratorTooSmallState(widget, true);
+
+				widget['update_attempts'] = 0;
+
+				return;
+			}
 		}
 
 		if (widget['scrollable'] == false) {
@@ -1202,9 +1481,14 @@
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage'],
-			'content_width': Math.floor(widget['content_body'].width()),
-			'content_height': Math.floor(widget['content_body'].height())
+			'storage': widget['storage']
+		};
+
+		if (!widget['iterator']) {
+			$.extend(ajax_data, {
+				'content_width': Math.floor(widget['content_body'].width()),
+				'content_height': Math.floor(widget['content_body'].height())
+			});
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1230,49 +1514,11 @@
 			data: ajax_data,
 			dataType: 'json'
 		})
-			.then(function(resp) {
-				stopPreloader(widget);
-				var $content_header = $('h4', widget['content_header']),
-					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
-
-				$content_header.text(resp.header);
-
-				if (typeof resp.aria_label !== 'undefined') {
-					$content_header.attr('aria-label', (resp.aria_label !== '') ? resp.aria_label : null);
-				}
-
-				widget['content_body'].empty();
-				if (typeof(resp.messages) !== 'undefined') {
-					widget['content_body'].append(resp.messages);
-				}
-				widget['content_body'].append(resp.body).css('overflow', '');
-
-				if (typeof(resp.debug) !== 'undefined') {
-					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
-				}
-
-				removeWidgetInfoButtons(widget['content_header']);
-				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
-					addWidgetInfoButtons(widget['content_header'], resp.info);
-				}
-
-				// Creates new script elements and removes previous ones to force their re-execution.
-				widget['content_script'].empty();
-				if (typeof(resp.script_inline) !== 'undefined') {
-					// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
-					var new_script = $('<script>')
-						.text(resp.script_inline);
-					widget['content_script'].append(new_script);
-				}
-
-				if (widget['update_attempts'] == 1) {
-					widget['update_attempts'] = 0;
-					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
-					doAction('onContentUpdated', $obj, data, null);
-				}
-				else {
-					widget['update_attempts'] = 0;
-					updateWidgetContent($obj, data, widget);
+			.then(function(response) {
+				if (widget["iterator"]) {
+					updateWidgetIteratorCallback($obj, data, widget, response);
+				} else {
+					updateWidgetCallback($obj, data, widget, response);
 				}
 			}, function() {
 				// TODO: gentle message about failed update of widget content
@@ -2046,8 +2292,9 @@
 				$this.data('dashboardGrid', {
 					dashboard: {},
 					options: options,
-					widgets: [],
 					widget_defaults: {},
+					widgets: [],
+					widgets_of_iterator: {},
 					triggers: {},
 					placeholder: $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).hide().appendTo($this),
 					new_widget_placeholder: new_widget_placeholder,
@@ -2120,7 +2367,7 @@
 			if (widget['fields'].length === 0) {
 				widget['fields'] = {};
 			}
-			widget = $.extend({}, {
+			widget = $.extend({
 				'widgetid': '',
 				'type': '',
 				'header': '',
@@ -2131,6 +2378,8 @@
 					'height': 1
 				},
 				'rf_rate': 0,
+				'iterator': false,
+				'padding': false,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
@@ -2139,14 +2388,26 @@
 				'ready': false,
 				'fields': {},
 				'storage': {}
-			}, widget);
+			}, widget, {
+				'widget_of_iterator': false,
+			});
+
+			if (widget['iterator']) {
+				$.extend(widget, {
+					'widgets_of_iterator': [],
+					'padding': false
+				});
+			}
 
 			return this.each(function() {
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
 				widget['uniqueid'] = generateUniqueId($this, data);
-				widget['div'] = makeWidgetDiv($this, data, widget).data('widget-index', data['widgets'].length);
+
+				widget['div'] = makeWidgetDiv($this, data, widget);
+				widget['div'].data('widget-index', data['widgets'].length);
+
 				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
@@ -2237,7 +2498,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid');
 
-				$.each(widgets, function(index, value) {
+				$.each(widgets, function() {
 					methods.addWidget.apply($this, Array.prototype.slice.call(arguments, 1));
 				});
 
@@ -2716,3 +2977,9 @@
 		}
 	}
 }(jQuery));
+
+window.setTimeout(function() {
+	jQuery(function($) {
+//		$("#dashbrd-edit").click();
+	});
+}, 1000);
