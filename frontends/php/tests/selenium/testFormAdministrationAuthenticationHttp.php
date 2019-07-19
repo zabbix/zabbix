@@ -307,7 +307,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						],
 						[
-							'page' => 'users.php',
+							'page' => 'zabbix.php?action=user.list',
 							'error' => 'Access denied'
 						],
 //						// Redirect to HTTP login form and user is signed on hosts page.
@@ -362,7 +362,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						],
 						[
-							'page' => 'users.php',
+							'page' => 'zabbix.php?action=user.list',
 							'error' => 'Access denied'
 						],
 //						// wait for ZBX-14774.

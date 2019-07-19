@@ -503,7 +503,7 @@ class testFormUser extends CWebTest {
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
 
-		$this->page->login()->open('users.php?form=create');
+		$this->page->login()->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
@@ -534,7 +534,7 @@ class testFormUser extends CWebTest {
 	 */
 	private function assertFormFields($data) {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
-		$this->page->open('users.php?form=update&userid='.$userid);
+		$this->page->open('zabbix.php?action=user.edit&userid='.$userid);
 		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 
 		// Verify that fields are updated.
@@ -902,7 +902,7 @@ class testFormUser extends CWebTest {
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
 
-		$this->page->login()->open('users.php?ddreset=1');
+		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 
 		// Update user parameters.
@@ -940,7 +940,7 @@ class testFormUser extends CWebTest {
 		$sql_hash = 'SELECT * FROM users ORDER BY userid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->page->login()->open('users.php?ddreset=1');
+		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', 'test-user')->waitUntilVisible()->one()->click();
 
 		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
@@ -964,7 +964,7 @@ class testFormUser extends CWebTest {
 			'error_message' => 'Login name or password is incorrect.',
 			'attempt_message' => '1 failed login attempt logged. Last failed attempt was from'
 		];
-		$this->page->login()->open('users.php?ddreset=1');
+		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $data['alias'])->waitUntilVisible()->one()->click();
 		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form_update->query('button:Change password')->one()->click();
@@ -1082,7 +1082,7 @@ class testFormUser extends CWebTest {
 			$username = $data['fields']['Alias'];
 		}
 
-		$this->page->login()->open('users.php');
+		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $username)->one()->click();
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias =' . zbx_dbstr($username));
 
@@ -1109,7 +1109,7 @@ class testFormUser extends CWebTest {
 	 * Check that user can't delete himself.
 	 */
 	public function testFormUser_SelfDeletion() {
-		$this->page->login()->open('users.php?form=update&userid=1');
+		$this->page->login()->open('zabbix.php?action=user.edit&userid=1');
 		$this->assertTrue($this->query('button:Delete')->waitUntilVisible()->one()->isEnabled(false));
 	}
 
@@ -1122,18 +1122,18 @@ class testFormUser extends CWebTest {
 		];
 		$sql_users = 'SELECT * FROM users ORDER BY userid';
 		$user_hash = CDBHelper::getHash($sql_users);
-		$this->page->login()->open('users.php?form=create');
+		$this->page->login()->open('zabbix.php?action=user.edit');
 
 		// Check cancellation when creating users.
 		$form_create = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
 		$form_create->fill($data);
 		$this->query('button:Cancel')->one()->click();
 		$cancel_url = $this->page->getCurrentURL();
-		$this->assertContains('users.php?cancel=1', $cancel_url);
+		$this->assertContains('zabbix.php?action=user.list', $cancel_url);
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
 
 		// Check Cancellation when updating users.
-		$this->page->open('users.php?form=update&userid=1');
+		$this->page->open('zabbix.php?action=user.edit&userid=1');
 		$this->query('id:name')->one()->fill('Boris');
 		$this->query('button:Cancel')->one()->click();
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
