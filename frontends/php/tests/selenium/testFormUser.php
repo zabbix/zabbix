@@ -1210,10 +1210,10 @@ class testFormUser extends CWebTest {
 
 	private function setAutoLogout($data) {
 		$form = $this->query('name:user_form')->asForm()->one();
-		$auto_logout = $form->getFieldElements('Auto-logout');
-		$auto_logout->query('id:autologout_visible')->first()->asCheckbox()->set($data['checked']);
+		$auto_logout = $form->getFieldContainer('Auto-logout');
+		$auto_logout->query('id:autologout_visible')->asCheckbox()->one()->set($data['checked']);
 		if (array_key_exists('value', $data)) {
-			$auto_logout->query('id:autologout')->first()->overwrite($data['value']);
+			$auto_logout->query('id:autologout')->one()->overwrite($data['value']);
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
