@@ -79,15 +79,12 @@ class CControllerUserUpdate extends CController {
 	 * Validate password directly from input when updating user.
 	 */
 	protected function validatePassword() {
-		$password1 = $this->getInput('password1', '');
-		$password2 = $this->getInput('password2', '');
-
-		if ($password1 !== $password2) {
+		if ($this->getInput('password1', '') !== $this->getInput('password2', '')) {
 			error(_('Both passwords must be equal.'));
 			return false;
 		}
 
-		if ($password1 === '') {
+		if ($this->hasInput('password1') && $this->getInput('password1') === '') {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
 			return false;
 		}

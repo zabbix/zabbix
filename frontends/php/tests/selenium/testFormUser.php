@@ -37,6 +37,7 @@ class testFormUser extends CWebTest {
 						'Password' => '123',
 						'Password (once again)' => '123'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'User with alias "Admin" already exists.'
 				]
 			],
@@ -50,8 +51,8 @@ class testFormUser extends CWebTest {
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
-					'error_title' => 'Page received incorrect data',
-					'error_details' => 'Incorrect value for field "Alias": cannot be empty.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Incorrect value for field "alias": cannot be empty.'
 				]
 			],
 			// Space as 'Alias' field value.
@@ -64,8 +65,8 @@ class testFormUser extends CWebTest {
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
-					'error_title' => 'Page received incorrect data',
-					'error_details' => 'Incorrect value for field "Alias": cannot be empty.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Incorrect value for field "alias": cannot be empty.'
 				]
 			],
 			// Empty 'Group' field.
@@ -77,7 +78,8 @@ class testFormUser extends CWebTest {
 						'Password' => 'zabbix',
 						'Password (once again)' => 'zabbix'
 					],
-					'error_details' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Field "user_groups" is mandatory.'
 				]
 			],
 			// 'Password' fields not specified.
@@ -88,7 +90,8 @@ class testFormUser extends CWebTest {
 						'Alias' => 'Negative_Test2',
 						'Groups' => 'Zabbix administrators'
 					],
-					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Incorrect value for field "passwd": cannot be empty.'
 				]
 			],
 			// Empty 'Password (once again)' field.
@@ -100,7 +103,8 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password' => 'zabbix'
 					],
-					'error_title' => 'Cannot add user. Both passwords must be equal.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// Empty 'Password' field.
@@ -112,7 +116,8 @@ class testFormUser extends CWebTest {
 						'Groups' => 'Zabbix administrators',
 						'Password (once again)' => 'zabbix'
 					],
-					'error_title' => 'Cannot add user. Both passwords must be equal.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// 'Password' and 'Password (once again)' do not match.
@@ -125,7 +130,8 @@ class testFormUser extends CWebTest {
 						'Password' => 'PaSSwOrD',
 						'Password (once again)' => 'password'
 					],
-					'error_title' => 'Cannot add user. Both passwords must be equal.'
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// Empty 'Refresh' field.
@@ -139,6 +145,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => ''
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
 				]
 			],
@@ -153,6 +160,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '123abc'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
@@ -167,6 +175,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '3601'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
@@ -180,6 +189,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '2h'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
@@ -193,6 +203,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '61m'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
@@ -207,6 +218,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => '00000000000001'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
@@ -221,7 +233,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Rows per page' => '0'
 					],
-					'error_title' => 'Page received incorrect data',
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
 				]
 			],
@@ -236,7 +248,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Rows per page' => 'abc123'
 					],
-					'error_title' => 'Page received incorrect data',
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
 				]
 			],
@@ -254,6 +266,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '89'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -270,6 +283,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1m'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -287,6 +301,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '86401'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -303,6 +318,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1441m'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -319,6 +335,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '25h'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -336,6 +353,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => 'ninety'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
 				]
 			],
@@ -353,6 +371,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
 				]
 			],
@@ -367,6 +386,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'www.zab bix.com'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -381,6 +401,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'zabbix.com'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -395,6 +416,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'sysmaps'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -409,6 +431,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
+					'error_title' => 'Cannot add user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -604,6 +627,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Alias' => 'Admin'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'User with alias "Admin" already exists.'
 				]
 			],
@@ -614,7 +638,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Groups' => ''
 					],
-					'error_details' => 'Invalid parameter "/1/usrgrps": cannot be empty.'
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Field "user_groups" is mandatory.'
 				]
 			],
 			// Empty 'Password (once again)' field.
@@ -624,7 +649,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Password' => 'zabbix'
 					],
-					'error_title' => 'Cannot update user. Both passwords must be equal.'
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// Empty 'Password' field.
@@ -634,7 +660,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Password (once again)' => 'zabbix'
 					],
-					'error_title' => 'Cannot update user. Both passwords must be equal.'
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// 'Password' and 'Password (once again)' do not match.
@@ -646,7 +673,8 @@ class testFormUser extends CWebTest {
 						'Password' => 'PaSSwOrD',
 						'Password (once again)' => 'password'
 					],
-					'error_title' => 'Cannot update user. Both passwords must be equal.'
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// Empty 'Refresh' field.
@@ -659,7 +687,8 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => ''
 					],
-					'error_details' => 'Invalid parameter "/1/refresh": cannot be empty.'
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
 				]
 			],
 			// Digits in value of the 'Refresh' field.
@@ -669,6 +698,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '123abc'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
@@ -679,6 +709,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '3601'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
@@ -688,6 +719,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '61m'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
@@ -698,6 +730,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '00000000000001'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
@@ -708,7 +741,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Rows per page' => '0'
 					],
-					'error_title' => 'Page received incorrect data',
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
 				]
 			],
@@ -719,7 +752,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Rows per page' => 'abc123'
 					],
-					'error_title' => 'Page received incorrect data',
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
 				]
 			],
@@ -732,6 +765,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '89'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -744,6 +778,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '86401'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -755,6 +790,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1m'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -766,6 +802,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1441m'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -777,6 +814,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '25h'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
@@ -789,6 +827,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => 'ninety'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
 				]
 			],
@@ -801,6 +840,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid value for field "/1/autologout": cannot be empty.'
 				]
 			],
@@ -811,6 +851,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'www.zab bix.com'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -821,6 +862,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'zabbix.com'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -831,6 +873,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'sysmaps'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -841,6 +884,7 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
+					'error_title' => 'Cannot update user',
 					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
 				]
 			],
@@ -1167,14 +1211,9 @@ class testFormUser extends CWebTest {
 	private function setAutoLogout($data) {
 		$form = $this->query('name:user_form')->asForm()->one();
 		$auto_logout = $form->getFieldElements('Auto-logout');
-		/*
-		 * Auto-logout fields consists of multiple elements, the following of which will be used:
-		 *		0 - Checkbox element
-		 *		3 - Text input element
-		 */
-		$auto_logout->get(0)->asCheckbox()->set($data['checked']);
+		$auto_logout->query('id:autologout_visible')->asCheckbox()->set($data['checked']);
 		if (array_key_exists('value', $data)) {
-			$auto_logout->get(3)->overwrite($data['value']);
+			$auto_logout->query('id:autologout')->overwrite($data['value']);
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
