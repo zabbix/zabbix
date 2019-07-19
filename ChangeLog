@@ -1,9 +1,22 @@
 Changes for 4.0.11rc1
 
 New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
+........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
+.......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
+...G...PS. [ZBX-16103] reduced PCRE recursion limit (asestakovs)
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
+A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
+....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
+...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
+.......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
+..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
+..F....... [ZBX-16329] fixed duplicate value checking in trigger action conditions (Ivo)
+A......... [ZBX-15562] reworked history.get API method; fixed output as well as other known issues in history API (miks, Sasha)
 ..F....... [ZBX-16135] fixed error messages in XML export files (averza)
 A......... [ZBX-16213] fixed PostgreSQL bad performance on history tables (averza)
 ..F....... [ZBX-16176] preserve trailing spaces in history values (averza)

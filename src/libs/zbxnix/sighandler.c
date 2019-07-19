@@ -95,18 +95,16 @@ static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
  *                                                                            *
  * Function: terminate_signal_handler                                         *
  *                                                                            *
- * Purpose: handle terminate signals: SIGQUIT, SIGINT, SIGTERM, SIGUSR2       *
+ * Purpose: handle terminate signals: SIGABRT, SIGINT, SIGTERM, SIGUSR2       *
  *                                                                            *
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
 	if (!SIG_PARENT_PROCESS)
 	{
 		/* the parent process can either politely ask a child process to finish it's work and perform cleanup */
-		/* by sending SIGUSR2 or terminate child process immediately without cleanup by sending SIGQUIT       */
-		if (SIGQUIT == sig)
+		/* by sending SIGUSR2 or terminate child process immediately without cleanup by sending SIGABRT       */
+		if (SIGABRT == sig)
 			exit_with_failure();
 
 		if (SIGUSR2 == sig)
@@ -114,6 +112,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 	else
 	{
+		SIG_CHECK_PARAMS(sig, siginfo, context);
+
 		if (0 == sig_exiting)
 		{
 			sig_exiting = 1;
@@ -180,6 +180,7 @@ void	zbx_set_common_signal_handlers(void)
 	phan.sa_sigaction = terminate_signal_handler;
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGABRT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGUSR2, &phan, NULL);
 
