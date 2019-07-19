@@ -2,4 +2,6 @@
 
 SUBDIRS = \
 	cmd \
-	pkg
+	pkg \
+	internal
+

@@ -1964,6 +1964,8 @@ AC_OUTPUT([
 	src/go/cmd/Makefile
 	src/go/cmd/agent/Makefile
 	src/go/pkg/Makefile
+	src/go/internal/Makefile
+	src/go/internal/log/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

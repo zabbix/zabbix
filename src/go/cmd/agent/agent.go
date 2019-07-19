@@ -1,10 +1,8 @@
 package main
 
-import (
-	"fmt"
-	)
+import "go/internal/log"
 
-func main () {
-
-	fmt.Printf("Zabbix Go agent\n")
+func main() {
+	log.Open(log.Console, log.Debug, "/tmp/zabbix_agent.log")
+	log.Infof("Zabbix Go agent")
 }
