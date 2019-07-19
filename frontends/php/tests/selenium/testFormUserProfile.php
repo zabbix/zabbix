@@ -135,7 +135,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => ' ',
-				'error_msg' => 'Invalid value for field "/1/refresh": cannot be empty.'
+				'error_msg' => 'Incorrect value for field "refresh": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,

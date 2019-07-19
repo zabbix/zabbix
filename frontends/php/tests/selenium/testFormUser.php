@@ -139,7 +139,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => ''
 					],
-					'error_details' => 'Invalid value for field "/1/refresh": cannot be empty.'
+					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
 				]
 			],
 			// Digits in value of the 'Refresh' field.
