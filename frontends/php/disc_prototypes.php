@@ -26,7 +26,9 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js',
+	'textareaflexible.js'
+];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
