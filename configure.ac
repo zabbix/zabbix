@@ -1963,7 +1963,6 @@ AC_OUTPUT([
 	src/go/Makefile
 	src/go/cmd/Makefile
 	src/go/cmd/agent/Makefile
-	src/go/cmd/test/Makefile
 	src/go/pkg/Makefile
 	src/go/pkg/log/Makefile
 	])
