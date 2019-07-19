@@ -1923,9 +1923,11 @@
 	 * @param {object} data  Data from dashboard grid.
 	 */
 	function showMessageExhausted(data) {
+		data.dialogue.body.children('.msg-warning').remove();
 		$('<div class="msg-warning">' + data.options['message-exhausted'] + '</div>').prependTo(
 			data.dialogue.body
 		);
+		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
 
 	/**
