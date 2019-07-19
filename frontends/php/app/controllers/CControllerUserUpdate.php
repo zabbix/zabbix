@@ -41,7 +41,7 @@ class CControllerUserUpdate extends CController {
 			'lang' =>			'db users.lang|in '.implode(',', $locales),
 			'theme' =>			'db users.theme|in '.implode(',', $themes),
 			'autologin' =>		'db users.autologin|in 0,1',
-			'autologout' =>		'db users.autologout',
+			'autologout' =>		'db users.autologout|not_empty',
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page|ge 1|le 999999',
 			'url' =>			'db users.url',

@@ -230,7 +230,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => ' ',
-				'error_msg' => 'Invalid parameter "/1/autologout": cannot be empty.'
+				'error_msg' => 'Incorrect value for field "autologout": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,

@@ -353,7 +353,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
-					'error_details' => 'Invalid value for field "/1/autologout": cannot be empty.'
+					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
 				]
 			],
 			// URL with a space in the middle.
