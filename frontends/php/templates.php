@@ -25,6 +25,13 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['title'] = _('Configuration of templates');
+$page['file'] = 'templates.php';
+$page['scripts'] = ['multiselect.js'];
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = [
 	'groups'			=> [T_ZBX_STR, O_OPT, null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
@@ -83,38 +90,13 @@ $fields = [
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-
-function prepare_page_header($type) {
-	global $page;
-
-	if ($type === 'html') {
-		$page['title'] = _('Configuration of templates');
-		$page['file'] = 'templates.php';
-		$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-		$page['scripts'] = ['multiselect.js'];
-	}
-	elseif ($type === 'xml') {
-		$page['file'] = 'zbx_export_templates.xml';
-		$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	}
-}
-
-$fields_error = check_fields_raw($fields);
-if ($fields_error & ZBX_VALID_ERROR) {
-	// Halt on a HTML page with errors.
-
-	prepare_page_header('html');
-	require_once dirname(__FILE__).'/include/page_header.php';
-
-	invalid_url();
-}
+check_fields($fields);
 
 /*
  * Permissions
  */
-$access_deny = false;
 if (getRequest('groupid') && !isWritableHostGroups([getRequest('groupid')])) {
-	$access_deny = true;
+	access_deny();
 }
 if (getRequest('templateid')) {
 	$templates = API::Template()->get([
@@ -124,52 +106,11 @@ if (getRequest('templateid')) {
 	]);
 
 	if (!$templates) {
-		$access_deny = true;
+		access_deny();
 	}
-}
-if ($access_deny) {
-	// Halt on a HTML page with errors.
-
-	prepare_page_header('html');
-	require_once dirname(__FILE__).'/include/page_header.php';
-
-	access_deny();
 }
 
 $templateIds = getRequest('templates', []);
-
-if (hasRequest('action') && getRequest('action') === 'template.export' && hasRequest('templates')) {
-	$export = new CConfigurationExport(['templates' => $templateIds]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-
-	$export_data = $export->export();
-
-	if ($export_data === false) {
-		prepare_page_header('html');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		access_deny();
-	}
-	elseif (hasErrorMesssages()) {
-		prepare_page_header('html');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		show_messages();
-	}
-	else {
-		prepare_page_header('xml');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		print($export_data);
-	}
-
-	exit;
-}
-
-// Using HTML for the rest of functions.
-prepare_page_header('html');
-require_once dirname(__FILE__).'/include/page_header.php';
 
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {
