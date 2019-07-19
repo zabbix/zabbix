@@ -97,7 +97,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'alias' => '',
 			'name' => '',
 			'surname' => '',
-			'change_password' => false,
 			'password1' => '',
 			'password2' => '',
 			'lang' => $db_defaults['lang'],
@@ -130,6 +129,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['name'] = $this->user['name'];
 			$data['surname'] = $this->user['surname'];
 			$user_groups = zbx_objectValues($this->user['usrgrps'], 'usrgrpid');
+			$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 			$data['password1'] = '';
 			$data['password2'] = '';
 			$data['lang'] = $this->user['lang'];
@@ -142,12 +142,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['user_medias'] = $this->user['medias'];
 			$data['type'] = $this->user['type'];
 		}
+		else {
+			$data['change_password'] = true;
+		}
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'user_medias', 'form_refresh', 'type'
 		]);
-		$data['change_password'] = $this->hasInput('change_password') || $this->hasInput('password1');
 		if ($this->hasInput('user_groups')) {
 			$user_groups = $this->getInput('user_groups');
 		}

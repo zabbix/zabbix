@@ -58,7 +58,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'password1' => '',
 				'password2' => '',
-				'error_msg' => 'Incorrect value for field "passwd": cannot be empty.'
+				'error_msg' => 'Incorrect value for field "Password": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,

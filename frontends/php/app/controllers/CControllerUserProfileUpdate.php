@@ -86,8 +86,8 @@ class CControllerUserProfileUpdate extends CController {
 			$password2 = $this->hasInput('password2') ? $this->getInput('password2') : null;
 		}
 
-		if ($password1 !== null && CWebUser::$data['alias'] != ZBX_GUEST_USER && $password1 === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty')));
+		if ($password1 === '') {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
 			return false;
 		}
 

@@ -88,7 +88,7 @@ class testFormUser extends CWebTest {
 						'Alias' => 'Negative_Test2',
 						'Groups' => 'Zabbix administrators'
 					],
-					'error_details' => 'Incorrect value for field "passwd": cannot be empty.'
+					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
 				]
 			],
 			// Empty 'Password (once again)' field.
