@@ -28,6 +28,7 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+.......P.. [ZBX-16365] fixed "Something impossible has just happened." error in case item type is set to log type but log is not monitored (vso)
 ..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
 ........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
 ..F....... [ZBX-15954] fixed functional macros resolving in maps (miks)
