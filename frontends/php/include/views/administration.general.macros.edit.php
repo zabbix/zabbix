@@ -33,6 +33,7 @@ $widget = (new CWidget())
 
 $table = (new CTable())
 	->setId('tbl_macros')
+	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setHeader([_('Macro'), '', _('Value'), '']);
 
 // fields

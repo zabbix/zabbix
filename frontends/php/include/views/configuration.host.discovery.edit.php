@@ -711,6 +711,7 @@ $lld_macro_paths_form_list = new CFormList();
 
 $lld_macro_paths_table = (new CTable())
 	->setId('lld_macro_paths')
+	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->addStyle('width: 100%;')
 	->setHeader([_('LLD macro'), _('JSONPath'), '']);
 
