@@ -1,3 +1,1 @@
-SUBDIRS = \
-	log
 

@@ -1,0 +1,272 @@
+package conf
+
+import (
+	"reflect"
+	"testing"
+)
+
+func TestParserErrors(t *testing.T) {
+	type Options struct {
+		Test string `conf:"Te$t,optional"`
+	}
+
+	var input = []string{
+		"abc",
+		"abc =",
+		" = abc",
+		"Te$t = value"}
+
+	for _, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err != nil {
+			t.Logf("Returned error: %s", err.Error())
+		} else {
+			t.Errorf("Successfully parsed conf: %s", data)
+		}
+	}
+}
+
+func TestParserSuccess(t *testing.T) {
+	type Options struct {
+		Text string `conf:",optional"`
+	}
+
+	var input = []string{
+		"Text=1",
+		" Text = 2 ",
+		"Text = 3\nText=4",
+		"# comments\nText=5",
+		" # comments\nText=6",
+		"    \nText=7",
+		"Text=8=9",
+	}
+
+	var output = []Options{
+		{Text: "1"},
+		{Text: "2"},
+		{Text: "4"},
+		{Text: "5"},
+		{Text: "6"},
+		{Text: "7"},
+		{Text: "8=9"},
+	}
+
+	for i, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err != nil {
+			t.Logf("[%d] returned error: %s", i, err.Error())
+			t.Fail()
+		}
+		if options.Text != output[i].Text {
+			t.Errorf("[%d] expected %s while got %s\n", i, output[i].Text, options.Text)
+		}
+	}
+}
+
+func TestParserRangeErrors(t *testing.T) {
+	type Options struct {
+		Value int `conf:",,-10:10"`
+	}
+
+	var input = []string{
+		`Value=-11`,
+		`Value=-10.5`,
+		`Value=10.5`,
+		`Value=11`,
+	}
+
+	for i, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err != nil {
+			t.Logf("Returned error: %s", err.Error())
+		} else {
+			t.Errorf("[%d] expected error while got success", i)
+		}
+	}
+}
+
+func TestParserExistanceErrors(t *testing.T) {
+	type Options struct {
+		Text  string
+		Value int
+	}
+
+	var input = []string{
+		`Value=1`,
+		`Value=1
+		 Text=1
+		 None=1`,
+	}
+
+	for i, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err != nil {
+			t.Logf("Returned error: %s", err.Error())
+		} else {
+			t.Errorf("[%d] expected error while got %+v", i, options)
+		}
+	}
+}
+
+func checkUnmarshal(t *testing.T, data []byte, expected interface{}, options interface{}) {
+	if err := Unmarshal([]byte(data), options); err != nil {
+		t.Errorf("Expected success while got error: %s", err.Error())
+	}
+	if !reflect.DeepEqual(options, expected) {
+		t.Errorf("Expected %+v while got %+v", expected, options)
+	}
+}
+
+func TestNestedPointer(t *testing.T) {
+	type Options struct {
+		Pointer ***int
+	}
+	input := `Pointer = 42`
+
+	value := 42
+	pvalue := &value
+	ppvalue := &pvalue
+	var options Options
+	var expected Options = Options{&ppvalue}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestArray(t *testing.T) {
+	type Options struct {
+		Values []int `conf:"Value"`
+	}
+	input := `
+			Value = 1
+			Value = 2
+			Value = 3`
+
+	var options Options
+	var expected Options = Options{[]int{1, 2, 3}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestNestedArray(t *testing.T) {
+	type Options struct {
+		Values [][]int `conf:"Value"`
+	}
+	input := `
+			Value.1 = 1
+			Value.1 = 2
+			Value.2 = 3
+			Value.2 = 4
+			Value.3 = 5
+			Value.3 = 6`
+
+	var options Options
+	var expected Options = Options{[][]int{[]int{1, 2}, []int{3, 4}, []int{5, 6}}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestOptional(t *testing.T) {
+	type Options struct {
+		Text *string `conf:",optional"`
+	}
+	input := ``
+
+	var options Options
+	var expected Options = Options{nil}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestDefault(t *testing.T) {
+	type Options struct {
+		Text string `conf:",,,Default, \"value\""`
+	}
+	input := ``
+
+	var options Options
+	var expected Options = Options{`Default, "value"`}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestMap(t *testing.T) {
+	type Options struct {
+		Index map[string]uint64
+	}
+	input := `
+			Index.apple = 9
+			Index.orange = 7
+			Index.banana = 3
+		`
+
+	var options Options
+	var expected Options = Options{map[string]uint64{"apple": 9, "orange": 7, "banana": 3}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestStructMap(t *testing.T) {
+	type Object struct {
+		Id          uint64
+		Description string
+	}
+	type Options struct {
+		Index map[string]Object
+	}
+	input := `
+			Index.apple.Id = 9
+			Index.apple.Description = An apple
+			Index.orange.Id = 7
+			Index.orange.Description = An orange
+			Index.banana.Id = 3
+			Index.banana.Description = A banana
+		`
+
+	var options Options
+	var expected Options = Options{map[string]Object{
+		"apple":  Object{9, "An apple"},
+		"orange": Object{7, "An orange"},
+		"banana": Object{3, "A banana"}}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestStructPtrMap(t *testing.T) {
+	type Object struct {
+		Id          uint64
+		Description string
+	}
+	type Options struct {
+		Index map[string]*Object
+	}
+	input := `
+			Index.apple.Id = 9
+			Index.apple.Description = An apple
+			Index.orange.Id = 7
+			Index.orange.Description = An orange
+			Index.banana.Id = 3
+			Index.banana.Description = A banana
+		`
+
+	objects := []Object{Object{9, "An apple"}, Object{7, "An orange"}, Object{3, "A banana"}}
+	var options Options
+	var expected Options = Options{map[string]*Object{
+		"apple":  &objects[0],
+		"orange": &objects[1],
+		"banana": &objects[2]}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestNestedStruct(t *testing.T) {
+	type Object struct {
+		Id   uint64
+		Name string
+	}
+	type Options struct {
+		Chair Object
+		Desk  Object
+	}
+	input := `
+			Chair.Id = 1
+			Chair.Name = a chair
+			Desk.Id = 2
+			Desk.Name = a desk
+		`
+
+	var options Options
+	var expected Options = Options{Object{1, "a chair"}, Object{2, "a desk"}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
