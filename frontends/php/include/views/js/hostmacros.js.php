@@ -51,6 +51,9 @@
 				}
 				$(this).trigger('input');
 			})
+			.on('click', 'button.element-table-add', function() {
+				$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+			})
 			.on('click', 'button.element-table-change', function() {
 				var macroNum = $(this).attr('id').split('_')[1];
 
