@@ -94,7 +94,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 
-		$this->zbxTestClickXpathWait("//ul[@id='userFormList']//button[contains(@onclick, 'change_password')]");
+		$this->zbxTestClickXpathWait("//ul[@id='user_form_list']//button[contains(@onclick, 'change_password')]");
 		$this->zbxTestInputTypeWait('password1', $data['password1']);
 		$this->zbxTestInputType('password2', $data['password2']);
 
@@ -135,7 +135,7 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => ' ',
-				'error_msg' => 'Invalid parameter "/1/refresh": cannot be empty.'
+				'error_msg' => 'Invalid value for field "/1/refresh": cannot be empty.'
 			]],
 			[[
 				'expected' => TEST_BAD,

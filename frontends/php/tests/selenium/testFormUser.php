@@ -139,7 +139,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix',
 						'Refresh' => ''
 					],
-					'error_details' => 'Invalid parameter "/1/refresh": cannot be empty.'
+					'error_details' => 'Invalid value for field "/1/refresh": cannot be empty.'
 				]
 			],
 			// Digits in value of the 'Refresh' field.
@@ -353,7 +353,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
-					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
+					'error_details' => 'Invalid value for field "/1/autologout": cannot be empty.'
 				]
 			],
 			// URL with a space in the middle.
@@ -504,7 +504,7 @@ class testFormUser extends CWebTest {
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=user.edit');
-		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('auto_logout', $data)) {
@@ -535,7 +535,7 @@ class testFormUser extends CWebTest {
 	private function assertFormFields($data) {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE alias ='.zbx_dbstr($data['fields']['Alias']));
 		$this->page->open('zabbix.php?action=user.edit&userid='.$userid);
-		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 
 		// Verify that fields are updated.
 		$check_fields = ['Alias', 'Name', 'Surname', 'Language', 'Theme', 'Refresh', 'Rows per page', 'URL (after login)'];
@@ -801,7 +801,7 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
-					'error_details' => 'Invalid parameter "/1/autologout": cannot be empty.'
+					'error_details' => 'Invalid value for field "/1/autologout": cannot be empty.'
 				]
 			],
 			// URL with a space in the middle.
@@ -906,7 +906,7 @@ class testFormUser extends CWebTest {
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 
 		// Update user parameters.
-		$form = $this->query('name:userForm')->asForm()->one();
+		$form = $this->query('name:user_form')->asForm()->one();
 		if (array_key_exists('Password', $data['fields']) || array_key_exists('Password (once again)', $data['fields'])) {
 			$form->query('button:Change password')->one()->click();
 		}
@@ -943,7 +943,7 @@ class testFormUser extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', 'test-user')->waitUntilVisible()->one()->click();
 
-		$form = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->submit();
 		$this->page->waitUntilReady();
 		$message = CMessageElement::find()->one();
@@ -966,7 +966,7 @@ class testFormUser extends CWebTest {
 		];
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $data['alias'])->waitUntilVisible()->one()->click();
-		$form_update = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form_update->query('button:Change password')->one()->click();
 
 		// Change user password and log out.
@@ -1125,7 +1125,7 @@ class testFormUser extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=user.edit');
 
 		// Check cancellation when creating users.
-		$form_create = $this->query('name:userForm')->asForm()->waitUntilVisible()->one();
+		$form_create = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form_create->fill($data);
 		$this->query('button:Cancel')->one()->click();
 		$cancel_url = $this->page->getCurrentURL();
@@ -1165,7 +1165,7 @@ class testFormUser extends CWebTest {
 	}
 
 	private function setAutoLogout($data) {
-		$form = $this->query('name:userForm')->asForm()->one();
+		$form = $this->query('name:user_form')->asForm()->one();
 		$auto_logout = $form->getFieldElements('Auto-logout');
 		/*
 		 * Auto-logout fields consists of multiple elements, the following of which will be used:
