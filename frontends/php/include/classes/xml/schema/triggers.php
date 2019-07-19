@@ -25,8 +25,8 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 		(new CXmlTagString('name'))->setRequired()->setKey('description'),
 		(new CXmlTagString('correlation_mode'))
 			->setDefaultValue(CXmlDefine::TRIGGER_DISABLED)
-			->addConstant('DISABLED', CXmlDefine::TRIGGER_DISABLED)
-			->addConstant('TAG_VALUE', CXmlDefine::TRIGGER_TAG_VALUE),
+			->addConstant(CXmlConstant::DISABLED, CXmlDefine::TRIGGER_DISABLED)
+			->addConstant(CXmlConstant::TAG_VALUE, CXmlDefine::TRIGGER_TAG_VALUE),
 		new CXmlTagString('correlation_tag'),
 		(new CXmlTagIndexedArray('dependencies'))->setSchema(
 			(new CXmlTagArray('dependency'))->setSchema(
@@ -38,26 +38,26 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 		(new CXmlTagString('description'))->setKey('comments'),
 		(new CXmlTagString('manual_close'))
 			->setDefaultValue(CXmlDefine::NO)
-			->addConstant('NO', CXmlDefine::NO)
-			->addConstant('YES', CXmlDefine::YES),
+			->addConstant(CXmlConstant::NO, CXmlDefine::NO)
+			->addConstant(CXmlConstant::YES, CXmlDefine::YES),
 		(new CXmlTagString('priority'))
 			->setDefaultValue(CXmlDefine::NOT_CLASSIFIED)
-			->addConstant('NOT_CLASSIFIED', CXmlDefine::NOT_CLASSIFIED)
-			->addConstant('INFO', CXmlDefine::INFO)
-			->addConstant('WARNING', CXmlDefine::WARNING)
-			->addConstant('AVERAGE', CXmlDefine::AVERAGE)
-			->addConstant('HIGH', CXmlDefine::HIGH)
-			->addConstant('DISASTER', CXmlDefine::DISASTER),
+			->addConstant(CXmlConstant::NOT_CLASSIFIED, CXmlDefine::NOT_CLASSIFIED)
+			->addConstant(CXmlConstant::INFO, CXmlDefine::INFO)
+			->addConstant(CXmlConstant::WARNING, CXmlDefine::WARNING)
+			->addConstant(CXmlConstant::AVERAGE, CXmlDefine::AVERAGE)
+			->addConstant(CXmlConstant::HIGH, CXmlDefine::HIGH)
+			->addConstant(CXmlConstant::DISASTER, CXmlDefine::DISASTER),
 		new CXmlTagString('recovery_expression'),
 		(new CXmlTagString('recovery_mode'))
 			->setDefaultValue(CXmlDefine::TRIGGER_EXPRESSION)
-			->addConstant('EXPRESSION', CXmlDefine::TRIGGER_EXPRESSION)
-			->addConstant('RECOVERY_EXPRESSION', CXmlDefine::TRIGGER_RECOVERY_EXPRESSION)
-			->addConstant('NONE', CXmlDefine::TRIGGER_NONE),
+			->addConstant(CXmlConstant::EXPRESSION, CXmlDefine::TRIGGER_EXPRESSION)
+			->addConstant(CXmlConstant::RECOVERY_EXPRESSION, CXmlDefine::TRIGGER_RECOVERY_EXPRESSION)
+			->addConstant(CXmlConstant::NONE, CXmlDefine::TRIGGER_NONE),
 		(new CXmlTagString('status'))
 			->setDefaultValue(CXmlDefine::ENABLED)
-			->addConstant('ENABLED', CXmlDefine::ENABLED)
-			->addConstant('DISABLED', CXmlDefine::DISABLED),
+			->addConstant(CXmlConstant::ENABLED, CXmlDefine::ENABLED)
+			->addConstant(CXmlConstant::DISABLED, CXmlDefine::DISABLED),
 		(new CXmlTagIndexedArray('tags'))->setSchema(
 			(new CXmlTagArray('tag'))->setSchema(
 				(new CXmlTagString('tag'))->setRequired(),
@@ -66,8 +66,8 @@ return (new CXmlTagIndexedArray('triggers'))->setSchema(
 		),
 		(new CXmlTagString('type'))
 			->setDefaultValue(CXmlDefine::SINGLE)
-			->addConstant('SINGLE', CXmlDefine::SINGLE)
-			->addConstant('MULTIPLE', CXmlDefine::MULTIPLE),
+			->addConstant(CXmlConstant::SINGLE, CXmlDefine::SINGLE)
+			->addConstant(CXmlConstant::MULTIPLE, CXmlDefine::MULTIPLE),
 		new CXmlTagString('url')
 	)
 );

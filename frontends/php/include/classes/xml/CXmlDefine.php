@@ -19,20 +19,23 @@
 **/
 
 
-class CXmlDefine
-{
+/**
+ * Constant values what we used in schema.
+ */
+class CXmlDefine {
+
 	// Types.
-	// const STRING = 0x01;
-	// const ARRAY = 0x02;
-	// const INTEGER = 0x03;
-	// const INDEXED_ARRAY = 0x04;
-	// const REQUIRED = 0x08;
+	const STRING = 0x01;
+	const ARRAY = 0x02;
+	const INTEGER = 0x03;
+	const INDEXED_ARRAY = 0x04;
+	const REQUIRED = 0x08;
 
 	// Values.
 	const ENABLED = 0;
 	const DISABLED = 1;
 
-	const DEFAULT = -1;
+	const XML_DEFAULT = -1;
 	const NONE = 0;
 	const MD2 = 1;
 	const MD5 = 2;
@@ -44,7 +47,7 @@ class CXmlDefine
 	const USER = 2;
 	const OPERATOR = 3;
 	const ADMIN = 4;
-	// const OEM = 5;  // Duplicate
+	// const OEM = 5; // Duplicate.
 
 	const NO_ENCRYPTION = 1;
 	const TLS_PSK = 2;
@@ -58,15 +61,15 @@ class CXmlDefine
 	const IPMI = 3;
 	const JMX = 4;
 
-	const INV_MODE_DISABLED = '-1'; // Duplicate
+	const INV_MODE_DISABLED = '-1'; // Duplicate.
 	const INV_MODE_MANUAL = 0;
 	const INV_MODE_AUTOMATIC = 1;
 
 	const TRIGGER_EXPRESSION = 0;
 	const TRIGGER_RECOVERY_EXPRESSION = 1;
-	const TRIGGER_NONE = 2; // Duplicate
+	const TRIGGER_NONE = 2; // Duplicate.
 
-	const TRIGGER_DISABLED = 0; // Duplicate
+	const TRIGGER_DISABLED = 0; // Duplicate.
 	const TRIGGER_TAG_VALUE = 1;
 
 	const NOT_CLASSIFIED = 0;
@@ -110,7 +113,7 @@ class CXmlDefine
 	const PASSWORD = 0;
 	const PUBLIC_KEY = 1;
 
-	// const NONE = 0; // Duplicate
+	// const NONE = 0; // Duplicate.
 	const BASIC = 1;
 	const NTLM = 2;
 
@@ -213,7 +216,7 @@ class CXmlDefine
 	const ITEM_TYPE_ZABBIX_PASSIVE = 0;
 	const ITEM_TYPE_SNMPV1 = 1;
 	const ITEM_TYPE_TRAP = 2;
-	const ITEM_TYPE_SIMPLE = 3; // Duplicate
+	const ITEM_TYPE_SIMPLE = 3; // Duplicate.
 	const ITEM_TYPE_SNMPV2 = 4;
 	const ITEM_TYPE_INTERNAL = 5;
 	const ITEM_TYPE_SNMPV3 = 6;
@@ -221,11 +224,11 @@ class CXmlDefine
 	const ITEM_TYPE_AGGREGATE = 8;
 	const ITEM_TYPE_EXTERNAL = 10;
 	const ITEM_TYPE_ODBC = 11;
-	const ITEM_TYPE_IPMI = 12; // Duplicate
+	const ITEM_TYPE_IPMI = 12; // Duplicate.
 	const ITEM_TYPE_SSH = 13;
 	const ITEM_TYPE_TELNET = 14;
-	const ITEM_TYPE_CALCULATED = 15; // Duplicate
-	const ITEM_TYPE_JMX = 16; // Duplicate
+	const ITEM_TYPE_CALCULATED = 15; // Duplicate.
+	const ITEM_TYPE_JMX = 16; // Duplicate.
 	const ITEM_TYPE_SNMP_TRAP = 17;
 	const ITEM_TYPE_DEPENDENT = 18;
 	const ITEM_TYPE_HTTP_AGENT = 19;
@@ -266,12 +269,12 @@ class CXmlDefine
 	const PROMETHEUS_TO_JSON = 23;
 
 	const AND_OR = 0;
-	const AND = 1;
-	const OR = 2;
+	const XML_AND = 1;
+	const XML_OR = 2;
 	const FORMULA = 3;
 
-	const CONDITION_MATCHES_REGEX = 8; // Duplicate
-	const CONDITION_NOT_MATCHES_REGEX = 9; // Duplicate
+	const CONDITION_MATCHES_REGEX = 8; // Duplicate.
+	const CONDITION_NOT_MATCHES_REGEX = 9; // Duplicate.
 
 	public static $subtags = [
 		'groups' => 'group',
