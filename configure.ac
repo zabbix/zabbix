@@ -1831,6 +1831,16 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 
 AC_SUBST(LOAD_MODULE_PATH)
 
+GOBIN=${bindir}
+GOPATH=$ac_abs_confdir
+GOCMD=go
+GOWORKDIR=$ac_abs_confdir/src/go
+
+AC_SUBST(GOBIN)
+AC_SUBST(GOPATH)
+AC_SUBST(GOCMD)
+AC_SUBST(GOWORKDIR)
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                         Other checks                          *
@@ -1949,8 +1959,13 @@ AC_OUTPUT([
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
-	src/go/Makefile
 	man/Makefile
+	src/go/Makefile
+	src/go/cmd/Makefile
+	src/go/cmd/agent/Makefile
+	src/go/cmd/test/Makefile
+	src/go/pkg/Makefile
+	src/go/pkg/log/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

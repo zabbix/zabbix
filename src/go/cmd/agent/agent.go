@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	)
 
 func main () {
+
 	fmt.Printf("Zabbix Go agent\n")
 }
