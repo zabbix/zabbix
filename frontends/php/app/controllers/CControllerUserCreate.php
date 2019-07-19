@@ -41,7 +41,7 @@ class CControllerUserCreate extends CController {
 			'autologout' =>		'db users.autologout|not_empty',
 			'url' =>			'db users.url',
 			'refresh' =>		'required|db users.refresh|not_empty',
-			'rows_per_page' =>	'required|db users.rows_per_page|ge 1|le 999999',
+			'rows_per_page' =>	'required|db users.rows_per_page',
 			'form_refresh' =>	'int32'
 		];
 

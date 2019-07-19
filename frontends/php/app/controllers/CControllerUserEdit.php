@@ -43,7 +43,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'autologin' =>			'db users.autologin|in 0,1',
 			'autologout' =>			'db users.autologout',
 			'refresh' =>			'db users.refresh',
-			'rows_per_page' =>		'db users.rows_per_page|ge 1|le 999999',
+			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
 			'user_medias' =>		'array',
 			'new_media' =>			'array',
