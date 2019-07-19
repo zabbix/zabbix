@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2019\-01\-29" Zabbix
+.TH ZABBIX_SENDER 1 "2019\-07\-10" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -399,7 +399,7 @@ An example of a line of the input file:
 
 For more details please see option \fB\-\-input\-file\fR.
 
-If a timestamped value is sent for a host that is in a “no data” maintenance type then this value will be dropped however it is possible to send a timestamped value in for an expired maintenance period and it will be accepted. 
+If a timestamped value is sent for a host that is in a “no data” maintenance type then this value will be dropped; however, it is possible to send a timestamped value in for an expired maintenance period and it will be accepted. 
 
 .IP "\fB\-r\fR, \fB\-\-real\-time\fR"
 Send values one by one as soon as they are received.
