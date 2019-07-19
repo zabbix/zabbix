@@ -382,22 +382,6 @@ switch ($data['popup_type']) {
 		unset($data['table_records']);
 		break;
 
-	case 'screens2':
-		foreach ($data['table_records'] as $screen) {
-			$screen['resourceid'] = $screen['screenid'];
-			$name = new CLink($screen['name'], 'javascript:void(0);');
-
-			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $screen[$options['dstfld1']]);
-			$action .= $options['srcfld2']
-				? get_window_opener($options['dstfrm'], $options['dstfld2'], $screen[$options['srcfld2']])
-				: '';
-
-			$name->onClick($action.$js_action_onclick);
-			$table->addRow($name);
-		}
-		unset($data['table_records']);
-		break;
-
 	case 'items':
 	case 'item_prototypes':
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {

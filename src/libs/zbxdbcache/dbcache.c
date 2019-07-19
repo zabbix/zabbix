@@ -2147,6 +2147,8 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 				case ITEM_VALUE_TYPE_TEXT:
 					pvalue = h->value.str;
 					break;
+				case ITEM_VALUE_TYPE_LOG:
+					continue;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;

@@ -1,6 +1,8 @@
 Changes for 4.4.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
+A.F.I..... [ZBXNEXT-5250] dropped support of screen element 'Screen' (miks)
 ..F....... [ZBXNEXT-5249] added new dashboard widget "Host availability" (rlataria)
 ..F....... [ZBXNEXT-5238] added edit control for the widget in dashboard view mode (ashubin)
 A......... [ZBXNEXT-5183] implemented support of simple triggers under items in export files (agriscenko)
@@ -11,6 +13,8 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
+.......PS. [ZBX-16308] fixed proxy-server configuration synchronization when using dependent items (wiper)
+..F....... [ZBX-15954] fixed functional macros resolving in maps (miks)
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
@@ -21,9 +25,19 @@ Bug fixes:
 Changes for 4.2.5rc1
 
 New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+.......PS. [ZBX-16308] fixed proxy-server configuration synchronization when using dependent items (wiper)
+.......P.. [ZBX-16365] fixed "Something impossible has just happened." error in case item type is set to log type but log is not monitored (vso)
+..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
+........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
+..F....... [ZBX-15954] fixed functional macros resolving in maps (miks)
+........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
+.......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
+...G...PS. [ZBX-16103] reduced PCRE recursion limit (asestakovs)
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
 A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
 ....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 ...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
@@ -502,9 +516,17 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.11rc1
 
 New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-16376] fixed preprocessing steps having incorrect order and duplicate step numbers (Ivo)
+..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
+........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
+........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
+.......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
+...G...PS. [ZBX-16103] reduced PCRE recursion limit (asestakovs)
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
 A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
 ....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
 ...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)

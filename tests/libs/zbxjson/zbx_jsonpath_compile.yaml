@@ -1,0 +1,1024 @@
+# Invalid definite jsonpaths
+
+---
+test case: Compile fail ""
+in:
+  path: ""
+out:
+  result: FAIL
+---
+test case: Compile fail $
+in:
+  path: $
+out:
+  result: FAIL
+---
+test case: Compile fail "$." 
+in:
+  path: $.
+out:
+  result: FAIL
+---
+test case: Compile fail "$['a'"
+in:
+  path: $['a'
+out:
+  result: FAIL
+---
+test case: Compile fail "$[a']"
+in:
+  path: $[a']
+out:
+  result: FAIL
+---
+test case: Compile fail "$['']"
+in:
+  path: $['']
+out:
+  result: FAIL
+---
+test case: Compile fail "$.a[]" 
+in:
+  path: $.a[]
+out:
+  result: FAIL
+---
+test case: Compile fail "$.a[1"
+in:
+  path: $.a[1
+out:
+  result: FAIL
+---
+test case: Compile fail "$['a'][]"
+in:
+  path: $['a'][]
+out:
+  result: FAIL
+---
+test case: Compile fail "$['a'][1"
+in:
+  path: $['a'][1
+out:
+  result: FAIL
+---
+test case: Compile fail "$.a."
+in:
+  path: $.a.
+out:
+  result: FAIL
+---
+
+# Valid definite jsonpaths
+test case: Compile success "$.a" 
+in:
+  path: $.a
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'" 
+---
+test case: Compile success "$['a']"
+in:
+  path: $['a']
+out:
+  result: SUCCEED
+  definite: 1 
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+---
+test case: Compile success "$[ 'a' ]"
+in:
+  path: $[ 'a' ]
+out:
+  result: SUCCEED
+  definite: 1 
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+---
+test case: Compile success '$["a"]'
+in:
+  path: $["a"]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+---
+test case: Compile success "$.a.b"
+in:
+  path: $.a.b
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+---
+test case: Compile success "$['a'].b"
+in:
+  path: $['a'].b
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+---
+test case: Compile success "$['a']['b']"
+in:
+  path: $['a']['b']
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+---
+test case: Compile success $.a['b']
+in:
+  path: $.a['b']
+out:
+  result: SUCCEED
+  definite: 1 
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+---
+test case: Compile success $.a[0]
+in:
+  path: $.a[0]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 0
+---
+test case: Compile success $[-1]
+in:
+  path: $[-1]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: -1
+---
+test case: Compile success $.a[0].b[1] 
+in:
+  path: $.a[0].b[1]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 0
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1
+---
+test case: Compile success $.a[1000]
+in:
+  path: $.a[1000]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1000
+---
+test case: Compile success $.a[ 1 ]
+in:
+  path: $.a[ 1 ]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1
+---
+test case: Compile success $['a'][2]
+in:
+  path: $['a'][2]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 2
+---
+test case: Compile success $['a'][2]['b'][3]
+in:
+  path: $['a'][2]['b'][3]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 2
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 3
+---
+test case: Compile success $[1][2]
+in:
+  path: $[1][2]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 2
+---
+test case: Compile success $.['a'].['b']
+in:
+  path: $.['a'].['b']
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+---
+# Invalid list based json filters
+
+test case: Compile fail $...a
+in:
+  path: $...a
+out:
+  result: FAIL 
+---
+test case: 'Compile fail $.**.a'
+in:
+  path: '$.**.a'
+out:
+  result: FAIL 
+---
+test case: Compile fail $[,1]
+in:
+  path: $[,1]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[1,]
+in:
+  path: $[1,]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[1,,2]
+in:
+  path: $[1,,2]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[1,*,2]
+in:
+  path: $[1,*,2]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[--1]
+in:
+  path: $[--1]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[a]
+in:
+  path: $[a]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[$a$]
+in:
+  path: $[$a$]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[,'a']
+in:
+  path: $[,'a']
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a',]
+in:
+  path: $['a',]
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a',,'b']
+in:
+  path: $['a',,2]
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a',*,'b']
+in:
+  path: $['a',*,2]
+out:
+  result: FAIL 
+---
+test case: Compile fail $[--'a']
+in:
+  path: $[--'a']
+out:
+  result: FAIL 
+---
+test case: Compile fail $[1,'a']
+in:
+  path: $[1,'a']
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a\a']
+in:
+  path: $['a\a']
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a\']
+in:
+  path: $['a\']
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a\"']
+in:
+  path: $['a\"']
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a\]
+in:
+  path: $['a\]
+out:
+  result: FAIL 
+---
+test case: Compile fail $['a\
+in:
+  path: $['a\
+out:
+  result: FAIL 
+---
+test case: Compile fail $["a\'"]
+in:
+  path: $["a\'"]
+out:
+  result: FAIL 
+---
+# Valid list based json filters
+
+test case: Compile success $[ 1 ]
+in:
+  path: $[ 1 ]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1
+---
+test case: Compile success $[1,2]
+in:
+  path: $[1,2]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1,2
+---
+test case: Compile success $[ 1 , 2 ]
+in:
+  path: $[ 1 , 2 ]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: 1,2
+---
+test case: Compile success $[ -1 ]
+in:
+  path: $[ -1 ]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: -1
+---
+test case: Compile success $[ -1, 2, 3 ]
+in:
+  path: $[ -1, 2, 3 ]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: -1,2,3
+---
+test case: Compile success $[ ' a ' ]
+in:
+  path: $[ ' a ' ]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "' a '"
+---
+test case: Compile success $[ ' a ', "b" ]
+in:
+  path: $[ ' a ', "b" ]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "' a ','b'"
+---
+test case: Compile success $['a \'b\' \\/']
+in:
+  path: $['a \'b\' \\/']
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a 'b' \\/'"
+---
+test case: Compile success $["a \"b\""]
+in:
+  path: $["a \"b\""]
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a \"b\"'"
+---
+test case: Compile success $.*.a
+in:
+  path: $.*.a
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
+      data: "*"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+---
+test case: Compile success $.*
+in:
+  path: $.*
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
+      data: "*"
+---
+test case: Compile success $[*]
+in:
+  path: $[*]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_ALL
+      data: "*"
+---
+test case: Compile success $..a.b..c
+in:
+  path: $..a.b..c
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'a'"
+      detached: 1
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'b'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'c'"
+      detached: 1
+---
+# Slice based json filters
+
+test case: Compile fail $[1:2:3]
+in:
+  path: $[1:2:3]
+out:
+  result: FAIL 
+---
+test case: Compile success $[:]
+in:
+  path: "$[:]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: ":"
+---
+test case: Compile success $[1:]
+in:
+  path: "$[1:]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: "1:"
+---
+test case: Compile success $[:1]
+in:
+  path: "$[:1]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: ":1"
+---
+test case: Compile success $[1:2]
+in:
+  path: "$[1:2]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: "1:2"
+---
+test case: "Compile success $[-1:-1]"
+in:
+  path: "$[-1:-1]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: "-1:-1"
+---
+test case: "Compile success $[ 1 : 2 ]"
+in:
+  path: "$[ 1 : 2 ]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: "1:2"
+---
+test case: "Compile success $[  : 1 ]"
+in:
+  path: "$[  : 1 ]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: ":1"
+---
+test case: "Compile success $[ 1 :  ]"
+in:
+  path: "$[ 1 :  ]"
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_SLICE
+      data: "1:"
+---
+test case: Compile fail $.min(
+in:
+  path: $.min(
+out:
+  result: FAIL 
+---
+test case: Compile fail $.min(1)
+in:
+  path: $.min(1)
+out:
+  result: FAIL 
+---
+test case: Compile fail $.div()
+in:
+  path: $.div()
+out:
+  result: FAIL 
+---
+test case: Compile fail $.avg().data
+in:
+  path: $.avg().data
+out:
+  result: FAIL 
+---
+test case: Compile fail $.len()
+in:
+  path: $.len()
+out:
+  result: FAIL
+---
+test case: Compile success $.min()
+in:
+  path: $.min()
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "min()"
+---
+test case: Compile success $.max()
+in:
+  path: $.max()
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "max()"
+---
+test case: Compile success $.avg()
+in:
+  path: $.avg()
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "avg()"
+---
+test case: Compile success $.length()
+in:
+  path: $.length()
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "length()"
+---
+test case: Compile success $.first().max()
+in:
+  path: $.first().max()
+out:
+  result: SUCCEED 
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "first()"
+    - type: ZBX_JSONPATH_SEGMENT_FUNCTION
+      data: "max()"
+---
+test case: Compile fail $[?]
+in:
+  path: $[?]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(]
+in:
+  path: $[?(]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?()]
+in:
+  path: $[?()]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(+)]
+in:
+  path: $[?(+)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(==)]
+in:
+  path: $[?(==)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(()]
+in:
+  path: $[?(()]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(+1)]
+in:
+  path: $[?(+1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(!)]
+in:
+  path: $[?(!)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(a)]
+in:
+  path: $[?(a)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(())]
+in:
+  path: $[?(())]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(1++1)]
+in:
+  path: $[?(1++1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(1 - - 1)]
+in:
+  path: $[?(1 - - 1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(1 + + 1)]
+in:
+  path: $[?(1 +  + 1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?((1+1)+)]
+in:
+  path: $[?((1+1)+)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?((1 + 1) + ())]
+in:
+  path: $[?((1 + 1) + ())]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(a + 1)]
+in:
+  path: $[?(a + 1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?(1 + 'a)]
+in:
+  path: $[?(1 + 'a)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?($..b + 1)]
+in:
+  path: $[?($..b + 1)]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?($['a])]
+in:
+  path: $[?($['a])]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?($[1,2])]
+in:
+  path: $[?($[1,2])]
+out:
+  result: FAIL
+---
+test case: Compile fail $[?($.a.)]
+in:
+  path: $[?($.a.)]
+out:
+  result: FAIL
+---
+test case: Compile success $[?(1)]
+in:
+  path: $[?(1)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1"
+---
+test case: Compile success $[?(-1)]
+in:
+  path: $[?(-1)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "-1"
+---
+test case: Compile success $[?($.a)]
+in:
+  path: $[?($.a)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "$.a"
+---
+test case: Compile success $[?(@.b)]
+in:
+  path: $[?(@.b)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "@.b"
+---
+test case: Compile success $[?(!1)]
+in:
+  path: $[?(!1)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , !"
+---
+test case: Compile success $[?(1 + 2)]
+in:
+  path: $[?(1 + 2)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , +"
+---
+test case: Compile success $[?(1 + 2 * 3)]
+in:
+  path: $[?(1 + 2 * 3)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , 3 , * , +"
+---
+test case: Compile success $[?(1 - 2 / 3)]
+in:
+  path: $[?(1 - 2 / 3)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , 3 , / , -"
+---
+test case: Compile success $[?((1 + 2) * 3)]
+in:
+  path: $[?((1 + 2) * 3)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , + , 3 , *"
+---
+test case: Compile success $[?($.a + 2 == 3)]
+in:
+  path: $[?($.a + 2 == 3)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "$.a , 2 , + , 3 , =="
+---
+test case: Compile success $[?((1 + 2) * (3 - 4))]
+in:
+  path: $[?((1 + 2) * (3 - 4))]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , + , 3 , 4 , - , *"
+---
+test case: Compile success $[?(1 == 2 || !3*5)]
+in:
+  path: $[?(1 == 2 || !3*5)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , == , 3 , ! , 5 , * , ||"
+---
+test case: Compile success $[?(1 == 2 || !(3*5))]
+in:
+  path: $[?(1 == 2 || !(3*5))]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , == , 3 , 5 , * , ! , ||"
+---
+test case: Compile success $[?(1 == 2 * @.a)]
+in:
+  path: $[?(1 == 2 * @.a)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , @.a , * , =="
+---
+test case: Compile success $[?((1)+(2))]
+in:
+  path: $[?((1)+(2))]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , +"
+---
+test case: Compile success $[?(1 + 2 - 3 + 4)]
+in:
+  path: $[?(1 + 2 - 3 + 4)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , + , 3 , - , 4 , +"
+---
+test case: Compile success $[?(1 == 2 == 3)]
+in:
+  path: $[?(1 == 2 == 3)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "1 , 2 , == , 3 , =="
+---
+test case: Compile fail $[?(1 == 2 == 3]
+in:
+  path: $[?(1 == 2 == 3]
+out:
+  result: FAIL 
+---
+test case: Compile success $..[?(@.id)]
+in:
+  path: $..[?(@.id)]
+out:
+  result: SUCCEED 
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "@.id"
+      detached: 1
+...

@@ -21,6 +21,8 @@
 #include "db.h"
 #include "dbupgrade.h"
 
+extern unsigned char	program_type;
+
 /*
  * 4.4 development database patches
  */
@@ -108,6 +110,17 @@ static int	DBpatch_4030009(void)
 	return DBdrop_field("items", "error");
 }
 
+static int	DBpatch_4030010(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 8 - SCREEN_RESOURCE_SCREEN */
+	if (ZBX_DB_OK > DBexecute("delete from screens_items where resourcetype=8"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4030)
@@ -124,5 +137,6 @@ DBPATCH_ADD(4030006, 0, 1)
 DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
+DBPATCH_ADD(4030010, 0, 1)
 
 DBPATCH_END()

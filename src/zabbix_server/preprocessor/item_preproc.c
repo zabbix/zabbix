@@ -171,7 +171,7 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	{
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
-			zbx_variant_set_variant(value_num, value);
+			zbx_variant_copy(value_num, value);
 			ret = SUCCEED;
 			break;
 		case ZBX_VARIANT_STR:
@@ -390,7 +390,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 
 	if (ZBX_VARIANT_NONE != history_value->type)
 	{
-		zbx_variant_set_variant(value, &value_num);
+		zbx_variant_copy(value, &value_num);
 
 		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
 		{
@@ -411,7 +411,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 
 	*history_ts = *ts;
 	zbx_variant_clear(history_value);
-	zbx_variant_set_variant(history_value, &value_num);
+	zbx_variant_copy(history_value, &value_num);
 	zbx_variant_clear(&value_num);
 
 	return SUCCEED;
@@ -911,20 +911,24 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	struct zbx_json_parse	jp, jp_out;
+	struct zbx_json_parse	jp;
 	char			*data = NULL;
-	size_t			data_alloc = 0;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_jsonpath_query(&jp, params, &data))
 	{
 		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 		return FAIL;
 	}
 
-	zbx_json_value_dyn(&jp_out, &data, &data_alloc);
+	if (NULL == data)
+	{
+		*errmsg = zbx_strdup(*errmsg, "no data matches the specified path");
+		return FAIL;
+	}
+
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, data);
 
@@ -1197,7 +1201,7 @@ static int	item_preproc_validate_regex(const zbx_variant_t *value, const char *p
 	const char	*errptr = NULL;
 	char		*errmsg;
 
-	zbx_variant_set_variant(&value_str, value);
+	zbx_variant_copy(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
@@ -1253,7 +1257,7 @@ static int	item_preproc_validate_not_regex(const zbx_variant_t *value, const cha
 	const char	*errptr = NULL;
 	char		*errmsg;
 
-	zbx_variant_set_variant(&value_str, value);
+	zbx_variant_copy(&value_str, value);
 
 	if (FAIL == zbx_variant_convert(&value_str, ZBX_VARIANT_STR))
 	{
@@ -1311,18 +1315,10 @@ out:
 static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *params, char **error)
 {
 	zbx_variant_t		value_str;
-	char			err[MAX_STRING_LEN];
 	int			ret;
-	struct zbx_json_parse	jp, jp_out;
-	size_t			data_alloc = 0;
+	struct zbx_json_parse	jp;
 
-	if (FAIL == zbx_json_path_check(params, err, sizeof(err)))
-	{
-		*error = zbx_strdup(*error, err);
-		return FAIL;
-	}
-
-	zbx_variant_set_variant(&value_str, value);
+	zbx_variant_copy(&value_str, value);
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
@@ -1330,14 +1326,21 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+	if (FAIL == zbx_json_open(value->data.str, &jp))
 		goto out;
 
-	zbx_json_value_dyn(&jp_out, error, &data_alloc);
+	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))
+	{
+		*error = zbx_strdup(NULL, zbx_json_strerror());
+		goto out;
+	}
 
-	zbx_lrtrim(*error, " \t\n\r");
-	if ('\0' == **error)
-		zbx_free(*error);
+	if (NULL != *error)
+	{
+		zbx_lrtrim(*error, " \t\n\r");
+		if ('\0' == **error)
+			zbx_free(*error);
+	}
 out:
 	zbx_variant_clear(&value_str);
 
@@ -1380,7 +1383,7 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	xmlErrorPtr		pErr;
 	xmlBufferPtr		xmlBufferLocal;
 
-	zbx_variant_set_variant(&value_str, value);
+	zbx_variant_copy(&value_str, value);
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
@@ -1473,7 +1476,7 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 	int		ret;
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 
-	zbx_variant_set_variant(&value_str, value);
+	zbx_variant_copy(&value_str, value);
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
@@ -1534,7 +1537,7 @@ static int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_
 	ret = zbx_variant_compare(value, history_value);
 
 	zbx_variant_clear(history_value);
-	zbx_variant_set_variant(history_value, value);
+	zbx_variant_copy(history_value, value);
 
 	if (0 == ret)
 		zbx_variant_clear(value);
@@ -1576,7 +1579,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 	ret = zbx_variant_compare(value, history_value);
 
 	zbx_variant_clear(history_value);
-	zbx_variant_set_variant(history_value, value);
+	zbx_variant_copy(history_value, value);
 
 	if (ZBX_VARIANT_NONE != history_value->type)
 		period = ts->sec - history_ts->sec;
@@ -1931,7 +1934,7 @@ int	zbx_item_preproc_test(unsigned char value_type, zbx_variant_t *value, const 
 			break;
 		}
 
-		zbx_variant_set_variant(&results[i].value, value);
+		zbx_variant_copy(&results[i].value, value);
 
 		if (ZBX_VARIANT_NONE != history_value.type)
 		{
