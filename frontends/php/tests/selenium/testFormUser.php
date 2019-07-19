@@ -234,7 +234,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
 			// Non-numeric value of 'Rows per page' field.
@@ -249,7 +249,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
 			// 'Autologout' below minimal value.
@@ -742,7 +742,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
 			//	Non-numeric value of 'Rows per page' field.
@@ -753,7 +753,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
 			// 'Autologout' below minimal value.
