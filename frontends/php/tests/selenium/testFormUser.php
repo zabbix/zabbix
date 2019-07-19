@@ -234,7 +234,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
 				]
 			],
 			// Non-numeric value of 'Rows per page' field.
@@ -249,7 +249,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
 				]
 			],
 			// 'Autologout' below minimal value.
@@ -742,7 +742,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
 				]
 			],
 			//	Non-numeric value of 'Rows per page' field.
@@ -753,7 +753,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Incorrect value "0" for "Rows per page" field: must be between 1 and 999999.'
+					'error_details' => 'Invalid parameter "/1/rows_per_page": must be one of 1-999999.'
 				]
 			],
 			// 'Autologout' below minimal value.
@@ -1211,9 +1211,9 @@ class testFormUser extends CWebTest {
 	private function setAutoLogout($data) {
 		$form = $this->query('name:user_form')->asForm()->one();
 		$auto_logout = $form->getFieldElements('Auto-logout');
-		$auto_logout->query('id:autologout_visible')->one()->asCheckbox()->set($data['checked']);
+		$auto_logout->query('id:autologout_visible')->first()->asCheckbox()->set($data['checked']);
 		if (array_key_exists('value', $data)) {
-			$auto_logout->query('id:autologout')->one()->overwrite($data['value']);
+			$auto_logout->query('id:autologout')->first()->overwrite($data['value']);
 		}
 		// Verify that Auto-login is unchecked after setting Auto-logout.
 		$this->assertTrue($form->getField('Auto-login')->isChecked(false));
