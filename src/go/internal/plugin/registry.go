@@ -17,12 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package plugin
 
-import (
-	"testing"
-)
-
-func TestAgent(t *testing.T) {
-
+func RegisterMetric(impl Impl, name string, key string, description string) {
 }

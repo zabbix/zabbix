@@ -1,3 +1,22 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 // Package conf provides .conf file loading and unmarshaling
 package conf
 
@@ -5,7 +24,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"go/pkg/std"
 	"reflect"
 	"strconv"
 	"strings"
@@ -417,16 +436,23 @@ func parseConfig(root *Node, data []byte) (err error) {
 		for start < tail && isWhitespace(data[tail-1]) {
 			tail--
 		}
-		var key, value, inc []byte
+		var key, value []byte
 		if key, value, err = parseLine(data[start:tail]); err != nil {
 			return fmt.Errorf("Cannot parse configuration at line %d: %s", num, err.Error())
 		}
 		if string(key) == "Include" {
 			filename := string(value)
-			if inc, err = ioutil.ReadFile(filename); err != nil {
-				return fmt.Errorf("Cannot read include file %s: %s", filename, err.Error())
+			var file std.File
+			if file, err = stdOs.Open(filename); err != nil {
+				return fmt.Errorf("Cannot read include file: %s", err.Error())
 			}
-			if err = parseConfig(root, inc); err != nil {
+			defer file.Close()
+
+			buf := bytes.Buffer{}
+			if _, err = buf.ReadFrom(file); err != nil {
+				return fmt.Errorf("Cannot read include file: %s", err.Error())
+			}
+			if err = parseConfig(root, buf.Bytes()); err != nil {
 				return fmt.Errorf("Cannot parse include file %s: %s", filename, err.Error())
 			}
 		} else {
@@ -462,9 +488,23 @@ func Unmarshal(data []byte, v interface{}) (err error) {
 }
 
 func Load(filename string, v interface{}) (err error) {
-	var data []byte
-	if data, err = ioutil.ReadFile(filename); err != nil {
+	var file std.File
+
+	if file, err = stdOs.Open(filename); err != nil {
 		return fmt.Errorf("Cannot load configuration: %s", err.Error())
 	}
-	return Unmarshal(data, v)
+	defer file.Close()
+
+	buf := bytes.Buffer{}
+	if _, err = buf.ReadFrom(file); err != nil {
+		return fmt.Errorf("Cannot load configuration: %s", err.Error())
+	}
+
+	return Unmarshal(buf.Bytes(), v)
+}
+
+var stdOs std.Os
+
+func init() {
+	stdOs = std.NewOs()
 }

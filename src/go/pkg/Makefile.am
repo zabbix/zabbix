@@ -1,2 +1,4 @@
 SUBDIRS = \
 	log \
+	conf \
+	std

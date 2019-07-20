@@ -1,1 +1,3 @@
-
+SUBDIRS = \
+    agent \
+    plugin

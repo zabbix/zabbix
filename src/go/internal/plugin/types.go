@@ -17,12 +17,44 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package plugin
 
-import (
-	"testing"
-)
+import "time"
 
-func TestAgent(t *testing.T) {
+// Collector - interface for periodical metric collection
+type Collector interface {
+	Collect() error
+	Period() int
+}
 
+// Exporter - interface for exporting collected metrics
+type Exporter interface {
+	Export(key string, params []string) (interface{}, error)
+}
+
+// Runner - interface to start/stop metric background processes
+type Runner interface {
+	Start() error
+	Stop() error
+}
+
+type HistoryCacher interface {
+	Write(itemid uint64, result *Result)
+}
+
+type Result struct {
+	Value       *string
+	Ts          time.Time
+	Error       error
+	LastLogsize uint64
+	Mtime       int
+}
+
+type Request struct {
+	Itemid      uint64
+	Key         string
+	Params      []string
+	Delay       string
+	LastLogsize uint64
+	Mtime       int
 }

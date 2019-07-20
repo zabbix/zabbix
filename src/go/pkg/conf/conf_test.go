@@ -1,6 +1,26 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 package conf
 
 import (
+	"go/pkg/std"
 	"reflect"
 	"testing"
 )
@@ -268,5 +288,26 @@ func TestNestedStruct(t *testing.T) {
 
 	var options Options
 	var expected Options = Options{Object{1, "a chair"}, Object{2, "a desk"}}
+	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestInclude(t *testing.T) {
+	stdOs = std.NewMockOs()
+	stdOs.(std.MockOs).MockFile("/tmp/array10.conf", []byte("Value=10\nValue=20"))
+	stdOs.(std.MockOs).MockFile("/tmp/array100.conf", []byte("Value=100\nValue=200"))
+
+	type Options struct {
+		Values []int `conf:"Value"`
+	}
+	input := `
+			Value = 1
+			Include = /tmp/array10.conf
+			Value = 2
+			Include = /tmp/array100.conf
+			Value = 3
+		`
+
+	var options Options
+	var expected Options = Options{[]int{1, 10, 20, 2, 100, 200, 3}}
 	checkUnmarshal(t, []byte(input), &expected, &options)
 }

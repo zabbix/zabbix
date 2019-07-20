@@ -17,12 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package main
+package uptime
 
 import (
-	"testing"
+	"errors"
+	"go/internal/plugin"
+	"go/pkg/std"
 )
 
-func TestAgent(t *testing.T) {
+// Plugin -
+type Plugin struct {
+}
 
+var impl Plugin
+var stdOs std.Os
+
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
+	}
+	return getUptime()
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds")
+	stdOs = std.NewOs()
 }
