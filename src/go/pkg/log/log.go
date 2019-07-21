@@ -21,7 +21,6 @@ package log
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 )
@@ -103,7 +102,6 @@ func Tracef(format string, args ...interface{}) {
 }
 
 func Debugf(format string, args ...interface{}) {
-	fmt.Println(Debug, logLevel)
 	if CheckLogLevel(Debug) {
 		logger.Printf(format, args...)
 	}

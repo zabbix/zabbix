@@ -17,35 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package agent
 
 import (
-	"fmt"
-	"go/pkg/log"
+	"errors"
+	"go/internal/plugin"
 )
 
-var plugins map[Initializer]*Plugin = make(map[Initializer]*Plugin)
-var metrics map[string]*Plugin = make(map[string]*Plugin)
-
-func RegisterMetric(impl Initializer, name string, key string, description string) {
-	if _, ok := metrics[key]; ok {
-		log.Warningf("cannot register duplicate metric \"%s\"", key)
-		return
-	}
-	var plugin *Plugin
-	var ok bool
-	if plugin, ok = plugins[impl]; !ok {
-		impl.Init(name, description)
-		plugin = NewPlugin(impl)
-		plugins[impl] = plugin
-	}
-	metrics[key] = plugin
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
-func Get(key string) (p *Plugin, err error) {
-	if p, ok := metrics[key]; !ok {
-		return nil, fmt.Errorf("cannot find plugin for metric \"%s\"", key)
-	} else {
-		return p, nil
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
 	}
+	p.Infof("export")
+	return Options.Hostname, nil
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
 }

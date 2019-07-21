@@ -27,6 +27,7 @@ import (
 
 // Plugin -
 type Plugin struct {
+	plugin.Base
 }
 
 var impl Plugin
@@ -41,6 +42,6 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds")
 	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds")
 }

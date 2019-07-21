@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package itemutil
 
 import (
 	"errors"
@@ -31,7 +31,7 @@ func isKeyChar(c byte) bool {
 	if c == '.' || c == '-' || c == '_' {
 		return true
 	}
-	if c >= '0' && c <= '0' {
+	if c >= '0' && c <= '9' {
 		return true
 	}
 	if c >= 'A' && c <= 'Z' {

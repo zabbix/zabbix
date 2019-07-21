@@ -25,6 +25,7 @@ import (
 	"go/internal/agent"
 	"go/pkg/conf"
 	"go/pkg/log"
+	_ "go/plugins"
 	"os"
 	"os/signal"
 	"syscall"
@@ -47,11 +48,61 @@ func main() {
 	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
 	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorhand)")
 
+	var testFlag string
+	const (
+		testDefault     = ""
+		testDescription = "Test specified item and exit"
+	)
+	flag.StringVar(&testFlag, "test", testDefault, testDescription)
+	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorhand)")
+
+	var printFlag bool
+	const (
+		printDefault     = false
+		printDescription = "Print known items and exit"
+	)
+	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
+	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorhand)")
+
 	flag.Parse()
 
-	if err := conf.Load(confFlag, &agent.Options); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-		os.Exit(1)
+	var argConfig, argTest, argPrint bool
+
+	// Need to manually check if the flag was specified, as default flag package
+	// does not offer automatic detection. Consider using third party package.
+	flag.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "t", "test":
+			argTest = true
+		case "p", "print":
+			argPrint = true
+		case "c", "config":
+			argConfig = true
+		}
+	})
+
+	if argConfig {
+		if err := conf.Load(confFlag, &agent.Options); err != nil {
+			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			os.Exit(1)
+		}
+	}
+
+	if argTest || argPrint {
+		if err := log.Open(log.Console, log.Warning, ""); err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
+			os.Exit(1)
+		}
+
+		if argTest {
+			if err := agent.CheckMetric(testFlag); err != nil {
+				os.Exit(1)
+			}
+		} else {
+			agent.CheckMetrics()
+		}
+
+		os.Exit(0)
 	}
 
 	var logType, logLevel int

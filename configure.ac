@@ -1836,6 +1836,7 @@ GOPATH=$ac_abs_confdir
 GOCMD=go
 GOWORKDIR=$ac_abs_confdir/src/go
 
+export GOBIN=${GOBIN}
 AC_SUBST(GOBIN)
 AC_SUBST(GOPATH)
 AC_SUBST(GOCMD)
@@ -1969,7 +1970,6 @@ AC_OUTPUT([
 	src/go/pkg/std/Makefile
 	src/go/pkg/itemutil/Makefile
 	src/go/internal/Makefile
-	src/go/internal/agent/Makefile
 	src/go/internal/plugin/Makefile
 	src/go/plugins/Makefile
 	src/go/plugins/system/Makefile

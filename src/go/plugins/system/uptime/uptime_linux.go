@@ -22,6 +22,7 @@ package uptime
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"go/pkg/std"
 	"strconv"
 	"strings"
@@ -31,6 +32,7 @@ import (
 func getUptime() (uptime int, err error) {
 	var file std.File
 	if file, err = stdOs.Open("/proc/stat"); err != nil {
+		err = fmt.Errorf("Cannot read boot time: %s", err.Error())
 		return
 	}
 	defer file.Close()
