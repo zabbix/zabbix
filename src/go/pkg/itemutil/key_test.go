@@ -24,7 +24,7 @@ import (
 	"testing"
 )
 
-func TestParseItemKey(t *testing.T) {
+func TestParseKey(t *testing.T) {
 	type Result struct {
 		input  string
 		failed bool
@@ -99,7 +99,7 @@ func TestParseItemKey(t *testing.T) {
 
 	for _, result := range results {
 		t.Run(result.input, func(t *testing.T) {
-			key, params, err := ParseItemKey(result.input)
+			key, params, err := ParseKey(result.input)
 			if err == nil {
 				if key != result.key {
 					t.Errorf("Expected key '%s' while got '%s'", result.key, key)

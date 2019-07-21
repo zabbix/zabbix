@@ -244,9 +244,9 @@ func parseParams(data []byte) (params []string, err error) {
 	return
 }
 
-// ParseItemKey parses item key in format key[param1, param2, ...] and returns
+// ParseKey parses item key in format key[param1, param2, ...] and returns
 // the parsed key and parameteres.
-func ParseItemKey(text string) (key string, params []string, err error) {
+func ParseKey(text string) (key string, params []string, err error) {
 	if text == "" {
 		err = errors.New("empty key")
 		return
