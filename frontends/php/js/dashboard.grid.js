@@ -2366,7 +2366,10 @@
 
 					if (data.dialogue['widget_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
+						ajax_data['view_mode'] = fields['show_header'] == 1 ? 0 : 1
+
 						delete fields['name'];
+						delete fields['show_header'];
 					}
 					else {
 						// Get default config if widget type changed.

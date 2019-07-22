@@ -1452,7 +1452,8 @@ select {
     .checkbox-radio + label span:active {
       border-color: #888; }
   .checkbox-radio + label.label-pos-left span {
-    margin-left: 4px; }
+    margin-left: 6px;
+    margin-right: 1px; }
   .checkbox-radio:focus + label span {
     border-color: #000; }
   .checkbox-radio:checked:focus + label span {
