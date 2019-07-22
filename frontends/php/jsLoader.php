@@ -117,8 +117,8 @@ $tranStrings = [
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
-		'Cannot add widget: not enough free space in dashboard' =>
-			_('Cannot add widget: not enough free space in dashboard')
+		'Cannot add widget: not enough free space in dashboard.' =>
+			_('Cannot add widget: not enough free space in dashboard.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

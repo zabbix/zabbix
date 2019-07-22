@@ -1924,9 +1924,8 @@
 	 */
 	function showMessageExhausted(data) {
 		data.dialogue.body.children('.msg-warning').remove();
-		$('<div class="msg-warning">' + data.options['message-exhausted'] + '</div>').prependTo(
-			data.dialogue.body
-		);
+		$('<div class="msg-warning">' + t('Cannot add widget: not enough free space in dashboard.') + '</div>').
+			prependTo(data.dialogue.body);
 		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
 
@@ -2018,7 +2017,6 @@
 				'widget-height': 70,
 				'widget-min-rows': 2,
 				'max-rows': 64,
-				'message-exhausted': t('Cannot add widget: not enough free space in dashboard'),
 				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
