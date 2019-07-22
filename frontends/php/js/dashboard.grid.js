@@ -1323,7 +1323,7 @@
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
-			view_mode = fields['show_header'] == 1 ? 0 : 1,
+			view_mode = (fields['show_header'] == 1) ? 0 : 1,
 			ajax_data = {
 				type: type,
 				name: name,
@@ -2366,7 +2366,7 @@
 
 					if (data.dialogue['widget_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
-						ajax_data['view_mode'] = fields['show_header'] == 1 ? 0 : 1
+						ajax_data['view_mode'] = (fields['show_header'] == 1) ? 0 : 1
 
 						delete fields['name'];
 						delete fields['show_header'];
