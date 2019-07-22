@@ -50,6 +50,7 @@ class CWidgetHelper {
 					(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)),
 					(new CDiv((new CCheckBox('show_header'))
 						->setLabel(_('Show header'))
+						->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
 						->setId('show_header')
 						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
 					))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
