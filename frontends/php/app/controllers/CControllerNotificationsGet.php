@@ -35,6 +35,7 @@ class CControllerNotificationsGet extends CController {
 		$this->settings['timeout'] = $timeout;
 		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);
 		$this->settings['show_recovered'] = (bool) $this->settings['triggers.recovery'];
+		$this->settings['show_suppressed'] = (bool) $this->settings['show_suppressed'];
 		if (!$this->settings['triggers.severities']) {
 			$this->settings['enabled'] = true;
 		}
@@ -84,7 +85,7 @@ class CControllerNotificationsGet extends CController {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'severities' => array_keys($this->settings['triggers.severities']),
-			'show_suppressed' => $this->settings['show_suppressed'] ? null : false,
+			'suppressed' => $this->settings['show_suppressed'] ? null : false,
 			'sortorder' => ZBX_SORT_DOWN,
 			'sortfield' => 'eventid',
 			'limit' => 15,
