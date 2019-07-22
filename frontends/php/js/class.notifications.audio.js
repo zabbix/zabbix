@@ -149,6 +149,7 @@ ZBX_NotificationsAudio.prototype.once = function() {
  */
 ZBX_NotificationsAudio.prototype.stop = function() {
 	this.ms_timeout = 0;
+	this.is_playing = false;
 
 	return this;
 };

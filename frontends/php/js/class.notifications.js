@@ -826,6 +826,7 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 
 	if (this.old_id !== this.getId()) {
 		this.player.seek(0);
+		this.player.stop();
 	}
 
 	this.player.tune({
