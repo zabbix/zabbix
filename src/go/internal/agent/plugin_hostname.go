@@ -36,7 +36,6 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters")
 	}
-	p.Infof("export")
 	return Options.Hostname, nil
 }
 
