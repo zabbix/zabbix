@@ -1970,6 +1970,7 @@ AC_OUTPUT([
 	src/go/pkg/std/Makefile
 	src/go/pkg/itemutil/Makefile
 	src/go/internal/Makefile
+	src/go/internal/agent/Makefile
 	src/go/internal/plugin/Makefile
 	src/go/plugins/Makefile
 	src/go/plugins/system/Makefile
