@@ -81,7 +81,13 @@
 		widget['content_script'] = $('<div>');
 
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
-			.append(widget['content_header'])
+			.append(widget['content_header'].on('focusin focusout', function(event) {
+				var $widget = $(this).closest('.dashbrd-grid-widget');
+				$widget.toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
+				if ($widget.hasClass('dashbrd-grid-widget-hidden-header') && $widget.position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
+				}
+			}))
 			.append(widget['content_body'])
 			.append(widget['content_script'])
 			.toggleClass('no-padding', !widget['padding']);
@@ -96,10 +102,6 @@
 			.toggleClass('new-widget', !widget['widgetid'].length)
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(widget['container'])
-			.on('focusin focusout', function(event) {
-				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
-				$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
-			})
 			.on('mouseenter mouseleave', function(event) {
 				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
 					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
