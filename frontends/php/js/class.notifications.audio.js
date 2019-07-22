@@ -222,6 +222,7 @@ ZBX_NotificationsAudio.prototype.resetPromise = function() {
  */
 ZBX_NotificationsAudio.prototype.timeout = function(seconds) {
 	if (this.message_timeout == 0) {
+		this.stop();
 		return this.resetPromise();
 	}
 
