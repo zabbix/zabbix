@@ -2371,7 +2371,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-  transform: translate3d(0, -95%, 0);
+  transform: translate3d(0, -94%, 0);
   z-index: 5; }
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
