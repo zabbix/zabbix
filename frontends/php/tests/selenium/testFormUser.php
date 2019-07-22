@@ -387,7 +387,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'www.zab bix.com'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// External URL without protocol.
@@ -402,7 +402,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'zabbix.com'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Internal URL without extention.
@@ -417,7 +417,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'sysmaps'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -432,7 +432,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Creating user by specifying only mandatory parameters.
@@ -852,7 +852,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'www.zab bix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// External URL without protocol.
@@ -863,7 +863,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'zabbix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Internal URL without extention.
@@ -874,7 +874,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'sysmaps'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Incorrect URL protocol.
@@ -885,7 +885,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/url": unacceptible URL.'
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// Updating all fields (except password) of an existing user.
