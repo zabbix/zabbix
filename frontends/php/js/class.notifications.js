@@ -828,10 +828,6 @@ ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 		this.player.seek(0);
 	}
 
-	if (this.timeout == ZBX_Notifications.ALARM_ONCE_PLAYER) {
-		this.markAsPlayed();
-	}
-
 	this.player.tune({
 		playOnce: (this.calcTimeout(user_settings) == ZBX_Notifications.ALARM_ONCE_PLAYER),
 		messageTimeout: (this.notif.calcDisplayTimeout(user_settings) / 1000) >> 0,

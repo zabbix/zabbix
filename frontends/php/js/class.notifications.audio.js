@@ -94,6 +94,7 @@ ZBX_NotificationsAudio.prototype.file = function(file) {
 	}
 
 	this.wave = file;
+	this.seek(0);
 
 	if (!this.wave) {
 		this.audio.removeAttribute('src');
