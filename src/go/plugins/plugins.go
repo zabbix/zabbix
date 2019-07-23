@@ -21,4 +21,5 @@ package plugins
 
 import (
 	_ "go/plugins/system/uptime"
+	_ "go/plugins/systemd"
 )

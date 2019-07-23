@@ -1975,6 +1975,7 @@ AC_OUTPUT([
 	src/go/plugins/Makefile
 	src/go/plugins/system/Makefile
 	src/go/plugins/system/uptime/Makefile
+	src/go/plugins/systemd/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
