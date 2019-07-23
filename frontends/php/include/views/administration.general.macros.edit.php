@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
+
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
 	->setControls((new CTag('nav', true,
@@ -90,7 +92,5 @@ $form = (new CForm())
 	->addItem($tab_view);
 
 $widget->addItem($form);
-
-require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
 return $widget;

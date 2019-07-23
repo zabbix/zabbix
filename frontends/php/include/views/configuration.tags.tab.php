@@ -19,6 +19,10 @@
 **/
 
 
+if (!$data['readonly']) {
+	require_once dirname(__FILE__).'/js/configuration.tags.tab.js.php';
+}
+
 $show_inherited_tags = (array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags']);
 
 // form list
@@ -121,9 +125,5 @@ if ($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype') {
 }
 
 $tags_form_list->addRow(null, $table);
-
-if (!$data['readonly']) {
-	require_once dirname(__FILE__).'/js/configuration.tags.tab.js.php';
-}
 
 return $tags_form_list;

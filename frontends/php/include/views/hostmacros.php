@@ -19,6 +19,10 @@
 **/
 
 
+if (!$data['readonly']) {
+	require_once dirname(__FILE__).'/js/hostmacros.js.php';
+}
+
 // form list
 $macros_form_list = new CFormList('macrosFormList');
 
@@ -187,9 +191,5 @@ $macros_form_list
 			->setModern(true)
 	)
 	->addRow(null, $table);
-
-if (!$data['readonly']) {
-	require_once dirname(__FILE__).'/js/hostmacros.js.php';
-}
 
 return $macros_form_list;

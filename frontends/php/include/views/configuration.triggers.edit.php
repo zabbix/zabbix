@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Triggers'));
 
 // Append host summary to widget header.
@@ -633,7 +635,5 @@ else {
 $triggersForm->addItem($triggersTab);
 
 $widget->addItem($triggersForm);
-
-require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 return $widget;
