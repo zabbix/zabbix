@@ -95,9 +95,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$user_medias = $this->getInput('user_medias', []);
+			$user['user_medias'] = [];
 
-			foreach ($user_medias as $media) {
+			foreach ($this->getInput('user_medias', []) as $media) {
 				$user['user_medias'][] = [
 					'mediatypeid' => $media['mediatypeid'],
 					'sendto' => $media['sendto'],

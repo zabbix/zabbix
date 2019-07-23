@@ -98,14 +98,15 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'refresh', 'rows_per_page', 'url', 'type'
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
-		$user_medias = $this->getInput('user_medias', []);
 
 		if ($this->getInput('password1', '') !== ''
 				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		foreach ($user_medias as $media) {
+		$user['user_medias'] = [];
+
+		foreach ($this->getInput('user_medias', []) as $media) {
 			$user['user_medias'][] = [
 				'mediatypeid' => $media['mediatypeid'],
 				'sendto' => $media['sendto'],

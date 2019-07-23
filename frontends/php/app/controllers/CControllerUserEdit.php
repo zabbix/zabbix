@@ -148,10 +148,11 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'user_medias', 'form_refresh', 'type'
+			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh', 'type'
 		]);
 		if ($data['form_refresh'] != 0) {
 			$user_groups = $this->getInput('user_groups', []);
+			$data['user_medias'] = $this->getInput('user_medias', []);
 		}
 
 		$data = $this->setUserMedias($data);

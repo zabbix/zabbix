@@ -127,10 +127,14 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['password1', 'password2', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-			'rows_per_page', 'url', 'user_medias', 'form_refresh'
+			'rows_per_page', 'url', 'form_refresh'
 		]);
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			if ($data['form_refresh'] != 0) {
+				$data['user_medias'] = $this->getInput('user_medias', []);
+			}
+
 			$data = $this->setUserMedias($data);
 		}
 

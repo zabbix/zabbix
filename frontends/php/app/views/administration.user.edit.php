@@ -202,100 +202,102 @@ $user_form_list
 		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-// Media tab.
-$media_form_list = new CFormList('userMediaFormList');
-$user_form->addVar('user_medias', $data['user_medias']);
-
-$media_table_info = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
-
-foreach ($data['user_medias'] as $index => $media) {
-	if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-		$status = (new CLink(_('Enabled'), '#'))
-			->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN);
-	}
-	else {
-		$status = (new CLink(_('Disabled'), '#'))
-			->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_RED);
-	}
-
-	$popup_options = [
-		'dstfrm' => $user_form->getName(),
-		'media' => $index,
-		'mediatypeid' => $media['mediatypeid'],
-		($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
-		'period' => $media['period'],
-		'severity' => $media['severity'],
-		'active' => $media['active']
-	];
-
-
-	$media_severity = [];
-
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$severity_name = getSeverityName($severity, $data['config']);
-
-		$media_active = ($media['severity'] & (1 << $severity));
-
-		$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
-			->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
-			->addClass($media_active ? getSeverityStatusStyle($severity) : ZBX_STYLE_STATUS_DISABLED_BG);
-	}
-
-	if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
-		$media['sendto'] = implode(', ', $media['sendto']);
-	}
-
-	if (mb_strlen($media['sendto']) > 50) {
-		$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
-	}
-
-	$media_table_info->addRow(
-		(new CRow([
-			$media['description'],
-			$media['sendto'],
-			(new CDiv($media['period']))
-				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-			(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
-			$status,
-			(new CCol(
-				new CHorList([
-					(new CButton(null, _('Edit')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->onClick('javascript: removeMedia('.$index.');')
-				])
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setId('user_medias_'.$index)
-	);
-}
-
-$media_form_list->addRow(_('Media'),
-	(new CDiv([
-		$media_table_info,
-		(new CButton(null, _('Add')))
-			->onClick('return PopUp("popup.media",'.
-				CJs::encodeJson([
-					'dstfrm' => $user_form->getName()
-				]).', null, this);'
-			)
-			->addClass(ZBX_STYLE_BTN_LINK),
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-// Append form lists to tab.
 $tabs->addTab('userTab', _('User'), $user_form_list);
-$tabs->addTab('mediaTab', _('Media'), $media_form_list);
+
+// Media tab.
+if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+	$media_form_list = new CFormList('userMediaFormList');
+	$user_form->addVar('user_medias', $data['user_medias']);
+
+	$media_table_info = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
+
+	foreach ($data['user_medias'] as $index => $media) {
+		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
+			$status = (new CLink(_('Enabled'), '#'))
+				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN);
+		}
+		else {
+			$status = (new CLink(_('Disabled'), '#'))
+				->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED);
+		}
+
+		$popup_options = [
+			'dstfrm' => $user_form->getName(),
+			'media' => $index,
+			'mediatypeid' => $media['mediatypeid'],
+			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
+			'period' => $media['period'],
+			'severity' => $media['severity'],
+			'active' => $media['active']
+		];
+
+
+		$media_severity = [];
+
+		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$severity_name = getSeverityName($severity, $data['config']);
+
+			$media_active = ($media['severity'] & (1 << $severity));
+
+			$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
+				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
+				->addClass($media_active ? getSeverityStatusStyle($severity) : ZBX_STYLE_STATUS_DISABLED_BG);
+		}
+
+		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+			$media['sendto'] = implode(', ', $media['sendto']);
+		}
+
+		if (mb_strlen($media['sendto']) > 50) {
+			$media['sendto'] = (new CSpan(mb_substr($media['sendto'], 0, 50).'...'))->setHint($media['sendto']);
+		}
+
+		$media_table_info->addRow(
+			(new CRow([
+				$media['description'],
+				$media['sendto'],
+				(new CDiv($media['period']))
+					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+				(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
+				$status,
+				(new CCol(
+					new CHorList([
+						(new CButton(null, _('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('return PopUp("popup.media",'.CJs::encodeJson($popup_options).', null, this);'),
+						(new CButton(null, _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('javascript: removeMedia('.$index.');')
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->setId('user_medias_'.$index)
+		);
+	}
+
+	$media_form_list->addRow(_('Media'),
+		(new CDiv([
+			$media_table_info,
+			(new CButton(null, _('Add')))
+				->onClick('return PopUp("popup.media",'.
+					CJs::encodeJson([
+						'dstfrm' => $user_form->getName()
+					]).', null, this);'
+				)
+				->addClass(ZBX_STYLE_BTN_LINK),
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+
+	$tabs->addTab('mediaTab', _('Media'), $media_form_list);
+}
 
 // Permissions tab.
 if ($data['action'] === 'user.edit') {
