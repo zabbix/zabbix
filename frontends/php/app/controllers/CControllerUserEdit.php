@@ -150,8 +150,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$this->getInputs($data, ['alias', 'name', 'surname', 'password1', 'password2', 'lang', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'user_medias', 'form_refresh', 'type'
 		]);
-		if ($this->hasInput('user_groups')) {
-			$user_groups = $this->getInput('user_groups');
+		if ($data['form_refresh'] != 0) {
+			$user_groups = $this->getInput('user_groups', []);
 		}
 
 		$data = $this->setUserMedias($data);
