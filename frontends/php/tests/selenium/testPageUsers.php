@@ -150,7 +150,7 @@ class testPageUsers extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 
 			$this->zbxTestCheckboxSelect('userids_' . $id);
-			$this->zbxTestClickButton('user.massdelete');
+			$this->zbxTestClickButton('user.delete');
 
 			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
