@@ -13,7 +13,7 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	Conn  []*dbus.Conn
+	conn  []*dbus.Conn
 	mutex sync.Mutex
 }
 
@@ -32,42 +32,42 @@ type unit struct {
 	JobPath     string `json:"{#UNIT.JOBPATH}"`
 }
 
-func getConnection(impl *Plugin) (*dbus.Conn, error) {
-	var error error
-	var Conn *dbus.Conn
+func getConnection() (*dbus.Conn, error) {
+	var err error
+	var conn *dbus.Conn
 
 	impl.mutex.Lock()
 	defer impl.mutex.Unlock()
 
-	if len(impl.Conn) == 0 {
-		Conn, error = dbus.SystemBusPrivate()
-		if error != nil {
-			return nil, error
+	if len(impl.conn) == 0 {
+		conn, err = dbus.SystemBusPrivate()
+		if err != nil {
+			return nil, err
 		}
-		error = Conn.Auth(nil)
-		if error != nil {
-			Conn.Close()
-			return nil, error
+		err = conn.Auth(nil)
+		if err != nil {
+			conn.Close()
+			return nil, err
 		}
 
-		error = Conn.Hello()
-		if error != nil {
-			Conn.Close()
-			return nil, error
+		err = conn.Hello()
+		if err != nil {
+			conn.Close()
+			return nil, err
 		}
 
 	} else {
-		Conn = impl.Conn[len(impl.Conn)-1]
-		impl.Conn = impl.Conn[:len(impl.Conn)-1]
+		conn = impl.conn[len(impl.conn)-1]
+		impl.conn = impl.conn[:len(impl.conn)-1]
 	}
 
-	return Conn, error
+	return conn, nil
 }
 
-func releaseConnection(impl *Plugin, Conn *dbus.Conn) {
+func releaseConnection(conn *dbus.Conn) {
 	impl.mutex.Lock()
 	defer impl.mutex.Unlock()
-	impl.Conn = append(impl.Conn, Conn)
+	impl.conn = append(impl.conn, conn)
 }
 
 func zbxNum2hex(c byte) byte {
@@ -79,63 +79,41 @@ func zbxNum2hex(c byte) byte {
 
 // Export -
 func (p *Plugin) Export(key string, params []string) (interface{}, error) {
-	Conn, error := getConnection(&impl)
+	conn, err := getConnection()
 
-	if nil != error {
-		return nil, fmt.Errorf("cannot establish connection to any available bus: %s", error)
+	if nil != err {
+		return nil, fmt.Errorf("Cannot establish connection to any available bus: %s", err)
 	}
 
-	defer releaseConnection(&impl, Conn)
+	defer releaseConnection(conn)
 
 	switch key {
 	case "systemd.unit.discovery":
 		var ext string
 
 		if len(params) > 1 {
-			return nil, fmt.Errorf("too many parameters")
+			return nil, fmt.Errorf("Too many parameters.")
 		}
 
 		if len(params) == 0 || len(params[0]) == 0 {
 			ext = ".service"
 		} else {
 			switch params[0] {
-			case "service":
-				fallthrough
-			case "target":
-				fallthrough
-			case "automount":
-				fallthrough
-			case "device":
-				fallthrough
-			case "mount":
-				fallthrough
-			case "path":
-				fallthrough
-			case "scope":
-				fallthrough
-			case "slice":
-				fallthrough
-			case "snapshot":
-				fallthrough
-			case "socket":
-				fallthrough
-			case "swap":
-				fallthrough
-			case "timer":
+			case "service", "target", "automount", "device", "mount", "path", "scope", "slice", "snapshot", "socket", "swap", "timer":
 				ext = "." + params[0]
 			case "all":
 				ext = ""
 			default:
-				return nil, fmt.Errorf("invalid first parameter")
+				return nil, fmt.Errorf("Invalid first parameter.")
 			}
 		}
 
 		var units []unit
-		obj := Conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
-		error := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
+		obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1"))
+		err := obj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store(&units)
 
-		if nil != error {
-			return nil, fmt.Errorf("cannot retrieve list of units: %s", error)
+		if nil != err {
+			return nil, fmt.Errorf("Cannot retrieve list of units: %s", err)
 		}
 
 		array := make([]*unit, len(units))
@@ -148,23 +126,23 @@ func (p *Plugin) Export(key string, params []string) (interface{}, error) {
 			j++
 		}
 
-		jsonArray, error := json.Marshal(array[:j])
+		jsonArray, err := json.Marshal(array[:j])
 
-		if nil != error {
-			return nil, fmt.Errorf("cannot create JSON array: %s", error)
+		if nil != err {
+			return nil, fmt.Errorf("Cannot create JSON array: %s", err)
 		}
 
 		return string(jsonArray), nil
 	case "systemd.unit.info":
 		var property, unitType string
-		var value, error interface{}
+		var value interface{}
 
 		if len(params) > 3 {
-			return nil, fmt.Errorf("too many parameters")
+			return nil, fmt.Errorf("Too many parameters.")
 		}
 
 		if len(params) < 1 || len(params[0]) == 0 {
-			return nil, fmt.Errorf("invalid first parameter")
+			return nil, fmt.Errorf("Invalid first parameter.")
 		}
 
 		if len(params) < 2 || len(params[1]) == 0 {
@@ -199,11 +177,11 @@ func (p *Plugin) Export(key string, params []string) (interface{}, error) {
 			j++
 		}
 
-		obj := Conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
-		error = obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+		obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+string(nameEsc[:j])))
+		err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
 
-		if nil != error {
-			return nil, fmt.Errorf("cannot get unit property: %s", error)
+		if nil != err {
+			return nil, fmt.Errorf("Cannot get unit property: %s", err)
 		}
 
 		return value, nil
