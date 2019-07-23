@@ -57,7 +57,7 @@ class CControllerUserList extends CController {
 		$filter_usrgrpid = $this->getInput('filter_usrgrpid', CProfile::get('web.user.filter.usrgrpid', 0));
 		CProfile::update('web.user.filter.usrgrpid', $filter_usrgrpid, PROFILE_TYPE_ID);
 
-		$sortfield = $this->getInput('sort', CProfile::get('web.user.sort', 'name'));
+		$sortfield = $this->getInput('sort', CProfile::get('web.user.sort', 'alias'));
 		$sortorder = $this->getInput('sortorder', CProfile::get('web.user.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.user.sort', $sortfield, PROFILE_TYPE_STR);
 		CProfile::update('web.user.sortorder', $sortorder, PROFILE_TYPE_STR);
