@@ -12,7 +12,6 @@ A.F....PS. [ZBXNEXT-1856,ZBXNEXT-5223] added web scenario and HTTP agent with Ke
 ..F....... [ZBX-10574] automated documentation link update upon release of new major version (vasilijs)
 
 Bug fixes:
-.......PS. [ZBX-16308] fixed proxy-server configuration synchronization when using dependent items (wiper)
 ..F....... [ZBX-15954] fixed functional macros resolving in maps (miks)
 ..F....... [ZBX-15905] reverted changes that introduced error with write permissions in assets directory (gcalenko)
 ..F....... [ZBX-15804] fixed links for discovered hosts, items, triggers and graphs (gcalenko)
