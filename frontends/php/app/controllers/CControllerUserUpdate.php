@@ -22,7 +22,7 @@
 /**
  * Class containing operations for updating a user.
  */
-class CControllerUserUpdate extends CController {
+class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
@@ -52,9 +52,13 @@ class CControllerUserUpdate extends CController {
 		$ret = $this->validateInput($this->fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
-			$error = self::VALIDATION_ERROR;
-			$ret = false;
+		if ($ret) {
+			$this->auth_type = getGroupsGuiAccess($this->getInput('user_groups'));
+
+			if (!$this->validatePassword($this->auth_type)) {
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
@@ -73,23 +77,6 @@ class CControllerUserUpdate extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Validate password directly from input when updating user.
-	 */
-	protected function validatePassword() {
-		if ($this->getInput('password1', '') !== $this->getInput('password2', '')) {
-			error(_('Both passwords must be equal.'));
-			return false;
-		}
-
-		if ($this->hasInput('password1') && $this->getInput('password1') === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
-			return false;
-		}
-
-		return true;
 	}
 
 	protected function checkPermissions() {
@@ -113,7 +100,8 @@ class CControllerUserUpdate extends CController {
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 		$user_medias = $this->getInput('user_medias', []);
 
-		if ($this->getInput('password1', '') !== '') {
+		if ($this->getInput('password1', '') !== ''
+				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 

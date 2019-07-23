@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerUserCreate extends CController {
+class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
@@ -47,6 +47,15 @@ class CControllerUserCreate extends CController {
 
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
+
+		if ($ret) {
+			$this->auth_type = getGroupsGuiAccess($this->getInput('user_groups'));
+
+			if (!$this->validatePassword($this->auth_type)) {
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
+			}
+		}
 
 		if ($ret && $this->getInput('password1') !== $this->getInput('password2')) {
 			error(_('Both passwords must be equal.'));
@@ -85,7 +94,8 @@ class CControllerUserCreate extends CController {
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups'), 'usrgrpid');
 		$user_medias = $this->getInput('user_medias', []);
 
-		if ($this->getInput('password1') !== '') {
+		if ($this->getInput('password1', '') !== ''
+				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 

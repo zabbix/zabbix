@@ -121,7 +121,7 @@ class CControllerUserList extends CController {
 				'type' => ($filter['type'] == -1) ? null : $filter['type']
 			],
 			'usrgrpids' => ($filter_usrgrpid == 0) ? null : $filter_usrgrpid,
-			'getAccess' => 1,
+			'getAccess' => true,
 			'limit' => $config['search_limit'] + 1
 		]);
 

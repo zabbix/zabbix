@@ -22,7 +22,7 @@
 /**
  * Class containing operations for updating user profile.
  */
-class CControllerUserProfileUpdate extends CController {
+class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput() {
 		$locales = array_keys(getLocales());
@@ -48,9 +48,13 @@ class CControllerUserProfileUpdate extends CController {
 		$ret = $this->validateInput($this->fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword()) {
-			$error = self::VALIDATION_ERROR;
-			$ret = false;
+		if ($ret) {
+			$this->auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
+
+			if (!$this->validatePassword($this->auth_type)) {
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
+			}
 		}
 
 		if (!$ret) {
@@ -71,34 +75,6 @@ class CControllerUserProfileUpdate extends CController {
 		return $ret;
 	}
 
-	/**
-	 * Validate password based on current user ID.
-	 */
-	protected function validatePassword() {
-		$auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
-
-		if ($auth_type != ZBX_AUTH_INTERNAL) {
-			$password1 = null;
-			$password2 = null;
-		}
-		else {
-			$password1 = $this->hasInput('password1') ? $this->getInput('password1') : null;
-			$password2 = $this->hasInput('password2') ? $this->getInput('password2') : null;
-		}
-
-		if ($password1 === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
-			return false;
-		}
-
-		if ($password1 !== $password2) {
-			error(_('Both passwords must be equal.'));
-			return false;
-		}
-
-		return true;
-	}
-
 	protected function checkPermissions() {
 		return (bool) API::User()->get([
 			'output' => [],
@@ -113,6 +89,11 @@ class CControllerUserProfileUpdate extends CController {
 		$this->getInputs($user, ['lang', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page', 'url']);
 		$user['userid'] = CWebUser::$data['userid'];
 
+		if ($this->getInput('password1', '') !== ''
+				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
+			$user['passwd'] = $this->getInput('password1');
+		}
+
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$user_medias = $this->getInput('user_medias', []);
 
@@ -125,10 +106,6 @@ class CControllerUserProfileUpdate extends CController {
 					'period' => $media['period']
 				];
 			}
-		}
-
-		if ($this->getInput('password1', '') !== '') {
-			$user['passwd'] = $this->getInput('password1');
 		}
 
 		DBstart();
