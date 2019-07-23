@@ -121,6 +121,14 @@ static int	DBpatch_4030010(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030011(void)
+{
+	const ZBX_FIELD	field = {"opdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("triggers", "details", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -138,5 +146,6 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
+DBPATCH_ADD(4030011, 0, 1)
 
 DBPATCH_END()
