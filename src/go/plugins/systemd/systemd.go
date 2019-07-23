@@ -13,8 +13,8 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	conn  []*dbus.Conn
-	mutex sync.Mutex
+	connections []*dbus.Conn
+	mutex       sync.Mutex
 }
 
 var impl Plugin
@@ -32,14 +32,14 @@ type unit struct {
 	JobPath     string `json:"{#UNIT.JOBPATH}"`
 }
 
-func getConnection() (*dbus.Conn, error) {
+func (p *Plugin) getConnection() (*dbus.Conn, error) {
 	var err error
 	var conn *dbus.Conn
 
-	impl.mutex.Lock()
-	defer impl.mutex.Unlock()
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
-	if len(impl.conn) == 0 {
+	if len(p.connections) == 0 {
 		conn, err = dbus.SystemBusPrivate()
 		if err != nil {
 			return nil, err
@@ -57,17 +57,17 @@ func getConnection() (*dbus.Conn, error) {
 		}
 
 	} else {
-		conn = impl.conn[len(impl.conn)-1]
-		impl.conn = impl.conn[:len(impl.conn)-1]
+		conn = p.connections[len(p.connections)-1]
+		p.connections = p.connections[:len(p.connections)-1]
 	}
 
 	return conn, nil
 }
 
-func releaseConnection(conn *dbus.Conn) {
-	impl.mutex.Lock()
-	defer impl.mutex.Unlock()
-	impl.conn = append(impl.conn, conn)
+func (p *Plugin) releaseConnection(conn *dbus.Conn) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.connections = append(p.connections, conn)
 }
 
 func zbxNum2hex(c byte) byte {
@@ -79,13 +79,13 @@ func zbxNum2hex(c byte) byte {
 
 // Export -
 func (p *Plugin) Export(key string, params []string) (interface{}, error) {
-	conn, err := getConnection()
+	conn, err := p.getConnection()
 
 	if nil != err {
 		return nil, fmt.Errorf("Cannot establish connection to any available bus: %s", err)
 	}
 
-	defer releaseConnection(conn)
+	defer p.releaseConnection(conn)
 
 	switch key {
 	case "systemd.unit.discovery":
