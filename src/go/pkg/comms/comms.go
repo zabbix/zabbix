@@ -123,5 +123,9 @@ func read(r io.Reader) ([]byte, error) {
 }
 
 func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
+	err := c.conn.SetReadDeadline(time.Now().Add(timeout))
+	if nil != err {
+		return nil, err
+	}
 	return read(c.conn)
 }
