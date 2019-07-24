@@ -49,7 +49,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$error = $this->GetValidationError();
 
 		if ($ret) {
-			$this->auth_type = getGroupsGuiAccess($this->getInput('user_groups'));
+			$this->auth_type = getGroupsAuthenticationType($this->getInput('user_groups'));
 
 			if (!$this->validatePassword($this->auth_type)) {
 				$error = self::VALIDATION_ERROR;

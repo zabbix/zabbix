@@ -91,39 +91,36 @@ function check_perm2login($userId) {
 /**
  * Get user gui access.
  *
- * @param string $userId
- * @param int    $maxGuiAccess
+ * @param string $userid
  *
  * @return int
  */
-function getUserGuiAccess($userId, $maxGuiAccess = null) {
-	if (bccomp($userId, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
+function getUserGuiAccess($userid) {
+	if (bccomp($userid, CWebUser::$data['userid']) == 0 && isset(CWebUser::$data['gui_access'])) {
 		return CWebUser::$data['gui_access'];
 	}
 
-	$guiAccess = DBfetch(DBselect(
+	$gui_access = DBfetch(DBselect(
 		'SELECT MAX(g.gui_access) AS gui_access'.
 		' FROM usrgrp g,users_groups ug'.
-		' WHERE ug.userid='.zbx_dbstr($userId).
-			' AND g.usrgrpid=ug.usrgrpid'.
-			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.zbx_dbstr($maxGuiAccess))
+		' WHERE g.usrgrpid=ug.usrgrpid'.
+			' AND ug.userid='.zbx_dbstr($userid)
 	));
 
-	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+	return $gui_access ? $gui_access['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
 }
 
 /**
  * Get user authentication type.
  *
- * @param string $userId
- * @param int    $maxGuiAccess
+ * @param string $userid
  *
  * @return int
  */
-function getUserAuthenticationType($userId, $maxGuiAccess = null) {
+function getUserAuthenticationType($userid) {
 	$config = select_config();
 
-	switch (getUserGuiAccess($userId, $maxGuiAccess)) {
+	switch (getUserGuiAccess($userid)) {
 		case GROUP_GUI_ACCESS_SYSTEM:
 			return $config['authentication_type'];
 
@@ -141,20 +138,43 @@ function getUserAuthenticationType($userId, $maxGuiAccess = null) {
 /**
  * Get groups gui access.
  *
- * @param array $groupIds
- * @param int   $maxGuiAccess
+ * @param array $groupids
  *
  * @return int
  */
-function getGroupsGuiAccess($groupIds, $maxGuiAccess = null) {
-	$guiAccess = DBfetch(DBselect(
+function getGroupsGuiAccess($groupids) {
+	$gui_access = DBfetch(DBselect(
 		'SELECT MAX(g.gui_access) AS gui_access'.
 		' FROM usrgrp g'.
-		' WHERE '.dbConditionInt('g.usrgrpid', $groupIds).
-			(($maxGuiAccess === null) ? '' : ' AND g.gui_access<='.zbx_dbstr($maxGuiAccess))
+		' WHERE '.dbConditionInt('g.usrgrpid', $groupids)
 	));
 
-	return $guiAccess ? $guiAccess['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+	return $gui_access ? $gui_access['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+}
+
+/**
+ * Get user groups authentication type.
+ *
+ * @param string $groupids
+ *
+ * @return int
+ */
+function getGroupsAuthenticationType($groupids) {
+	$config = select_config();
+
+	switch (getGroupsGuiAccess($groupids)) {
+		case GROUP_GUI_ACCESS_SYSTEM:
+			return $config['authentication_type'];
+
+		case GROUP_GUI_ACCESS_INTERNAL:
+			return ZBX_AUTH_INTERNAL;
+
+		case GROUP_GUI_ACCESS_LDAP:
+			return ZBX_AUTH_LDAP;
+
+		default:
+			return $config['authentication_type'];
+	}
 }
 
 /***********************************************
