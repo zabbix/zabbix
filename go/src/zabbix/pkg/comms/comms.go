@@ -50,8 +50,9 @@ func (c *ZbxConnection) WriteString(timeout time.Duration, s string) error {
 func read(r io.Reader) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
+	var b [2048]byte
 
-	s := make([]byte, 2048)
+	s := b[:]
 
 	for total < headerSize {
 		n, err := r.Read(s[total:cap(s)])
