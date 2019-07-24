@@ -97,7 +97,7 @@ func TestReceive(t *testing.T) {
 			data, err := read(m)
 			if err == nil {
 				if result.failed {
-					t.Errorf("Error expected")
+					t.Errorf("Expcted error while got success")
 				} else {
 					var buffer bytes.Buffer
 					for j := 0; j < len(result.data); j++ {
@@ -106,11 +106,11 @@ func TestReceive(t *testing.T) {
 
 					if len(buffer.Bytes()) < 13 {
 						if 0 != len(buffer.Bytes()) || 0 != len(data) {
-							t.Errorf("Header is missing")
+							t.Errorf("Expected header on success")
 						}
 					} else {
 						if !bytes.Equal(data, buffer.Bytes()[13:]) {
-							t.Errorf("Received bytes %v mismatch expected %v", data, buffer.Bytes())
+							t.Errorf("Expected data '%v' while got '%v'", buffer.Bytes(), data)
 						}
 					}
 				}
