@@ -70,25 +70,25 @@ func read(r io.Reader) ([]byte, error) {
 		if total == 0 {
 			return []byte{}, nil
 		}
-		return nil, fmt.Errorf("Message is shorter than expected")
+		return nil, fmt.Errorf("Message is missing header.")
 	}
 
 	if !bytes.Equal(s[:4], []byte{'Z', 'B', 'X', 'D'}) {
-		return nil, fmt.Errorf("Message is missing header, expected: 'ZBXD' received: '%s'", s[:4])
+		return nil, fmt.Errorf("Message is using unsupported protocol.")
 	}
 
 	if s[4] != 0x01 {
-		return nil, fmt.Errorf("Unsupported protocol version, expected: 0x01 received: 0x%02x", s[4])
+		return nil, fmt.Errorf("Message is using unsupported protocol version.")
 	}
 
 	expectedSize := binary.LittleEndian.Uint32(s[5:9])
 
 	if expectedSize > maxRecvDataSize {
-		return nil, fmt.Errorf("Message size %d exceeds the maximum size %d", expectedSize, maxRecvDataSize)
+		return nil, fmt.Errorf("Message size %d exceeds the maximum size %d bytes.", expectedSize, maxRecvDataSize)
 	}
 
 	if int(expectedSize) < total-headerSize {
-		return nil, fmt.Errorf("Message is longer than expected")
+		return nil, fmt.Errorf("Message is longer than expected.")
 	}
 
 	if int(expectedSize) == total-headerSize {
@@ -116,7 +116,7 @@ func read(r io.Reader) ([]byte, error) {
 	}
 
 	if total != int(expectedSize) {
-		return nil, fmt.Errorf("Message size is shorted or longer than expected")
+		return nil, fmt.Errorf("Message size is shorted or longer than expected.")
 	}
 
 	return s[:total], nil
