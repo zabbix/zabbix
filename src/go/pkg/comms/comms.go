@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const headerSize = 13
+
 type ZbxConnection struct {
 	conn net.Conn
 }
@@ -21,7 +23,7 @@ func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) 
 func write(w io.Writer, data []byte) error {
 	var b bytes.Buffer
 
-	b.Grow(len(data) + 13)
+	b.Grow(len(data) + headerSize)
 	b.Write([]byte{'Z', 'B', 'X', 'D', 0x01})
 	err := binary.Write(&b, binary.LittleEndian, uint64(len(data)))
 	if nil != err {
@@ -47,7 +49,6 @@ func (c *ZbxConnection) WriteString(timeout time.Duration, s string) error {
 
 func read(r io.Reader) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
-	const headerSize = 13
 	var total int
 
 	s := make([]byte, 2048)
@@ -66,6 +67,9 @@ func read(r io.Reader) ([]byte, error) {
 	}
 
 	if total < 13 {
+		if total == 0 {
+			return []byte{}, nil
+		}
 		return nil, fmt.Errorf("Message is shorter than expected")
 	}
 
@@ -88,7 +92,7 @@ func read(r io.Reader) ([]byte, error) {
 	}
 
 	if int(expectedSize) == total-headerSize {
-		return s[:total-headerSize], nil
+		return s[headerSize:total], nil
 	}
 
 	sTmp := make([]byte, expectedSize)
@@ -109,6 +113,10 @@ func read(r io.Reader) ([]byte, error) {
 		}
 
 		total += n
+	}
+
+	if total != int(expectedSize) {
+		return nil, fmt.Errorf("Message is shorter than expected")
 	}
 
 	return s[:total], nil
