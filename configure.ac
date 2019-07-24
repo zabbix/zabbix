@@ -1832,9 +1832,9 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 AC_SUBST(LOAD_MODULE_PATH)
 
 GOBIN=${bindir}
-GOPATH=$ac_abs_confdir
+GOPATH=$ac_abs_confdir/go
 GOCMD=go
-GOWORKDIR=$ac_abs_confdir/src/go
+GOWORKDIR=$ac_abs_confdir/go/src/zabbix
 
 export GOBIN=${GOBIN}
 AC_SUBST(GOBIN)
@@ -1961,21 +1961,23 @@ AC_OUTPUT([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile
-	src/go/Makefile
-	src/go/cmd/Makefile
-	src/go/cmd/agent/Makefile
-	src/go/pkg/Makefile
-	src/go/pkg/conf/Makefile
-	src/go/pkg/log/Makefile
-	src/go/pkg/std/Makefile
-	src/go/pkg/itemutil/Makefile
-	src/go/internal/Makefile
-	src/go/internal/agent/Makefile
-	src/go/internal/plugin/Makefile
-	src/go/plugins/Makefile
-	src/go/plugins/system/Makefile
-	src/go/plugins/system/uptime/Makefile
-	src/go/plugins/systemd/Makefile
+	go/Makefile
+	go/src/Makefile
+	go/src/zabbix/Makefile
+	go/src/zabbix/cmd/Makefile
+	go/src/zabbix/cmd/agent/Makefile
+	go/src/zabbix/pkg/Makefile
+	go/src/zabbix/pkg/conf/Makefile
+	go/src/zabbix/pkg/log/Makefile
+	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/itemutil/Makefile
+	go/src/zabbix/internal/Makefile
+	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/plugin/Makefile
+	go/src/zabbix/plugins/Makefile
+	go/src/zabbix/plugins/system/Makefile
+	go/src/zabbix/plugins/system/uptime/Makefile
+	go/src/zabbix/plugins/systemd/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

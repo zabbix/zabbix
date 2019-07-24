@@ -2,11 +2,18 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+if GO
+GO_SUBDIRS = \
+	go
+endif
+
+
 SUBDIRS = \
 	src \
 	database \
 	man \
-	misc
+	misc \
+	$(GO_SUBDIRS)
 
 EXTRA_DIST = \
 	bin \
@@ -14,7 +21,8 @@ EXTRA_DIST = \
 	frontends \
 	include \
 	conf \
-	sass
+	sass \
+	go
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
