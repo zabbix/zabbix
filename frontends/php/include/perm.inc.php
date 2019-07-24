@@ -138,31 +138,38 @@ function getUserAuthenticationType($userid) {
 /**
  * Get groups gui access.
  *
- * @param array $groupids
+ * @param array $usrgrpids
  *
  * @return int
  */
-function getGroupsGuiAccess($groupids) {
-	$gui_access = DBfetch(DBselect(
-		'SELECT MAX(g.gui_access) AS gui_access'.
-		' FROM usrgrp g'.
-		' WHERE '.dbConditionInt('g.usrgrpid', $groupids)
-	));
+function getGroupsGuiAccess($usrgrpids) {
+	$usrgrps = API::UserGroup()->get([
+		'output' => ['gui_access'],
+		'usrgrpids' => $usrgrpids
+	]);
 
-	return $gui_access ? $gui_access['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
+	$gui_access = GROUP_GUI_ACCESS_SYSTEM;
+
+	foreach ($usrgrps as $usrgrp) {
+		if ($gui_access < $usrgrp['gui_access']) {
+			$gui_access = $usrgrp['gui_access'];
+		}
+	}
+
+	return $gui_access;
 }
 
 /**
  * Get user groups authentication type.
  *
- * @param string $groupids
+ * @param string $usrgrpids
  *
  * @return int
  */
-function getGroupsAuthenticationType($groupids) {
+function getGroupsAuthenticationType($usrgrpids) {
 	$config = select_config();
 
-	switch (getGroupsGuiAccess($groupids)) {
+	switch (getGroupsGuiAccess($usrgrpids)) {
 		case GROUP_GUI_ACCESS_SYSTEM:
 			return $config['authentication_type'];
 
