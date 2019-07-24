@@ -869,6 +869,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"httpstep",
 		"httpstepitem",
 		"httpstep_field",
+		"config_autoreg_tls",
 		NULL
 	};
 

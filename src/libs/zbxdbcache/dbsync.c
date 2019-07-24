@@ -487,6 +487,85 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 #undef SELECTED_CONFIG_FIELD_COUNT
 }
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dbsync_compare_autoreg_psk                                   *
+ *                                                                            *
+ * Purpose: compares 'config_autoreg_tls' table with cached configuration     *
+ *          data                                                              *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     On success this function produces a changeset with 0 or 1 record       *
+ *     because 'config_autoreg_tls' table can have no more than 1 record.     *
+ *     If in future you want to support multiple autoregistration PSKs and/or *
+ *     select more colums in DBselect() then do not forget to sync changes    *
+ *     with DCsync_autoreg_config() !!!                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
+{
+	DB_RESULT	result;
+	DB_ROW		dbrow;
+	int		num_records = 0;
+
+#define CONFIG_AUTOREG_TLS_FIELD_COUNT	2	/* number of columns in the following DBselect() */
+
+	if (NULL == (result = DBselect("select tls_psk_identity,tls_psk"
+			" from config_autoreg_tls"
+			" order by autoreg_tlsid")))	/* if you change number of colums in DBselect(), */
+							/* adjust CONFIG_AUTOREG_TLS_FIELD_COUNT */
+	{
+		return FAIL;
+	}
+
+	dbsync_prepare(sync, CONFIG_AUTOREG_TLS_FIELD_COUNT, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		sync->dbresult = result;
+		return SUCCEED;
+	}
+
+	/* 0 or 1 records are expected */
+
+	if (NULL != (dbrow = DBfetch(result)))
+	{
+		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+
+		if ('\0' == dbsync_env.cache->autoreg_psk_identity[0])	/* no autoregistration PSK in cache */
+		{
+			tag = ZBX_DBSYNC_ROW_ADD;
+		}
+		else if (FAIL == dbsync_compare_str(dbrow[0], dbsync_env.cache->autoreg_psk_identity) ||
+				FAIL == dbsync_compare_str(dbrow[1], dbsync_env.cache->autoreg_psk))
+		{
+			tag = ZBX_DBSYNC_ROW_UPDATE;
+		}
+
+		if (ZBX_DBSYNC_ROW_NONE != tag)
+			dbsync_add_row(sync, 0, tag, dbrow);	/* fictious rowid 0 is used, there is only 1 record */
+
+		num_records = 1;
+	}
+	else if ('\0' != dbsync_env.cache->autoreg_psk_identity[0])
+			dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, NULL);
+
+	if (1 == num_records && NULL != (dbrow = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_ERR, "table 'config_autoreg_tls' has multiple records");
+
+	DBfree_result(result);
+
+	return SUCCEED;
+#undef CONFIG_AUTOREG_TLS_FIELD_COUNT
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: dbsync_compare_host                                              *

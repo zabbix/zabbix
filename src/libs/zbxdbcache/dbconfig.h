@@ -795,10 +795,6 @@ typedef struct
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
-							/* by PSK identity */
-#endif
 	zbx_hashset_t		data_sessions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -806,6 +802,13 @@ typedef struct
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
+							/* by PSK identity */
+	/* globally configured autoregistration PSK */
+	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 ZBX_DC_CONFIG;
 
