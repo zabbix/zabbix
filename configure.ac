@@ -1969,6 +1969,7 @@ AC_OUTPUT([
 	src/go/pkg/log/Makefile
 	src/go/pkg/std/Makefile
 	src/go/pkg/itemutil/Makefile
+	src/go/pkg/comms/Makefile
 	src/go/internal/Makefile
 	src/go/internal/agent/Makefile
 	src/go/internal/plugin/Makefile
