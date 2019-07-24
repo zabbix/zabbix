@@ -24,10 +24,10 @@ import (
 	"zabbix/pkg/log"
 )
 
-var plugins map[Initializer]*Plugin = make(map[Initializer]*Plugin)
+var plugins map[Accessor]*Plugin = make(map[Accessor]*Plugin)
 var metrics map[string]*Plugin = make(map[string]*Plugin)
 
-func RegisterMetric(impl Initializer, name string, key string, description string) {
+func RegisterMetric(impl Accessor, name string, key string, description string) {
 	if _, ok := metrics[key]; ok {
 		log.Warningf("cannot register duplicate metric \"%s\"", key)
 		return

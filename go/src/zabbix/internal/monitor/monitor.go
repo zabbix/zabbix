@@ -17,45 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package monitor
 
-import "time"
+import (
+	"sync"
+)
 
-// Collector - interface for periodical metric collection
-type Collector interface {
-	Collect() error
-	Period() int
+var waitGroup sync.WaitGroup
+
+// ServiceStarted must be called by internal services at start
+func Register() {
+	waitGroup.Add(1)
 }
 
-// Exporter - interface for exporting collected metrics
-type Exporter interface {
-	Export(key string, params []string) (interface{}, error)
+// ServiceStopped must be called by internal services at exit
+func Unregister() {
+	waitGroup.Done()
 }
 
-// Runner - interface to start/stop metric background processes
-type Runner interface {
-	Start() error
-	Stop() error
-}
-
-type ResultWriter interface {
-	Write(result *Result)
-}
-
-type Result struct {
-	Itemid      uint64
-	Value       *string
-	Ts          time.Time
-	Error       error
-	LastLogsize uint64
-	Mtime       int
-}
-
-type Request struct {
-	Itemid      uint64
-	Key         string
-	Params      []string
-	Delay       string
-	LastLogsize uint64
-	Mtime       int
+// WaitForServices waits until all started services are stopped
+func Wait() {
+	waitGroup.Wait()
 }

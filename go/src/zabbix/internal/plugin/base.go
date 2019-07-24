@@ -24,8 +24,10 @@ import (
 	"zabbix/pkg/log"
 )
 
-type Initializer interface {
+type Accessor interface {
 	Init(name string, description string)
+	Name() string
+	Description() string
 }
 
 type Base struct {

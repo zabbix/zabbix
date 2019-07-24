@@ -20,7 +20,7 @@
 package plugin
 
 type Plugin struct {
-	Impl interface{}
+	Impl Accessor
 	//	Queue        Performers
 	Active       bool
 	Queued       bool
@@ -28,7 +28,7 @@ type Plugin struct {
 	UsedCapacity int
 }
 
-func NewPlugin(impl interface{}) *Plugin {
+func NewPlugin(impl Accessor) *Plugin {
 	plugin := Plugin{Impl: impl}
 
 	//	plugin.Queue = make(Performers, 0)
