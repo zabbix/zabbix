@@ -95,7 +95,7 @@ func read(r io.Reader) ([]byte, error) {
 		return s[headerSize:total], nil
 	}
 
-	sTmp := make([]byte, expectedSize)
+	sTmp := make([]byte, expectedSize+1)
 	if total > headerSize {
 		copy(sTmp, s[headerSize:total])
 	}
@@ -116,7 +116,7 @@ func read(r io.Reader) ([]byte, error) {
 	}
 
 	if total != int(expectedSize) {
-		return nil, fmt.Errorf("Message is shorter than expected")
+		return nil, fmt.Errorf("Message size is shorted or longer than expected")
 	}
 
 	return s[:total], nil
