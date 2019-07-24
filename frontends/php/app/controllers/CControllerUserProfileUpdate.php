@@ -29,7 +29,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
 
-		$this->fields = [
+		$fields = [
 			'userid' =>			'fatal|required|db users.userid',
 			'password1' =>		'db users.passwd',
 			'password2' =>		'db users.passwd',
@@ -45,7 +45,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			'form_refresh' =>	'int32'
 		];
 
-		$ret = $this->validateInput($this->fields);
+		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
 		if ($ret) {
