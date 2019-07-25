@@ -17,39 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package agent
 
 import (
-	"errors"
-	"zabbix/pkg/log"
+	"fmt"
+	"strconv"
 )
 
-var plugins map[Accessor]*Plugin = make(map[Accessor]*Plugin)
-var metrics map[string]*Plugin = make(map[string]*Plugin)
-
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := metrics[key]; ok {
-		log.Warningf("cannot register duplicate metric \"%s\"", key)
-		return
+func valueToString(value interface{}) string {
+	switch value.(type) {
+	case string:
+		return value.(string)
+	case *string:
+		return *value.(*string)
+	case int:
+		return strconv.Itoa(value.(int))
+	default:
+		return fmt.Sprintf("%v", value)
 	}
-	var plugin *Plugin
-	var ok bool
-	if plugin, ok = plugins[impl]; !ok {
-		impl.Init(name, description)
-		plugin = NewPlugin(impl)
-		plugins[impl] = plugin
-	}
-	metrics[key] = plugin
-}
-
-func Get(key string) (p *Plugin, err error) {
-	if p, ok := metrics[key]; !ok {
-		return nil, errors.New("no plugin found")
-	} else {
-		return p, nil
-	}
-}
-
-func Count() int {
-	return len(plugins)
 }

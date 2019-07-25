@@ -17,39 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package itemutil
 
 import (
-	"errors"
-	"zabbix/pkg/log"
+	"strconv"
+	"time"
 )
 
-var plugins map[Accessor]*Plugin = make(map[Accessor]*Plugin)
-var metrics map[string]*Plugin = make(map[string]*Plugin)
-
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := metrics[key]; ok {
-		log.Warningf("cannot register duplicate metric \"%s\"", key)
+func GetNextcheck(itemid uint64, delay string, unsupported bool, from time.Time) (nextcheck time.Time, err error) {
+	var simple_delay int64
+	// TODO: add flexible/scheduled interval support
+	if simple_delay, err = strconv.ParseInt(delay, 10, 64); err != nil {
 		return
 	}
-	var plugin *Plugin
-	var ok bool
-	if plugin, ok = plugins[impl]; !ok {
-		impl.Init(name, description)
-		plugin = NewPlugin(impl)
-		plugins[impl] = plugin
-	}
-	metrics[key] = plugin
-}
-
-func Get(key string) (p *Plugin, err error) {
-	if p, ok := metrics[key]; !ok {
-		return nil, errors.New("no plugin found")
-	} else {
-		return p, nil
-	}
-}
-
-func Count() int {
-	return len(plugins)
+	from_seconds := from.Unix()
+	return time.Unix(from_seconds-from_seconds%simple_delay+simple_delay, 0), nil
 }

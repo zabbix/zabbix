@@ -54,7 +54,6 @@ type Result struct {
 type Request struct {
 	Itemid      uint64
 	Key         string
-	Params      []string
 	Delay       string
 	LastLogsize uint64
 	Mtime       int
