@@ -174,7 +174,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
 			'details' => 1,
-			'show_latest_values' => 0,
+			'show_opdata' => 0,
 			'sort_field' => '',
 			'sort_order' => ZBX_SORT_DOWN
 		];
