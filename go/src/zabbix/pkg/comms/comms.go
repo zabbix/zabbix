@@ -75,7 +75,7 @@ func read(r io.Reader) ([]byte, error) {
 
 	for total < headerSize {
 		n, err := r.Read(s[total:])
-		if err != nil {
+		if err != nil && err != io.EOF {
 			return nil, fmt.Errorf("Cannot read message: '%s'", err)
 		}
 

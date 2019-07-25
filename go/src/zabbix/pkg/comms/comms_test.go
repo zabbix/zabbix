@@ -21,6 +21,7 @@ package comms
 
 import (
 	"bytes"
+	"io"
 	"testing"
 )
 
@@ -87,6 +88,10 @@ func (t mockRead) Read(p []byte) (n int, err error) {
 	}
 
 	copy(p, s[:n])
+
+	if n == 0 {
+		return 0, io.EOF
+	}
 
 	return n, nil
 }
