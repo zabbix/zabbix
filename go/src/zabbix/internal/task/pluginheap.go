@@ -17,17 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package task
 
-import "container/heap"
+import (
+	"container/heap"
+)
 
-type Heap []*Plugin
+type pluginHeap []*Plugin
 
-func (h Heap) Len() int {
+func (h pluginHeap) Len() int {
 	return len(h)
 }
 
-func (h Heap) Less(i, j int) bool {
+func (h pluginHeap) Less(i, j int) bool {
 	if left := h[i].PeekQueue(); left != nil {
 		if right := h[j].PeekQueue(); right != nil {
 			return left.Scheduled().Before(right.Scheduled())
@@ -39,14 +41,14 @@ func (h Heap) Less(i, j int) bool {
 	}
 }
 
-func (h Heap) Swap(i, j int) {
+func (h pluginHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 	h[i].index = i
 	h[j].index = j
 }
 
 // Push -
-func (h *Heap) Push(x interface{}) {
+func (h *pluginHeap) Push(x interface{}) {
 	// Push and Pop use pointer receivers because they modify the slice's length,
 	// not just its contents.
 	p := x.(*Plugin)
@@ -55,7 +57,7 @@ func (h *Heap) Push(x interface{}) {
 }
 
 // Pop -
-func (h *Heap) Pop() interface{} {
+func (h *pluginHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	p := old[n-1]
@@ -65,13 +67,15 @@ func (h *Heap) Pop() interface{} {
 }
 
 // Peek -
-func (h *Heap) Peek() *Plugin {
+func (h *pluginHeap) Peek() *Plugin {
 	if len(*h) == 0 {
 		return nil
 	}
 	return (*h)[0]
 }
 
-func (h *Heap) Update(p *Plugin) {
-	heap.Fix(h, p.index)
+func (h *pluginHeap) Update(p *Plugin) {
+	if p.index != -1 {
+		heap.Fix(h, p.index)
+	}
 }

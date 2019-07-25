@@ -10,17 +10,18 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** GNU General Public License for more detailm.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package task
 
 import (
 	"container/heap"
+	"errors"
 	"time"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
@@ -36,10 +37,11 @@ type Item struct {
 	task        *ExporterTask
 }
 
-type Scheduler struct {
-	input chan interface{}
-	items map[uint64]*Item
-	queue plugin.Heap
+type Manager struct {
+	input   chan interface{}
+	items   map[uint64]*Item
+	plugins map[string]*Plugin
+	queue   pluginHeap
 }
 
 type UpdateRequest struct {
@@ -47,16 +49,24 @@ type UpdateRequest struct {
 	requests []*plugin.Request
 }
 
-func (s *Scheduler) processUpdateRequest(update *UpdateRequest) {
+type Scheduler interface {
+	UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request)
+	FinishTask(performer Performer)
+}
+
+func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 	log.Debugf("processing update request from instance %p (%d requests)", update.writer, len(update.requests))
 
 	now := time.Now()
 	for _, r := range update.requests {
 		var key string
 		var err error
-		var plg *plugin.Plugin
+		var p *Plugin
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			plg, err = plugin.Get(key)
+			var ok bool
+			if p, ok = m.plugins[key]; !ok {
+				err = errors.New("unknown metric")
+			}
 		}
 		if err != nil {
 			update.writer.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
@@ -64,16 +74,16 @@ func (s *Scheduler) processUpdateRequest(update *UpdateRequest) {
 			continue
 		}
 
-		switch plg.Impl.(type) {
+		switch p.impl.(type) {
 		case plugin.Collector:
-			if !plg.Active {
-				log.Debugf("Start collector task for plugin %s", plg.Impl.Name())
+			if !p.active {
+				log.Debugf("Start collector task for plugin %s", p.impl.Name())
 				/*
 					task := &CollectorTask{
 						Task: Task{
 							plugin:    plugin,
-							created:   s.updateTime,
-							scheduled: GetItemNextcheck(item, s.updateTime)}}
+							created:   m.updateTime,
+							scheduled: GetItemNextcheck(item, m.updateTime)}}
 					plugin.Enqueue(task)
 				*/
 			}
@@ -85,112 +95,129 @@ func (s *Scheduler) processUpdateRequest(update *UpdateRequest) {
 				continue
 			}
 
-			if item, ok := s.items[r.Itemid]; !ok {
+			if item, ok := m.items[r.Itemid]; !ok {
 				item = &Item{itemid: r.Itemid,
 					delay: r.Delay,
 					key:   r.Key,
 				}
-				s.items[r.Itemid] = item
+				m.items[r.Itemid] = item
 
 				item.task = &ExporterTask{
 					Task: Task{
-						plugin:    plg,
+						plugin:    p,
 						scheduled: nextcheck,
 					},
 					writer: update.writer,
-					item:   *item,
+					item:   item,
 				}
 				log.Debugf("Enqueue task %+v", *item.task)
-				plg.Enqueue(item.task)
+				p.Enqueue(item.task)
 
-				if !plg.Active {
-					heap.Push(&s.queue, plg)
-					plg.Active = true
+				if !p.active {
+					heap.Push(&m.queue, p)
+					p.active = true
 				} else {
-					s.queue.Update(plg)
+					m.queue.Update(p)
 				}
 			} else {
 				if item.delay != r.Delay && !item.unsupported {
-					log.Debugf("number of sheduled tasks: %d", len(plg.Tasks))
-					if len(plg.Tasks) > 0 {
-						log.Debugf("item.task: %p, queued task: %p", item.task, plg.Tasks[0])
+					log.Debugf("number of sheduled tasks: %d", len(p.tasks))
+					if len(p.tasks) > 0 {
+						log.Debugf("item.task: %p, queued task: %p", item.task, p.tasks[0])
 					}
-					plg.Tasks.Update(item.task)
-					s.queue.Update(plg)
+					p.tasks.Update(item.task)
+					m.queue.Update(p)
 					item.task.scheduled = nextcheck
 				}
 				item.delay = r.Delay
 				item.key = r.Key
-				item.task.item = *item
 			}
 		}
 	}
 }
 
-func (s *Scheduler) processQueue() {
+func (m *Manager) processQueue() {
 	ts := time.Now()
-	for plg := s.queue.Peek(); plg != nil; plg = s.queue.Peek() {
-		if performer := plg.PeekQueue(); performer != nil {
+	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
+		if performer := p.PeekQueue(); performer != nil {
 			if performer.Scheduled().After(ts) {
 				break
 			}
-			heap.Pop(&s.queue)
-			if !plg.BeginTask(s.input) {
+			heap.Pop(&m.queue)
+			if !p.BeginTask(m) {
 				continue
 			}
-			if plg.PeekQueue() != nil {
-				heap.Push(&s.queue, plg)
+			if p.PeekQueue() != nil {
+				heap.Push(&m.queue, p)
 			}
 		} else {
-			// plugins with empty task queue should not be in scheduler queue
-			heap.Pop(&s.queue)
+			// plugins with empty task queue should not be in Manager queue
+			heap.Pop(&m.queue)
 		}
 	}
 }
 
-func (s *Scheduler) run() {
-	log.Debugf("starting scheduler")
+func (m *Manager) run() {
+	log.Debugf("starting Manager")
 	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			s.processQueue()
-		case v := <-s.input:
+			m.processQueue()
+		case v := <-m.input:
 			if v == nil {
 				break run
 			}
 			switch v.(type) {
 			case *UpdateRequest:
-				s.processUpdateRequest(v.(*UpdateRequest))
-			case plugin.Performer:
-				performer := v.(plugin.Performer)
+				m.processUpdateRequest(v.(*UpdateRequest))
+			case Performer:
+				performer := v.(Performer)
+				performer.Reschedule()
 				p := performer.Plugin()
 				if p.EndTask(performer) {
-					heap.Push(&s.queue, p)
+					heap.Push(&m.queue, p)
 				}
-				s.processQueue()
+				m.processQueue()
 			}
 		}
 	}
-	close(s.input)
-	log.Debugf("scheduler has been stopped")
+	close(m.input)
+	log.Debugf("Manager has been stopped")
 	monitor.Unregister()
 }
 
-func (s *Scheduler) Start() {
-	s.items = make(map[uint64]*Item)
-	s.input = make(chan interface{}, 10)
-	s.queue = make(plugin.Heap, 0, plugin.Count())
+func (m *Manager) Start() {
+	m.items = make(map[uint64]*Item)
+	m.input = make(chan interface{}, 10)
+	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
+
+	m.plugins = make(map[string]*Plugin)
+	for key, acc := range plugin.Metrics {
+		m.plugins[key] = &Plugin{
+			impl:         acc,
+			tasks:        make(performerHeap, 0),
+			active:       false,
+			capacity:     10,
+			usedCapacity: 0,
+			index:        -1,
+		}
+	}
+
 	monitor.Register()
-	go s.run()
+	go m.run()
 }
 
-func (s *Scheduler) Stop() {
-	s.input <- nil
+func (m *Manager) Stop() {
+	m.input <- nil
 }
 
-func (s *Scheduler) Update(writer plugin.ResultWriter, requests []*plugin.Request) {
+func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
 	r := UpdateRequest{writer: writer, requests: requests}
-	s.input <- &r
+	m.input <- &r
+}
+
+func (m *Manager) FinishTask(p Performer) {
+	m.input <- p
 }

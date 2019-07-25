@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package task
 
 import (
 	"reflect"
@@ -28,12 +28,12 @@ import (
 )
 
 type Task struct {
-	plugin    *plugin.Plugin
+	plugin    *Plugin
 	scheduled time.Time
 	index     int
 }
 
-func (t *Task) Plugin() *plugin.Plugin {
+func (t *Task) Plugin() *Plugin {
 	return t.plugin
 }
 
@@ -57,56 +57,62 @@ type CollectorTask struct {
 	Task
 }
 
-func (t *CollectorTask) Perform() {
-	collector, _ := t.plugin.Impl.(plugin.Collector)
-	if err := collector.Collect(); err != nil {
-		log.Warningf("Plugin '%s' collector failed: %s", t.plugin.Impl.Name(), err.Error())
-	}
+func (t *CollectorTask) Perform(s Scheduler) {
+	go func() {
+		collector, _ := t.plugin.impl.(plugin.Collector)
+		if err := collector.Collect(); err != nil {
+			log.Warningf("Plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
+		}
+		s.FinishTask(t)
+	}()
 }
 
 func (t *CollectorTask) Reschedule() {
-	collector, _ := t.plugin.Impl.(plugin.Collector)
+	collector, _ := t.plugin.impl.(plugin.Collector)
 	t.scheduled = t.scheduled.Add(time.Duration(collector.Period()) * time.Second)
 }
 
 func (t *CollectorTask) Weight() int {
-	return t.plugin.Capacity
+	return t.plugin.capacity
 }
 
 type ExporterTask struct {
 	Task
 	writer plugin.ResultWriter
-	item   Item
+	item   *Item
 }
 
-func (t *ExporterTask) Perform() {
-	exporter, _ := t.plugin.Impl.(plugin.Exporter)
-	now := time.Now()
-	var key string
-	var params []string
-	var err error
-	if key, params, err = itemutil.ParseKey(t.item.key); err == nil {
-		var ret interface{}
-		if ret, err = exporter.Export(key, params); err == nil {
-			rt := reflect.TypeOf(ret)
-			switch rt.Kind() {
-			case reflect.Slice:
-				fallthrough
-			case reflect.Array:
-				s := reflect.ValueOf(ret)
-				for i := 0; i < s.Len(); i++ {
-					value := valueToString(s.Index(i))
+func (t *ExporterTask) Perform(s Scheduler) {
+	go func(itemkey string) {
+		exporter, _ := t.plugin.impl.(plugin.Exporter)
+		now := time.Now()
+		var key string
+		var params []string
+		var err error
+		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
+			var ret interface{}
+			if ret, err = exporter.Export(key, params); err == nil {
+				rt := reflect.TypeOf(ret)
+				switch rt.Kind() {
+				case reflect.Slice:
+					fallthrough
+				case reflect.Array:
+					s := reflect.ValueOf(ret)
+					for i := 0; i < s.Len(); i++ {
+						value := itemutil.ValueToString(s.Index(i))
+						t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+					}
+				default:
+					value := itemutil.ValueToString(ret)
 					t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
 				}
-			default:
-				value := valueToString(ret)
-				t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
 			}
 		}
-	}
-	if err != nil {
-		t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
-	}
+		if err != nil {
+			t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
+		}
+		s.FinishTask(t)
+	}(t.item.key)
 }
 
 func (t *ExporterTask) Reschedule() {

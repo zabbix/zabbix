@@ -17,78 +17,73 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package task
 
 import (
 	"container/heap"
 	"time"
+	"zabbix/internal/plugin"
 )
 
 type Plugin struct {
-	Impl         Accessor
-	Tasks        PerformerHeap
-	Active       bool
-	Capacity     int
-	UsedCapacity int
+	impl         plugin.Accessor
+	tasks        performerHeap
+	active       bool
+	capacity     int
+	usedCapacity int
 	index        int
 }
 
-func NewPlugin(impl Accessor) *Plugin {
-	plugin := Plugin{Impl: impl}
+func NewPlugin(impl plugin.Accessor) *Plugin {
+	plugin := Plugin{impl: impl}
 
-	plugin.Tasks = make(PerformerHeap, 0)
-	plugin.Active = false
-	plugin.Capacity = 5
+	plugin.tasks = make(performerHeap, 0)
+	plugin.active = false
+	plugin.capacity = 5
 
 	return &plugin
 }
 
 func (p *Plugin) PeekQueue() Performer {
-	if len(p.Tasks) == 0 {
+	if len(p.tasks) == 0 {
 		return nil
 	}
-	return p.Tasks[0]
+	return p.tasks[0]
 }
 
 func (p *Plugin) PopQueue() Performer {
-	if len(p.Tasks) == 0 {
+	if len(p.tasks) == 0 {
 		return nil
 	}
-	task := p.Tasks[0]
-	heap.Pop(&p.Tasks)
+	task := p.tasks[0]
+	heap.Pop(&p.tasks)
 	return task
 }
 
 func (p *Plugin) Enqueue(performer Performer) {
-	heap.Push(&p.Tasks, performer)
+	heap.Push(&p.tasks, performer)
 }
 
-func (p *Plugin) performTask(performer Performer, sink chan interface{}) {
-	performer.Perform()
-	performer.Reschedule()
-	sink <- performer
-}
-
-func (p *Plugin) BeginTask(sink chan interface{}) bool {
+func (p *Plugin) BeginTask(s Scheduler) bool {
 	performer := p.PeekQueue()
-	if p.Capacity-p.UsedCapacity >= performer.Weight() {
-		p.UsedCapacity += performer.Weight()
+	if p.capacity-p.usedCapacity >= performer.Weight() {
+		p.usedCapacity += performer.Weight()
 		p.PopQueue()
-		go p.performTask(performer, sink)
+		performer.Perform(s)
 		return true
 	}
 	return false
 }
 
 func (p *Plugin) EndTask(performer Performer) bool {
-	p.UsedCapacity -= performer.Weight()
+	p.usedCapacity -= performer.Weight()
 	p.Enqueue(performer)
-	return p.index == -1 && p.Capacity-p.UsedCapacity >= p.Tasks[0].Weight()
+	return p.index == -1 && p.capacity-p.usedCapacity >= p.tasks[0].Weight()
 }
 
 func (p *Plugin) Scheduled() time.Time {
-	if len(p.Tasks) == 0 {
+	if len(p.tasks) == 0 {
 		return time.Time{}
 	}
-	return p.Tasks[0].Scheduled()
+	return p.tasks[0].Scheduled()
 }

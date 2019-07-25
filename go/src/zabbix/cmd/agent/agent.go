@@ -27,12 +27,13 @@ import (
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
+	"zabbix/internal/task"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
 
-var scheduler agent.Scheduler
+var taskManager task.Manager
 
 func main() {
 	var confFlag string
@@ -149,7 +150,7 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
-	scheduler.Start()
+	taskManager.Start()
 
 loop:
 	for {
@@ -163,7 +164,7 @@ loop:
 		}
 	}
 
-	scheduler.Stop()
+	taskManager.Stop()
 	monitor.Wait()
 
 	farewell := fmt.Sprintf("Zabbix Agent stopped. (version placeholder)")

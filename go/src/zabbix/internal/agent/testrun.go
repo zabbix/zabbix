@@ -40,14 +40,14 @@ func CheckMetric(metric string) (err error) {
 		return
 	}
 
-	var p *plugin.Plugin
-	if p, err = plugin.Get(key); err != nil {
+	var acc plugin.Accessor
+	if acc, err = plugin.Get(key); err != nil {
 		return
 	}
 
 	var exporter plugin.Exporter
 	var ok bool
-	if exporter, ok = p.Impl.(plugin.Exporter); !ok {
+	if exporter, ok = acc.(plugin.Exporter); !ok {
 		return errors.New("not an exporter plugin")
 	}
 

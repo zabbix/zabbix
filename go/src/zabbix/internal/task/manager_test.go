@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package task
 
 import (
 	"testing"
@@ -46,14 +46,14 @@ func (p *DebugPlugin) Export(key string, params []string) (result interface{}, e
 	return params[0] + ": " + time.Now().Format(time.RFC3339), nil
 }
 
-func TestParseKey(t *testing.T) {
+func TestManger(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	var debug DebugPlugin
 	plugin.RegisterMetric(&debug, "debug", "debug", "Debug")
 
-	var scheduler Scheduler
-	scheduler.Start()
+	var manager Manager
+	manager.Start()
 	var resultCache ResultCacheMock
 
 	requests := make([]*plugin.Request, 0)
@@ -69,12 +69,12 @@ func TestParseKey(t *testing.T) {
 			Delay:  "2",
 		})
 	*/
-	scheduler.Update(&resultCache, requests)
+	manager.UpdateTasks(&resultCache, requests)
 	time.Sleep(time.Second * 5)
 	requests[0].Delay = "2"
-	scheduler.Update(&resultCache, requests)
+	manager.UpdateTasks(&resultCache, requests)
 	time.Sleep(time.Second * 5)
 
-	scheduler.Stop()
+	manager.Stop()
 	monitor.Wait()
 }

@@ -1,4 +1,5 @@
 SUBDIRS = \
     agent \
     monitor \
-    plugin
+    plugin \
+    task

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package task
 
 import (
 	"container/heap"
@@ -26,7 +26,7 @@ import (
 
 type Performer interface {
 	Plugin() *Plugin
-	Perform()
+	Perform(s Scheduler)
 	Reschedule()
 	Scheduled() time.Time
 	Weight() int
@@ -34,25 +34,25 @@ type Performer interface {
 	SetIndex(index int)
 }
 
-// PerformerHeap -
-type PerformerHeap []Performer
+// performerHeap -
+type performerHeap []Performer
 
-func (h PerformerHeap) Len() int {
+func (h performerHeap) Len() int {
 	return len(h)
 }
 
-func (h PerformerHeap) Less(i, j int) bool {
+func (h performerHeap) Less(i, j int) bool {
 	return h[i].Scheduled().Before(h[j].Scheduled())
 }
 
-func (h PerformerHeap) Swap(i, j int) {
+func (h performerHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 	h[i].SetIndex(i)
 	h[j].SetIndex(j)
 }
 
 // Push -
-func (h *PerformerHeap) Push(x interface{}) {
+func (h *performerHeap) Push(x interface{}) {
 	// Push and Pop use pointer receivers because they modify the slice's length,
 	// not just its contents.
 	p := x.(Performer)
@@ -61,7 +61,7 @@ func (h *PerformerHeap) Push(x interface{}) {
 }
 
 // Pop -
-func (h *PerformerHeap) Pop() interface{} {
+func (h *performerHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	p := old[n-1]
@@ -71,13 +71,15 @@ func (h *PerformerHeap) Pop() interface{} {
 }
 
 // Peek -
-func (h *PerformerHeap) Peek() Performer {
+func (h *performerHeap) Peek() Performer {
 	if len(*h) == 0 {
 		return nil
 	}
 	return (*h)[0]
 }
 
-func (h *PerformerHeap) Update(p Performer) {
-	heap.Fix(h, p.Index())
+func (h *performerHeap) Update(p Performer) {
+	if p.Index() != -1 {
+		heap.Fix(h, p.Index())
+	}
 }
