@@ -29,14 +29,19 @@ import (
 
 func main() {
 	var fFlag, pFlag string
+	var tFlag int
+
 	const (
 		fDefault     = "active_checks.json"
 		fDescription = "Path to the json file used in response"
 		pDefault     = "10051"
 		pDescription = "Listen port"
+		tDefault     = 5
+		tDescription = "Timeout in seconds"
 	)
 	flag.StringVar(&fFlag, "f", fDefault, fDescription)
 	flag.StringVar(&pFlag, "p", pDefault, pDescription)
+	flag.IntVar(&tFlag, "t", tDefault, tDescription)
 	flag.Parse()
 
 	dat, err := ioutil.ReadFile(fFlag)
@@ -54,7 +59,7 @@ func main() {
 		return
 	}
 
-	err = c.Write(dat, time.Second*5)
+	err = c.Write(dat, time.Second*time.Duration(tFlag))
 	if err != nil {
 		fmt.Printf("Write failed: %s\n", err)
 		return
