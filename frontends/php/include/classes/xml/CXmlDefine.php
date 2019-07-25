@@ -24,13 +24,6 @@
  */
 class CXmlDefine {
 
-	// Types.
-	const STRING = 0x01;
-	const ARRAY = 0x02;
-	const INTEGER = 0x03;
-	const INDEXED_ARRAY = 0x04;
-	const REQUIRED = 0x08;
-
 	// Values.
 	const ENABLED = 0;
 	const DISABLED = 1;
