@@ -240,6 +240,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'adm.gui.php',
 					'label' => _('General'),
 					'sub_pages' => [
+						'adm.autoregconfig.php',
 						'adm.housekeeper.php',
 						'adm.images.php',
 						'adm.iconmapping.php',

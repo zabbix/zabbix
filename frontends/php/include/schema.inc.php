@@ -7665,4 +7665,26 @@ return [
 			],
 		],
 	],
+	'config_autoreg_tls' => [
+		'key' => 'autoreg_tlsid',
+		'fields' => [
+			'autoreg_tlsid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'tls_psk_identity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => '',
+			],
+			'tls_psk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
+				'default' => '',
+			],
+		],
+	],
 ];

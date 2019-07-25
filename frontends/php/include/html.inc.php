@@ -761,6 +761,7 @@ function makePageFooter($with_version = true) {
 function makeAdministrationGeneralMenu($selected) {
 	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
 		'adm.gui.php' => _('GUI'),
+		'adm.autoregconfig.php' => _('Auto registration'),
 		'adm.housekeeper.php' => _('Housekeeping'),
 		'adm.images.php' => _('Images'),
 		'adm.iconmapping.php' => _('Icon mapping'),
