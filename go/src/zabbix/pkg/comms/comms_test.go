@@ -50,7 +50,7 @@ var results = []Result{
 	Result{failed: true, data: []string{"ZBXD\x01\x00\x00\x00\x00"}},
 	Result{data: []string{"Z", "B", "X", "D", "\x01", "\x0A", "\x00", "\x00", "\x00", "\x00", "\x00", "\x00", "\x00", "agent.ping"}},
 	Result{failed: true, data: []string{"Z", "B", "X", "D", "\x01", "\x01\x00\x00\x08\x00\x00\x00\x00", "agent.ping"}},
-	Result{failed: true, data: []string{"ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping"}}, //
+	Result{failed: true, data: []string{"ZBXD\x01\x0B\x00\x00\x00\x00\x00\x00\x00agent.ping"}},
 	Result{failed: true, data: []string{"ZBXD\x01\x09\x00\x00\x00\x00\x00\x00\x00agent.ping"}},
 	Result{failed: true, data: []string{"ZBXD\x01\x01\x00\x00\x00\x00\x00\x00"}},
 	Result{data: []string{"ZBXD\x01\x0A\x00\x00", "\x00\x00\x00\x00\x00agent.pi", "ng"}},

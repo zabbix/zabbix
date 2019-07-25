@@ -35,7 +35,7 @@ func write(w io.Writer, data []byte) error {
 	return err
 }
 
-func (c *ZbxConnection) Write(timeout time.Duration, data []byte) error {
+func (c *ZbxConnection) Write(data []byte, timeout time.Duration) error {
 	err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
 	if nil != err {
 		return err
@@ -43,8 +43,8 @@ func (c *ZbxConnection) Write(timeout time.Duration, data []byte) error {
 	return write(c.conn, data)
 }
 
-func (c *ZbxConnection) WriteString(timeout time.Duration, s string) error {
-	return c.Write(timeout, []byte(s))
+func (c *ZbxConnection) WriteString(s string, timeout time.Duration) error {
+	return c.Write([]byte(s), timeout)
 }
 
 func read(r io.Reader) ([]byte, error) {
@@ -129,4 +129,22 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 		return nil, err
 	}
 	return read(c.conn)
+}
+
+func (c *ZbxConnection) ListenAndAccept(address string) (err error) {
+	ln, err := net.Listen("tcp", address)
+	if err != nil {
+		return fmt.Errorf("Listen failed: %s", err)
+	}
+
+	c.conn, err = ln.Accept()
+	if err != nil {
+		return fmt.Errorf("Accept failed: %s", err)
+	}
+
+	return nil
+}
+
+func (c *ZbxConnection) Close() (err error) {
+	return c.conn.Close()
 }

@@ -1966,6 +1966,7 @@ AC_OUTPUT([
 	go/src/zabbix/Makefile
 	go/src/zabbix/cmd/Makefile
 	go/src/zabbix/cmd/agent/Makefile
+	go/src/zabbix/cmd/mock_server/Makefile
 	go/src/zabbix/pkg/Makefile
 	go/src/zabbix/pkg/conf/Makefile
 	go/src/zabbix/pkg/log/Makefile
