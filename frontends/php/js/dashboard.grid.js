@@ -1649,7 +1649,7 @@
 					data.new_widget_placeholder.container.hide();
 					return;
 				}
-
+var test = true;
 				var o = data.options,
 					offset = $obj.offset(),
 					y = Math.min(o['max-rows'] - 1,
@@ -1662,7 +1662,7 @@
 						y: y,
 						x: x,
 						height: o['widget-min-rows'],
-						width: 1
+						width: test ? 2 : 1
 					},
 					overlap = false;
 
@@ -1670,19 +1670,41 @@
 					if (('top' in data.add_widget_dimension) === false) {
 						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: Math.min(y, data.add_widget_dimension.y), left: x});
 					}
+if (test) {
+	pos = {
+		x: Math.min(x, (data.add_widget_dimension.left < x)
+			? data.add_widget_dimension.x
+			: data.add_widget_dimension.left
+		),
+		y: Math.min(y, (data.add_widget_dimension.top < y)
+			? data.add_widget_dimension.y
+			: data.add_widget_dimension.top
+		),
+		width: Math.max(1, (data.add_widget_dimension.left < x)
+			? x - data.add_widget_dimension.left + 1
+			: data.add_widget_dimension.left - x + (test ? 1 : 2)
+		),
+		height: Math.max(2, (data.add_widget_dimension.top < y)
+			? y - data.add_widget_dimension.top + 1
+			: data.add_widget_dimension.top - y + 2
+		)
+	};
+}
+else {
+	pos = {
+		x: Math.min(x, data.add_widget_dimension.left),
+		y: Math.min(y, (data.add_widget_dimension.top < y)
+			? data.add_widget_dimension.y
+			: data.add_widget_dimension.top
+		),
+		width: Math.abs(data.add_widget_dimension.left - x) + 1,
+		height: Math.max(2, (data.add_widget_dimension.top < y)
+			? y - data.add_widget_dimension.top + 1
+			: data.add_widget_dimension.top - y + 2
+		)
+	};
+}
 
-					pos = {
-						x: Math.min(x, data.add_widget_dimension.left),
-						y: Math.min(y, (data.add_widget_dimension.top < y)
-							? data.add_widget_dimension.y
-							: data.add_widget_dimension.top
-						),
-						width: Math.abs(data.add_widget_dimension.left - x) + 1,
-						height: Math.max(2, (data.add_widget_dimension.top < y)
-							? y - data.add_widget_dimension.top + 1
-							: data.add_widget_dimension.top - y + 2
-						)
-					};
 
 					$.each(data.widgets, function(_, box) {
 						overlap |= rectOverlap(box.pos, pos);
@@ -1698,6 +1720,16 @@
 					if (rectOverlap(data.add_widget_dimension, {x: x, y: y, width: 1, height: 1})) {
 						return;
 					}
+// TODO
+	if (test) {
+		if ((pos.x + pos.width) > data['options']['max-columns']) {
+			pos.x = data['options']['max-columns'] - pos.width;
+		}
+		else if (data.add_widget_dimension.x < pos.x) {
+			--pos.x;
+		}
+	}
+
 
 					if ((pos.y + pos.height) > data['options']['max-rows']) {
 						pos.y = data['options']['max-rows'] - pos.height;
