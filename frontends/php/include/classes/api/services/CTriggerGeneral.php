@@ -1042,7 +1042,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($trigger['description'] !== $db_trigger['description']) {
 				$upd_trigger['values']['description'] = $trigger['description'];
 			}
-			if ($trigger['opdata'] !== $db_trigger['opdata']) {
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== $db_trigger['opdata']) {
 				$upd_trigger['values']['opdata'] = $trigger['opdata'];
 			}
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
