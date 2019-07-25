@@ -99,7 +99,9 @@ class CControllerNotificationsGet extends CController {
 		$events = API::Problem()->get($options);
 
 		// Select latest status for already known events that are no longer available in problems table.
-		$resolved_events = array_diff(array_keys($this->known_eventids), array_keys($events));
+		$resolved_events = $this->settings['show_recovered']
+			? array_diff(array_keys($this->known_eventids), array_keys($events))
+			: [];
 
 		if ($resolved_events) {
 			$events += API::Event()->get([
