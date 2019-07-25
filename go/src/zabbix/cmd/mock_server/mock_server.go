@@ -28,12 +28,15 @@ import (
 )
 
 func main() {
-	var fFlag string
+	var fFlag, pFlag string
 	const (
 		fDefault     = "active_checks.json"
 		fDescription = "Path to the json file used in response"
+		pDefault     = "10051"
+		pDescription = "Listen port"
 	)
 	flag.StringVar(&fFlag, "f", fDefault, fDescription)
+	flag.StringVar(&pFlag, "p", pDefault, pDescription)
 	flag.Parse()
 
 	dat, err := ioutil.ReadFile(fFlag)
@@ -44,7 +47,7 @@ func main() {
 
 	var c comms.ZbxConnection
 
-	err = c.ListenAndAccept(":10051")
+	err = c.ListenAndAccept(":" + pFlag)
 	defer c.Close()
 	if err != nil {
 		fmt.Printf("Listen and accept failed: %s\n", err)
