@@ -20,6 +20,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -44,7 +45,7 @@ func main() {
 	flag.IntVar(&tFlag, "t", tDefault, tDescription)
 	flag.Parse()
 
-	dat, err := ioutil.ReadFile(fFlag)
+	activeChecks, err := ioutil.ReadFile(fFlag)
 	if err != nil {
 		fmt.Printf("Cannot read file: %s\n", err)
 		return
@@ -59,9 +60,28 @@ func main() {
 		return
 	}
 
-	err = c.Write(dat, time.Second*time.Duration(tFlag))
+	js, err := c.Read(time.Second * time.Duration(tFlag))
 	if err != nil {
-		fmt.Printf("Write failed: %s\n", err)
+		fmt.Printf("Read failed: %s\n", err)
 		return
 	}
+
+	var pairs map[string]interface{}
+
+	if err := json.Unmarshal(js, &pairs); err != nil {
+		panic(err)
+	}
+
+	switch pairs["request"] {
+	case "active checks":
+		err = c.Write(activeChecks, time.Second*time.Duration(tFlag))
+		if err != nil {
+			fmt.Printf("Write failed: %s\n", err)
+			return
+		}
+	default:
+		fmt.Printf("Unsupported request: %s\n", pairs["request"])
+		return
+	}
+
 }
