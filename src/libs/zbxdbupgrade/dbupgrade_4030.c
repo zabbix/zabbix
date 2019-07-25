@@ -129,6 +129,35 @@ static int	DBpatch_4030011(void)
 	return DBrename_field("triggers", "details", &field);
 }
 
+static int	DBpatch_4030012(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.problem.filter.show_opdata'"
+				" where idx='web.problem.filter.show_latest_values'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030013(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update widget_field"
+				" set name='show_opdata'"
+				" where name='show_latest_values'"
+					" and exists (select null"
+						" from widget"
+						" where widget.widgetid=widget_field.widgetid"
+							" and widget.type in ('problems','problemsbysv'))"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -147,5 +176,7 @@ DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
 DBPATCH_ADD(4030011, 0, 1)
+DBPATCH_ADD(4030012, 0, 1)
+DBPATCH_ADD(4030013, 0, 1)
 
 DBPATCH_END()

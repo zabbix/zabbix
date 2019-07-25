@@ -47,7 +47,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'tags' => $fields['tags'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
-			'show_latest_values' => $fields['show_latest_values']
+			'show_opdata' => $fields['show_opdata']
 		], $config, true, true);
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $config, $sortfield, $sortorder);
@@ -67,7 +67,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
 			'details' => 0,
-			'show_latest_values' => $fields['show_latest_values']
+			'show_opdata' => $fields['show_opdata']
 		], true, true);
 
 		if ($fields['show_tags']) {
@@ -90,7 +90,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 				'tags' => $fields['tags'],
 				'tag_name_format' => $fields['tag_name_format'],
 				'tag_priority' => $fields['tag_priority'],
-				'show_latest_values' => $fields['show_latest_values']
+				'show_opdata' => $fields['show_opdata']
 			],
 			'config' => [
 				'problem_unack_style' => $config['problem_unack_style'],

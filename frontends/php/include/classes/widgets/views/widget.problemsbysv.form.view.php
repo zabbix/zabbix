@@ -76,10 +76,8 @@ $form_list->addRow(
 	CWidgetHelper::getCheckBox($fields['hide_empty_groups'])
 );
 
-// Show latest values.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
-	CWidgetHelper::getCheckBox($fields['show_latest_values'])
-);
+// Show operational data.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_opdata']), CWidgetHelper::getCheckBox($fields['show_opdata']));
 
 // Problem display.
 $form_list->addRow(CWidgetHelper::getLabel($fields['ext_ack']), CWidgetHelper::getRadioButtonList($fields['ext_ack']));

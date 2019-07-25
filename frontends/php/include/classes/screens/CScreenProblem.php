@@ -166,7 +166,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['show_suppressed']       (optional)
-	 * @param int    $filter['show_latest_values']    (optional)
+	 * @param int    $filter['show_opdata']           (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 * @param bool   $resolve_comments
@@ -335,20 +335,19 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$show_latest_values =
-						(array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1);
+					$show_opdata = (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1);
 					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
 
-					if ($show_latest_values) {
+					if ($show_opdata) {
 						$options['selectItems'] =
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_latest_values || $details) {
+					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
-					if ($show_latest_values || $details) {
+					if ($show_opdata || $details) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
 					}
 
@@ -569,7 +568,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $filter
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
-	 * @param int   $filter['show_latest_values']
+	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
 	 * @param bool  $resolve_urls
 	 *
@@ -596,7 +595,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
-		if ($filter['details'] == 1 || $filter['show_latest_values'] == 1) {
+		if ($filter['details'] == 1 || $filter['show_opdata'] == 1) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -611,7 +610,7 @@ class CScreenProblem extends CScreenBase {
 			]);
 
 			// Sort items.
-			if ($filter['show_latest_values'] == 1) {
+			if ($filter['show_opdata'] == 1) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
 
 				foreach ($data['triggers'] as &$trigger) {
@@ -911,7 +910,7 @@ class CScreenProblem extends CScreenBase {
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-						$this->data['filter']['show_latest_values'] ? _('Latest values') : null,
+						$this->data['filter']['show_opdata'] ? _('Operational data') : null,
 						_('Duration'),
 						_('Ack'),
 						_('Actions'),
@@ -1090,7 +1089,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
-					($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view'])
+					($this->data['filter']['show_opdata'] && !$this->data['filter']['compact_view'])
 						? self::getLatestValues($trigger['items'])
 						: null,
 					($problem['r_eventid'] != 0)

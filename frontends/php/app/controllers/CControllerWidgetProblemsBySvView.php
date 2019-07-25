@@ -48,7 +48,7 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'hide_empty_groups' => $fields['hide_empty_groups'],
 			'ext_ack' => $fields['ext_ack'],
 			'show_timeline' => $fields['show_timeline'],
-			'show_latest_values' => $fields['show_latest_values']
+			'show_opdata' => $fields['show_opdata']
 		];
 
 		$this->setResponse(new CControllerResponseData([
