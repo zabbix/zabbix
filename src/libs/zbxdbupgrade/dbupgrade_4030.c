@@ -121,6 +121,15 @@ static int	DBpatch_4030010(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030011(void)
+{
+
+	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("interface", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -138,5 +147,6 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
+DBPATCH_ADD(4030011, 0, 1)
 
 DBPATCH_END()
