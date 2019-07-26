@@ -97,11 +97,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := conf.Load(confFlag, &options); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-		os.Exit(1)
-	}
-
 	var logType, logLevel int
 	switch options.LogType {
 	case "console":
@@ -129,7 +124,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent [(hostname placeholder)]. (version placeholder)")
+	greeting := fmt.Sprintf("Starting Zabbix Mock server [(hostname placeholder)]. (version placeholder)")
 	log.Infof(greeting)
 
 	if foregroundFlag {
