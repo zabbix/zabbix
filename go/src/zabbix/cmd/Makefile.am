@@ -1,2 +1,3 @@
 SUBDIRS = \
-	agent
+	agent \
+	mock_server

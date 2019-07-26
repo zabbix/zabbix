@@ -2,4 +2,5 @@ SUBDIRS = \
 	log \
 	conf \
 	std \
-	itemutil
+	itemutil \
+	comms

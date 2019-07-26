@@ -22,13 +22,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
