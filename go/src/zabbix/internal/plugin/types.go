@@ -47,8 +47,8 @@ type Result struct {
 	Value       *string
 	Ts          time.Time
 	Error       error
-	LastLogsize uint64
-	Mtime       int
+	LastLogsize *uint64
+	Mtime       *int
 }
 
 type Request struct {
