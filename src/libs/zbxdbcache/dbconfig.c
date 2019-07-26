@@ -319,6 +319,26 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
+static int	DCitem_check_unreachable_time(ZBX_DC_ITEM *item, unsigned char new_state, int unreach_nextcheck,
+		time_t *next_interval)
+{
+	int			simple_interval;
+	zbx_custom_interval_t	*custom_intervals;
+
+	if (0 == item->nextcheck || ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
+	{
+		if (SUCCEED == zbx_interval_preproc(item->delay, &simple_interval, &custom_intervals, NULL))
+		{
+			if (FAIL == check_custom_interval(simple_interval, custom_intervals,unreach_nextcheck,
+					next_interval))
+			{
+				return FAIL;
+			}
+		}
+	}
+	return SUCCEED;
+}
+
 static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, int *prohibited_interval, char **error)
 {
 	zbx_uint64_t	seed;
@@ -7574,9 +7594,17 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 
 	old_nextcheck = dc_item->nextcheck;
 	unreach_nextcheck = DCget_disable_until(dc_item, dc_host);
+
 	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, &prohibited_interval, NULL);
 	if (0 == prohibited_interval && 0 != unreach_nextcheck && 0 != (flags & ZBX_HOST_UNREACHABLE))
-		dc_item->nextcheck = unreach_nextcheck;
+	{
+		time_t next_interval;
+
+		if (FAIL == DCitem_check_unreachable_time(dc_item, new_state, unreach_nextcheck, &next_interval))
+			dc_item->nextcheck = (int)(next_interval);
+		else
+			dc_item->nextcheck = unreach_nextcheck;
+	}
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);

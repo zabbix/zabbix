@@ -2222,6 +2222,40 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_custom_interval                                            *
+ *                                                                            *
+ * Purpose: checks if next unreachable check time value does not falls into   *
+ *          flexible interval with delay = 0                                  *
+ *                                                                            *
+ * Parameters: simple_interval   - [IN] default delay value                   *
+ *             custom_intervals  - [IN] preprocessed custom intervals         *
+ *             unreach_nextcheck - [IN] next unreachable check                *
+ *             next_interval     - [OUT] timestamp where delay !=0            *
+ *                                                                            *
+ * Return value: SUCCEED - unreach_nextcheck is not in interval with delay=0  *
+ *               FAIL - unreach_nextcheck is inside interval with delay=0     *
+ *                                                                            *
+ ******************************************************************************/
+int	check_custom_interval(int simple_interval, const zbx_custom_interval_t *custom_intervals, int unreach_nextcheck,
+		time_t *next_interval)
+{
+	int current_delay;
+
+	if (NULL != custom_intervals)
+	{
+		current_delay = get_current_delay(simple_interval, custom_intervals->flexible,
+				(time_t)unreach_nextcheck );
+		if (0 == current_delay){
+			get_next_delay_interval(custom_intervals->flexible, (time_t)unreach_nextcheck, next_interval);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: calculate_proxy_nextcheck                                        *
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for passive proxy                   *
