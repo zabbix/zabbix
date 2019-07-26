@@ -76,76 +76,77 @@ class CControllerAcknowledgeCreate extends CController {
 		$this->new_severity = $this->getInput('severity', '');
 		$this->message = $this->getInput('message', '');
 
-		// TODO VM+: it is no longer "eventids" now it is "eventids_grouped" or even $eventid_groups
-		$eventids = $this->groupEventsByActionsAllowed($this->getInput('eventids'));
+		$eventid_groups = $this->groupEventsByActionsAllowed($this->getInput('eventids'));
 
-		while ($eventids['readable']) {
+		while ($eventid_groups['readable']) {
 			// Repeat this till $eventids['readable'] is empty.
 
-			$data = $this->getAcknowledgeOptions($eventids);
+			$data = $this->getAcknowledgeOptions($eventid_groups);
 
-			// Acknowledge events.
-			if ($data['action'] != ZBX_PROBLEM_UPDATE_NONE) {
-				// Acknowledge directly selected events.
-				if ($data['eventids']) {
-					$result = API::Event()->acknowledge($data);
-					$updated_events_count += count($data['eventids']);
-				}
+			/*
+			 * No actions to perform. This can happen only if user manages to select action he has no permissions to do
+			 * for any of selected events. This should not be possible by using frontend.
+			 */
+			if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
+				break;
+			}
 
-				// Do not continue if acknowledge validation fails.
-				if (!$result) {
-					break;
-				}
+			// Acknowledge directly selected events.
+			if ($data['eventids']) {
+				$result = API::Event()->acknowledge($data);
+				$updated_events_count += count($data['eventids']);
+			}
 
-				// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
-				if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
-					// Get trigger IDs for selected events.
-					$events = API::Event()->get([
-						'output' => ['objectid'],
-						'eventids' => $data['eventids'],
-						'source' => EVENT_SOURCE_TRIGGERS,
-						'object' => EVENT_OBJECT_TRIGGER
+			// Do not continue if acknowledge validation fails.
+			if (!$result) {
+				break;
+			}
+
+			// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
+			if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
+				// Get trigger IDs for selected events.
+				$events = API::Event()->get([
+					'output' => ['objectid'],
+					'eventids' => $data['eventids'],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER
+				]);
+
+				$triggerids = zbx_objectValues($events, 'objectid');
+				if ($triggerids) {
+					// Select related events by trigger IDs. Submitted events were already updated.
+					$related_problems = API::Problem()->get([
+						'output' => [],
+						'objectids' => array_keys(array_flip($triggerids)),
+						'preservekeys' => true
 					]);
 
-					$triggerids = zbx_objectValues($events, 'objectid');
-					if ($triggerids) {
-						// Select related events by trigger IDs. Submitted events were already updated.
-						$related_problems = API::Problem()->get([
-							'output' => [],
-							'objectids' => array_keys(array_flip($triggerids)),
-							'preservekeys' => true
-						]);
+					// Skip update for submitted events.
+					foreach ($this->getInput('eventids') as $eventid) {
+						unset($related_problems[$eventid]);
+					}
 
-						// Skip update for submitted events.
-						foreach ($this->getInput('eventids') as $eventid) {
-							unset($related_problems[$eventid]);
-						}
+					if ($related_problems) {
+						$related_problems = array_chunk(array_keys($related_problems), ZBX_DB_MAX_INSERTS);
 
-						if ($related_problems) {
-							$related_problems = array_chunk(array_keys($related_problems), ZBX_DB_MAX_INSERTS);
+						foreach ($related_problems as $problems) {
+							$problem_eventids = $this->groupEventsByActionsAllowed($problems);
 
-							foreach ($related_problems as $problems) {
-								$problem_eventids = $this->groupEventsByActionsAllowed($problems);
+							while ($problem_eventids['readable'] && $result) {
+								$data = $this->getAcknowledgeOptions($problem_eventids);
 
-								while ($problem_eventids['readable'] && $result) {
-									$data = $this->getAcknowledgeOptions($problem_eventids);
-
-									// Acknowledge events.
-									if ($data['action'] != ZBX_PROBLEM_UPDATE_NONE && $data['eventids']) {
-										$result = API::Event()->acknowledge($data);
-										$updated_events_count += count($data['eventids']);
-									}
-									else {
-										break;
-									}
+								// Acknowledge events.
+								if ($data['action'] != ZBX_PROBLEM_UPDATE_NONE && $data['eventids']) {
+									$result = API::Event()->acknowledge($data);
+									$updated_events_count += count($data['eventids']);
+								}
+								else {
+									break;
 								}
 							}
 						}
 					}
 				}
-			}
-			else {
-				break;
 			}
 		}
 
@@ -177,51 +178,50 @@ class CControllerAcknowledgeCreate extends CController {
 	 *
 	 * @return array
 	 */
-	// TODO VM+: it is no longer "eventids" now it is "eventids_grouped" or even $eventid_groups
-	protected function getAcknowledgeOptions(array &$eventids) {
+	protected function getAcknowledgeOptions(array &$eventid_groups) {
 		$data = [
 			'action' => ZBX_PROBLEM_UPDATE_NONE,
 			'eventids' => []
 		];
 
-		if ($this->close_problems && $eventids['closable']) {
+		if ($this->close_problems && $eventid_groups['closable']) {
 			$data['action'] |= ZBX_PROBLEM_UPDATE_CLOSE;
-			$data['eventids'] = $eventids['closable'];
-			$eventids['closable'] = [];
+			$data['eventids'] = $eventid_groups['closable'];
+			$eventid_groups['closable'] = [];
 		}
 
-		if ($this->change_severity && $eventids['editable']) {
+		if ($this->change_severity && $eventid_groups['editable']) {
 
 			if (!$data['eventids']) {
-				$data['eventids'] = $eventids['editable'];
+				$data['eventids'] = $eventid_groups['editable'];
 			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_SEVERITY;
 			$data['severity'] = $this->new_severity;
-			$eventids['editable'] = array_diff($eventids['editable'], $data['eventids']);
+			$eventid_groups['editable'] = array_diff($eventid_groups['editable'], $data['eventids']);
 		}
 
-		if ($this->acknowledge && $eventids['acknowledgeable']) {
+		if ($this->acknowledge && $eventid_groups['acknowledgeable']) {
 
 			if (!$data['eventids']) {
-				$data['eventids'] = $eventids['acknowledgeable'];
+				$data['eventids'] = $eventid_groups['acknowledgeable'];
 			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
-			$eventids['acknowledgeable'] = array_diff($eventids['acknowledgeable'], $data['eventids']);
+			$eventid_groups['acknowledgeable'] = array_diff($eventid_groups['acknowledgeable'], $data['eventids']);
 		}
 
-		if ($this->message !== '' && $eventids['readable']) {
+		if ($this->message !== '' && $eventid_groups['readable']) {
 
 			if (!$data['eventids']) {
-				$data['eventids'] = $eventids['readable'];
+				$data['eventids'] = $eventid_groups['readable'];
 			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_MESSAGE;
 			$data['message'] = $this->message;
 		}
 
-		$eventids['readable'] = array_diff($eventids['readable'], $data['eventids']);
+		$eventid_groups['readable'] = array_diff($eventid_groups['readable'], $data['eventids']);
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		return $data;
