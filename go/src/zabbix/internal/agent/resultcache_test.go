@@ -16,25 +16,46 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-package itemutil
+package agent
 
 import (
-	"fmt"
-	"strconv"
+	"testing"
+	"time"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/log"
 )
 
-const StateNotSupported = 1
+type mockWriter struct {
+}
 
-func ValueToString(value interface{}) string {
-	switch value.(type) {
-	case string:
-		return value.(string)
-	case *string:
-		return *value.(*string)
-	case int:
-		return strconv.Itoa(value.(int))
-	default:
-		return fmt.Sprintf("%v", value)
+func (w *mockWriter) Write(data []byte) (n int, err error) {
+	log.Debugf("WRITE: %s", string(data))
+	return len(data), nil
+}
+
+func TestResultCache(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+	var cache ResultCache
+	var writer mockWriter
+
+	cache.Start()
+
+	value := "xyz"
+	result := plugin.Result{
+		Itemid: 1,
+		Value:  &value,
+		Ts:     time.Now(),
 	}
+
+	cache.Write(&result)
+	cache.FlushOutput(&writer)
+
+	cache.SetOutput(&writer)
+	cache.Write(&result)
+	cache.Write(&result)
+	cache.Flush()
+
+	time.Sleep(time.Second)
+	cache.Stop()
+
 }
