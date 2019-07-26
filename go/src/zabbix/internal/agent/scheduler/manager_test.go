@@ -22,9 +22,11 @@ package scheduler
 import (
 	"container/heap"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
 )
 
@@ -233,4 +235,185 @@ func TestTaskDelete(t *testing.T) {
 	}
 
 	validateQueue(t, &manager, items)
+}
+
+func getNextcheck(delay string, from time.Time) (nextcheck time.Time) {
+	simple_delay, _ := strconv.ParseInt(delay, 10, 64)
+	from_seconds := from.Unix()
+	return time.Unix(from_seconds-from_seconds%simple_delay+simple_delay, 0)
+}
+
+type MockTask struct {
+	Task
+	item    *Item
+	manager *Manager
+	sink    chan Performer
+}
+
+func (t *MockTask) Perform(s Scheduler) {
+	key, params, _ := itemutil.ParseKey(t.item.key)
+	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params)
+	t.sink <- t
+}
+
+func (t *MockTask) Reschedule() {
+	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
+}
+
+func finishTasks(m *Manager, sink chan Performer) {
+	for {
+		select {
+		case p := <-sink:
+			m.processFinishRequest(p)
+		default:
+			return
+		}
+	}
+}
+
+func TestSchedule(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	plugin.ClearRegistry()
+	plugins := make([]DebugPlugin, 3)
+	for i := range plugins {
+		p := &plugins[i]
+		name := fmt.Sprintf("debug%d", i+1)
+		plugin.RegisterMetric(p, name, name, "")
+	}
+
+	sink := make(chan Performer, 10)
+	var manager Manager
+	manager.init()
+
+	items := []*Item{
+		&Item{itemid: 1, delay: "1", key: "debug1"},
+		&Item{itemid: 2, delay: "2", key: "debug2"},
+		&Item{itemid: 3, delay: "5", key: "debug3"},
+	}
+
+	clock := time.Now().Unix()
+	now := time.Unix(clock-clock%10, 0)
+
+	// construct manager queue with mock tasks
+	for _, item := range items {
+		var key string
+		var err error
+		if key, _, err = itemutil.ParseKey(item.key); err != nil {
+			t.Errorf("Unexpected itemutil.ParseKey failure: %s", err.Error())
+		}
+		var p *Plugin
+		var ok bool
+		if p, ok = manager.plugins[key]; !ok {
+			t.Errorf("Cannot find plugin %s", key)
+		}
+		task := MockTask{
+			Task: Task{
+				plugin:    p,
+				scheduled: getNextcheck(item.delay, now),
+			},
+			item:    item,
+			manager: &manager,
+			sink:    sink,
+		}
+		p.Enqueue(&task)
+		if p.index == -1 {
+			heap.Push(&manager.queue, p)
+		}
+	}
+
+	uses := [][]int{
+		[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},
+		[]int{0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10},
+		[]int{0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4},
+	}
+
+	for i := 0; i < 20; i++ {
+		now = now.Add(time.Second)
+		manager.processQueue(now)
+		finishTasks(&manager, sink)
+
+		for j := range plugins {
+			p := &plugins[j]
+			if uses[j][i] != p.used {
+				t.Errorf("Wrong use count for plugin %s at step %d: expected %d while got %d",
+					p.Name(), i+1, uses[j][i], p.used)
+			}
+		}
+	}
+}
+
+func TestCapacity(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	plugin.ClearRegistry()
+	plugins := make([]DebugPlugin, 2)
+	for i := range plugins {
+		p := &plugins[i]
+		name := fmt.Sprintf("debug%d", i+1)
+		plugin.RegisterMetric(p, name, name, "")
+	}
+
+	sink := make(chan Performer, 10)
+	var manager Manager
+	manager.init()
+
+	p := manager.plugins["debug2"]
+	p.capacity = 2
+
+	items := []*Item{
+		&Item{itemid: 1, delay: "1", key: "debug1"},
+		&Item{itemid: 2, delay: "2", key: "debug2[1]"},
+		&Item{itemid: 3, delay: "2", key: "debug2[2]"},
+		&Item{itemid: 4, delay: "2", key: "debug2[3]"},
+	}
+
+	clock := time.Now().Unix()
+	now := time.Unix(clock-clock%10, 0)
+
+	// construct manager queue with mock tasks
+	for _, item := range items {
+		var key string
+		var err error
+		if key, _, err = itemutil.ParseKey(item.key); err != nil {
+			t.Errorf("Unexpected itemutil.ParseKey failure: %s", err.Error())
+		}
+		var p *Plugin
+		var ok bool
+		if p, ok = manager.plugins[key]; !ok {
+			t.Errorf("Cannot find plugin %s", key)
+		}
+		task := MockTask{
+			Task: Task{
+				plugin:    p,
+				scheduled: getNextcheck(item.delay, now),
+			},
+			item:    item,
+			manager: &manager,
+			sink:    sink,
+		}
+		p.Enqueue(&task)
+		if p.index == -1 {
+			heap.Push(&manager.queue, p)
+		}
+	}
+
+	uses := [][]int{
+		[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},
+		[]int{0, 2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18, 20, 21, 23, 24, 26, 27, 29},
+	}
+
+	for i := 0; i < 20; i++ {
+		now = now.Add(time.Second)
+		manager.processQueue(now)
+		finishTasks(&manager, sink)
+
+		for j := range plugins {
+			p := &plugins[j]
+			if uses[j][i] != p.used {
+				t.Errorf("Wrong use count for plugin %s at step %d: expected %d while got %d",
+					p.Name(), i, uses[j][i], p.used)
+			}
+		}
+	}
 }

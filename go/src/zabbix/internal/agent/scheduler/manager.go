@@ -145,11 +145,10 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 	}
 }
 
-func (m *Manager) processQueue() {
-	ts := time.Now()
+func (m *Manager) processQueue(now time.Time) {
 	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
 		if performer := p.PeekQueue(); performer != nil {
-			if performer.Scheduled().After(ts) {
+			if performer.Scheduled().After(now) {
 				break
 			}
 			heap.Pop(&m.queue)
@@ -166,6 +165,14 @@ func (m *Manager) processQueue() {
 	}
 }
 
+func (m *Manager) processFinishRequest(performer Performer) {
+	performer.Reschedule()
+	p := performer.Plugin()
+	if p.EndTask(performer) {
+		heap.Push(&m.queue, p)
+	}
+}
+
 func (m *Manager) run() {
 	log.Debugf("starting Manager")
 	ticker := time.NewTicker(time.Second)
@@ -173,7 +180,7 @@ run:
 	for {
 		select {
 		case <-ticker.C:
-			m.processQueue()
+			m.processQueue(time.Now())
 		case v := <-m.input:
 			if v == nil {
 				break run
@@ -182,13 +189,8 @@ run:
 			case *UpdateRequest:
 				m.processUpdateRequest(v.(*UpdateRequest))
 			case Performer:
-				performer := v.(Performer)
-				performer.Reschedule()
-				p := performer.Plugin()
-				if p.EndTask(performer) {
-					heap.Push(&m.queue, p)
-				}
-				m.processQueue()
+				m.processFinishRequest(v.(Performer))
+				m.processQueue(time.Now())
 			}
 		}
 	}

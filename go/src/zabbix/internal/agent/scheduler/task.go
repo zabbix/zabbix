@@ -120,6 +120,5 @@ func (t *ExporterTask) Perform(s Scheduler) {
 }
 
 func (t *ExporterTask) Reschedule() {
-	log.Debugf("reschedule: %+v", t.item)
 	t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, time.Now())
 }
