@@ -34,6 +34,10 @@ type ZbxConnection struct {
 	conn net.Conn
 }
 
+type ZbxListener struct {
+	ln net.Listener
+}
+
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
 	c.conn, err = net.DialTimeout("tcp", address, timeout)
 	return
@@ -150,13 +154,17 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 	return read(c.conn)
 }
 
-func (c *ZbxConnection) ListenAndAccept(address string) (err error) {
-	ln, err := net.Listen("tcp", address)
+func (c *ZbxListener) Listen(address string) (err error) {
+	c.ln, err = net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("Listen failed: %s", err)
 	}
 
-	c.conn, err = ln.Accept()
+	return nil
+}
+
+func (c *ZbxConnection) Accept(listener *ZbxListener) (err error) {
+	c.conn, err = listener.ln.Accept()
 	if err != nil {
 		return fmt.Errorf("Accept failed: %s", err)
 	}
@@ -166,4 +174,8 @@ func (c *ZbxConnection) ListenAndAccept(address string) (err error) {
 
 func (c *ZbxConnection) Close() (err error) {
 	return c.conn.Close()
+}
+
+func (c *ZbxListener) Close() (err error) {
+	return c.ln.Close()
 }

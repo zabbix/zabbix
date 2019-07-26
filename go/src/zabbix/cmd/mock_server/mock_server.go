@@ -28,37 +28,8 @@ import (
 	"zabbix/pkg/comms"
 )
 
-func main() {
-	var fFlag, pFlag string
-	var tFlag int
-
-	const (
-		fDefault     = "active_checks.json"
-		fDescription = "Path to the json file used in response"
-		pDefault     = "10051"
-		pDescription = "Listen port"
-		tDefault     = 5
-		tDescription = "Timeout in seconds"
-	)
-	flag.StringVar(&fFlag, "f", fDefault, fDescription)
-	flag.StringVar(&pFlag, "p", pDefault, pDescription)
-	flag.IntVar(&tFlag, "t", tDefault, tDescription)
-	flag.Parse()
-
-	activeChecks, err := ioutil.ReadFile(fFlag)
-	if err != nil {
-		fmt.Printf("Cannot read file: %s\n", err)
-		return
-	}
-
-	var c comms.ZbxConnection
-
-	err = c.ListenAndAccept(":" + pFlag)
+func handleConnection(c comms.ZbxConnection, activeChecks []byte, tFlag int) {
 	defer c.Close()
-	if err != nil {
-		fmt.Printf("Listen and accept failed: %s\n", err)
-		return
-	}
 
 	js, err := c.Read(time.Second * time.Duration(tFlag))
 	if err != nil {
@@ -83,5 +54,49 @@ func main() {
 		fmt.Printf("Unsupported request: %s\n", pairs["request"])
 		return
 	}
+}
 
+func main() {
+	var fFlag, pFlag string
+	var tFlag int
+
+	const (
+		fDefault     = "active_checks.json"
+		fDescription = "Path to the json file used in response"
+		pDefault     = "10051"
+		pDescription = "Listen port"
+		tDefault     = 5
+		tDescription = "Timeout in seconds"
+	)
+	flag.StringVar(&fFlag, "f", fDefault, fDescription)
+	flag.StringVar(&pFlag, "p", pDefault, pDescription)
+	flag.IntVar(&tFlag, "t", tDefault, tDescription)
+	flag.Parse()
+
+	activeChecks, err := ioutil.ReadFile(fFlag)
+	if err != nil {
+		fmt.Printf("Cannot read file: %s\n", err)
+		return
+	}
+
+	var ln comms.ZbxListener
+
+	err = ln.Listen(":" + pFlag)
+	if err != nil {
+		fmt.Printf("Listen failed: %s\n", err)
+		return
+	}
+	defer ln.Close()
+
+	for {
+		var c comms.ZbxConnection
+
+		err = c.Accept(&ln)
+		if err != nil {
+			fmt.Printf("Accept failed: %s\n", err)
+			return
+		}
+
+		go handleConnection(c, activeChecks, tFlag)
+	}
 }
