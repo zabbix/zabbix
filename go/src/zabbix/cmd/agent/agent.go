@@ -25,38 +25,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 	"zabbix/internal/agent"
-	"zabbix/pkg/comms"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
 
 func main() {
-
-	var c comms.ZbxConnection
-	err := c.Open("127.0.0.1:10051", time.Second*5)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	c.WriteString("{\"request\":\"active checks\",\"host\":\"Zabbix server\"}", time.Second*5)
-	b, err := c.Read(time.Second * 30)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(b))
-	for len(b) != 0 {
-		b, err = c.Read(time.Second * 30)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-
-	fmt.Println(string(b))
 	var confFlag string
 	const (
 		confDefault     = "agent.conf"
