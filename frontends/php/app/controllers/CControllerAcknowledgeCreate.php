@@ -233,7 +233,7 @@ class CControllerAcknowledgeCreate extends CController {
 				$eventid_groups['acknowledgeable'][] = $event['eventid'];
 			}
 
-			$eventid_groups['readable'][] = $event['eventid'];			
+			$eventid_groups['readable'][] = $event['eventid'];
 		}
 
 		return $eventid_groups;
