@@ -25,20 +25,10 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if (hasRequest('templates') && hasRequest('action') && getRequest('action') === 'template.export') {
-	$exportData = true;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export_templates.xml';
-}
-else {
-	$exportData = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = _('Configuration of templates');
-	$page['file'] = 'templates.php';
-	$page['scripts'] = ['multiselect.js'];
-}
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['title'] = _('Configuration of templates');
+$page['file'] = 'templates.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -121,22 +111,6 @@ if (getRequest('templateid')) {
 }
 
 $templateIds = getRequest('templates', []);
-
-if ($exportData) {
-	$export = new CConfigurationExport(['templates' => $templateIds]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
-
-	if (hasErrorMesssages()) {
-		show_messages();
-	}
-	else {
-		print($exportData);
-	}
-
-	exit;
-}
 
 $tags = getRequest('tags', []);
 foreach ($tags as $key => $tag) {

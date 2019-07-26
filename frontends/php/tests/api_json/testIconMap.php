@@ -349,7 +349,7 @@ class testIconMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": an integer is expected.'
 			]],
 			[[
 				'iconmap' => [
@@ -363,7 +363,7 @@ class testIconMap extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/mappings/1/inventory_link": an integer is expected.'
 			]],
 			[[
 				'iconmap' => [

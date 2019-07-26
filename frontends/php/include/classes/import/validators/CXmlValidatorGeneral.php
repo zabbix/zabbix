@@ -53,12 +53,10 @@ class CXmlValidatorGeneral {
 	 * @param array|string $data  Import data.
 	 * @param string       $path  XML path (for error reporting).
 	 *
-	 * @return array              Validator does some manipulations for the incoming data. For example, converts empty
-	 *                            tags to an array, if desired. Converted array is returned.
-	 *
 	 * @throws Exception if $data does not correspond to validation rules.
 	 *
-	 * @return array|string
+	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted array is returned.
 	 */
 	public function validate($data, $path) {
 		$this->validateData($this->rules, $data, null, $path);

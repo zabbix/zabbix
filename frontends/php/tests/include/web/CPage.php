@@ -148,6 +148,27 @@ class CPage {
 	}
 
 	/**
+	 * Logout and clean cookies.
+	 */
+	public function logout() {
+		try {
+			$session = (self::$cookie === null)
+					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
+					: self::$cookie['value'];
+
+			if ($session !== null) {
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));
+			}
+
+			$this->driver->manage()->deleteAllCookies();
+			self::$cookie = null;
+		}
+		catch (\Exception $e) {
+			// Code is not missing here.
+		}
+	}
+
+	/**
 	 * Open specified URL.
 	 *
 	 * @param string $url   URL to be opened.
@@ -235,6 +256,29 @@ class CPage {
 	 */
 	public function waitUntilReady() {
 		return (new CElementQuery(null))->waitUntilReady();
+	}
+
+	/**
+	 * Check if alert is present.
+	 *
+	 * @return boolean
+	 */
+	public function isAlertPresent() {
+		return ($this->getAlertText() !== null);
+	}
+
+	/**
+	 * Get alert text.
+	 *
+	 * @return string|null
+	 */
+	public function getAlertText() {
+		try {
+			return $this->driver->switchTo()->alert()->getText();
+		}
+		catch (NoAlertOpenException $exception) {
+			return null;
+		}
 	}
 
 	/**

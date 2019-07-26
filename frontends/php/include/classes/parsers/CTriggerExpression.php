@@ -53,14 +53,18 @@ class CTriggerExpression {
 	public $expressions = [];
 
 	/**
-	 * An options array
+	 * An options array.
 	 *
 	 * Supported options:
-	 *   'lldmacros' => true	Enable low-level discovery macros usage in trigger expression.
+	 *   'lldmacros' => true        Enable low-level discovery macros usage in trigger expression.
+	 *   'allow_func_only' => true  Allow trigger expression without host:key pair, i.e. {func(param)}.
 	 *
 	 * @var array
 	 */
-	public $options = ['lldmacros' => true];
+	public $options = [
+		'lldmacros' => true,
+		'allow_func_only' => false
+	];
 
 	/**
 	 * Source string.
@@ -156,11 +160,10 @@ class CTriggerExpression {
 	/**
 	 * @param array $options
 	 * @param bool  $options['lldmacros']
+	 * @param bool  $options['allow_func_only']
 	 */
 	public function __construct(array $options = []) {
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = array_merge($this->options, $options);
 
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
@@ -510,7 +513,7 @@ class CTriggerExpression {
 	 * constant.
 	 *
 	 * The constant can be:
-	 *  - trigger function like {host:item[].func()}
+	 *  - trigger function like {host:item[].func()}; can be without host:item pair
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
 	 *  - macro like {TRIGGER.VALUE}
 	 *  - user macro like {$MACRO}
@@ -535,7 +538,67 @@ class CTriggerExpression {
 			}
 		}
 
-		return false;
+		return ($this->options['allow_func_only'] && $this->parseFunction());
+	}
+
+	/**
+	 * Parses a trigger function in the trigger expression and moves a current position ($this->pos) on a last symbol of
+	 * the trigger function.
+	 *
+	 * @return bool  Returns true if parsed successfully, false otherwise.
+	 */
+	private function parseFunction() {
+		$pos = $this->pos;
+
+		if ($this->expression[$pos] !== '{') {
+			return false;
+		}
+
+		$pos++;
+
+		if ($this->function_parser->parse($this->expression, $pos) == CParser::PARSE_FAIL) {
+			return false;
+		}
+
+		$pos += $this->function_parser->getLength();
+
+		if (isset($this->expression[$pos]) && $this->expression[$pos] !== '}') {
+			return false;
+		}
+
+		$function_param_list = [];
+
+		for ($n = 0; $n < $this->function_parser->getParamsNum(); $n++) {
+			$function_param_list[] = $this->function_parser->getParam($n);
+		}
+
+		$expression = substr($this->expression, $this->pos, $pos + 1 - $this->pos);
+
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+			$expression, $this->pos, $this->function_parser->getLength() + 2,
+			[
+				'host' => '',
+				'item' => '',
+				'function' => $this->function_parser->getMatch(),
+				'functionName' => $this->function_parser->getFunction(),
+				'functionParams' => $function_param_list
+			]
+		);
+
+		$this->expressions[] = [
+			'expression' => $expression,
+			'pos' => $this->pos,
+			'host' => '',
+			'item' => '',
+			'function' => $this->function_parser->getMatch(),
+			'functionName' => $this->function_parser->getFunction(),
+			'functionParam' => $this->function_parser->getParameters(),
+			'functionParamList' => $function_param_list
+		];
+
+		$this->pos = $pos;
+
+		return true;
 	}
 
 	/**

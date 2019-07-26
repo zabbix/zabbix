@@ -44,12 +44,10 @@ class C42XmlValidator {
 	 * @param array  $data  Import data.
 	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @return array        Validator does some manipulations for the incoming data. For example, converts empty tags
-	 *                      to an array, if desired. Converted array is returned.
-	 *
 	 * @throws Exception if $data does not correspond to validation rules.
 	 *
-	 * @return array
+	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
+	 *                array, if desired. Converted array is returned.
 	 */
 	public function validate(array $data, $path) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [

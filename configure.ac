@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0alpha1])
+AC_INIT([Zabbix],[4.4.0alpha2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -62,7 +62,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h)
+  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -1721,7 +1721,7 @@ AC_SUBST(LDAP_CPPFLAGS)
 
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.20.0], [],[])
+LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])

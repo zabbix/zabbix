@@ -150,7 +150,8 @@ else {
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
 		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
 		'editable' => $data['dashboard']['editable'],
-		'edit_mode' => $data['dashboard_edit_mode']
+		'edit_mode' => $data['dashboard_edit_mode'],
+		'kioskmode' => ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE)
 	];
 	if ($data['dashboard']['dashboardid'] != 0) {
 		$dashboard_data['id'] = $data['dashboard']['dashboardid'];
@@ -168,10 +169,6 @@ else {
 			');'.
 			'timeControl.processObjects();'
 		);
-	}
-
-	if ($web_layout_mode === ZBX_LAYOUT_KIOSKMODE) {
-		$dashboard_options['kioskmode'] = true;
 	}
 
 	// Initialize dashboard grid.

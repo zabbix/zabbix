@@ -1031,12 +1031,12 @@ class DB {
 
 			switch ($field_schema['type']) {
 				case self::FIELD_TYPE_ID:
-					$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option], false, true, false);
+					$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option]);
 					break;
 
 				case self::FIELD_TYPE_INT:
 				case self::FIELD_TYPE_UINT:
-					$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option], false, true, false);
+					$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option]);
 					break;
 
 				default:
@@ -1091,12 +1091,12 @@ class DB {
 
 			switch ($field_schema['type']) {
 				case self::FIELD_TYPE_ID:
-					$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value, false, true, false);
+					$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
 					break;
 
 				case self::FIELD_TYPE_INT:
 				case self::FIELD_TYPE_UINT:
-					$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value, false, true, false);
+					$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
 					break;
 
 				default:

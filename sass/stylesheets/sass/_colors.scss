@@ -21,6 +21,7 @@ $alt-red: #e45959;
 $alt-orange: #ffa059;
 $alt-yellow: #ffc859;
 $alt-green: #59db8f;
+$alt-light-green: #86cc89;
 $alt-dark-blue: #7499ff;
 $alt-blue-grey: #97aab3;
 
@@ -139,3 +140,9 @@ $ok-ack-fg-color: #009900 !default;
 $multiselect-disabled-bg-color: $disabled-bg-color;
 $multiselect-item-disabled-color: $disabled-item-color;
 $multiselect-item-disabled-bg-color: $disabled-item-bg-color;
+
+// HOST STATUS
+$host-avail-true-bg-color: $alt-light-green !default;
+$host-avail-false-bg-color: $alt-red !default;
+$host-avail-unknown-bg-color: $alt-blue-grey !default;
+$host-avail-total-bg-color: $transparent !default;

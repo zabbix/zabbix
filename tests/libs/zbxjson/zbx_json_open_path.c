@@ -24,6 +24,21 @@
 
 #include "common.h"
 #include "zbxjson.h"
+#include "../../../src/libs/zbxjson/json.h"
+
+static void	json_value_dyn(const struct zbx_json_parse *jp, char **string, size_t *string_alloc)
+{
+	if (NULL == zbx_json_decodevalue_dyn(jp->start, string, string_alloc, NULL))
+	{
+		size_t	len = jp->end - jp->start + 2;
+
+		if (*string_alloc < len)
+			*string = (char *)zbx_realloc(*string, len);
+
+		zbx_strlcpy(*string, jp->start, len);
+	}
+}
+
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -42,8 +57,9 @@ void	zbx_mock_test_entry(void **state)
 	ret = zbx_json_open(json, &jp);
 	zbx_mock_assert_result_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
 
-	if (FAIL == (ret = zbx_json_path_open(&jp, path, &jp_out)))
+	if (FAIL == (ret = zbx_json_open_path(&jp, path, &jp_out)))
 	{
+		printf("zbx_json_path_open() error: %s\n", zbx_json_strerror());
 		zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "fail");
 		return;
 	}
@@ -51,7 +67,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_result_eq("Invalid zbx_json_path_open() return value", SUCCEED, ret);
 	zbx_mock_assert_str_eq("Invalid zbx_json_path_open() return value", result, "succeed");
 
-	zbx_json_value_dyn(&jp_out, &buffer, &size);
+	json_value_dyn(&jp_out, &buffer, &size);
 
 	value = zbx_mock_get_parameter_string("out.value");
 	zbx_mock_assert_str_eq("Invalid value", value, buffer);
