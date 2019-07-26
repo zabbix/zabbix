@@ -170,7 +170,7 @@ class CControllerAcknowledgeEdit extends CController {
 		}
 
 		// Severity can be changed only for editable triggers.
-		$data['problem_severity_can_be_changed'] = (count($editable_triggers) == count($triggerids));
+		$data['problem_severity_can_be_changed'] = (count($editable_triggers) > 0);
 
 		// Add number of selected and related problem events to count of selected resolved events.
 		$data['related_problems_count'] += API::Problem()->get([
