@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package task
+package scheduler
 
 import (
 	"container/heap"
@@ -35,6 +35,7 @@ type Item struct {
 	unsupported bool
 	key         string
 	task        *ExporterTask
+	updated     time.Time
 }
 
 type Manager struct {
@@ -74,8 +75,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 			continue
 		}
 
-		switch p.impl.(type) {
-		case plugin.Collector:
+		if _, ok := p.impl.(plugin.Collector); ok {
 			if !p.active {
 				log.Debugf("Start collector task for plugin %s", p.impl.Name())
 				/*
@@ -87,7 +87,8 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 					plugin.Enqueue(task)
 				*/
 			}
-		case plugin.Exporter:
+		}
+		if _, ok := p.impl.(plugin.Exporter); ok {
 			var nextcheck time.Time
 			if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
 				update.writer.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
@@ -97,8 +98,9 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 
 			if item, ok := m.items[r.Itemid]; !ok {
 				item = &Item{itemid: r.Itemid,
-					delay: r.Delay,
-					key:   r.Key,
+					delay:   r.Delay,
+					key:     r.Key,
+					updated: now,
 				}
 				m.items[r.Itemid] = item
 
@@ -110,7 +112,6 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 					writer: update.writer,
 					item:   item,
 				}
-				log.Debugf("Enqueue task %+v", *item.task)
 				p.Enqueue(item.task)
 
 				if !p.active {
@@ -120,17 +121,25 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 					m.queue.Update(p)
 				}
 			} else {
+				item.updated = now
 				if item.delay != r.Delay && !item.unsupported {
-					log.Debugf("number of sheduled tasks: %d", len(p.tasks))
-					if len(p.tasks) > 0 {
-						log.Debugf("item.task: %p, queued task: %p", item.task, p.tasks[0])
-					}
 					p.tasks.Update(item.task)
 					m.queue.Update(p)
 					item.task.scheduled = nextcheck
 				}
 				item.delay = r.Delay
 				item.key = r.Key
+			}
+		}
+	}
+
+	// remove deleted items
+	for _, item := range m.items {
+		if item.updated.Before(now) {
+			delete(m.items, item.itemid)
+			item.task.Remove()
+			if item.task.plugin.PeekQueue() == nil {
+				m.queue.Remove(item.task.plugin)
 			}
 		}
 	}
@@ -188,7 +197,7 @@ run:
 	monitor.Unregister()
 }
 
-func (m *Manager) Start() {
+func (m *Manager) init() {
 	m.items = make(map[uint64]*Item)
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
@@ -204,7 +213,10 @@ func (m *Manager) Start() {
 			index:        -1,
 		}
 	}
+}
 
+func (m *Manager) Start() {
+	m.init()
 	monitor.Register()
 	go m.run()
 }

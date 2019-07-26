@@ -43,3 +43,7 @@ func Get(key string) (acc Accessor, err error) {
 	}
 	return nil, errors.New("no plugin found")
 }
+
+func ClearRegistry() {
+	Metrics = make(map[string]Accessor)
+}

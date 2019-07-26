@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package task
+package scheduler
 
 import (
 	"container/heap"
@@ -62,6 +62,10 @@ func (p *Plugin) PopQueue() Performer {
 
 func (p *Plugin) Enqueue(performer Performer) {
 	heap.Push(&p.tasks, performer)
+}
+
+func (p *Plugin) Remove(index int) {
+	heap.Remove(&p.tasks, index)
 }
 
 func (p *Plugin) BeginTask(s Scheduler) bool {

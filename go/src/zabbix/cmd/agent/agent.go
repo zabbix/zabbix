@@ -26,14 +26,14 @@ import (
 	"os/signal"
 	"syscall"
 	"zabbix/internal/agent"
+	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
-	"zabbix/internal/task"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
 
-var taskManager task.Manager
+var taskManager scheduler.Manager
 
 func main() {
 	var confFlag string

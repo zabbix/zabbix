@@ -17,65 +17,69 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package task
+package scheduler
 
 import (
 	"container/heap"
+	"time"
 )
 
-type pluginHeap []*Plugin
+type Performer interface {
+	Plugin() *Plugin
+	Perform(s Scheduler)
+	Reschedule()
+	Scheduled() time.Time
+	Weight() int
+	Index() int
+	SetIndex(index int)
+}
 
-func (h pluginHeap) Len() int {
+// performerHeap -
+type performerHeap []Performer
+
+func (h performerHeap) Len() int {
 	return len(h)
 }
 
-func (h pluginHeap) Less(i, j int) bool {
-	if left := h[i].PeekQueue(); left != nil {
-		if right := h[j].PeekQueue(); right != nil {
-			return left.Scheduled().Before(right.Scheduled())
-		} else {
-			return false
-		}
-	} else {
-		return true
-	}
+func (h performerHeap) Less(i, j int) bool {
+	return h[i].Scheduled().Before(h[j].Scheduled())
 }
 
-func (h pluginHeap) Swap(i, j int) {
+func (h performerHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
-	h[i].index = i
-	h[j].index = j
+	h[i].SetIndex(i)
+	h[j].SetIndex(j)
 }
 
 // Push -
-func (h *pluginHeap) Push(x interface{}) {
+func (h *performerHeap) Push(x interface{}) {
 	// Push and Pop use pointer receivers because they modify the slice's length,
 	// not just its contents.
-	p := x.(*Plugin)
-	p.index = len(*h)
+	p := x.(Performer)
+	p.SetIndex(len(*h))
 	*h = append(*h, p)
 }
 
 // Pop -
-func (h *pluginHeap) Pop() interface{} {
+func (h *performerHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	p := old[n-1]
 	*h = old[0 : n-1]
-	p.index = -1
+	p.SetIndex(-1)
 	return p
 }
 
 // Peek -
-func (h *pluginHeap) Peek() *Plugin {
+func (h *performerHeap) Peek() Performer {
 	if len(*h) == 0 {
 		return nil
 	}
 	return (*h)[0]
 }
 
-func (h *pluginHeap) Update(p *Plugin) {
-	if p.index != -1 {
-		heap.Fix(h, p.index)
+func (h *performerHeap) Update(p Performer) {
+	if p.Index() != -1 {
+		heap.Fix(h, p.Index())
 	}
 }

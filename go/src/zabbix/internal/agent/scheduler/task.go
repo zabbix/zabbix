@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package task
+package scheduler
 
 import (
 	"reflect"
@@ -51,6 +51,10 @@ func (t *Task) Index() int {
 
 func (t *Task) SetIndex(index int) {
 	t.index = index
+}
+
+func (t *Task) Remove() {
+	t.plugin.Remove(t.index)
 }
 
 type CollectorTask struct {
