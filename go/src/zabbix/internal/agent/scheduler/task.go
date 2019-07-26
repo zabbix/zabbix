@@ -27,6 +27,15 @@ import (
 	"zabbix/pkg/log"
 )
 
+// task priority within the same second is done by setting nanosecond component
+const (
+	priorityStarterTaskNs = iota
+	priorityCollectorTaskNs
+	priorityWatcherTaskNs
+	priorityExporterTaskNs
+	priorityStopperTaskNs
+)
+
 type Task struct {
 	plugin    *Plugin
 	scheduled time.Time
@@ -54,9 +63,9 @@ func (t *Task) SetIndex(index int) {
 	t.index = index
 }
 
-func (t *Task) Remove() {
+func (t *Task) Deactivate() {
 	if t.index != -1 {
-		t.plugin.Remove(t.index)
+		t.plugin.removeTask(t.index)
 	}
 	t.active = false
 }
@@ -79,9 +88,10 @@ func (t *CollectorTask) Perform(s Scheduler) {
 	}()
 }
 
-func (t *CollectorTask) Reschedule() {
+func (t *CollectorTask) Reschedule() bool {
 	collector, _ := t.plugin.impl.(plugin.Collector)
 	t.scheduled = t.scheduled.Add(time.Duration(collector.Period()) * time.Second)
+	return true
 }
 
 func (t *CollectorTask) Weight() int {
@@ -127,6 +137,69 @@ func (t *ExporterTask) Perform(s Scheduler) {
 	}(t.item.key)
 }
 
-func (t *ExporterTask) Reschedule() {
+func (t *ExporterTask) Reschedule() bool {
 	t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, time.Now())
+	return true
+}
+
+type StarterTask struct {
+	Task
+}
+
+func (t *StarterTask) Perform(s Scheduler) {
+	go func() {
+		runner, _ := t.plugin.impl.(plugin.Runner)
+		runner.Start()
+		s.FinishTask(t)
+	}()
+}
+
+func (t *StarterTask) Reschedule() bool {
+	return false
+}
+
+func (t *StarterTask) Weight() int {
+	return t.plugin.capacity
+}
+
+type StopperTask struct {
+	Task
+}
+
+func (t *StopperTask) Perform(s Scheduler) {
+	go func() {
+		runner, _ := t.plugin.impl.(plugin.Runner)
+		runner.Stop()
+		s.FinishTask(t)
+	}()
+}
+
+func (t *StopperTask) Reschedule() bool {
+	return false
+}
+
+func (t *StopperTask) Weight() int {
+	return t.plugin.capacity
+}
+
+type WatcherTask struct {
+	Task
+	requests []*plugin.Request
+	sink     plugin.ResultWriter
+}
+
+func (t *WatcherTask) Perform(s Scheduler) {
+	go func() {
+		watcher, _ := t.plugin.impl.(plugin.Watcher)
+		watcher.Watch(t.requests, t.sink)
+		s.FinishTask(t)
+	}()
+}
+
+func (t *WatcherTask) Reschedule() bool {
+	return false
+}
+
+func (t *WatcherTask) Weight() int {
+	return t.plugin.capacity
 }

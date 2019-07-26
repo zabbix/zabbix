@@ -160,3 +160,4 @@ tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 /zabbix-*.tar.gz
 .vscode
 go/src/zabbix/cmd/agent/agent
+go/src/zabbix/cmd/mock_server/mock_server

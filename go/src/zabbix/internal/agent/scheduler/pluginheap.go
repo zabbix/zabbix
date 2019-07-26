@@ -30,8 +30,8 @@ func (h pluginHeap) Len() int {
 }
 
 func (h pluginHeap) Less(i, j int) bool {
-	if left := h[i].PeekQueue(); left != nil {
-		if right := h[j].PeekQueue(); right != nil {
+	if left := h[i].peekTask(); left != nil {
+		if right := h[j].peekTask(); right != nil {
 			return left.Scheduled().Before(right.Scheduled())
 		} else {
 			return false

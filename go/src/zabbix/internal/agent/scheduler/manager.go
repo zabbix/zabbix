@@ -29,24 +29,15 @@ import (
 	"zabbix/pkg/log"
 )
 
-type Item struct {
-	itemid      uint64
-	delay       string
-	unsupported bool
-	key         string
-	task        *ExporterTask
-	updated     time.Time
-}
-
 type Manager struct {
 	input   chan interface{}
-	items   map[uint64]*Item
 	plugins map[string]*Plugin
 	queue   pluginHeap
+	owners  map[plugin.ResultWriter]*Owner
 }
 
 type UpdateRequest struct {
-	writer   plugin.ResultWriter
+	sink     plugin.ResultWriter
 	requests []*plugin.Request
 }
 
@@ -56,7 +47,15 @@ type Scheduler interface {
 }
 
 func (m *Manager) processUpdateRequest(update *UpdateRequest) {
-	log.Debugf("processing update request from instance %p (%d requests)", update.writer, len(update.requests))
+	log.Debugf("processing update request (%d requests)", len(update.requests))
+
+	// TODO: owner expiry - remove unused owners after tiemout (day+?)
+	var owner *Owner
+	var ok bool
+	if owner, ok = m.owners[update.sink]; !ok {
+		owner = newOwner()
+		m.owners[update.sink] = owner
+	}
 
 	now := time.Now()
 	for _, r := range update.requests {
@@ -64,101 +63,69 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 		var err error
 		var p *Plugin
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			var ok bool
 			if p, ok = m.plugins[key]; !ok {
 				err = errors.New("unknown metric")
 			}
 		}
 		if err != nil {
-			update.writer.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
+			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
-
-		if _, ok := p.impl.(plugin.Collector); ok {
-			if !p.active {
-				log.Debugf("Start collector task for plugin %s", p.impl.Name())
-				log.Errf("Collector plugins are not yet supported")
-				/*
-					task := &CollectorTask{
-						Task: Task{
-							plugin:    plugin,
-							created:   m.updateTime,
-							scheduled: GetItemNextcheck(item, m.updateTime)}}
-					plugin.Enqueue(task)
-				*/
-			}
+		if err = owner.processRequest(p, r, update.sink, now); err != nil {
+			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
+			continue
 		}
-		if _, ok := p.impl.(plugin.Exporter); ok {
-			var nextcheck time.Time
-			if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
-				update.writer.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-				// item with tasks will be removed later as deleted
-				continue
-			}
 
-			if item, ok := m.items[r.Itemid]; !ok {
-				item = &Item{itemid: r.Itemid,
-					delay:   r.Delay,
-					key:     r.Key,
-					updated: now,
-				}
-				m.items[r.Itemid] = item
-
-				item.task = &ExporterTask{
-					Task: Task{
-						plugin:    p,
-						scheduled: nextcheck,
-						active:    true,
-					},
-					writer: update.writer,
-					item:   item,
-				}
-				p.Enqueue(item.task)
-
-				if !p.active {
-					heap.Push(&m.queue, p)
-					p.active = true
-				} else {
-					m.queue.Update(p)
-				}
-			} else {
-				item.updated = now
-				if item.delay != r.Delay && !item.unsupported {
-					p.tasks.Update(item.task)
-					m.queue.Update(p)
-					item.task.scheduled = nextcheck
-				}
-				item.delay = r.Delay
-				item.key = r.Key
-			}
+		if !p.queued() {
+			heap.Push(&m.queue, p)
+		} else {
+			m.queue.Update(p)
 		}
 	}
 
-	// remove deleted items
-	for _, item := range m.items {
-		if item.updated.Before(now) {
-			delete(m.items, item.itemid)
-			item.task.Remove()
-			if item.task.plugin.PeekQueue() == nil {
-				m.queue.Remove(item.task.plugin)
+	released := owner.releasePlugins(m.plugins, now)
+	for _, p := range released {
+		if p.refcount != 0 {
+			continue
+		}
+		p.tasks = p.tasks[:0]
+		if _, ok := p.impl.(plugin.Runner); ok {
+			log.Debugf("start stopper task for plugin %s", p.impl.Name())
+			task := &StopperTask{
+				Task: Task{
+					plugin:    p,
+					scheduled: now.Add(priorityStopperTaskNs),
+					active:    true,
+				}}
+			p.enqueueTask(task)
+
+			if !p.queued() {
+				heap.Push(&m.queue, p)
+			} else {
+				m.queue.Update(p)
 			}
+		} else {
+			m.queue.Remove(p)
 		}
 	}
 }
 
 func (m *Manager) processQueue(now time.Time) {
+	seconds := now.Unix()
 	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
-		if performer := p.PeekQueue(); performer != nil {
-			if performer.Scheduled().After(now) {
+		if performer := p.peekTask(); performer != nil {
+			if performer.Scheduled().Unix() > seconds {
 				break
 			}
 			heap.Pop(&m.queue)
-			if !p.BeginTask(m) {
-				continue
-			}
-			if p.PeekQueue() != nil {
-				heap.Push(&m.queue, p)
+			if p.hasCapacity() {
+				performer := p.popTask()
+				p.reserveCapacity(performer)
+				performer.Perform(m)
+				if p.hasCapacity() {
+					heap.Push(&m.queue, p)
+				}
 			}
 		} else {
 			// plugins with empty task queue should not be in Manager queue
@@ -168,9 +135,12 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(performer Performer) {
-	performer.Reschedule()
 	p := performer.Plugin()
-	if p.EndTask(performer) {
+	p.releaseCapacity(performer)
+	if p.active() && performer.Active() && performer.Reschedule() {
+		p.enqueueTask(performer)
+	}
+	if !p.queued() && p.hasCapacity() {
 		heap.Push(&m.queue, p)
 	}
 }
@@ -191,6 +161,7 @@ run:
 			switch v.(type) {
 			case *UpdateRequest:
 				m.processUpdateRequest(v.(*UpdateRequest))
+				m.processQueue(time.Now())
 			case Performer:
 				m.processFinishRequest(v.(Performer))
 				m.processQueue(time.Now())
@@ -203,19 +174,19 @@ run:
 }
 
 func (m *Manager) init() {
-	m.items = make(map[uint64]*Item)
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
+	m.owners = make(map[plugin.ResultWriter]*Owner)
 
 	m.plugins = make(map[string]*Plugin)
 	for key, acc := range plugin.Metrics {
 		m.plugins[key] = &Plugin{
 			impl:         acc,
 			tasks:        make(performerHeap, 0),
-			active:       false,
 			capacity:     10,
 			usedCapacity: 0,
 			index:        -1,
+			refcount:     0,
 		}
 	}
 }
@@ -231,7 +202,7 @@ func (m *Manager) Stop() {
 }
 
 func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := UpdateRequest{writer: writer, requests: requests}
+	r := UpdateRequest{sink: writer, requests: requests}
 	m.input <- &r
 }
 

@@ -32,10 +32,15 @@ type Exporter interface {
 	Export(key string, params []string) (interface{}, error)
 }
 
-// Runner - interface to start/stop metric background processes
+// Runner - interface for managing background processes
 type Runner interface {
-	Start() error
-	Stop() error
+	Start()
+	Stop()
+}
+
+// Watcher - interface for fully custom monitorin
+type Watcher interface {
+	Watch(requests []*Request, sink ResultWriter)
 }
 
 type ResultWriter interface {

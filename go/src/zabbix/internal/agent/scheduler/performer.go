@@ -27,12 +27,13 @@ import (
 type Performer interface {
 	Plugin() *Plugin
 	Perform(s Scheduler)
-	Reschedule()
+	Reschedule() bool
 	Scheduled() time.Time
 	Weight() int
 	Index() int
 	SetIndex(index int)
 	Active() bool
+	Deactivate()
 }
 
 // performerHeap -

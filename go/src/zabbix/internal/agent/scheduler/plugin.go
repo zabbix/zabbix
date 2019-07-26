@@ -21,37 +21,26 @@ package scheduler
 
 import (
 	"container/heap"
-	"time"
 	"zabbix/internal/plugin"
 )
 
 type Plugin struct {
 	impl         plugin.Accessor
 	tasks        performerHeap
-	active       bool
 	capacity     int
 	usedCapacity int
 	index        int
+	refcount     int
 }
 
-func NewPlugin(impl plugin.Accessor) *Plugin {
-	plugin := Plugin{impl: impl}
-
-	plugin.tasks = make(performerHeap, 0)
-	plugin.active = false
-	plugin.capacity = 5
-
-	return &plugin
-}
-
-func (p *Plugin) PeekQueue() Performer {
+func (p *Plugin) peekTask() Performer {
 	if len(p.tasks) == 0 {
 		return nil
 	}
 	return p.tasks[0]
 }
 
-func (p *Plugin) PopQueue() Performer {
+func (p *Plugin) popTask() Performer {
 	if len(p.tasks) == 0 {
 		return nil
 	}
@@ -60,39 +49,30 @@ func (p *Plugin) PopQueue() Performer {
 	return task
 }
 
-func (p *Plugin) Enqueue(performer Performer) {
+func (p *Plugin) enqueueTask(performer Performer) {
 	heap.Push(&p.tasks, performer)
 }
 
-func (p *Plugin) Remove(index int) {
+func (p *Plugin) removeTask(index int) {
 	heap.Remove(&p.tasks, index)
 }
 
-func (p *Plugin) BeginTask(s Scheduler) bool {
-	performer := p.PeekQueue()
-	if p.capacity-p.usedCapacity >= performer.Weight() {
-		p.usedCapacity += performer.Weight()
-		p.PopQueue()
-		performer.Perform(s)
-		return true
-	}
-	return false
+func (p *Plugin) reserveCapacity(performer Performer) {
+	p.usedCapacity += performer.Weight()
 }
 
-// EndTask enqueues finished task, updates plugin capacity and returns true
-// if the plugin itself must be enqueued
-func (p *Plugin) EndTask(performer Performer) bool {
+func (p *Plugin) releaseCapacity(performer Performer) {
 	p.usedCapacity -= performer.Weight()
-	if !performer.Active() {
-		return false
-	}
-	p.Enqueue(performer)
-	return p.index == -1 && p.capacity-p.usedCapacity >= p.tasks[0].Weight()
 }
 
-func (p *Plugin) Scheduled() time.Time {
-	if len(p.tasks) == 0 {
-		return time.Time{}
-	}
-	return p.tasks[0].Scheduled()
+func (p *Plugin) queued() bool {
+	return p.index != -1
+}
+
+func (p *Plugin) hasCapacity() bool {
+	return len(p.tasks) != 0 && p.capacity-p.usedCapacity >= p.tasks[0].Weight()
+}
+
+func (p *Plugin) active() bool {
+	return p.refcount != 0
 }

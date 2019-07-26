@@ -28,7 +28,14 @@ var Metrics map[string]Accessor = make(map[string]Accessor)
 
 func RegisterMetric(impl Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
-		log.Warningf("cannot register duplicate metric \"%s\"", key)
+		log.Warningf(`cannot register duplicate metric "%s"`, key)
+		return
+	}
+
+	switch impl.(type) {
+	case Exporter, Collector, Runner, Watcher:
+	default:
+		log.Warningf(`plugin "%s" does not implement any plugin interfaces`, name)
 		return
 	}
 
