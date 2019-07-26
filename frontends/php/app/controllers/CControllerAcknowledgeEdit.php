@@ -68,11 +68,10 @@ class CControllerAcknowledgeEdit extends CController {
 
 	protected function checkPermissions() {
 		$events = API::Event()->get([
+			'countOutput' => true,
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value' => TRIGGER_VALUE_TRUE,
-			'countOutput' => true
+			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
 		return ($events == count($this->getInput('eventids')));
