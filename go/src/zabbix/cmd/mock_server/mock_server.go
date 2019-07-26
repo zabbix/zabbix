@@ -86,7 +86,7 @@ func main() {
 	var foregroundFlag bool
 	const (
 		foregroundDefault     = true
-		foregroundDescription = "Run Zabbix agent in foreground"
+		foregroundDescription = "Run Zabbix mock server in foreground"
 	)
 	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
 	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorhand)")
