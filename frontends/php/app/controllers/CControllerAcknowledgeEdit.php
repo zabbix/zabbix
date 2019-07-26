@@ -125,7 +125,7 @@ class CControllerAcknowledgeEdit extends CController {
 			]);
 		}
 
-		$triggerids = zbx_objectValues($events, 'objectid');
+		$triggerids = array_keys(array_flip(zbx_objectValues($events, 'objectid')));
 
 		$editable_triggers = API::Trigger()->get([
 			'output' => ['manual_close'],
