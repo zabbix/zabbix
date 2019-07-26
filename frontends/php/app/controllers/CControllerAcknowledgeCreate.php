@@ -76,10 +76,12 @@ class CControllerAcknowledgeCreate extends CController {
 		$this->new_severity = $this->getInput('severity', '');
 		$this->message = $this->getInput('message', '');
 
+		// TODO VM+: it is no longer "eventids" now it is "eventids_grouped" or even $eventid_groups
 		$eventids = $this->groupEventsByActionsAllowed($this->getInput('eventids'));
 
 		while ($eventids['readable']) {
-			// Repeate this as long as $eventids['readable'] is clean.
+			// Repeat this till $eventids['readable'] is empty.
+
 			$data = $this->getAcknowledgeOptions($eventids);
 
 			// Acknowledge events.
@@ -162,6 +164,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$this->setResponse($response);
 	}
 
+	// TODO VM+: this function should be after isEventClosable(), because it is called later in doAction()
 	/**
 	 * Function returns an array for event.acknowledge API method, containing a list of eventids and specific 'action'
 	 * flag to perform for list of eventids returned. Function will also clean utilized eventids from $eventids array.
@@ -174,6 +177,7 @@ class CControllerAcknowledgeCreate extends CController {
 	 *
 	 * @return array
 	 */
+	// TODO VM+: it is no longer "eventids" now it is "eventids_grouped" or even $eventid_groups
 	protected function getAcknowledgeOptions(array &$eventids) {
 		$data = [
 			'action' => ZBX_PROBLEM_UPDATE_NONE,
@@ -187,34 +191,34 @@ class CControllerAcknowledgeCreate extends CController {
 		}
 
 		if ($this->change_severity && $eventids['editable']) {
-			$selected_eventids = $data['eventids']
-				? array_intersect($eventids['editable'], $data['eventids'])
-				: $eventids['editable'];
+
+			if (!$data['eventids']) {
+				$data['eventids'] = $eventids['editable'];
+			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_SEVERITY;
 			$data['severity'] = $this->new_severity;
-			$data['eventids'] = array_merge($data['eventids'], $selected_eventids);
 			$eventids['editable'] = array_diff($eventids['editable'], $data['eventids']);
 		}
 
 		if ($this->acknowledge && $eventids['acknowledgeable']) {
-			$selected_eventids = $data['eventids']
-				? array_intersect($eventids['acknowledgeable'], $data['eventids'])
-				: $eventids['acknowledgeable'];
+
+			if (!$data['eventids']) {
+				$data['eventids'] = $eventids['acknowledgeable'];
+			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_ACKNOWLEDGE;
-			$data['eventids'] = array_merge($data['eventids'], $selected_eventids);
 			$eventids['acknowledgeable'] = array_diff($eventids['acknowledgeable'], $data['eventids']);
 		}
 
 		if ($this->message !== '' && $eventids['readable']) {
-			$selected_eventids = $data['eventids']
-				? array_intersect($eventids['readable'], $data['eventids'])
-				: $eventids['readable'];
+
+			if (!$data['eventids']) {
+				$data['eventids'] = $eventids['readable'];
+			}
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_MESSAGE;
 			$data['message'] = $this->message;
-			$data['eventids'] = array_merge($data['eventids'], $selected_eventids);
 		}
 
 		$eventids['readable'] = array_diff($eventids['readable'], $data['eventids']);
