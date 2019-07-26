@@ -644,6 +644,7 @@ class CConfigurationExportBuilder {
 				'recovery_mode' => $trigger['recovery_mode'],
 				'recovery_expression' => $trigger['recovery_expression'],
 				'name' => $trigger['description'],
+				'opdata' => $trigger['opdata'],
 				'correlation_mode' => $trigger['correlation_mode'],
 				'correlation_tag' => $trigger['correlation_tag'],
 				'url' => $trigger['url'],
