@@ -78,6 +78,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 		if _, ok := p.impl.(plugin.Collector); ok {
 			if !p.active {
 				log.Debugf("Start collector task for plugin %s", p.impl.Name())
+				log.Errf("Collector plugins are not yet supported")
 				/*
 					task := &CollectorTask{
 						Task: Task{
@@ -92,7 +93,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 			var nextcheck time.Time
 			if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
 				update.writer.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-				// TODO: remove task from queue and if necessary plugin from parent queue
+				// item with tasks will be removed later as deleted
 				continue
 			}
 
@@ -108,6 +109,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 					Task: Task{
 						plugin:    p,
 						scheduled: nextcheck,
+						active:    true,
 					},
 					writer: update.writer,
 					item:   item,
@@ -174,6 +176,7 @@ func (m *Manager) processFinishRequest(performer Performer) {
 }
 
 func (m *Manager) run() {
+	defer log.PanicHook()
 	log.Debugf("starting Manager")
 	ticker := time.NewTicker(time.Second)
 run:

@@ -185,6 +185,48 @@ func TestTaskUpdate(t *testing.T) {
 	validateQueue(t, &manager, items)
 }
 
+func TestTaskUpdateInvalidInterval(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	plugin.ClearRegistry()
+	plugins := make([]DebugPlugin, 3)
+	for i, p := range plugins {
+		name := fmt.Sprintf("debug%d", i+1)
+		plugin.RegisterMetric(&p, name, name, "")
+	}
+
+	var manager Manager
+	manager.init()
+
+	var cache ResultCacheMock
+
+	items := []*Item{
+		&Item{itemid: 1, delay: "151", key: "debug1"},
+		&Item{itemid: 2, delay: "103", key: "debug2"},
+	}
+
+	update := UpdateRequest{
+		writer:   &cache,
+		requests: make([]*plugin.Request, 0),
+	}
+
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+	}
+	manager.processUpdateRequest(&update)
+
+	items[0].delay = "xyz"
+	update.requests = update.requests[:0]
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+	}
+	manager.processUpdateRequest(&update)
+
+	if len(manager.queue) != 1 {
+		t.Errorf("Expected %d plugins queued while got %d", 1, len(manager.queue))
+	}
+}
+
 func TestTaskDelete(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
@@ -311,6 +353,7 @@ func TestSchedule(t *testing.T) {
 			Task: Task{
 				plugin:    p,
 				scheduled: getNextcheck(item.delay, now),
+				active:    true,
 			},
 			item:    item,
 			manager: &manager,
@@ -387,6 +430,7 @@ func TestCapacity(t *testing.T) {
 			Task: Task{
 				plugin:    p,
 				scheduled: getNextcheck(item.delay, now),
+				active:    true,
 			},
 			item:    item,
 			manager: &manager,

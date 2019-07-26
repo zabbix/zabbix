@@ -79,8 +79,13 @@ func (p *Plugin) BeginTask(s Scheduler) bool {
 	return false
 }
 
+// EndTask enqueues finished task, updates plugin capacity and returns true
+// if the plugin itself must be enqueued
 func (p *Plugin) EndTask(performer Performer) bool {
 	p.usedCapacity -= performer.Weight()
+	if !performer.Active() {
+		return false
+	}
 	p.Enqueue(performer)
 	return p.index == -1 && p.capacity-p.usedCapacity >= p.tasks[0].Weight()
 }

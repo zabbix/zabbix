@@ -31,6 +31,7 @@ type Task struct {
 	plugin    *Plugin
 	scheduled time.Time
 	index     int
+	active    bool
 }
 
 func (t *Task) Plugin() *Plugin {
@@ -54,7 +55,14 @@ func (t *Task) SetIndex(index int) {
 }
 
 func (t *Task) Remove() {
-	t.plugin.Remove(t.index)
+	if t.index != -1 {
+		t.plugin.Remove(t.index)
+	}
+	t.active = false
+}
+
+func (t *Task) Active() bool {
+	return t.active
 }
 
 type CollectorTask struct {

@@ -32,6 +32,7 @@ type Performer interface {
 	Weight() int
 	Index() int
 	SetIndex(index int)
+	Active() bool
 }
 
 // performerHeap -
