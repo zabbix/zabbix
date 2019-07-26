@@ -17,44 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package itemutil
 
-import "time"
+import (
+	"fmt"
+	"strconv"
+)
 
-// Collector - interface for periodical metric collection
-type Collector interface {
-	Collect() error
-	Period() int
-}
-
-// Exporter - interface for exporting collected metrics
-type Exporter interface {
-	Export(key string, params []string) (interface{}, error)
-}
-
-// Runner - interface to start/stop metric background processes
-type Runner interface {
-	Start() error
-	Stop() error
-}
-
-type ResultWriter interface {
-	Write(result *Result)
-}
-
-type Result struct {
-	Itemid      uint64
-	Value       *string
-	Ts          time.Time
-	Error       error
-	LastLogsize uint64
-	Mtime       int
-}
-
-type Request struct {
-	Itemid      uint64
-	Key         string
-	Delay       string
-	LastLogsize uint64
-	Mtime       int
+func ValueToString(value interface{}) string {
+	switch value.(type) {
+	case string:
+		return value.(string)
+	case *string:
+		return *value.(*string)
+	case int:
+		return strconv.Itoa(value.(int))
+	default:
+		return fmt.Sprintf("%v", value)
+	}
 }

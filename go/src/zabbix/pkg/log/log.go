@@ -20,9 +20,11 @@
 package log
 
 import (
+	"bytes"
 	"errors"
 	"log"
 	"os"
+	"runtime/debug"
 )
 
 const Empty = 0
@@ -110,5 +112,23 @@ func Debugf(format string, args ...interface{}) {
 func Errf(format string, args ...interface{}) {
 	if CheckLogLevel(Err) {
 		logger.Printf(format, args...)
+	}
+}
+
+func PanicHook() {
+	if r := recover(); r != nil {
+		data := debug.Stack()
+		Critf("Critical failure: %v", r)
+		var tail int
+		for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
+			end = bytes.IndexByte(data[offset:], '\n')
+			if end != -1 {
+				tail = offset + end
+			} else {
+				tail = len(data)
+			}
+			Critf("%s", string(data[offset:tail]))
+		}
+		panic(r)
 	}
 }

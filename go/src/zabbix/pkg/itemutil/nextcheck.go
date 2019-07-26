@@ -17,23 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package itemutil
 
-type Plugin struct {
-	Impl interface{}
-	//	Queue        Performers
-	Active       bool
-	Queued       bool
-	Capacity     int
-	UsedCapacity int
-}
+import (
+	"strconv"
+	"time"
+)
 
-func NewPlugin(impl interface{}) *Plugin {
-	plugin := Plugin{Impl: impl}
-
-	//	plugin.Queue = make(Performers, 0)
-	plugin.Active = false
-	plugin.Capacity = 5
-
-	return &plugin
+func GetNextcheck(itemid uint64, delay string, unsupported bool, from time.Time) (nextcheck time.Time, err error) {
+	var simple_delay int64
+	// TODO: add flexible/scheduled interval support
+	if simple_delay, err = strconv.ParseInt(delay, 10, 64); err != nil {
+		return
+	}
+	from_seconds := from.Unix()
+	return time.Unix(from_seconds-from_seconds%simple_delay+simple_delay, 0), nil
 }

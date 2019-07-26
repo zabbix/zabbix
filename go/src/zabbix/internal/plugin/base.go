@@ -24,17 +24,22 @@ import (
 	"zabbix/pkg/log"
 )
 
-type Initializer interface {
-	Init(name string, description string)
+type Accessor interface {
+	Init(name string, key string, description string)
+	Name() string
+	Key() string
+	Description() string
 }
 
 type Base struct {
 	name        string
+	key         string
 	description string
 }
 
-func (b *Base) Init(name string, description string) {
+func (b *Base) Init(name string, key string, description string) {
 	b.name = name
+	b.key = key
 	b.description = description
 }
 
@@ -44,6 +49,10 @@ func (b *Base) Name() string {
 
 func (b *Base) Description() string {
 	return b.description
+}
+
+func (b *Base) Key() string {
+	return b.key
 }
 
 func (b *Base) Debugf(format string, args ...interface{}) {

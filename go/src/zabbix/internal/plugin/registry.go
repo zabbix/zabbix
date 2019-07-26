@@ -20,32 +20,30 @@
 package plugin
 
 import (
-	"fmt"
+	"errors"
 	"zabbix/pkg/log"
 )
 
-var plugins map[Initializer]*Plugin = make(map[Initializer]*Plugin)
-var metrics map[string]*Plugin = make(map[string]*Plugin)
+var Metrics map[string]Accessor = make(map[string]Accessor)
 
-func RegisterMetric(impl Initializer, name string, key string, description string) {
-	if _, ok := metrics[key]; ok {
+func RegisterMetric(impl Accessor, name string, key string, description string) {
+	if _, ok := Metrics[key]; ok {
 		log.Warningf("cannot register duplicate metric \"%s\"", key)
 		return
 	}
-	var plugin *Plugin
-	var ok bool
-	if plugin, ok = plugins[impl]; !ok {
-		impl.Init(name, description)
-		plugin = NewPlugin(impl)
-		plugins[impl] = plugin
-	}
-	metrics[key] = plugin
+
+	impl.Init(name, key, description)
+	Metrics[key] = impl
 }
 
-func Get(key string) (p *Plugin, err error) {
-	if p, ok := metrics[key]; !ok {
-		return nil, fmt.Errorf("cannot find plugin for metric \"%s\"", key)
-	} else {
-		return p, nil
+func Get(key string) (acc Accessor, err error) {
+	var ok bool
+	if acc, ok = Metrics[key]; ok {
+		return
 	}
+	return nil, errors.New("no plugin found")
+}
+
+func ClearRegistry() {
+	Metrics = make(map[string]Accessor)
 }
