@@ -46,6 +46,7 @@ class CControllerAcknowledgeCreate extends CController {
 					$response->setMessageError(_('Cannot update event'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
@@ -69,6 +70,7 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function doAction() {
 		$updated_events_count = 0;
 		$result = false;
+		$data = null;
 
 		$this->close_problems = ($this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_CLOSE);
 		$this->change_severity = ($this->getInput('change_severity', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SEVERITY);
@@ -76,76 +78,41 @@ class CControllerAcknowledgeCreate extends CController {
 		$this->new_severity = $this->getInput('severity', '');
 		$this->message = $this->getInput('message', '');
 
-		$eventid_groups = $this->groupEventsByActionsAllowed($this->getInput('eventids'));
+		$eventids = array_flip($this->getInput('eventids'));
 
-		while ($eventid_groups['readable']) {
-			// Repeat this till $eventids['readable'] is empty.
+		// Select events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
+		if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
+			$eventids += array_flip($this->getRelatedProblemids($eventids));
+		}
 
-			$data = $this->getAcknowledgeOptions($eventid_groups);
+		// Select data about all affected events and triggers involved.
+		list($events, $editable_triggers) = $this->getEventDetails(array_keys($eventids));
 
-			/*
-			 * No actions to perform. This can happen only if user manages to select action he has no permissions to do
-			 * for any of selected events. This should not be possible by using frontend.
-			 */
-			if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
-				break;
-			}
+		// Update selected events.
+		$event_chunks = array_chunk($events, ZBX_DB_MAX_INSERTS);
+		foreach ($event_chunks as $events) {
+			// Group events by actions user is allowed to perform.
+			$eventid_groups = $this->groupEventsByActionsAllowed($events, $editable_triggers);
 
-			// Acknowledge directly selected events.
-			if ($data['eventids']) {
-				$result = API::Event()->acknowledge($data);
-				$updated_events_count += count($data['eventids']);
-			}
+			while ($eventid_groups['readable']) {
+				$data = $this->getAcknowledgeOptions($eventid_groups);
 
-			// Do not continue if acknowledge validation fails.
-			if (!$result) {
-				break;
-			}
+				/*
+				 * No actions to perform. This can happen only if user has selected action he have no permissions to do
+				 * for any of selected events. This should not be possible by using frontend.
+				 */
+				if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
+					break;
+				}
 
-			// Acknowledge events that are created from the same trigger if ZBX_ACKNOWLEDGE_PROBLEM is selected.
-			if ($this->getInput('scope', ZBX_ACKNOWLEDGE_SELECTED) == ZBX_ACKNOWLEDGE_PROBLEM) {
-				// Get trigger IDs for selected events.
-				$events = API::Event()->get([
-					'output' => ['objectid'],
-					'eventids' => $data['eventids'],
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER
-				]);
+				if ($data['eventids']) {
+					$result = API::Event()->acknowledge($data);
+					$updated_events_count += count($data['eventids']);
+				}
 
-				$triggerids = zbx_objectValues($events, 'objectid');
-				if ($triggerids) {
-					// Select related events by trigger IDs. Submitted events were already updated.
-					$related_problems = API::Problem()->get([
-						'output' => [],
-						'objectids' => array_keys(array_flip($triggerids)),
-						'preservekeys' => true
-					]);
-
-					// Skip update for submitted events.
-					foreach ($this->getInput('eventids') as $eventid) {
-						unset($related_problems[$eventid]);
-					}
-
-					if ($related_problems) {
-						$related_problems = array_chunk(array_keys($related_problems), ZBX_DB_MAX_INSERTS);
-
-						foreach ($related_problems as $problems) {
-							$problem_eventids = $this->groupEventsByActionsAllowed($problems);
-
-							while ($problem_eventids['readable'] && $result) {
-								$data = $this->getAcknowledgeOptions($problem_eventids);
-
-								// Acknowledge events.
-								if ($data['action'] != ZBX_PROBLEM_UPDATE_NONE && $data['eventids']) {
-									$result = API::Event()->acknowledge($data);
-									$updated_events_count += count($data['eventids']);
-								}
-								else {
-									break;
-								}
-							}
-						}
-					}
+				// Do not continue if event.acknowledge validation fails.
+				if (!$result) {
+					break 2;
 				}
 			}
 		}
@@ -157,12 +124,74 @@ class CControllerAcknowledgeCreate extends CController {
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(($data['action'] == ZBX_PROBLEM_UPDATE_NONE)
+			$response->setMessageError(($data && $data['action'] == ZBX_PROBLEM_UPDATE_NONE)
 				? _('At least one update operation is mandatory')
 				: _n('Cannot update event', 'Cannot update events', $updated_events_count)
 			);
 		}
 		$this->setResponse($response);
+	}
+
+	/**
+	 * Function returns array containing problem IDs generated by same trigger as event IDs passed as $eventids.
+	 *
+	 * @param array $eventids  Event IDs for which related problems must be selected.
+	 *
+	 * @return array
+	 */
+	protected function getRelatedProblemids(array $eventids) {
+		$events = API::Event()->get([
+			'output' => ['objectid'],
+			'eventids' => array_keys($eventids),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER
+		]);
+
+		if ($events) {
+			$related_problems = API::Problem()->get([
+				'output' => [],
+				'objectids' => array_keys(array_flip(zbx_objectValues($events, 'objectid'))),
+				'preservekeys' => true
+			]);
+
+			return array_keys($related_problems);
+		}
+
+		return [];
+	}
+
+	/**
+	 * Function returns array containing 2 sub-arrays:
+	 *  - First sub-array contains details for all requested events based on user actions.
+	 *  - Second sub-array contains all editable trigger IDs that has caused requested events.
+	 *
+	 * @param array $eventids
+	 *
+	 * @return array
+	 */
+	protected function getEventDetails(array $eventids) {
+		// Select details for all affected events.
+		$events = API::Event()->get([
+			'output' => ['objectid', 'acknowledged', 'r_eventid'],
+			'select_acknowledges' => $this->close_problems ? ['action'] : null,
+			'selectRelatedObject' => $this->close_problems ? ['manual_close'] : null,
+			'eventids' => $eventids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'preservekeys' => true
+		]);
+
+		// Select editable triggers.
+		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
+			? API::Trigger()->get([
+				'output' => [],
+				'triggerids' => zbx_objectValues($events, 'objectid'),
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		return [$events, $editable_triggers];
 	}
 
 	/**
@@ -173,11 +202,17 @@ class CControllerAcknowledgeCreate extends CController {
 	 *  - acknowledgeable (events are not yet acknowledged);
 	 *  - readable events (events that user has at least read permissions).
 	 *
-	 * @param array $eventids    Eventids to group.
+	 * @param array $events
+	 * @param int   $events[]['eventid']                        Event id.
+	 * @param int   $events[]['objectid']                       Trigger ID that has generated particular event.
+	 * @param int   $events[]['relatedObject']['manual_close']  Flag if problem can be closed manually.
+	 * @param int   $events[]['r_eventid']                      Recovery event ID.
+	 * @param array $events[]['acknowledged']                   Array containing previously performed actions to event.
+	 * @param array $editable_triggers[<triggerid>]             Arrays containing editable trigger IDs as keys.
 	 *
 	 * @param array
 	 */
-	protected function groupEventsByActionsAllowed(array $eventids = []) {
+	protected function groupEventsByActionsAllowed(array $events, array $editable_triggers) {
 		$eventid_groups = [
 			'closable' => [],
 			'editable' => [],
@@ -185,40 +220,20 @@ class CControllerAcknowledgeCreate extends CController {
 			'readable' => []
 		];
 
-		$events = API::Event()->get([
-			'output' => ['objectid', 'acknowledged', 'r_eventid'],
-			'select_acknowledges' => $this->close_problems ? ['action'] : null,
-			'selectRelatedObject' => $this->close_problems ? ['manual_close'] : null,
-			'eventids' => $eventids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value' => TRIGGER_VALUE_TRUE,
-			'preservekeys' => true
-		]);
-
-		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
-			? API::Trigger()->get([
-				'output' => [],
-				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
-
-		foreach ($events as $eventid => $event) {
+		foreach ($events as $event) {
 			if ($this->close_problems && $this->isEventClosable($event, $editable_triggers)) {
-				$eventid_groups['closable'][] = $eventid;
+				$eventid_groups['closable'][] = $event['eventid'];
 			}
 
 			if ($this->change_severity && array_key_exists($event['objectid'], $editable_triggers)) {
-				$eventid_groups['editable'][] = $eventid;
+				$eventid_groups['editable'][] = $event['eventid'];
 			}
 
 			if ($this->acknowledge && $event['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-				$eventid_groups['acknowledgeable'][] = $eventid;
+				$eventid_groups['acknowledgeable'][] = $event['eventid'];
 			}
 
-			$eventid_groups['readable'][] = $eventid;
+			$eventid_groups['readable'][] = $event['eventid'];			
 		}
 
 		return $eventid_groups;
