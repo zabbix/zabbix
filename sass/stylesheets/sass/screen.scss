@@ -5088,11 +5088,10 @@ td.inactive-bg {
 	margin-top: 2px;
 }
 
-.msg-warning {
+.msg-warning, .msg-bad-global {
 	color: $font-color;
 	border: 2px solid $alt-yellow;
 	background-color: $ui-bg-color;
-	text-align: left;
 
 	@extend %msg;
 
@@ -5124,7 +5123,7 @@ td.inactive-bg {
 	}
 }
 
-.msg-warning:before {
+.msg-warning:before, .msg-bad-global:before {
 	content: "";
 	background-color: $alt-yellow;
 	float: left;
@@ -5135,7 +5134,7 @@ td.inactive-bg {
 	position: absolute;
 }
 
-.msg-warning:after {
+.msg-warning:after, .msg-bad-global:after {
 	content: "";
 	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
 	width: 27px;
@@ -5275,40 +5274,10 @@ td.inactive-bg {
 	display: none;
 	position: fixed;
 	z-index: 10000;
-	text-align: left;
 	right: 0;
 	left: 0;
 	bottom: 0;
-	vertical-align: middle;
-	font-size: $font-top-nav-size;
-	color: $font-color;
-	border: 2px solid $alt-yellow;
-	background-color: $ui-bg-color;
 	margin: 0 10px 0 10px;
-	padding: 6px 10px 6px 75px;
-}
-
-.msg-bad-global:before {
-	content: "";
-	background-color: $alt-yellow;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
-
-.msg-bad-global:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
 }
 
 .msg-global {
