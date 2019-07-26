@@ -948,7 +948,7 @@ function parseUrlString(url) {
 
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = false) {
 	var classes = ['msg-good', 'msg-bad', 'msg-warning'],
-	    index = classes.indexOf(type);
+		index = classes.indexOf(type);
 
 	if ( index == -1) {
 		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
@@ -958,7 +958,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		aria_labels = [t('Success message'), t('Error message'), t('Warning message')],
 		$msg_box = jQuery('<output>').addClass(type).attr('role', 'contentinfo').attr('aria-label', aria_labels[index]);
 
-    if (title !== null) {
+	if (title !== null) {
 		jQuery('<span>').text(title).appendTo($msg_box);
 	}
 
@@ -968,7 +968,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			$link_details = jQuery('<a>').text(t('Details') + ' ').addClass('link-action').append($details_arrow)
 				.attr('aria-expanded', show_details ? 'true' : 'false');
 
-	    $link_details.click(function() {
+		$link_details.click(function() {
 			showHide(jQuery(this).siblings('.msg-details').find('.msg-details-border'));
 			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
 			jQuery(this).attr('aria-expanded', jQuery(this).find('.arrow-down').length == 0);
