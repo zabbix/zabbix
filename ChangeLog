@@ -1,7 +1,13 @@
+Changes for 4.4.0alpha2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.4.0alpha1
 
 New features:
-.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
 A.F.I..... [ZBXNEXT-5250] dropped support of screen element 'Screen' (miks)
 ..F....... [ZBXNEXT-5249] added new dashboard widget "Host availability" (rlataria)
 ..F....... [ZBXNEXT-5238] added edit control for the widget in dashboard view mode (ashubin)
@@ -28,6 +34,9 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+.......PS. [ZBX-16308] fixed proxy-server configuration synchronization when using dependent items (wiper)
+.......P.. [ZBX-16365] fixed "Something impossible has just happened." error in case item type is set to log type but log is not monitored (vso)
+..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
 ........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
 ..F....... [ZBX-15954] fixed functional macros resolving in maps (miks)
 ........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
@@ -516,6 +525,8 @@ New features:
 ..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
 
 Bug fixes:
+A......... [ZBX-16376] fixed preprocessing steps having incorrect order and duplicate step numbers (Ivo)
+..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
 ........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
 ........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
 .......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
