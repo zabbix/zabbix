@@ -600,6 +600,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history(void);
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more);
+void	zbx_log_sync_history_cache_progress(void);
 int	init_database_cache(char **error);
 void	free_database_cache(void);
 
@@ -937,7 +938,7 @@ zbx_lld_macro_path_t;
 int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error);
 void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path);
 int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
-		const char *macro, char **value, size_t *value_alloc);
+		const char *macro, char **value);
 int	zbx_lld_macro_paths_compare(const void *d1, const void *d2);
 
 void	zbx_dc_get_item_tags_by_functionids(const zbx_uint64_t *functionids, size_t functionids_num, zbx_vector_ptr_t *host_tags);

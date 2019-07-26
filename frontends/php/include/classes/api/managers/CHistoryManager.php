@@ -146,27 +146,38 @@ class CHistoryManager {
 
 		if ($limit == 1) {
 			foreach ($items as $item) {
-				$values = DBfetchArray(DBselect(
-					'SELECT *'.
+				// Executing two subsequent queries individually for the sake of performance.
+
+				$clock_max = DBfetch(DBselect(
+					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						' AND h.clock=('.
-							'SELECT MAX(h2.clock)'.
-							' FROM '.self::getTableName($item['value_type']).' h2'.
-							' WHERE h2.itemid='.zbx_dbstr($item['itemid']).
-								($period ? ' AND h2.clock>'.$period : '').
-						')'.
-					' ORDER BY h.ns DESC',
-					$limit
-				));
+						($period ? ' AND h.clock>'.$period : '')
+				), false);
 
-				if ($values) {
-					$results[$item['itemid']] = $values;
+				if ($clock_max) {
+					$clock_max = reset($clock_max);
+
+					if ($clock_max !== null) {
+						$values = DBfetchArray(DBselect(
+							'SELECT *'.
+							' FROM '.self::getTableName($item['value_type']).' h'.
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+								' AND h.clock='.zbx_dbstr($clock_max).
+							' ORDER BY h.ns DESC',
+							$limit
+						));
+
+						if ($values) {
+							$results[$item['itemid']] = $values;
+						}
+					}
 				}
 			}
 		}
 		else {
 			foreach ($items as $item) {
+				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
 					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
@@ -181,6 +192,11 @@ class CHistoryManager {
 					$clock = $values[$count - 1]['clock'];
 
 					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
+						/*
+						 * The last selected entries having the same clock means the selection (not just the order)
+						 * of the last entries is possibly wrong due to unordered by nanoseconds.
+						 */
+
 						do {
 							unset($values[--$count]);
 						} while ($values && $values[$count - 1]['clock'] == $clock);

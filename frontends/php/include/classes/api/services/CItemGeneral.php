@@ -268,7 +268,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$this->checkNoParameters(
 					$item,
-					['templateid', 'state'],
+					['templateid', 'state', 'lastlogsize', 'mtime', 'error'],
 					_('Cannot update "%1$s" for item "%2$s".'),
 					$item['name']
 				);
@@ -640,9 +640,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return bool
 	 */
-	protected function checkSpecificFields(array $item, $method) {
-		return true;
-	}
+	abstract protected function checkSpecificFields(array $item, $method);
 
 	protected function clearValues(array $item) {
 		if (isset($item['port']) && $item['port'] != '') {
@@ -840,8 +838,6 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array an array of unsaved child items
 	 */
 	private function prepareInheritedItems(array $tpl_items, array $hostids = null) {
-		$class = get_class($this);
-
 		$itemids_by_templateid = [];
 		foreach ($tpl_items as $tpl_item) {
 			$itemids_by_templateid[$tpl_item['hostid']][] = $tpl_item['itemid'];
@@ -902,10 +898,10 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		foreach ($hostids_by_key as $key_ => $key_hostids) {
-			$sql_select = ($class === 'CItemPrototype') ? ',id.parent_itemid AS ruleid' : '';
+			$sql_select = ($this instanceof CItemPrototype) ? ',id.parent_itemid AS ruleid' : '';
 			// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or lld rule.
 			// For example, when linking an item prototype with same key as in an item on target host or template.
-			$sql_join = ($class === 'CItemPrototype') ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
+			$sql_join = ($this instanceof CItemPrototype) ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
 			$db_items = DBselect(
 				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
 					' FROM items i'.$sql_join.
@@ -922,7 +918,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		// Preparing list of application prototypes.
-		if ($class === 'CItemPrototype') {
+		if ($this instanceof CItemPrototype) {
 			$tpl_app_prototypes = [];
 			$item_prototypeids = [];
 
@@ -948,7 +944,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		// List of the discovery rules.
-		if ($class === 'CItemPrototype') {
+		if ($this instanceof CItemPrototype) {
 			// List of itemids without 'ruleid' property.
 			$tpl_itemids = [];
 			$tpl_ruleids = [];
@@ -1033,7 +1029,7 @@ abstract class CItemGeneral extends CApiService {
 						));
 					}
 
-					if ($class === 'CItemPrototype') {
+					if ($this instanceof CItemPrototype) {
 						$chd_ruleid = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
 						if (bccomp($chd_item['ruleid'], $chd_ruleid) != 0) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1052,7 +1048,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 				else {
 					unset($new_item['itemid']);
-					if ($class === 'CItemPrototype') {
+					if ($this instanceof CItemPrototype) {
 						$new_item['ruleid'] = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
 					}
 				}
@@ -1072,6 +1068,18 @@ abstract class CItemGeneral extends CApiService {
 							));
 						}
 					}
+
+					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
+						if (!array_key_exists('itemid', $new_item)) {
+							$new_item['rtdata'] = DB::getDefaults($this->getSecondaryTableName());
+							foreach ($this->secondary_table_fields as $field) {
+								if (array_key_exists($field, $new_item)) {
+									$new_item['rtdata'][$field] = $new_item[$field];
+									unset($new_item[$field]);
+								}
+							}
+						}
+					}
 				}
 
 				if (array_key_exists('preprocessing', $new_item)) {
@@ -1085,7 +1093,7 @@ abstract class CItemGeneral extends CApiService {
 					}
 				}
 
-				if ($class === 'CItemPrototype' && array_key_exists('applicationPrototypes', $new_item)) {
+				if ($this instanceof CItemPrototype && array_key_exists('applicationPrototypes', $new_item)) {
 					foreach ($new_item['applicationPrototypes'] as &$application_prototype) {
 						$application_prototype['templateid'] =
 							$tpl_app_prototypes[$tpl_item['itemid']][$application_prototype['name']];
@@ -1117,7 +1125,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		// Setting item applications.
-		if ($class === 'CItem' || $class === 'CItemPrototype') {
+		if ($this instanceof CItem || $this instanceof CItemPrototype) {
 			$tpl_applicationids = [];
 			foreach ($tpl_items as $tpl_item) {
 				if (array_key_exists('applications', $tpl_item)) {
@@ -2144,14 +2152,17 @@ abstract class CItemGeneral extends CApiService {
 			],
 			'authtype' => [
 				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM])
+				'in' => implode(',', [
+					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS
+				])
 			]
 		];
 
 		$data = $item + $db_item;
 
 		if (array_key_exists('authtype', $data)
-				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
+				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
+					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS)) {
 			$rules += [
 				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]
@@ -2258,11 +2269,13 @@ abstract class CItemGeneral extends CApiService {
 				libxml_clear_errors();
 
 				if (!$errors) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.', _('XML is empty')));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('XML is expected'))
+					);
 				}
 				else {
 					$error = reset($errors);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
 						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
 						$error->line, $error->column
 					)));
@@ -2271,7 +2284,9 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
 				if (trim($posts, " \r\n") === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 
 				$types = [
@@ -2298,7 +2313,9 @@ abstract class CItemGeneral extends CApiService {
 				$json->decode($posts);
 
 				if ($json->hasError()) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 			}
 		}

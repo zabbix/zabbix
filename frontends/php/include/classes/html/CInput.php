@@ -25,9 +25,11 @@ class CInput extends CTag {
 		parent::__construct('input');
 		$this->setType($type);
 
-		// if id is not passed, it will be the same as element name
-		$this->setId(zbx_formatDomId($name));
-		$this->setAttribute('name', $name);
+		if ($name !== null) {
+			$this->setId(zbx_formatDomId($name));
+			$this->setAttribute('name', $name);
+		}
+
 		$this->setAttribute('value', $value);
 		return $this;
 	}

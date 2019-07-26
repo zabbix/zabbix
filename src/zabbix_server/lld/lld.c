@@ -224,11 +224,9 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 		const lld_condition_t *condition)
 {
 	char	*value = NULL;
-	size_t	value_alloc = 0;
 	int	ret;
 
-	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value,
-			&value_alloc)))
+	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value)))
 	{
 		switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 		{
@@ -480,7 +478,7 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 {
 	int			i, index;
 	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
-	struct zbx_json_parse	jp_out;
+	char			*output = NULL;
 
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
@@ -493,12 +491,13 @@ static void	lld_check_received_data_for_filter(lld_filter_t *filter, const struc
 		{
 			lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
 
-			if (FAIL == zbx_json_path_open(jp_row, lld_macro_path->path, &jp_out))
+			if (FAIL == zbx_jsonpath_query(jp_row, lld_macro_path->path, &output) || NULL == output)
 			{
 				*info = zbx_strdcatf(*info,
 						"Cannot accurately apply filter: no value received for macro \"%s\""
 						" json path '%s'.\n", lld_macro_path->lld_macro, lld_macro_path->path);
 			}
+			zbx_free(output);
 
 			continue;
 		}

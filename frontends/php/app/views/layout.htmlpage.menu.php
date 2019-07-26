@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(

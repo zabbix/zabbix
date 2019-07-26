@@ -25,20 +25,10 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'screen.export' && hasRequest('screens')) {
-	$isExportData = true;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export_screens.xml';
-}
-else {
-	$isExportData = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = _('Configuration of screens');
-	$page['file'] = 'screenconf.php';
-	$page['scripts'] = ['multiselect.js'];
-}
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['title'] = _('Configuration of screens');
+$page['file'] = 'screenconf.php';
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -78,8 +68,6 @@ $fields = [
 ];
 check_fields($fields);
 
-CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_INT);
-
 /*
  * Permissions
  */
@@ -109,27 +97,6 @@ if (hasRequest('screenid')) {
 }
 else {
 	$screen = [];
-}
-
-/*
- * Export
- */
-if ($isExportData) {
-	$screens = getRequest('screens', []);
-
-	$export = new CConfigurationExport(['screens' => $screens]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
-
-	if (hasErrorMesssages()) {
-		show_messages();
-	}
-	else {
-		print($exportData);
-	}
-
-	exit;
 }
 
 /*

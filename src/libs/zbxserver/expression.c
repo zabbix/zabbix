@@ -5205,7 +5205,6 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 {
 	char	c, *replace_to = NULL;
 	int	ret = SUCCEED, l ,r;
-	size_t	replace_to_alloc = 0;
 
 	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
@@ -5221,7 +5220,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	c = (*data)[r + 1];
 	(*data)[r + 1] = '\0';
 
-	if (SUCCEED != zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, *data + l, &replace_to, &replace_to_alloc))
+	if (SUCCEED != zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, *data + l, &replace_to))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set", *data + l);
 
@@ -5241,7 +5240,6 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 
 	if (ZBX_TOKEN_LLD_FUNC_MACRO == token->type)
 	{
-		replace_to_alloc = 0;
 		if (SUCCEED != (zbx_calculate_macro_function(*data, &token->data.lld_func_macro, &replace_to)))
 		{
 			int	len = token->data.lld_func_macro.func.r - token->data.lld_func_macro.func.l + 1;
@@ -5266,6 +5264,9 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags, c
 	{
 		if (SUCCEED == is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX))
 		{
+			size_t	replace_to_alloc;
+
+			replace_to_alloc = strlen(replace_to) + 1;
 			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 		}
 		else

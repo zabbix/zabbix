@@ -19,25 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-CWebUser::disableSessionCookie();
+header('Content-Type: text/xml; charset=utf-8');
+header('Content-Disposition: attachment; filename="'.$data['page']['file'].'"');
 
-require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
-
-$page['title'] = _('ZABBIX');
-$page['file'] = 'cachewarning.php';
-
-if ((new CAssetsFileCache(ZBase::getRootDir()))->build()) {
-	redirect('index.php');
-
-	exit;
-}
-
-(new CView('general.warning', [
-	'header' => _('Insufficient file system permissions.'),
-	'messages' => [
-		_('Assets cache directory is not writable.')
-	],
-	'theme' => ZBX_DEFAULT_THEME
-]))->render();
+echo $data['main_block'];
