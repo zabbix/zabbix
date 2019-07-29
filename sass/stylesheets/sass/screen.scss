@@ -6845,47 +6845,49 @@ table.preprocessing-test-results {
 	width: 100%;
 	height: 100%;
 
-	tr td {
+	> tbody > tr > td {
 		vertical-align: middle;
 		padding: 0 10px;
 
-		span {
+		> span {
 			font-size: 16px;
 		}
-	}
-	tr td:before {
-		content: '';
-		position: static;
-		display: block;
-		min-width: 65px;
-		min-height: 0;
-	}
 
+		&:before {
+			content: '';
+			position: static;
+			display: block;
+			min-width: 65px;
+			min-height: 0;
+		}
+	}
+	
 	&.by-severity-layout-horizontal {
 
-		tr td {
+		> tbody > tr > td {
 			text-align: center;
 
-			span {
+			> span {
 				display: block;
 			}
 		}
 	}
-	&.by-severity-layout-vertical tr td span {
+	&.by-severity-layout-vertical > tbody > tr > td > span {
 		margin-right: 5px;
 	}
 }
 
 @if $theme_name == 'hc-light' or $theme_name == 'hc-dark' {
-	.by-severity-widget tr td {
+	.by-severity-widget > tbody > tr > td {
 		border-left-width: 34px;
 		border-left-style: solid;
-	}
-	.by-severity-widget tr td:after {
-		margin: auto;
-		top: 0;
-		bottom: 0;
-		left: -28px;
+	
+		&:after {
+			margin: auto;
+			top: 0;
+			bottom: 0;
+			left: -28px;
+		}
 	}
 }
 
