@@ -1097,6 +1097,10 @@ td.inactive-bg {
 	}
 }
 
+.by-severity-widget > tbody > tr > td {
+	@include hc-by-severity-widget;
+}
+
 // WIDGET HOST AVAILABILITY
 
 .host-avail-widget {

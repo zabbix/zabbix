@@ -6877,20 +6877,6 @@ table.preprocessing-test-results {
 	}
 }
 
-@if $theme_name == 'hc-light' or $theme_name == 'hc-dark' {
-	.by-severity-widget > tbody > tr > td {
-		border-left-width: 34px;
-		border-left-style: solid;
-
-		&:after {
-			margin: auto;
-			top: 0;
-			bottom: 0;
-			left: -28px;
-		}
-	}
-}
-
 // WIDGET HOST AVAILABILITY
 
 .host-avail-widget {
