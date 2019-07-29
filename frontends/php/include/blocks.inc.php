@@ -646,7 +646,6 @@ function getSystemStatusTotals(array &$data, array $severity_names) {
 	$goups_info = [
 		0 => [
 			'groupid' => 0,
-			'name' => 'Totals',
 			'stats' => []
 		]
 	];
