@@ -456,6 +456,135 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Resolve macros in triggers operational data.
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[$triggerid]['expression']
+	 * @param string $triggers[$triggerid]['opdata']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *
+	 * @return array
+	 */
+	public function resolveTriggersOpdata(array $triggers, array $options) {
+		$macros = [
+			'host' => [],
+			'interface' => [],
+			'item' => []
+		];
+		$usermacros = [];
+		$macro_values = [];
+
+		$types = [
+			'macros_n' => [
+				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
+			'macro_funcs_n' => [
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
+			'usermacros' => true
+		];
+
+		// Find macros.
+		foreach ($triggers as $triggerid => $trigger) {
+			$functionids = $this->findFunctions($trigger['expression']);
+
+			$matched_macros = $this->extractMacros([$trigger['opdata']], $types);
+
+			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'function' => $data['function'],
+						'parameters' => $data['parameters']
+					];
+				}
+			}
+
+			if ($matched_macros['usermacros']) {
+				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		// Get macro value.
+		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
+		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options['events']);
+
+		if ($usermacros) {
+			// Get hosts for triggers.
+			$db_triggers = API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'triggerids' => array_keys($usermacros),
+				'preservekeys' => true
+			]);
+
+			foreach ($usermacros as $triggerid => &$usermacros_data) {
+				if (array_key_exists($triggerid, $db_triggers)) {
+					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
+				}
+			}
+			unset($usermacros_data);
+
+			// Get user macros values.
+			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
+					: $usermacros_data['macros'];
+			}
+		}
+
+		$types = $this->transformToPositionTypes($types);
+
+		// Replace macros to value
+		foreach ($macro_values as $triggerid => $foo) {
+			$trigger = &$triggers[$triggerid];
+
+			$matched_macros = $this->getMacroPositions($trigger['opdata'], $types);
+
+			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+				$trigger['opdata'] = substr_replace($trigger['opdata'], $macro_values[$triggerid][$macro], $pos,
+					strlen($macro)
+				);
+			}
+		}
+		unset($trigger);
+
+		return $triggers;
+	}
+
+	/**
 	 * Resolve macros in trigger description.
 	 *
 	 * @param array  $triggers

@@ -909,6 +909,22 @@ class CEvent extends CApiService {
 
 		$eventids = array_keys($result);
 
+		// Adding operational data.
+		if ($this->outputIsRequested('opdata', $options['output'])) {
+			$triggers = DBFetchArrayAssoc(DBselect(
+				'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
+					' FROM triggers t'.
+						' JOIN events e ON t.triggerid=e.objectid'.
+					' WHERE '.dbConditionInt('e.eventid', $eventids)
+			), 'eventid');
+
+			foreach ($result as $eventid => $event) {
+				$result[$eventid]['opdata'] = CMacrosResolverHelper::resolveTriggerOpdata($triggers[$eventid],
+					['events' => true]
+				);
+			}
+		}
+
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			// trigger events

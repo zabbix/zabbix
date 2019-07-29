@@ -71,7 +71,6 @@ class CProblem extends CApiService {
 			'any'						=> null,	// (internal) true if need not filtred by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
-			'recent'					=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -400,6 +399,22 @@ class CProblem extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$eventids = array_keys($result);
+
+		// Adding operational data.
+		if ($this->outputIsRequested('opdata', $options['output'])) {
+			$triggers = DBFetchArrayAssoc(DBselect(
+				'SELECT p.eventid,p.clock,p.ns,t.triggerid,t.expression,t.opdata'.
+					' FROM triggers t'.
+						' JOIN problem p ON t.triggerid=p.objectid'.
+					' WHERE '.dbConditionInt('p.eventid', $eventids)
+			), 'eventid');
+
+			foreach ($result as $eventid => $problem) {
+				$result[$eventid]['opdata'] = CMacrosResolverHelper::resolveTriggerOpdata($triggers[$eventid],
+					['events' => true]
+				);
+			}
+		}
 
 		// adding acknowledges
 		if ($options['selectAcknowledges'] !== null) {

@@ -202,6 +202,23 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
+	// operational data
+	$opdata = null;
+	if ($data['fields']['show_opdata']) {
+		$opdata = ($trigger['opdata'] !== '')
+			? CMacrosResolverHelper::resolveTriggerOpdata(
+				[
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				],
+				['events' => true]
+			)
+			: CScreenProblem::getLatestValues($trigger['items']);
+	}
+
 	// Create acknowledge url.
 	$problem_update_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'acknowledge.edit')
@@ -215,7 +232,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		$data['fields']['show_opdata'] ? CScreenProblem::getLatestValues($trigger['items']) : null,
+		$opdata,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))

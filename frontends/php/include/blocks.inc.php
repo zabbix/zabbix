@@ -162,7 +162,7 @@ function getSystemStatusData(array $filter) {
 		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1) {
 			$options['output'] = array_merge(
 				$options['output'],
-				['url', 'expression', 'recovery_mode','recovery_expression']
+				['url', 'expression', 'recovery_mode', 'recovery_expression', 'opdata']
 			);
 		}
 
@@ -288,6 +288,7 @@ function getSystemStatusData(array $filter) {
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
  * @param int    $filter['show_timeline']      (optional)
+ * @param int    $filter['show_opdata']        (optional)
  * @param array  $data
  * @param array  $data['groups']
  * @param string $data['groups'][]['groupid']
@@ -311,6 +312,7 @@ function getSystemStatusData(array $filter) {
  * @param string $data['triggers'][<triggerid>]['description']
  * @param array  $data['triggers'][<triggerid>]['hosts']
  * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
+ * @param array  $data['triggers'][<triggerid>]['opdata']
  * @param array  $config
  * @param string $config['severity_name_*']
  * @param string $backurl
@@ -511,12 +513,14 @@ function make_status_of_zbx() {
  * @param string $triggers[<triggerid>]['description']
  * @param array  $triggers[<triggerid>]['hosts']
  * @param string $triggers[<triggerid>]['hosts'][]['name']
+ * @param string $triggers[<triggerid>]['opdata']
  * @param string $backurl
  * @param array  $actions
  * @param array  $config
  * @param array  $filter
  * @param array  $filter['show_suppressed']  (optional)
  * @param array  $filter['show_timeline']    (optional)
+ * @param array  $filter['show_opdata']      (optional)
  *
  * @return CTableInfo
  */
@@ -615,6 +619,23 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
 		}
 
+		// operational data
+		$opdata = null;
+		if ($show_opdata) {
+			$opdata = ($trigger['opdata'] !== '')
+				? CMacrosResolverHelper::resolveTriggerOpdata(
+					[
+						'triggerid' => $trigger['triggerid'],
+						'expression' => $trigger['expression'],
+						'opdata' => $trigger['opdata'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					['events' => true]
+				)
+				: CScreenProblem::getLatestValues($trigger['items']);
+		}
+
 		// ack
 		$problem_update_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'acknowledge.edit')
@@ -630,7 +651,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
 			getSeverityCell($problem['severity'], null, $problem['name']),
-			$show_opdata ? CScreenProblem::getLatestValues($trigger['items']) : null,
+			$opdata,
 			zbx_date2age($problem['clock']),
 			$ack,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],

@@ -212,6 +212,52 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger operational data.
+	 *
+	 * @static
+	 *
+	 * @param array  $trigger
+	 * @param string $trigger['expression']
+	 * @param string $trigger['opdata']
+	 * @param int    $trigger['clock']       (optional)
+	 * @param int    $trigger['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *                                       Default: false.
+	 *
+	 * @return string
+	 */
+	public static function resolveTriggerOpdata(array $trigger, array $options = []) {
+		$triggers = self::resolveTriggersOpdata([$trigger['triggerid'] => $trigger], $options);
+
+		return $triggers[$trigger['triggerid']]['opdata'];
+	}
+
+	/**
+	 * Resolve macros in triggers operational data.
+	 *
+	 * @static
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[$triggerid]['expression']
+	 * @param string $triggers[$triggerid]['opdata']
+	 * @param int    $triggers[$triggerid]['clock']       (optional)
+	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param array  $options
+	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
+	 *                                                    fields. Default: false.
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggersOpdata(array $triggers, array $options = []) {
+		self::init();
+
+		$options += ['events' => false];
+
+		return self::$macrosResolver->resolveTriggersOpdata($triggers, $options);
+	}
+
+	/**
 	 * Resolve macros in trigger description.
 	 *
 	 * @static
