@@ -1,9 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = \
-	scheduler \
-	server_connector
-
 all: build
 
 build:

@@ -27,6 +27,7 @@ import (
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
+	"zabbix/internal/agent/server_connector"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
@@ -34,6 +35,7 @@ import (
 )
 
 var taskManager scheduler.Manager
+var serverConnector server_connector.ServerConnector
 
 func main() {
 	var confFlag string
@@ -151,6 +153,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
 	taskManager.Start()
+	serverConnector.Start()
 
 loop:
 	for {
@@ -164,6 +167,7 @@ loop:
 		}
 	}
 
+	serverConnector.Stop()
 	taskManager.Stop()
 	monitor.Wait()
 
