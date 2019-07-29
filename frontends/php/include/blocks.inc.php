@@ -505,7 +505,7 @@ function getSeverityTotals(&$data) {
  *
  * @return CTableInfo
  */
-function makeSeverityTable(array &$data, CTableInfo $table, $hide_empty_groups = null, CUrl $groupurl = null,
+function makeSeverityTable(array &$data, CTableInfo $table, $hide_empty_groups = false, CUrl $groupurl = null,
 		$is_total = true) {
 	foreach ($data['data']['groups'] as $group) {
 		if ($hide_empty_groups && !$group['has_problems']) {
