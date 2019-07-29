@@ -20,11 +20,12 @@
 package agent
 
 type AgentOptions struct {
-	LogType    string `conf:",,,console"`
-	LogFile    string `conf:",optional"`
-	DebugLevel int    `conf:",,0:5,3"`
-	Hostname   string
-	Plugins    map[string]map[string]string
+	LogType      string `conf:",,,console"`
+	LogFile      string `conf:",optional"`
+	DebugLevel   int    `conf:",,0:5,3"`
+	ServerActive string `conf:",optional"`
+	Hostname     string
+	Plugins      map[string]map[string]string
 }
 
 var Options AgentOptions

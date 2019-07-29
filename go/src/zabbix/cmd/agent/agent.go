@@ -22,8 +22,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
@@ -35,7 +37,31 @@ import (
 )
 
 var taskManager scheduler.Manager
-var serverConnector server_connector.ServerConnector
+
+func parseServerActive() ([]string, error) {
+	addresses := strings.Split(agent.Options.ServerActive, ",")
+
+	for i := 0; i < len(addresses); i++ {
+		if strings.IndexByte(addresses[i], ':') == -1 {
+			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			}
+			addresses[i] += ":10051"
+		} else {
+			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			}
+		}
+
+		for j := 0; j < i; j++ {
+			if addresses[j] == addresses[i] {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
+			}
+		}
+	}
+
+	return addresses, nil
+}
 
 func main() {
 	var confFlag string
@@ -137,6 +163,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
+
+	addresses, err := parseServerActive()
+	if err != nil {
+		log.Critf("%s", err)
+		os.Exit(1)
+	}
+
 	greeting := fmt.Sprintf("Starting Zabbix Agent [(hostname placeholder)]. (version placeholder)")
 	log.Infof(greeting)
 
@@ -153,7 +186,12 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
 	taskManager.Start()
-	serverConnector.Start()
+
+	serverConnectors := make([]server_connector.ServerConnector, len(addresses))
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Start()
+	}
 
 loop:
 	for {
@@ -167,7 +205,10 @@ loop:
 		}
 	}
 
-	serverConnector.Stop()
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Stop()
+	}
+
 	taskManager.Stop()
 	monitor.Wait()
 
