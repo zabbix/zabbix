@@ -98,10 +98,10 @@
 			hidden_form = document.createElement('div');
 			hidden_form.id = 'hidden-form';
 
-			hidden_form.append(httpconf.scenario.toFragment());
-			hidden_form.append(httpconf.steps.toFragment());
+			hidden_form.appendChild(httpconf.scenario.toFragment());
+			hidden_form.appendChild(httpconf.steps.toFragment());
 
-			this.append(hidden_form);
+			this.appendChild(hidden_form);
 		});
 	});
 
@@ -501,22 +501,22 @@
 	 * @return {DocumentFragment}
 	 */
 	Scenario.prototype.toFragment = function() {
-		var frag = new DocumentFragment(),
+		var frag = document.createDocumentFragment(),
 			iter = 0,
 			prefix;
 
 		eachPair.call(this.pairs.headers, function(pair) {
 			prefix = 'pairs[' + (iter ++) + ']';
-			frag.append(hiddenInput('type', 'headers', prefix));
-			frag.append(hiddenInput('name', pair.name, prefix));
-			frag.append(hiddenInput('value', pair.value, prefix));
+			frag.appendChild(hiddenInput('type', 'headers', prefix));
+			frag.appendChild(hiddenInput('name', pair.name, prefix));
+			frag.appendChild(hiddenInput('value', pair.value, prefix));
 		});
 
 		eachPair.call(this.pairs.variables, function(pair) {
 			prefix = 'pairs[' + (iter ++) + ']';
-			frag.append(hiddenInput('type', 'variables', prefix));
-			frag.append(hiddenInput('name', pair.name, prefix));
-			frag.append(hiddenInput('value', pair.value, prefix));
+			frag.appendChild(hiddenInput('type', 'variables', prefix));
+			frag.appendChild(hiddenInput('name', pair.name, prefix));
+			frag.appendChild(hiddenInput('value', pair.value, prefix));
 		});
 
 		return frag;
@@ -579,7 +579,7 @@
 	 * @return {DocumentFragment}
 	 */
 	Steps.prototype.toFragment = function() {
-		var frag = new DocumentFragment(),
+		var frag = document.createDocumentFragment(),
 			iter_step = 0;
 
 		this.sort_index.forEach(function(id) {
@@ -588,49 +588,49 @@
 				prefix_step = 'steps[' + (iter_step ++) + ']',
 				prefix_pair;
 
-			frag.append(hiddenInput('follow_redirects', step.data.follow_redirects, prefix_step));
-			frag.append(hiddenInput('httpstepid',       step.data.httpstepid,       prefix_step));
-			frag.append(hiddenInput('name',             step.data.name,             prefix_step));
-			frag.append(hiddenInput('post_type',        step.data.post_type,        prefix_step));
-			frag.append(hiddenInput('required',         step.data.required,         prefix_step));
-			frag.append(hiddenInput('retrieve_mode',    step.data.retrieve_mode,    prefix_step));
-			frag.append(hiddenInput('status_codes',     step.data.status_codes,     prefix_step));
-			frag.append(hiddenInput('timeout',          step.data.timeout,          prefix_step));
-			frag.append(hiddenInput('url',              step.data.url,              prefix_step));
+			frag.appendChild(hiddenInput('follow_redirects', step.data.follow_redirects, prefix_step));
+			frag.appendChild(hiddenInput('httpstepid',       step.data.httpstepid,       prefix_step));
+			frag.appendChild(hiddenInput('name',             step.data.name,             prefix_step));
+			frag.appendChild(hiddenInput('post_type',        step.data.post_type,        prefix_step));
+			frag.appendChild(hiddenInput('required',         step.data.required,         prefix_step));
+			frag.appendChild(hiddenInput('retrieve_mode',    step.data.retrieve_mode,    prefix_step));
+			frag.appendChild(hiddenInput('status_codes',     step.data.status_codes,     prefix_step));
+			frag.appendChild(hiddenInput('timeout',          step.data.timeout,          prefix_step));
+			frag.appendChild(hiddenInput('url',              step.data.url,              prefix_step));
 
 			if (step.data.retrieve_mode != httpconf.HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
 				if (step.data.post_type != httpconf.ZBX_POSTTYPE_FORM) {
-					frag.append(hiddenInput('posts', step.data.posts, prefix_step));
+					frag.appendChild(hiddenInput('posts', step.data.posts, prefix_step));
 				}
 				else {
 					step.data.pairs.post_fields.forEach(function(pair) {
 						prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
-						frag.append(hiddenInput('type',  'post_fields', prefix_pair));
-						frag.append(hiddenInput('name',  pair.name,     prefix_pair));
-						frag.append(hiddenInput('value', pair.value,    prefix_pair));
+						frag.appendChild(hiddenInput('type',  'post_fields', prefix_pair));
+						frag.appendChild(hiddenInput('name',  pair.name,     prefix_pair));
+						frag.appendChild(hiddenInput('value', pair.value,    prefix_pair));
 					});
 				}
 			}
 
 			step.data.pairs.query_fields.forEach(function(pair) {
 				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
-				frag.append(hiddenInput('type',  'query_fields', prefix_pair));
-				frag.append(hiddenInput('name',  pair.name,      prefix_pair));
-				frag.append(hiddenInput('value', pair.value,     prefix_pair));
+				frag.appendChild(hiddenInput('type',  'query_fields', prefix_pair));
+				frag.appendChild(hiddenInput('name',  pair.name,      prefix_pair));
+				frag.appendChild(hiddenInput('value', pair.value,     prefix_pair));
 			});
 
 			step.data.pairs.variables.forEach(function(pair) {
 				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
-				frag.append(hiddenInput('type',  'variables', prefix_pair));
-				frag.append(hiddenInput('name',  pair.name,   prefix_pair));
-				frag.append(hiddenInput('value', pair.value,  prefix_pair));
+				frag.appendChild(hiddenInput('type',  'variables', prefix_pair));
+				frag.appendChild(hiddenInput('name',  pair.name,   prefix_pair));
+				frag.appendChild(hiddenInput('value', pair.value,  prefix_pair));
 			});
 
 			step.data.pairs.headers.forEach(function(pair) {
 				prefix_pair = prefix_step + '[pairs][' + (iter_pair ++) + ']';
-				frag.append(hiddenInput('type',  'headers',  prefix_pair));
-				frag.append(hiddenInput('name',  pair.name,  prefix_pair));
-				frag.append(hiddenInput('value', pair.value, prefix_pair));
+				frag.appendChild(hiddenInput('type',  'headers',  prefix_pair));
+				frag.appendChild(hiddenInput('name',  pair.name,  prefix_pair));
+				frag.appendChild(hiddenInput('value', pair.value, prefix_pair));
 			});
 
 		}.bind(this));
