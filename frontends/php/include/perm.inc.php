@@ -113,14 +113,14 @@ function getUserGuiAccess($userid) {
 /**
  * Get user authentication type.
  *
- * @param string $userid
+ * @param int $gui_access  Frontend access. GROUP_GUI_ACCESS_*
  *
  * @return int
  */
-function getUserAuthenticationType($userid) {
+function getUserAuthenticationType($gui_access) {
 	$config = select_config();
 
-	switch (getUserGuiAccess($userid)) {
+	switch ($gui_access) {
 		case GROUP_GUI_ACCESS_SYSTEM:
 			return $config['authentication_type'];
 
@@ -157,31 +157,6 @@ function getGroupsGuiAccess($usrgrpids) {
 	}
 
 	return $gui_access;
-}
-
-/**
- * Get user groups authentication type.
- *
- * @param string $usrgrpids
- *
- * @return int
- */
-function getGroupsAuthenticationType($usrgrpids) {
-	$config = select_config();
-
-	switch (getGroupsGuiAccess($usrgrpids)) {
-		case GROUP_GUI_ACCESS_SYSTEM:
-			return $config['authentication_type'];
-
-		case GROUP_GUI_ACCESS_INTERNAL:
-			return ZBX_AUTH_INTERNAL;
-
-		case GROUP_GUI_ACCESS_LDAP:
-			return ZBX_AUTH_LDAP;
-
-		default:
-			return $config['authentication_type'];
-	}
 }
 
 /***********************************************

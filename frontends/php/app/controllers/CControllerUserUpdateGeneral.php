@@ -25,18 +25,21 @@
 abstract class CControllerUserUpdateGeneral extends CController {
 
 	/**
-	 * User authentication type.
+	 * Allow empty password.
 	 *
 	 * @var int
 	 */
-	protected $auth_type;
+	protected $allow_empty_password;
 
 	/**
 	 * Validate password directly from input when updating user.
 	 *
-	 * @param $auth_type  User authentication type.
+	 * @param int $gui_access  Frontend access. GROUP_GUI_ACCESS_*
 	 */
-	protected function validatePassword($auth_type) {
+	protected function validatePassword($gui_access) {
+		$this->allow_empty_password = ($gui_access == GROUP_GUI_ACCESS_DISABLED
+			|| getUserAuthenticationType($gui_access) != ZBX_AUTH_INTERNAL);
+
 		$password1 = $this->hasInput('password1') ? $this->getInput('password1') : null;
 		$password2 = $this->hasInput('password2') ? $this->getInput('password2') : null;
 
@@ -46,7 +49,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				return false;
 			}
 
-			if ($password1 === '' && $auth_type == ZBX_AUTH_INTERNAL) {
+			if ($password1 === '' && !$this->allow_empty_password) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Password'), _('cannot be empty')));
 				return false;
 			}

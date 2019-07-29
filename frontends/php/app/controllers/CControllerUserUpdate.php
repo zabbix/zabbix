@@ -52,13 +52,9 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret) {
-			$this->auth_type = getGroupsAuthenticationType($this->getInput('user_groups'));
-
-			if (!$this->validatePassword($this->auth_type)) {
-				$error = self::VALIDATION_ERROR;
-				$ret = false;
-			}
+		if ($ret && !$this->validatePassword(getGroupsGuiAccess($this->getInput('user_groups')))) {
+			$error = self::VALIDATION_ERROR;
+			$ret = false;
 		}
 
 		if (!$ret) {
@@ -99,8 +95,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		]);
 		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 
-		if ($this->getInput('password1', '') !== ''
-				|| ($this->hasInput('password1') && $this->auth_type == ZBX_AUTH_INTERNAL)) {
+		if ($this->getInput('password1', '') !== '' || ($this->hasInput('password1') && !$this->allow_empty_password)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 

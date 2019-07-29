@@ -49,7 +49,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$error = $this->GetValidationError();
 
 		if ($ret) {
-			$this->auth_type = getUserAuthenticationType(CWebUser::$data['userid']);
+			$this->auth_type = getUserAuthenticationType(getUserGuiAccess(CWebUser::$data['userid']));
 
 			if (!$this->validatePassword($this->auth_type)) {
 				$error = self::VALIDATION_ERROR;
