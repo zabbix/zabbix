@@ -48,13 +48,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword(getGroupsGuiAccess($this->getInput('user_groups')))) {
-			$error = self::VALIDATION_ERROR;
-			$ret = false;
-		}
-
-		if ($ret && $this->getInput('password1') !== $this->getInput('password2')) {
-			error(_('Both passwords must be equal.'));
+		if ($ret && !$this->validatePassword()) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}

@@ -27,18 +27,63 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	/**
 	 * Allow empty password.
 	 *
-	 * @var int
+	 * @var bool
 	 */
 	protected $allow_empty_password;
 
 	/**
+	 * Get groups gui access.
+	 *
+	 * @param array  $usrgrps
+	 * @param string $usrgrps[]['gui_access']
+	 *
+	 * @return int
+	 */
+	private static function hasInternalAuth($usrgrps) {
+		$config = select_config();
+		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
+			? GROUP_GUI_ACCESS_INTERNAL
+			: GROUP_GUI_ACCESS_LDAP;
+
+		foreach($usrgrps as $usrgrp) {
+			$gui_access = ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM)
+				? $system_gui_access
+				: $usrgrp['gui_access'];
+
+			if ($gui_access == GROUP_GUI_ACCESS_INTERNAL) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Validate password directly from input when updating user.
 	 *
-	 * @param int $gui_access  Frontend access. GROUP_GUI_ACCESS_*
+	 * @return bool
 	 */
-	protected function validatePassword($gui_access) {
-		$this->allow_empty_password = ($gui_access == GROUP_GUI_ACCESS_DISABLED
-			|| getUserAuthenticationType($gui_access) != ZBX_AUTH_INTERNAL);
+	protected function validatePassword() {
+		if ($this instanceof CControllerUserProfileUpdate) {
+			$usrgrps = API::UserGroup()->get([
+				'output' => ['gui_access'],
+				'userids' => CWebUser::$data['userid'],
+				'filter' => [
+					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
+				]
+			]);
+		}
+		else {
+			$usrgrps = API::UserGroup()->get([
+				'output' => ['gui_access'],
+				'usrgrpids' => $this->getInput('user_groups'),
+				'filter' => [
+					'gui_access' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL]
+				]
+			]);
+		}
+
+		$this->allow_empty_password = !self::hasInternalAuth($usrgrps);
 
 		$password1 = $this->hasInput('password1') ? $this->getInput('password1') : null;
 		$password2 = $this->hasInput('password2') ? $this->getInput('password2') : null;

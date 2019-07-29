@@ -563,10 +563,9 @@ class CUser extends CApiService {
 	 */
 	private static function hasInternalAuth($user, $db_usrgrps) {
 		$config = select_config();
-		$system_gui_access = array_search($config['authentication_type'], [
-			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
-			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
-		]);
+		$system_gui_access = ($config['authentication_type'] == ZBX_AUTH_INTERNAL)
+			? GROUP_GUI_ACCESS_INTERNAL
+			: GROUP_GUI_ACCESS_LDAP;
 
 		foreach($user['usrgrps'] as $usrgrp) {
 			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];

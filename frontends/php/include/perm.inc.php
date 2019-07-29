@@ -135,30 +135,6 @@ function getUserAuthenticationType($gui_access) {
 	}
 }
 
-/**
- * Get groups gui access.
- *
- * @param array $usrgrpids
- *
- * @return int
- */
-function getGroupsGuiAccess($usrgrpids) {
-	$usrgrps = API::UserGroup()->get([
-		'output' => ['gui_access'],
-		'usrgrpids' => $usrgrpids
-	]);
-
-	$gui_access = GROUP_GUI_ACCESS_SYSTEM;
-
-	foreach ($usrgrps as $usrgrp) {
-		if ($gui_access < $usrgrp['gui_access']) {
-			$gui_access = $usrgrp['gui_access'];
-		}
-	}
-
-	return $gui_access;
-}
-
 /***********************************************
 	GET ACCESSIBLE RESOURCES BY RIGHTS
 ************************************************/

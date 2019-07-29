@@ -52,7 +52,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$ret = $this->validateInput($fields);
 		$error = $this->GetValidationError();
 
-		if ($ret && !$this->validatePassword(getGroupsGuiAccess($this->getInput('user_groups')))) {
+		if ($ret && !$this->validatePassword()) {
 			$error = self::VALIDATION_ERROR;
 			$ret = false;
 		}
