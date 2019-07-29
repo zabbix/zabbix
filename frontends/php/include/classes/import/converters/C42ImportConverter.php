@@ -31,10 +31,6 @@ class C42ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = $this->convertInventoryMode($data['zabbix_export']['hosts']);
 		}
 
-		if (array_key_exists('host_prototypes', $data['zabbix_export'])) {
-			$data['zabbix_export']['host_prototypes'] = $this->convertInventoryMode($data['zabbix_export']['host_prototypes']);
-		}
-
 		if (array_key_exists('screens', $data['zabbix_export'])) {
 			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
 		}
@@ -49,12 +45,15 @@ class C42ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	protected function convertInventoryMode(array $hosts)
-	{
+	protected function convertInventoryMode(array $hosts) {
 		foreach ($hosts as &$host) {
 			if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
 				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
-				unset($host['inventory']);
+				unset($host['inventory']['inventory_mode']);
+
+				if (count($host['inventory']) === 0) {
+					unset($host['inventory']);
+				}
 			}
 		}
 

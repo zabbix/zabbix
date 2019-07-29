@@ -19,6 +19,9 @@
 **/
 
 
-class CXmlTagString extends CXmlTag {
+interface CArrayXmlTagInterface extends CXmlTagInterface {
 
+	public function setSchema();
+
+	public function getSubTags();
 }

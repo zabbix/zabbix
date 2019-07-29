@@ -19,14 +19,33 @@
 **/
 
 
-return (new CXmlTagIndexedArray('value_maps'))->setKey('valueMaps')->setSchema(
-	(new CXmlTagArray('value_map'))->setSchema(
-		(new CXmlTagString('name'))->setRequired(),
-		(new CXmlTagIndexedArray('mappings'))->setSchema(
-			(new CXmlTagArray('mapping'))->setSchema(
-				new CXmlTagString('value'),
-				new CXmlTagString('newvalue')
-			)
-		)
-	)
-);
+class CXmlSchemaBuilder {
+
+	public function build(CXmlTagInterface $class) {
+		$result = [];
+		$sub_tags = $class->getSubTags();
+
+		if (count($sub_tags) === 0) {
+			throw new CXmlSchemaBuilderException(_s('Tag "%1$s" schema is empty.', $class->getTag()));
+		}
+
+		foreach ($sub_tags as $tag) {
+			$result[$tag->getTag()] = $tag;
+		}
+
+		return $class instanceof CIndexedArrayXmlTagInterface
+			? $result
+			: [$class->getTag() => $result];
+	}
+
+	public function getFullSchema() {
+		return [
+			(new CGraphsSchemaCreater)->create(),
+			(new CGroupsSchemaCreater)->create(),
+			(new CHostsSchemaCreater)->create(),
+			(new CValueMapsSchemaCreater)->create(),
+			(new CTemplatesSchemaCreater)->create(),
+			(new CTriggersSchemaCreater)->create()
+		];
+	}
+}

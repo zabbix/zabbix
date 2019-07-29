@@ -19,6 +19,17 @@
 **/
 
 
-class CXmlTagArray extends CXmlTag {
+interface CXmlTagInterface {
 
+	public function setTag($tag);
+
+	public function getTag();
+
+	public function setRequired();
+
+	public function isRequired();
+
+	public function setKey($key);
+
+	public function getKey();
 }

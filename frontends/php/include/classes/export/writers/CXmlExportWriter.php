@@ -90,7 +90,7 @@ class CXmlExportWriter extends CExportWriter {
 	 * @return bool
 	 */
 	public function mapName($name) {
-		$map = CXmlDefine::$subtags;
+		$map = CXmlConstantValue::$subtags;
 
 		return isset($map[$name]) ? $map[$name] : false;
 	}

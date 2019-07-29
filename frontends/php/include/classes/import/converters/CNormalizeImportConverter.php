@@ -23,14 +23,23 @@
  * Add missed tags. Convert constant to value.
  * Use new XML schema.
  */
-class CNewSchemaConverter extends CConverter {
+class CNormalizeImportConverter extends CConverter {
+
+	/**
+	 * Schema builder
+	 *
+	 * @var CXmlSchemaBuilder
+	 */
+	private $builder;
 
 	public function convert($data) {
 		if ($data['zabbix_export']['version'] < 4.4) {
 			return $data;
 		}
 
-		$schema = include(__DIR__ . '/../../xml/schema.php');
+		$this->builder = new CXmlSchemaBuilder;
+
+		$schema = $this->builder->getFullSchema();
 
 		foreach ($schema as $tag_class) {
 			$tag = $tag_class->getTag();
@@ -47,15 +56,15 @@ class CNewSchemaConverter extends CConverter {
 
 	protected function replaceValue(array $schema, array $data) {
 		foreach ($schema as $tag => $tag_class) {
-			if (!array_key_exists($tag, $data) || $tag_class instanceof CXmlTagString) {
-				$data[$tag] = $tag_class->fromXml($data);
+			if (!array_key_exists($tag, $data) || $tag_class instanceof CStringXmlTagInterface) {
+				$data[$tag] = (new CTagImporter($tag_class))->import($data);
 				continue;
 			}
 
-			if ($tag_class instanceof CXmlTagIndexedArray) {
+			if ($tag_class instanceof CIndexedArrayXmlTagInterface) {
 				$data[$tag] = $this->convertIndexedArray($tag_class, $data[$tag]);
 			}
-			if ($tag_class instanceof CXmlTagArray) {
+			if ($tag_class instanceof CArrayXmlTagInterface) {
 				$data[$tag] = $this->convertArray($tag_class, $data[$tag]);
 			}
 		}
@@ -63,15 +72,15 @@ class CNewSchemaConverter extends CConverter {
 		return $data;
 	}
 
-	protected function convertIndexedArray(CXmlTag $class, array $data) {
+	protected function convertIndexedArray(CXmlTagInterface $class, array $data) {
 		$class_tag = $class->getTag();
-		$schema = $class->buildSchema();
+		$schema = $this->builder->build($class);
 
 		// If it indexed array getting child tag schema.
-		if ($class instanceof CXmlTagIndexedArray) {
-			$class_tag = CXmlDefine::$subtags[$class->getTag()];
-			$schema = $class->getNextSchema();
-			$schema = $schema[$class_tag]->buildSchema();
+		if ($class instanceof CIndexedArrayXmlTagInterface) {
+			$schema = $this->builder->build($class);
+			$class_tag = CXmlConstantValue::$subtags[$class->getTag()];
+			$schema = $this->builder->build($schema[$class_tag]);
 		}
 
 		$count = count($data);
@@ -85,19 +94,17 @@ class CNewSchemaConverter extends CConverter {
 		return $data;
 	}
 
-	protected function convertArray(CXmlTag $class, array $data) {
-		$schema = $class->buildSchema();
+	protected function convertArray(CXmlTagInterface $class, array $data) {
+		$schema = $this->builder->build($class);
 
 		return $this->replaceValue($schema[$class->getTag()], $data);
 	}
 
-	protected function converter(CXmlTag $class, array $data) {
-		$schema = $class->getNextSchema();
+	protected function converter(CXmlTagInterface $class, array $data) {
+		$schema = $this->builder->build($class);
 
 		foreach($schema as $tag_class) {
-			if ($class instanceof CXmlTagIndexedArray) {
-				return $this->convertIndexedArray($tag_class, $data);
-			}
+			return $this->convertIndexedArray($tag_class, $data);
 		}
 
 		return $data;

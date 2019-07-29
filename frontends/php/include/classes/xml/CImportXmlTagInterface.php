@@ -19,11 +19,9 @@
 **/
 
 
-return [
-	include(__DIR__ . '/schema/graphs.php'),
-	include(__DIR__ . '/schema/groups.php'),
-	include(__DIR__ . '/schema/hosts.php'),
-	include(__DIR__ . '/schema/value_maps.php'),
-	include(__DIR__ . '/schema/templates.php'),
-	include(__DIR__ . '/schema/triggers.php')
-];
+interface CImportXmlTagInterface {
+
+	public function setImportHandler(callable $func);
+
+	public function getImportHandler();
+}

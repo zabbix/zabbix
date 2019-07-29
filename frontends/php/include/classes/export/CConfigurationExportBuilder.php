@@ -47,8 +47,6 @@ class CConfigurationExportBuilder {
 	 * Build wrapper.
 	 *
 	 * @param array $data
-	 *
-	 * @return void
 	 */
 	public function buildWrapper(array $data) {
 		// Create triggers.
@@ -58,10 +56,10 @@ class CConfigurationExportBuilder {
 			$simple_triggers = $this->createTriggers($data['triggers']);
 		}
 
-		$schema = include(__DIR__ . '/../xml/schema.php');
+		$schema = (new CXmlSchemaBuilder)->getFullSchema();
 
-		foreach ($schema as $tagClass) {
-			$key = $tagClass->getKey() ?: $tagClass->getTag();
+		foreach ($schema as $class) {
+			$key = $class->getKey() ?: $class->getTag();
 
 			if (!$data[$key]) {
 				continue;
@@ -72,19 +70,19 @@ class CConfigurationExportBuilder {
 				$data[$key] = call_user_func([$this, $format_method], $data[$key], $simple_triggers);
 			}
 
-			$this->data[$tagClass->getTag()] = $this->build($tagClass, $data[$key]);
+			$this->data[$class->getTag()] = $this->build($class, $data[$key]);
 		}
 	}
 
 	/**
 	 * Build XML data.
 	 *
-	 * @param CXmlTag $schema_class
-	 * @param array   $data
+	 * @param CXmlTagInterface $schema_class
+	 * @param array            $data
 	 *
 	 * @return array
 	 */
-	protected function build(CXmlTag $schema_class, array $data) {
+	protected function build(CXmlTagInterface $schema_class, array $data) {
 		$n = 0;
 		$result = [];
 
@@ -94,10 +92,11 @@ class CConfigurationExportBuilder {
 			$store = [];
 			foreach ($schema as $tag => $class) {
 				$is_require = $class->isRequired();
-				$is_array = $class instanceof CXmlTagArray;
-				$is_indexed_array = $class instanceof CXmlTagIndexedArray;
-				$default_value = $class->getDefaultValue();
+				$is_array = $class instanceof CArrayXmlTagInterface;
+				$is_indexed_array = $class instanceof CIndexedArrayXmlTagInterface;
+				$is_string = $class instanceof CStringXmlTagInterface;
 				$has_data = array_key_exists($tag, $row);
+				$default_value = $is_string ? $class->getDefaultValue() : null;
 
 				if (!$default_value && !$has_data) {
 					if ($is_require) {
@@ -122,10 +121,10 @@ class CConfigurationExportBuilder {
 					continue;
 				}
 
-				$store[$tag] = $class->toXml($row);
+				$store[$tag] = (new CTagExporter($class))->export($row);
 			}
 
-			if ($schema_class instanceof CXmlTagIndexedArray) {
+			if ($schema_class instanceof CIndexedArrayXmlTagInterface) {
 				$result[$n] = $store;
 			}
 			else {
@@ -141,25 +140,25 @@ class CConfigurationExportBuilder {
 	/**
 	 * Prepare schema array for building xml file.
 	 *
-	 * @param CXmlTag $class
+	 * @param CXmlTagInterface $class
 	 *
 	 * @return array
 	 */
-	protected function prepareSchema(CXmlTag $class) {
-		$schema = $class->buildSchema();
-		$schema_tag = array_key_exists($class->getTag(), CXmlDefine::$subtags)
-			? CXmlDefine::$subtags[$class->getTag()]
+	protected function prepareSchema(CXmlTagInterface $class) {
+		$builder = new CXmlSchemaBuilder;
+		$schema_tag = array_key_exists($class->getTag(), CXmlConstantValue::$subtags)
+			? CXmlConstantValue::$subtags[$class->getTag()]
 			: $class->getTag();
+		$schema = $builder->build($class);
 
-		if ($schema_tag <> $class->getTag()) {
-			$schema = $schema[$class->getTag()];
+		$schema = $schema[$schema_tag];
+
+		if ($schema instanceof CXmlTagInterface) {
+			$schema = $builder->build($schema);
+			$schema = $schema[$schema_tag];
 		}
 
-		if ($schema[$schema_tag] instanceof CXmlTag) {
-			$schema = $schema[$schema_tag]->buildSchema();
-		}
-
-		return $schema[$schema_tag];
+		return $schema;
 	}
 
 	/**
@@ -169,7 +168,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function createTriggers(array $triggers) {
+	protected function createTriggers(array &$triggers) {
 		$simple_triggers = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
@@ -181,6 +180,15 @@ class CConfigurationExportBuilder {
 		}
 
 		return $simple_triggers;
+	}
+
+	/**
+	 * Format screens.
+	 *
+	 * @param array $screens
+	 */
+	public function buildScreens(array $screens) {
+		$this->data['screens'] = $this->formatScreens($screens);
 	}
 
 	/**

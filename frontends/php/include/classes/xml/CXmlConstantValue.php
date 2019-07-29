@@ -22,7 +22,7 @@
 /**
  * Constant values what we used in schema.
  */
-class CXmlDefine {
+class CXmlConstantValue {
 
 	// Values.
 	const ENABLED = 0;

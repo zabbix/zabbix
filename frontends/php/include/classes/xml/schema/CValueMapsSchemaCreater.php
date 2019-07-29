@@ -19,6 +19,24 @@
 **/
 
 
-class CXmlTagIndexedArray extends CXmlTag {
+class CValueMapsSchemaCreater implements CSchemaCreater {
 
+	public function create() {
+		return (new CIndexedArrayXmlTag('value_maps'))
+			->setKey('valueMaps')
+			->setSchema(
+				(new CArrayXmlTag('value_map'))
+					->setSchema(
+						(new CStringXmlTag('name'))->setRequired(),
+						(new CIndexedArrayXmlTag('mappings'))
+							->setSchema(
+								(new CArrayXmlTag('mapping'))
+									->setSchema(
+										new CStringXmlTag('value'),
+										new CStringXmlTag('newvalue')
+									)
+							)
+					)
+			);
+	}
 }

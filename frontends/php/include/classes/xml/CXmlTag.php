@@ -22,7 +22,7 @@
 /**
  * Abstract class for tags.
  */
-abstract class CXmlTag {
+abstract class CXmlTag implements CXmlTagInterface, CExportXmlTagInterface, CImportXmlTagInterface {
 
 	/**
 	 * Class tag.
@@ -34,7 +34,7 @@ abstract class CXmlTag {
 	/**
 	 * Data key.
 	 *
-	 * @var ?string
+	 * @var string
 	 */
 	protected $key;
 
@@ -46,53 +46,18 @@ abstract class CXmlTag {
 	protected $is_required = false;
 
 	/**
-	 * Tag has constant.
+	 * Callback for export method.
 	 *
-	 * @var boolean
+	 * @var callable
 	 */
-	protected $has_constants = false;
+	protected $export_handler;
 
 	/**
-	 * Store constant by id.
+	 * Callback for import method.
 	 *
-	 * @var array
+	 * @var callable
 	 */
-	protected $constantids;
-
-	/**
-	 * Store constant by value.
-	 *
-	 * @var array
-	 */
-	protected $constant_values;
-
-	/**
-	 * Tag default value.
-	 *
-	 * @var ?string
-	 */
-	protected $default_value;
-
-	/**
-	 * Subtags.
-	 *
-	 * @var array
-	 */
-	protected $sub_tags = [];
-
-	/**
-	 * Callback for toXml method.
-	 *
-	 * @var ?callable
-	 */
-	protected $to_xml_callback;
-
-	/**
-	 * Callback for fromXml method.
-	 *
-	 * @var ?callable
-	 */
-	protected $from_xml_callback;
+	protected $import_handler;
 
 	/**
 	 * Class constructor.
@@ -100,7 +65,13 @@ abstract class CXmlTag {
 	 * @param string $tag
 	 */
 	public function __construct($tag) {
+		$this->setTag($tag);
+	}
+
+	public function setTag($tag) {
 		$this->tag = $tag;
+
+		return $this;
 	}
 
 	public function getTag() {
@@ -127,124 +98,23 @@ abstract class CXmlTag {
 		return $this->key;
 	}
 
-	public function setDefaultValue($val) {
-		$this->default_value = $val;
+	public function setExportHandler(callable $func) {
+		$this->export_handler = $func;
 
 		return $this;
 	}
 
-	public function getDefaultValue() {
-		return $this->default_value;
+	public function getExportHandler() {
+		return $this->export_handler;
 	}
 
-	public function addConstant($const, $value, $index = 0) {
-		$this->has_constants = true;
-
-		$this->constantids[$index][$value] = $const;
-		if (is_string($const)) {
-			$this->constans_values[$index][$const] = $value;
-		}
-		return $this;
-	}
-
-	/**
-	 * Get constant name by constant value.
-	 *
-	 * @param string $const
-	 * @param integer      $index
-	 *
-	 * @return string
-	 */
-	public function getConstantByValue($const, $index = 0) {
-		if (!array_key_exists($const, $this->constantids[$index])) {
-			throw new \InvalidArgumentException(_s('Constant "%1$s" for tag "%2$s" does not exist.', $const, $this->tag));
-		}
-
-		return $this->constantids[$index][$const];
-	}
-
-	/**
-	 * Get constant value by constant name.
-	 *
-	 * @param string $const
-	 * @param integer $index
-	 *
-	 * @return void
-	 */
-	public function getConstantValueByName($const, $index = 0) {
-		if (!isset($this->constans_values[$index][$const])) {
-			throw new \InvalidArgumentException(_s('Constant "%1$s" for tag "%2$s" does not exist.', $const, $this->tag));
-		}
-
-		return $this->constans_values[$index][$const];
-	}
-
-	public function setSchema() {
-		$this->sub_tags = func_get_args();
+	public function setImportHandler(callable $func) {
+		$this->import_handler = $func;
 
 		return $this;
 	}
 
-	public function buildSchema() {
-		$result = [];
-		foreach ($this->sub_tags as $class) {
-			$result[$class->getTag()] = $class;
-		}
-
-		return [$this->getTag() => $result];
-	}
-
-	public function getNextSchema() {
-		if (!($this instanceof CXmlTagIndexedArray)) {
-			return false;
-		}
-
-		foreach ($this->sub_tags as $class) {
-			return [$class->getTag() => $class];
-		}
-	}
-
-	public function toXml($data) {
-		if (is_callable($this->to_xml_callback)) {
-			return call_user_func($this->to_xml_callback, $data, $this);
-		}
-
-		if ($this->has_constants) {
-			return $this->getConstantByValue($data[$this->tag]);
-		}
-
-		return $data[$this->tag];
-	}
-
-	public function setToXmlCallback(callable $func) {
-		$this->to_xml_callback = $func;
-
-		return $this;
-	}
-
-	public function fromXml($data) {
-		if (is_callable($this->from_xml_callback)) {
-			return call_user_func($this->from_xml_callback, $data, $this);
-		}
-
-		if (!array_key_exists($this->tag, $data)) {
-			if ($this->getDefaultValue() !== null) {
-				return (string) $this->getDefaultValue();
-			}
-
-			return '';
-		}
-
-		if ($this->has_constants) {
-			return (string)$this->getConstantValueByName($data[$this->tag]);
-		}
-
-		return (string)$data[$this->tag];
-	}
-
-	public function setFromXmlCallback(callable $func) {
-		$this->from_xml_callback = $func;
-
-		return $this;
+	public function getImportHandler() {
+		return $this->import_handler;
 	}
 }

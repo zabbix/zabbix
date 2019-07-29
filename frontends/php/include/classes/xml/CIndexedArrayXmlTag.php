@@ -19,8 +19,22 @@
 **/
 
 
-return (new CXmlTagIndexedArray('groups'))->setSchema(
-	(new CXmlTagArray('group'))->setSchema(
-		(new CXmlTagString('name'))->setRequired()
-	)
-);
+class CIndexedArrayXmlTag extends CXmlTag implements CIndexedArrayXmlTagInterface {
+
+	/**
+	 * Subtags.
+	 *
+	 * @var array
+	 */
+	protected $sub_tags = [];
+
+	public function setSchema(CArrayXmlTagInterface $class) {
+		$this->sub_tags = [$class];
+
+		return $this;
+	}
+
+	public function getSubTags() {
+		return $this->sub_tags;
+	}
+}

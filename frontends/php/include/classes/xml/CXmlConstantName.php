@@ -22,7 +22,7 @@
 /**
  * Constant names what we used in schema.
  */
-class CXmlConstant {
+class CXmlConstantName {
 
 	const ENABLED = 'ENABLED';
 	const DISABLED = 'DISABLED';
