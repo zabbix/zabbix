@@ -27,17 +27,18 @@ import (
 )
 
 type ServerConnector struct {
-	input chan interface{}
+	input   chan interface{}
+	Address string
 }
 
 func (s *ServerConnector) init() {
 	s.input = make(chan interface{}, 10)
 }
 
-func refreshActiveChecks() ([]byte, error) {
+func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 	var c comms.ZbxConnection
 
-	err := c.Open("127.0.0.1:10051", time.Second*5)
+	err := c.Open(s.Address, time.Second*5)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +69,9 @@ run:
 	for {
 		select {
 		case <-ticker.C:
-			b, err := refreshActiveChecks()
+			b, err := s.refreshActiveChecks()
 			if err != nil {
-				log.Warningf("active check configuration update from [%s:%d] started to fail (%s)", "", 10051, err)
+				log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
 			} else {
 				log.Debugf("got [%s]", string(b))
 			}

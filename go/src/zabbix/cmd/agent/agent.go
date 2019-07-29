@@ -36,8 +36,6 @@ import (
 	_ "zabbix/plugins"
 )
 
-var taskManager scheduler.Manager
-
 func parseServerActive() ([]string, error) {
 	addresses := strings.Split(agent.Options.ServerActive, ",")
 
@@ -64,6 +62,7 @@ func parseServerActive() ([]string, error) {
 }
 
 func main() {
+	var taskManager scheduler.Manager
 	var confFlag string
 	const (
 		confDefault     = "agent.conf"
@@ -190,6 +189,7 @@ func main() {
 	serverConnectors := make([]server_connector.ServerConnector, len(addresses))
 
 	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Address = addresses[i]
 		serverConnectors[i].Start()
 	}
 
