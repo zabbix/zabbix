@@ -527,15 +527,11 @@ class CUser extends CApiService {
 				$passwd = '';
 			}
 
-			if ($passwd === '') {
-				$gui_access = self::getGroupGuiAccess($user, $db_usrgrps);
-
-				// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
-				if (in_array(GROUP_GUI_ACCESS_INTERNAL, $gui_access)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
-					);
-				}
+			// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
+			if ($passwd === '' && self::hasInternalAuth($user, $db_usrgrps)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
+				);
 			}
 		}
 	}
@@ -556,34 +552,32 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Get list of all current authentication options available to user.
+	 * Returns true if user has internal authentication type.
 	 *
 	 * @param array  $user
 	 * @param string $user['usrgrps'][]['usrgrpid']
 	 * @param array  $db_usrgrps
 	 * @param int    $db_usrgrps[usrgrpid]['gui_access']
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	private static function getGroupGuiAccess($user, $db_usrgrps) {
-		$gui_access_arr = [];
-		$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
-
+	private static function hasInternalAuth($user, $db_usrgrps) {
 		$config = select_config();
 		$system_gui_access = array_search($config['authentication_type'], [
 			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
 			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP
 		]);
 
-		foreach($usrgrps as $usergrp) {
-			if (array_key_exists($usergrp, $db_usrgrps)) {
-				$gui_access = (int) $db_usrgrps[$usergrp]['gui_access'];
-				$index = ($gui_access == GROUP_GUI_ACCESS_SYSTEM) ? $system_gui_access : $gui_access;
-				$gui_access_arr[$index] = '';
+		foreach($user['usrgrps'] as $usrgrp) {
+			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];
+			$gui_access = ($gui_access == GROUP_GUI_ACCESS_SYSTEM) ? $system_gui_access : $gui_access;
+
+			if ($gui_access == GROUP_GUI_ACCESS_INTERNAL) {
+				return true;
 			}
 		}
 
-		return array_keys($gui_access_arr);
+		return false;
 	}
 
 	/**
