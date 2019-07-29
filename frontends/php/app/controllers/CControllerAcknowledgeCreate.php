@@ -87,6 +87,7 @@ class CControllerAcknowledgeCreate extends CController {
 
 		// Select data about all affected events and triggers involved.
 		list($events, $editable_triggers) = $this->getEventDetails(array_keys($eventids));
+		unset($eventids);
 
 		// Update selected events.
 		$event_chunks = array_chunk($events, ZBX_DB_MAX_INSERTS);
@@ -174,7 +175,6 @@ class CControllerAcknowledgeCreate extends CController {
 		$events = API::Event()->get([
 			'output' => ['objectid', 'acknowledged', 'r_eventid'],
 			'select_acknowledges' => $this->close_problems ? ['action'] : null,
-			'selectRelatedObject' => $this->close_problems ? ['manual_close'] : null,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -184,7 +184,7 @@ class CControllerAcknowledgeCreate extends CController {
 		// Select editable triggers.
 		$editable_triggers = ($events && ($this->change_severity || $this->close_problems))
 			? API::Trigger()->get([
-				'output' => [],
+				'output' => ['manual_close'],
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'editable' => true,
 				'preservekeys' => true
@@ -203,12 +203,12 @@ class CControllerAcknowledgeCreate extends CController {
 	 *  - readable events (events that user has at least read permissions).
 	 *
 	 * @param array $events
-	 * @param int   $events[]['eventid']                        Event id.
-	 * @param int   $events[]['objectid']                       Trigger ID that has generated particular event.
-	 * @param int   $events[]['relatedObject']['manual_close']  Flag if problem can be closed manually.
-	 * @param int   $events[]['r_eventid']                      Recovery event ID.
-	 * @param array $events[]['acknowledged']                   Array containing previously performed actions to event.
-	 * @param array $editable_triggers[<triggerid>]             Arrays containing editable trigger IDs as keys.
+	 * @param int   $events[]['eventid']                             Event id.
+	 * @param int   $events[]['objectid']                            Trigger ID that has generated particular event.
+	 * @param int   $events[]['r_eventid']                           Recovery event ID.
+	 * @param array $events[]['acknowledged']                        Array containing previously performed actions.
+	 * @param array $editable_triggers[<triggerid>]                  Arrays containing editable trigger IDs as keys.
+	 * @param array $editable_triggers[<triggerid>]['manual_close']  Arrays containing editable trigger IDs as keys.
 	 *
 	 * @param array
 	 */
@@ -242,18 +242,18 @@ class CControllerAcknowledgeCreate extends CController {
 	/**
 	 * Checks if events can be closed manually.
 	 *
-	 * @param array $event                                     Event object.
-	 * @param array $event['r_eventid']                        OK event id. 0 if not resolved.
-	 * @param array $event['acknowledges']                     List of problem updates.
-	 * @param array $event['relatedObject']['manual_close']    Trigger's manual_close configuration.
-	 * @param array $event['acknowledges'][]['action']         Action performed in update.
-	 * @param array $editable_triggers                         List of editable triggers.
+	 * @param array $event                                           Event object.
+	 * @param array $event['r_eventid']                              OK event id. 0 if not resolved.
+	 * @param array $event['acknowledges']                           List of problem updates.
+	 * @param array $event['acknowledges'][]['action']               Action performed in update.
+	 * @param array $editable_triggers[<triggerid>]                  List of editable triggers.
+	 * @param array $editable_triggers[<triggerid>]['manual_close']  Trigger's manual_close configuration.
 	 *
 	 * @return bool
 	 */
 	protected function isEventClosable(array $event, array $editable_triggers) {
-		if ($event['relatedObject']['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
-				|| !array_key_exists($event['objectid'], $editable_triggers)
+		if (!array_key_exists($event['objectid'], $editable_triggers)
+				|| $editable_triggers[$event['objectid']]['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 				|| bccomp($event['r_eventid'], '0') > 0) {
 			return false;
 		}
