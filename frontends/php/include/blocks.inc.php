@@ -463,7 +463,7 @@ function getSeveritiesByGroops(&$data) {
 				: null
 		);
 
-	return populateSeverityNormalTable($data, $table, $hide_empty_groups, $groupurl, false);
+	return makeSeverityTable($data, $table, $hide_empty_groups, $groupurl, false);
 }
 
 /**
@@ -485,10 +485,10 @@ function getSeverityTotals(&$data) {
 		);
 
 	if ($data['filter']['layout'] == STYLE_HORIZONTAL) {
-		return populateSeverityNormalTable($data, $table);
+		return makeSeverityTable($data, $table);
 	}
 	else {
-		return populateSeverityVerticalTotalTable($data, $table);
+		return makeSeverityTotalsTableVertical($data, $table);
 	}
 }
 
@@ -505,7 +505,7 @@ function getSeverityTotals(&$data) {
  *
  * @return CTableInfo
  */
-function populateSeverityNormalTable(array &$data, CTableInfo $table, $hide_empty_groups = null, CUrl $groupurl = null,
+function makeSeverityTable(array &$data, CTableInfo $table, $hide_empty_groups = null, CUrl $groupurl = null,
 		$is_total = true) {
 	foreach ($data['data']['groups'] as $group) {
 		if ($hide_empty_groups && !$group['has_problems']) {
@@ -549,7 +549,7 @@ function populateSeverityNormalTable(array &$data, CTableInfo $table, $hide_empt
  *
  * @return CTableInfo
  */
-function populateSeverityVerticalTotalTable(array &$data, CTableInfo $table) {
+function makeSeverityTotalsTableVertical(array &$data, CTableInfo $table) {
 	foreach ($data['data']['groups'] as $group) {
 		foreach ($group['stats'] as $severity => $stat) {
 			if ($data['filter']['severities'] && !in_array($severity, $data['filter']['severities'])) {
