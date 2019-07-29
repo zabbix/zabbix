@@ -24,41 +24,54 @@ import (
 	"time"
 )
 
-type Performer interface {
-	Plugin() *Plugin
-	Perform(s Scheduler)
-	Reschedule() bool
-	Scheduled() time.Time
-	Weight() int
-	Index() int
-	SetIndex(index int)
-	Active() bool
-	Deactivate()
+// performer interface is implemented by task to
+type performer interface {
+	// returns the task plugin
+	getPlugin() *pluginAgent
+	// performs the task, this function is called in a separate goroutine
+	perform(s Scheduler)
+	// reschedules the task, returns false if the task has been expired
+	reschedule() bool
+	// finishes performed task, this function is called in sheduler goroutine and can
+	// be used to update scheduler data without synchronization
+	finish()
+	// returns time the task has been scheduled to perform
+	getScheduled() time.Time
+	// returns task weight
+	getWeight() int
+	// returns task index in plugin task queue
+	getIndex() int
+	// sets task index in the plugin task queue
+	setIndex(index int)
+	// returns true if the task is active
+	isActive() bool
+	// deactivates task, removing from plugin task queue if necessary
+	deactivate()
 }
 
 // performerHeap -
-type performerHeap []Performer
+type performerHeap []performer
 
 func (h performerHeap) Len() int {
 	return len(h)
 }
 
 func (h performerHeap) Less(i, j int) bool {
-	return h[i].Scheduled().Before(h[j].Scheduled())
+	return h[i].getScheduled().Before(h[j].getScheduled())
 }
 
 func (h performerHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
-	h[i].SetIndex(i)
-	h[j].SetIndex(j)
+	h[i].setIndex(i)
+	h[j].setIndex(j)
 }
 
 // Push -
 func (h *performerHeap) Push(x interface{}) {
 	// Push and Pop use pointer receivers because they modify the slice's length,
 	// not just its contents.
-	p := x.(Performer)
-	p.SetIndex(len(*h))
+	p := x.(performer)
+	p.setIndex(len(*h))
 	*h = append(*h, p)
 }
 
@@ -68,20 +81,20 @@ func (h *performerHeap) Pop() interface{} {
 	n := len(old)
 	p := old[n-1]
 	*h = old[0 : n-1]
-	p.SetIndex(-1)
+	p.setIndex(-1)
 	return p
 }
 
 // Peek -
-func (h *performerHeap) Peek() Performer {
+func (h *performerHeap) Peek() performer {
 	if len(*h) == 0 {
 		return nil
 	}
 	return (*h)[0]
 }
 
-func (h *performerHeap) Update(p Performer) {
-	if p.Index() != -1 {
-		heap.Fix(h, p.Index())
+func (h *performerHeap) Update(p performer) {
+	if p.getIndex() != -1 {
+		heap.Fix(h, p.getIndex())
 	}
 }

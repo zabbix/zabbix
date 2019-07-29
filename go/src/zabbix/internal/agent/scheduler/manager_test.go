@@ -172,7 +172,7 @@ func (c *resultCacheMock) Write(r *plugin.Result) {
 
 type mockManager struct {
 	Manager
-	sink      chan Performer
+	sink      chan performer
 	now       time.Time
 	startTime time.Time
 }
@@ -208,74 +208,74 @@ func (m *mockManager) mockTasks() {
 	for _, p := range m.plugins {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
-		for j, performer := range tasks {
-			switch performer.(type) {
-			case *CollectorTask:
+		for j, task := range tasks {
+			switch task.(type) {
+			case *collectorTask:
 				collector := p.impl.(plugin.Collector)
-				task := &mockCollectorTask{
-					Task: Task{
-						plugin:    performer.Plugin(),
+				mockTask := &mockCollectorTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
 						scheduled: getNextcheck(fmt.Sprintf("%d", collector.Period()), m.now).Add(priorityCollectorTaskNs),
 						index:     -1,
-						active:    performer.Active(),
+						active:    task.isActive(),
 					},
 					sink: m.sink,
 				}
-				p.enqueueTask(task)
-			case *ExporterTask:
-				e := tasks[j].(*ExporterTask)
-				task := &mockExporterTask{
-					Task: Task{
-						plugin:    performer.Plugin(),
+				p.enqueueTask(mockTask)
+			case *exporterTask:
+				e := tasks[j].(*exporterTask)
+				mockTask := &mockExporterTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
 						scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
 						index:     -1,
-						active:    performer.Active(),
+						active:    task.isActive(),
 					},
 					sink: m.sink,
 					item: e.item,
 				}
-				e.item.task = task
-				p.enqueueTask(task)
-			case *StarterTask:
-				task := &mockStarterTask{
-					Task: Task{
-						plugin:    performer.Plugin(),
+				e.item.task = mockTask
+				p.enqueueTask(mockTask)
+			case *starterTask:
+				mockTask := &mockStarterTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
 						scheduled: m.now,
 						index:     -1,
-						active:    performer.Active(),
+						active:    task.isActive(),
 					},
 					sink: m.sink,
 				}
-				p.enqueueTask(task)
-			case *StopperTask:
-				task := &mockStopperTask{
-					Task: Task{
-						plugin:    performer.Plugin(),
+				p.enqueueTask(mockTask)
+			case *stopperTask:
+				mockTask := &mockStopperTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
 						scheduled: m.now.Add(priorityStopperTaskNs),
 						index:     -1,
-						active:    performer.Active(),
+						active:    task.isActive(),
 					},
 					sink: m.sink,
 				}
-				p.enqueueTask(task)
-			case *WatcherTask:
-				w := tasks[j].(*WatcherTask)
-				task := &mockWatcherTask{
-					Task: Task{
-						plugin:    performer.Plugin(),
+				p.enqueueTask(mockTask)
+			case *watcherTask:
+				w := tasks[j].(*watcherTask)
+				mockTask := &mockWatcherTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
 						scheduled: m.now.Add(priorityWatcherTaskNs),
 						index:     -1,
-						active:    performer.Active(),
+						active:    task.isActive(),
 					},
 					sink:       m.sink,
 					resultSink: w.sink,
 					requests:   w.requests,
 				}
-				p.enqueueTask(task)
+				p.enqueueTask(mockTask)
 			default:
-				p.enqueueTask(performer)
+				p.enqueueTask(task)
 			}
-			tasks[j].SetIndex(-1)
+			tasks[j].setIndex(-1)
 		}
 		m.queue.Update(p)
 	}
@@ -351,103 +351,103 @@ func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accesso
 }
 
 type mockExporterTask struct {
-	Task
-	item *Item
-	sink chan Performer
+	taskBase
+	item *batchItem
+	sink chan performer
 }
 
-func (t *mockExporterTask) Perform(s Scheduler) {
+func (t *mockExporterTask) perform(s Scheduler) {
 	key, params, _ := itemutil.ParseKey(t.item.key)
 	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params)
 	t.sink <- t
 }
 
-func (t *mockExporterTask) Reschedule() bool {
+func (t *mockExporterTask) reschedule() bool {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
 	return true
 }
 
 type mockCollectorTask struct {
-	Task
-	sink chan Performer
+	taskBase
+	sink chan performer
 }
 
-func (t *mockCollectorTask) Perform(s Scheduler) {
+func (t *mockCollectorTask) perform(s Scheduler) {
 	_ = t.plugin.impl.(plugin.Collector).Collect()
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) Reschedule() bool {
+func (t *mockCollectorTask) reschedule() bool {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
 	return true
 }
 
-func (t *mockCollectorTask) Weight() int {
+func (t *mockCollectorTask) getWeight() int {
 	return t.plugin.capacity
 }
 
 type mockStarterTask struct {
-	Task
-	sink chan Performer
+	taskBase
+	sink chan performer
 }
 
-func (t *mockStarterTask) Perform(s Scheduler) {
+func (t *mockStarterTask) perform(s Scheduler) {
 	t.plugin.impl.(plugin.Runner).Start()
 	t.sink <- t
 }
 
-func (t *mockStarterTask) Reschedule() bool {
+func (t *mockStarterTask) reschedule() bool {
 	return false
 }
 
-func (t *mockStarterTask) Weight() int {
+func (t *mockStarterTask) getWeight() int {
 	return t.plugin.capacity
 }
 
 type mockStopperTask struct {
-	Task
-	sink chan Performer
+	taskBase
+	sink chan performer
 }
 
-func (t *mockStopperTask) Perform(s Scheduler) {
+func (t *mockStopperTask) perform(s Scheduler) {
 	t.plugin.impl.(plugin.Runner).Stop()
 	t.sink <- t
 }
 
-func (t *mockStopperTask) Reschedule() bool {
+func (t *mockStopperTask) reschedule() bool {
 	return false
 }
 
-func (t *mockStopperTask) Weight() int {
+func (t *mockStopperTask) getWeight() int {
 	return t.plugin.capacity
 }
 
 type mockWatcherTask struct {
-	Task
-	sink       chan Performer
+	taskBase
+	sink       chan performer
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
 }
 
-func (t *mockWatcherTask) Perform(s Scheduler) {
+func (t *mockWatcherTask) perform(s Scheduler) {
 	t.plugin.impl.(plugin.Watcher).Watch(t.requests, t.resultSink)
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) Reschedule() bool {
+func (t *mockWatcherTask) reschedule() bool {
 	return false
 }
 
-func (t *mockWatcherTask) Weight() int {
+func (t *mockWatcherTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-func checkExporterTasks(t *testing.T, m *Manager, sink plugin.ResultWriter, items []*Item) {
+func checkExporterTasks(t *testing.T, m *Manager, sink plugin.ResultWriter, items []*batchItem) {
 	lastCheck := time.Time{}
 	n := 0
 	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
-		if performer := p.peekTask(); performer != nil {
-			if performer.Scheduled().Before(lastCheck) {
+		if task := p.peekTask(); task != nil {
+			if task.getScheduled().Before(lastCheck) {
 				t.Errorf("out of order tasks detected")
 			}
 			heap.Pop(&m.queue)
@@ -462,7 +462,7 @@ func checkExporterTasks(t *testing.T, m *Manager, sink plugin.ResultWriter, item
 		t.Errorf("Expected %d tasks while got %d", len(items), n)
 	}
 
-	var owner *Owner
+	var owner *batch
 	var ok bool
 	if owner, ok = m.owners[sink]; !ok {
 		t.Errorf("Cannot find owner of the specified result writer sink")
@@ -501,20 +501,20 @@ func TestTaskCreate(t *testing.T) {
 	var manager Manager
 	manager.init()
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "151", key: "debug1"},
-		&Item{itemid: 2, delay: "103", key: "debug2"},
-		&Item{itemid: 3, delay: "79", key: "debug3"},
-		&Item{itemid: 4, delay: "17", key: "debug1"},
-		&Item{itemid: 5, delay: "7", key: "debug2"},
-		&Item{itemid: 6, delay: "1", key: "debug3"},
-		&Item{itemid: 7, delay: "63", key: "debug1"},
-		&Item{itemid: 8, delay: "47", key: "debug2"},
-		&Item{itemid: 9, delay: "31", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "151", key: "debug1"},
+		&batchItem{itemid: 2, delay: "103", key: "debug2"},
+		&batchItem{itemid: 3, delay: "79", key: "debug3"},
+		&batchItem{itemid: 4, delay: "17", key: "debug1"},
+		&batchItem{itemid: 5, delay: "7", key: "debug2"},
+		&batchItem{itemid: 6, delay: "1", key: "debug3"},
+		&batchItem{itemid: 7, delay: "63", key: "debug1"},
+		&batchItem{itemid: 8, delay: "47", key: "debug2"},
+		&batchItem{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -546,20 +546,20 @@ func TestTaskUpdate(t *testing.T) {
 	var manager Manager
 	manager.init()
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "151", key: "debug1"},
-		&Item{itemid: 2, delay: "103", key: "debug2"},
-		&Item{itemid: 3, delay: "79", key: "debug3"},
-		&Item{itemid: 4, delay: "17", key: "debug1"},
-		&Item{itemid: 5, delay: "7", key: "debug2"},
-		&Item{itemid: 6, delay: "1", key: "debug3"},
-		&Item{itemid: 7, delay: "63", key: "debug1"},
-		&Item{itemid: 8, delay: "47", key: "debug2"},
-		&Item{itemid: 9, delay: "31", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "151", key: "debug1"},
+		&batchItem{itemid: 2, delay: "103", key: "debug2"},
+		&batchItem{itemid: 3, delay: "79", key: "debug3"},
+		&batchItem{itemid: 4, delay: "17", key: "debug1"},
+		&batchItem{itemid: 5, delay: "7", key: "debug2"},
+		&batchItem{itemid: 6, delay: "1", key: "debug3"},
+		&batchItem{itemid: 7, delay: "63", key: "debug1"},
+		&batchItem{itemid: 8, delay: "47", key: "debug2"},
+		&batchItem{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -600,13 +600,13 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 	var manager Manager
 	manager.init()
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "151", key: "debug1"},
-		&Item{itemid: 2, delay: "103", key: "debug2"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "151", key: "debug1"},
+		&batchItem{itemid: 2, delay: "103", key: "debug2"},
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -642,20 +642,20 @@ func TestTaskDelete(t *testing.T) {
 	var manager Manager
 	manager.init()
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "151", key: "debug1"},
-		&Item{itemid: 2, delay: "103", key: "debug2"},
-		&Item{itemid: 3, delay: "79", key: "debug3"}, // remove
-		&Item{itemid: 4, delay: "17", key: "debug1"},
-		&Item{itemid: 5, delay: "7", key: "debug2"},
-		&Item{itemid: 6, delay: "1", key: "debug3"}, // remove
-		&Item{itemid: 7, delay: "63", key: "debug1"},
-		&Item{itemid: 8, delay: "47", key: "debug2"}, // remove
-		&Item{itemid: 9, delay: "31", key: "debug3"}, // remove
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "151", key: "debug1"},
+		&batchItem{itemid: 2, delay: "103", key: "debug2"},
+		&batchItem{itemid: 3, delay: "79", key: "debug3"}, // remove
+		&batchItem{itemid: 4, delay: "17", key: "debug1"},
+		&batchItem{itemid: 5, delay: "7", key: "debug2"},
+		&batchItem{itemid: 6, delay: "1", key: "debug3"}, // remove
+		&batchItem{itemid: 7, delay: "63", key: "debug1"},
+		&batchItem{itemid: 8, delay: "47", key: "debug2"}, // remove
+		&batchItem{itemid: 9, delay: "31", key: "debug3"}, // remove
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -683,7 +683,7 @@ func TestTaskDelete(t *testing.T) {
 func TestSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -693,10 +693,10 @@ func TestSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "1", key: "debug1"},
-		&Item{itemid: 2, delay: "2", key: "debug2"},
-		&Item{itemid: 3, delay: "5", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "1", key: "debug1"},
+		&batchItem{itemid: 2, delay: "2", key: "debug2"},
+		&batchItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -706,7 +706,7 @@ func TestSchedule(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -724,7 +724,7 @@ func TestSchedule(t *testing.T) {
 func TestScheduleCapacity(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 2)
 	for i := range plugins {
@@ -737,11 +737,11 @@ func TestScheduleCapacity(t *testing.T) {
 	p := manager.plugins["debug2"]
 	p.capacity = 2
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "1", key: "debug1"},
-		&Item{itemid: 2, delay: "2", key: "debug2"},
-		&Item{itemid: 3, delay: "2", key: "debug2"},
-		&Item{itemid: 4, delay: "2", key: "debug2"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "1", key: "debug1"},
+		&batchItem{itemid: 2, delay: "2", key: "debug2"},
+		&batchItem{itemid: 3, delay: "2", key: "debug2"},
+		&batchItem{itemid: 4, delay: "2", key: "debug2"},
 	}
 
 	calls := []map[string][]int{
@@ -750,7 +750,7 @@ func TestScheduleCapacity(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -768,7 +768,7 @@ func TestScheduleCapacity(t *testing.T) {
 func TestScheduleUpdate(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -778,10 +778,10 @@ func TestScheduleUpdate(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "1", key: "debug1"},
-		&Item{itemid: 2, delay: "1", key: "debug2"},
-		&Item{itemid: 3, delay: "1", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "1", key: "debug1"},
+		&batchItem{itemid: 2, delay: "1", key: "debug2"},
+		&batchItem{itemid: 3, delay: "1", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -791,7 +791,7 @@ func TestScheduleUpdate(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -826,7 +826,7 @@ func TestScheduleUpdate(t *testing.T) {
 func TestCollectorSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -836,8 +836,8 @@ func TestCollectorSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "1", key: "debug1"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "1", key: "debug1"},
 	}
 
 	calls := []map[string][]int{
@@ -845,7 +845,7 @@ func TestCollectorSchedule(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -862,7 +862,7 @@ func TestCollectorSchedule(t *testing.T) {
 func TestCollectorScheduleUpdate(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -872,10 +872,10 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "5", key: "debug1"},
-		&Item{itemid: 2, delay: "5", key: "debug2"},
-		&Item{itemid: 3, delay: "5", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "5", key: "debug1"},
+		&batchItem{itemid: 2, delay: "5", key: "debug2"},
+		&batchItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -885,7 +885,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -926,7 +926,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 func TestRunner(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -934,13 +934,12 @@ func TestRunner(t *testing.T) {
 		name := fmt.Sprintf("debug%d", i+1)
 		plugin.RegisterMetric(plugins[i], name, name, "")
 	}
-	log.Debugf("plugins %+v", plugin.Metrics)
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "5", key: "debug1"},
-		&Item{itemid: 2, delay: "5", key: "debug2"},
-		&Item{itemid: 3, delay: "5", key: "debug3"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "5", key: "debug1"},
+		&batchItem{itemid: 2, delay: "5", key: "debug2"},
+		&batchItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -950,7 +949,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1025,7 +1024,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*plugin.Requ
 func TestWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1033,16 +1032,15 @@ func TestWatcher(t *testing.T) {
 		name := fmt.Sprintf("debug%d", i+1)
 		plugin.RegisterMetric(plugins[i], name, name, "")
 	}
-	log.Debugf("plugins %+v", plugin.Metrics)
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "5", key: "debug1"},
-		&Item{itemid: 2, delay: "5", key: "debug2[1]"},
-		&Item{itemid: 3, delay: "5", key: "debug2[2]"},
-		&Item{itemid: 4, delay: "5", key: "debug3[1]"},
-		&Item{itemid: 5, delay: "5", key: "debug3[2]"},
-		&Item{itemid: 6, delay: "5", key: "debug3[3]"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "5", key: "debug1"},
+		&batchItem{itemid: 2, delay: "5", key: "debug2[1]"},
+		&batchItem{itemid: 3, delay: "5", key: "debug2[2]"},
+		&batchItem{itemid: 4, delay: "5", key: "debug3[1]"},
+		&batchItem{itemid: 5, delay: "5", key: "debug3[2]"},
+		&batchItem{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
@@ -1052,7 +1050,7 @@ func TestWatcher(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1111,7 +1109,7 @@ func TestWatcher(t *testing.T) {
 func TestCollectorExporterSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1120,10 +1118,10 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "2", key: "debug[1]"},
-		&Item{itemid: 2, delay: "2", key: "debug[2]"},
-		&Item{itemid: 3, delay: "2", key: "debug[3]"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "2", key: "debug[1]"},
+		&batchItem{itemid: 2, delay: "2", key: "debug[2]"},
+		&batchItem{itemid: 3, delay: "2", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
@@ -1131,7 +1129,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1149,7 +1147,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 func TestRunnerWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
@@ -1157,16 +1155,15 @@ func TestRunnerWatcher(t *testing.T) {
 		name := fmt.Sprintf("debug%d", i+1)
 		plugin.RegisterMetric(plugins[i], name, name, "")
 	}
-	log.Debugf("plugins %+v", plugin.Metrics)
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "5", key: "debug1"},
-		&Item{itemid: 2, delay: "5", key: "debug2[1]"},
-		&Item{itemid: 3, delay: "5", key: "debug2[2]"},
-		&Item{itemid: 4, delay: "5", key: "debug3[1]"},
-		&Item{itemid: 5, delay: "5", key: "debug3[2]"},
-		&Item{itemid: 6, delay: "5", key: "debug3[3]"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "5", key: "debug1"},
+		&batchItem{itemid: 2, delay: "5", key: "debug2[1]"},
+		&batchItem{itemid: 3, delay: "5", key: "debug2[2]"},
+		&batchItem{itemid: 4, delay: "5", key: "debug3[1]"},
+		&batchItem{itemid: 5, delay: "5", key: "debug3[2]"},
+		&batchItem{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
@@ -1176,7 +1173,7 @@ func TestRunnerWatcher(t *testing.T) {
 	}
 
 	var cache resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1236,7 +1233,7 @@ func TestRunnerWatcher(t *testing.T) {
 func TestMultiCollectorExporterSchedule(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
@@ -1245,8 +1242,8 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "2", key: "debug[1]"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "2", key: "debug[1]"},
 	}
 
 	calls := []map[string][]int{
@@ -1254,7 +1251,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	}
 
 	var cache1, cache2 resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache1,
 		requests: make([]*plugin.Request, 0),
 	}
@@ -1285,20 +1282,19 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 func TestMultiRunnerWatcher(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	manager := mockManager{sink: make(chan Performer, 10)}
+	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockRunnerWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
 	}
-	log.Debugf("plugins %+v", plugin.Metrics)
 	manager.mockInit(t)
 
-	items := []*Item{
-		&Item{itemid: 1, delay: "5", key: "debug[1]"},
-		&Item{itemid: 2, delay: "5", key: "debug[2]"},
-		&Item{itemid: 3, delay: "5", key: "debug[3]"},
+	items := []*batchItem{
+		&batchItem{itemid: 1, delay: "5", key: "debug[1]"},
+		&batchItem{itemid: 2, delay: "5", key: "debug[2]"},
+		&batchItem{itemid: 3, delay: "5", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
@@ -1306,7 +1302,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	}
 
 	var cache1, cache2 resultCacheMock
-	update := UpdateRequest{
+	update := updateRequest{
 		sink:     &cache1,
 		requests: make([]*plugin.Request, 0),
 	}

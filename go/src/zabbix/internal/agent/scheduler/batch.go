@@ -27,37 +27,37 @@ import (
 	"zabbix/pkg/log"
 )
 
-type Item struct {
+type batchItem struct {
 	itemid      uint64
 	delay       string
 	unsupported bool
 	key         string
-	task        Performer
+	task        performer
 	updated     time.Time
 }
 
-type PluginInfo struct {
+type pluginInfo struct {
 	used    time.Time
-	watcher *WatcherTask
+	watcher *watcherTask
 }
 
-type Owner struct {
-	items   map[uint64]*Item
-	plugins map[*Plugin]*PluginInfo
+type batch struct {
+	items   map[uint64]*batchItem
+	plugins map[*pluginAgent]*pluginInfo
 }
 
-func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
+func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var nextcheck time.Time
 	if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
 		return
 	}
 	nextcheck.Add(priorityExporterTaskNs)
 
-	var info *PluginInfo
+	var info *pluginInfo
 	var ok bool
-	if info, ok = o.plugins[p]; !ok {
-		info = &PluginInfo{}
-		o.plugins[p] = info
+	if info, ok = b.plugins[p]; !ok {
+		info = &pluginInfo{}
+		b.plugins[p] = info
 	}
 
 	// handle Collector interface
@@ -66,8 +66,8 @@ func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultW
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
 			log.Debugf("start collector task for plugin %s with collecting interval %d", p.impl.Name(), c.Period())
-			task := &CollectorTask{
-				Task: Task{
+			task := &collectorTask{
+				taskBase: taskBase{
 					plugin:    p,
 					scheduled: time.Unix(now.Unix()+int64(h.Sum32())%int64(c.Period())+1, priorityCollectorTaskNs),
 					active:    true,
@@ -78,19 +78,19 @@ func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultW
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if item, ok := o.items[r.Itemid]; !ok {
-			item = &Item{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
-			o.items[r.Itemid] = item
-			item.task = &ExporterTask{
-				Task:   Task{plugin: p, scheduled: nextcheck, active: true},
-				writer: sink,
-				item:   item}
+		if item, ok := b.items[r.Itemid]; !ok {
+			item = &batchItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
+			b.items[r.Itemid] = item
+			item.task = &exporterTask{
+				taskBase: taskBase{plugin: p, scheduled: nextcheck, active: true},
+				writer:   sink,
+				item:     item}
 			p.enqueueTask(item.task)
 		} else {
 			item.updated = now
 			if item.delay != r.Delay && !item.unsupported {
 				p.tasks.Update(item.task)
-				item.task.Reschedule()
+				item.task.reschedule()
 			}
 			item.delay = r.Delay
 			item.key = r.Key
@@ -101,8 +101,8 @@ func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultW
 	if _, ok := p.impl.(plugin.Runner); ok {
 		if p.refcount == 0 && info.used.IsZero() {
 			log.Debugf("start starter task for plugin %s", p.impl.Name())
-			task := &StarterTask{
-				Task: Task{
+			task := &starterTask{
+				taskBase: taskBase{
 					plugin:    p,
 					scheduled: now.Add(priorityStarterTaskNs),
 					active:    true,
@@ -114,8 +114,8 @@ func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultW
 	// handle Watcher interface
 	if _, ok := p.impl.(plugin.Watcher); ok {
 		if info.watcher == nil {
-			info.watcher = &WatcherTask{
-				Task: Task{
+			info.watcher = &watcherTask{
+				taskBase: taskBase{
 					plugin:    p,
 					scheduled: now.Add(priorityWatcherTaskNs),
 					active:    true,
@@ -135,27 +135,27 @@ func (o *Owner) processRequest(p *Plugin, r *plugin.Request, sink plugin.ResultW
 	return nil
 }
 
-func (o *Owner) releasePlugins(plugins map[string]*Plugin, now time.Time) (released []*Plugin) {
-	released = make([]*Plugin, 0, len(o.plugins))
+func (b *batch) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
+	released = make([]*pluginAgent, 0, len(b.plugins))
 	// remover references to temporary watcher tasks
-	for _, p := range o.plugins {
+	for _, p := range b.plugins {
 		p.watcher = nil
 	}
 
 	// remove unused items
-	for _, item := range o.items {
+	for _, item := range b.items {
 		if item.updated.Before(now) {
-			delete(o.items, item.itemid)
-			item.task.Deactivate()
+			delete(b.items, item.itemid)
+			item.task.deactivate()
 		}
 	}
 
 	// deactivate plugins
 	for _, p := range plugins {
-		if info, ok := o.plugins[p]; ok {
+		if info, ok := b.plugins[p]; ok {
 			if info.used.Before(now) {
 				released = append(released, p)
-				delete(o.plugins, p)
+				delete(b.plugins, p)
 				p.refcount--
 			}
 		}
@@ -163,10 +163,10 @@ func (o *Owner) releasePlugins(plugins map[string]*Plugin, now time.Time) (relea
 	return
 }
 
-func newOwner() (owner *Owner) {
-	owner = &Owner{
-		items:   make(map[uint64]*Item),
-		plugins: make(map[*Plugin]*PluginInfo),
+func newBatch() (b *batch) {
+	b = &batch{
+		items:   make(map[uint64]*batchItem),
+		plugins: make(map[*pluginAgent]*pluginInfo),
 	}
 	return
 }
