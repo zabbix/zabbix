@@ -40,6 +40,18 @@ type ZbxListener struct {
 
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
 	c.conn, err = net.DialTimeout("tcp", address, timeout)
+
+	if nil != err {
+		return
+	}
+
+	err = c.conn.SetReadDeadline(time.Now().Add(timeout))
+	if nil != err {
+		return
+	}
+
+	err = c.conn.SetWriteDeadline(time.Now().Add(timeout))
+
 	return
 }
 
@@ -59,9 +71,11 @@ func write(w io.Writer, data []byte) error {
 }
 
 func (c *ZbxConnection) Write(data []byte, timeout time.Duration) error {
-	err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return err
+	if timeout != 0 {
+		err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
+		if nil != err {
+			return err
+		}
 	}
 	return write(c.conn, data)
 }
@@ -147,9 +161,11 @@ func read(r io.Reader) ([]byte, error) {
 }
 
 func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
-	err := c.conn.SetReadDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return nil, err
+	if timeout != 0 {
+		err := c.conn.SetReadDeadline(time.Now().Add(timeout))
+		if nil != err {
+			return nil, err
+		}
 	}
 	return read(c.conn)
 }

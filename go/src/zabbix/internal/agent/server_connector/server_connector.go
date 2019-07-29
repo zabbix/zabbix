@@ -21,6 +21,7 @@ package server_connector
 
 import (
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/comms"
 	"zabbix/pkg/log"
@@ -38,17 +39,17 @@ func (s *ServerConnector) init() {
 func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 	var c comms.ZbxConnection
 
-	err := c.Open(s.Address, time.Second*5)
+	err := c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.WriteString("{\"request\":\"active checks\",\"host\":\"Zabbix server\"}", time.Second*5)
+	err = c.WriteString("{\"request\":\"active checks\",\"host\":\""+agent.Options.Hostname+"\"}", 0)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err := c.Read(time.Second * 5)
+	b, err := c.Read(0)
 	if err != nil {
 		return nil, err
 	}
@@ -61,20 +62,31 @@ func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 	return b, nil
 }
 
+var lastError error
+
+func (s *ServerConnector) handleActiveChecks() {
+	b, err := s.refreshActiveChecks()
+	if err != nil {
+		if lastError == nil {
+			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
+			lastError = err
+		}
+	} else {
+		log.Debugf("got [%s]", string(b))
+		lastError = nil
+	}
+}
+
 func (s *ServerConnector) run() {
 	defer log.PanicHook()
 	log.Debugf("starting Server connector")
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Second * time.Duration(agent.Options.RefreshActiveChecks))
+	s.handleActiveChecks()
 run:
 	for {
 		select {
 		case <-ticker.C:
-			b, err := s.refreshActiveChecks()
-			if err != nil {
-				log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
-			} else {
-				log.Debugf("got [%s]", string(b))
-			}
+			s.handleActiveChecks()
 		case <-s.input:
 			break run
 		}
