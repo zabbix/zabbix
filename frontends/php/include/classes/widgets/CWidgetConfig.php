@@ -215,8 +215,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type)
-	{
+	public static function hasPadding($type) {
 		switch ($type) {
 			case WIDGET_HOST_AVAIL:
 				return false;

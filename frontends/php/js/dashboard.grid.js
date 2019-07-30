@@ -1619,7 +1619,7 @@
 			 * Unset if dimension width/height is equal to size of placeholder.
 			 * Widget default size will be used.
 			 */
-			if (dimension.width == 1 && dimension.height == 2) {
+			if (dimension.width == 2 && dimension.height == 2) {
 				delete dimension.width;
 				delete dimension.height;
 			}
@@ -1673,6 +1673,7 @@
 				if (event.type === 'mouseenter' && data['pos-action'] === '') {
 					data.new_widget_placeholder.container.show();
 					data.new_widget_placeholder.setPositioning();
+					return;
 				}
 				else if (!drag && !$target.is($obj) && !$target.is(data.new_widget_placeholder.container)
 						&& data.new_widget_placeholder.container.has($target).length == 0) {
@@ -1681,62 +1682,48 @@
 					data.new_widget_placeholder.container.hide();
 					return;
 				}
-var test = true;
-				var o = data.options,
-					offset = $obj.offset(),
-					y = Math.min(o['max-rows'] - 1,
-							Math.max(0, Math.floor((event.pageY - offset.top) / o['widget-height']))
+
+				var offset = $obj.offset(),
+					y = Math.min(data.options['max-rows'] - 1,
+							Math.max(0, Math.floor((event.pageY - offset.top) / data.options['widget-height']))
 						),
-					x = Math.min(o['max-columns'] - 1,
+					x = Math.min(data.options['max-columns'] - 1,
 							Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
 						),
 					pos = {
-						y: y,
 						x: x,
-						height: o['widget-min-rows'],
-						width: test ? 2 : 1
+						y: y,
+						width: (x < data.options['max-columns'] - 1) ? 1 : 2,
+						height: data.options['widget-min-rows']
 					},
 					overlap = false;
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
-						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: Math.min(y, data.add_widget_dimension.y), left: x});
+						data.add_widget_dimension = $.extend(data.add_widget_dimension, {
+							left: x,
+							top: Math.min(y, data.add_widget_dimension.y)
+						});
 					}
-if (test) {
-	pos = {
-		x: Math.min(x, (data.add_widget_dimension.left < x)
-			? data.add_widget_dimension.x
-			: data.add_widget_dimension.left
-		),
-		y: Math.min(y, (data.add_widget_dimension.top < y)
-			? data.add_widget_dimension.y
-			: data.add_widget_dimension.top
-		),
-		width: Math.max(1, (data.add_widget_dimension.left < x)
-			? x - data.add_widget_dimension.left + 1
-			: data.add_widget_dimension.left - x + (test ? 1 : 2)
-		),
-		height: Math.max(2, (data.add_widget_dimension.top < y)
-			? y - data.add_widget_dimension.top + 1
-			: data.add_widget_dimension.top - y + 2
-		)
-	};
-}
-else {
-	pos = {
-		x: Math.min(x, data.add_widget_dimension.left),
-		y: Math.min(y, (data.add_widget_dimension.top < y)
-			? data.add_widget_dimension.y
-			: data.add_widget_dimension.top
-		),
-		width: Math.abs(data.add_widget_dimension.left - x) + 1,
-		height: Math.max(2, (data.add_widget_dimension.top < y)
-			? y - data.add_widget_dimension.top + 1
-			: data.add_widget_dimension.top - y + 2
-		)
-	};
-}
 
+					pos = {
+						x: Math.min(x, (data.add_widget_dimension.left < x)
+							? data.add_widget_dimension.x
+							: data.add_widget_dimension.left
+						),
+						y: Math.min(y, (data.add_widget_dimension.top < y)
+							? data.add_widget_dimension.y
+							: data.add_widget_dimension.top
+						),
+						width: Math.max(1, (data.add_widget_dimension.left < x)
+							? x - data.add_widget_dimension.left + 1
+							: data.add_widget_dimension.left - x + 1
+						),
+						height: Math.max(2, (data.add_widget_dimension.top < y)
+							? y - data.add_widget_dimension.top + 1
+							: data.add_widget_dimension.top - y + 2
+						)
+					};
 
 					$.each(data.widgets, function(_, box) {
 						overlap |= rectOverlap(box.pos, pos);
@@ -1749,47 +1736,63 @@ else {
 					}
 				}
 				else {
-					if (rectOverlap(data.add_widget_dimension, {x: x, y: y, width: 1, height: 1})) {
-						return;
+
+					if ((pos.x + pos.width) > data.options['max-columns']) {
+						pos.x = data.options['max-columns'] - pos.width;
 					}
-// TODO
-	if (test) {
-		if ((pos.x + pos.width) > data['options']['max-columns']) {
-			pos.x = data['options']['max-columns'] - pos.width;
-		}
-		else if (data.add_widget_dimension.x < pos.x) {
-			--pos.x;
-		}
-	}
+					else if (data.add_widget_dimension.x < pos.x) {
+						--pos.x;
+					}
 
-
-					if ((pos.y + pos.height) > data['options']['max-rows']) {
-						pos.y = data['options']['max-rows'] - pos.height;
+					if ((pos.y + pos.height) > data.options['max-rows']) {
+						pos.y = data.options['max-rows'] - pos.height;
 					}
 					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 
-					$.each(data.widgets, function(_, box) {
-						overlap |= rectOverlap(box.pos, pos);
-
-						return !overlap;
-					});
-
 					/**
 					 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
 					 * slot.
 					 */
-					if (overlap && pos.y > 0) {
-						overlap = false;
-						--pos.y;
+					var delta_check = [
+						[0, 0, 2],
+						[-1, 0, 2],
+						[0, 0, 1],
+						[0, -1, 2],
+						[0, -1, 1]
+					];
 
-						$.each(data.widgets, function(_, box) {
-							overlap |= rectOverlap(box.pos, pos);
-
-							return !overlap;
+					$.each(delta_check, function(i, val) {
+						var c_pos = $.extend({}, {
+							x: Math.max(0, (val[2] < 2 ? x : pos.x) + val[0]),
+							y: Math.max(0, pos.y + val[1]),
+							width: val[2],
+							height: pos.height
 						});
-					}
+
+						if (x > c_pos.x + 1) {
+							++c_pos.x;
+						}
+
+						overlap = false;
+						if (rectOverlap({
+							x: 0,
+							y: 0,
+							width: data.options['max-columns'],
+							height: data.options['max-rows']
+						}, c_pos)) {
+							$.each(data.widgets, function(_, box) {
+								overlap |= rectOverlap(box.pos, c_pos);
+								return !overlap;
+							});
+						}
+
+						if (!overlap) {
+							pos = c_pos;
+							return false;
+						}
+					});
 
 					if (overlap) {
 						data.add_widget_dimension = {};
@@ -1798,7 +1801,7 @@ else {
 					}
 				}
 
-				if ((pos.y + pos.height) > data['options']['rows']) {
+				if ((pos.y + pos.height) > data.options['rows']) {
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
 
@@ -1807,10 +1810,10 @@ else {
 				data.new_widget_placeholder.container
 					.css({
 						position: 'absolute',
-						top: (data.add_widget_dimension.y * o['widget-height']) + 'px',
-						left: (data.add_widget_dimension.x * o['widget-width']) + '%',
-						height: (data.add_widget_dimension.height * o['widget-height']) + 'px',
-						width: (data.add_widget_dimension.width * o['widget-width']) + '%'
+						top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
+						left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
+						height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
+						width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
 					})
 					.show();
 
