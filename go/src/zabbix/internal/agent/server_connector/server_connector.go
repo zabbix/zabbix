@@ -142,19 +142,21 @@ func (s *ServerConnector) Write(data []byte) (n int, err error) {
 }
 
 func (s *ServerConnector) run() {
+	var start time.Time
+
 	defer log.PanicHook()
 	log.Debugf("starting Server connector")
-	s.ResultCache.SetOutput(s)
-	s.refreshActiveChecks()
-	ticker := time.NewTicker(time.Second * time.Duration(agent.Options.RefreshActiveChecks))
-	tickerFlush := time.NewTicker(time.Second)
+
+	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			s.refreshActiveChecks()
-		case <-tickerFlush.C:
 			s.ResultCache.Flush()
+			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
+				s.refreshActiveChecks()
+				start = time.Now()
+			}
 		case <-s.input:
 			break run
 		}
@@ -166,6 +168,7 @@ run:
 
 func (s *ServerConnector) init() {
 	s.input = make(chan interface{})
+	s.ResultCache.SetOutput(s)
 }
 
 func (s *ServerConnector) Start() {
