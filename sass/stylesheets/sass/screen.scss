@@ -6844,11 +6844,16 @@ table.preprocessing-test-results {
 .by-severity-widget {
 	width: 100%;
 	height: 100%;
-
+	
 	> tbody > tr > td {
 		vertical-align: middle;
 		padding: 0 10px;
-
+		border-bottom: none !important;		
+		
+		@if $theme_name == 'blue' or $theme_name == 'dark' {	
+			border-left: none !important;		
+		}
+		
 		> span {
 			font-size: 16px;
 		}

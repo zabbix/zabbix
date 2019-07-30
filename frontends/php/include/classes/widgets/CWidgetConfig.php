@@ -211,15 +211,23 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type Widget type
+	 * @param string $type   Widget type
+	 * @param array  $fields Widget form fields
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type)
-	{
+	public static function hasPadding($type, $fields) {
 		switch ($type) {
 			case WIDGET_HOST_AVAIL:
 				return false;
+
+            case WIDGET_PROBLEMS_BY_SV:
+				if (array_key_exists('show_type', $fields)
+						&& $fields['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+					return false;
+				}
+
+				return true;
 
 			default:
 				return true;
