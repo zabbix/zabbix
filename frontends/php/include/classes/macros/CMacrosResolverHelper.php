@@ -228,33 +228,11 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerOpdata(array $trigger, array $options = []) {
-		$triggers = self::resolveTriggersOpdata([$trigger['triggerid'] => $trigger], $options);
+		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger],
+			$options + ['sources' => ['opdata']]
+		);
 
 		return $triggers[$trigger['triggerid']]['opdata'];
-	}
-
-	/**
-	 * Resolve macros in triggers operational data.
-	 *
-	 * @static
-	 *
-	 * @param array  $triggers
-	 * @param string $triggers[$triggerid]['expression']
-	 * @param string $triggers[$triggerid]['opdata']
-	 * @param int    $triggers[$triggerid]['clock']       (optional)
-	 * @param int    $triggers[$triggerid]['ns']          (optional)
-	 * @param array  $options
-	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
-	 *                                                    fields. Default: false.
-	 *
-	 * @return array
-	 */
-	public static function resolveTriggersOpdata(array $triggers, array $options = []) {
-		self::init();
-
-		$options += ['events' => false];
-
-		return self::$macrosResolver->resolveTriggersOpdata($triggers, $options);
 	}
 
 	/**
@@ -274,24 +252,27 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerDescription(array $trigger, array $options = []) {
-		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger], $options);
+		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger],
+			$options + ['sources' => ['comments']]
+		);
 
 		return $triggers[$trigger['triggerid']]['comments'];
 	}
 
 	/**
-	 * Resolve macros in trigger descriptions.
+	 * Resolve macros in trigger descriptions and operational data.
 	 *
 	 * @static
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
-	 * @param string $triggers[$triggerid]['comments']
+	 * @param string $triggers[$triggerid][<sources>]     See $options['sources'].
 	 * @param int    $triggers[$triggerid]['clock']       (optional)
 	 * @param int    $triggers[$triggerid]['ns']          (optional)
 	 * @param array  $options
 	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
 	 *                                                    fields. Default: false.
+	 * @param array  $options['sources']                  An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
 	 */

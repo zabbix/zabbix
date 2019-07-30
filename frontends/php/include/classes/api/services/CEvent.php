@@ -911,17 +911,17 @@ class CEvent extends CApiService {
 
 		// Adding operational data.
 		if ($this->outputIsRequested('opdata', $options['output'])) {
-			$triggers = DBFetchArrayAssoc(DBselect(
+			$events = DBFetchArrayAssoc(DBselect(
 				'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
-					' FROM triggers t'.
-						' JOIN events e ON t.triggerid=e.objectid'.
+					' FROM events e'.
+						' JOIN triggers t ON t.triggerid=e.objectid'.
 					' WHERE '.dbConditionInt('e.eventid', $eventids)
 			), 'eventid');
 
 			foreach ($result as $eventid => $event) {
-				$result[$eventid]['opdata'] = CMacrosResolverHelper::resolveTriggerOpdata($triggers[$eventid],
-					['events' => true]
-				);
+				$result[$eventid]['opdata'] = ($events[$eventid]['opdata'] !== '')
+					? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
+					: '';
 			}
 		}
 

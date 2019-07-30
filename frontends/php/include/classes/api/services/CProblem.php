@@ -402,17 +402,17 @@ class CProblem extends CApiService {
 
 		// Adding operational data.
 		if ($this->outputIsRequested('opdata', $options['output'])) {
-			$triggers = DBFetchArrayAssoc(DBselect(
+			$problems = DBFetchArrayAssoc(DBselect(
 				'SELECT p.eventid,p.clock,p.ns,t.triggerid,t.expression,t.opdata'.
-					' FROM triggers t'.
-						' JOIN problem p ON t.triggerid=p.objectid'.
+					' FROM problem p'.
+						' JOIN triggers t ON t.triggerid=p.objectid'.
 					' WHERE '.dbConditionInt('p.eventid', $eventids)
 			), 'eventid');
 
 			foreach ($result as $eventid => $problem) {
-				$result[$eventid]['opdata'] = CMacrosResolverHelper::resolveTriggerOpdata($triggers[$eventid],
-					['events' => true]
-				);
+				$result[$eventid]['opdata'] = ($problems[$eventid]['opdata'] !== '')
+					? CMacrosResolverHelper::resolveTriggerOpdata($problems[$eventid], ['events' => true])
+					: '';
 			}
 		}
 
