@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"hash/fnv"
 	"time"
 	"zabbix/internal/plugin"
@@ -27,7 +28,7 @@ import (
 	"zabbix/pkg/log"
 )
 
-type batchItem struct {
+type clientItem struct {
 	itemid      uint64
 	delay       string
 	unsupported bool
@@ -41,15 +42,21 @@ type pluginInfo struct {
 	watcher *watcherTask
 }
 
-type batch struct {
-	items   map[uint64]*batchItem
+type client struct {
+	id      uint64
+	items   map[uint64]*clientItem
 	plugins map[*pluginAgent]*pluginInfo
 }
 
-func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
+func (b *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var nextcheck time.Time
-	if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
-		return
+	// calculate nextcheck for normal requests, while direct requests are executed immediately
+	if r.Itemid != 0 {
+		if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
+			return fmt.Errorf("Cannot calculate nextcheck: %s", err.Error())
+		}
+	} else {
+		nextcheck = now
 	}
 	nextcheck.Add(priorityExporterTaskNs)
 
@@ -79,8 +86,11 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		if item, ok := b.items[r.Itemid]; !ok {
-			item = &batchItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
-			b.items[r.Itemid] = item
+			item = &clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
+			// don't cache items for direct requests
+			if r.Itemid != 0 {
+				b.items[r.Itemid] = item
+			}
 			item.task = &exporterTask{
 				taskBase: taskBase{plugin: p, scheduled: nextcheck, active: true},
 				writer:   sink,
@@ -135,7 +145,7 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 	return nil
 }
 
-func (b *batch) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
+func (b *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
 	released = make([]*pluginAgent, 0, len(b.plugins))
 	// remover references to temporary watcher tasks
 	for _, p := range b.plugins {
@@ -150,10 +160,19 @@ func (b *batch) cleanup(plugins map[string]*pluginAgent, now time.Time) (release
 		}
 	}
 
+	var expiry time.Time
+	// Direct requests are handled by special client with id 0. Such requests have
+	// day expiry time before used plugins are released.
+	if b.id != 0 {
+		expiry = now
+	} else {
+		expiry = now.Add(-time.Hour * 24)
+	}
+
 	// deactivate plugins
 	for _, p := range plugins {
 		if info, ok := b.plugins[p]; ok {
-			if info.used.Before(now) {
+			if info.used.Before(expiry) {
 				released = append(released, p)
 				delete(b.plugins, p)
 				p.refcount--
@@ -163,9 +182,10 @@ func (b *batch) cleanup(plugins map[string]*pluginAgent, now time.Time) (release
 	return
 }
 
-func newBatch() (b *batch) {
-	b = &batch{
-		items:   make(map[uint64]*batchItem),
+func newClient(id uint64) (b *client) {
+	b = &client{
+		id:      id,
+		items:   make(map[uint64]*clientItem),
 		plugins: make(map[*pluginAgent]*pluginInfo),
 	}
 	return

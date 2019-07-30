@@ -104,7 +104,7 @@ func (t *collectorTask) getWeight() int {
 type exporterTask struct {
 	taskBase
 	writer      plugin.ResultWriter
-	item        *batchItem
+	item        *clientItem
 	unsupported bool
 }
 
@@ -145,6 +145,10 @@ func (t *exporterTask) perform(s Scheduler) {
 }
 
 func (t *exporterTask) reschedule() bool {
+	// direct metric requests are one time checks and must not be rescheduled
+	if t.item.itemid == 0 {
+		return false
+	}
 	t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, time.Now())
 	return true
 }

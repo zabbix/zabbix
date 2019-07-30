@@ -19,14 +19,10 @@
 
 package agent
 
-type AgentOptions struct {
-	LogType    string `conf:",,,console"`
-	LogFile    string `conf:",optional"`
-	DebugLevel int    `conf:",,0:5,3"`
-	Hostname   string
-	Plugins    map[string]map[string]string
-	ListenPort int `conf:",,1024:32767,10050"`
-	Timeout    int `conf:",,1:30,3"`
-}
+import "sync/atomic"
 
-var Options AgentOptions
+var lastClientID uint64
+
+func newClientID() uint64 {
+	return atomic.AddUint64(&lastClientID, 1)
+}

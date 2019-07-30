@@ -33,6 +33,22 @@ import (
 	_ "zabbix/plugins"
 )
 
+func run() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+
+	for {
+		sig := <-sigs
+		switch sig {
+		case syscall.SIGINT, syscall.SIGTERM:
+			return
+		case syscall.SIGUSR1:
+			log.Debugf("user signal received")
+			return
+		}
+	}
+}
+
 func main() {
 	var confFlag string
 	const (
@@ -145,23 +161,22 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+	var err error
+	taskManager := &scheduler.Manager{}
+	listener := &agent.ServerListener{Scheduler: taskManager}
 
 	taskManager := scheduler.NewManager()
 	taskManager.Start()
-loop:
-	for {
-		sig := <-sigs
-		switch sig {
-		case syscall.SIGINT, syscall.SIGTERM:
-			break loop
-		case syscall.SIGUSR1:
-			log.Debugf("user signal received")
-			break loop
-		}
+
+	err = listener.Start()
+
+	if err == nil {
+		run()
+	} else {
+		log.Errf("cannot start agent: %s", err.Error())
 	}
 
+	listener.Stop()
 	taskManager.Stop()
 	monitor.Wait()
 

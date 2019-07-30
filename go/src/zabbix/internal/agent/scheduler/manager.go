@@ -33,28 +33,29 @@ type Manager struct {
 	input   chan interface{}
 	plugins map[string]*pluginAgent
 	queue   pluginHeap
-	owners  map[plugin.ResultWriter]*batch
+	clients map[uint64]*client
 }
 
 type updateRequest struct {
+	clientID uint64
 	sink     plugin.ResultWriter
 	requests []*plugin.Request
 }
 
 type Scheduler interface {
-	UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request)
 	FinishTask(task performer)
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: owner expiry - remove unused owners after tiemout (day+?)
-	var owner *batch
+	// TODO: client expiry - remove unused owners after tiemout (day+?)
+	var requestClient *client
 	var ok bool
-	if owner, ok = m.owners[update.sink]; !ok {
-		owner = newBatch()
-		m.owners[update.sink] = owner
+	if requestClient, ok = m.clients[update.clientID]; !ok {
+		requestClient = newClient(update.clientID)
+		m.clients[update.clientID] = requestClient
 	}
 
 	now := time.Now()
@@ -64,7 +65,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 		var p *pluginAgent
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
-				err = errors.New("unknown metric")
+				err = errors.New("Unknown metric")
 			}
 		}
 		if err != nil {
@@ -72,7 +73,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
-		if err = owner.addRequest(p, r, update.sink, now); err != nil {
+		if err = requestClient.addRequest(p, r, update.sink, now); err != nil {
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			continue
 		}
@@ -84,7 +85,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 		}
 	}
 
-	released := owner.cleanup(m.plugins, now)
+	released := requestClient.cleanup(m.plugins, now)
 	for _, p := range released {
 		if p.refcount != 0 {
 			continue
@@ -170,14 +171,14 @@ run:
 		}
 	}
 	close(m.input)
-	log.Debugf("Manager has been stopped")
+	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
 
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
-	m.owners = make(map[plugin.ResultWriter]*batch)
+	m.clients = make(map[uint64]*client)
 
 	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
@@ -201,8 +202,8 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := updateRequest{sink: writer, requests: requests}
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request) {
+	r := updateRequest{clientID: clientID, sink: writer, requests: requests}
 	m.input <- &r
 }
 

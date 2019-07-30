@@ -19,14 +19,19 @@
 
 package agent
 
-type AgentOptions struct {
-	LogType    string `conf:",,,console"`
-	LogFile    string `conf:",optional"`
-	DebugLevel int    `conf:",,0:5,3"`
-	Hostname   string
-	Plugins    map[string]map[string]string
-	ListenPort int `conf:",,1024:32767,10050"`
-	Timeout    int `conf:",,1:30,3"`
+import (
+	"time"
+	"zabbix/pkg/comms"
+)
+
+type passiveConnection struct {
+	conn *comms.ZbxConnection
 }
 
-var Options AgentOptions
+func (c *passiveConnection) Write(data []byte) (n int, err error) {
+	if err = c.conn.Write(data, time.Second*time.Duration(Options.Timeout)); err != nil {
+		n = len(data)
+	}
+	c.conn.Close()
+	return
+}

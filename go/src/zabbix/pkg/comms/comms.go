@@ -35,7 +35,7 @@ type ZbxConnection struct {
 }
 
 type ZbxListener struct {
-	ln net.Listener
+	listener *net.TCPListener
 }
 
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
@@ -154,22 +154,31 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 	return read(c.conn)
 }
 
-func (c *ZbxListener) Listen(address string) (err error) {
-	c.ln, err = net.Listen("tcp", address)
-	if err != nil {
-		return fmt.Errorf("Listen failed: %s", err)
+func Listen(address string) (c *ZbxListener, err error) {
+	l, tmperr := net.Listen("tcp", address)
+	if tmperr != nil {
+		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
-
-	return nil
+	c = &ZbxListener{listener: l.(*net.TCPListener)}
+	return
 }
 
-func (c *ZbxConnection) Accept(listener *ZbxListener) (err error) {
-	c.conn, err = listener.ln.Accept()
-	if err != nil {
-		return fmt.Errorf("Accept failed: %s", err)
+func (l *ZbxListener) Accept(timeout time.Duration) (c *ZbxConnection, err error) {
+	deadline := time.Time{}
+	if timeout != 0 {
+		deadline = time.Now().Add(timeout)
+	}
+	if err = l.listener.SetDeadline(deadline); err != nil {
+		return
 	}
 
-	return nil
+	var conn net.Conn
+	if conn, err = l.listener.Accept(); err != nil {
+		return
+	} else {
+		c = &ZbxConnection{conn: conn}
+	}
+	return
 }
 
 func (c *ZbxConnection) Close() (err error) {
@@ -177,5 +186,5 @@ func (c *ZbxConnection) Close() (err error) {
 }
 
 func (c *ZbxListener) Close() (err error) {
-	return c.ln.Close()
+	return c.listener.Close()
 }
