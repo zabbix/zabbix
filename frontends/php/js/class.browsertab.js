@@ -50,7 +50,7 @@ function ZBX_BrowserTab(store) {
 
 	this.on_focus_cbs = [];
 	this.on_blur_cbs = [];
-	this.on_before_unload_cbs = [];
+	this.on_unload_cbs = [];
 	this.on_crashed_cbs = [];
 
 	this.bindEventHandlers();
@@ -85,8 +85,11 @@ ZBX_BrowserTab.prototype.handleKeepAliveTick = function() {
 ZBX_BrowserTab.prototype.bindEventHandlers = function() {
 	setInterval(this.handleKeepAliveTick.bind(this), ZBX_BrowserTab.keep_alive_interval * 1000);
 
-	// If beforeunload event is used, it is dispatched twice if navigating across domain in chrome, because unload event.
-	window.addEventListener('beforeunload', this.handleUnload.bind(this));
+	/*
+	 * Beforeunload event is not used here, because it is dispatched twice when navigating across TLD in chrome,
+	 * that is cruicial for active tab delegation.
+	 */
+	window.addEventListener('unload', this.handleUnload.bind(this));
 	window.addEventListener('focus', this.handleFocus.bind(this));
 	this.store.onKeyUpdate('tabs.lastseen', this.handlePushedLastseen.bind(this));
 };
@@ -141,7 +144,7 @@ ZBX_BrowserTab.prototype.onCrashed = function(callback) {
  * @param {callable} callback
  */
 ZBX_BrowserTab.prototype.onUnload = function(callback) {
-	this.on_before_unload_cbs.push(callback);
+	this.on_unload_cbs.push(callback);
 };
 
 /**
@@ -157,10 +160,10 @@ ZBX_BrowserTab.prototype.handleFocus = function(e) {
 ZBX_BrowserTab.prototype.handleUnload = function(e) {
 	delete this.lastseen[this.uid];
 
-	this.on_before_unload_cbs.forEach(function(c) {c(this, this.getAllTabIds());}.bind(this));
+	this.on_unload_cbs.forEach(function(c) {c(this, this.getAllTabIds());}.bind(this));
 	this.pushLastseen();
 
-	window.removeEventListener('beforeunload', this.handleUnload.bind(this));
+	window.removeEventListener('unload', this.handleUnload.bind(this));
 	window.removeEventListener('focus', this.handleFocus.bind(this));
 };
 
