@@ -10424,11 +10424,12 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
  * Purpose: get global configuration data                                     *
  *                                                                            *
  * Parameters: cfg   - [OUT] the global configuration data                    *
- *             flags - [IN] the flags specifying fields to set,               *
+ *             flags - [IN] the flags specifying fields to get,               *
  *                          see ZBX_CONFIG_FLAGS_ defines                     *
  *                                                                            *
- * Comments: It's recommended to cleanup this structure with zbx_config_clean *
- *           function even if only simple fields are requested.               *
+ * Comments: It's recommended to cleanup 'cfg' structure after use with       *
+ *           zbx_config_clean() function even if only simple fields were      *
+ *           requested.                                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
@@ -10462,6 +10463,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
 		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
+		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
 
 	UNLOCK_CACHE;
 
