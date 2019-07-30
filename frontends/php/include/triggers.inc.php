@@ -785,6 +785,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		}
 	}
 
+	usort($triggers, function($a, $b) {
+		return strcasecmp($a['description'], $b['description']);
+	});
+
 	return $triggers;
 }
 
