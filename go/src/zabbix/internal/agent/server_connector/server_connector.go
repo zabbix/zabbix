@@ -44,6 +44,8 @@ func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 		return nil, err
 	}
 
+	defer c.Close()
+
 	err = c.WriteString("{\"request\":\"active checks\",\"host\":\""+agent.Options.Hostname+"\"}", 0)
 	if err != nil {
 		return nil, err
@@ -54,39 +56,34 @@ func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 		return nil, err
 	}
 
-	err = c.Close()
-	if err != nil {
-		return nil, err
-	}
-
 	return b, nil
 }
 
-var lastError error
-
-func (s *ServerConnector) handleActiveChecks() {
+func (s *ServerConnector) handleActiveChecks(lastError *error) {
 	b, err := s.refreshActiveChecks()
 	if err != nil {
-		if lastError == nil {
+		if *lastError == nil {
 			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
-			lastError = err
+			*lastError = err
 		}
 	} else {
 		log.Debugf("got [%s]", string(b))
-		lastError = nil
+		*lastError = nil
 	}
 }
 
 func (s *ServerConnector) run() {
+	var lastError error
+
 	defer log.PanicHook()
 	log.Debugf("starting Server connector")
+	s.handleActiveChecks(&lastError)
 	ticker := time.NewTicker(time.Second * time.Duration(agent.Options.RefreshActiveChecks))
-	s.handleActiveChecks()
 run:
 	for {
 		select {
 		case <-ticker.C:
-			s.handleActiveChecks()
+			s.handleActiveChecks(&lastError)
 		case <-s.input:
 			break run
 		}
