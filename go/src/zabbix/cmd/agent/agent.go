@@ -22,10 +22,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
@@ -35,31 +33,6 @@ import (
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
-
-func parseServerActive() ([]string, error) {
-	addresses := strings.Split(agent.Options.ServerActive, ",")
-
-	for i := 0; i < len(addresses); i++ {
-		if strings.IndexByte(addresses[i], ':') == -1 {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
-			addresses[i] += ":10051"
-		} else {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
-		}
-
-		for j := 0; j < i; j++ {
-			if addresses[j] == addresses[i] {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
-			}
-		}
-	}
-
-	return addresses, nil
-}
 
 func main() {
 	var taskManager scheduler.Manager
@@ -163,7 +136,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	addresses, err := parseServerActive()
+	addresses, err := server_connector.ParseServerActive()
 	if err != nil {
 		log.Critf("%s", err)
 		os.Exit(1)

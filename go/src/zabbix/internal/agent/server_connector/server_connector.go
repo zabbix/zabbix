@@ -21,6 +21,9 @@ package server_connector
 
 import (
 	"encoding/json"
+	"fmt"
+	"net"
+	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
@@ -38,8 +41,29 @@ type ServerConnector struct {
 	TaskManager *scheduler.Manager
 }
 
-func (s *ServerConnector) init() {
-	s.input = make(chan interface{}, 10)
+func ParseServerActive() ([]string, error) {
+	addresses := strings.Split(agent.Options.ServerActive, ",")
+
+	for i := 0; i < len(addresses); i++ {
+		if strings.IndexByte(addresses[i], ':') == -1 {
+			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			}
+			addresses[i] += ":10051"
+		} else {
+			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			}
+		}
+
+		for j := 0; j < i; j++ {
+			if addresses[j] == addresses[i] {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
+			}
+		}
+	}
+
+	return addresses, nil
 }
 
 func (s *ServerConnector) getActiveChecks() ([]byte, error) {
@@ -112,17 +136,25 @@ func (s *ServerConnector) refreshActiveChecks() {
 	s.TaskManager.UpdateTasks(s.ResultCache, r.Data)
 }
 
-func (s *ServerConnector) run() {
+func (s *ServerConnector) Write(data []byte) (n int, err error) {
+	log.Debugf("upload to %s: %s", s.Address, string(data))
+	return len(data), nil
+}
 
+func (s *ServerConnector) run() {
 	defer log.PanicHook()
 	log.Debugf("starting Server connector")
+	s.ResultCache.SetOutput(s)
 	s.refreshActiveChecks()
 	ticker := time.NewTicker(time.Second * time.Duration(agent.Options.RefreshActiveChecks))
+	tickerFlush := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
 			s.refreshActiveChecks()
+		case <-tickerFlush.C:
+			s.ResultCache.Flush()
 		case <-s.input:
 			break run
 		}
@@ -130,6 +162,10 @@ run:
 	close(s.input)
 	log.Debugf("Server connector has been stopped")
 	monitor.Unregister()
+}
+
+func (s *ServerConnector) init() {
+	s.input = make(chan interface{})
 }
 
 func (s *ServerConnector) Start() {
