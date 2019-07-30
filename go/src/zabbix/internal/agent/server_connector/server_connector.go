@@ -41,6 +41,12 @@ type ServerConnector struct {
 	TaskManager *scheduler.Manager
 }
 
+type response struct {
+	Response string            `json:"response"`
+	Info     string            `json:"info"`
+	Data     []*plugin.Request `json:"data"`
+}
+
 func ParseServerActive() ([]string, error) {
 	addresses := strings.Split(agent.Options.ServerActive, ",")
 
@@ -89,12 +95,6 @@ func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 	return b, nil
 }
 
-type response struct {
-	Response string            `json:"response"`
-	Info     string            `json:"info"`
-	Data     []*plugin.Request `json:"data"`
-}
-
 func (s *ServerConnector) refreshActiveChecks() {
 	js, err := s.getActiveChecks()
 
@@ -137,7 +137,44 @@ func (s *ServerConnector) refreshActiveChecks() {
 }
 
 func (s *ServerConnector) Write(data []byte) (n int, err error) {
-	log.Debugf("upload to %s: %s", s.Address, string(data))
+	var c comms.ZbxConnection
+
+	err = c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
+	if err != nil {
+		return 0, err
+	}
+
+	defer c.Close()
+
+	err = c.Write(data, 0)
+	if err != nil {
+		return 0, err
+	}
+
+	js, err := c.Read(0)
+	if err != nil {
+		return 0, err
+	}
+
+	log.Debugf("got back [%s]", string(js))
+
+	var r response
+
+	err = json.Unmarshal(js, &r)
+	if err != nil {
+		return 0, err
+	}
+
+	if r.Response != "success" {
+		if len(r.Info) != 0 {
+			log.Errf("%s", r.Info)
+		} else {
+			log.Errf("unsuccessful response")
+		}
+
+		return
+	}
+
 	return len(data), nil
 }
 
