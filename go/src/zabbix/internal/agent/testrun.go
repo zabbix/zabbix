@@ -76,6 +76,7 @@ func CheckMetric(metric string) (err error) {
 func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
+		"agent.ping",
 		"system.uptime",
 	}
 

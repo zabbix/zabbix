@@ -21,6 +21,7 @@ package agent
 
 import (
 	"errors"
+	"fmt"
 	"zabbix/internal/plugin"
 )
 
@@ -36,9 +37,18 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters")
 	}
-	return Options.Hostname, nil
+
+	switch key {
+	case "agent.hostname":
+		return Options.Hostname, nil
+	case "agent.ping":
+		return 1, nil
+	}
+
+	return nil, fmt.Errorf("Not implemented: %s", key)
 }
 
 func init() {
 	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
+	plugin.RegisterMetric(&impl, "ping", "agent.ping", "Returns agent availability check result")
 }
