@@ -24,7 +24,7 @@
  * It plays, meanwhile decrementing timeout. Pausing and playing is done by control of 'volume' and 'muted' properties.
  * It holds infinite loop, so it allows us easily adjust timeout during playback.
  */
-function ZBX_NotificationsAudio(master) {
+function ZBX_NotificationsAudio() {
 	this.audio = new Audio();
 
 	this.audio.volume = 0;
@@ -41,7 +41,6 @@ function ZBX_NotificationsAudio(master) {
 	this.is_playing = false;
 	this.message_timeout = 0;
 	this.callback = null;
-	this.master = master;
 
 	this.resetPromise();
 	this.listen();
@@ -64,7 +63,7 @@ ZBX_NotificationsAudio.prototype.listen = function() {
 		this.is_playing = (this.ms_timeout > 0.0001);
 		this.audio.volume = this.is_playing ? 1 : 0;
 
-		if (this.ms_timeout < 0.0001 || !this.master._isActive()) {
+		if (this.ms_timeout < 0.0001) {
 			this._resolve_timeout(this);
 			this.ms_timeout = 0;
 			this.seek(0);

@@ -61,7 +61,7 @@ function ZBX_Notifications(store, tab) {
 	this.tab = tab;
 
 	this.collection = new ZBX_NotificationCollection();
-	this.alarm = new ZBX_NotificationsAlarm(new ZBX_NotificationsAudio(this));
+	this.alarm = new ZBX_NotificationsAlarm(new ZBX_NotificationsAudio());
 
 	this.fetchUpdates();
 
@@ -546,13 +546,6 @@ ZBX_Notifications.prototype.mainLoop = function() {
 	this.fetch('notifications.get', {known_eventids: this.getEventIds()})
 		.catch(console.error)
 		.then(this.handleMainLoopResp.bind(this));
-};
-
-/**
- * Check if tab is active.
- */
-ZBX_Notifications.prototype._isActive = function() {
-	return this.active;
 };
 
 /**
