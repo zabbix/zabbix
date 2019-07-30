@@ -20,23 +20,29 @@
 package server_connector
 
 import (
+	"encoding/json"
 	"time"
 	"zabbix/internal/agent"
+	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
+	"zabbix/internal/plugin"
 	"zabbix/pkg/comms"
 	"zabbix/pkg/log"
 )
 
 type ServerConnector struct {
-	input   chan interface{}
-	Address string
+	input       chan interface{}
+	Address     string
+	lastError   error
+	ResultCache *agent.ResultCache
+	TaskManager *scheduler.Manager
 }
 
 func (s *ServerConnector) init() {
 	s.input = make(chan interface{}, 10)
 }
 
-func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
+func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 	var c comms.ZbxConnection
 
 	err := c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
@@ -59,31 +65,64 @@ func (s *ServerConnector) refreshActiveChecks() ([]byte, error) {
 	return b, nil
 }
 
-func (s *ServerConnector) handleActiveChecks(lastError *error) {
-	b, err := s.refreshActiveChecks()
+type response struct {
+	Response string            `json:"response"`
+	Info     string            `json:"info"`
+	Data     []*plugin.Request `json:"data"`
+}
+
+func (s *ServerConnector) refreshActiveChecks() {
+	js, err := s.getActiveChecks()
+
 	if err != nil {
-		if *lastError == nil {
+		if s.lastError == nil || err.Error() != s.lastError.Error() {
 			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
-			*lastError = err
+			s.lastError = err
+
 		}
-	} else {
-		log.Debugf("got [%s]", string(b))
-		*lastError = nil
+		return
 	}
+	s.lastError = nil
+
+	log.Debugf("got [%s]", string(js))
+
+	var r response
+
+	err = json.Unmarshal(js, &r)
+	if err != nil {
+		log.Errf("cannot parse list of active checks from [%s]: %s", s.Address, err)
+		return
+	}
+
+	if r.Response != "success" {
+		if len(r.Info) != 0 {
+			log.Errf("no active checks on server [%s]: %s", s.Address, r.Info)
+		} else {
+			log.Errf("no active checks on server")
+		}
+
+		return
+	}
+
+	if nil == r.Data {
+		log.Errf("cannot parse list of active checks: data array is missing")
+		return
+	}
+
+	s.TaskManager.UpdateTasks(s.ResultCache, r.Data)
 }
 
 func (s *ServerConnector) run() {
-	var lastError error
 
 	defer log.PanicHook()
 	log.Debugf("starting Server connector")
-	s.handleActiveChecks(&lastError)
+	s.refreshActiveChecks()
 	ticker := time.NewTicker(time.Second * time.Duration(agent.Options.RefreshActiveChecks))
 run:
 	for {
 		select {
 		case <-ticker.C:
-			s.handleActiveChecks(&lastError)
+			s.refreshActiveChecks()
 		case <-s.input:
 			break run
 		}
