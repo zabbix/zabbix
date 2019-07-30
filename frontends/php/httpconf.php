@@ -707,9 +707,12 @@ if (isset($_REQUEST['form'])) {
 			' WHERE a.hostid='.zbx_dbstr($data['hostid']).
 				' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 		);
+
 		while ($dbApp = DBfetch($dbApps)) {
 			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
 		}
+
+		uasort($data['application_list'], strcasecmp);
 	}
 
 	foreach($data['steps'] as $stepid => $step) {
