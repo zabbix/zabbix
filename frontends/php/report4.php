@@ -278,7 +278,7 @@ else {
 		echo BR();
 
 		$links = [];
-		sort($media_types, SORT_FLAG_CASE | SORT_NATURAL);
+		usort($media_types, 'strcasecmp');
 		foreach ($media_types as $id => $description) {
 			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
 				? $description

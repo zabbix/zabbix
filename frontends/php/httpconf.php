@@ -712,7 +712,7 @@ if (isset($_REQUEST['form'])) {
 			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
 		}
 
-		uasort($data['application_list'], strcasecmp);
+		uasort($data['application_list'], 'strcasecmp');
 	}
 
 	foreach($data['steps'] as $stepid => $step) {
