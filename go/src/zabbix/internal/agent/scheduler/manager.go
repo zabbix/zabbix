@@ -149,7 +149,7 @@ func (m *Manager) processFinishRequest(task performer) {
 
 func (m *Manager) run() {
 	defer log.PanicHook()
-	log.Debugf("starting Manager")
+	log.Debugf("starting manager")
 	ticker := time.NewTicker(time.Second)
 run:
 	for {

@@ -43,7 +43,7 @@ type MockServerOptions struct {
 
 var options MockServerOptions
 
-func handleConnection(c comms.ZbxConnection, activeChecks []byte, tFlag int) {
+func handleConnection(c *comms.ZbxConnection, activeChecks []byte, tFlag int) {
 	defer c.Close()
 
 	js, err := c.Read(time.Second * time.Duration(tFlag))
@@ -142,24 +142,19 @@ func main() {
 		return
 	}
 
-	var ln comms.ZbxListener
-
-	err = ln.Listen(":" + strconv.Itoa(options.Port))
+	listener, err := comms.Listen(":" + strconv.Itoa(options.Port))
 	if err != nil {
 		log.Critf("Listen failed: %s\n", err)
 		return
 	}
-	defer ln.Close()
+	defer listener.Close()
 
 	for {
-		var c comms.ZbxConnection
-
-		err = c.Accept(&ln)
+		c, err := listener.Accept()
 		if err != nil {
 			log.Critf("Accept failed: %s\n", err)
 			return
 		}
-
 		go handleConnection(c, activeChecks, options.Timeout)
 	}
 }

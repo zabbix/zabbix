@@ -22,7 +22,6 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"net"
 	"time"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
@@ -57,28 +56,33 @@ func (l *ServerListener) processConnection(conn *comms.ZbxConnection) (err error
 	return nil
 }
 
+func (l *ServerListener) accept() {
+	for {
+		conn, err := l.listener.Accept()
+		if err == nil {
+			l.input <- conn
+		} else {
+			log.Errf("cannot accept incoming connection: %s", err.Error())
+		}
+	}
+}
+
 func (l *ServerListener) run() {
 	defer log.PanicHook()
 	log.Debugf("starting listener")
-run:
+	go l.accept()
+
 	for {
-		select {
-		case v := <-l.input:
-			if v == nil {
-				break run
+		v := <-l.input
+		if v == nil {
+			break
+		}
+		if conn, ok := v.(*comms.ZbxConnection); ok {
+			if err := l.processConnection(conn); err != nil {
+				log.Warningf("cannot process incoming connection: %s", err.Error())
 			}
-		default:
-			conn, err := l.listener.Accept(1e9)
-			if err == nil {
-				if err = l.processConnection(conn); err != nil {
-					log.Warningf("cannot process incoming connection: %s", err.Error())
-				}
-			} else {
-				if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
-					continue
-				}
-				log.Errf("cannot accept incoming connection: %s", err.Error())
-			}
+		} else {
+			log.Warningf("listener received unknown request of type %T", v)
 		}
 	}
 
@@ -92,6 +96,7 @@ func (l *ServerListener) Start() (err error) {
 	if l.listener, err = comms.Listen(fmt.Sprintf(":%d", Options.ListenPort)); err != nil {
 		return err
 	}
+	l.input = make(chan interface{}, 10)
 	monitor.Register()
 	go l.run()
 	return

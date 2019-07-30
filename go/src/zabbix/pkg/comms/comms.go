@@ -35,7 +35,7 @@ type ZbxConnection struct {
 }
 
 type ZbxListener struct {
-	listener *net.TCPListener
+	listener net.Listener
 }
 
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
@@ -163,15 +163,7 @@ func Listen(address string) (c *ZbxListener, err error) {
 	return
 }
 
-func (l *ZbxListener) Accept(timeout time.Duration) (c *ZbxConnection, err error) {
-	deadline := time.Time{}
-	if timeout != 0 {
-		deadline = time.Now().Add(timeout)
-	}
-	if err = l.listener.SetDeadline(deadline); err != nil {
-		return
-	}
-
+func (l *ZbxListener) Accept() (c *ZbxConnection, err error) {
 	var conn net.Conn
 	if conn, err = l.listener.Accept(); err != nil {
 		return
