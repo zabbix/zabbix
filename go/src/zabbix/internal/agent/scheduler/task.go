@@ -36,49 +36,52 @@ const (
 	priorityStopperTaskNs
 )
 
-type Task struct {
-	plugin    *Plugin
+type taskBase struct {
+	plugin    *pluginAgent
 	scheduled time.Time
 	index     int
 	active    bool
 }
 
-func (t *Task) Plugin() *Plugin {
+func (t *taskBase) getPlugin() *pluginAgent {
 	return t.plugin
 }
 
-func (t *Task) Scheduled() time.Time {
+func (t *taskBase) getScheduled() time.Time {
 	return t.scheduled
 }
 
-func (t *Task) Weight() int {
+func (t *taskBase) getWeight() int {
 	return 1
 }
 
-func (t *Task) Index() int {
+func (t *taskBase) getIndex() int {
 	return t.index
 }
 
-func (t *Task) SetIndex(index int) {
+func (t *taskBase) setIndex(index int) {
 	t.index = index
 }
 
-func (t *Task) Deactivate() {
+func (t *taskBase) deactivate() {
 	if t.index != -1 {
 		t.plugin.removeTask(t.index)
 	}
 	t.active = false
 }
 
-func (t *Task) Active() bool {
+func (t *taskBase) isActive() bool {
 	return t.active
 }
 
-type CollectorTask struct {
-	Task
+func (t *taskBase) finish() {
 }
 
-func (t *CollectorTask) Perform(s Scheduler) {
+type collectorTask struct {
+	taskBase
+}
+
+func (t *collectorTask) perform(s Scheduler) {
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
@@ -88,23 +91,24 @@ func (t *CollectorTask) Perform(s Scheduler) {
 	}()
 }
 
-func (t *CollectorTask) Reschedule() bool {
+func (t *collectorTask) reschedule() bool {
 	collector, _ := t.plugin.impl.(plugin.Collector)
 	t.scheduled = t.scheduled.Add(time.Duration(collector.Period()) * time.Second)
 	return true
 }
 
-func (t *CollectorTask) Weight() int {
+func (t *collectorTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-type ExporterTask struct {
-	Task
-	writer plugin.ResultWriter
-	item   *Item
+type exporterTask struct {
+	taskBase
+	writer      plugin.ResultWriter
+	item        *batchItem
+	unsupported bool
 }
 
-func (t *ExporterTask) Perform(s Scheduler) {
+func (t *exporterTask) perform(s Scheduler) {
 	go func(itemkey string) {
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
@@ -132,21 +136,28 @@ func (t *ExporterTask) Perform(s Scheduler) {
 		}
 		if err != nil {
 			t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
+			t.unsupported = true
+		} else {
+			t.unsupported = false
 		}
 		s.FinishTask(t)
 	}(t.item.key)
 }
 
-func (t *ExporterTask) Reschedule() bool {
+func (t *exporterTask) reschedule() bool {
 	t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, time.Now())
 	return true
 }
 
-type StarterTask struct {
-	Task
+func (t *exporterTask) finish() {
+	t.item.unsupported = t.unsupported
 }
 
-func (t *StarterTask) Perform(s Scheduler) {
+type starterTask struct {
+	taskBase
+}
+
+func (t *starterTask) perform(s Scheduler) {
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Start()
@@ -154,19 +165,19 @@ func (t *StarterTask) Perform(s Scheduler) {
 	}()
 }
 
-func (t *StarterTask) Reschedule() bool {
+func (t *starterTask) reschedule() bool {
 	return false
 }
 
-func (t *StarterTask) Weight() int {
+func (t *starterTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-type StopperTask struct {
-	Task
+type stopperTask struct {
+	taskBase
 }
 
-func (t *StopperTask) Perform(s Scheduler) {
+func (t *stopperTask) perform(s Scheduler) {
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Stop()
@@ -174,21 +185,21 @@ func (t *StopperTask) Perform(s Scheduler) {
 	}()
 }
 
-func (t *StopperTask) Reschedule() bool {
+func (t *stopperTask) reschedule() bool {
 	return false
 }
 
-func (t *StopperTask) Weight() int {
+func (t *stopperTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-type WatcherTask struct {
-	Task
+type watcherTask struct {
+	taskBase
 	requests []*plugin.Request
 	sink     plugin.ResultWriter
 }
 
-func (t *WatcherTask) Perform(s Scheduler) {
+func (t *watcherTask) perform(s Scheduler) {
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
 		watcher.Watch(t.requests, t.sink)
@@ -196,10 +207,10 @@ func (t *WatcherTask) Perform(s Scheduler) {
 	}()
 }
 
-func (t *WatcherTask) Reschedule() bool {
+func (t *watcherTask) reschedule() bool {
 	return false
 }
 
-func (t *WatcherTask) Weight() int {
+func (t *watcherTask) getWeight() int {
 	return t.plugin.capacity
 }

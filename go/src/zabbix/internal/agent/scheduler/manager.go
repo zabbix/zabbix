@@ -31,29 +31,29 @@ import (
 
 type Manager struct {
 	input   chan interface{}
-	plugins map[string]*Plugin
+	plugins map[string]*pluginAgent
 	queue   pluginHeap
-	owners  map[plugin.ResultWriter]*Owner
+	owners  map[plugin.ResultWriter]*batch
 }
 
-type UpdateRequest struct {
+type updateRequest struct {
 	sink     plugin.ResultWriter
 	requests []*plugin.Request
 }
 
 type Scheduler interface {
 	UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request)
-	FinishTask(performer Performer)
+	FinishTask(task performer)
 }
 
-func (m *Manager) processUpdateRequest(update *UpdateRequest) {
+func (m *Manager) processUpdateRequest(update *updateRequest) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
 	// TODO: owner expiry - remove unused owners after tiemout (day+?)
-	var owner *Owner
+	var owner *batch
 	var ok bool
 	if owner, ok = m.owners[update.sink]; !ok {
-		owner = newOwner()
+		owner = newBatch()
 		m.owners[update.sink] = owner
 	}
 
@@ -61,7 +61,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 	for _, r := range update.requests {
 		var key string
 		var err error
-		var p *Plugin
+		var p *pluginAgent
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
 				err = errors.New("unknown metric")
@@ -72,7 +72,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
-		if err = owner.processRequest(p, r, update.sink, now); err != nil {
+		if err = owner.addRequest(p, r, update.sink, now); err != nil {
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			continue
 		}
@@ -84,7 +84,7 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 		}
 	}
 
-	released := owner.releasePlugins(m.plugins, now)
+	released := owner.cleanup(m.plugins, now)
 	for _, p := range released {
 		if p.refcount != 0 {
 			continue
@@ -92,8 +92,8 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 		p.tasks = p.tasks[:0]
 		if _, ok := p.impl.(plugin.Runner); ok {
 			log.Debugf("start stopper task for plugin %s", p.impl.Name())
-			task := &StopperTask{
-				Task: Task{
+			task := &stopperTask{
+				taskBase: taskBase{
 					plugin:    p,
 					scheduled: now.Add(priorityStopperTaskNs),
 					active:    true,
@@ -114,15 +114,15 @@ func (m *Manager) processUpdateRequest(update *UpdateRequest) {
 func (m *Manager) processQueue(now time.Time) {
 	seconds := now.Unix()
 	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
-		if performer := p.peekTask(); performer != nil {
-			if performer.Scheduled().Unix() > seconds {
+		if task := p.peekTask(); task != nil {
+			if task.getScheduled().Unix() > seconds {
 				break
 			}
 			heap.Pop(&m.queue)
 			if p.hasCapacity() {
-				performer := p.popTask()
-				p.reserveCapacity(performer)
-				performer.Perform(m)
+				p.popTask()
+				p.reserveCapacity(task)
+				task.perform(m)
 				if p.hasCapacity() {
 					heap.Push(&m.queue, p)
 				}
@@ -134,11 +134,12 @@ func (m *Manager) processQueue(now time.Time) {
 	}
 }
 
-func (m *Manager) processFinishRequest(performer Performer) {
-	p := performer.Plugin()
-	p.releaseCapacity(performer)
-	if p.active() && performer.Active() && performer.Reschedule() {
-		p.enqueueTask(performer)
+func (m *Manager) processFinishRequest(task performer) {
+	task.finish()
+	p := task.getPlugin()
+	p.releaseCapacity(task)
+	if p.active() && task.isActive() && task.reschedule() {
+		p.enqueueTask(task)
 	}
 	if !p.queued() && p.hasCapacity() {
 		heap.Push(&m.queue, p)
@@ -159,11 +160,11 @@ run:
 				break run
 			}
 			switch v.(type) {
-			case *UpdateRequest:
-				m.processUpdateRequest(v.(*UpdateRequest))
+			case *updateRequest:
+				m.processUpdateRequest(v.(*updateRequest))
 				m.processQueue(time.Now())
-			case Performer:
-				m.processFinishRequest(v.(Performer))
+			case performer:
+				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
 			}
 		}
@@ -176,11 +177,11 @@ run:
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
-	m.owners = make(map[plugin.ResultWriter]*Owner)
+	m.owners = make(map[plugin.ResultWriter]*batch)
 
-	m.plugins = make(map[string]*Plugin)
+	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
-		m.plugins[key] = &Plugin{
+		m.plugins[key] = &pluginAgent{
 			impl:         acc,
 			tasks:        make(performerHeap, 0),
 			capacity:     10,
@@ -202,10 +203,10 @@ func (m *Manager) Stop() {
 }
 
 func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := UpdateRequest{sink: writer, requests: requests}
+	r := updateRequest{sink: writer, requests: requests}
 	m.input <- &r
 }
 
-func (m *Manager) FinishTask(p Performer) {
-	m.input <- p
+func (m *Manager) FinishTask(task performer) {
+	m.input <- task
 }

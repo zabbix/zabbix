@@ -24,23 +24,24 @@ import (
 	"zabbix/internal/plugin"
 )
 
-type Plugin struct {
+type pluginAgent struct {
 	impl         plugin.Accessor
 	tasks        performerHeap
 	capacity     int
 	usedCapacity int
 	index        int
-	refcount     int
+	// refcount us used to track plugin usage by request batches
+	refcount int
 }
 
-func (p *Plugin) peekTask() Performer {
+func (p *pluginAgent) peekTask() performer {
 	if len(p.tasks) == 0 {
 		return nil
 	}
 	return p.tasks[0]
 }
 
-func (p *Plugin) popTask() Performer {
+func (p *pluginAgent) popTask() performer {
 	if len(p.tasks) == 0 {
 		return nil
 	}
@@ -49,30 +50,30 @@ func (p *Plugin) popTask() Performer {
 	return task
 }
 
-func (p *Plugin) enqueueTask(performer Performer) {
-	heap.Push(&p.tasks, performer)
+func (p *pluginAgent) enqueueTask(task performer) {
+	heap.Push(&p.tasks, task)
 }
 
-func (p *Plugin) removeTask(index int) {
+func (p *pluginAgent) removeTask(index int) {
 	heap.Remove(&p.tasks, index)
 }
 
-func (p *Plugin) reserveCapacity(performer Performer) {
-	p.usedCapacity += performer.Weight()
+func (p *pluginAgent) reserveCapacity(task performer) {
+	p.usedCapacity += task.getWeight()
 }
 
-func (p *Plugin) releaseCapacity(performer Performer) {
-	p.usedCapacity -= performer.Weight()
+func (p *pluginAgent) releaseCapacity(task performer) {
+	p.usedCapacity -= task.getWeight()
 }
 
-func (p *Plugin) queued() bool {
+func (p *pluginAgent) queued() bool {
 	return p.index != -1
 }
 
-func (p *Plugin) hasCapacity() bool {
-	return len(p.tasks) != 0 && p.capacity-p.usedCapacity >= p.tasks[0].Weight()
+func (p *pluginAgent) hasCapacity() bool {
+	return len(p.tasks) != 0 && p.capacity-p.usedCapacity >= p.tasks[0].getWeight()
 }
 
-func (p *Plugin) active() bool {
+func (p *pluginAgent) active() bool {
 	return p.refcount != 0
 }
