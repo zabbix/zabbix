@@ -1990,6 +1990,9 @@ static int	dbsync_compare_trigger(const ZBX_DC_TRIGGER *trigger, const DB_ROW db
 	if (FAIL == dbsync_compare_str(dbrow[13], trigger->correlation_tag))
 		return FAIL;
 
+	if (FAIL == dbsync_compare_str(dbrow[14], trigger->opdata))
+		return FAIL;
+
 	return SUCCEED;
 }
 
@@ -2082,7 +2085,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	if (NULL == (result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
-				"t.correlation_mode,t.correlation_tag"
+				"t.correlation_mode,t.correlation_tag,opdata"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -2095,7 +2098,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 14, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 15, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

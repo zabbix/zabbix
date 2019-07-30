@@ -816,6 +816,7 @@ static void	DCdump_triggers(void)
 				trigger->correlation_tag, trigger->recovery_mode, trigger->correlation_mode);
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,
 				trigger->functional, trigger->locked);
+		zabbix_log(LOG_LEVEL_TRACE, "  opdata:'%s'", trigger->opdata);
 
 		if (0 != trigger->tags.values_num)
 			DCdump_trigger_tags(trigger);

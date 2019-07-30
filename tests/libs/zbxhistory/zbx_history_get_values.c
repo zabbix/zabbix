@@ -37,7 +37,7 @@ int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *error);
+		unsigned char trigger_value, const char *trigger_opdata, const char *error);
 int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 void	__wrap_zbx_clean_events(void);
 void	zbx_vcmock_read_values(zbx_mock_handle_t hdata, unsigned char value_type, zbx_vector_history_record_t *values);
@@ -67,7 +67,7 @@ int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *error)
+		unsigned char trigger_value, const char *trigger_opdata, const char *error)
 {
 	ZBX_UNUSED(source);
 	ZBX_UNUSED(object);
@@ -83,6 +83,7 @@ int	__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_
 	ZBX_UNUSED(trigger_correlation_mode);
 	ZBX_UNUSED(trigger_correlation_tag);
 	ZBX_UNUSED(trigger_value);
+	ZBX_UNUSED(trigger_opdata);
 	ZBX_UNUSED(error);
 	return SUCCEED;
 

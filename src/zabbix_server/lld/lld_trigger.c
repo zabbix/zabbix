@@ -32,6 +32,7 @@ typedef struct
 	char			*comments;
 	char			*url;
 	char			*correlation_tag;
+	char			*opdata;
 	unsigned char		status;
 	unsigned char		type;
 	unsigned char		priority;
@@ -60,6 +61,8 @@ typedef struct
 	char			*url_orig;
 	char			*correlation_tag;
 	char			*correlation_tag_orig;
+	char			*opdata;
+	char			*opdata_orig;
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	dependents;
@@ -77,13 +80,14 @@ typedef struct
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE	__UINT64_C(0x0200)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG	__UINT64_C(0x0400)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE	__UINT64_C(0x0800)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA		__UINT64_C(0x1000)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE										\
 		(ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION | ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION |		\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY |			\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LLD_TRIGGER_UPDATE_URL |			\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION | ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE |	\
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE | ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG |	\
-		ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE)
+		ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE | ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA)
 	zbx_uint64_t		flags;
 }
 zbx_lld_trigger_t;
@@ -233,6 +237,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 	zbx_vector_ptr_destroy(&trigger_prototype->dependencies);
 	zbx_vector_ptr_clear_ext(&trigger_prototype->functions, (zbx_mem_free_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger_prototype->functions);
+	zbx_free(trigger_prototype->opdata);
 	zbx_free(trigger_prototype->correlation_tag);
 	zbx_free(trigger_prototype->url);
 	zbx_free(trigger_prototype->comments);
@@ -251,6 +256,8 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 	zbx_vector_ptr_destroy(&trigger->dependencies);
 	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
 	zbx_vector_ptr_destroy(&trigger->functions);
+	zbx_free(trigger->opdata_orig);
+	zbx_free(trigger->opdata);
 	zbx_free(trigger->correlation_tag_orig);
 	zbx_free(trigger->correlation_tag);
 	zbx_free(trigger->url_orig);
@@ -286,7 +293,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
 				"t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,t.correlation_tag,"
-				"t.manual_close"
+				"t.manual_close,t.opdata"
 			" from triggers t,functions f,items i,item_discovery id"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -312,6 +319,7 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 		ZBX_STR2UCHAR(trigger_prototype->correlation_mode, row[10]);
 		trigger_prototype->correlation_tag = zbx_strdup(NULL, row[11]);
 		ZBX_STR2UCHAR(trigger_prototype->manual_close, row[12]);
+		trigger_prototype->opdata = zbx_strdup(NULL, row[13]);
 
 		zbx_vector_ptr_create(&trigger_prototype->functions);
 		zbx_vector_ptr_create(&trigger_prototype->dependencies);
@@ -363,7 +371,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
-				"t.correlation_tag,t.manual_close"
+				"t.correlation_tag,t.manual_close,t.opdata"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -428,6 +436,8 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->url_orig = NULL;
 		trigger->correlation_tag = zbx_strdup(NULL, row[11]);
 		trigger->correlation_tag_orig = NULL;
+		trigger->opdata = zbx_strdup(NULL, row[13]);
+		trigger->opdata_orig = NULL;
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
@@ -1257,6 +1267,17 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			buffer = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG;
 		}
+
+		buffer = zbx_strdup(buffer, trigger_prototype->opdata);
+		substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(buffer, ZBX_WHITESPACE);
+		if (0 != strcmp(trigger->opdata, buffer))
+		{
+			trigger->opdata_orig = trigger->opdata;
+			trigger->opdata = buffer;
+			buffer = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA;
+		}
 	}
 	else
 	{
@@ -1292,6 +1313,11 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->correlation_tag_orig = NULL;
 		substitute_lld_macros(&trigger->correlation_tag, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(trigger->correlation_tag, ZBX_WHITESPACE);
+
+		trigger->opdata = zbx_strdup(NULL, trigger_prototype->opdata);
+		trigger->opdata_orig = NULL;
+		substitute_lld_macros(&trigger->opdata, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(trigger->opdata, ZBX_WHITESPACE);
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
@@ -1913,6 +1939,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_URL, TRIGGER_URL_LEN, error);
 		lld_validate_trigger_field(trigger, &trigger->correlation_tag, &trigger->correlation_tag_orig,
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG, TAG_NAME_LEN, error);
+		lld_validate_trigger_field(trigger, &trigger->opdata, &trigger->opdata_orig,
+				ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA, TRIGGER_OPDATA_LEN, error);
 	}
 
 	/* checking duplicated triggers in DB */
@@ -1989,6 +2017,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->url_orig = NULL;
 			db_trigger->correlation_tag = NULL;
 			db_trigger->correlation_tag_orig = NULL;
+			db_trigger->opdata = NULL;
+			db_trigger->opdata_orig = NULL;
 			db_trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
 			zbx_vector_ptr_create(&db_trigger->functions);
@@ -2387,7 +2417,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 		zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "expression", "priority",
 				"status", "comments", "url", "type", "value", "state", "flags", "recovery_mode",
-				"recovery_expression", "correlation_mode", "correlation_tag", "manual_close", NULL);
+				"recovery_expression", "correlation_mode", "correlation_tag", "manual_close", "opdata",
+				NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
 				NULL);
@@ -2426,7 +2457,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		char	*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc;
+		char	*description_esc, *expression_esc, *comments_esc, *url_esc, *value_esc, *opdata_esc;
 		int	index;
 
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -2473,7 +2504,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					(int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger_prototype->recovery_mode,
 					trigger->recovery_expression, (int)trigger_prototype->correlation_mode,
-					trigger->correlation_tag, (int)trigger_prototype->manual_close);
+					trigger->correlation_tag, (int)trigger_prototype->manual_close,
+					trigger->opdata);
 
 			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid);
 
@@ -2569,6 +2601,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
 						(int)trigger_prototype->manual_close);
+				d = ",";
+			}
+
+			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA))
+			{
+				opdata_esc = DBdyn_escape_string(trigger->opdata);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
+				zbx_free(opdata_esc);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

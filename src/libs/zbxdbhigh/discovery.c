@@ -360,7 +360,7 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 		{
 			discovery_update_dservice(dservice->dserviceid, service_status, now, 0, value);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
-					DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+					DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 
 			if (DOBJECT_STATUS_DOWN == dhost->status)
 			{
@@ -373,7 +373,7 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 				discovery_update_dhost(dhost);
 				zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
 						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL,
-						0, NULL, 0, NULL);
+						0, NULL, 0, NULL, NULL);
 			}
 		}
 		else if (0 != strcmp(dservice->value, value))
@@ -387,13 +387,13 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 		{
 			discovery_update_dservice(dservice->dserviceid, service_status, 0, now, dservice->value);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
-					DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+					DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 
 			/* service went DOWN, no need to update host status here as other services may be UP */
 		}
 	}
 	zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts, service_status,
-			NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+			NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -423,7 +423,7 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 
 			discovery_update_dhost(dhost);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-					DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+					DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 		}
 	}
 	else	/* DOBJECT_STATUS_DOWN */
@@ -436,11 +436,11 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 
 			discovery_update_dhost(dhost);
 			zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-					DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+					DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 		}
 	}
 	zbx_add_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts, status, NULL, NULL, NULL, 0, 0,
-			NULL, 0, NULL, 0, NULL);
+			NULL, 0, NULL, 0, NULL, NULL);
 }
 
 /******************************************************************************

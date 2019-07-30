@@ -1414,6 +1414,63 @@ static int	get_history_log_value(const char *expression, char **replace_to, int 
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBitem_get_value                                                 *
+ *                                                                            *
+ * Purpose: retrieve item value by item id                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = DBselect(
+			"select value_type,valuemapid,units"
+			" from items"
+			" where itemid=" ZBX_FS_UI64,
+			itemid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		unsigned char		value_type;
+		zbx_uint64_t		valuemapid;
+		zbx_history_record_t	vc_value;
+
+		value_type = (unsigned char)atoi(row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[1]);
+
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, ts, &vc_value))
+		{
+			char	tmp[MAX_BUFFER_LEN];
+
+			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_record_clear(&vc_value, value_type);
+
+			if (0 == raw)
+				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+
+			*lastvalue = zbx_strdup(*lastvalue, tmp);
+
+			ret = SUCCEED;
+		}
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBitem_lastvalue                                                 *
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
@@ -1431,52 +1488,18 @@ static int	get_history_log_value(const char *expression, char **replace_to, int 
  ******************************************************************************/
 static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL;
+	zbx_timespec_t	ts;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto out;
+	ts.sec = time(NULL);
+	ts.ns = 999999999;
 
-	result = DBselect(
-			"select value_type,valuemapid,units"
-			" from items"
-			" where itemid=" ZBX_FS_UI64,
-			itemid);
+	if (SUCCEED == (ret = get_N_itemid(expression, N_functionid, &itemid)))
+		ret = DBitem_get_value(itemid, lastvalue, raw, &ts);
 
-	if (NULL != (row = DBfetch(result)))
-	{
-		unsigned char		value_type;
-		zbx_uint64_t		valuemapid;
-		zbx_history_record_t	vc_value;
-		zbx_timespec_t		ts;
-
-		ts.sec = time(NULL);
-		ts.ns = 999999999;
-
-		value_type = (unsigned char)atoi(row[0]);
-		ZBX_DBROW2UINT64(valuemapid, row[1]);
-
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
-		{
-			char	tmp[MAX_BUFFER_LEN];
-
-			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
-			zbx_history_record_clear(&vc_value, value_type);
-
-			if (0 == raw)
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
-
-			*lastvalue = zbx_strdup(*lastvalue, tmp);
-
-			ret = SUCCEED;
-		}
-	}
-	DBfree_result(result);
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1494,49 +1517,95 @@ out:
  ******************************************************************************/
 static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns, int raw)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL;
+	zbx_timespec_t	ts = {clock, ns};
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto out;
+	if (SUCCEED == (ret = get_N_itemid(expression, N_functionid, &itemid)))
+		ret = DBitem_get_value(itemid, value, raw, &ts);
 
-	result = DBselect(
-			"select value_type,valuemapid,units"
-			" from items"
-			" where itemid=" ZBX_FS_UI64,
-			itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
-	if (NULL != (row = DBfetch(result)))
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: resolve_opdata                                                   *
+ *                                                                            *
+ * Purpose: resolve {EVENT.OPDATA} macro                                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if ('\0' == *event->trigger.opdata)
 	{
-		unsigned char		value_type;
-		zbx_uint64_t		valuemapid;
-		zbx_timespec_t		ts = {clock, ns};
-		zbx_history_record_t	vc_value;
+		int			pos = 0;
+		zbx_token_t		token;
+		zbx_uint64_t		itemid;
+		zbx_vector_uint64_t	itemids;
+		zbx_timespec_t		ts;
 
-		value_type = (unsigned char)atoi(row[0]);
-		ZBX_DBROW2UINT64(valuemapid, row[1]);
+		ts.sec = time(NULL);
+		ts.ns = 999999999;
 
-		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
+		zbx_vector_uint64_create(&itemids);
+		ret = SUCCEED;
+
+		for (; SUCCEED == zbx_token_find(event->trigger.expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 		{
-			char	tmp[MAX_BUFFER_LEN];
+			switch (token.type)
+			{
+				case ZBX_TOKEN_OBJECTID:
+					if (SUCCEED != (ret = get_N_itemid(event->trigger.expression + token.loc.l, 1,
+							&itemid)))
+					{
+						zbx_free(*replace_to);
+						goto out;
+					}
 
-			zbx_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
-			zbx_history_record_clear(&vc_value, value_type);
+					if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					{
+						char	*val = NULL;
 
-			if (0 == raw)
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+						zbx_vector_uint64_append(&itemids, itemid);
 
-			*value = zbx_strdup(*value, tmp);
+						if (SUCCEED == (ret = DBitem_get_value(itemid, &val, 0, &ts)))
+						{
+							if (NULL != *replace_to )
+								*replace_to = zbx_strdcat(*replace_to, ", ");
 
-			ret = SUCCEED;
+							*replace_to = zbx_strdcat(*replace_to, val);
+							zbx_free(val);
+						}
+					}
+					ZBX_FALLTHROUGH;
+				case ZBX_TOKEN_USER_MACRO:
+				case ZBX_TOKEN_SIMPLE_MACRO:
+				case ZBX_TOKEN_MACRO:
+					pos = token.loc.r;
+			}
 		}
-	}
-	DBfree_result(result);
 out:
+		zbx_vector_uint64_destroy(&itemids);
+	}
+	else
+	{
+		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
+		ret = substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1789,6 +1858,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
 #define MVAR_EVENT_SEVERITY		MVAR_EVENT "SEVERITY}"
 #define MVAR_EVENT_NSEVERITY		MVAR_EVENT "NSEVERITY}"
+#define MVAR_EVENT_OPDATA		MVAR_EVENT "OPDATA}"
 #define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
 #define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
 #define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
@@ -2832,6 +2902,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, event->name);
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
+				{
+					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
+				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_ACK) && NULL != ack)
@@ -3131,6 +3205,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->name);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
+				{
+					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -3519,6 +3597,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->name);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
+				{
+					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
