@@ -27,7 +27,7 @@ import (
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
-	"zabbix/internal/agent/server_connector"
+	"zabbix/internal/agent/serverconnector"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
@@ -135,7 +135,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	addresses, err := server_connector.ParseServerActive()
+	addresses, err := serverconnector.ParseServerActive()
 	if err != nil {
 		log.Critf("%s", err)
 		os.Exit(1)
@@ -160,10 +160,10 @@ func main() {
 	taskManager.Start()
 
 	resultCaches := make([]*agent.ResultCache, len(addresses))
-	serverConnectors := make([]*server_connector.ServerConnector, len(addresses))
+	serverConnectors := make([]*serverconnector.ServerConnector, len(addresses))
 
 	for i := 0; i < len(addresses); i++ {
-		serverConnectors[i] = server_connector.NewServerConnector(taskManager, addresses[i])
+		serverConnectors[i] = serverconnector.NewServerConnector(taskManager, addresses[i])
 		resultCaches[i] = agent.NewActiveCache(serverConnectors[i])
 		serverConnectors[i].ResultCache = resultCaches[i]
 

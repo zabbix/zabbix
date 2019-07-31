@@ -2,7 +2,7 @@
 
 SUBDIRS = \
 	scheduler \
-	server_connector
+	serverconnector
 
 all: build
 
