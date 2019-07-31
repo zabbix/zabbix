@@ -29,8 +29,6 @@ import (
 )
 
 type OutputController interface {
-	// sets the default output writer
-	SetOutput(w io.Writer)
 	// flushes cache to the specified output writer
 	FlushOutput(w io.Writer) (err error)
 }
@@ -39,10 +37,6 @@ type ResultCache struct {
 	input   chan interface{}
 	output  io.Writer
 	results []*plugin.Result
-}
-
-func (c *ResultCache) setOutput(w io.Writer) {
-	c.output = w
 }
 
 type AgentData struct {
@@ -123,12 +117,8 @@ func (c *ResultCache) run() {
 			break
 		}
 		switch v.(type) {
-		case outputRequest:
-			r := v.(outputRequest)
-			c.setOutput(r.output)
-		case flushRequest:
-			r := v.(flushRequest)
-			c.flushOutput(r.output)
+		case io.Writer:
+			c.flushOutput(v.(io.Writer))
 		case *plugin.Result:
 			r := v.(*plugin.Result)
 			c.write(r)
@@ -154,20 +144,23 @@ type outputRequest struct {
 	output io.Writer
 }
 
-func (c *ResultCache) SetOutput(w io.Writer) {
-	c.input <- outputRequest{output: w}
+func NewActiveCache(output io.Writer) *ResultCache {
+	return &ResultCache{output: output}
 }
 
-type flushRequest struct {
-	output io.Writer
+func NewPassiveCache() *ResultCache {
+	return &ResultCache{}
 }
 
 func (c *ResultCache) FlushOutput(w io.Writer) {
-	c.input <- flushRequest{output: w}
+	c.input <- w
 }
 
 func (c *ResultCache) Flush() {
-	c.FlushOutput(c.output)
+	// only active connections with output set can be flushed without specifying output
+	if c.output != nil {
+		c.FlushOutput(c.output)
+	}
 }
 
 func (c *ResultCache) Write(result *plugin.Result) {

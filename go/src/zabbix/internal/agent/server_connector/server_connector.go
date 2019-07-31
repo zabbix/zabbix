@@ -203,9 +203,12 @@ run:
 	monitor.Unregister()
 }
 
+func NewServerConnector() *ServerConnector {
+	return &ServerConnector{}
+}
+
 func (s *ServerConnector) init() {
 	s.input = make(chan interface{})
-	s.ResultCache.SetOutput(s)
 }
 
 func (s *ServerConnector) Start() {

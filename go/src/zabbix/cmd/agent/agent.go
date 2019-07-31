@@ -35,7 +35,6 @@ import (
 )
 
 func main() {
-	var taskManager scheduler.Manager
 	var confFlag string
 	const (
 		confDefault     = "agent.conf"
@@ -157,16 +156,21 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
+	taskManager := scheduler.NewManager()
 	taskManager.Start()
 
-	serverConnectors := make([]server_connector.ServerConnector, len(addresses))
-	resultCaches := make([]agent.ResultCache, len(addresses))
+	resultCaches := make([]*agent.ResultCache, len(addresses))
+	serverConnectors := make([]*server_connector.ServerConnector, len(addresses))
 
 	for i := 0; i < len(addresses); i++ {
-		resultCaches[i].Start()
-		serverConnectors[i].TaskManager = &taskManager
-		serverConnectors[i].ResultCache = &resultCaches[i]
+		serverConnectors[i] = server_connector.NewServerConnector()
+		resultCaches[i] = agent.NewActiveCache(serverConnectors[i])
+
+		serverConnectors[i].ResultCache = resultCaches[i]
+		serverConnectors[i].TaskManager = taskManager
 		serverConnectors[i].Address = addresses[i]
+
+		resultCaches[i].Start()
 		serverConnectors[i].Start()
 	}
 
