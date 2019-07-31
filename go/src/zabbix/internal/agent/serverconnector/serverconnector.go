@@ -21,6 +21,7 @@ package serverconnector
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -37,8 +38,8 @@ type Connector struct {
 	input       chan interface{}
 	address     string
 	lastError   error
-	ResultCache *agent.ResultCache
-	taskManager *scheduler.Manager
+	resultCache *agent.ResultCache
+	taskManager scheduler.Scheduler
 }
 
 type activeChecksRequest struct {
@@ -129,7 +130,7 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	log.Tracef("started tasks update from [%s]", c.address)
-	c.taskManager.UpdateTasks(c.ResultCache, response.Data)
+	c.taskManager.UpdateTasks(c.resultCache, response.Data)
 	log.Tracef("finished tasks update from [%s]", c.address)
 }
 
@@ -151,7 +152,7 @@ func (c *Connector) Write(data []byte) (n int, err error) {
 			return 0, fmt.Errorf("%s", response.Info)
 		}
 
-		return 0, fmt.Errorf("%s", "unsuccessful response")
+		return 0, errors.New("unsuccessful response")
 	}
 
 	return len(data), nil
@@ -168,7 +169,7 @@ run:
 	for {
 		select {
 		case <-ticker.C:
-			c.ResultCache.Flush()
+			c.resultCache.Flush()
 			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
 				log.Debugf("started active checks refresh from [%s]", c.address)
 				c.refreshActiveChecks()
@@ -187,6 +188,7 @@ run:
 func New(taskManager *scheduler.Manager, address string) *Connector {
 	c := &Connector{taskManager: taskManager, address: address}
 	c.init()
+	c.resultCache = agent.NewActiveCache(c)
 
 	return c
 }
@@ -196,10 +198,12 @@ func (c *Connector) init() {
 }
 
 func (c *Connector) Start() {
+	c.resultCache.Start()
 	monitor.Register()
 	go c.run()
 }
 
-func (s *Connector) Stop() {
-	s.input <- nil
+func (c *Connector) Stop() {
+	c.input <- nil
+	c.resultCache.Stop()
 }

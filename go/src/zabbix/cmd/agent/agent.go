@@ -159,15 +159,10 @@ func main() {
 	taskManager := scheduler.NewManager()
 	taskManager.Start()
 
-	resultCaches := make([]*agent.ResultCache, len(addresses))
 	serverConnectors := make([]*serverconnector.Connector, len(addresses))
 
-	for i := 0; i < len(addresses); i++ {
+	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
-		resultCaches[i] = agent.NewActiveCache(serverConnectors[i])
-		serverConnectors[i].ResultCache = resultCaches[i]
-
-		resultCaches[i].Start()
 		serverConnectors[i].Start()
 	}
 
@@ -183,9 +178,8 @@ loop:
 		}
 	}
 
-	for i := 0; i < len(addresses); i++ {
+	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].Stop()
-		resultCaches[i].Stop()
 	}
 
 	taskManager.Stop()
