@@ -157,7 +157,7 @@ func (c *Connector) Write(data []byte) (n int, err error) {
 	return len(data), nil
 }
 
-func (s *Connector) run() {
+func (c *Connector) run() {
 	var start time.Time
 
 	defer log.PanicHook()
@@ -168,34 +168,36 @@ run:
 	for {
 		select {
 		case <-ticker.C:
-			s.ResultCache.Flush()
+			c.ResultCache.Flush()
 			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
-				log.Debugf("started active checks refresh from [%s]", s.address)
-				s.refreshActiveChecks()
-				log.Debugf("finished active checks refresh from [%s]", s.address)
+				log.Debugf("started active checks refresh from [%s]", c.address)
+				c.refreshActiveChecks()
+				log.Debugf("finished active checks refresh from [%s]", c.address)
 				start = time.Now()
 			}
-		case <-s.input:
+		case <-c.input:
 			break run
 		}
 	}
-	close(s.input)
+	close(c.input)
 	log.Debugf("Server connector has been stopped")
 	monitor.Unregister()
 }
 
 func New(taskManager *scheduler.Manager, address string) *Connector {
-	return &Connector{taskManager: taskManager, address: address}
+	c := &Connector{taskManager: taskManager, address: address}
+	c.init()
+
+	return c
 }
 
-func (s *Connector) init() {
-	s.input = make(chan interface{})
+func (c *Connector) init() {
+	c.input = make(chan interface{})
 }
 
-func (s *Connector) Start() {
-	s.init()
+func (c *Connector) Start() {
 	monitor.Register()
-	go s.run()
+	go c.run()
 }
 
 func (s *Connector) Stop() {
