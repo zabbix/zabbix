@@ -201,22 +201,28 @@ func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error
 	var c ZbxConnection
 
 	log.Debugf("connecting to [%s]", address)
+
 	err := c.Open(address, time.Second*time.Duration(timeout))
 	if err != nil {
+		log.Debugf("cannot connect to [%s]: %s", address, err)
 		return nil, err
 	}
 
 	defer c.Close()
 
 	log.Debugf("sending [%s] to [%s]", string(data), address)
+
 	err = c.Write(data, 0)
 	if err != nil {
+		log.Debugf("cannot send to [%s]: %s", address, err)
 		return nil, err
 	}
 
 	log.Debugf("receiving data from [%s]", address)
+
 	b, err := c.Read(0)
 	if err != nil {
+		log.Debugf("cannot receive data from [%s]: %s", address, err)
 		return nil, err
 	}
 
