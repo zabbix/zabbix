@@ -453,9 +453,6 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 						'height' => (int) $widget['height']
 					],
 					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
-					'scrollable' => CWidgetConfig::isScrollable($widget['type']),
-					'iterator' => CWidgetConfig::isIterator($widget['type']),
-					'padding' => CWidgetConfig::hasPadding($widget['type']),
 					'fields' => $fields
 				];
 			}

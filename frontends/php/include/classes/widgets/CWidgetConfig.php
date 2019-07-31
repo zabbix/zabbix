@@ -88,7 +88,7 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Return default values for new widgets.
+	 * Return default and static values for widgets.
 	 *
 	 * @static
 	 *
@@ -101,7 +101,10 @@ class CWidgetConfig {
 		foreach (self::getKnownWidgetTypes() as $type => $name) {
 			$ret[$type] = [
 				'header' => $name,
-				'size' => $dimensions[$type]
+				'size' => $dimensions[$type],
+				'iterator' => self::isIterator($type),
+				'scrollable' => self::isScrollable($type),
+				'padding' => self::hasPadding($type)
 			];
 		}
 
@@ -190,6 +193,16 @@ class CWidgetConfig {
 		}
 	}
 
+	public static function isIterator($type) {
+		switch ($type) {
+			case WIDGET_GRAPH_PROTOTYPE:
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
 	/**
 	 * Is it allowed for the widget to have scrollable content.
 	 *
@@ -208,16 +221,6 @@ class CWidgetConfig {
 
 			default:
 				return true;
-		}
-	}
-
-	public static function isIterator($type) {
-		switch ($type) {
-			case WIDGET_GRAPH_PROTOTYPE:
-				return true;
-
-			default:
-				return false;
 		}
 	}
 

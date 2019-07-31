@@ -49,62 +49,18 @@ class CWidgetHelper {
 				(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types))
 			)
 			->addRow(_('Name'),
-				(new CTextBox('name',$dialogue_name))
+				(new CTextBox('name', $dialogue_name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
 	}
 
-	public static function appendIteratorFieldsToFormList($form_list) {
-		$fields_spec = [
-			'columns' => [
-				'label' => _('Columns'),
-				'min' => 1,
-				'max' => 12,
-				'default' => 2,
-			],
-			'rows' => [
-				'label' => _('Rows'),
-				'min' => 1,
-				'max' => 12,
-				'default' => 1,
-			],
-		];
-
-		foreach ($fields_spec as $name => $spec) {
-			$field = (new CWidgetFieldIntegerBox($name, $spec['label'], $spec['min'], $spec['max']))
-				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-				->setDefault(25)
-			;
-
-			if (array_key_exists('show_lines', $this->data)) {
-				$field_lines->setValue($this->data['show_lines']);
-			}
-
-		}
-		$field_lines = (new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
-			ZBX_MAX_WIDGET_LINES
-		))
-			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			->setDefault(25);
-
-		if (array_key_exists('show_lines', $this->data)) {
-			$field_lines->setValue($this->data['show_lines']);
-		}
-
-		$this->fields[$field_lines->getName()] = $field_lines;
-
-
-
-
-		$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
-
-		$form_list->addRow(_('Columns'),
-			(new CTextBox('tests'))
-				->setAttribute('placeholder', _('default'))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		);
+	public static function addIteratorFields($form_list, $fields) {
+		$form_list
+			->addRow(self::getLabel($fields['columns']), self::getIntegerBox($fields['columns']))
+			->addRow(self::getLabel($fields['rows']), self::getIntegerBox($fields['rows']))
+		;
 	}
 
 	/**
@@ -310,6 +266,35 @@ class CWidgetHelper {
 			'popup' => [
 				'parameters' => [
 						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'dstfrm' => $form_name,
+						'dstfld1' => zbx_formatDomId($field_name)
+					] + $field->getFilterParameters()
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldItem $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getItemPrototype($field, $captions, $form_name) {
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
+		return (new CMultiSelect([
+			'name' => $field_name,
+			'object_name' => 'item_prototypes',
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'popup' => [
+				'parameters' => [
+						'srctbl' => 'item_prototypes',
 						'srcfld1' => 'itemid',
 						'dstfrm' => $form_name,
 						'dstfld1' => zbx_formatDomId($field_name)

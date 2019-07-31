@@ -172,79 +172,6 @@ else {
 	}
 
 	// Initialize dashboard grid.
-//	$this->addPostJS(
-//		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
-//			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
-//			'.dashboardGrid("setDashboardData", '.CJs::encodeJson($dashboard_data).')'.
-//			'.dashboardGrid("setDefaults", '.CJs::encodeJson($data['widget_defaults']).')'.
-//			'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
-//		');'
-//	);
-
-
-
-	$data['widget_defaults']['graphprototype'] = [
-		'header' => 'Graph prototype',
-		'size' => ['width' => 6, 'height' => 5],
-	];
-
-
-	$data['grid_widgets'] = [[
-	//	"widgetid" => "15",
-		"type" => "clock",
-		"header" => "",
-		"pos" => [
-			"x" => 0,
-			"y" => 0,
-			"width" => 2,
-			"height" => 3,
-		],
-		"rf_rate" => 2,
-		"scrollable" => true,
-		"iterator" => false,
-		"padding" => true,
-		"fields" => [
-			"time_type" => "0",
-		],
-	], [
-		"type" => "clock",
-		"header" => "",
-		"pos" => [
-			"x" => 0,
-			"y" => 3,
-			"width" => 2,
-			"height" => 3,
-		],
-		"rf_rate" => 0,
-		"scrollable" => true,
-		"iterator" => false,
-		"padding" => true,
-		"fields" => [
-			"time_type" => "0",
-		],
-	], [
-		"type" => "graphprototype",
-		"header" => "",
-		"pos" => [
-			"x" => 2,
-			"y" => 0,
-			"width" => 7,
-			"height" => 8,
-		],
-		"rf_rate" => 0,
-		"scrollable" => true,
-		"iterator" => true,
-		"padding" => true,
-		"fields" => [
-			'columns' => 3,
-			'rows' => 3,
-		],
-	]];
-
-
-//	array_splice($data['grid_widgets'], 0, 2);
-
-
 	$this->addPostJS(
 		'jQuery(".'.ZBX_STYLE_DASHBRD_GRID_CONTAINER.'")'.
 			'.dashboardGrid('.CJs::encodeJson($dashboard_options).')'.
@@ -253,7 +180,4 @@ else {
 			'.dashboardGrid("addWidgets", '.CJs::encodeJson($data['grid_widgets']).
 		');'
 	);
-
-
-
 }

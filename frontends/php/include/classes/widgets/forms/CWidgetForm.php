@@ -58,6 +58,30 @@ class CWidgetForm {
 		}
 
 		$this->fields[$rf_rate_field->getName()] = $rf_rate_field;
+
+		// Add Columns and Rows fields for Iterator widgets.
+
+		if (CWidgetConfig::isIterator($type)) {
+			$field_columns = (new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
+				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				->setDefault(2)
+			;
+			if (array_key_exists('columns', $this->data)) {
+				$field_columns->setValue($this->data['columns']);
+			}
+
+			$this->fields[$field_columns->getName()] = $field_columns;
+
+			$field_rows = (new CWidgetFieldIntegerBox('rows', _('Rows'), 1, DASHBOARD_WIDGET_MAX_ROWS))
+				->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				->setDefault(1)
+			;
+			if (array_key_exists('rows', $this->data)) {
+				$field_rows->setValue($this->data['rows']);
+			}
+
+			$this->fields[$field_rows->getName()] = $field_rows;
+		}
 	}
 
 	/**

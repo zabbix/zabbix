@@ -29,33 +29,37 @@ class CHost extends CHostGeneral {
 	/**
 	 * Get host data.
 	 *
-	 * @param array      $options
-	 * @param array      $options['groupids']                  HostGroup IDs
-	 * @param array      $options['hostids']                   Host IDs
-	 * @param bool       $options['monitored_hosts']           only monitored Hosts
-	 * @param bool       $options['templated_hosts']           include templates in result
-	 * @param bool       $options['with_items']                only with items
-	 * @param bool       $options['with_monitored_items']      only with monitored items
-	 * @param bool       $options['with_triggers']             only with triggers
-	 * @param bool       $options['with_monitored_triggers']   only with monitored triggers
-	 * @param bool       $options['with_httptests']            only with http tests
-	 * @param bool       $options['with_monitored_httptests']  only with monitored http tests
-	 * @param bool       $options['with_graphs']               only with graphs
-	 * @param bool       $options['editable']                  only with read-write permission. Ignored for SuperAdmins
-	 * @param bool       $options['selectGroups']              select HostGroups
-	 * @param bool       $options['selectItems']               select Items
-	 * @param bool       $options['selectTriggers']            select Triggers
-	 * @param bool       $options['selectGraphs']              select Graphs
-	 * @param bool       $options['selectApplications']        select Applications
-	 * @param bool       $options['selectMacros']              select Macros
-	 * @param bool|array $options['selectInventory']           select Inventory
-	 * @param bool       $options['withInventory']             select only hosts with inventory
-	 * @param int        $options['count']                     count Hosts, returned column name is rowscount
-	 * @param string     $options['pattern']                   search hosts by pattern in Host name
-	 * @param string     $options['extendPattern']             search hosts by pattern in Host name, ip and DNS
-	 * @param int        $options['limit']                     limit selection
-	 * @param string     $options['sortfield']                 field to sort by
-	 * @param string     $options['sortorder']                 sort order
+	 * @param array			$options
+	 * @param array			$options['groupids']					HostGroup IDs
+	 * @param array			$options['hostids']						Host IDs
+	 * @param bool			$options['monitored_hosts']				only monitored Hosts
+	 * @param bool			$options['templated_hosts']				include templates in result
+	 * @param bool			$options['with_items']					only with items
+	 * @param bool			$options['with_item_prototypes']		only with item prototypes
+	 * @param bool			$options['with_simple_graph_items']		only with items suitable for graphs
+	 * @param bool			$options['with_simple_graph_item_prototypes']	only with item prototypes suitable for graphs
+	 * @param bool			$options['with_monitored_items']		only with monitored items
+	 * @param bool			$options['with_triggers']				only with triggers
+	 * @param bool			$options['with_monitored_triggers']		only with monitored triggers
+	 * @param bool			$options['with_httptests']				only with http tests
+	 * @param bool			$options['with_monitored_httptests']	only with monitored http tests
+	 * @param bool			$options['with_graphs']					only with graphs
+	 * @param bool			$options['with_graph_prototypes']		only with graph prototypes
+	 * @param bool			$options['editable']					only with read-write permission. Ignored for SuperAdmins
+	 * @param bool			$options['selectGroups']				select HostGroups
+	 * @param bool			$options['selectItems']					select Items
+	 * @param bool			$options['selectTriggers']				select Triggers
+	 * @param bool			$options['selectGraphs']				select Graphs
+	 * @param bool			$options['selectApplications']			select Applications
+	 * @param bool			$options['selectMacros']				select Macros
+	 * @param bool|array	$options['selectInventory']				select Inventory
+	 * @param bool			$options['withInventory']				select only hosts with inventory
+	 * @param int			$options['count']						count Hosts, returned column name is rowscount
+	 * @param string		$options['pattern']						search hosts by pattern in Host name
+	 * @param string		$options['extendPattern']				search hosts by pattern in Host name, ip and DNS
+	 * @param int			$options['limit']						limit selection
+	 * @param string		$options['sortfield']					field to sort by
+	 * @param string		$options['sortorder']					sort order
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
@@ -72,67 +76,70 @@ class CHost extends CHostGeneral {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'hostids'					=> null,
-			'proxyids'					=> null,
-			'templateids'				=> null,
-			'interfaceids'				=> null,
-			'itemids'					=> null,
-			'triggerids'				=> null,
-			'maintenanceids'			=> null,
-			'graphids'					=> null,
-			'applicationids'			=> null,
-			'dserviceids'				=> null,
-			'httptestids'				=> null,
-			'monitored_hosts'			=> null,
-			'templated_hosts'			=> null,
-			'proxy_hosts'				=> null,
-			'with_items'				=> null,
-			'with_monitored_items'		=> null,
-			'with_simple_graph_items'	=> null,
-			'with_triggers'				=> null,
-			'with_monitored_triggers'	=> null,
-			'with_httptests'			=> null,
-			'with_monitored_httptests'	=> null,
-			'with_graphs'				=> null,
-			'with_applications'			=> null,
-			'withInventory'				=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
+			'groupids'							=> null,
+			'hostids'							=> null,
+			'proxyids'							=> null,
+			'templateids'						=> null,
+			'interfaceids'						=> null,
+			'itemids'							=> null,
+			'triggerids'						=> null,
+			'maintenanceids'					=> null,
+			'graphids'							=> null,
+			'applicationids'					=> null,
+			'dserviceids'						=> null,
+			'httptestids'						=> null,
+			'monitored_hosts'					=> null,
+			'templated_hosts'					=> null,
+			'proxy_hosts'						=> null,
+			'with_items'						=> null,
+			'with_item_prototypes'				=> null,
+			'with_simple_graph_items'			=> null,
+			'with_simple_graph_item_prototypes'	=> null,
+			'with_monitored_items'				=> null,
+			'with_triggers'						=> null,
+			'with_monitored_triggers'			=> null,
+			'with_httptests'					=> null,
+			'with_monitored_httptests'			=> null,
+			'with_graphs'						=> null,
+			'with_graph_prototypes'				=> null,
+			'with_applications'					=> null,
+			'withInventory'						=> null,
+			'editable'							=> false,
+			'nopermissions'						=> null,
 			// filter
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
-			'filter'					=> null,
-			'search'					=> null,
-			'searchInventory'			=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> false,
+			'evaltype'							=> TAG_EVAL_TYPE_AND_OR,
+			'tags'								=> null,
+			'filter'							=> null,
+			'search'							=> null,
+			'searchInventory'					=> null,
+			'searchByAny'						=> null,
+			'startSearch'						=> false,
+			'excludeSearch'						=> false,
+			'searchWildcardsEnabled'			=> false,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectGroups'				=> null,
-			'selectParentTemplates'		=> null,
-			'selectItems'				=> null,
-			'selectDiscoveries'			=> null,
-			'selectTriggers'			=> null,
-			'selectGraphs'				=> null,
-			'selectApplications'		=> null,
-			'selectMacros'				=> null,
-			'selectScreens'				=> null,
-			'selectInterfaces'			=> null,
-			'selectInventory'			=> null,
-			'selectHttpTests'			=> null,
-			'selectDiscoveryRule'		=> null,
-			'selectHostDiscovery'		=> null,
-			'selectTags'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'output'							=> API_OUTPUT_EXTEND,
+			'selectGroups'						=> null,
+			'selectParentTemplates'				=> null,
+			'selectItems'						=> null,
+			'selectDiscoveries'					=> null,
+			'selectTriggers'					=> null,
+			'selectGraphs'						=> null,
+			'selectApplications'				=> null,
+			'selectMacros'						=> null,
+			'selectScreens'						=> null,
+			'selectInterfaces'					=> null,
+			'selectInventory'					=> null,
+			'selectHttpTests'					=> null,
+			'selectDiscoveryRule'				=> null,
+			'selectHostDiscovery'				=> null,
+			'selectTags'						=> null,
+			'countOutput'						=> false,
+			'groupCount'						=> false,
+			'preservekeys'						=> false,
+			'sortfield'							=> '',
+			'sortorder'							=> '',
+			'limit'								=> null,
+			'limitSelects'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -293,33 +300,37 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_monitored_items, with_simple_graph_items
-		if (!is_null($options['with_items'])) {
+		// with_items, with_item_prototypes, with_simple_graph_items, with_simple_graph_item_prototypes, with_monitored_items
+		if ($options['with_items'] !== null
+				|| $options['with_item_prototypes'] !== null
+				|| $options['with_simple_graph_items'] !== null
+				|| $options['with_simple_graph_item_prototypes'] !== null
+				|| $options['with_monitored_items'] !== null) {
+
+			$where_and = '';
+
+			if ($options['with_item_prototypes'] !== null || $options['with_simple_graph_item_prototypes'] !== null) {
+				$where_and .= ' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE;
+			}
+			else {
+				$where_and .= ' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')';
+			}
+
+			if ($options['with_simple_graph_items'] !== null || $options['with_simple_graph_item_prototypes'] !== null) {
+				$where_and .= ' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')';
+			}
+
+			if ($options['with_monitored_items'] !== null) {
+				$where_and .=  ' AND i.status='.ITEM_STATUS_ACTIVE;
+			}
+
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
-		}
-		elseif (!is_null($options['with_monitored_items'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE h.hostid=i.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
-		}
-		elseif (!is_null($options['with_simple_graph_items'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE h.hostid=i.hostid'.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+						$where_and.
+					')'
+			;
 		}
 
 		// with_triggers, with_monitored_triggers
@@ -359,15 +370,18 @@ class CHost extends CHostGeneral {
 				')';
 		}
 
-		// with_graphs
-		if (!is_null($options['with_graphs'])) {
+		// with_graphs, with_graph_prototypes
+		if ($options['with_graphs'] !== null || $options['with_graph_prototypes'] !== null) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i,graphs_items gi,graphs g'.
 					' WHERE i.hostid=h.hostid'.
 						' AND i.itemid=gi.itemid '.
 						' AND gi.graphid=g.graphid'.
-						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+							(($options['with_graph_prototypes'] !== null)
+								? ' AND g.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
+								: ' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'
+							).
 					')';
 		}
 

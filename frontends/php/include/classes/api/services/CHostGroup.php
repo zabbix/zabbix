@@ -47,47 +47,49 @@ class CHostGroup extends CApiService {
 		];
 
 		$defOptions = [
-			'groupids'					=> null,
-			'hostids'					=> null,
-			'templateids'				=> null,
-			'graphids'					=> null,
-			'triggerids'				=> null,
-			'maintenanceids'			=> null,
-			'monitored_hosts'			=> null,
-			'templated_hosts'			=> null,
-			'real_hosts'				=> null,
-			'with_hosts_and_templates'	=> null,
-			'with_items'				=> null,
-			'with_simple_graph_items'	=> null,
-			'with_monitored_items'		=> null,
-			'with_triggers'				=> null,
-			'with_monitored_triggers'	=> null,
-			'with_httptests'			=> null,
-			'with_monitored_httptests'	=> null,
-			'with_graphs'				=> null,
-			'with_applications'			=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
+			'groupids'								=> null,
+			'hostids'								=> null,
+			'templateids'							=> null,
+			'graphids'								=> null,
+			'triggerids'							=> null,
+			'maintenanceids'						=> null,
+			'monitored_hosts'						=> null,
+			'templated_hosts'						=> null,
+			'real_hosts'							=> null,
+			'with_hosts_and_templates'				=> null,
+			'with_items'							=> null,
+			'with_monitored_items'					=> null,
+			'with_simple_graph_items'				=> null,
+			'with_simple_graph_item_prototypes'		=> null,
+			'with_triggers'							=> null,
+			'with_monitored_triggers'				=> null,
+			'with_httptests'						=> null,
+			'with_monitored_httptests'				=> null,
+			'with_graphs'							=> null,
+			'with_graph_prototypes'					=> null,
+			'with_applications'						=> null,
+			'editable'								=> false,
+			'nopermissions'							=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
+			'filter'								=> null,
+			'search'								=> null,
+			'searchByAny'							=> null,
+			'startSearch'							=> false,
+			'excludeSearch'							=> false,
+			'searchWildcardsEnabled'				=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectTemplates'			=> null,
-			'selectGroupDiscovery'		=> null,
-			'selectDiscoveryRule'		=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
+			'output'								=> API_OUTPUT_EXTEND,
+			'selectHosts'							=> null,
+			'selectTemplates'						=> null,
+			'selectGroupDiscovery'					=> null,
+			'selectDiscoveryRule'					=> null,
+			'countOutput'							=> false,
+			'groupCount'							=> false,
+			'preservekeys'							=> false,
+			'sortfield'								=> '',
+			'sortorder'								=> '',
+			'limit'									=> null,
+			'limitSelects'							=> null
 		];
 		$options = zbx_array_merge($defOptions, $params);
 
@@ -196,7 +198,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		// with_items, with_monitored_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_simple_graph_items, with_simple_graph_item_prototypes
 		if ($options['with_items'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
@@ -215,13 +217,16 @@ class CHostGroup extends CApiService {
 				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
-		elseif ($options['with_simple_graph_items'] !== null) {
+		elseif ($options['with_simple_graph_items'] !== null
+				|| $options['with_simple_graph_item_prototypes'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
 			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
+				($options['with_simple_graph_item_prototypes'] !== null)
+					? [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+					: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 
@@ -265,8 +270,8 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where'][] = dbConditionInt('ht.status', [HTTPTEST_STATUS_ACTIVE]);
 		}
 
-		// with_graphs
-		if ($options['with_graphs'] !== null) {
+		// with_graphs, with_graph_prototypes
+		if ($options['with_graphs'] !== null || $options['with_graph_prototypes'] !== null) {
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
 			$sub_sql_parts['from']['gr'] = 'graphs gr';
@@ -274,7 +279,9 @@ class CHostGroup extends CApiService {
 			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
 			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
 			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
-				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
+				$options['with_graph_prototypes'] !== null
+					? [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+					: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 			);
 		}
 

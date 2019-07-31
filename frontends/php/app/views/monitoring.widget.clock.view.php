@@ -62,6 +62,3 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo (new CJson())->encode($output);
-
-
-usleep(rand(500, 2000)*1000);

@@ -220,8 +220,8 @@
 		;
 
 		if (widget['iterator'] && widget['div'].hasClass('ui-resizable-resizing')) {
-			var place_w = Math.floor($div.width() / cell_w),
-				place_h = Math.floor($div.height() / cell_h)
+			var place_w = Math.round($div.width() / cell_w - 0.49),
+				place_h = Math.round($div.height() / cell_h - 0.49),
 				place_x = widget['div'].hasClass('resizing-left')
 					? (Math.round((pos.left + $div.width()) / cell_w) - place_w)
 					: Math.round(pos.left / cell_w),
@@ -1275,12 +1275,20 @@
 		return iterator['div'].hasClass('iterator-too-small');
 	}
 
-	function isIteratorTooSmall(iterator, pos) {
-		return pos['width'] < iterator['fields']['columns'] || pos['height'] < iterator['fields']['rows'] * 2;
+	function numIteratorColumns(iterator) {
+		return iterator['fields']['columns'] ? iterator['fields']['columns'] : 2;
 	}
 
-	function addIteratorPlaceholders(iterator, num_placeholders) {
-		for (var index = 0; index < num_placeholders; index++) {
+	function numIteratorRows(iterator) {
+		return iterator['fields']['rows'] ? iterator['fields']['rows'] : 1;
+	}
+
+	function isIteratorTooSmall(iterator, pos) {
+		return pos['width'] < numIteratorColumns(iterator) || pos['height'] < numIteratorRows(iterator) * 2;
+	}
+
+	function addIteratorPlaceholders(iterator, count) {
+		for (var index = 0; index < count; index++) {
 			iterator['content_body'].append(
 				$('<div>', {'class': 'dashbrd-grid-widget-iterator-placeholder'}).append('<div>')
 			);
@@ -1294,17 +1302,27 @@
 			return;
 		}
 
+		if (getIteratorTooSmallState(iterator) && iterator['update_pending']) {
+			setIteratorTooSmallState(iterator, false);
+			updateWidgetContent($obj, data, iterator);
+
+			return;
+		}
+
 		setIteratorTooSmallState(iterator, false);
 
-		var $placeholders = iterator['content_body'].find('.dashbrd-grid-widget-iterator-placeholder');
+		var $placeholders = iterator['content_body'].find('.dashbrd-grid-widget-iterator-placeholder'),
+			num_columns = numIteratorColumns(iterator),
+			num_rows = numIteratorRows(iterator)
+		;
 
-		for (var i = 0, count = iterator['fields']['columns'] * iterator['fields']['rows']; i < count; i++) {
-			var cell_column = i % iterator['fields']['columns'],
-				cell_row = Math.floor(i / iterator['fields']['columns']),
-				cell_width_min = Math.floor(pos['width'] / iterator['fields']['columns']),
-				cell_height_min = Math.floor(pos['height'] / iterator['fields']['rows']),
-				num_enlarged_columns = pos['width'] - cell_width_min * iterator['fields']['columns'],
-				num_enlarged_rows = pos['height'] - cell_height_min * iterator['fields']['rows'],
+		for (var i = 0, count = num_columns * num_rows; i < count; i++) {
+			var cell_column = i % num_columns,
+				cell_row = Math.floor(i / num_columns),
+				cell_width_min = Math.floor(pos['width'] / num_columns),
+				cell_height_min = Math.floor(pos['height'] / num_rows),
+				num_enlarged_columns = pos['width'] - cell_width_min * num_columns,
+				num_enlarged_rows = pos['height'] - cell_height_min * num_rows,
 				x = cell_column * cell_width_min + Math.min(cell_column, num_enlarged_columns),
 				y = cell_row * cell_height_min + Math.min(cell_row, num_enlarged_rows),
 				width = cell_width_min + (cell_column < num_enlarged_columns ? 1 : 0),
@@ -1373,12 +1391,16 @@
 		iterator['content_body'].empty();
 		iterator['widgets_of_iterator'] = [];
 
-		$.each(response.widgets_of_iterator, function(index, widget_of_iterator) {
+		var widgets_of_iterator = response.widgets_of_iterator.slice(0,
+			numIteratorColumns(iterator) * numIteratorRows(iterator)
+		);
+
+		$.each(widgets_of_iterator, function(index, widget_of_iterator) {
 			addWidgetOfIterator($obj, data, iterator, widget_of_iterator);
 		});
 
 		addIteratorPlaceholders(iterator,
-			iterator['fields']['columns'] * iterator['fields']['rows'] - iterator['widgets_of_iterator'].length
+			numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['widgets_of_iterator'].length
 		);
 
 		positionWidgetsOfIterator($obj, data, iterator,
@@ -1457,13 +1479,24 @@
 		}
 
 		if (widget['iterator']) {
+			widget['content_body'].empty();
+			widget['widgets_of_iterator'] = [];
+
 			var pos = (typeof widget['current_pos'] === "object") ? widget['current_pos'] : widget['pos'];
 			if (isIteratorTooSmall(widget, pos)) {
+				// 1. Put the Iterator into "too small" state.
+				// 2. Set the Iterator to reload the contents as soon as it is shown again.
+
 				setIteratorTooSmallState(widget, true);
+				widget['update_pending'] = true;
 
 				widget['update_attempts'] = 0;
 
 				return;
+			}
+			else {
+				setIteratorTooSmallState(widget, false);
+				widget['update_pending'] = false;
 			}
 		}
 
@@ -2378,8 +2411,9 @@
 					'height': 1
 				},
 				'rf_rate': 0,
-				'iterator': false,
-				'padding': false,
+				'scrollable': null,
+				'iterator': null,
+				'padding': null,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_attempts': 0,
@@ -2392,33 +2426,41 @@
 				'widget_of_iterator': false,
 			});
 
-			if (widget['iterator']) {
-				$.extend(widget, {
-					'widgets_of_iterator': [],
-					'padding': false
-				});
-			}
-
 			return this.each(function() {
 				var	$this = $(this),
-					data = $this.data('dashboardGrid');
+					data = $this.data('dashboardGrid'),
+					widget_local = JSON.parse(JSON.stringify(widget)),
+					widget_type_defaults = data['widget_defaults'][widget_local['type']]
+				;
 
-				widget['uniqueid'] = generateUniqueId($this, data);
+				$(['iterator', 'scrollable', 'padding']).each(function(index, key) {
+					widget_local[key] = widget_type_defaults[key];
+				});
 
-				widget['div'] = makeWidgetDiv($this, data, widget);
-				widget['div'].data('widget-index', data['widgets'].length);
+				if (widget_local['iterator']) {
+					$.extend(widget_local, {
+						'widgets_of_iterator': [],
+						'update_pending': false,
+						'padding': false
+					});
+				}
 
-				updateWidgetDynamic($this, data, widget);
+				widget_local['uniqueid'] = generateUniqueId($this, data);
 
-				data['widgets'].push(widget);
-				$this.append(widget['div']);
+				widget_local['div'] = makeWidgetDiv($this, data, widget_local);
+				widget_local['div'].data('widget-index', data['widgets'].length);
 
-				setDivPosition(widget['div'], data, widget['pos']);
-				checkWidgetOverlap(data, widget);
+				updateWidgetDynamic($this, data, widget_local);
+
+				data['widgets'].push(widget_local);
+				$this.append(widget_local['div']);
+
+				setDivPosition(widget_local['div'], data, widget_local['pos']);
+				checkWidgetOverlap(data, widget_local);
 
 				resizeDashboardGrid($this, data);
 
-				showPreloader(widget);
+				showPreloader(widget_local);
 				data.new_widget_placeholder.container.hide();
 			});
 		},

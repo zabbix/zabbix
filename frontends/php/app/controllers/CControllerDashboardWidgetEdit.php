@@ -106,6 +106,14 @@ class CControllerDashboardWidgetEdit extends CController {
 						case WIDGET_FIELD_SELECT_RES_GRAPH:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible graph');
 							break;
+
+						case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible graph prototype');
+							break;
+
+						case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
+							$captions['simple'][$resource_type][$id] = _('Inaccessible item prototype');
+							break;
 					}
 				}
 			}
@@ -131,17 +139,39 @@ class CControllerDashboardWidgetEdit extends CController {
 					break;
 
 				case WIDGET_FIELD_SELECT_RES_GRAPH:
-					$graphs = API::Graph()->get([
+				case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
+					$options = [
 						'graphids' => array_keys($list),
 						'selectHosts' => ['name'],
 						'output' => ['graphid', 'name']
-					]);
+					];
 
-					if ($graphs) {
-						foreach ($graphs as $key => $graph) {
-							order_result($graph['hosts'], 'name');
-							$graph['host'] = reset($graph['hosts']);
-							$list[$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
+					$records = ($resource_type === WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE)
+						? API::GraphPrototype()->get($options)
+						: API::Graph()->get($options)
+					;
+					if ($records) {
+						foreach ($records as $record) {
+							order_result($record['hosts'], 'name');
+							$record['host'] = reset($record['hosts']);
+							$list[$record['graphid']] = $record['host']['name'].NAME_DELIMITER.$record['name'];
+						}
+					}
+					break;
+
+				case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
+					$items = API::ItemPrototype()->get([
+						'itemids' => array_keys($list),
+						'selectHosts' => ['name'],
+						'output' => ['itemid', 'name']
+					]);
+					if ($items) {
+						$items = CMacrosResolverHelper::resolveItemNames($items);
+
+						foreach ($items as $item) {
+							order_result($item['hosts'], 'name');
+							$item['host'] = reset($item['hosts']);
+							$list[$item['itemid']] = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 						}
 					}
 					break;

@@ -93,6 +93,8 @@ class CWidgetField {
 
 			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 				$this->validation_rules = ['type' => API_ID];
 				break;
 

@@ -19,39 +19,60 @@
 **/
 
 
+/**
+ * Graph prototype widget form.
+ */
 class CWidgetFormGraphPrototype extends CWidgetForm {
 
 	public function __construct($data) {
 		parent::__construct($data, WIDGET_GRAPH_PROTOTYPE);
 
-//		// Time type field.
-//		$field_time_type = (new CWidgetFieldComboBox('time_type', _('Time type'), [
-//			TIME_TYPE_LOCAL => _('Local time'),
-//			TIME_TYPE_SERVER => _('Server time'),
-//			TIME_TYPE_HOST => _('Host time')
-//		]))
-//			->setDefault(TIME_TYPE_LOCAL)
-//			->setAction('updateWidgetConfigDialogue()');
+		// Select graph type field.
+		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
+			ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype'),
+		]))
+			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
+			->setAction('updateWidgetConfigDialogue()')
+			->setModern(true);
 
-//		if (array_key_exists('time_type', $this->data)) {
-//			$field_time_type->setValue($this->data['time_type']);
-//		}
+		if (array_key_exists('source_type', $this->data)) {
+			$field_source->setValue($this->data['source_type']);
+		}
 
-//		$this->fields[$field_time_type->getName()] = $field_time_type;
+		$this->fields[$field_source->getName()] = $field_source;
 
-//		// Item field.
-//		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
-//			// Item multiselector with single value.
-//			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
-//				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-//				->setMultiple(false);
+		if (array_key_exists('source_type', $this->data)
+				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			// Select simple graph prototype field.
+			$field_item_prototype = (new CWidgetFieldSelectResource('itemid', _('Simple graph prototype'),
+					WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			;
+			if (array_key_exists('itemid', $this->data)) {
+				$field_item_prototype->setValue($this->data['itemid']);
+			}
 
-//			if (array_key_exists('itemid', $this->data)) {
-//				$field_item->setValue($this->data['itemid']);
-//			}
+			$this->fields[$field_item_prototype->getName()] = $field_item_prototype;
+		}
+		else {
+			// Select graph prototype field.
+			$field_graph_prototype = (new CWidgetFieldSelectResource('graphid', _('Graph prototype'),
+					WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			;
+			if (array_key_exists('graphid', $this->data)) {
+				$field_graph_prototype->setValue($this->data['graphid']);
+			}
 
-//			$this->fields[$field_item->getName()] = $field_item;
-//		}
+			$this->fields[$field_graph_prototype->getName()] = $field_graph_prototype;
+		}
+
+		// Dynamic item.
+		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
+
+		$field_dynamic->setValue(array_key_exists('dynamic', $this->data) ? $this->data['dynamic'] : false);
+
+		$this->fields[$field_dynamic->getName()] = $field_dynamic;
 	}
-
 }

@@ -32,22 +32,46 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $scripts = [];
 
+// Source.
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['source_type']),
+	CWidgetHelper::getRadioButtonList($fields['source_type'])
+);
 
+// Graph prototype.
+if (array_key_exists('graphid', $fields)) {
+	$field = $fields['graphid'];
 
+	// Needed for popup script.
+	$form->addVar($field->getName(), $field->getValue());
 
-// Time type.
-// $form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getComboBox($fields['time_type']));
+	$field_graphid = CWidgetHelper::getSelectResource(
+		$field,
+		($field->getValue() != 0) ? $data['captions']['simple'][$field->getResourceType()][$field->getValue()] : '',
+		$form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getLabel($fields['graphid']), $field_graphid);
+}
 
-// Item.
-// if (array_key_exists('itemid', $fields)) {
-//	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-//		$form->getName()
-//	);
-//	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-//	$scripts[] = $field_itemid->getPostJS();
-// }
+// Item prototype.
+if (array_key_exists('itemid', $fields)) {
+	$field = $fields['itemid'];
 
-CWidgetHelper::appendIteratorFieldsToFormList($form_list);
+	// Needed for popup script.
+	$form->addVar($field->getName(), $field->getValue());
+
+	$field_itemid = CWidgetHelper::getSelectResource(
+		$field,
+		($field->getValue() != 0) ? $data['captions']['simple'][$field->getResourceType()][$field->getValue()] : '',
+		$form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getLabel($fields['itemid']), $field_itemid);
+}
+
+// Dynamic item.
+$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+
+CWidgetHelper::addIteratorFields($form_list, $fields);
 
 $form->addItem($form_list);
 
