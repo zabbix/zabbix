@@ -1533,86 +1533,6 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: resolve_opdata                                                   *
- *                                                                            *
- * Purpose: resolve {EVENT.OPDATA} macro                                      *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
-{
-	int	ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if ('\0' == *event->trigger.opdata)
-	{
-		int			pos = 0;
-		zbx_token_t		token;
-		zbx_uint64_t		itemid;
-		zbx_vector_uint64_t	itemids;
-		zbx_timespec_t		ts;
-
-		ts.sec = time(NULL);
-		ts.ns = 999999999;
-
-		zbx_vector_uint64_create(&itemids);
-		ret = SUCCEED;
-
-		for (; SUCCEED == zbx_token_find(event->trigger.expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
-		{
-			switch (token.type)
-			{
-				case ZBX_TOKEN_OBJECTID:
-					if (SUCCEED != (ret = get_N_itemid(event->trigger.expression + token.loc.l, 1,
-							&itemid)))
-					{
-						zbx_free(*replace_to);
-						goto out;
-					}
-
-					if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
-							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-					{
-						char	*val = NULL;
-
-						zbx_vector_uint64_append(&itemids, itemid);
-
-						if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
-						{
-							if (NULL != *replace_to )
-								*replace_to = zbx_strdcat(*replace_to, ", ");
-
-							*replace_to = zbx_strdcat(*replace_to, val);
-							zbx_free(val);
-						}
-					}
-					ZBX_FALLTHROUGH;
-				case ZBX_TOKEN_USER_MACRO:
-				case ZBX_TOKEN_SIMPLE_MACRO:
-				case ZBX_TOKEN_MACRO:
-					pos = token.loc.r;
-			}
-		}
-out:
-		zbx_vector_uint64_destroy(&itemids);
-	}
-	else
-	{
-		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
-		ret = substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
-				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_escalation_history                                           *
  *                                                                            *
  * Purpose: retrieve escalation history                                       *
@@ -2730,6 +2650,85 @@ static const char	*zbx_dobject_status2str(int st)
 		default:
 			return "UNKNOWN";
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: resolve_opdata                                                   *
+ *                                                                            *
+ * Purpose: resolve {EVENT.OPDATA} macro                                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if ('\0' == *event->trigger.opdata)
+	{
+		int			pos = 0;
+		zbx_token_t		token;
+		zbx_uint64_t		itemid;
+		zbx_vector_uint64_t	itemids;
+		zbx_timespec_t		ts;
+
+		ts.sec = time(NULL);
+		ts.ns = 999999999;
+
+		zbx_vector_uint64_create(&itemids);
+		ret = SUCCEED;
+
+		for (; SUCCEED == zbx_token_find(event->trigger.expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
+		{
+			switch (token.type)
+			{
+				case ZBX_TOKEN_OBJECTID:
+					if (SUCCEED != (ret = get_N_itemid(event->trigger.expression + token.loc.l, 1,
+							&itemid)))
+						goto out;
+
+					if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					{
+						char	*val = NULL;
+
+						zbx_vector_uint64_append(&itemids, itemid);
+
+						if (NULL != *replace_to )
+							*replace_to = zbx_strdcat(*replace_to, ", ");
+
+						if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
+						{
+							*replace_to = zbx_strdcat(*replace_to, val);
+							zbx_free(val);
+						}
+						else
+							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
+					}
+					ZBX_FALLTHROUGH;
+				case ZBX_TOKEN_USER_MACRO:
+				case ZBX_TOKEN_SIMPLE_MACRO:
+				case ZBX_TOKEN_MACRO:
+					pos = token.loc.r;
+			}
+		}
+out:
+		zbx_vector_uint64_destroy(&itemids);
+	}
+	else
+	{
+		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
+		ret = substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
