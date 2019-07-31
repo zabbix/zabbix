@@ -75,6 +75,8 @@ func ParseServerActive() ([]string, error) {
 func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 	var c comms.ZbxConnection
 
+	log.Debugf("connecting to [%s]", s.Address)
+
 	err := c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
 	if err != nil {
 		return nil, err
@@ -82,7 +84,11 @@ func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 
 	defer c.Close()
 
-	err = c.WriteString("{\"request\":\"active checks\",\"host\":\""+agent.Options.Hostname+"\"}", 0)
+	js := "{\"request\":\"active checks\",\"host\":\"" + agent.Options.Hostname + "\"}"
+
+	log.Debugf("sending [%s] to [%s]", js, s.Address)
+
+	err = c.WriteString(js, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +97,8 @@ func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Debugf("got [%s]", string(js))
 
 	return b, nil
 }
@@ -107,8 +115,6 @@ func (s *ServerConnector) refreshActiveChecks() {
 		return
 	}
 	s.lastError = nil
-
-	log.Debugf("got [%s]", string(js))
 
 	var r response
 
