@@ -33,7 +33,7 @@ import (
 	"zabbix/pkg/log"
 )
 
-type ServerConnector struct {
+type Connector struct {
 	input       chan interface{}
 	address     string
 	lastError   error
@@ -41,15 +41,15 @@ type ServerConnector struct {
 	taskManager *scheduler.Manager
 }
 
+type activeChecksRequest struct {
+	Request string `json:"request"`
+	Host    string `json:"host"`
+}
+
 type activeChecksResponse struct {
 	Response string            `json:"response"`
 	Info     string            `json:"info"`
 	Data     []*plugin.Request `json:"data"`
-}
-
-type activeChecksRequest struct {
-	Request string `json:"request"`
-	Host    string `json:"host"`
 }
 
 type agendDataResponse struct {
@@ -82,42 +82,40 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
-func (s *ServerConnector) refreshActiveChecks() {
-	var c comms.ZbxConnection
-
+func (c *Connector) refreshActiveChecks() {
 	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {
-		log.Errf("cannot create active checks request to [%s]: %s", s.address, err)
+		log.Errf("cannot create active checks request to [%s]: %s", c.address, err)
 		return
 	}
 
-	data, err := c.Exchange(s.address, time.Second*time.Duration(agent.Options.Timeout), request)
+	data, err := comms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), request)
 
 	if err != nil {
-		if s.lastError == nil || err.Error() != s.lastError.Error() {
-			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.address, err)
-			s.lastError = err
+		if c.lastError == nil || err.Error() != c.lastError.Error() {
+			log.Warningf("active check configuration update from [%s] started to fail (%s)", c.address, err)
+			c.lastError = err
 
 		}
 		return
 	}
 
-	if s.lastError != nil {
-		log.Warningf("active check configuration update from [%s] is working again", s.address)
-		s.lastError = nil
+	if c.lastError != nil {
+		log.Warningf("active check configuration update from [%s] is working again", c.address)
+		c.lastError = nil
 	}
 
 	var response activeChecksResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Errf("cannot parse list of active checks from [%s]: %s", s.address, err)
+		log.Errf("cannot parse list of active checks from [%s]: %s", c.address, err)
 		return
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			log.Errf("no active checks on server [%s]: %s", s.address, response.Info)
+			log.Errf("no active checks on server [%s]: %s", c.address, response.Info)
 		} else {
 			log.Errf("no active checks on server")
 		}
@@ -130,22 +128,20 @@ func (s *ServerConnector) refreshActiveChecks() {
 		return
 	}
 
-	log.Tracef("started tasks update from [%s]", s.address)
-	s.taskManager.UpdateTasks(s.ResultCache, response.Data)
-	log.Tracef("finished tasks update from [%s]", s.address)
+	log.Tracef("started tasks update from [%s]", c.address)
+	c.taskManager.UpdateTasks(c.ResultCache, response.Data)
+	log.Tracef("finished tasks update from [%s]", c.address)
 }
 
-func (s *ServerConnector) Write(data []byte) (n int, err error) {
-	var c comms.ZbxConnection
-
-	js, err := c.Exchange(s.address, time.Second*time.Duration(agent.Options.Timeout), data)
+func (c *Connector) Write(data []byte) (n int, err error) {
+	b, err := comms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), data)
 	if err != nil {
 		return 0, err
 	}
 
 	var response agendDataResponse
 
-	err = json.Unmarshal(js, &response)
+	err = json.Unmarshal(b, &response)
 	if err != nil {
 		return 0, err
 	}
@@ -161,7 +157,7 @@ func (s *ServerConnector) Write(data []byte) (n int, err error) {
 	return len(data), nil
 }
 
-func (s *ServerConnector) run() {
+func (s *Connector) run() {
 	var start time.Time
 
 	defer log.PanicHook()
@@ -188,20 +184,20 @@ run:
 	monitor.Unregister()
 }
 
-func NewServerConnector(taskManager *scheduler.Manager, address string) *ServerConnector {
-	return &ServerConnector{taskManager: taskManager, address: address}
+func New(taskManager *scheduler.Manager, address string) *Connector {
+	return &Connector{taskManager: taskManager, address: address}
 }
 
-func (s *ServerConnector) init() {
+func (s *Connector) init() {
 	s.input = make(chan interface{})
 }
 
-func (s *ServerConnector) Start() {
+func (s *Connector) Start() {
 	s.init()
 	monitor.Register()
 	go s.run()
 }
 
-func (s *ServerConnector) Stop() {
+func (s *Connector) Stop() {
 	s.input <- nil
 }

@@ -160,10 +160,10 @@ func main() {
 	taskManager.Start()
 
 	resultCaches := make([]*agent.ResultCache, len(addresses))
-	serverConnectors := make([]*serverconnector.ServerConnector, len(addresses))
+	serverConnectors := make([]*serverconnector.Connector, len(addresses))
 
 	for i := 0; i < len(addresses); i++ {
-		serverConnectors[i] = serverconnector.NewServerConnector(taskManager, addresses[i])
+		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
 		resultCaches[i] = agent.NewActiveCache(serverConnectors[i])
 		serverConnectors[i].ResultCache = resultCaches[i]
 

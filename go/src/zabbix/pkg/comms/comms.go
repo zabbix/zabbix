@@ -197,7 +197,9 @@ func (c *ZbxListener) Close() (err error) {
 	return c.ln.Close()
 }
 
-func (c *ZbxConnection) Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
+func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
+	var c ZbxConnection
+
 	log.Debugf("connecting to [%s]", address)
 
 	err := c.Open(address, time.Second*time.Duration(timeout))
