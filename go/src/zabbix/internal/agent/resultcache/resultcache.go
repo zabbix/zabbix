@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package resultcache
 
 import (
 	"crypto/md5"
@@ -26,16 +26,12 @@ import (
 	"encoding/json"
 	"io"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
 )
-
-type OutputController interface {
-	// flushes cache to the specified output writer
-	FlushOutput(w io.Writer) (err error)
-}
 
 type ResultCache struct {
 	input      chan interface{}
@@ -70,7 +66,7 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 		Request:   "agent data",
 		Data:      make([]AgentData, len(c.results)),
 		Sessionid: c.token,
-		Host:      Options.Hostname,
+		Host:      agent.Options.Hostname,
 		Version:   "TODO",
 	}
 
@@ -156,11 +152,11 @@ func (c *ResultCache) Stop() {
 	c.input <- nil
 }
 
-func NewActiveCache(output io.Writer) *ResultCache {
+func NewActive(output io.Writer) *ResultCache {
 	return &ResultCache{output: output, token: newToken()}
 }
 
-func NewPassiveCache() *ResultCache {
+func NewPassive() *ResultCache {
 	return &ResultCache{token: newToken()}
 }
 

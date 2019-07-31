@@ -16,7 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-package agent
+package resultcache
 
 import (
 	"encoding/json"
@@ -57,7 +57,7 @@ func TestResultCache(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	writer := mockWriter{lastid: 1, t: t}
-	cache := NewActiveCache(&writer)
+	cache := NewActive(&writer)
 
 	value := "xyz"
 	result := plugin.Result{
