@@ -17,29 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package resultcache
 
 import (
+	"crypto/md5"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"io"
+	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
 )
 
-type OutputController interface {
-	// flushes cache to the specified output writer
-	FlushOutput(w io.Writer) (err error)
-}
-
 type ResultCache struct {
-	input   chan interface{}
-	output  io.Writer
-	results []*plugin.Result
+	input      chan interface{}
+	output     io.Writer
+	results    []*plugin.Result
+	token      string
+	lastDataID uint64
 }
 
 type AgentData struct {
+	Id          uint64  `json:"id"`
 	Itemid      uint64  `json:"itemid"`
 	LastLogsize *uint64 `json:"lastlogsize,omitempty"`
 	Mtime       *int    `json:"mtime,omitempty"`
@@ -58,18 +61,21 @@ type AgentDataRequest struct {
 }
 
 func (c *ResultCache) flushOutput(w io.Writer) {
-
-	log.Debugf("results %d", len(c.results))
+	log.Debugf("upload history data, %d value(s)", len(c.results))
 	request := AgentDataRequest{
 		Request:   "agent data",
 		Data:      make([]AgentData, len(c.results)),
-		Sessionid: "TODO",
-		Host:      Options.Hostname,
-		Version:   "TOOD",
+		Sessionid: c.token,
+		Host:      agent.Options.Hostname,
+		Version:   "TODO",
 	}
+
+	lastDataID := c.lastDataID
 
 	for i, r := range c.results {
 		d := &request.Data[i]
+		lastDataID++
+		d.Id = lastDataID
 		d.Itemid = r.Itemid
 		d.LastLogsize = r.LastLogsize
 		d.Mtime = r.Mtime
@@ -99,7 +105,7 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 		log.Errf("cannot upload cached history to server: %s", err.Error())
 		return
 	}
-
+	c.lastDataID = lastDataID
 	c.results = make([]*plugin.Result, 0)
 }
 
@@ -129,6 +135,12 @@ func (c *ResultCache) run() {
 	monitor.Unregister()
 }
 
+func newToken() string {
+	h := md5.New()
+	_ = binary.Write(h, binary.LittleEndian, time.Now().UnixNano())
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 func (c *ResultCache) Start() {
 	c.input = make(chan interface{}, 100)
 	c.results = make([]*plugin.Result, 0)
@@ -140,16 +152,12 @@ func (c *ResultCache) Stop() {
 	c.input <- nil
 }
 
-type outputRequest struct {
-	output io.Writer
+func NewActive(output io.Writer) *ResultCache {
+	return &ResultCache{output: output, token: newToken()}
 }
 
-func NewActiveCache(output io.Writer) *ResultCache {
-	return &ResultCache{output: output}
-}
-
-func NewPassiveCache() *ResultCache {
-	return &ResultCache{}
+func NewPassive() *ResultCache {
+	return &ResultCache{token: newToken()}
 }
 
 func (c *ResultCache) FlushOutput(w io.Writer) {

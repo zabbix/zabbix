@@ -16,9 +16,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-package agent
+package resultcache
 
 import (
+	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 	"zabbix/internal/plugin"
@@ -26,19 +28,36 @@ import (
 )
 
 type mockWriter struct {
+	counter int
+	lastid  uint64
+	t       *testing.T
 }
 
 func (w *mockWriter) Write(data []byte) (n int, err error) {
-	log.Debugf("WRITE: %s", string(data))
-	return len(data), nil
+	log.Debugf("%s", string(data))
+	if w.counter&1 != 0 {
+		err = errors.New("mock error")
+	} else {
+		var request AgentDataRequest
+		_ = json.Unmarshal(data, &request)
+		for _, d := range request.Data {
+			if d.Id != w.lastid {
+				w.t.Errorf("Expected %d data id while got %d", w.lastid, d.Id)
+				w.t.Fail()
+			}
+			w.lastid++
+		}
+	}
+
+	w.counter++
+	return
 }
 
 func TestResultCache(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
-	var writer mockWriter
-	cache := NewActiveCache(&writer)
-	cache.Start()
+	writer := mockWriter{lastid: 1, t: t}
+	cache := NewActive(&writer)
 
 	value := "xyz"
 	result := plugin.Result{
@@ -47,14 +66,31 @@ func TestResultCache(t *testing.T) {
 		Ts:     time.Now(),
 	}
 
-	cache.Write(&result)
-	cache.FlushOutput(&writer)
+	cache.write(&result)
+	cache.flushOutput(&writer)
 
-	cache.Write(&result)
-	cache.Write(&result)
-	cache.Flush()
+	cache.write(&result)
+	cache.write(&result)
+	cache.flushOutput(&writer)
 
-	time.Sleep(time.Second)
-	cache.Stop()
+	cache.write(&result)
+	cache.write(&result)
+	cache.write(&result)
+	cache.write(&result)
+	cache.flushOutput(&writer)
+}
 
+func TestToken(t *testing.T) {
+	tokens := make(map[string]bool)
+	for i := 0; i < 100000; i++ {
+		token := newToken()
+		if len(token) != 32 {
+			t.Errorf("Expected token length 32 while got %d", len(token))
+			return
+		}
+		if _, ok := tokens[token]; ok {
+			t.Errorf("Duplicated token detected")
+		}
+		tokens[token] = true
+	}
 }

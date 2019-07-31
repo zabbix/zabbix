@@ -1,10 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = \
-	scheduler \
-	resultcache \
-	serverconnector
-
 all: build
 
 build:

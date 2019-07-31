@@ -498,8 +498,7 @@ func TestTaskCreate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
 	items := []*batchItem{
 		&batchItem{itemid: 1, delay: "151", key: "debug1"},
@@ -529,7 +528,7 @@ func TestTaskCreate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, &cache, items)
 }
 
 func TestTaskUpdate(t *testing.T) {
@@ -543,8 +542,7 @@ func TestTaskUpdate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
 	items := []*batchItem{
 		&batchItem{itemid: 1, delay: "151", key: "debug1"},
@@ -583,7 +581,7 @@ func TestTaskUpdate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, &cache, items)
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
@@ -597,8 +595,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
 	items := []*batchItem{
 		&batchItem{itemid: 1, delay: "151", key: "debug1"},
@@ -639,8 +636,7 @@ func TestTaskDelete(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
 	items := []*batchItem{
 		&batchItem{itemid: 1, delay: "151", key: "debug1"},
@@ -677,7 +673,7 @@ func TestTaskDelete(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 2, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, &cache, items)
 }
 
 func TestSchedule(t *testing.T) {

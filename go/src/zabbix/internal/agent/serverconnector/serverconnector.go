@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 	"zabbix/internal/agent"
+	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
@@ -38,7 +39,7 @@ type Connector struct {
 	input       chan interface{}
 	address     string
 	lastError   error
-	resultCache *agent.ResultCache
+	resultCache *resultcache.ResultCache
 	taskManager scheduler.Scheduler
 }
 
@@ -188,7 +189,7 @@ run:
 func New(taskManager *scheduler.Manager, address string) *Connector {
 	c := &Connector{taskManager: taskManager, address: address}
 	c.init()
-	c.resultCache = agent.NewActiveCache(c)
+	c.resultCache = resultcache.NewActive(c)
 
 	return c
 }
