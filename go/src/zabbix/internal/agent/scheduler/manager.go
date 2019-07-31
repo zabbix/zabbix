@@ -47,7 +47,7 @@ type Scheduler interface {
 	FinishTask(task performer)
 }
 
-func (m *Manager) processUpdateRequest(update *updateRequest) {
+func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
 	// TODO: client expiry - remove unused owners after tiemout (day+?)
@@ -58,7 +58,6 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 		m.clients[update.clientID] = requestClient
 	}
 
-	now := time.Now()
 	for _, r := range update.requests {
 		var key string
 		var err error
@@ -162,7 +161,7 @@ run:
 			}
 			switch v.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v.(*updateRequest))
+				m.processUpdateRequest(v.(*updateRequest), time.Now())
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v.(performer))

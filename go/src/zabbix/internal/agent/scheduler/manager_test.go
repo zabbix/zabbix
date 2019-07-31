@@ -204,6 +204,10 @@ func (m *mockManager) mockInit(t *testing.T) {
 	m.now = m.startTime
 }
 
+func (m *mockManager) update(update *updateRequest) {
+	m.processUpdateRequest(update, m.now)
+}
+
 func (m *mockManager) mockTasks() {
 	for _, p := range m.plugins {
 		tasks := p.tasks
@@ -525,7 +529,7 @@ func TestTaskCreate(t *testing.T) {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
 
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
@@ -569,7 +573,7 @@ func TestTaskUpdate(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	for _, item := range items {
 		item.delay = "10" + item.delay
@@ -579,7 +583,7 @@ func TestTaskUpdate(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
@@ -616,14 +620,14 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	items[0].delay = "xyz"
 	update.requests = update.requests[:0]
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 1 {
 		t.Errorf("Expected %d plugins queued while got %d", 1, len(manager.queue))
@@ -665,7 +669,7 @@ func TestTaskDelete(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	items[2] = items[6]
 	items = items[:cap(items)-4]
@@ -673,7 +677,7 @@ func TestTaskDelete(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 2 {
 		t.Errorf("Expected %d plugins queued while got %d", 2, len(manager.queue))
@@ -717,7 +721,7 @@ func TestSchedule(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 
 	manager.iterate(t, 20)
@@ -762,7 +766,7 @@ func TestScheduleCapacity(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 
 	manager.iterate(t, 10)
@@ -804,25 +808,25 @@ func TestScheduleUpdate(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -859,7 +863,7 @@ func TestCollectorSchedule(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 20)
 	manager.checkPluginTimeline(t, plugins, calls, 20)
@@ -900,31 +904,31 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[1:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -965,49 +969,49 @@ func TestRunner(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[1:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[1:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1067,7 +1071,7 @@ func TestWatcher(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1077,7 +1081,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:6])
 
 	update.requests = update.requests[:5]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1087,7 +1091,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:5])
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1096,7 +1100,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:3])
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1105,7 +1109,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:2])
 
 	update.requests = update.requests[:6]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1147,7 +1151,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 10)
 
@@ -1192,7 +1196,7 @@ func TestRunnerWatcher(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1202,7 +1206,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:6])
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1211,7 +1215,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:3])
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1219,13 +1223,13 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[0], update.requests[0:1])
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[1:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1233,7 +1237,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[:2])
 
 	update.requests = update.requests[2:5]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1271,21 +1275,21 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	update.clientID = 2
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.clientID = 1
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1323,39 +1327,103 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	for _, item := range items {
 		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	update.clientID = 2
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.clientID = 1
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	update.clientID = 2
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.clientID = 1
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:1]
 	update.clientID = 2
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.clientID = 1
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
+}
 
+func TestPassiveRunner(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	manager := mockManager{sink: make(chan performer, 10)}
+	plugin.ClearRegistry()
+	plugins := make([]plugin.Accessor, 3)
+	for i := range plugins {
+		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
+		name := fmt.Sprintf("debug%d", i+1)
+		plugin.RegisterMetric(plugins[i], name, name, "")
+	}
+	manager.mockInit(t)
+
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
+	}
+
+	calls := []map[string][]int{
+		map[string][]int{"$start": []int{1}, "$stop": []int{}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*49 + 1}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*25 + 1}},
+	}
+
+	var cache resultCacheMock
+	update := updateRequest{
+		clientID: 0,
+		sink:     &cache,
+		requests: make([]*plugin.Request, 0),
+	}
+
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+	}
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600)
+	manager.checkPluginTimeline(t, plugins, calls, 3600)
+
+	update.requests = update.requests[:0]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600)
+	manager.checkPluginTimeline(t, plugins, calls, 3600)
+
+	update.requests = update.requests[:2]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600*23)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*23)
+
+	update.requests = update.requests[:1]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600*24)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*24)
+
+	update.requests = update.requests[:1]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 1)
+	manager.checkPluginTimeline(t, plugins, calls, 1)
 }
