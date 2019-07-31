@@ -84,6 +84,10 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
+func (c *Connector) GetAddr() (s string) {
+	return c.address
+}
+
 func (c *Connector) refreshActiveChecks() {
 	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {

@@ -35,10 +35,11 @@ import (
 
 type ResultCache struct {
 	input      chan interface{}
-	output     io.Writer
+	output     Uploader
 	results    []*plugin.Result
 	token      string
 	lastDataID uint64
+	lastError  error
 }
 
 type AgentData struct {
@@ -60,7 +61,12 @@ type AgentDataRequest struct {
 	Version   string      `json:"version"`
 }
 
-func (c *ResultCache) flushOutput(w io.Writer) {
+type Uploader interface {
+	Write(p []byte) (n int, err error)
+	GetAddr() (s string)
+}
+
+func (c *ResultCache) flushOutput(w Uploader) {
 	log.Debugf("upload history data, %d value(s)", len(c.results))
 	request := AgentDataRequest{
 		Request:   "agent data",
@@ -102,9 +108,19 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 		w = c.output
 	}
 	if _, err = w.Write(data); err != nil {
-		log.Errf("cannot upload cached history to server: %s", err.Error())
+		if c.lastError == nil || err.Error() != c.lastError.Error() {
+			log.Warningf("active check data upload to [%s] started to fail: (%s)", w.GetAddr(), err)
+			c.lastError = err
+		}
+
 		return
 	}
+
+	if c.lastError != nil {
+		log.Warningf("active check data upload to [%s] is working again", w.GetAddr())
+		c.lastError = nil
+	}
+
 	c.lastDataID = lastDataID
 	c.results = make([]*plugin.Result, 0)
 }
@@ -123,8 +139,8 @@ func (c *ResultCache) run() {
 			break
 		}
 		switch v.(type) {
-		case io.Writer:
-			c.flushOutput(v.(io.Writer))
+		case Uploader:
+			c.flushOutput(v.(Uploader))
 		case *plugin.Result:
 			r := v.(*plugin.Result)
 			c.write(r)
@@ -152,7 +168,7 @@ func (c *ResultCache) Stop() {
 	c.input <- nil
 }
 
-func NewActive(output io.Writer) *ResultCache {
+func NewActive(output Uploader) *ResultCache {
 	return &ResultCache{output: output, token: newToken()}
 }
 
