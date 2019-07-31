@@ -93,6 +93,7 @@ func (s *ServerConnector) getActiveChecks() ([]byte, error) {
 		return nil, err
 	}
 
+	log.Debugf("before read")
 	b, err := c.Read(0)
 	if err != nil {
 		return nil, err
@@ -143,7 +144,9 @@ func (s *ServerConnector) refreshActiveChecks() {
 		return
 	}
 
+	log.Tracef("started tasks update from [%s]", s.Address)
 	s.TaskManager.UpdateTasks(s.ResultCache, r.Data)
+	log.Tracef("finished tasks update from [%s]", s.Address)
 }
 
 func (s *ServerConnector) Write(data []byte) (n int, err error) {
@@ -201,7 +204,9 @@ run:
 		case <-ticker.C:
 			s.ResultCache.Flush()
 			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
+				log.Debugf("started active checks refresh from [%s]", s.Address)
 				s.refreshActiveChecks()
+				log.Debugf("finished active checks refresh from [%s]", s.Address)
 				start = time.Now()
 			}
 		case <-s.input:
