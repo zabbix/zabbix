@@ -2662,10 +2662,8 @@ static const char	*zbx_dobject_status2str(int st)
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
+static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error, int maxerrlen)
 {
-	int	ret;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if ('\0' == *event->trigger.opdata)
@@ -2680,35 +2678,38 @@ static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error,
 		ts.ns = 999999999;
 
 		zbx_vector_uint64_create(&itemids);
-		ret = SUCCEED;
 
 		for (; SUCCEED == zbx_token_find(event->trigger.expression, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 		{
 			switch (token.type)
 			{
 				case ZBX_TOKEN_OBJECTID:
-					if (SUCCEED != (ret = get_N_itemid(event->trigger.expression + token.loc.l, 1,
-							&itemid)))
-						goto out;
-
-					if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
-							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					if (SUCCEED == get_N_itemid(event->trigger.expression + token.loc.l, 1,
+							&itemid))
 					{
-						char	*val = NULL;
-
-						zbx_vector_uint64_append(&itemids, itemid);
-
-						if (NULL != *replace_to )
-							*replace_to = zbx_strdcat(*replace_to, ", ");
-
-						if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
+						if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
+								ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 						{
-							*replace_to = zbx_strdcat(*replace_to, val);
-							zbx_free(val);
+							char	*val = NULL;
+
+							zbx_vector_uint64_append(&itemids, itemid);
+
+							if (NULL != *replace_to)
+								*replace_to = zbx_strdcat(*replace_to, ", ");
+
+							if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
+							{
+								*replace_to = zbx_strdcat(*replace_to, val);
+								zbx_free(val);
+							}
+							else
+							{
+								*replace_to = zbx_strdcat(*replace_to,
+										STR_UNKNOWN_VARIABLE);
+							}
 						}
-						else
-							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
 					}
+
 					ZBX_FALLTHROUGH;
 				case ZBX_TOKEN_USER_MACRO:
 				case ZBX_TOKEN_SIMPLE_MACRO:
@@ -2716,19 +2717,17 @@ static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error,
 					pos = token.loc.r;
 			}
 		}
-out:
+
 		zbx_vector_uint64_destroy(&itemids);
 	}
 	else
 	{
 		*replace_to = zbx_strdup(*replace_to, event->trigger.opdata);
-		ret = substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, replace_to,
 				MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -2903,7 +2902,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
 				{
-					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
+					resolve_opdata(c_event, &replace_to, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
@@ -3207,7 +3206,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
 				{
-					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
+					resolve_opdata(c_event, &replace_to, error, maxerrlen);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -3599,7 +3598,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_OPDATA))
 				{
-					ret = resolve_opdata(c_event, &replace_to, error, maxerrlen);
+					resolve_opdata(c_event, &replace_to, error, maxerrlen);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
