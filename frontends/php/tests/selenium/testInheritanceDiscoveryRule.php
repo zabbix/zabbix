@@ -161,8 +161,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				if (array_key_exists('macros', $data)) {
 					$this->zbxTestTabSwitch('LLD macros');
 					foreach ($data['macros'] as $i => $lld_macro) {
-						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_lld_macro"][@value="'.$lld_macro['macro'].'"][@readonly]');
-						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_path"][@value="'.$lld_macro['path'].'"][@readonly]');
+						$this->zbxTestAssertElementPresentXpath('//textarea[@id="lld_macro_paths_'.$i.'_lld_macro"][contains(text(),"'.$lld_macro['macro'].'")][@readonly]');
+						$this->zbxTestAssertElementPresentXpath('//textarea[@id="lld_macro_paths_'.$i.'_path"][contains(text(),"'.$lld_macro['path'].'")][@readonly]');
 					}
 				}
 				break;

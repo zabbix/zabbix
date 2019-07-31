@@ -200,8 +200,8 @@ class testInheritanceTrigger extends CLegacyWebTest {
 
 		foreach ($array as $count => $tag){
 			$row = $tags_table->getRows()->get($count);
-			$row->getColumn('Name')->query('tag:input')->one()->fill($tag['name']);
-			$row->getColumn('Value')->query('tag:input')->one()->fill($tag['value']);
+			$row->getColumn('Name')->query('tag:textarea')->one()->fill($tag['name']);
+			$row->getColumn('Value')->query('tag:textarea')->one()->fill($tag['value']);
 			if ($count !== $last) {
 				$button->click();
 			}

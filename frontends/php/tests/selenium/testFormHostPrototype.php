@@ -68,12 +68,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
 		foreach ($macros as $macro) {
 			// Macro check and row selection.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//input[@class="macro"][@readonly][@value="'.
-							$macro['macro'].'"]/../..')
+			$element = $this->webDriver->findElement(WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"][@readonly][contains(text(),"'.
+							$macro['macro'].'")]/../..')
 			);
 			// Effective value.
 			$this->assertEquals($macro['value'], $element->findElement(
-							WebDriverBy::xpath('./td[3]/input[@type="text"][@readonly]')
+							WebDriverBy::xpath('./td[3]/textarea[@readonly]')
 					)->getAttribute('value'));
 
 			// Template value.
@@ -86,7 +86,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Total macro count.
 		$this->assertEquals(count($macros), count($this->webDriver->findElements(
-								WebDriverBy::xpath('//input[@class="macro"]')
+								WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"]')
 		)));
 
 		// Check layout at Encryption tab.

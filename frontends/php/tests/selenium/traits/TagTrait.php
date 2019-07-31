@@ -35,12 +35,12 @@ trait TagTrait {
 			'mapping' => [
 				'Name' => [
 					'name' => 'name',
-					'selector' => 'xpath:./input',
+					'selector' => 'xpath:./textarea',
 					'class' => 'CElement'
 				],
 				'Value' => [
 					'name' => 'value',
-					'selector' => 'xpath:./input',
+					'selector' => 'xpath:./textarea',
 					'class' => 'CElement'
 				]
 			]

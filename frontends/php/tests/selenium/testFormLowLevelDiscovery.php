@@ -2177,8 +2177,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		foreach ($data['macros'] as $i => $lld_macro) {
 			$row = $macros_table->getRows()->get($i);
-			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
-			$row->getColumn('JSONPath')->query('tag:input')->one()->fill($lld_macro['path']);
+			$row->getColumn('LLD macro')->query('tag:textarea')->one()->fill($lld_macro['macro']);
+			$row->getColumn('JSONPath')->query('tag:textarea')->one()->fill($lld_macro['path']);
 
 			if ($i !== $last) {
 				$button->click();
@@ -2229,9 +2229,9 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$row = $table->getRows()->get($i);
 
 			$this->assertEquals($lld_macro['macro'],
-					$row->getColumn('LLD macro')->query('tag:input')->one()->getValue()
+					$row->getColumn('LLD macro')->query('tag:textarea')->one()->getValue()
 			);
-			$this->assertEquals($lld_macro['path'], $row->getColumn('JSONPath')->query('tag:input')->one()->getValue());
+			$this->assertEquals($lld_macro['path'], $row->getColumn('JSONPath')->query('tag:textarea')->one()->getValue());
 		}
 	}
 }
