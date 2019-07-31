@@ -60,7 +60,7 @@ func (l *ServerListener) processConnection(conn *comms.ZbxConnection) (err error
 		return l.processRequest(conn, data)
 	}
 
-	log.Debugf("recived passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
+	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: l.Scheduler}
 	go response.handleCheck(data)
 
