@@ -1580,7 +1580,7 @@ static int	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error,
 
 						zbx_vector_uint64_append(&itemids, itemid);
 
-						if (SUCCEED == (ret = DBitem_get_value(itemid, &val, 0, &ts)))
+						if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
 						{
 							if (NULL != *replace_to )
 								*replace_to = zbx_strdcat(*replace_to, ", ");
