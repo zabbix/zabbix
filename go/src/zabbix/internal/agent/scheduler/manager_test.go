@@ -535,7 +535,7 @@ func TestTaskCreate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, 1, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdate(t *testing.T) {
@@ -589,7 +589,7 @@ func TestTaskUpdate(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, 1, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
@@ -683,7 +683,7 @@ func TestTaskDelete(t *testing.T) {
 		t.Errorf("Expected %d plugins queued while got %d", 2, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, 1, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestSchedule(t *testing.T) {
