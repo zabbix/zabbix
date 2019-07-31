@@ -27,35 +27,105 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$this->setType(WIDGET_GRAPH_PROTOTYPE);
 		$this->setValidationRules([
 			'name' => 'string',
-			'uniqueid' => 'required|string',
-//			'widgetid' => 'required|string',
-			'initial_load' => 'in 0,1',
-			'edit_mode' => 'in 0,1',
-			'dashboardid' => 'db dashboard.dashboardid',
 			'fields' => 'json',
 			'dynamic_hostid' => 'db hosts.hostid',
-			'dynamic_groupid' => 'db hosts.hostid',
 		]);
 	}
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
+		if ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+			$return = $this->doGraphPrototype();
+		} elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			$return = $this->doSimpleGraphPrototype();
+		} else {
+			error(_('Page received incorrect data'));
+		}
 
+		if (($messages = getMessages()) !== null) {
+			$return = ['messages' => $messages->toString()];
+		}
 
-		$dynamic_widget_name = $this->getDefaultHeader();
-		$same_host = true;
+		echo (new CJson())->encode($return);
+	}
 
+	protected function doGraphPrototype() {
+		$fields = $this->getForm()->getFieldsData();
 
-
-
-
-
+		$options = [
+			'output' => ['graphid', 'name'],
+			'selectHosts' => ['name'],
+			'selectDiscoveryRule' => ['hostid']
+		];
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
+		if ($fields['dynamic'] && $dynamic_hostid) {
+			// The key of the actual graph prototype selected on widget's edit form.
+			$graph_prototype = API::GraphPrototype()->get([
+				'output' => ['name'],
+				'graphids' => [$fields['graphid']]
+			]);
+			$graph_prototype = reset($graph_prototype);
 
-		$created_items_resolved = [];
+			// Analog graph prototype for the selected dynamic host.
+			$options['hostids'] = [$dynamic_hostid];
+			$options['filter'] = ['name' => $graph_prototype['name']];
+		}
+		else {
+			// Just fetch the item prototype selected on widget's edit form.
+			$options['graphids'] = [$fields['graphid']];
+		}
+
+		// Use this graph prototype as base for collecting created graphs.
+		$graph_prototype = API::GraphPrototype()->get($options);
+		$graph_prototype = reset($graph_prototype);
+
+		$graphs_collected = [];
+
+		if ($graph_prototype) {
+			$graphs_created_all = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
+				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'expandName' => true
+			]);
+
+			// Collect graphs based on the graph prototype.
+			foreach ($graphs_created_all as $graph) {
+				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
+					$graphs_collected[$graph['graphid']] = $graph['name'];
+				}
+			}
+			natsort($graphs_collected);
+		}
+
+		$widgets_of_iterator = [];
+
+		foreach ($graphs_collected as $graphid => $name) {
+			$widgets_of_iterator[] = [
+				'widgetid' => (string) $graphid,
+				'type' => 'graph',
+				'header' => $name,
+				'fields' => [
+					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
+					'graphid' => $graphid,
+				]
+			];
+		}
+
+		return [
+			'header' =>
+				$this->getInput('name', $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name']),
+
+			'widgets_of_iterator' => $widgets_of_iterator
+		];
+	}
+
+	protected function doSimpleGraphPrototype() {
+		$fields = $this->getForm()->getFieldsData();
 
 		$options = [
 			'output' => ['itemid', 'name'],
@@ -63,77 +133,71 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'selectDiscoveryRule' => ['hostid']
 		];
 
+		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
+
 		if ($fields['dynamic'] && $dynamic_hostid) {
+			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
 				'itemids' => [$fields['itemid']]
 			]);
 			$item_prototype = reset($item_prototype);
 
+			// Analog item prototype for the selected dynamic host.
 			$options['hostids'] = [$dynamic_hostid];
 			$options['filter'] = ['key_' => $item_prototype['key_']];
 		}
 		else {
+			// Just fetch the item prototype selected on widget's edit form.
 			$options['itemids'] = [$fields['itemid']];
 		}
 
+		// Use this item prototype as base for collecting created items.
 		$item_prototype = API::ItemPrototype()->get($options);
 		$item_prototype = reset($item_prototype);
 
+		$items_collected = [];
+
 		if ($item_prototype) {
-			// get all created (discovered) items for current host
-			$allCreatedItems = API::Item()->get([
+			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name', 'key_', 'hostid'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
 				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
 			]);
 
-			// collect those items where parent item is item prototype selected for this screen item as resource
-			$created_items = [];
-			foreach ($allCreatedItems as $item) {
-				if ($item['itemDiscovery']['parent_itemid'] == $item_prototype['itemid']) {
-					$created_items[] = $item;
+			// Collect items based on the item prototype.
+			$items_created = [];
+			foreach ($items_created_all as $item) {
+				if ($item['itemDiscovery']['parent_itemid'] === $item_prototype['itemid']) {
+					$items_created[] = $item;
 				}
 			}
-
-			foreach (CMacrosResolverHelper::resolveItemNames($created_items) as $item) {
-				$created_items_resolved[$item['itemid']] = $item['name_expanded'];
+			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
+				$items_collected[$item['itemid']] = $item['name_expanded'];
 			}
-			natsort($created_items_resolved);
+			natsort($items_collected);
 		}
 
+		$widgets_of_iterator = [];
 
-
-		$dynamic_widget_name = $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
-
-
-
-
-
-		$widgets = [];
-
-		foreach ($created_items_resolved as $itemid => $name) {
-			$widgets[] = [
-				"widgetid" => (string) $itemid,
-				"type" => "graph",
-				"header" => $name,
-				"scrollable" => false,
-				"padding" => true,
-				"fields" => [
-					'source_type' => 1,
+		foreach ($items_collected as $itemid => $name) {
+			$widgets_of_iterator[] = [
+				'widgetid' => (string) $itemid,
+				'type' => 'graph',
+				'header' => $name,
+				'fields' => [
+					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
 					'itemid' => $itemid,
-				],
+				]
 			];
 		}
 
-		$output = [
-			'header' => $this->getInput('name', $dynamic_widget_name),
-			'widgets_of_iterator' => $widgets,
+		return [
+			'header' =>
+				$this->getInput('name', $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name']),
+
+			'widgets_of_iterator' => $widgets_of_iterator
 		];
-
-//		usleep(500000);
-
-		echo (new CJson())->encode($output);
 	}
 }

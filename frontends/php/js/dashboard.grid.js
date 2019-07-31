@@ -86,7 +86,6 @@
 		}
 
 		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + _add_class});
-		widget['content_script'] = $('<div>');
 
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container' + _add_class})
 			.toggleClass('no-padding', !widget['padding'])
@@ -98,14 +97,20 @@
 		;
 
 		if (widget['iterator']) {
-			widget['container'].append($('<div>', {'class': 'dashbrd-grid-widget-iterator-too-small'})
-				.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
-			);
+			widget['container']
+				.append($('<div>', {'class': 'dashbrd-grid-widget-iterator-too-small'})
+					.append($('<div>')
+						.html(t('Widget is too small for the specified number of columns and rows.'))
+					)
+				)
+			;
 		}
-
-		widget['container']
-			.append(widget['content_script'])
-		;
+		else {
+			widget['content_script'] = $('<div>');
+			widget['container']
+				.append(widget['content_script'])
+			;
+		}
 
 		var $div = $('<div>', {
 			'class': widget['iterator'] ? 'dashbrd-grid-widget-iterator' : 'dashbrd-grid-widget'
@@ -178,7 +183,7 @@
 			data.new_widget_placeholder.container.show();
 		}
 
-		if (typeof(min_rows) != 'undefined' && data['options']['rows'] < min_rows) {
+		if (typeof min_rows !== 'undefined' && data['options']['rows'] < min_rows) {
 			data['options']['rows'] = min_rows;
 		}
 
@@ -1195,7 +1200,7 @@
 	}
 
 	function showPreloader(widget) {
-		if (typeof(widget['preloader_div']) == 'undefined') {
+		if (typeof widget['preloader_div'] === 'undefined') {
 			widget['preloader_div'] = $('<div>')
 				.addClass('preloader-container')
 				.append($('<div>').addClass('preloader'));
@@ -1205,14 +1210,14 @@
 	}
 
 	function hidePreloader(widget) {
-		if (typeof(widget['preloader_div']) != 'undefined') {
+		if (typeof widget['preloader_div'] !== 'undefined') {
 			widget['preloader_div'].remove();
 			delete widget['preloader_div'];
 		}
 	}
 
 	function startPreloader(widget) {
-		if (typeof(widget['preloader_timeoutid']) != 'undefined' || typeof(widget['preloader_div']) != 'undefined') {
+		if (typeof widget['preloader_timeoutid'] !== 'undefined' || typeof widget['preloader_div'] !== 'undefined') {
 			return;
 		}
 
@@ -1220,18 +1225,18 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['content_body'].fadeTo(widget['preloader_fadespeed'], 0.4);
+			widget['content_body'].stop(true, true).fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
 	function stopPreloader(widget) {
-		if (typeof(widget['preloader_timeoutid']) != 'undefined') {
+		if (typeof widget['preloader_timeoutid'] !== 'undefined') {
 			clearTimeout(widget['preloader_timeoutid']);
 			delete widget['preloader_timeoutid'];
 		}
 
 		hidePreloader(widget);
-		widget['content_body'].fadeTo(0, 1);
+		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
 	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
@@ -1260,7 +1265,7 @@
 	}
 
 	function startWidgetRefresh($obj, data, widget) {
-		if (typeof(widget['rf_timeoutid']) != 'undefined') {
+		if (typeof widget['rf_timeoutid'] !== 'undefined') {
 			stopWidgetRefreshTimer(widget);
 		}
 
@@ -1304,6 +1309,9 @@
 
 		if (getIteratorTooSmallState(iterator) && iterator['update_pending']) {
 			setIteratorTooSmallState(iterator, false);
+
+			showPreloader(iterator);
+
 			updateWidgetContent($obj, data, iterator);
 
 			return;
@@ -1380,6 +1388,7 @@
 
 	function updateWidgetIteratorCallback($obj, data, iterator, response) {
 		stopPreloader(iterator);
+
 		var $content_header = $('h4', iterator['content_header']);
 
 		$content_header.text(response.header);
@@ -1391,25 +1400,42 @@
 		iterator['content_body'].empty();
 		iterator['widgets_of_iterator'] = [];
 
-		var widgets_of_iterator = response.widgets_of_iterator.slice(0,
-			numIteratorColumns(iterator) * numIteratorRows(iterator)
-		);
+		if (getIteratorTooSmallState(iterator)) {
+			iterator['update_pending'] = true;
+		}
+		else if (typeof response.messages !== 'undefined') {
+			iterator['div'].addClass('iterator-messages');
 
-		$.each(widgets_of_iterator, function(index, widget_of_iterator) {
-			addWidgetOfIterator($obj, data, iterator, widget_of_iterator);
-		});
+			iterator['content_body'].append(response.messages);
+		}
+		else {
+			iterator['div'].removeClass('iterator-messages');
 
-		addIteratorPlaceholders(iterator,
-			numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['widgets_of_iterator'].length
-		);
+			if (getIteratorTooSmallState(iterator)) {
+				iterator['update_pending'] = true;
+			}
+			else {
+				var widgets_of_iterator = response.widgets_of_iterator.slice(0,
+					numIteratorColumns(iterator) * numIteratorRows(iterator)
+				);
 
-		positionWidgetsOfIterator($obj, data, iterator,
-			(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
-		);
+				$.each(widgets_of_iterator, function(index, widget_of_iterator) {
+					addWidgetOfIterator($obj, data, iterator, widget_of_iterator);
+				});
 
-		$.each(iterator['widgets_of_iterator'], function(index, widget_of_iterator) {
-			updateWidgetContent($obj, data, widget_of_iterator);
-		});
+				addIteratorPlaceholders(iterator,
+					numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['widgets_of_iterator'].length
+				);
+
+				positionWidgetsOfIterator($obj, data, iterator,
+					(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
+				);
+
+				$.each(iterator['widgets_of_iterator'], function(index, widget_of_iterator) {
+					updateWidgetContent($obj, data, widget_of_iterator);
+				});
+			}
+		}
 
 		if (iterator['update_attempts'] == 1) {
 			iterator['update_attempts'] = 0;
@@ -1424,6 +1450,7 @@
 
 	function updateWidgetCallback($obj, data, widget, response) {
 		stopPreloader(widget);
+
 		var $content_header = $('h4', widget['content_header']),
 			debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
 
@@ -1434,23 +1461,23 @@
 		}
 
 		widget['content_body'].empty();
-		if (typeof(response.messages) !== 'undefined') {
+		if (typeof response.messages !== 'undefined') {
 			widget['content_body'].append(response.messages);
 		}
 		widget['content_body'].append(response.body).css('overflow', '');
 
-		if (typeof(response.debug) !== 'undefined') {
+		if (typeof response.debug !== 'undefined') {
 			$(response.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 		}
 
 		removeWidgetInfoButtons(widget['content_header']);
-		if (typeof(response.info) !== 'undefined' && data['options']['edit_mode'] === false) {
+		if (typeof response.info !== 'undefined' && data['options']['edit_mode'] === false) {
 			addWidgetInfoButtons(widget['content_header'], response.info);
 		}
 
 		// Creates new script elements and removes previous ones to force their re-execution.
 		widget['content_script'].empty();
-		if (typeof(response.script_inline) !== 'undefined') {
+		if (typeof response.script_inline !== 'undefined') {
 			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
 			var new_script = $('<script>')
 				.text(response.script_inline);
@@ -1487,6 +1514,8 @@
 				// 1. Put the Iterator into "too small" state.
 				// 2. Set the Iterator to reload the contents as soon as it is shown again.
 
+				stopPreloader(widget);
+
 				setIteratorTooSmallState(widget, true);
 				widget['update_pending'] = true;
 
@@ -1500,7 +1529,8 @@
 			}
 		}
 
-		if (widget['scrollable'] == false) {
+		if (!widget['scrollable']) {
+			// For Internet Explorer 11 to calculate content_body size properly.
 			widget['content_body'].css('overflow', 'hidden');
 		}
 
@@ -1530,11 +1560,10 @@
 		if (widget['header'] !== '') {
 			ajax_data['name'] = widget['header'];
 		}
-		// display widget with yet unsaved changes
 		if (typeof widget['fields'] !== 'undefined' && Object.keys(widget['fields']).length != 0) {
 			ajax_data['fields'] = JSON.stringify(widget['fields']);
 		}
-		if (typeof(widget['dynamic']) !== 'undefined') {
+		if (typeof widget['dynamic'] !== 'undefined') {
 			ajax_data['dynamic_hostid'] = widget['dynamic']['hostid'];
 			ajax_data['dynamic_groupid'] = widget['dynamic']['groupid'];
 		}
@@ -1579,7 +1608,7 @@
 	}
 
 	function refreshWidget($obj, data, widget) {
-		if (typeof(widget['rf_timeoutid']) !== 'undefined') {
+		if (typeof widget['rf_timeoutid'] !== 'undefined') {
 			stopWidgetRefreshTimer(widget);
 		}
 
@@ -1650,7 +1679,7 @@
 			dataType: 'json',
 			data: ajax_data,
 			success: function(resp) {
-				if (typeof(resp.errors) !== 'undefined') {
+				if (typeof resp.errors !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
@@ -2166,7 +2195,7 @@
 
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
-		if (typeof(widget['fields']['dynamic']) !== 'undefined' && widget['fields']['dynamic'] === '1') {
+		if (typeof widget['fields']['dynamic'] !== 'undefined' && widget['fields']['dynamic'] === '1') {
 			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
 					'hostid': data['dashboard']['dynamic']['hostid'],
@@ -2177,7 +2206,7 @@
 				delete widget['dynamic'];
 			}
 		}
-		else if (typeof(widget['dynamic']) !== 'undefined') {
+		else if (typeof widget['dynamic'] !== 'undefined') {
 			delete widget['dynamic'];
 		}
 	}
@@ -2210,7 +2239,7 @@
 	 * @return int                Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
-		if (typeof(data['triggers'][hook_name]) === 'undefined') {
+		if (typeof data['triggers'][hook_name] === 'undefined') {
 			return 0;
 		}
 		var triggers = [];
@@ -2226,8 +2255,8 @@
 			});
 		}
 		triggers.sort(function(a,b) {
-			var priority_a = (typeof(a['options']['priority']) !== 'undefined') ? a['options']['priority'] : 10;
-			var priority_b = (typeof(b['options']['priority']) !== 'undefined') ? b['options']['priority'] : 10;
+			var priority_a = (typeof a['options']['priority'] !== 'undefined') ? a['options']['priority'] : 10;
+			var priority_b = (typeof b['options']['priority'] !== 'undefined') ? b['options']['priority'] : 10;
 
 			if (priority_a < priority_b) {
 				return -1;
@@ -2239,17 +2268,17 @@
 		});
 
 		$.each(triggers, function(index, trigger) {
-			if (typeof(window[trigger['function']]) !== typeof(Function)) {
+			if (typeof window[trigger['function']] !== typeof Function) {
 				return true;
 			}
 
 			var params = [];
-			if (typeof(trigger['options']['parameters']) !== 'undefined') {
+			if (typeof trigger['options']['parameters'] !== 'undefined') {
 				params = trigger['options']['parameters'];
 			}
-			if (typeof(trigger['options']['grid']) !== 'undefined') {
+			if (typeof trigger['options']['grid'] !== 'undefined') {
 				var grid = {};
-				if (typeof(trigger['options']['grid']['widget']) !== 'undefined'
+				if (typeof trigger['options']['grid']['widget'] !== 'undefined'
 						&& trigger['options']['grid']['widget']
 				) {
 					if (widget === null) {
@@ -2263,10 +2292,10 @@
 						grid['widget'] = widget;
 					}
 				}
-				if (typeof(trigger['options']['grid']['data']) !== 'undefined' && trigger['options']['grid']['data']) {
+				if (typeof trigger['options']['grid']['data'] !== 'undefined' && trigger['options']['grid']['data']) {
 					grid['data'] = data;
 				}
-				if (typeof(trigger['options']['grid']['obj']) !== 'undefined' && trigger['options']['grid']['obj']) {
+				if (typeof trigger['options']['grid']['obj'] !== 'undefined' && trigger['options']['grid']['obj']) {
 					grid['obj'] = $obj;
 				}
 				params.push(grid);
@@ -2696,10 +2725,10 @@
 					success: function(resp) {
 						body.empty();
 						body.append(resp.body);
-						if (typeof(resp.debug) !== 'undefined') {
+						if (typeof resp.debug !== 'undefined') {
 							body.append(resp.debug);
 						}
-						if (typeof(resp.messages) !== 'undefined') {
+						if (typeof resp.messages !== 'undefined') {
 							body.append(resp.messages);
 						}
 
@@ -2980,15 +3009,15 @@
 					found = false,
 					trigger_name = null;
 
-				if (typeof(data['triggers'][hook_name]) === 'undefined') {
+				if (typeof data['triggers'][hook_name] === 'undefined') {
 					data['triggers'][hook_name] = [];
 				}
 
 				// Add trigger with each name only once.
-				if (typeof(options['trigger_name']) !== 'undefined') {
+				if (typeof options['trigger_name'] !== 'undefined') {
 					trigger_name = options['trigger_name'];
 					$.each(data['triggers'][hook_name], function(index, trigger) {
-						if (typeof(trigger['options']['trigger_name']) !== 'undefined'
+						if (typeof trigger['options']['trigger_name'] !== 'undefined'
 							&& trigger['options']['trigger_name'] === trigger_name)
 						{
 							found = true;
@@ -3019,9 +3048,3 @@
 		}
 	}
 }(jQuery));
-
-window.setTimeout(function() {
-	jQuery(function($) {
-//		$("#dashbrd-edit").click();
-	});
-}, 1000);

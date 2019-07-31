@@ -88,7 +88,7 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Return default and static values for widgets.
+	 * Return default values for widgets.
 	 *
 	 * @static
 	 *
