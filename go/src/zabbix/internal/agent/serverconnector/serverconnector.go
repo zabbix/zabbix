@@ -89,6 +89,11 @@ func (c *Connector) GetAddr() (s string) {
 }
 
 func (c *Connector) refreshActiveChecks() {
+	var err error
+
+	log.Debugf("In refreshActiveChecks() from [%s]", c.address)
+	defer log.Debugf("End of refreshActiveChecks() from [%s]", c.address)
+
 	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {
 		log.Errf("cannot create active checks request to [%s]: %s", c.address, err)
@@ -176,9 +181,7 @@ run:
 		case <-ticker.C:
 			c.resultCache.Flush()
 			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
-				log.Debugf("started active checks refresh from [%s]", c.address)
 				c.refreshActiveChecks()
-				log.Debugf("finished active checks refresh from [%s]", c.address)
 				start = time.Now()
 			}
 		case <-c.input:
