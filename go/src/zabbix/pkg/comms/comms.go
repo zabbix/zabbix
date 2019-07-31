@@ -201,7 +201,6 @@ func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error
 	var c ZbxConnection
 
 	log.Debugf("connecting to [%s]", address)
-
 	err := c.Open(address, time.Second*time.Duration(timeout))
 	if err != nil {
 		return nil, err
@@ -210,19 +209,18 @@ func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error
 	defer c.Close()
 
 	log.Debugf("sending [%s] to [%s]", string(data), address)
-
 	err = c.Write(data, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("before read from [%s]", address)
+	log.Debugf("receiving data from [%s]", address)
 	b, err := c.Read(0)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("got [%s] from [%s]", string(b), address)
+	log.Debugf("received [%s] from [%s]", string(b), address)
 
 	return b, nil
 }
