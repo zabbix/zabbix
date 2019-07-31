@@ -58,8 +58,8 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 			'output' => ['available', 'snmp_available', 'jmx_available', 'ipmi_available'],
 			'groupids' => $groupids,
 			'filter' => ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF)
-				? ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
-				: null
+				? ['status' => 0, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
+				: ['status' => 0]
 		]);
 
 		foreach ($db_hosts as $host) {
