@@ -2,7 +2,8 @@
 
 SUBDIRS = \
 	scheduler \
-	resultcache
+	resultcache \
+	serverlistener
 
 all: build
 
