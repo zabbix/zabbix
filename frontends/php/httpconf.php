@@ -701,18 +701,16 @@ if (isset($_REQUEST['form'])) {
 
 	$data['application_list'] = [];
 	if (!empty($data['hostid'])) {
-		$dbApps = DBselect(
-			'SELECT a.applicationid,a.name'.
-			' FROM applications a'.
-			' WHERE a.hostid='.zbx_dbstr($data['hostid']).
-				' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
-		);
+		$db_applications = API::Application()->get([
+			'output' => ['applicationid', 'name'],
+			'hostids' => $data['hostid'],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 
-		while ($dbApp = DBfetch($dbApps)) {
-			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
-		}
-
-		uasort($data['application_list'], 'strcasecmp');
+		CArrayHelper::sort($db_applications, ['name']);
+		array_map(function($application) use (&$data) {
+			$data['application_list'][$application['applicationid']] = $application['name'];
+		}, $db_applications);
 	}
 
 	foreach($data['steps'] as $stepid => $step) {
