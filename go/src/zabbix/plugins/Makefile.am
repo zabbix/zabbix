@@ -2,5 +2,6 @@
 
 SUBDIRS = \
 	system \
-	systemd
+	systemd \
+	debug
 

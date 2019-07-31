@@ -118,19 +118,23 @@ func (t *exporterTask) perform(s Scheduler) {
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
 			if ret, err = exporter.Export(key, params); err == nil {
-				rt := reflect.TypeOf(ret)
-				switch rt.Kind() {
-				case reflect.Slice:
-					fallthrough
-				case reflect.Array:
-					s := reflect.ValueOf(ret)
-					for i := 0; i < s.Len(); i++ {
-						value := itemutil.ValueToString(s.Index(i))
+				if ret != nil {
+					rt := reflect.TypeOf(ret)
+					switch rt.Kind() {
+					case reflect.Slice:
+						fallthrough
+					case reflect.Array:
+						s := reflect.ValueOf(ret)
+						for i := 0; i < s.Len(); i++ {
+							value := itemutil.ValueToString(s.Index(i))
+							t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+						}
+					default:
+						value := itemutil.ValueToString(ret)
 						t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
 					}
-				default:
-					value := itemutil.ValueToString(ret)
-					t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+				} else {
+					t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Ts: now})
 				}
 			}
 		}

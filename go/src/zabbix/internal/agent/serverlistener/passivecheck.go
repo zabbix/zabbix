@@ -53,7 +53,12 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	select {
 	case r := <-pc.results:
 		if r.Error == nil {
-			response = []byte(*r.Value)
+			if r.Value != nil {
+				response = []byte(*r.Value)
+			} else {
+				// TODO: check what must be returned on empty result
+				response = []byte("(null)")
+			}
 		} else {
 			response = pc.formatError(r.Error.Error())
 		}
