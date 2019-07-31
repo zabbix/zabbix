@@ -3481,11 +3481,12 @@ $form-icon-btn: (
 
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				transform: translate3d(0, -94%, 0);
+				transform: translate3d(0, -94%, 2px);
 				z-index: 5;
 			}
 
 			.dashbrd-grid-widget-content {
+				transform: translate3d(0, 0, 3px);
 				z-index: 6;
 			}
 		}
@@ -3557,6 +3558,7 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-content {
 			background-color: $ui-bg-color;
+			transform: translate3d(0, 0, 1px);
 			transition: z-index .3s;
 			z-index: 3;
 		}
