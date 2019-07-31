@@ -89,9 +89,9 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		if p.refcount != 0 {
 			continue
 		}
+		log.Debugf("deactivate unused plugin %s", p.name())
 		p.tasks = p.tasks[:0]
 		if _, ok := p.impl.(plugin.Runner); ok {
-			log.Debugf("start stopper task for plugin %s", p.impl.Name())
 			task := &stopperTask{
 				taskBase: taskBase{
 					plugin:    p,
@@ -99,6 +99,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 					active:    true,
 				}}
 			p.enqueueTask(task)
+			log.Debugf("created stopper task for plugin %s", p.name())
 
 			if !p.queued() {
 				heap.Push(&m.queue, p)
