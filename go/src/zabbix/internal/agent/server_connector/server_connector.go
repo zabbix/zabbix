@@ -35,10 +35,10 @@ import (
 
 type ServerConnector struct {
 	input       chan interface{}
-	Address     string
+	address     string
 	lastError   error
 	ResultCache *agent.ResultCache
-	TaskManager *scheduler.Manager
+	taskManager *scheduler.Manager
 }
 
 type activeChecksResponse struct {
@@ -87,15 +87,15 @@ func (s *ServerConnector) refreshActiveChecks() {
 
 	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {
-		log.Errf("cannot create active checks request to [%s]: %s", s.Address, err)
+		log.Errf("cannot create active checks request to [%s]: %s", s.address, err)
 		return
 	}
 
-	data, err := c.Exchange(s.Address, time.Second*time.Duration(agent.Options.Timeout), request)
+	data, err := c.Exchange(s.address, time.Second*time.Duration(agent.Options.Timeout), request)
 
 	if err != nil {
 		if s.lastError == nil || err.Error() != s.lastError.Error() {
-			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.Address, err)
+			log.Warningf("active check configuration update from [%s] started to fail (%s)", s.address, err)
 			s.lastError = err
 
 		}
@@ -103,7 +103,7 @@ func (s *ServerConnector) refreshActiveChecks() {
 	}
 
 	if s.lastError != nil {
-		log.Warningf("active check configuration update from [%s] is working again", s.Address)
+		log.Warningf("active check configuration update from [%s] is working again", s.address)
 		s.lastError = nil
 	}
 
@@ -111,13 +111,13 @@ func (s *ServerConnector) refreshActiveChecks() {
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Errf("cannot parse list of active checks from [%s]: %s", s.Address, err)
+		log.Errf("cannot parse list of active checks from [%s]: %s", s.address, err)
 		return
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			log.Errf("no active checks on server [%s]: %s", s.Address, response.Info)
+			log.Errf("no active checks on server [%s]: %s", s.address, response.Info)
 		} else {
 			log.Errf("no active checks on server")
 		}
@@ -130,15 +130,15 @@ func (s *ServerConnector) refreshActiveChecks() {
 		return
 	}
 
-	log.Tracef("started tasks update from [%s]", s.Address)
-	s.TaskManager.UpdateTasks(s.ResultCache, response.Data)
-	log.Tracef("finished tasks update from [%s]", s.Address)
+	log.Tracef("started tasks update from [%s]", s.address)
+	s.taskManager.UpdateTasks(s.ResultCache, response.Data)
+	log.Tracef("finished tasks update from [%s]", s.address)
 }
 
 func (s *ServerConnector) Write(data []byte) (n int, err error) {
 	var c comms.ZbxConnection
 
-	js, err := c.Exchange(s.Address, time.Second*time.Duration(agent.Options.Timeout), data)
+	js, err := c.Exchange(s.address, time.Second*time.Duration(agent.Options.Timeout), data)
 	if err != nil {
 		return 0, err
 	}
@@ -174,9 +174,9 @@ run:
 		case <-ticker.C:
 			s.ResultCache.Flush()
 			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
-				log.Debugf("started active checks refresh from [%s]", s.Address)
+				log.Debugf("started active checks refresh from [%s]", s.address)
 				s.refreshActiveChecks()
-				log.Debugf("finished active checks refresh from [%s]", s.Address)
+				log.Debugf("finished active checks refresh from [%s]", s.address)
 				start = time.Now()
 			}
 		case <-s.input:
@@ -188,8 +188,8 @@ run:
 	monitor.Unregister()
 }
 
-func NewServerConnector() *ServerConnector {
-	return &ServerConnector{}
+func NewServerConnector(taskManager *scheduler.Manager, address string) *ServerConnector {
+	return &ServerConnector{taskManager: taskManager, address: address}
 }
 
 func (s *ServerConnector) init() {

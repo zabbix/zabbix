@@ -163,12 +163,9 @@ func main() {
 	serverConnectors := make([]*server_connector.ServerConnector, len(addresses))
 
 	for i := 0; i < len(addresses); i++ {
-		serverConnectors[i] = server_connector.NewServerConnector()
+		serverConnectors[i] = server_connector.NewServerConnector(taskManager, addresses[i])
 		resultCaches[i] = agent.NewActiveCache(serverConnectors[i])
-
 		serverConnectors[i].ResultCache = resultCaches[i]
-		serverConnectors[i].TaskManager = taskManager
-		serverConnectors[i].Address = addresses[i]
 
 		resultCaches[i].Start()
 		serverConnectors[i].Start()
