@@ -2085,7 +2085,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		zbx_uint64_t triggerid, const char *description, const char *expression,
 		const char *recovery_expression, unsigned char recovery_mode, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments, const char *url, unsigned char flags,
-		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close)
+		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
+		const char *opdata)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2104,7 +2105,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 			*url_esc = NULL,
 			*function_esc = NULL,
 			*parameter_esc = NULL,
-			*correlation_tag_esc;
+			*correlation_tag_esc,
+			*opdata_esc;
 	int		res = FAIL;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
@@ -2113,6 +2115,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 	description_esc = DBdyn_escape_string(description);
 	correlation_tag_esc = DBdyn_escape_string(correlation_tag);
+	opdata_esc = DBdyn_escape_string(opdata);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.expression,t.recovery_expression"
@@ -2141,9 +2144,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 					",correlation_mode=%d"
 					",correlation_tag='%s'"
 					",manual_close=%d"
+					",opdata='%s'"
 				" where triggerid=" ZBX_FS_UI64 ";\n",
 				triggerid, (int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-				(int)manual_close, h_triggerid);
+				(int)manual_close, opdata_esc, h_triggerid);
 
 		*new_triggerid = 0;
 		*cur_triggerid = h_triggerid;
@@ -2170,14 +2174,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
 						"comments,url,type,value,state,templateid,flags,recovery_mode,"
-						"correlation_mode,correlation_tag,manual_close)"
+						"correlation_mode,correlation_tag,manual_close,opdata)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,%d,"
-						"%d,'%s',%d);\n",
+						"%d,'%s',%d,'%s');\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
 					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, triggerid,
 					(int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-					(int)manual_close);
+					(int)manual_close, opdata_esc);
 
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
@@ -2263,6 +2267,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 	zbx_free(sql);
 	zbx_free(correlation_tag_esc);
+	zbx_free(opdata_esc);
 	zbx_free(description_esc);
 
 	return res;
@@ -3636,7 +3641,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,t.description,t.expression,t.status,"
 				"t.type,t.priority,t.comments,t.url,t.flags,t.recovery_expression,t.recovery_mode,"
-				"t.correlation_mode,t.correlation_tag,t.manual_close"
+				"t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -3664,7 +3669,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[8]),	/* flags */
 				(unsigned char)atoi(row[11]),	/* correlation_mode */
 				row[12],			/* correlation_tag */
-				(unsigned char)atoi(row[13]));	/* manual_close */
+				(unsigned char)atoi(row[13]),	/* manual_close */
+				row[14]);			/* opdata */
 
 		if (0 != new_triggerid)				/* new trigger added */
 			zbx_vector_uint64_append(&new_triggerids, new_triggerid);
