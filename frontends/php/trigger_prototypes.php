@@ -35,7 +35,7 @@ $fields = [
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
-	'opdata' =>									[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'opdata' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
