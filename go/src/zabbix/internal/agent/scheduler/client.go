@@ -162,11 +162,12 @@ func (b *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 	var expiry time.Time
 	// Direct requests are handled by special client with id 0. Such requests have
-	// day expiry time before used plugins are released.
+	// day+hour (to keep once per day checks without expiring) expiry time before
+	// used plugins are released.
 	if b.id != 0 {
 		expiry = now
 	} else {
-		expiry = now.Add(-time.Hour * 24)
+		expiry = now.Add(-time.Hour * 25)
 	}
 
 	// deactivate plugins
