@@ -35,9 +35,9 @@ func (w *mockWriter) Write(data []byte) (n int, err error) {
 
 func TestResultCache(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
-	var cache ResultCache
-	var writer mockWriter
 
+	var writer mockWriter
+	cache := NewActiveCache(&writer)
 	cache.Start()
 
 	value := "xyz"
@@ -50,7 +50,6 @@ func TestResultCache(t *testing.T) {
 	cache.Write(&result)
 	cache.FlushOutput(&writer)
 
-	cache.SetOutput(&writer)
 	cache.Write(&result)
 	cache.Write(&result)
 	cache.Flush()

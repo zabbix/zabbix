@@ -33,8 +33,6 @@ import (
 	_ "zabbix/plugins"
 )
 
-var taskManager scheduler.Manager
-
 func main() {
 	var confFlag string
 	const (
@@ -150,8 +148,8 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
+	taskManager := scheduler.NewManager()
 	taskManager.Start()
-
 loop:
 	for {
 		sig := <-sigs

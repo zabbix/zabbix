@@ -193,7 +193,6 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	m.init()
 	monitor.Register()
 	go m.run()
 }
@@ -209,4 +208,10 @@ func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Req
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func NewManager() *Manager {
+	var m Manager
+	m.init()
+	return &m
 }
