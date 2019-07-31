@@ -253,7 +253,8 @@ $ok-ack-fg-color: #00ff00;
 .host-avail-widget {
 	color: darken($font-color, 85%);
 
-	.host-avail-total {
+	.host-avail-total,
+	&.list-table tbody th {
 		color: $font-color;
 	}
 }

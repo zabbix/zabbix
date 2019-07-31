@@ -35,6 +35,15 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
+		// Availability type.
+		$field_availtype = new CWidgetFieldMultiCheckBox('availtype', _('Availability type'));
+
+		if (array_key_exists('availtype', $this->data)) {
+			$field_availtype->setValue($this->data['availtype']);
+		}
+
+		$this->fields[$field_availtype->getName()] = $field_availtype;
+
 		// Layout.
 		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 			STYLE_HORIZONTAL => _('Horizontal'),

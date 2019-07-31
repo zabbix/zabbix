@@ -4911,14 +4911,15 @@ table.preprocessing-test-results .rel-container {
   margin-top: -2px; }
 
 .host-avail-widget {
-  width: 100%;
-  height: 100%;
   table-layout: fixed; }
-  .host-avail-widget td {
-    padding: 0 10px;
-    vertical-align: middle; }
-  .host-avail-widget .host-avail-count {
-    font-size: 16px; }
+  .host-avail-widget.host-avail-layout-horizontal, .host-avail-widget.host-avail-layout-vertical {
+    width: 100%;
+    height: 100%; }
+    .host-avail-widget.host-avail-layout-horizontal td, .host-avail-widget.host-avail-layout-vertical td {
+      padding: 0 10px;
+      vertical-align: middle; }
+    .host-avail-widget.host-avail-layout-horizontal .host-avail-count, .host-avail-widget.host-avail-layout-vertical .host-avail-count {
+      font-size: 16px; }
   .host-avail-widget.host-avail-layout-horizontal {
     min-width: 305px; }
     .host-avail-widget.host-avail-layout-horizontal td {
@@ -4929,6 +4930,8 @@ table.preprocessing-test-results .rel-container {
     padding-top: 3px; }
   .host-avail-widget.host-avail-layout-vertical .host-avail-count {
     margin-right: 5px; }
+  .host-avail-widget.list-table tbody td:not(:last-of-type), .host-avail-widget.list-table tbody th:not(:last-child) {
+    border-right: 1px dotted #888; }
   .host-avail-widget .host-avail-true {
     background: #86cc89; }
   .host-avail-widget .host-avail-false {
@@ -5617,10 +5620,12 @@ td.inactive-bg {
     border: none !important;
     top: 0; }
 
-.host-avail-widget tr {
-  border-top: 1px solid #9f9f9f; }
+.host-avail-widget.host-avail-layout-horizontal tr, .host-avail-widget.host-avail-layout-vertical tr {
+  border-top: 1px solid #888; }
 .host-avail-widget.host-avail-layout-horizontal td:not(:last-of-type) {
-  border-right: 1px solid #9f9f9f; }
+  border-right: 1px solid #888; }
+.host-avail-widget.list-table tbody td:not(:last-of-type), .host-avail-widget.list-table tbody th:not(:last-child) {
+  border-right: 1px dotted #888; }
 .host-avail-widget .host-avail-count {
   font-weight: bold; }
 .host-avail-widget .host-avail-true,

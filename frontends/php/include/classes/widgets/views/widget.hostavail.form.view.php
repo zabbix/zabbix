@@ -37,6 +37,17 @@ $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts = [$field_groupids->getPostJS()];
 
+// Availability type.
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['availtype']),
+	CWidgetHelper::getMultiCheckBox($fields['availtype'], [
+		HOST_AVAILABLE_TYPE_AGENT => _('Zabbix agent'),
+		HOST_AVAILABLE_TYPE_SNMP => _('SNMP'),
+		HOST_AVAILABLE_TYPE_JMX => _('JMX'),
+		HOST_AVAILABLE_TYPE_IPMI => _('IPMI')
+	])
+);
+
 // Layout.
 $form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
 

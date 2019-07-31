@@ -211,15 +211,19 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type Widget type
+	 * @param string $type   Widget type
+	 * @param mixed  $fields Rows from widget_fields
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type)
-	{
+	public static function hasPadding($type, $fields) {
 		switch ($type) {
 			case WIDGET_HOST_AVAIL:
-				return false;
+				if (array_key_exists('availtype', $fields)) {
+					return !is_string($fields['availtype']);
+				}
+
+				return true;
 
 			default:
 				return true;

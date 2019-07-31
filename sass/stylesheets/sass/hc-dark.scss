@@ -1166,15 +1166,24 @@ td.inactive-bg {
 
 .host-avail-widget {
 
-	tr {
-		border-top: 1px solid $ui-border-color;
+	&.host-avail-layout-horizontal,
+	&.host-avail-layout-vertical {
+
+		tr {
+			border-top: 1px solid $table-border-color;
+		}
 	}
 
 	&.host-avail-layout-horizontal {
 
 		td:not(:last-of-type) {
-			border-right: 1px solid $ui-border-color;
+			border-right: 1px solid $table-border-color;
 		}
+	}
+
+	&.list-table tbody td:not(:last-of-type),
+	&.list-table tbody th:not(:last-child) {
+		border-right: 1px dotted $table-border-color;
 	}
 
 	.host-avail-count {

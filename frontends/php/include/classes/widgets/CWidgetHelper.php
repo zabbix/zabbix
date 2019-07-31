@@ -373,6 +373,32 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * @param CWidgetFieldMultiCheckBox $field
+	 * @param array $config
+	 *
+	 * @return CList
+	 */
+	public static function getMultiCheckBox($field, array $values) {
+		$checkbox = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
+		if ($field->getOrientation() == CWidgetFieldMultiCheckBox::ORIENTATION_HORIZONTAL) {
+			$checkbox->addClass(ZBX_STYLE_HOR_LIST);
+		}
+
+		foreach ($values as $key => $label) {
+			$checkbox->addItem(
+				(new CCheckBox($field->getName().'[]', $key))
+					->setLabel($label)
+					->setId($field->getName().'_'.$key)
+					->setChecked(in_array($key, $field->getValue()))
+					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			);
+		}
+
+		return $checkbox;
+	}
+
+	/**
 	 * @param CWidgetFieldTags $field
 	 *
 	 * @return CTable
