@@ -35,21 +35,32 @@ type ServerListener struct {
 	Scheduler scheduler.Scheduler
 }
 
-func (l *ServerListener) processRequest(data []byte) (err error) {
+func (l *ServerListener) processRequest(conn *comms.ZbxConnection, data []byte) (err error) {
 	return errors.New("json requests are not yet supported")
 }
 
 func (l *ServerListener) processConnection(conn *comms.ZbxConnection) (err error) {
+	defer func() {
+		if err != nil {
+			conn.Close()
+		}
+	}()
+
 	var data []byte
 	if data, err = conn.Read(time.Second * time.Duration(Options.Timeout)); err != nil {
 		return err
 	}
 
-	if data[0] == '{' {
-		return l.processRequest(data)
+	if len(data) == 0 {
+		err = fmt.Errorf("received empty data from '%s'", conn.RemoteIP())
+		return
 	}
 
-	log.Debugf("recived passive check request: '%s'", string(data))
+	if data[0] == '{' {
+		return l.processRequest(conn, data)
+	}
+
+	log.Debugf("recived passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: l.Scheduler}
 	go response.handleCheck(data)
 

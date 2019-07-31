@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -152,6 +153,14 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 		return nil, err
 	}
 	return read(c.conn)
+}
+
+func (c *ZbxConnection) RemoteIP() string {
+	addr := c.conn.RemoteAddr().String()
+	if pos := strings.Index(addr, ":"); pos != -1 {
+		addr = addr[:pos]
+	}
+	return addr
 }
 
 func Listen(address string) (c *ZbxListener, err error) {
