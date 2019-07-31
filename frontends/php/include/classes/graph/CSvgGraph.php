@@ -971,11 +971,14 @@ class CSvgGraph extends CSvg {
 	 * Add metric of type bar to graph.
 	 */
 	protected function drawMetricsBar() {
-		$this->paths = (new CSvgSideBySideFormatter)->format($this->paths, $this->metrics);
+		$this->paths = (new CBarGraphDataFormatter)->format($this->paths, $this->metrics);
 
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $this->paths)) {
-				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric, $this->getCanvasHeight()));
+				$metric['options']['zero_point'] = $metric['options']['axisy']
+					? $this->right_y_zero
+					: $this->left_y_zero;
+				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));
 			}
 		}
 	}

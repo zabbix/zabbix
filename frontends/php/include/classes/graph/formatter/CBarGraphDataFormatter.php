@@ -19,12 +19,12 @@
 **/
 
 
-class CSvgSideBySideFormatter implements CSvgFormatter {
+class CBarGraphDataFormatter implements CDataFormatter {
 
 	const MIN_BAR_GAP_WIDTH = 3;
 
 	/**
-	 * Get datasets with bar type
+	 * Get datasets with bar type separated by axis
 	 *
 	 * @param array $paths
 	 * @param array $metrics
@@ -36,7 +36,7 @@ class CSvgSideBySideFormatter implements CSvgFormatter {
 
 		foreach ($metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $paths)) {
-				$result[] = $paths[$index][0];
+				$result[$metric['options']['axisy']][] = $paths[$index][0];
 			}
 		}
 
@@ -56,13 +56,17 @@ class CSvgSideBySideFormatter implements CSvgFormatter {
 
 		$datasets = $this->getDatasetByBarType($paths, $metrics);
 
-		foreach ($datasets as $dataset) {
-			foreach ($dataset as $value) {
-				if (!array_key_exists((int)$value[0], $result)) {
-					$result[$value[0]] = 0;
-				}
+		foreach ($datasets as $axis => $value) {
+			$result[$axis] = [];
 
-				$result[$value[0]]++;
+			foreach ($value as $dataset) {
+				foreach ($dataset as $val) {
+					if (!array_key_exists((int)$val[0], $result[$axis])) {
+						$result[$axis][$val[0]] = 0;
+					}
+
+					$result[$axis][$val[0]]++;
+				}
 			}
 		}
 
@@ -70,15 +74,15 @@ class CSvgSideBySideFormatter implements CSvgFormatter {
 	}
 
 	/**
-	 * Get minimal bar width by datasets
+	 * Get minimal bar width by datasets on same axis
 	 *
 	 * @param array $paths
 	 * @param array $metrics
 	 *
-	 * @return integer
+	 * @return array
 	 */
 	protected function getBarWidth(array $paths, array $metrics) {
-		$width = [];
+		$result = [];
 
 		$datasets = $this->getDatasetByBarType($paths, $metrics);
 
@@ -86,22 +90,28 @@ class CSvgSideBySideFormatter implements CSvgFormatter {
 			return 0;
 		}
 
-		foreach ($datasets as $dataset) {
-			list ($count, $first, $last) = [count($dataset), reset($dataset)[0], end($dataset)[0]];
+		foreach ($datasets as $axis => $value) {
+			$width = [];
 
-			$graph_width = ($last - $first) / $count;
-			$gap = self::MIN_BAR_GAP_WIDTH >= $graph_width ? 0 : $graph_width * 0.25;
+			foreach ($value as $dataset) {
+				list ($count, $first, $last) = [count($dataset), reset($dataset)[0], end($dataset)[0]];
 
-			$graph_width -= $gap;
+				$graph_width = ($last - $first) / $count;
+				$gap = self::MIN_BAR_GAP_WIDTH >= $graph_width ? 0 : $graph_width * 0.25;
 
-			if ($graph_width < self::MIN_BAR_GAP_WIDTH) {
-				$graph_width = 2;
+				$graph_width -= $gap;
+
+				if ($graph_width < self::MIN_BAR_GAP_WIDTH) {
+					$graph_width = 2;
+				}
+
+				$width[] = $graph_width;
 			}
 
-			$width[] = $graph_width;
+			$result[$axis] = min($width);
 		}
 
-		return min($width);
+		return $result;
 	}
 
 	/**
@@ -118,27 +128,32 @@ class CSvgSideBySideFormatter implements CSvgFormatter {
 		$indexes = [];
 
 		foreach ($metrics as $index => $metric) {
+			if (!array_key_exists($metric['options']['axisy'], $indexes)) {
+				$indexes[$metric['options']['axisy']] = [];
+			}
+
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $paths)) {
 				foreach ($paths[$index][0] as $key => $value) {
-					$count = $datatimes[$value[0]];
+					$count = $datatimes[$metric['options']['axisy']][$value[0]];
+					$axis_width = $width[$metric['options']['axisy']];
 
-					if (!array_key_exists((int)$value[0], $indexes)) {
-						$indexes[$value[0]] = 0;
+					if (!array_key_exists((int)$value[0], $indexes[$metric['options']['axisy']])) {
+						$indexes[$metric['options']['axisy']][$value[0]] = 0;
 					}
 
 					if ($count > 1) {
 						$paths[$index][0][$key] = [
-							$value[0] + (($width / $count) * $indexes[$value[0]]),
+							$value[0] + (($axis_width / $count) * $indexes[$metric['options']['axisy']][$value[0]]),
 							$value[1],
 							$value[2],
-							$width / $count,
+							$axis_width / $count,
 							$value[0]
 						];
 
-						$indexes[$value[0]]++;
+						$indexes[$metric['options']['axisy']][$value[0]]++;
 					}
 					else {
-						$paths[$index][0][$key] = array_merge($value, [$width, $value[0]]);
+						$paths[$index][0][$key] = array_merge($value, [$axis_width, $value[0]]);
 					}
 				}
 			}

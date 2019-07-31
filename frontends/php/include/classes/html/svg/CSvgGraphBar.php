@@ -25,9 +25,8 @@ class CSvgGraphBar extends CSvgGroup {
 	protected $itemid;
 	protected $item_name;
 	protected $options;
-	protected $canvas_height;
 
-	public function __construct($path, $metric, $canvas_height) {
+	public function __construct($path, $metric) {
 		parent::__construct();
 
 		$this->path = $path ? : [];
@@ -40,7 +39,6 @@ class CSvgGraphBar extends CSvgGroup {
 			'width' => CSvgGraph::SVG_GRAPH_DEFAULT_LINE_WIDTH,
 			'order' => 1
 		];
-		$this->canvas_height = $canvas_height + 10;
 	}
 
 	public function makeStyles() {
@@ -61,10 +59,10 @@ class CSvgGraphBar extends CSvgGroup {
 			$this->addItem(
 				(new CSvgPolygon(
 					[
-						[$point[0], $this->canvas_height],
+						[$point[0], $this->options['zero_point']],
 						[$point[0], $point[1]],
 						[$point[0] + $point[3], $point[1]],
-						[$point[0] + $point[3], $this->canvas_height]
+						[$point[0] + $point[3], $this->options['zero_point']]
 					]
 				))
 					// Value.

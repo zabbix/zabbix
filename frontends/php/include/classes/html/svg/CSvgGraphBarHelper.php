@@ -19,7 +19,11 @@
 **/
 
 
-interface CSvgFormatter
-{
-	public function format(array $paths, array $metrics);
+class CSvgGraphBarHelper {
+	/**
+	 * Canvas height
+	 *
+	 * @var integer
+	 */
+	public static $canvas_height;
 }
