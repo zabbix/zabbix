@@ -114,7 +114,11 @@ func (s *ServerConnector) refreshActiveChecks() {
 		}
 		return
 	}
-	s.lastError = nil
+
+	if s.lastError != nil {
+		log.Warningf("active check configuration update from [%s] is working again", s.Address)
+		s.lastError = nil
+	}
 
 	var r response
 
