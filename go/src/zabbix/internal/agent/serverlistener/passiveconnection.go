@@ -29,10 +29,14 @@ type passiveConnection struct {
 	conn *comms.ZbxConnection
 }
 
-func (c *passiveConnection) Write(data []byte) (n int, err error) {
-	if err = c.conn.Write(data, time.Second*time.Duration(agent.Options.Timeout)); err != nil {
+func (pc *passiveConnection) Write(data []byte) (n int, err error) {
+	if err = pc.conn.Write(data, time.Second*time.Duration(agent.Options.Timeout)); err != nil {
 		n = len(data)
 	}
-	c.conn.Close()
+	pc.conn.Close()
 	return
+}
+
+func (pc *passiveConnection) Address() string {
+	return pc.conn.RemoteIP()
 }

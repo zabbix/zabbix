@@ -66,7 +66,7 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 		response = pc.formatError("timeout occurred")
 	}
 	if _, err := pc.conn.Write(response); err != nil {
-		log.Warningf("could not send response to server")
+		log.Warningf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
 	}
 	close(pc.results)
 }

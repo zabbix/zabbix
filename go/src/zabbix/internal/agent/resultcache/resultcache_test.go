@@ -57,7 +57,7 @@ func TestResultCache(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	writer := mockWriter{lastid: 1, t: t}
-	cache := NewActive(&writer)
+	cache := NewActive(0, &writer)
 
 	value := "xyz"
 	result := plugin.Result{

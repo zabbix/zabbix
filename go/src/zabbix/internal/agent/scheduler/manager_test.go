@@ -1384,8 +1384,8 @@ func TestPassiveRunner(t *testing.T) {
 
 	calls := []map[string][]int{
 		map[string][]int{"$start": []int{1}, "$stop": []int{}},
-		map[string][]int{"$start": []int{1}, "$stop": []int{3600*49 + 1}},
-		map[string][]int{"$start": []int{1}, "$stop": []int{3600*25 + 1}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*51 + 1}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*26 + 1}},
 	}
 
 	var cache resultCacheMock
@@ -1412,14 +1412,14 @@ func TestPassiveRunner(t *testing.T) {
 	update.requests = update.requests[:2]
 	manager.update(&update)
 	manager.mockTasks()
-	manager.iterate(t, 3600*23)
-	manager.checkPluginTimeline(t, plugins, calls, 3600*23)
+	manager.iterate(t, 3600*24)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*24)
 
 	update.requests = update.requests[:1]
 	manager.update(&update)
 	manager.mockTasks()
-	manager.iterate(t, 3600*24)
-	manager.checkPluginTimeline(t, plugins, calls, 3600*24)
+	manager.iterate(t, 3600*25)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*25)
 
 	update.requests = update.requests[:1]
 	manager.update(&update)

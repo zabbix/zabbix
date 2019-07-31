@@ -39,6 +39,7 @@ type ResultCache struct {
 	results    []*plugin.Result
 	token      string
 	lastDataID uint64
+	clientID   uint64
 }
 
 type AgentData struct {
@@ -61,7 +62,7 @@ type AgentDataRequest struct {
 }
 
 func (c *ResultCache) flushOutput(w io.Writer) {
-	log.Debugf("upload history data, %d value(s)", len(c.results))
+	log.Debugf("[%d] upload history data, %d value(s)", c.clientID, len(c.results))
 	request := AgentDataRequest{
 		Request:   "agent data",
 		Data:      make([]AgentData, len(c.results)),
@@ -94,7 +95,7 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 	var err error
 
 	if data, err = json.Marshal(&request); err != nil {
-		log.Errf("cannot convert cached history to json: %s", err.Error())
+		log.Errf("[%d] cannot convert cached history to json: %s", c.clientID, err.Error())
 		return
 	}
 
@@ -102,7 +103,7 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 		w = c.output
 	}
 	if _, err = w.Write(data); err != nil {
-		log.Errf("cannot upload cached history to server: %s", err.Error())
+		log.Errf("[%d] cannot upload cached history to server: %s", c.clientID, err.Error())
 		return
 	}
 	c.lastDataID = lastDataID
@@ -115,7 +116,7 @@ func (c *ResultCache) write(result *plugin.Result) {
 
 func (c *ResultCache) run() {
 	defer log.PanicHook()
-	log.Debugf("starting ResultCache")
+	log.Debugf("[%d] starting result cache", c.clientID)
 
 	for {
 		v := <-c.input
@@ -131,7 +132,7 @@ func (c *ResultCache) run() {
 		}
 	}
 	close(c.input)
-	log.Debugf("Result cache has been stopped")
+	log.Debugf("[%d] result cache has been stopped", c.clientID)
 	monitor.Unregister()
 }
 
@@ -152,12 +153,12 @@ func (c *ResultCache) Stop() {
 	c.input <- nil
 }
 
-func NewActive(output io.Writer) *ResultCache {
-	return &ResultCache{output: output, token: newToken()}
+func NewActive(clientid uint64, output io.Writer) *ResultCache {
+	return &ResultCache{clientID: clientid, output: output, token: newToken()}
 }
 
-func NewPassive() *ResultCache {
-	return &ResultCache{token: newToken()}
+func NewPassive(clientid uint64) *ResultCache {
+	return &ResultCache{clientID: clientid, token: newToken()}
 }
 
 func (c *ResultCache) FlushOutput(w io.Writer) {
