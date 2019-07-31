@@ -26,6 +26,7 @@ import (
 	"io"
 	"net"
 	"time"
+	"zabbix/pkg/log"
 )
 
 const headerSize = 13
@@ -194,4 +195,32 @@ func (c *ZbxConnection) Close() (err error) {
 
 func (c *ZbxListener) Close() (err error) {
 	return c.ln.Close()
+}
+
+func (c *ZbxConnection) Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
+	log.Debugf("connecting to [%s]", address)
+
+	err := c.Open(address, time.Second*time.Duration(timeout))
+	if err != nil {
+		return nil, err
+	}
+
+	defer c.Close()
+
+	log.Debugf("sending [%s] to [%s]", string(data), address)
+
+	err = c.Write(data, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("before read from [%s]", address)
+	b, err := c.Read(0)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("got [%s] from [%s]", string(b), address)
+
+	return b, nil
 }

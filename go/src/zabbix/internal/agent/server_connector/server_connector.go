@@ -41,10 +41,20 @@ type ServerConnector struct {
 	TaskManager *scheduler.Manager
 }
 
-type response struct {
+type activeChecksResponse struct {
 	Response string            `json:"response"`
 	Info     string            `json:"info"`
 	Data     []*plugin.Request `json:"data"`
+}
+
+type activeChecksRequest struct {
+	Request string `json:"request"`
+	Host    string `json:"host"`
+}
+
+type agendDataResponse struct {
+	Response string `json:"response"`
+	Info     string `json:"info"`
 }
 
 func ParseServerActive() ([]string, error) {
@@ -72,40 +82,16 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
-func (s *ServerConnector) getActiveChecks() ([]byte, error) {
+func (s *ServerConnector) refreshActiveChecks() {
 	var c comms.ZbxConnection
 
-	log.Debugf("connecting to [%s]", s.Address)
-
-	err := c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
+	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {
-		return nil, err
+		log.Errf("cannot create active checks request to [%s]: %s", s.Address, err)
+		return
 	}
 
-	defer c.Close()
-
-	js := "{\"request\":\"active checks\",\"host\":\"" + agent.Options.Hostname + "\"}"
-
-	log.Debugf("sending [%s] to [%s]", js, s.Address)
-
-	err = c.WriteString(js, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debugf("before read")
-	b, err := c.Read(0)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debugf("got [%s]", string(js))
-
-	return b, nil
-}
-
-func (s *ServerConnector) refreshActiveChecks() {
-	js, err := s.getActiveChecks()
+	data, err := c.Exchange(s.Address, time.Second*time.Duration(agent.Options.Timeout), request)
 
 	if err != nil {
 		if s.lastError == nil || err.Error() != s.lastError.Error() {
@@ -121,17 +107,17 @@ func (s *ServerConnector) refreshActiveChecks() {
 		s.lastError = nil
 	}
 
-	var r response
+	var response activeChecksResponse
 
-	err = json.Unmarshal(js, &r)
+	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Errf("cannot parse list of active checks from [%s]: %s", s.Address, err)
 		return
 	}
 
-	if r.Response != "success" {
-		if len(r.Info) != 0 {
-			log.Errf("no active checks on server [%s]: %s", s.Address, r.Info)
+	if response.Response != "success" {
+		if len(response.Info) != 0 {
+			log.Errf("no active checks on server [%s]: %s", s.Address, response.Info)
 		} else {
 			log.Errf("no active checks on server")
 		}
@@ -139,53 +125,37 @@ func (s *ServerConnector) refreshActiveChecks() {
 		return
 	}
 
-	if nil == r.Data {
+	if nil == response.Data {
 		log.Errf("cannot parse list of active checks: data array is missing")
 		return
 	}
 
 	log.Tracef("started tasks update from [%s]", s.Address)
-	s.TaskManager.UpdateTasks(s.ResultCache, r.Data)
+	s.TaskManager.UpdateTasks(s.ResultCache, response.Data)
 	log.Tracef("finished tasks update from [%s]", s.Address)
 }
 
 func (s *ServerConnector) Write(data []byte) (n int, err error) {
 	var c comms.ZbxConnection
 
-	err = c.Open(s.Address, time.Second*time.Duration(agent.Options.Timeout))
+	js, err := c.Exchange(s.Address, time.Second*time.Duration(agent.Options.Timeout), data)
 	if err != nil {
 		return 0, err
 	}
 
-	defer c.Close()
+	var response agendDataResponse
 
-	err = c.Write(data, 0)
+	err = json.Unmarshal(js, &response)
 	if err != nil {
 		return 0, err
 	}
 
-	js, err := c.Read(0)
-	if err != nil {
-		return 0, err
-	}
-
-	log.Debugf("got back [%s]", string(js))
-
-	var r response
-
-	err = json.Unmarshal(js, &r)
-	if err != nil {
-		return 0, err
-	}
-
-	if r.Response != "success" {
-		if len(r.Info) != 0 {
-			log.Errf("%s", r.Info)
-		} else {
-			log.Errf("unsuccessful response")
+	if response.Response != "success" {
+		if len(response.Info) != 0 {
+			return 0, fmt.Errorf("%s", response.Info)
 		}
 
-		return
+		return 0, fmt.Errorf("%s", "unsuccessful response")
 	}
 
 	return len(data), nil
