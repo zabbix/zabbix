@@ -1471,42 +1471,6 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: DBitem_lastvalue                                                 *
- *                                                                            *
- * Purpose: retrieve item lastvalue by trigger expression                     *
- *          and number of function                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
-{
-	zbx_uint64_t	itemid;
-	zbx_timespec_t	ts;
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ts.sec = time(NULL);
-	ts.ns = 999999999;
-
-	if (SUCCEED == (ret = get_N_itemid(expression, N_functionid, &itemid)))
-		ret = DBitem_get_value(itemid, lastvalue, raw, &ts);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBitem_value                                                     *
  *                                                                            *
  * Purpose: retrieve item value by trigger expression and number of function  *
@@ -1525,6 +1489,40 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 
 	if (SUCCEED == (ret = get_N_itemid(expression, N_functionid, &itemid)))
 		ret = DBitem_get_value(itemid, value, raw, &ts);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBitem_lastvalue                                                 *
+ *                                                                            *
+ * Purpose: retrieve item lastvalue by trigger expression                     *
+ *          and number of function                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
+{
+	zbx_timespec_t	ts;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ts.sec = time(NULL);
+	ts.ns = 999999999;
+
+	ret = DBitem_value(expression, lastvalue, N_functionid, ts.sec, ts.ns, raw);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2685,29 +2683,24 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 			{
 				case ZBX_TOKEN_OBJECTID:
 					if (SUCCEED == get_N_itemid(event->trigger.expression + token.loc.l, 1,
-							&itemid))
+							&itemid) &&
+							FAIL == zbx_vector_uint64_search(&itemids, itemid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 					{
-						if (FAIL == zbx_vector_uint64_search(&itemids, itemid,
-								ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+						char	*val = NULL;
+
+						zbx_vector_uint64_append(&itemids, itemid);
+
+						if (NULL != *replace_to)
+							*replace_to = zbx_strdcat(*replace_to, ", ");
+
+						if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
 						{
-							char	*val = NULL;
-
-							zbx_vector_uint64_append(&itemids, itemid);
-
-							if (NULL != *replace_to)
-								*replace_to = zbx_strdcat(*replace_to, ", ");
-
-							if (SUCCEED == DBitem_get_value(itemid, &val, 0, &ts))
-							{
-								*replace_to = zbx_strdcat(*replace_to, val);
-								zbx_free(val);
-							}
-							else
-							{
-								*replace_to = zbx_strdcat(*replace_to,
-										STR_UNKNOWN_VARIABLE);
-							}
+							*replace_to = zbx_strdcat(*replace_to, val);
+							zbx_free(val);
 						}
+						else
+							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
 					}
 
 					ZBX_FALLTHROUGH;
