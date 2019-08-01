@@ -21,8 +21,6 @@
 
 class CWidgetFieldItem extends CWidgetField {
 
-	private $prototypes = false;
-
 	private $multiple = true;
 
 	private $filter_parameters = [
@@ -67,28 +65,6 @@ class CWidgetFieldItem extends CWidgetField {
 
 	public function setValue($value) {
 		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	/**
-	 * Selecting item prototypes or items?
-	 *
-	 * @return bool
-	 */
-	public function isSelectingPrototypes() {
-		return $this->prototypes;
-	}
-
-	/**
-	 * Set field to select item prototypes or items.
-	 *
-	 * @param bool $value
-	 *
-	 * @return CWidgetFieldItem
-	 */
-	public function setSelectingPrototypes($value) {
-		$this->selecting_prototypes = $value;
 
 		return $this;
 	}
