@@ -62,7 +62,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	Write(p []byte) (n int, err error)
+	io.Writer
 	Addr() (s string)
 }
 
@@ -176,8 +176,8 @@ func NewPassive() *ResultCache {
 	return &ResultCache{token: newToken()}
 }
 
-func (c *ResultCache) FlushOutput(w io.Writer) {
-	c.input <- w
+func (c *ResultCache) FlushOutput(u Uploader) {
+	c.input <- u
 }
 
 func (c *ResultCache) Flush() {

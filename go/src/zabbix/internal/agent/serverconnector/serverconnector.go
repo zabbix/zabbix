@@ -139,9 +139,7 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	log.Tracef("started tasks update from [%s]", c.address)
 	c.taskManager.UpdateTasks(c.resultCache, response.Data)
-	log.Tracef("finished tasks update from [%s]", c.address)
 }
 
 func (c *Connector) Write(data []byte) (n int, err error) {
