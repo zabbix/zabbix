@@ -17,11 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package empty
 
 import (
-	//	_ "zabbix/plugins/debug/empty"
-	//	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+var stdOs std.Os
+
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	return nil, nil
+}
+
+func init() {
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "debug.empty", "debug.empty", "Returns empty value")
+}

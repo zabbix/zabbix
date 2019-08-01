@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package comms
+package zbxcomms
 
 import (
 	"bytes"
@@ -32,15 +32,16 @@ import (
 
 const headerSize = 13
 
-type ZbxConnection struct {
+type Connection struct {
 	conn net.Conn
 }
 
-type ZbxListener struct {
+type Listener struct {
 	listener net.Listener
 }
 
-func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
+func Open(address string, timeout time.Duration) (c *Connection, err error) {
+	c = &Connection{}
 	c.conn, err = net.DialTimeout("tcp", address, timeout)
 
 	if nil != err {
@@ -72,7 +73,7 @@ func write(w io.Writer, data []byte) error {
 	return err
 }
 
-func (c *ZbxConnection) Write(data []byte, timeout time.Duration) error {
+func (c *Connection) Write(data []byte, timeout time.Duration) error {
 	if timeout != 0 {
 		err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
 		if nil != err {
@@ -82,7 +83,7 @@ func (c *ZbxConnection) Write(data []byte, timeout time.Duration) error {
 	return write(c.conn, data)
 }
 
-func (c *ZbxConnection) WriteString(s string, timeout time.Duration) error {
+func (c *Connection) WriteString(s string, timeout time.Duration) error {
 	return c.Write([]byte(s), timeout)
 }
 
@@ -162,7 +163,7 @@ func read(r io.Reader) ([]byte, error) {
 	return s[:total], nil
 }
 
-func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
+func (c *Connection) Read(timeout time.Duration) ([]byte, error) {
 	if timeout != 0 {
 		err := c.conn.SetReadDeadline(time.Now().Add(timeout))
 		if nil != err {
@@ -172,7 +173,7 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 	return read(c.conn)
 }
 
-func (c *ZbxConnection) RemoteIP() string {
+func (c *Connection) RemoteIP() string {
 	addr := c.conn.RemoteAddr().String()
 	if pos := strings.Index(addr, ":"); pos != -1 {
 		addr = addr[:pos]
@@ -180,39 +181,37 @@ func (c *ZbxConnection) RemoteIP() string {
 	return addr
 }
 
-func Listen(address string) (c *ZbxListener, err error) {
+func Listen(address string) (c *Listener, err error) {
 	l, tmperr := net.Listen("tcp", address)
 	if tmperr != nil {
 		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
-	c = &ZbxListener{listener: l.(*net.TCPListener)}
+	c = &Listener{listener: l.(*net.TCPListener)}
 	return
 }
 
-func (l *ZbxListener) Accept() (c *ZbxConnection, err error) {
+func (l *Listener) Accept() (c *Connection, err error) {
 	var conn net.Conn
 	if conn, err = l.listener.Accept(); err != nil {
 		return
 	} else {
-		c = &ZbxConnection{conn: conn}
+		c = &Connection{conn: conn}
 	}
 	return
 }
 
-func (c *ZbxConnection) Close() (err error) {
+func (c *Connection) Close() (err error) {
 	return c.conn.Close()
 }
 
-func (c *ZbxListener) Close() (err error) {
+func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
 func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
-	var c ZbxConnection
-
 	log.Tracef("connecting to [%s]", address)
 
-	err := c.Open(address, time.Second*time.Duration(timeout))
+	c, err := Open(address, time.Second*time.Duration(timeout))
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
