@@ -114,8 +114,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$macros = CDBHelper::getAll('SELECT * FROM globalmacro');
 		foreach ($macros as $macro) {
 			// Macro check and row selection.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"][@readonly][contains(text(),"'.
-					$macro['macro'].'")]/../..')
+			$element = $this->webDriver->findElement(WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"][@readonly][text()="'.
+					$macro['macro'].'"]/../..')
 			);
 			// Effective value.
 			$this->assertEquals($macro['value'], $element->findElement(
