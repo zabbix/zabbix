@@ -66,7 +66,7 @@ type Uploader interface {
 	Addr() (s string)
 }
 
-func (c *ResultCache) flushOutput(w Uploader) {
+func (c *ResultCache) flushOutput(u Uploader) {
 	log.Debugf("upload history data, %d value(s)", len(c.results))
 	request := AgentDataRequest{
 		Request:   "agent data",
@@ -104,12 +104,12 @@ func (c *ResultCache) flushOutput(w Uploader) {
 		return
 	}
 
-	if w == nil {
-		w = c.output
+	if u == nil {
+		u = c.output
 	}
-	if _, err = w.Write(data); err != nil {
+	if _, err = u.Write(data); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("active check data upload to [%s] started to fail: (%s)", w.Addr(), err)
+			log.Warningf("active check data upload to [%s] started to fail: (%s)", u.Addr(), err)
 			c.lastError = err
 		}
 
@@ -117,7 +117,7 @@ func (c *ResultCache) flushOutput(w Uploader) {
 	}
 
 	if c.lastError != nil {
-		log.Warningf("active check data upload to [%s] is working again", w.Addr())
+		log.Warningf("active check data upload to [%s] is working again", u.Addr())
 		c.lastError = nil
 	}
 
