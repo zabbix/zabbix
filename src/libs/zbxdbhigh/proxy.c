@@ -116,6 +116,7 @@ static zbx_history_table_t	areg = {
 		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
 		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
+		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
 };
@@ -3990,6 +3991,8 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
+		unsigned int	connection_type;
+
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
@@ -4041,8 +4044,19 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __func__, tmp);
 			continue;
 		}
+		else if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TLS_ACCEPTED, tmp, sizeof(tmp)))
+		{
+			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+		}
+		else if (FAIL == is_uint32(tmp, &connection_type) || (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
+				ZBX_TCP_SEC_TLS_PSK != connection_type))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid value for \""
+					ZBX_PROTO_TAG_TLS_ACCEPTED "\"", __func__, tmp);
+			continue;
+		}
 
-		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, itemtime);
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)
