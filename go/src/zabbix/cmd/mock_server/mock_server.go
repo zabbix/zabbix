@@ -67,6 +67,13 @@ func handleConnection(c *comms.ZbxConnection, activeChecks []byte, tFlag int) {
 			log.Warningf("Write failed: %s\n", err)
 			return
 		}
+	case "agent data":
+		err = c.WriteString("{\"response\":\"success\",\"info\":\"processed: 0; failed: 0; total: 0; seconds spent: 0.042523\"}", time.Second*time.Duration(tFlag))
+		if err != nil {
+			log.Warningf("Write failed: %s\n", err)
+			return
+		}
+
 	default:
 		log.Warningf("Unsupported request: %s\n", pairs["request"])
 		return

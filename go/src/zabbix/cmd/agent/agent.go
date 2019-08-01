@@ -27,6 +27,7 @@ import (
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
+	"zabbix/internal/agent/serverconnector"
 	"zabbix/internal/agent/serverlistener"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
@@ -150,6 +151,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
+
+	addresses, err := serverconnector.ParseServerActive()
+	if err != nil {
+		log.Critf("%s", err)
+		os.Exit(1)
+	}
+
 	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (version placeholder)", agent.Options.Hostname)
 	log.Infof(greeting)
 
@@ -162,11 +170,18 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	var err error
 	taskManager := scheduler.NewManager()
 	listener := serverlistener.New(taskManager)
 
 	taskManager.Start()
+
+	serverConnectors := make([]*serverconnector.Connector, len(addresses))
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
+		serverConnectors[i].Start()
+	}
+
 	err = listener.Start()
 
 	if err == nil {
@@ -176,6 +191,11 @@ func main() {
 	}
 
 	listener.Stop()
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Stop()
+	}
+
 	taskManager.Stop()
 	monitor.Wait()
 

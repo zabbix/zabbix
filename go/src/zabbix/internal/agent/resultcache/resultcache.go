@@ -35,11 +35,12 @@ import (
 
 type ResultCache struct {
 	input      chan interface{}
-	output     io.Writer
+	output     Uploader
 	results    []*plugin.Result
 	token      string
 	lastDataID uint64
 	clientID   uint64
+	lastError  error
 }
 
 type AgentData struct {
@@ -61,8 +62,17 @@ type AgentDataRequest struct {
 	Version   string      `json:"version"`
 }
 
-func (c *ResultCache) flushOutput(w io.Writer) {
+type Uploader interface {
+	io.Writer
+	Addr() (s string)
+}
+
+func (c *ResultCache) flushOutput(u Uploader) {
 	log.Debugf("[%d] upload history data, %d value(s)", c.clientID, len(c.results))
+	if len(c.results) == 0 {
+		return
+	}
+
 	request := AgentDataRequest{
 		Request:   "agent data",
 		Data:      make([]AgentData, len(c.results)),
@@ -99,13 +109,22 @@ func (c *ResultCache) flushOutput(w io.Writer) {
 		return
 	}
 
-	if w == nil {
-		w = c.output
+	if u == nil {
+		u = c.output
 	}
-	if _, err = w.Write(data); err != nil {
-		log.Errf("[%d] cannot upload cached history to server: %s", c.clientID, err.Error())
+	if _, err = u.Write(data); err != nil {
+		if c.lastError == nil || err.Error() != c.lastError.Error() {
+			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
+			c.lastError = err
+		}
 		return
 	}
+
+	if c.lastError != nil {
+		log.Warningf("[%d] history upload to [%s] is working again", c.clientID, u.Addr())
+		c.lastError = nil
+	}
+
 	c.lastDataID = lastDataID
 	c.results = make([]*plugin.Result, 0)
 }
@@ -124,8 +143,8 @@ func (c *ResultCache) run() {
 			break
 		}
 		switch v.(type) {
-		case io.Writer:
-			c.flushOutput(v.(io.Writer))
+		case Uploader:
+			c.flushOutput(v.(Uploader))
 		case *plugin.Result:
 			r := v.(*plugin.Result)
 			c.write(r)
@@ -153,7 +172,7 @@ func (c *ResultCache) Stop() {
 	c.input <- nil
 }
 
-func NewActive(clientid uint64, output io.Writer) *ResultCache {
+func NewActive(clientid uint64, output Uploader) *ResultCache {
 	return &ResultCache{clientID: clientid, output: output, token: newToken()}
 }
 
@@ -161,8 +180,8 @@ func NewPassive(clientid uint64) *ResultCache {
 	return &ResultCache{clientID: clientid, token: newToken()}
 }
 
-func (c *ResultCache) FlushOutput(w io.Writer) {
-	c.input <- w
+func (c *ResultCache) FlushOutput(u Uploader) {
+	c.input <- u
 }
 
 func (c *ResultCache) Flush() {

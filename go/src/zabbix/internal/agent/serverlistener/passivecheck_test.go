@@ -19,7 +19,9 @@
 
 package serverlistener
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFormatError(t *testing.T) {
 	const notsupported = "ZBX_NOTSUPPORTED"

@@ -53,6 +53,10 @@ func (w *mockWriter) Write(data []byte) (n int, err error) {
 	return
 }
 
+func (w *mockWriter) Addr() string {
+	return ""
+}
+
 func TestResultCache(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
