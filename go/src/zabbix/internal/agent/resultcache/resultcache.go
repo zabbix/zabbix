@@ -63,7 +63,7 @@ type AgentDataRequest struct {
 
 type Uploader interface {
 	Write(p []byte) (n int, err error)
-	GetAddr() (s string)
+	Addr() (s string)
 }
 
 func (c *ResultCache) flushOutput(w Uploader) {
@@ -109,7 +109,7 @@ func (c *ResultCache) flushOutput(w Uploader) {
 	}
 	if _, err = w.Write(data); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("active check data upload to [%s] started to fail: (%s)", w.GetAddr(), err)
+			log.Warningf("active check data upload to [%s] started to fail: (%s)", w.Addr(), err)
 			c.lastError = err
 		}
 
@@ -117,7 +117,7 @@ func (c *ResultCache) flushOutput(w Uploader) {
 	}
 
 	if c.lastError != nil {
-		log.Warningf("active check data upload to [%s] is working again", w.GetAddr())
+		log.Warningf("active check data upload to [%s] is working again", w.Addr())
 		c.lastError = nil
 	}
 

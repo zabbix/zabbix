@@ -84,7 +84,7 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
-func (c *Connector) GetAddr() (s string) {
+func (c *Connector) Addr() (s string) {
 	return c.address
 }
 
