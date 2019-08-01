@@ -434,6 +434,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		$sqlParts = $this->applyQueryFilterOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -457,6 +458,7 @@ class CHost extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['inventory_mode'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -467,10 +469,44 @@ class CHost extends CHostGeneral {
 		return $result;
 	}
 
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
+			if ($options['filter']['inventory_mode'] !== null) {
+				$inventory_mode_query = is_array($options['filter']['inventory_mode'])
+					? $options['filter']['inventory_mode']
+					: [$options['filter']['inventory_mode']];
+
+				$inventory_mode_where = [];
+				$null_position = array_search(HOST_INVENTORY_DISABLED, $inventory_mode_query);
+
+				if ($null_position !== false) {
+					array_splice($inventory_mode_query, $null_position, 1);
+					$inventory_mode_where[] = 'hi.inventory_mode IS NULL';
+				}
+
+				if ($inventory_mode_query) {
+					$inventory_mode_where[] = dbConditionInt('hi.inventory_mode', $inventory_mode_query);
+				}
+
+				if (count($inventory_mode_where) > 1) {
+					$sqlParts['where'][] = '(' . implode(' OR ', $inventory_mode_where) . ')';
+				}
+				else {
+					$sqlParts['where'][] = array_pop($inventory_mode_where);
+				}
+			}
+		}
+
+		return $sqlParts;
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($this->outputIsRequested('inventory_mode', $options['output'])) {
+		if ($this->outputIsRequested('inventory_mode', $options['output'])
+			|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 
 			$sqlParts['select']['inventory_mode'] = 'COALESCE(hi.inventory_mode, ' . HOST_INVENTORY_DISABLED . ') AS inventory_mode';
 			$sqlParts['left_join'][] = [
