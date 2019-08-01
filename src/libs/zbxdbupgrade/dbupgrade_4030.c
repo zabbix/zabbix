@@ -124,11 +124,7 @@ static int	DBpatch_4030010(void)
 
 static int	DBpatch_4030011(void)
 {
-	int	res;
-
-	res = DBexecute("update widget set x=x*2, width=width*2;");
-
-	if (ZBX_DB_OK > res)
+	if (ZBX_DB_OK > DBexecute("update widget set x=x*2, width=width*2"))
 		return FAIL;
 
 	return SUCCEED;
