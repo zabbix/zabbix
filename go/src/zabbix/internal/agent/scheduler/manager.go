@@ -136,10 +136,11 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(task performer) {
-	task.finish()
+	reschedule := task.finish()
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && task.reschedule() {
+	if p.active() && task.isActive() && reschedule {
+		task.reschedule(time.Now())
 		p.enqueueTask(task)
 	}
 	if !p.queued() && p.hasCapacity() {
@@ -147,15 +148,43 @@ func (m *Manager) processFinishRequest(task performer) {
 	}
 }
 
+// rescheduleQueue reschedules all queued tasks. This is done whenever time
+// difference between ticks exceeds limits (for example during daylight saving changes).
+func (m *Manager) rescheduleQueue(now time.Time) {
+	// easier to rebuild queues than update each element
+	queue := make(pluginHeap, 0, len(m.queue))
+	for _, p := range queue {
+		tasks := p.tasks
+		p.tasks = make(performerHeap, 0, len(tasks))
+		for _, t := range tasks {
+			t.reschedule(now)
+			p.enqueueTask(t)
+		}
+		heap.Push(&queue, p)
+	}
+	m.queue = queue
+}
+
 func (m *Manager) run() {
 	defer log.PanicHook()
 	log.Debugf("starting manager")
+	// Adjust ticker creation at the 0 nanosecond timestamp. In reality it will have at least
+	// some microseconds, which will be enough to include all scheduled tasks at this second
+	// even with nanosecond priority adjustment.
+	lastTick := time.Now()
+	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			m.processQueue(time.Now())
+			now := time.Now()
+			diff := now.Sub(lastTick)
+			interval := time.Second * 10
+			if diff <= -interval || diff >= interval {
+				m.rescheduleQueue(now)
+			}
+			m.processQueue(now)
 		case v := <-m.input:
 			if v == nil {
 				break run

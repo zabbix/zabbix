@@ -210,7 +210,7 @@ func (m *mockManager) iterate(t *testing.T, iters int) {
 func (m *mockManager) mockInit(t *testing.T) {
 	m.init()
 	clock := time.Now().Unix()
-	m.startTime = time.Unix(clock-clock%10, 0)
+	m.startTime = time.Unix(clock-clock%10, 100)
 	t.Logf("starting time %s", m.startTime.Format(time.Stamp))
 	m.now = m.startTime
 }
@@ -390,8 +390,11 @@ func (t *mockExporterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockExporterTask) reschedule() bool {
+func (t *mockExporterTask) reschedule(now time.Time) {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
+}
+
+func (t *mockExporterTask) finish() bool {
 	return true
 }
 
@@ -405,13 +408,16 @@ func (t *mockCollectorTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) reschedule() bool {
+func (t *mockCollectorTask) reschedule(now time.Time) {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
-	return true
 }
 
 func (t *mockCollectorTask) getWeight() int {
 	return t.plugin.capacity
+}
+
+func (t *mockCollectorTask) finish() bool {
+	return true
 }
 
 type mockStarterTask struct {
@@ -424,8 +430,7 @@ func (t *mockStarterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStarterTask) reschedule() bool {
-	return false
+func (t *mockStarterTask) reschedule(now time.Time) {
 }
 
 func (t *mockStarterTask) getWeight() int {
@@ -442,8 +447,7 @@ func (t *mockStopperTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStopperTask) reschedule() bool {
-	return false
+func (t *mockStopperTask) reschedule(now time.Time) {
 }
 
 func (t *mockStopperTask) getWeight() int {
@@ -462,8 +466,7 @@ func (t *mockWatcherTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) reschedule() bool {
-	return false
+func (t *mockWatcherTask) reschedule(now time.Time) {
 }
 
 func (t *mockWatcherTask) getWeight() int {
@@ -481,8 +484,7 @@ func (t *mockConfigerTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockConfigerTask) reschedule() bool {
-	return false
+func (t *mockConfigerTask) reschedule(now time.Time) {
 }
 
 func (t *mockConfigerTask) getWeight() int {

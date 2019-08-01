@@ -31,10 +31,11 @@ type performer interface {
 	// performs the task, this function is called in a separate goroutine
 	perform(s Scheduler)
 	// reschedules the task, returns false if the task has been expired
-	reschedule() bool
+	reschedule(now time.Time)
 	// finishes performed task, this function is called in sheduler goroutine and can
 	// be used to update scheduler data without synchronization
-	finish()
+	// Return false if the task was one time and should not be resheduled.
+	finish() bool
 	// returns time the task has been scheduled to perform
 	getScheduled() time.Time
 	// returns task weight
