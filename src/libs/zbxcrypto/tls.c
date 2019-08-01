@@ -212,7 +212,10 @@ ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
 /* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
-size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
+size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t, unsigned int *) = NULL;
+
+/* variable for passing information from callback functions if PSK was found among host PSKs or autoregistration PSK */
+static unsigned int	psk_usage;
 
 #if defined(HAVE_POLARSSL)
 ZBX_THREAD_LOCAL static x509_crt		*ca_cert		= NULL;
@@ -1275,7 +1278,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 		tls_psk_identity[psk_identity_len] = '\0';
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, sizeof(tls_psk_hex)))
+		if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, sizeof(tls_psk_hex), &psk_usage))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -1357,7 +1360,8 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 		/* search the required PSK in configuration cache */
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, sizeof(tls_psk_hex)))
+		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, sizeof(tls_psk_hex),
+				&psk_usage))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -1502,7 +1506,8 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		/* search the required PSK in configuration cache */
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, sizeof(tls_psk_hex)))
+		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, sizeof(tls_psk_hex),
+				&psk_usage))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -5703,4 +5708,8 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 }
 #endif
 
+unsigned int	zbx_tls_get_psk_usage(void)
+{
+	return	psk_usage;
+}
 #endif
