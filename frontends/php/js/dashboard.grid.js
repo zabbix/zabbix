@@ -224,13 +224,13 @@
 			cell_h = data['options']['widget-height']
 		;
 
-		if (widget['iterator'] && widget['div'].hasClass('ui-resizable-resizing')) {
+		if (widget['iterator'] && $div.hasClass('ui-resizable-resizing')) {
 			var place_w = Math.round($div.width() / cell_w - 0.49),
 				place_h = Math.round($div.height() / cell_h - 0.49),
-				place_x = widget['div'].hasClass('resizing-left')
+				place_x = $div.hasClass('resizing-left')
 					? (Math.round((pos.left + $div.width()) / cell_w) - place_w)
 					: Math.round(pos.left / cell_w),
-				place_y = widget['div'].hasClass('resizing-top')
+				place_y = $div.hasClass('resizing-top')
 					? (Math.round((pos.top + $div.height()) / cell_h) - place_h)
 					: Math.round(pos.top / cell_h)
 			;
