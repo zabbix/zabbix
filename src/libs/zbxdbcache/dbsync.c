@@ -487,7 +487,6 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 #undef SELECTED_CONFIG_FIELD_COUNT
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dbsync_compare_autoreg_psk                                   *
@@ -564,7 +563,6 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	return SUCCEED;
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
 }
-#endif
 
 /******************************************************************************
  *                                                                            *

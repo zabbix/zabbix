@@ -999,7 +999,6 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 #undef SELECTED_FIELD_COUNT
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 {
 	/* sync this function with zbx_dbsync_compare_autoreg_psk() */
@@ -1031,7 +1030,6 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-#endif
 
 static void	DCsync_hosts(zbx_dbsync_t *sync)
 {
@@ -4905,10 +4903,8 @@ void	DCsync_configuration(unsigned char mode)
 			maintenance_sync, maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
 			maintenance_host_sync, hgroup_host_sync;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
-#endif
 	zbx_uint64_t	update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -4917,9 +4913,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_dbsync_init(&autoreg_config_sync, mode);
-#endif
 	zbx_dbsync_init(&hosts_sync, mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
@@ -4961,23 +4955,20 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	csec = zbx_time() - sec;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_autoreg_psk(&autoreg_config_sync))
 		goto out;
 	autoreg_csec = zbx_time() - sec;
-#endif
+
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_config(&config_sync, &flags);
 	csec2 = zbx_time() - sec;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	sec = zbx_time();
 	DCsync_autoreg_config(&autoreg_config_sync);	/* must be done in the same cache locking with config sync */
 	autoreg_csec2 = zbx_time() - sec;
-#endif
 	FINISH_SYNC;
 
 	/* sync macro related data, to support macro resolving during configuration sync */
@@ -5291,14 +5282,14 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
 		total += autoreg_csec;
 		total2 += autoreg_csec2;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, autoreg_csec, autoreg_csec2, autoreg_config_sync.add_num,
 				autoreg_config_sync.update_num, autoreg_config_sync.remove_num);
-#endif
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
