@@ -226,7 +226,7 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
-	$('.textarea-flexible').textareaFlexible();
+	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });
 
 <?php return ob_get_clean(); ?>
