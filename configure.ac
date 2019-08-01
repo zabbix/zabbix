@@ -1983,7 +1983,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
-	go/src/zabbix/plugins/vfs/vfs_file/Makefile
+	go/src/zabbix/plugins/vfs/filecksum/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
