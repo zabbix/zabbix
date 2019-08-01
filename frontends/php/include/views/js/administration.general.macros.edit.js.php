@@ -26,16 +26,6 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		$('#tbl_macros')
-			.dynamicRows({template: '#macro-row-tmpl'})
-			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
-				if ($(this).hasClass('macro')) {
-					macroToUpperCase(this);
-				}
-				$(this).trigger('input');
-			})
-			.on('click', 'button.element-table-add', function() {
-				$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			})
 			.on('click', 'button.element-table-remove', function() {
 				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
 				var macroNum = $(this).attr('id').split('_')[1];
@@ -43,6 +33,16 @@
 					var count = $('#update').data('removedCount') + 1;
 					$('#update').data('removedCount', count);
 				}
+			})
+			.dynamicRows({template: '#macro-row-tmpl'})
+			.on('click', 'button.element-table-add', function() {
+				$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+			})
+			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
+				if ($(this).hasClass('macro')) {
+					macroToUpperCase(this);
+				}
+				$(this).trigger('input');
 			});
 
 		$('#update').click(function() {
