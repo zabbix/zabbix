@@ -20,7 +20,8 @@
 package plugins
 
 import (
-	_ "zabbix/plugins/debug"
+	_ "zabbix/plugins/debug/empty"
+	_ "zabbix/plugins/debug/log"
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
 )

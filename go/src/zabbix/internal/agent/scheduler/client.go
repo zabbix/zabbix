@@ -10,7 +10,7 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more detailm.
+** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
@@ -124,22 +124,25 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		}
 	}
 
-	// handle Watcher interface
-	if _, ok := p.impl.(plugin.Watcher); ok {
-		if info.watcher == nil {
-			info.watcher = &watcherTask{
-				taskBase: taskBase{
-					plugin:    p,
-					scheduled: now.Add(priorityWatcherTaskNs),
-					active:    true,
-				},
-				sink:     sink,
-				requests: make([]*plugin.Request, 0, 1),
+	// Watcher plugins are not supported by direct requests
+	if c.id != 0 {
+		// handle Watcher interface
+		if _, ok := p.impl.(plugin.Watcher); ok {
+			if info.watcher == nil {
+				info.watcher = &watcherTask{
+					taskBase: taskBase{
+						plugin:    p,
+						scheduled: now.Add(priorityWatcherTaskNs),
+						active:    true,
+					},
+					sink:     sink,
+					requests: make([]*plugin.Request, 0, 1),
+				}
+				p.enqueueTask(info.watcher)
+				log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 			}
-			p.enqueueTask(info.watcher)
-			log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
+			info.watcher.requests = append(info.watcher.requests, r)
 		}
-		info.watcher.requests = append(info.watcher.requests, r)
 	}
 	if info.used.IsZero() {
 		p.refcount++

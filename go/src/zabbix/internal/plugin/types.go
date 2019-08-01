@@ -38,7 +38,7 @@ type Runner interface {
 	Stop()
 }
 
-// Watcher - interface for fully custom monitorin
+// Watcher - interface for fully custom monitoring
 type Watcher interface {
 	Watch(requests []*Request, sink ResultWriter)
 }

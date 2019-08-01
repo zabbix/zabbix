@@ -1986,6 +1986,8 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
 	go/src/zabbix/plugins/debug/Makefile
+	go/src/zabbix/plugins/debug/empty/Makefile
+	go/src/zabbix/plugins/debug/log/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

@@ -10,7 +10,7 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more detailm.
+** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
@@ -55,7 +55,7 @@ type activeChecksResponse struct {
 	Data     []*plugin.Request `json:"data"`
 }
 
-type agendDataResponse struct {
+type agentDataResponse struct {
 	Response string `json:"response"`
 	Info     string `json:"info"`
 }
@@ -85,6 +85,8 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
+// Write function is used by ResultCache to print diagnostic information. It will be callled from
+// different goroutine.
 func (c *Connector) Addr() (s string) {
 	return c.address
 }
@@ -143,13 +145,15 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache, response.Data)
 }
 
+// Write function is used by ResultCache to upload cached history. It will be callled from
+// different goroutine.
 func (c *Connector) Write(data []byte) (n int, err error) {
 	b, err := comms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), data)
 	if err != nil {
 		return 0, err
 	}
 
-	var response agendDataResponse
+	var response agentDataResponse
 
 	err = json.Unmarshal(b, &response)
 	if err != nil {
