@@ -91,16 +91,17 @@ class CControllerAcknowledgeCreate extends CController {
 
 		// Update selected events.
 		$event_chunks = array_chunk($events, ZBX_DB_MAX_INSERTS);
-		foreach ($event_chunks as $events) {
+		foreach ($event_chunks as $event_chunk) {
 			// Group events by actions user is allowed to perform.
-			$eventid_groups = $this->groupEventsByActionsAllowed($events, $editable_triggers);
+			$eventid_groups = $this->groupEventsByActionsAllowed($event_chunk, $editable_triggers);
 
 			while ($eventid_groups['readable']) {
 				$data = $this->getAcknowledgeOptions($eventid_groups);
 
 				/*
 				 * No actions to perform. This can happen only if user has selected action he have no permissions to do
-				 * for any of selected events. This should not be possible by using frontend.
+				 * for any of selected events. This can happen, when you will perform one action on multiple problems,
+				 * where only some of these problems can perform this action (ex. close problem).
 				 */
 				if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
 					break;
@@ -173,7 +174,7 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function getEventDetails(array $eventids) {
 		// Select details for all affected events.
 		$events = API::Event()->get([
-			'output' => ['objectid', 'acknowledged', 'r_eventid'],
+			'output' => ['eventid', 'objectid', 'acknowledged', 'r_eventid'],
 			'select_acknowledges' => $this->close_problems ? ['action'] : null,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
