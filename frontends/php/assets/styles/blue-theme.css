@@ -2384,11 +2384,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-  transform: translate3d(0, -94%, 2px);
+  transform: translate3d(0, -94%, 0);
   z-index: 5; }
 .dashbrd-grid-container .dashbrd-grid-widget-focus.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content,
 .dashbrd-grid-container .dashbrd-grid-widget:hover.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
-  transform: translate3d(0, 0, 3px);
   z-index: 6; }
 
 .dashbrd-grid-widget-container {
@@ -2437,7 +2436,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 2; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   background-color: #fff;
-  transform: translate3d(0, 0, 1px);
   transition: z-index .3s;
   z-index: 3; }
 
