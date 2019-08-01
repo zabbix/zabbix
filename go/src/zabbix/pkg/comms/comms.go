@@ -26,6 +26,7 @@ import (
 	"io"
 	"net"
 	"time"
+	"zabbix/pkg/log"
 )
 
 const headerSize = 13
@@ -40,6 +41,18 @@ type ZbxListener struct {
 
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
 	c.conn, err = net.DialTimeout("tcp", address, timeout)
+
+	if nil != err {
+		return
+	}
+
+	err = c.conn.SetReadDeadline(time.Now().Add(timeout))
+	if nil != err {
+		return
+	}
+
+	err = c.conn.SetWriteDeadline(time.Now().Add(timeout))
+
 	return
 }
 
@@ -59,9 +72,11 @@ func write(w io.Writer, data []byte) error {
 }
 
 func (c *ZbxConnection) Write(data []byte, timeout time.Duration) error {
-	err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return err
+	if timeout != 0 {
+		err := c.conn.SetWriteDeadline(time.Now().Add(timeout))
+		if nil != err {
+			return err
+		}
 	}
 	return write(c.conn, data)
 }
@@ -147,9 +162,11 @@ func read(r io.Reader) ([]byte, error) {
 }
 
 func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
-	err := c.conn.SetReadDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return nil, err
+	if timeout != 0 {
+		err := c.conn.SetReadDeadline(time.Now().Add(timeout))
+		if nil != err {
+			return nil, err
+		}
 	}
 	return read(c.conn)
 }
@@ -178,4 +195,38 @@ func (c *ZbxConnection) Close() (err error) {
 
 func (c *ZbxListener) Close() (err error) {
 	return c.ln.Close()
+}
+
+func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
+	var c ZbxConnection
+
+	log.Debugf("connecting to [%s]", address)
+
+	err := c.Open(address, time.Second*time.Duration(timeout))
+	if err != nil {
+		log.Debugf("cannot connect to [%s]: %s", address, err)
+		return nil, err
+	}
+
+	defer c.Close()
+
+	log.Debugf("sending [%s] to [%s]", string(data), address)
+
+	err = c.Write(data, 0)
+	if err != nil {
+		log.Debugf("cannot send to [%s]: %s", address, err)
+		return nil, err
+	}
+
+	log.Debugf("receiving data from [%s]", address)
+
+	b, err := c.Read(0)
+	if err != nil {
+		log.Debugf("cannot receive data from [%s]: %s", address, err)
+		return nil, err
+	}
+
+	log.Debugf("received [%s] from [%s]", string(b), address)
+
+	return b, nil
 }
