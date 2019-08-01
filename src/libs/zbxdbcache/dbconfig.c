@@ -6355,7 +6355,9 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *     psk_identity - [IN] PSK identity to search for ('\0' terminated)       *
  *     psk_buf      - [OUT] output buffer for PSK value                       *
  *     psk_buf_len  - [IN] output buffer size                                 *
- *                                                                            *
+ *     psk_usage    - [OUT] 0 - PSK not found, 1 - found in host PSKs,        *
+ *                          2 - found in autoregistration PSK, 3 - found in   *
+ *                          both                                              *
  * Return value:                                                              *
  *     PSK length in bytes if PSK found. 0 - if PSK not found.                *
  *                                                                            *
@@ -6367,24 +6369,69 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *     the src/libs/zbxcrypto/tls.c.                                          *
  *                                                                            *
  ******************************************************************************/
-size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len)
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len,
+		unsigned int *psk_usage)
 {
 	const ZBX_DC_PSK	*psk_i;
 	ZBX_DC_PSK		psk_i_local;
 	size_t			psk_len = 0;
 
+	*psk_usage = 0;
+
 	RDLOCK_CACHE;
 
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
+	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
+	{
 		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, psk_buf_len);
+		*psk_usage = ZBX_PSK_FOR_HOST;
+	}
+
+	/* Does it match autoregistration PSK? */
+	if (0 == strcmp(config->autoreg_psk_identity, (const char *)psk_identity))
+	{
+		if (0 == *psk_usage)
+			psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+
+		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
+	}
 
 	UNLOCK_CACHE;
 
 	return psk_len;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_autoregistration_psk                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Copy autoregistration PSK identity and value from configuration cache  *
+ *     into caller's buffers                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
+ *     psk_identity_buf_len - [IN] buffer length for PSK identity             *
+ *     psk_buf              - [OUT] buffer for PSK value                      *
+ *     psk_buf_len          - [IN] buffer length for PSK value                *
+ *                                                                            *
+ * Comments: if autoregistration PSK is not configured then empty strings     *
+ *           will be copied into buffers                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
+		unsigned char *psk_buf, size_t psk_buf_len)
+{
+	RDLOCK_CACHE;
+
+	zbx_strlcpy((char *)psk_identity_buf, config->autoreg_psk_identity, psk_identity_buf_len);
+	zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+
+	UNLOCK_CACHE;
+}
 
 static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface)
 {
