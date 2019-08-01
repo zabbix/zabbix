@@ -128,7 +128,7 @@ func (c *Connector) refreshActiveChecks() {
 		if len(response.Info) != 0 {
 			log.Errf("no active checks on server [%s]: %s", c.address, response.Info)
 		} else {
-			log.Errf("no active checks on server")
+			log.Errf("no active checks on server [%s]", c.address)
 		}
 
 		return
