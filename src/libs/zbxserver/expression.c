@@ -1514,15 +1514,11 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
  ******************************************************************************/
 static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
 {
-	zbx_timespec_t	ts;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ts.sec = time(NULL);
-	ts.ns = 999999999;
-
-	ret = DBitem_value(expression, lastvalue, N_functionid, ts.sec, ts.ns, raw);
+	ret = DBitem_value(expression, lastvalue, N_functionid, time(NULL), 999999999, raw);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
