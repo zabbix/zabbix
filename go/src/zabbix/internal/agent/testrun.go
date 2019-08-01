@@ -77,6 +77,9 @@ func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
 		"system.uptime",
+		"vfs.file.cksum",
+		"vfs.file.contents",
+		"vfs.file.exists",
 	}
 
 	for _, metric := range metrics {

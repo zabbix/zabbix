@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	system \
-	systemd\
-	vfs
+	vfs_file
 

@@ -22,4 +22,5 @@ package plugins
 import (
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
+	_ "zabbix/plugins/vfs/vfs_file"
 )
