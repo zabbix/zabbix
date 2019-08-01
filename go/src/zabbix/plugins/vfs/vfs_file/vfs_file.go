@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
+	"time"
 	"zabbix/internal/plugin"
 )
 
@@ -43,9 +44,8 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 			return nil, errors.New("Wrong number of parameters")
 		}
 
-		/*
-			start := time.Now()
-		*/
+		start := time.Now()
+
 		buf, err := ioutil.ReadFile(params[0])
 		if err != nil {
 			return nil, fmt.Errorf("Cannot read file %s", params[0])
@@ -57,10 +57,10 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 		binary.LittleEndian.PutUint32(lbytes, l)
 		buf = append(buf, lbytes...)
 
-		/*elapsed := time.Since(start)
-		if elapsed.Seconds() > agent.Options.Timeot {
+		elapsed := time.Since(start)
+		if elapsed.Seconds() > /*agent.Options.Timeot*/ 3 {
 			return nil, errors.New("Timeout while processing item")
-		}*/
+		}
 
 		return crc32.Checksum([]byte(buf), crc32q), nil
 	case "vfs.file.contents":
