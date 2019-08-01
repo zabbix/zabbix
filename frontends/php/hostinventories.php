@@ -199,9 +199,9 @@ else {
 			$options = [
 				'output' => ['hostid', 'name', 'status'],
 				'selectInventory' => $requiredInventoryFields,
-				'withInventory' => true,
 				'selectGroups' => API_OUTPUT_EXTEND,
-				'groupids' => $data['pageFilter']->groupids
+				'groupids' => $data['pageFilter']->groupids,
+				'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 			];
 
 			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {

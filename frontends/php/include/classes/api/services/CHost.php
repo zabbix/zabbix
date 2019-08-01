@@ -49,7 +49,6 @@ class CHost extends CHostGeneral {
 	 * @param bool       $options['selectApplications']        select Applications
 	 * @param bool       $options['selectMacros']              select Macros
 	 * @param bool|array $options['selectInventory']           select Inventory
-	 * @param bool       $options['withInventory']             select only hosts with inventory
 	 * @param int        $options['count']                     count Hosts, returned column name is rowscount
 	 * @param string     $options['pattern']                   search hosts by pattern in Host name
 	 * @param string     $options['extendPattern']             search hosts by pattern in Host name, ip and DNS
@@ -96,7 +95,6 @@ class CHost extends CHostGeneral {
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
 			'with_applications'			=> null,
-			'withInventory'				=> null,
 			'editable'					=> false,
 			'nopermissions'				=> null,
 			// filter
@@ -375,14 +373,6 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['with_applications'])) {
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
-		}
-
-		// withInventory
-		if (!is_null($options['withInventory']) && $options['withInventory']) {
-			$sqlParts['where'][] = ' h.hostid IN ('.
-					' SELECT hin.hostid'.
-					' FROM host_inventory hin'.
-					')';
 		}
 
 		// tags

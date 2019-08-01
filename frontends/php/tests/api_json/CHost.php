@@ -74,9 +74,9 @@ class API_JSON_Host extends CAPITest {
 			[
 				// request
 				[
-					'withInventory' => true,
 					'selectInventory' => ['type'],
-					'hostids' => 10053
+					'hostids' => 10053,
+					'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 				],
 				// expected result
 				[
@@ -87,9 +87,9 @@ class API_JSON_Host extends CAPITest {
 			[
 				// request
 				[
-					'withInventory' => true,
 					'selectInventory' => ['os', 'tag'],
-					'hostids' => 10053
+					'hostids' => 10053,
+					'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 				],
 				// expected result
 				[
@@ -101,9 +101,9 @@ class API_JSON_Host extends CAPITest {
 			[
 				// request
 				[
-					'withInventory' => true,
 					'selectInventory' => ['blabla'], // non existent field
-					'hostids' => 10053
+					'hostids' => 10053,
+					'filter' => ['inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]]
 				],
 				// expected result
 				[
