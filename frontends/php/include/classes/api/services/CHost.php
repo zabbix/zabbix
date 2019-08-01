@@ -467,6 +467,23 @@ class CHost extends CHostGeneral {
 		return $result;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if ($this->outputIsRequested('inventory_mode', $options['output'])) {
+
+			$sqlParts['select']['inventory_mode'] = 'COALESCE(hi.inventory_mode, ' . HOST_INVENTORY_DISABLED . ') AS inventory_mode';
+			$sqlParts['left_join'][] = [
+				'from' => 'host_inventory hi',
+				'on' => $this->tableAlias() . '.' . $this->pk() . '=hi.' . $this->pk()
+			];
+			$sqlParts['left_table'] = $this->tableName();
+		}
+
+
+		return $sqlParts;
+	}
+
 	/**
 	 * Add host.
 	 *
