@@ -17,10 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package serverlistener
 
 import (
-	_ "zabbix/plugins/debug"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
+	"time"
+	"zabbix/internal/agent"
+	"zabbix/pkg/comms"
 )
+
+type passiveConnection struct {
+	conn *comms.ZbxConnection
+}
+
+func (pc *passiveConnection) Write(data []byte) (n int, err error) {
+	if err = pc.conn.Write(data, time.Second*time.Duration(agent.Options.Timeout)); err != nil {
+		n = len(data)
+	}
+	pc.conn.Close()
+	return
+}
+
+func (pc *passiveConnection) Address() string {
+	return pc.conn.RemoteIP()
+}

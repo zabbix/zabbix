@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 	"time"
 	"zabbix/pkg/log"
 )
@@ -36,7 +37,7 @@ type ZbxConnection struct {
 }
 
 type ZbxListener struct {
-	ln net.Listener
+	listener net.Listener
 }
 
 func (c *ZbxConnection) Open(address string, timeout time.Duration) (err error) {
@@ -171,22 +172,31 @@ func (c *ZbxConnection) Read(timeout time.Duration) ([]byte, error) {
 	return read(c.conn)
 }
 
-func (c *ZbxListener) Listen(address string) (err error) {
-	c.ln, err = net.Listen("tcp", address)
-	if err != nil {
-		return fmt.Errorf("Listen failed: %s", err)
+func (c *ZbxConnection) RemoteIP() string {
+	addr := c.conn.RemoteAddr().String()
+	if pos := strings.Index(addr, ":"); pos != -1 {
+		addr = addr[:pos]
 	}
-
-	return nil
+	return addr
 }
 
-func (c *ZbxConnection) Accept(listener *ZbxListener) (err error) {
-	c.conn, err = listener.ln.Accept()
-	if err != nil {
-		return fmt.Errorf("Accept failed: %s", err)
+func Listen(address string) (c *ZbxListener, err error) {
+	l, tmperr := net.Listen("tcp", address)
+	if tmperr != nil {
+		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
+	c = &ZbxListener{listener: l.(*net.TCPListener)}
+	return
+}
 
-	return nil
+func (l *ZbxListener) Accept() (c *ZbxConnection, err error) {
+	var conn net.Conn
+	if conn, err = l.listener.Accept(); err != nil {
+		return
+	} else {
+		c = &ZbxConnection{conn: conn}
+	}
+	return
 }
 
 func (c *ZbxConnection) Close() (err error) {
@@ -194,39 +204,39 @@ func (c *ZbxConnection) Close() (err error) {
 }
 
 func (c *ZbxListener) Close() (err error) {
-	return c.ln.Close()
+	return c.listener.Close()
 }
 
 func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
 	var c ZbxConnection
 
-	log.Debugf("connecting to [%s]", address)
+	log.Tracef("connecting to [%s]", address)
 
 	err := c.Open(address, time.Second*time.Duration(timeout))
 	if err != nil {
-		log.Debugf("cannot connect to [%s]: %s", address, err)
+		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
 	}
 
 	defer c.Close()
 
-	log.Debugf("sending [%s] to [%s]", string(data), address)
+	log.Tracef("sending [%s] to [%s]", string(data), address)
 
 	err = c.Write(data, 0)
 	if err != nil {
-		log.Debugf("cannot send to [%s]: %s", address, err)
+		log.Tracef("cannot send to [%s]: %s", address, err)
 		return nil, err
 	}
 
-	log.Debugf("receiving data from [%s]", address)
+	log.Tracef("receiving data from [%s]", address)
 
 	b, err := c.Read(0)
 	if err != nil {
-		log.Debugf("cannot receive data from [%s]: %s", address, err)
+		log.Tracef("cannot receive data from [%s]: %s", address, err)
 		return nil, err
 	}
 
-	log.Debugf("received [%s] from [%s]", string(b), address)
+	log.Tracef("received [%s] from [%s]", string(b), address)
 
 	return b, nil
 }

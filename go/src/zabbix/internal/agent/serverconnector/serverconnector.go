@@ -36,6 +36,7 @@ import (
 )
 
 type Connector struct {
+	clientID    uint64
 	input       chan interface{}
 	address     string
 	lastError   error
@@ -91,12 +92,12 @@ func (c *Connector) Addr() (s string) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
-	log.Debugf("In refreshActiveChecks() from [%s]", c.address)
-	defer log.Debugf("End of refreshActiveChecks() from [%s]", c.address)
+	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
+	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
 	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
 	if err != nil {
-		log.Errf("cannot create active checks request to [%s]: %s", c.address, err)
+		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address, err)
 		return
 	}
 
@@ -104,15 +105,15 @@ func (c *Connector) refreshActiveChecks() {
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("active check configuration update from [%s] started to fail (%s)", c.address, err)
+			log.Warningf("[%d] active check configuration update from [%s] started to fail (%s)", c.clientID,
+				c.address, err)
 			c.lastError = err
-
 		}
 		return
 	}
 
 	if c.lastError != nil {
-		log.Warningf("active check configuration update from [%s] is working again", c.address)
+		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.address)
 		c.lastError = nil
 	}
 
@@ -120,26 +121,26 @@ func (c *Connector) refreshActiveChecks() {
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Errf("cannot parse list of active checks from [%s]: %s", c.address, err)
+		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address, err)
 		return
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			log.Errf("no active checks on server [%s]: %s", c.address, response.Info)
+			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address, response.Info)
 		} else {
-			log.Errf("no active checks on server [%s]", c.address)
+			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
 		}
 
 		return
 	}
 
 	if nil == response.Data {
-		log.Errf("cannot parse list of active checks: data array is missing")
+		log.Errf("[%d] cannot parse list of active checks: data array is missing", c.clientID)
 		return
 	}
 
-	c.taskManager.UpdateTasks(c.resultCache, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache, response.Data)
 }
 
 func (c *Connector) Write(data []byte) (n int, err error) {
@@ -159,7 +160,6 @@ func (c *Connector) Write(data []byte) (n int, err error) {
 		if len(response.Info) != 0 {
 			return 0, fmt.Errorf("%s", response.Info)
 		}
-
 		return 0, errors.New("unsuccessful response")
 	}
 
@@ -170,7 +170,7 @@ func (c *Connector) run() {
 	var start time.Time
 
 	defer log.PanicHook()
-	log.Debugf("starting Server connector")
+	log.Debugf("[%d] starting server connector for '%s'", c.clientID, c.address)
 
 	ticker := time.NewTicker(time.Second)
 run:
@@ -187,20 +187,20 @@ run:
 		}
 	}
 	close(c.input)
-	log.Debugf("Server connector has been stopped")
+	log.Debugf("[%d] server connector has been stopped", c.clientID)
 	monitor.Unregister()
 }
 
 func New(taskManager *scheduler.Manager, address string) *Connector {
-	c := &Connector{taskManager: taskManager, address: address}
-	c.init()
-	c.resultCache = resultcache.NewActive(c)
+	c := &Connector{
+		taskManager: taskManager,
+		address:     address,
+		input:       make(chan interface{}, 10),
+		clientID:    agent.NewClientID(),
+	}
+	c.resultCache = resultcache.NewActive(c.clientID, c)
 
 	return c
-}
-
-func (c *Connector) init() {
-	c.input = make(chan interface{})
 }
 
 func (c *Connector) Start() {

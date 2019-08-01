@@ -77,3 +77,7 @@ func (p *pluginAgent) hasCapacity() bool {
 func (p *pluginAgent) active() bool {
 	return p.refcount != 0
 }
+
+func (p *pluginAgent) name() string {
+	return p.impl.Name()
+}

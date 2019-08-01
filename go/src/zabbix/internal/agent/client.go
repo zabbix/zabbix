@@ -17,10 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package agent
 
-import (
-	_ "zabbix/plugins/debug"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-)
+import "sync/atomic"
+
+var lastClientID uint64
+
+// Internal client id assigned to each active server and unique passive bulk request.
+// Single checks (internal and old style passive checks) has built-in client id 0.
+func NewClientID() uint64 {
+	return atomic.AddUint64(&lastClientID, 1)
+}

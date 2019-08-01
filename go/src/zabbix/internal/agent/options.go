@@ -27,6 +27,7 @@ type AgentOptions struct {
 	RefreshActiveChecks int    `conf:",,30:3600,120"`
 	Timeout             int    `conf:",,1-30,3"`
 	Hostname            string
+	ListenPort          int `conf:",,1024:32767,10050"`
 	Plugins             map[string]map[string]string
 }
 

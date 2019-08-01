@@ -17,10 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package debug
 
 import (
-	_ "zabbix/plugins/debug"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
+	"errors"
+	"zabbix/internal/plugin"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	switch key {
+	case "debug.empty":
+		return nil, nil
+	}
+	return nil, errors.New("Unknown metric")
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "debug", "debug.empty", "Returns empty value")
+}

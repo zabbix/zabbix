@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"hash/fnv"
 	"time"
 	"zabbix/internal/plugin"
@@ -27,7 +28,7 @@ import (
 	"zabbix/pkg/log"
 )
 
-type batchItem struct {
+type clientItem struct {
 	itemid      uint64
 	delay       string
 	unsupported bool
@@ -41,56 +42,68 @@ type pluginInfo struct {
 	watcher *watcherTask
 }
 
-type batch struct {
-	items   map[uint64]*batchItem
+type client struct {
+	id      uint64
+	items   map[uint64]*clientItem
 	plugins map[*pluginAgent]*pluginInfo
 }
 
-func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
+func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var nextcheck time.Time
-	if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
-		return
+	// calculate nextcheck for normal requests, while direct requests are executed immediately
+	if r.Itemid != 0 {
+		if nextcheck, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
+			return fmt.Errorf("Cannot calculate nextcheck: %s", err.Error())
+		}
+	} else {
+		nextcheck = now
 	}
 	nextcheck.Add(priorityExporterTaskNs)
 
 	var info *pluginInfo
 	var ok bool
-	if info, ok = b.plugins[p]; !ok {
+	if info, ok = c.plugins[p]; !ok {
 		info = &pluginInfo{}
-		b.plugins[p] = info
+		c.plugins[p] = info
 	}
 
 	// handle Collector interface
-	if c, ok := p.impl.(plugin.Collector); ok {
+	if col, ok := p.impl.(plugin.Collector); ok {
 		if p.refcount == 0 && info.used.IsZero() {
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
-			log.Debugf("start collector task for plugin %s with collecting interval %d", p.impl.Name(), c.Period())
 			task := &collectorTask{
 				taskBase: taskBase{
 					plugin:    p,
-					scheduled: time.Unix(now.Unix()+int64(h.Sum32())%int64(c.Period())+1, priorityCollectorTaskNs),
+					scheduled: time.Unix(now.Unix()+int64(h.Sum32())%int64(col.Period())+1, priorityCollectorTaskNs),
 					active:    true,
 				}}
 			p.enqueueTask(task)
+			log.Debugf("[%d] created collector task for plugin %s with collecting interval %d", c.id, p.name(),
+				col.Period())
 		}
 	}
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if item, ok := b.items[r.Itemid]; !ok {
-			item = &batchItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
-			b.items[r.Itemid] = item
+		if item, ok := c.items[r.Itemid]; !ok {
+			item = &clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
+			// don't cache items for direct requests
+			if r.Itemid != 0 {
+				c.items[r.Itemid] = item
+			}
 			item.task = &exporterTask{
 				taskBase: taskBase{plugin: p, scheduled: nextcheck, active: true},
 				writer:   sink,
 				item:     item}
 			p.enqueueTask(item.task)
+			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
 			item.updated = now
 			if item.delay != r.Delay && !item.unsupported {
 				p.tasks.Update(item.task)
 				item.task.reschedule()
+				log.Debugf("[%d] updated exporter task for plugin %s", c.id, p.name())
 			}
 			item.delay = r.Delay
 			item.key = r.Key
@@ -100,7 +113,6 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 	// handle runner interface for inactive plugins
 	if _, ok := p.impl.(plugin.Runner); ok {
 		if p.refcount == 0 && info.used.IsZero() {
-			log.Debugf("start starter task for plugin %s", p.impl.Name())
 			task := &starterTask{
 				taskBase: taskBase{
 					plugin:    p,
@@ -108,6 +120,7 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 					active:    true,
 				}}
 			p.enqueueTask(task)
+			log.Debugf("[%d] created starter task for plugin %s", c.id, p.name())
 		}
 	}
 
@@ -124,6 +137,7 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 				requests: make([]*plugin.Request, 0, 1),
 			}
 			p.enqueueTask(info.watcher)
+			log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 		}
 		info.watcher.requests = append(info.watcher.requests, r)
 	}
@@ -135,37 +149,55 @@ func (b *batch) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Result
 	return nil
 }
 
-func (b *batch) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
-	released = make([]*pluginAgent, 0, len(b.plugins))
+func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
+	released = make([]*pluginAgent, 0, len(c.plugins))
 	// remover references to temporary watcher tasks
-	for _, p := range b.plugins {
+	for _, p := range c.plugins {
 		p.watcher = nil
 	}
 
 	// remove unused items
-	for _, item := range b.items {
+	for _, item := range c.items {
 		if item.updated.Before(now) {
-			delete(b.items, item.itemid)
+			delete(c.items, item.itemid)
 			item.task.deactivate()
 		}
 	}
 
+	var expiry time.Time
+	// Direct requests are handled by special client with id 0. Such requests have
+	// day+hour (to keep once per day checks without expiring) expiry time before
+	// used plugins are released.
+	if c.id != 0 {
+		expiry = now
+	} else {
+		expiry = now.Add(-time.Hour * 25)
+	}
+
 	// deactivate plugins
 	for _, p := range plugins {
-		if info, ok := b.plugins[p]; ok {
-			if info.used.Before(now) {
+		if info, ok := c.plugins[p]; ok {
+			if info.used.Before(expiry) {
 				released = append(released, p)
-				delete(b.plugins, p)
+				delete(c.plugins, p)
 				p.refcount--
+				// TODO: define uniform time format
+				if c.id != 0 {
+					log.Debugf("[%d] released unused plugin %s", c.id, p.name())
+				} else {
+					log.Debugf("[%d] released plugin %s as not used since %s", c.id, p.name(),
+						time.Now().Format(time.Stamp))
+				}
 			}
 		}
 	}
 	return
 }
 
-func newBatch() (b *batch) {
-	b = &batch{
-		items:   make(map[uint64]*batchItem),
+func newClient(id uint64) (b *client) {
+	b = &client{
+		id:      id,
+		items:   make(map[uint64]*clientItem),
 		plugins: make(map[*pluginAgent]*pluginInfo),
 	}
 	return
