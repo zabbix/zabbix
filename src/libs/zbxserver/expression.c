@@ -1507,10 +1507,6 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
 {
