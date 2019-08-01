@@ -29,7 +29,8 @@ import (
 
 // task priority within the same second is done by setting nanosecond component
 const (
-	priorityStarterTaskNs = iota
+	priorityConfigerTaskNs = iota
+	priorityStarterTaskNs
 	priorityCollectorTaskNs
 	priorityWatcherTaskNs
 	priorityExporterTaskNs
@@ -220,5 +221,26 @@ func (t *watcherTask) reschedule() bool {
 }
 
 func (t *watcherTask) getWeight() int {
+	return t.plugin.capacity
+}
+
+type configerTask struct {
+	taskBase
+	options map[string]string
+}
+
+func (t *configerTask) perform(s Scheduler) {
+	go func() {
+		config, _ := t.plugin.impl.(plugin.Configer)
+		config.Configure(t.options)
+		s.FinishTask(t)
+	}()
+}
+
+func (t *configerTask) reschedule() bool {
+	return false
+}
+
+func (t *configerTask) getWeight() int {
 	return t.plugin.capacity
 }

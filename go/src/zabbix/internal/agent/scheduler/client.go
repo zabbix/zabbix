@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
@@ -144,6 +145,24 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			info.watcher.requests = append(info.watcher.requests, r)
 		}
 	}
+
+	// handle configer interface for inactive plugins
+	if _, ok := p.impl.(plugin.Configer); ok && agent.Options.Plugins != nil {
+		if p.refcount == 0 && info.used.IsZero() {
+			if options, ok := agent.Options.Plugins[p.impl.Name()]; ok {
+				task := &configerTask{
+					taskBase: taskBase{
+						plugin:    p,
+						scheduled: now.Add(priorityConfigerTaskNs),
+						active:    true,
+					},
+					options: options}
+				p.enqueueTask(task)
+				log.Debugf("[%d] created configer task for plugin %s", c.id, p.name())
+			}
+		}
+	}
+
 	if info.used.IsZero() {
 		p.refcount++
 	}

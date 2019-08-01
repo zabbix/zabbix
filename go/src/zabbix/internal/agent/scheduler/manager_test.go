@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
@@ -162,6 +163,16 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 	return p.requests
 }
 
+type mockConfigerPlugin struct {
+	plugin.Base
+	mockPlugin
+	options map[string]string
+}
+
+func (p *mockConfigerPlugin) Configure(options map[string]string) {
+	p.call("$configure")
+}
+
 type resultCacheMock struct {
 	results []*plugin.Result
 }
@@ -274,6 +285,19 @@ func (m *mockManager) mockTasks() {
 					sink:       m.sink,
 					resultSink: w.sink,
 					requests:   w.requests,
+				}
+				p.enqueueTask(mockTask)
+			case *configerTask:
+				c := tasks[j].(*configerTask)
+				mockTask := &mockConfigerTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
+						scheduled: m.now.Add(priorityWatcherTaskNs),
+						index:     -1,
+						active:    task.isActive(),
+					},
+					options: c.options,
+					sink:    m.sink,
 				}
 				p.enqueueTask(mockTask)
 			default:
@@ -443,6 +467,25 @@ func (t *mockWatcherTask) reschedule() bool {
 }
 
 func (t *mockWatcherTask) getWeight() int {
+	return t.plugin.capacity
+}
+
+type mockConfigerTask struct {
+	taskBase
+	sink    chan performer
+	options map[string]string
+}
+
+func (t *mockConfigerTask) perform(s Scheduler) {
+	t.plugin.impl.(plugin.Configer).Configure(t.options)
+	t.sink <- t
+}
+
+func (t *mockConfigerTask) reschedule() bool {
+	return false
+}
+
+func (t *mockConfigerTask) getWeight() int {
 	return t.plugin.capacity
 }
 
@@ -1426,4 +1469,68 @@ func TestPassiveRunner(t *testing.T) {
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
+}
+
+func TestConfiger(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	options := map[string]map[string]string{
+		"debug1": map[string]string{"delay": "5"},
+		"debug2": map[string]string{"delay": "30"},
+		"debug3": map[string]string{"delay": "60"},
+	}
+	agent.Options.Plugins = options
+
+	manager := mockManager{sink: make(chan performer, 10)}
+	plugin.ClearRegistry()
+	plugins := make([]plugin.Accessor, 3)
+	for i := range plugins {
+		name := fmt.Sprintf("debug%d", i+1)
+		plugins[i] = &mockConfigerPlugin{
+			Base:       plugin.Base{},
+			mockPlugin: mockPlugin{now: &manager.now},
+			options:    options[name]}
+		plugin.RegisterMetric(plugins[i], name, name, "")
+	}
+	manager.mockInit(t)
+
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
+	}
+
+	calls := []map[string][]int{
+		map[string][]int{"$configure": []int{1}},
+		map[string][]int{"$configure": []int{6}},
+		map[string][]int{"$configure": []int{11}},
+	}
+
+	var cache resultCacheMock
+	update := updateRequest{
+		clientID: 1,
+		sink:     &cache,
+		requests: make([]*plugin.Request, 0),
+	}
+
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+	}
+	update.requests = update.requests[:1]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
+
+	update.requests = update.requests[:2]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
+
+	update.requests = update.requests[:3]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
 }

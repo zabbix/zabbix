@@ -33,7 +33,7 @@ func RegisterMetric(impl Accessor, name string, key string, description string) 
 	}
 
 	switch impl.(type) {
-	case Exporter, Collector, Runner, Watcher:
+	case Exporter, Collector, Runner, Watcher, Configer:
 	default:
 		log.Warningf(`plugin "%s" does not implement any plugin interfaces`, name)
 		return
