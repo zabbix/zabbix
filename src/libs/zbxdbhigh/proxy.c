@@ -3363,72 +3363,28 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 	return rights->value;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: process_client_history_data                                      *
- *                                                                            *
- * Purpose: process history data sent by proxy/agent/sender                   *
- *                                                                            *
- * Parameters: sock           - [IN] the connection socket                    *
- *             jp             - [IN] JSON with historical data                *
- *             ts             - [IN] the client connection timestamp          *
- *             validator_func - [IN] the item validator callback function     *
- *             validator_args - [IN] the user arguments passed to validator   *
- *                                   function                                 *
- *             info           - [OUT] address of a pointer to the info string *
- *                                    (should be freed by the caller)         *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
-static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		zbx_client_item_validator_t validator_func, void *validator_args, char **info)
+static int	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
+		void *validator_args, char **info, struct zbx_json_parse *jp_data, char *token)
 {
 	int			ret, values_num, read_num, processed_num = 0, total_num = 0, i;
-	struct zbx_json_parse	jp_data;
 	zbx_timespec_t		unique_shift = {0, 0};
 	const char		*pnext = NULL;
-	char			*error = NULL, *token = NULL;
-	size_t			token_alloc = 0;
+	char			*error = NULL;
 	zbx_host_key_t		*hostkeys;
 	DC_ITEM			*items;
-	double			sec;
 	zbx_data_session_t	*session = NULL;
 	zbx_uint64_t		last_hostid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	int			errcodes[ZBX_HISTORY_VALUES_MAX];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
+	double			sec;
 
 	sec = zbx_time();
-
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
-		goto out;
-	}
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
-	{
-		size_t	token_len;
-
-		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
-		{
-			error = zbx_dsprintf(NULL, "invalid session token length %d", (int)token_len);
-			zbx_free(token);
-			ret = FAIL;
-			goto out;
-		}
-	}
 
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 	memset(hostkeys, 0, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 
-	while (SUCCEED == parse_history_data(&jp_data, &pnext, values, hostkeys, &values_num, &read_num,
+	while (SUCCEED == parse_history_data(jp_data, &pnext, values, hostkeys, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
 		DCconfig_get_items_by_keys(items, hostkeys, errcodes, values_num);
@@ -3489,7 +3445,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	zbx_free(hostkeys);
 	zbx_free(items);
 	zbx_free(token);
-out:
+
 	if (NULL == error)
 	{
 		ret = SUCCEED;
@@ -3502,6 +3458,61 @@ out:
 		*info = error;
 	}
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_client_history_data                                      *
+ *                                                                            *
+ * Purpose: process history data sent by proxy/agent/sender                   *
+ *                                                                            *
+ * Parameters: sock           - [IN] the connection socket                    *
+ *             jp             - [IN] JSON with historical data                *
+ *             ts             - [IN] the client connection timestamp          *
+ *             validator_func - [IN] the item validator callback function     *
+ *             validator_args - [IN] the user arguments passed to validator   *
+ *                                   function                                 *
+ *             info           - [OUT] address of a pointer to the info string *
+ *                                    (should be freed by the caller)         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
+		zbx_client_item_validator_t validator_func, void *validator_args, char **info)
+{
+	int			ret;
+	char			*token = NULL;
+	size_t			token_alloc = 0;
+	struct zbx_json_parse	jp_data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
+
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*info = zbx_strdup(*info, zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc))
+	{
+		size_t	token_len;
+
+		if (ZBX_DATA_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
+		{
+			*info = zbx_dsprintf(*info, "invalid session token length %d", (int)token_len);
+			zbx_free(token);
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	ret = process_history_data_by_keys(sock, validator_func, validator_args, info, &jp_data, token);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
