@@ -1421,7 +1421,7 @@
 			'height': data['widget_defaults'][type]['size']['height']
 		}
 
-        if (data.dialogue.widget !== null) {
+		if (data.dialogue.widget !== null) {
 			pos.width = data.dialogue.widget.pos.width;
 			pos.height = data.dialogue.widget.pos.height;
 		}
