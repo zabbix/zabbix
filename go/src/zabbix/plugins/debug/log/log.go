@@ -1,0 +1,90 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+package log
+
+import (
+	"time"
+	"zabbix/internal/plugin"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	input   chan *watchRequest
+	clients map[plugin.ResultWriter][]*plugin.Request
+}
+
+type watchRequest struct {
+	requests []*plugin.Request
+	sink     plugin.ResultWriter
+}
+
+var impl Plugin
+
+func (p *Plugin) run() {
+	p.Debugf("activating plugin")
+	ticker := time.NewTicker(time.Second)
+
+run:
+	for {
+		select {
+		case <-ticker.C:
+			for sink, requests := range p.clients {
+				for _, r := range requests {
+					now := time.Now()
+					value := now.Format(time.Stamp)
+					lastlogsize := uint64(now.UnixNano())
+					mtime := int(now.Unix())
+					sink.Write(&plugin.Result{
+						Itemid:      r.Itemid,
+						Value:       &value,
+						LastLogsize: &lastlogsize,
+						Ts:          now,
+						Mtime:       &mtime})
+				}
+			}
+		case wr := <-p.input:
+			if wr == nil {
+				break run
+			}
+			p.clients[wr.sink] = wr.requests
+		}
+	}
+
+	p.Debugf("plugin deactivated")
+}
+
+func (p *Plugin) Start() {
+	p.input = make(chan *watchRequest)
+	p.clients = make(map[plugin.ResultWriter][]*plugin.Request)
+	go p.run()
+}
+
+func (p *Plugin) Stop() {
+	close(p.input)
+}
+
+func (p *Plugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+	p.input <- &watchRequest{sink: sink, requests: requests}
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "debug.log", "debug.log", "Returns timestamp each second")
+}
