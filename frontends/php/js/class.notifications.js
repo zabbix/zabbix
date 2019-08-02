@@ -101,7 +101,7 @@ function ZBX_Notifications(store, tab) {
  * Binds to click events, LS update events and tab events.
  */
 ZBX_Notifications.prototype.bindEventHandlers = function() {
-	this.tab.onUnload(this.handleTabUnload.bind(this));
+	this.tab.onBeforeUnload(this.handleTabBeforeUnload.bind(this));
 	this.tab.onFocus(this.handleTabFocusIn.bind(this));
 	this.tab.onCrashed(this.handleTabFocusIn.bind(this));
 
@@ -387,7 +387,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * @param {ZBX_BrowseTab} removed_tab  Current tab instance.
  * @param {array} other_tabids  List of alive tab ids (wuthout current tabid).
  */
-ZBX_Notifications.prototype.handleTabUnload = function(removed_tab, other_tabids) {
+ZBX_Notifications.prototype.handleTabBeforeUnload = function(removed_tab, other_tabids) {
 	if (this.active && other_tabids.length) {
 		this.pushActiveTabid(other_tabids[0]);
 		this.becomeInactive();
