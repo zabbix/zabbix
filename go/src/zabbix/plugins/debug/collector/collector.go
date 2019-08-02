@@ -41,7 +41,7 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 }
 
 func (p *Plugin) Collect() error {
-	p.Debugf("collect %s", p.Name())
+	p.Debugf("collect")
 	p.counter++
 	return nil
 }
@@ -51,7 +51,7 @@ func (p *Plugin) Period() int {
 }
 
 func (p *Plugin) Configure(options map[string]string) {
-	p.Debugf("configure %s", p.Name())
+	p.Debugf("configure")
 	if val, ok := options["Interval"]; ok {
 		p.interval, _ = strconv.Atoi(val)
 	} else {

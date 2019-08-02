@@ -72,17 +72,24 @@ run:
 }
 
 func (p *Plugin) Start() {
+	p.Debugf("start")
 	p.input = make(chan *watchRequest)
 	p.clients = make(map[plugin.ResultWriter][]*plugin.Request)
 	go p.run()
 }
 
 func (p *Plugin) Stop() {
+	p.Debugf("stop")
 	close(p.input)
 }
 
 func (p *Plugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+	p.Debugf("watch")
 	p.input <- &watchRequest{sink: sink, requests: requests}
+}
+
+func (p *Plugin) Configure(options map[string]string) {
+	p.Debugf("configure")
 }
 
 func init() {
