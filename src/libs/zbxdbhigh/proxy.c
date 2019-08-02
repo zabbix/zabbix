@@ -3534,7 +3534,7 @@ int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp,
  *                                                                            *
  * Function: process_agent_history_data                                       *
  *                                                                            *
- * Purpose: process history data received form Zabbix active agent            *
+ * Purpose: process history data received from Zabbix active agent            *
  *                                                                            *
  * Parameters: sock         - [IN] the connection socket                      *
  *             jp           - [IN] the JSON with history data                 *
@@ -3557,7 +3557,7 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  *                                                                            *
  * Function: process_sender_history_data                                      *
  *                                                                            *
- * Purpose: process history data received form Zabbix sender                  *
+ * Purpose: process history data received from Zabbix sender                  *
  *                                                                            *
  * Parameters: sock         - [IN] the connection socket                      *
  *             jp           - [IN] the JSON with history data                 *

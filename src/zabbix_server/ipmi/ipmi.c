@@ -138,7 +138,7 @@ int	zbx_ipmi_execute_command(const DC_HOST *host, const char *command, char *err
 
 	if (ZBX_IPC_IPMI_SCRIPT_RESULT != message.code)
 	{
-		zbx_snprintf(error, max_error_len, "invalid response code:%u received form IPMI service", message.code);
+		zbx_snprintf(error, max_error_len, "invalid response code:%u received from IPMI service", message.code);
 		goto cleanup;
 	}
 
