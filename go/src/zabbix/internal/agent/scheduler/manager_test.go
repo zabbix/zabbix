@@ -163,13 +163,13 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 	return p.requests
 }
 
-type mockConfigerPlugin struct {
+type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
 	options map[string]string
 }
 
-func (p *mockConfigerPlugin) Configure(options map[string]string) {
+func (p *mockConfiguratorPlugin) Configure(options map[string]string) {
 	p.call("$configure")
 }
 
@@ -326,7 +326,7 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 		}
 	}
 
-	// find the range start in offsetse
+	// find the range start in offsets
 	if len(offsets) != 0 {
 		for offsets[right] < from {
 			right++
@@ -480,7 +480,7 @@ type mockConfigerTask struct {
 }
 
 func (t *mockConfigerTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Configer).Configure(t.options)
+	t.plugin.impl.(plugin.Configurator).Configure(t.options)
 	t.sink <- t
 }
 
@@ -1473,7 +1473,7 @@ func TestPassiveRunner(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 }
 
-func TestConfiger(t *testing.T) {
+func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	options := map[string]map[string]string{
@@ -1488,7 +1488,7 @@ func TestConfiger(t *testing.T) {
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
 		name := fmt.Sprintf("debug%d", i+1)
-		plugins[i] = &mockConfigerPlugin{
+		plugins[i] = &mockConfiguratorPlugin{
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
 			options:    options[name]}

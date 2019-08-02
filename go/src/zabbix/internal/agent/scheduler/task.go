@@ -29,7 +29,7 @@ import (
 
 // task priority within the same second is done by setting nanosecond component
 const (
-	priorityConfigerTaskNs = iota
+	priorityConfiguratorTaskNs = iota
 	priorityStarterTaskNs
 	priorityCollectorTaskNs
 	priorityWatcherTaskNs
@@ -115,6 +115,7 @@ type exporterTask struct {
 }
 
 func (t *exporterTask) perform(s Scheduler) {
+	log.Debugf("ExporterTask.perform(%d)", t.item.itemid)
 	go func(itemkey string) {
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
@@ -163,6 +164,7 @@ func (t *exporterTask) reschedule(now time.Time) {
 }
 
 func (t *exporterTask) finish() bool {
+	log.Debugf("ExporterTask.finish(%d)", t.item.itemid)
 	// direct metric requests are one time checks
 	if t.item.itemid == 0 {
 		return false
@@ -240,14 +242,14 @@ type configerTask struct {
 
 func (t *configerTask) perform(s Scheduler) {
 	go func() {
-		config, _ := t.plugin.impl.(plugin.Configer)
+		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)
 		s.FinishTask(t)
 	}()
 }
 
 func (t *configerTask) reschedule(now time.Time) {
-	t.scheduled = time.Unix(now.Unix(), priorityConfigerTaskNs)
+	t.scheduled = time.Unix(now.Unix(), priorityConfiguratorTaskNs)
 }
 
 func (t *configerTask) getWeight() int {

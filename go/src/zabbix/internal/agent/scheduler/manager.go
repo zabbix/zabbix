@@ -10,7 +10,7 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more detailm.
+** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
@@ -22,7 +22,11 @@ package scheduler
 import (
 	"container/heap"
 	"errors"
+	"math"
+	"strconv"
+	"strings"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
@@ -50,7 +54,7 @@ type Scheduler interface {
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: client expiry - remove unused owners after tiemout (day+?)
+	// TODO: client expiry - remove unused owners after timeout (day+?)
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
@@ -182,8 +186,11 @@ run:
 			diff := now.Sub(lastTick)
 			interval := time.Second * 10
 			if diff <= -interval || diff >= interval {
+				log.Warningf("detected %d time difference between queue checks, rescheduling tasks",
+					int(math.Abs(float64(diff))/1e9))
 				m.rescheduleQueue(now)
 			}
+			lastTick = now
 			m.processQueue(now)
 		case v := <-m.input:
 			if v == nil {
@@ -211,10 +218,21 @@ func (m *Manager) init() {
 
 	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
+		capacity := plugin.DefaultCapacity
+		section := strings.Title(acc.Name())
+		if options, ok := agent.Options.Plugins[section]; ok {
+			if cap, ok := options["Capacity"]; ok {
+				var err error
+				if capacity, err = strconv.Atoi(cap); err != nil {
+					log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
+						section, cap, plugin.DefaultCapacity)
+				}
+			}
+		}
 		m.plugins[key] = &pluginAgent{
 			impl:         acc,
 			tasks:        make(performerHeap, 0),
-			capacity:     10,
+			capacity:     capacity,
 			usedCapacity: 0,
 			index:        -1,
 			refcount:     0,

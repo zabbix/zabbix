@@ -86,5 +86,5 @@ func (p *Plugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "debug.log", "debug.log", "Returns timestamp each second")
+	plugin.RegisterMetric(&impl, "debuglog", "debug.log", "Returns timestamp each second")
 }

@@ -137,8 +137,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		}
 	}
 
-	// handle configer interface for inactive plugins
-	if _, ok := p.impl.(plugin.Configer); ok && agent.Options.Plugins != nil {
+	// handle configurator interface for inactive plugins
+	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
 		if p.refcount == 0 && info.used.IsZero() {
 			if options, ok := agent.Options.Plugins[p.impl.Name()]; ok {
 				task := &configerTask{
@@ -149,7 +149,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					options: options}
 				task.reschedule(now)
 				p.enqueueTask(task)
-				log.Debugf("[%d] created configer task for plugin %s", c.id, p.name())
+				log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 			}
 		}
 	}
