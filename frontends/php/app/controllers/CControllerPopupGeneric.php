@@ -540,33 +540,14 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['templated_hosts'] = true;
 		}
 
-		if ($this->hasInput('with_applications')) {
-			$options['groups']['with_applications'] = true;
-			$options['hosts']['with_applications'] = true;
-		}
-		elseif ($this->hasInput('with_graphs')) {
-			$options['groups']['with_graphs'] = true;
-			$options['hosts']['with_graphs'] = true;
-		}
-		elseif ($this->hasInput('with_graph_prototypes')) {
-			$options['groups']['with_graph_prototypes'] = true;
-			$options['hosts']['with_graph_prototypes'] = true;
-		}
-		elseif ($this->hasInput('with_simple_graph_items')) {
-			$options['groups']['with_simple_graph_items'] = true;
-			$options['hosts']['with_simple_graph_items'] = true;
-		}
-		elseif ($this->hasInput('with_simple_graph_item_prototypes')) {
-			$options['groups']['with_simple_graph_item_prototypes'] = true;
-			$options['hosts']['with_simple_graph_item_prototypes'] = true;
-		}
-		elseif ($this->hasInput('with_triggers')) {
-			$options['groups']['with_triggers'] = true;
-			$options['hosts']['with_triggers'] = true;
-		}
-		elseif ($this->hasInput('with_monitored_triggers')) {
-			$options['groups']['with_monitored_triggers'] = true;
-			$options['hosts']['with_monitored_triggers'] = true;
+		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
+				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
+			if ($this->hasInput($name)) {
+				$options['groups'][$name] = true;
+				$options['hosts'][$name] = true;
+
+				break;
+			}
 		}
 
 		$page_filter = new CPageFilter($options);

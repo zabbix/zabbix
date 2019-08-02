@@ -114,7 +114,7 @@
 
 		var $div = $('<div>', {
 			'class': widget['iterator'] ? 'dashbrd-grid-widget-iterator' : 'dashbrd-grid-widget'
-		}).toggleClass('new-widget', !widget['widgetid'].length);
+		}).toggleClass('new-widget', widget['new_widget']);
 
 		if (!widget['widget_of_iterator']) {
 			$div
@@ -224,7 +224,7 @@
 			cell_h = data['options']['widget-height']
 		;
 
-		if (widget['iterator'] && $div.hasClass('ui-resizable-resizing')) {
+		if (widget['iterator'] && data['pos-action'] === 'resize') {
 			var place_w = Math.round($div.width() / cell_w - 0.49),
 				place_h = Math.round($div.height() / cell_h - 0.49),
 				place_x = $div.hasClass('resizing-left')
@@ -1372,7 +1372,8 @@
 		}, widget_of_iterator, {
 			'rf_rate': 0,
 			'iterator': false,
-			'widget_of_iterator': true
+			'widget_of_iterator': true,
+			'new_widget': false
 		});
 
 		widget_of_iterator['uniqueid'] = generateUniqueId($obj, data);
@@ -1681,11 +1682,13 @@
 			success: function(resp) {
 				if (typeof resp.errors !== 'undefined') {
 					// Error returned. Remove previous errors.
+
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
 				}
 				else {
 					// No errors, proceed with update.
+
 					overlayDialogueDestroy('widgetConfg');
 
 					if (widget === null || ('type' in widget) === false) {
@@ -1732,38 +1735,23 @@
 							'header': name,
 							'pos': widget['pos'],
 							'rf_rate': 0,
-							'fields': fields
+							'fields': fields,
+							'new_widget': false,
 						};
 
 						removeWidget($obj, data, widget);
 
+						// Disable position/size checking.
+						data['pos-action'] = 'updateWidgetConfig';
+
 						methods.addWidget.call($obj, widget_data);
+
+						data['pos-action'] = '';
 
 						// New widget is last element in data['widgets'] array.
 						widget = data['widgets'].slice(-1)[0];
 						updateWidgetContent($obj, data, widget);
 						setWidgetModeEdit($obj, data, widget);
-
-/*
-
-TODO: WORKING ON THIS.
-
-
-						}
-						else {
-							if (widget['type'] !== type) {
-								widget['type'] = type;
-								widget['initial_load'] = true;
-							}
-
-							widget['header'] = name;
-							widget['fields'] = fields;
-							doAction('afterUpdateWidgetConfig', $obj, data, null);
-							updateWidgetDynamic($obj, data, widget);
-							refreshWidget($obj, data, widget);
-
-						}
-*/
 					}
 
 					// Mark dashboard as updated.
@@ -1775,7 +1763,8 @@ TODO: WORKING ON THIS.
 				if ($placeholder) {
 					$placeholder.remove();
 				}
-			});
+			})
+		;
 	}
 
 	function findEmptyPosition($obj, data, type) {
@@ -2134,8 +2123,27 @@ TODO: WORKING ON THIS.
 		makeResizable($obj, data, widget);
 	}
 
+	function deleteWidget($obj, data, widget) {
+		var index = widget['div'].data('widget-index');
+
+		// Remove div from the grid.
+		widget['div'].remove();
+		data['widgets'].splice(index, 1);
+
+		// Update widget-index for all following widgets.
+		for (var i = index; i < data['widgets'].length; i++) {
+			data['widgets'][i]['div'].data('widget-index', i);
+		}
+
+		if (typeof widget['old_widget'] === 'undefined') {
+			// Mark dashboard as updated.
+			data['options']['updated'] = true;
+			resizeDashboardGrid($obj, data);
+		}
+	}
+
 	/**
-	 * Remove the widget.
+	 * Remove the widget without updating the dashboard.
 	 */
 	function removeWidget($obj, data, widget) {
 		var index = widget['div'].data('widget-index');
@@ -2489,10 +2497,14 @@ TODO: WORKING ON THIS.
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
-				'storage': {}
+				'storage': {},
 			}, widget, {
 				'widget_of_iterator': false,
 			});
+
+			if (typeof widget['new_widget'] === 'undefined') {
+				widget['new_widget'] = !widget['widgetid'].length;
+			}
 
 			return this.each(function() {
 				var	$this = $(this),
@@ -2524,9 +2536,11 @@ TODO: WORKING ON THIS.
 				$this.append(widget_local['div']);
 
 				setDivPosition(widget_local['div'], data, widget_local['pos']);
-				checkWidgetOverlap(data, widget_local);
 
-				resizeDashboardGrid($this, data);
+				if (data['pos-action'] !== 'updateWidgetConfig') {
+					checkWidgetOverlap(data, widget_local);
+					resizeDashboardGrid($this, data);
+				}
 
 				showPreloader(widget_local);
 				data.new_widget_placeholder.container.hide();
