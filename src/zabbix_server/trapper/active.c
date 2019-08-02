@@ -572,16 +572,23 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
-			if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
+
+			if (ZBX_COMPONENT_VERSION(4,4) > version)
 			{
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
-						dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+				if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
+				{
+					zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
+							dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+				}
+
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
+			}
+			else
+			{
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, dc_items[i].itemid);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay, ZBX_JSON_TYPE_STRING);
 			}
 
-			if (ZBX_COMPONENT_VERSION(4,4) >= version)
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay, ZBX_JSON_TYPE_STRING);
-			else
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			/* The agent expects ALWAYS to have lastlogsize and mtime tags. */
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);

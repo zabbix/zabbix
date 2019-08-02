@@ -47,6 +47,7 @@ type Connector struct {
 type activeChecksRequest struct {
 	Request string `json:"request"`
 	Host    string `json:"host"`
+	Version string `json:"version"`
 }
 
 type activeChecksResponse struct {
@@ -97,7 +98,7 @@ func (c *Connector) refreshActiveChecks() {
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
-	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
+	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: "4.4"})
 	if err != nil {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address, err)
 		return

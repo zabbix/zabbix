@@ -5143,5 +5143,5 @@ int	zbx_get_component_version(char *value)
 	if (NULL != (ptr = strchr(pminor, '.')))
 		*ptr = '\0';
 
-	return  ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
 }

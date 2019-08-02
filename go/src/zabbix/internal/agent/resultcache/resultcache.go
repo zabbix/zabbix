@@ -68,10 +68,11 @@ type Uploader interface {
 }
 
 func (c *ResultCache) flushOutput(u Uploader) {
-	log.Debugf("[%d] upload history data, %d value(s)", c.clientID, len(c.results))
 	if len(c.results) == 0 {
 		return
 	}
+
+	log.Debugf("[%d] upload history data, %d value(s)", c.clientID, len(c.results))
 
 	request := AgentDataRequest{
 		Request:   "agent data",
