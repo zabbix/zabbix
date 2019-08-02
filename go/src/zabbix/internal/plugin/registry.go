@@ -21,21 +21,21 @@ package plugin
 
 import (
 	"errors"
-	"zabbix/pkg/log"
+	"fmt"
 )
 
 var Metrics map[string]Accessor = make(map[string]Accessor)
 
 func RegisterMetric(impl Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
-		log.Warningf(`cannot register duplicate metric "%s"`, key)
+		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
 		return
 	}
 
 	switch impl.(type) {
 	case Exporter, Collector, Runner, Watcher, Configurator:
 	default:
-		log.Warningf(`plugin "%s" does not implement any plugin interfaces`, name)
+		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
 		return
 	}
 

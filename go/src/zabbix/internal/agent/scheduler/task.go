@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 	"zabbix/internal/plugin"
@@ -94,9 +95,14 @@ func (t *collectorTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *collectorTask) reschedule(now time.Time) {
+func (t *collectorTask) reschedule(now time.Time) (err error) {
 	collector, _ := t.plugin.impl.(plugin.Collector)
-	t.scheduled = time.Unix(now.Unix()+int64(t.seed)%int64(collector.Period())+1, priorityCollectorTaskNs)
+	period := collector.Period()
+	if period == 0 {
+		return fmt.Errorf("invalid collector interval 0 seconds")
+	}
+	t.scheduled = time.Unix(now.Unix()+int64(t.seed)%int64(period)+1, priorityCollectorTaskNs)
+	return
 }
 
 func (t *collectorTask) getWeight() int {
@@ -154,12 +160,17 @@ func (t *exporterTask) perform(s Scheduler) {
 	}(t.item.key)
 }
 
-func (t *exporterTask) reschedule(now time.Time) {
+func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, now)
+		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, now); err != nil {
+			return err
+		} else {
+			t.scheduled = nextcheck.Add(priorityExporterTaskNs)
+		}
 	} else {
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
+	return
 }
 
 func (t *exporterTask) finish() bool {
@@ -183,8 +194,9 @@ func (t *starterTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *starterTask) reschedule(now time.Time) {
+func (t *starterTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityStarterTaskNs)
+	return
 }
 
 func (t *starterTask) getWeight() int {
@@ -203,8 +215,9 @@ func (t *stopperTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *stopperTask) reschedule(now time.Time) {
+func (t *stopperTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityStopperTaskNs)
+	return
 }
 
 func (t *stopperTask) getWeight() int {
@@ -225,8 +238,9 @@ func (t *watcherTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *watcherTask) reschedule(now time.Time) {
+func (t *watcherTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityWatcherTaskNs)
+	return
 }
 
 func (t *watcherTask) getWeight() int {
@@ -246,8 +260,9 @@ func (t *configerTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *configerTask) reschedule(now time.Time) {
+func (t *configerTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityConfiguratorTaskNs)
+	return
 }
 
 func (t *configerTask) getWeight() int {

@@ -21,6 +21,7 @@ package scheduler
 
 import (
 	"hash/fnv"
+	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
@@ -53,25 +54,22 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	var ok bool
 	if info, ok = c.plugins[p]; !ok {
 		info = &pluginInfo{}
-		c.plugins[p] = info
 	}
 
-	if info.used.IsZero() {
-		p.refcount++
-	}
-	info.used = now
+	tasks := make([]performer, 0, 6)
 
 	// handle Collector interface
 	if col, ok := p.impl.(plugin.Collector); ok {
-		if p.refcount == 0 && info.used.IsZero() {
+		if p.refcount == 0 {
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
-
 			task := &collectorTask{
 				taskBase: taskBase{plugin: p, active: true},
 				seed:     uint64(h.Sum32())}
-			task.reschedule(now)
-			p.enqueueTask(task)
+			if err = task.reschedule(now); err != nil {
+				return
+			}
+			tasks = append(tasks, task)
 			log.Debugf("[%d] created collector task for plugin %s with collecting interval %d", c.id, p.name(),
 				col.Period())
 		}
@@ -94,15 +92,20 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			// cache scheduled (non direct) requests
 			if r.Itemid != 0 {
 				c.items[r.Itemid] = item
-				task.reschedule(now)
+				if err = task.reschedule(now); err != nil {
+					return
+				}
 			}
 			item.task = task
-			p.enqueueTask(task)
+			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
 			item.updated = now
 			if item.delay != r.Delay && !item.unsupported {
-				item.task.reschedule(now)
+				if err = item.task.reschedule(now); err != nil {
+					item.task.deactivate()
+					return
+				}
 				p.tasks.Update(item.task)
 				log.Debugf("[%d] updated exporter task for plugin %s", c.id, p.name())
 			}
@@ -113,14 +116,16 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle runner interface for inactive plugins
 	if _, ok := p.impl.(plugin.Runner); ok {
-		if p.refcount == 0 && info.used.IsZero() {
+		if p.refcount == 0 {
 			task := &starterTask{
 				taskBase: taskBase{
 					plugin: p,
 					active: true,
 				}}
-			task.reschedule(now)
-			p.enqueueTask(task)
+			if err = task.reschedule(now); err != nil {
+				return
+			}
+			tasks = append(tasks, task)
 			log.Debugf("[%d] created starter task for plugin %s", c.id, p.name())
 		}
 	}
@@ -138,8 +143,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					sink:     sink,
 					requests: make([]*plugin.Request, 0, 1),
 				}
-				info.watcher.reschedule(now)
-				p.enqueueTask(info.watcher)
+				if err = info.watcher.reschedule(now); err != nil {
+					return
+				}
+				tasks = append(tasks, info.watcher)
 				log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 			}
 			info.watcher.requests = append(info.watcher.requests, r)
@@ -148,20 +155,31 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle configurator interface for inactive plugins
 	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
-		if p.refcount == 0 && info.used.IsZero() {
-			if options, ok := agent.Options.Plugins[p.impl.Name()]; ok {
+		if p.refcount == 0 {
+			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
 				task := &configerTask{
 					taskBase: taskBase{
 						plugin: p,
 						active: true,
 					},
 					options: options}
-				task.reschedule(now)
-				p.enqueueTask(task)
+				if err = task.reschedule(now); err != nil {
+					return
+				}
+				tasks = append(tasks, task)
 				log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 			}
 		}
 	}
+	for _, t := range tasks {
+		p.enqueueTask(t)
+	}
+
+	if info.used.IsZero() {
+		p.refcount++
+		c.plugins[p] = info
+	}
+	info.used = now
 
 	return nil
 }

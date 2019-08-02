@@ -23,6 +23,7 @@ import (
 	"container/heap"
 	"errors"
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -144,8 +145,11 @@ func (m *Manager) processFinishRequest(task performer) {
 	p := task.getPlugin()
 	p.releaseCapacity(task)
 	if p.active() && task.isActive() && reschedule {
-		task.reschedule(time.Now())
-		p.enqueueTask(task)
+		if err := task.reschedule(time.Now()); err != nil {
+			log.Warningf("cannot reschedule plugin %s: %s", p.impl.Name(), err)
+		} else {
+			p.enqueueTask(task)
+		}
 	}
 	if !p.queued() && p.hasCapacity() {
 		heap.Push(&m.queue, p)
@@ -161,8 +165,9 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for _, t := range tasks {
-			t.reschedule(now)
-			p.enqueueTask(t)
+			if err := t.reschedule(now); err == nil {
+				p.enqueueTask(t)
+			}
 		}
 		heap.Push(&queue, p)
 	}
@@ -216,6 +221,7 @@ func (m *Manager) init() {
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
 
+	metrics := make([]plugin.Accessor, 0, len(plugin.Metrics))
 	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
 		capacity := plugin.DefaultCapacity
@@ -237,6 +243,32 @@ func (m *Manager) init() {
 			index:        -1,
 			refcount:     0,
 		}
+		metrics = append(metrics, acc)
+	}
+
+	// log available plugins
+	sort.Slice(metrics, func(i, j int) bool {
+		return metrics[i].Name() < metrics[j].Name()
+	})
+	for _, acc := range metrics {
+		interfaces := ""
+		if _, ok := acc.(plugin.Exporter); ok {
+			interfaces += "exporter, "
+		}
+		if _, ok := acc.(plugin.Collector); ok {
+			interfaces += "collector, "
+		}
+		if _, ok := acc.(plugin.Runner); ok {
+			interfaces += "runner, "
+		}
+		if _, ok := acc.(plugin.Watcher); ok {
+			interfaces += "watcher, "
+		}
+		if _, ok := acc.(plugin.Configurator); ok {
+			interfaces += "configurator, "
+		}
+		interfaces = interfaces[:len(interfaces)-2]
+		log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
 	}
 }
 

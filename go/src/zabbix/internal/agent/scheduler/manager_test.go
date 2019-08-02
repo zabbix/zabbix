@@ -390,8 +390,9 @@ func (t *mockExporterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockExporterTask) reschedule(now time.Time) {
+func (t *mockExporterTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
+	return
 }
 
 func (t *mockExporterTask) finish() bool {
@@ -408,8 +409,9 @@ func (t *mockCollectorTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) reschedule(now time.Time) {
+func (t *mockCollectorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
+	return
 }
 
 func (t *mockCollectorTask) getWeight() int {
@@ -430,7 +432,8 @@ func (t *mockStarterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStarterTask) reschedule(now time.Time) {
+func (t *mockStarterTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStarterTask) getWeight() int {
@@ -447,7 +450,8 @@ func (t *mockStopperTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStopperTask) reschedule(now time.Time) {
+func (t *mockStopperTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStopperTask) getWeight() int {
@@ -466,7 +470,8 @@ func (t *mockWatcherTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) reschedule(now time.Time) {
+func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockWatcherTask) getWeight() int {
@@ -484,7 +489,8 @@ func (t *mockConfigerTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockConfigerTask) reschedule(now time.Time) {
+func (t *mockConfigerTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockConfigerTask) getWeight() int {
