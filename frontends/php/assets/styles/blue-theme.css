@@ -3502,28 +3502,28 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   margin-left: 16px;
   margin-top: 2px; }
 
-.msg-warning, .msg-bad-global {
+.msg-warning {
   color: #1f2c33;
   border: 2px solid #ffc859;
   background-color: #fff; }
-  .msg-warning .link-action, .msg-bad-global .link-action {
+  .msg-warning .link-action {
     color: #2a502c;
     margin-right: 10px;
     font-size: 0.85em; }
-    .msg-warning .link-action .arrow-up, .msg-bad-global .link-action .arrow-up {
+    .msg-warning .link-action .arrow-up {
       border-bottom-color: #2a502c; }
-    .msg-warning .link-action .arrow-down, .msg-bad-global .link-action .arrow-down {
+    .msg-warning .link-action .arrow-down {
       border-top-color: #2a502c; }
-  .msg-warning .overlay-close-btn, .msg-bad-global .overlay-close-btn {
+  .msg-warning .overlay-close-btn {
     color: #768d99; }
-  .msg-warning ul, .msg-bad-global ul {
+  .msg-warning ul {
     border-top-color: #ffc859; }
-  .msg-warning button, .msg-bad-global button {
+  .msg-warning button {
     background-color: #fff;
     color: #2a502c;
     border-color: #ffc859; }
 
-.msg-warning:before, .msg-bad-global:before {
+.msg-warning:before {
   content: "";
   background-color: #ffc859;
   float: left;
@@ -3533,7 +3533,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   bottom: 0;
   position: absolute; }
 
-.msg-warning:after, .msg-bad-global:after {
+.msg-warning:after {
   content: "";
   background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
   width: 27px;
@@ -3621,7 +3621,7 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   .msg-buttons button {
     margin: 0 0 0 10px; }
 
-.msg-good, .msg-warning, .msg-bad-global, .msg-bad {
+.msg-good, .msg-warning, .msg-bad {
   font-size: 1.167em;
   padding: 6px 10px 6px 75px;
   text-align: left;
@@ -3631,10 +3631,10 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
-  .msg-good .overlay-close-btn, .msg-warning .overlay-close-btn, .msg-bad-global .overlay-close-btn, .msg-bad .overlay-close-btn {
+  .msg-good .overlay-close-btn, .msg-warning .overlay-close-btn, .msg-bad .overlay-close-btn {
     font-size: 1.167em; }
 
-.msg-bad-global {
+.msg-global-footer {
   display: none;
   position: fixed;
   z-index: 10000;

@@ -55,15 +55,15 @@ jQuery(function($) {
 
 		showWarning: function(message) {
 			if (!this.warning) {
-				$('#msg-bad-global').text(message);
-				$('#msg-bad-global').fadeIn(100);
+				$('#msg-global-footer').text(message);
+				$('#msg-global-footer').fadeIn(100);
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#msg-bad-global').fadeOut(100);
+				$('#msg-global-footer').fadeOut(100);
 				this.warning = false;
 			}
 		}
@@ -83,7 +83,7 @@ jQuery(function($) {
 
 
 	// event that hide warning message when mouse hover it
-	$('#msg-bad-global').on('mouseenter', function() {
+	$('#msg-global-footer').on('mouseenter', function() {
 		var obj = $(this),
 			offset = obj.offset(),
 			x1 = Math.floor(offset.left),
