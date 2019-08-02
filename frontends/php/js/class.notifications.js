@@ -109,10 +109,10 @@ ZBX_Notifications.prototype.bindEventHandlers = function() {
 	this.collection.btn_close.onclick = this.handleCloseClicked.bind(this);
 	this.collection.btn_mute.onclick = this.handleMuteClicked.bind(this);
 
-	this.store.onKeyUpdate('notifications.active_tabid', this.handlePushedActiveTabid.bind(this));
-	this.store.onKeyUpdate('notifications.list', this.handlePushedList.bind(this));
-	this.store.onKeyUpdate('notifications.user_settings', this.handlePushedUserSettings.bind(this));
-	this.store.onKeyUpdate('notifications.alarm_state', this.handlePushedAlarmState.bind(this));
+	this.store.onKeySync('notifications.active_tabid', this.handlePushedActiveTabid.bind(this));
+	this.store.onKeySync('notifications.list', this.handlePushedList.bind(this));
+	this.store.onKeySync('notifications.user_settings', this.handlePushedUserSettings.bind(this));
+	this.store.onKeySync('notifications.alarm_state', this.handlePushedAlarmState.bind(this));
 
 	this.alarm.onChange(this.handleAlarmStateChanged.bind(this));
 };
