@@ -137,9 +137,48 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	if nil == response.Data {
-		log.Errf("[%d] cannot parse list of active checks: data array is missing", c.clientID)
+	if response.Data == nil {
+		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
+			c.address)
 		return
+	}
+
+	for i := 0; i < len(response.Data); i++ {
+		if len(response.Data[i].Key) == 0 {
+			if response.Data[i].Itemid == 0 {
+				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
+					c.clientID, c.address)
+				return
+			}
+
+			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].Itemid == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
+				c.clientID, c.address, response.Data[i].Key)
+			return
+		}
+
+		if len(response.Data[i].Delay) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].LastLogsize == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].Mtime == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
 	}
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache, response.Data)
