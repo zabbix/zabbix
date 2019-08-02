@@ -38,12 +38,15 @@ extern unsigned char	program_type;
  * Parameters: host          - [IN] name of the host to be added or updated   *
  *             ip            - [IN] IP address of the host                    *
  *             port          - [IN] port of the host                          *
+ *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                *
+ *                             ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT    *
  *             host_metadata - [IN] host metadata                             *
  *                                                                            *
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
  ******************************************************************************/
-static void	db_register_host(const char *host, const char *ip, unsigned short port, const char *host_metadata)
+static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
+		const char *host_metadata)
 {
 	char	dns[INTERFACE_DNS_LEN_MAX];
 
@@ -57,11 +60,55 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	DBbegin();
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
+		DBregister_host(0, host, ip, dns, port, connection_type, host_metadata, (int)time(NULL));
 	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		DBproxy_register_host(host, ip, dns, port, host_metadata);
+		DBproxy_register_host(host, ip, dns, port, connection_type, host_metadata);
 
 	DBcommit();
+}
+
+static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsigned short port,
+		const zbx_socket_t *sock)
+{
+	zbx_config_t	cfg;
+	int		ret = FAIL;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT);
+
+	if (0 == (cfg.autoreg_tls_accept & sock->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
+				" port:%hu): connection type \"%s\" is not allowed for autoregistration",
+				sock->peer, host, ip, port, zbx_tcp_connection_type_name(sock->connection_type));
+		goto out;
+	}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (0 == (ZBX_PSK_FOR_AUTOREG & zbx_tls_get_psk_usage()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
+					" port:%hu): connection used PSK which is not configured for autoregistration",
+					sock->peer, host, ip, port);
+			goto out;
+		}
+
+		ret = SUCCEED;
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type)
+	{
+		ret = SUCCEED;
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+#else
+	ret = SUCCEED;
+#endif
+out:
+	zbx_config_clean(&cfg);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -193,7 +240,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		/* metadata is available only on Zabbix server */
 		if (SUCCEED == DBis_null(old_metadata) || 0 != strcmp(old_metadata, host_metadata))
 		{
-			db_register_host(host, ip, port, host_metadata);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata);
 		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
@@ -208,7 +255,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	else
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
-		db_register_host(host, ip, port, host_metadata);
+
+		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock))
+			db_register_host(host, ip, port, sock->connection_type, host_metadata);
 	}
 done:
 	DBfree_result(result);
