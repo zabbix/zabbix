@@ -30,16 +30,13 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['known_widget_types'], $fields['rf_rate']
 );
 
+$scripts = [];
+
 // Show.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show']), CWidgetHelper::getRadioButtonList($fields['show']));
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
-	$form->getName()
-);
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
-$scripts = [$field_groupids->getPostJS()];
+$fields['groupids']->addToForm($form, $form_list, $scripts);
 
 // Application.
 $form_list->addRow(CWidgetHelper::getLabel($fields['application']),

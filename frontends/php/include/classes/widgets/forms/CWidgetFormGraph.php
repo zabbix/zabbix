@@ -44,12 +44,13 @@ class CWidgetFormGraph extends CWidgetForm {
 
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			// Item multiselector with single value.
-			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
+			// Select simple graph field.
+			$field_item = (new CWidgetFieldMultiselectItem('itemid', _('Item')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
-				->setFilterParameter('numeric', true)
-				->setFilterParameter('with_simple_graph_items', true);
+				->setFilterParameter('numeric', true) // For filtering items.
+				->setFilterParameter('with_simple_graph_items', true) // For groups and hosts selection.
+			;
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
@@ -59,8 +60,10 @@ class CWidgetFormGraph extends CWidgetForm {
 		}
 		else {
 			// Select graph field.
-			$field_graph = (new CWidgetFieldSelectResource('graphid', _('Graph'), WIDGET_FIELD_SELECT_RES_GRAPH))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+			$field_graph = (new CWidgetFieldMultiselectGraph('graphid', _('Graph')))
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				->setMultiple(false)
+			;
 
 			if (array_key_exists('graphid', $this->data)) {
 				$field_graph->setValue($this->data['graphid']);

@@ -65,7 +65,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
-				'graphids' => [$fields['graphid']]
+				'graphids' => reset($fields['graphid'])
 			]);
 			$graph_prototype = reset($graph_prototype);
 
@@ -75,7 +75,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		}
 		else {
 			// Just fetch the item prototype selected on widget's edit form.
-			$options['graphids'] = [$fields['graphid']];
+			$options['graphids'] = reset($fields['graphid']);
 		}
 
 		// Use this graph prototype as base for collecting created graphs.
@@ -139,7 +139,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
-				'itemids' => [$fields['itemid']]
+				'itemids' => reset($fields['itemid'])
 			]);
 			$item_prototype = reset($item_prototype);
 
@@ -149,7 +149,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		}
 		else {
 			// Just fetch the item prototype selected on widget's edit form.
-			$options['itemids'] = [$fields['itemid']];
+			$options['itemids'] = reset($fields['itemid']);
 		}
 
 		// Use this item prototype as base for collecting created items.

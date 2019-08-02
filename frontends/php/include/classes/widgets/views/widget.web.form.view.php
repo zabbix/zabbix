@@ -33,28 +33,13 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 $scripts = [];
 
 // Host groups
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
-	$form->getName()
-);
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
-$scripts[] = $field_groupids->getPostJS();
+$fields['groupids']->addToForm($form, $form_list, $scripts);
 
 // Exclude host groups.
-$field_exclude_groupids = CWidgetHelper::getGroup($fields['exclude_groupids'],
-	$data['captions']['ms']['groups']['exclude_groupids'],
-	$form->getName()
-);
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['exclude_groupids']), $field_exclude_groupids);
-$scripts[] = $field_exclude_groupids->getPostJS();
+$fields['exclude_groupids']->addToForm($form, $form_list, $scripts);
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
-	$form->getName()
-);
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
-$scripts[] = $field_hostids->getPostJS();
+$fields['hostids']->addToForm($form, $form_list, $scripts);
 
 // Show hosts in maintenance.
 $form_list->addRow(CWidgetHelper::getLabel($fields['maintenance']), CWidgetHelper::getCheckBox($fields['maintenance']));

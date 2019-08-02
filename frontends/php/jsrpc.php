@@ -290,34 +290,77 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
-				$items = API::Item()->get([
+			case 'item_prototypes':
+				$options = [
 					'output' => ['itemid', 'hostid', 'name', 'key_'],
 					'selectHosts' => ['name'],
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
-					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'limit' => $config['search_limit']
-				]);
+				];
 
-				if ($items) {
-					$items = CMacrosResolverHelper::resolveItemNames($items);
-					CArrayHelper::sort($items, [
-						['field' => 'name_expanded', 'order' => ZBX_SORT_UP]
-					]);
+				if ($data['objectName'] === 'item_prototypes') {
+					$records = API::ItemPrototype()->get($options);
+				}
+				else {
+					if (array_key_exists('webitems', $data)) {
+						$options['webitems'] = $data['webitems'];
+					}
+
+					$records = API::Item()->get($options);
+				}
+
+				if ($records) {
+					$records = CMacrosResolverHelper::resolveItemNames($records);
+					CArrayHelper::sort($records, ['name_expanded']);
 
 					if (array_key_exists('limit', $data)) {
-						$items = array_slice($items, 0, $data['limit']);
+						$records = array_slice($records, 0, $data['limit']);
 					}
 
-					foreach ($items as $item) {
+					foreach ($records as $record) {
 						$result[] = [
-							'id' => $item['itemid'],
-							'name' => $item['name_expanded'],
-							'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+							'id' => $record['itemid'],
+							'name' => $record['name_expanded'],
+							'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
 						];
 					}
+				}
+				break;
+
+			case 'graphs':
+			case 'graph_prototypes':
+				$options = [
+					'output' => ['graphid', 'name'],
+					'selectHosts' => ['name'],
+					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
+					'limit' => $config['search_limit']
+				];
+
+				if ($data['objectName'] === 'graph_prototypes') {
+					$records = API::GraphPrototype()->get($options);
+				}
+				else {
+					$records = API::Graph()->get($options);
+				}
+
+				CArrayHelper::sort($records, ['name']);
+
+				if (array_key_exists('limit', $data)) {
+					$records = array_slice($records, 0, $data['limit']);
+				}
+
+				foreach ($records as $record) {
+					$result[] = [
+						'id' => $record['graphid'],
+						'name' => $record['name'],
+						'prefix' => $record['hosts'][0]['name'].NAME_DELIMITER
+					];
 				}
 				break;
 

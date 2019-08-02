@@ -45,9 +45,10 @@ class CWidgetFormClock extends CWidgetForm {
 		// Item field.
 		if ($field_time_type->getValue() === TIME_TYPE_HOST) {
 			// Item multiselector with single value.
-			$field_item = (new CWidgetFieldItem('itemid', _('Item')))
+			$field_item = (new CWidgetFieldMultiselectItem('itemid', _('Item')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false);
+				->setMultiple(false)
+			;
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);

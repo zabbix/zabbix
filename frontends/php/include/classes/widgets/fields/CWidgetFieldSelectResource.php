@@ -48,27 +48,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$this->srcfld1 = 'sysmapid';
 				$this->srcfld2 = 'name';
 				break;
-
-			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
-				$this->srctbl = 'graphs';
-				$this->srcfld1 = 'graphid';
-				$this->srcfld2 = 'name';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE);
-				$this->srctbl = 'graph_prototypes';
-				$this->srcfld1 = 'graphid';
-				$this->srcfld2 = 'name';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE);
-				$this->srctbl = 'item_prototypes';
-				$this->srcfld1 = 'itemid';
-				$this->srcfld2 = 'name';
-				break;
 		}
 
 		$this->dstfld1 = $name;
@@ -111,23 +90,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			'dstfld2' => $this->dstfld2,
 			'dstfrm' => $dstfrm
 		];
-
-		switch ($this->resource_type) {
-			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$popup_options['real_hosts'] = '1';
-				$popup_options['with_graphs'] = '1';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
-				$popup_options['real_hosts'] = '1';
-				$popup_options['with_graph_prototypes'] = '1';
-				break;
-
-			case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
-				$popup_options['real_hosts'] = '1';
-				$popup_options['with_simple_graph_item_prototypes'] = '1';
-				break;
-		}
 
 		return $popup_options;
 	}

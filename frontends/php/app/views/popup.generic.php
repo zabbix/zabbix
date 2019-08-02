@@ -483,27 +483,7 @@ switch ($data['popup_type']) {
 
 	case 'graphs':
 	case 'graph_prototypes':
-		foreach ($data['table_records'] as $graph) {
-			$host = reset($graph['hosts']);
-			$graph['hostname'] = $host['name'];
-			$description = new CLink($graph['name'], 'javascript:void(0);');
-			$graph['name'] = $graph['hostname'].NAME_DELIMITER.$graph['name'];
-
-			if ($data['multiselect']) {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($graph['graphid']).');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $graph[$options['srcfld1']],
-					$options['dstfld2'] => $graph[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-					zbx_jsvalue($values).');';
-			}
-
-			$description->onClick($js_action.$js_action_onclick);
-
+		foreach ($data['table_records'] as &$graph) {
 			switch ($graph['graphtype']) {
 				case GRAPH_TYPE_STACKED:
 					$graphtype = _('Stacked');
@@ -520,14 +500,31 @@ switch ($data['popup_type']) {
 			}
 
 			$table->addRow([
+				// Multiselect checkbox.
 				$data['multiselect']
-					? new CCheckBox('graphs['.zbx_jsValue($graph[$options['srcfld1']]).']', $graph['graphid'])
+					? new CCheckBox('item['.CJs::encodeJson($graph[$options['srcfld1']]).']', $graph['graphid'])
 					: null,
-				$description,
+
+				// Clickable graph name.
+				(new CLink($graph['name'], 'javascript:void(0);'))
+					->onClick('javascript: addValue('.
+						CJs::encodeJson($options['reference']).', '.
+						CJs::encodeJson($graph['graphid']).', '.
+						$options['parentid'].
+						');'.$js_action_onclick
+					),
+
+				// Graph type.
 				$graphtype
 			]);
-			unset($description);
+
+			// For a "popup_reference".
+			$graph = [
+				'id' => $graph['graphid'],
+				'name' => reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+			];
 		}
+		unset($graph);
 		break;
 
 	case 'screens':
@@ -623,7 +620,7 @@ if ($data['multiselect'] && $form !== null) {
 }
 
 $types = ['users', 'templates', 'hosts', 'host_templates', 'host_groups', 'applications', 'application_prototypes',
-	'proxies', 'items'
+	'proxies', 'items', 'item_prototypes', 'graphs', 'graph_prototypes'
 ];
 if (array_key_exists('table_records', $data) && (in_array($data['popup_type'], $types) || $data['multiselect'])) {
 	$output['script_inline'] .= 'var popup_reference = '.zbx_jsvalue($data['table_records'], true).';';

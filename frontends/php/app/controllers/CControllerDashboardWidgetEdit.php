@@ -86,7 +86,7 @@ class CControllerDashboardWidgetEdit extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		$captions = ['simple' => [], 'ms' => []];
+		$captions = ['simple' => []];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
@@ -101,18 +101,6 @@ class CControllerDashboardWidgetEdit extends CController {
 					switch ($resource_type) {
 						case WIDGET_FIELD_SELECT_RES_SYSMAP:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
-							break;
-
-						case WIDGET_FIELD_SELECT_RES_GRAPH:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible graph');
-							break;
-
-						case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible graph prototype');
-							break;
-
-						case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible item prototype');
 							break;
 					}
 				}
@@ -137,156 +125,9 @@ class CControllerDashboardWidgetEdit extends CController {
 						}
 					}
 					break;
-
-				case WIDGET_FIELD_SELECT_RES_GRAPH:
-				case WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE:
-					$options = [
-						'graphids' => array_keys($list),
-						'selectHosts' => ['name'],
-						'output' => ['graphid', 'name']
-					];
-
-					$records = ($resource_type === WIDGET_FIELD_SELECT_RES_GRAPH_PROTOTYPE)
-						? API::GraphPrototype()->get($options)
-						: API::Graph()->get($options)
-					;
-					if ($records) {
-						foreach ($records as $record) {
-							order_result($record['hosts'], 'name');
-							$record['host'] = reset($record['hosts']);
-							$list[$record['graphid']] = $record['host']['name'].NAME_DELIMITER.$record['name'];
-						}
-					}
-					break;
-
-				case WIDGET_FIELD_SELECT_RES_ITEM_PROTOTYPE:
-					$items = API::ItemPrototype()->get([
-						'itemids' => array_keys($list),
-						'selectHosts' => ['name'],
-						'output' => ['itemid', 'name']
-					]);
-					if ($items) {
-						$items = CMacrosResolverHelper::resolveItemNames($items);
-
-						foreach ($items as $item) {
-							order_result($item['hosts'], 'name');
-							$item['host'] = reset($item['hosts']);
-							$list[$item['itemid']] = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
-						}
-					}
-					break;
 			}
 		}
 		unset($list);
-
-		// Prepare data for CMultiSelect controls.
-		$groupids = [];
-		$hostids = [];
-		$itemids = [];
-
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldGroup) {
-				$field_name = $field->getName();
-				$captions['ms']['groups'][$field_name] = [];
-
-				foreach ($field->getValue() as $groupid) {
-					$captions['ms']['groups'][$field_name][$groupid] = ['id' => $groupid];
-					$groupids[$groupid][] = $field_name;
-				}
-			}
-			elseif ($field instanceof CWidgetFieldHost) {
-				$field_name = $field->getName();
-				$captions['ms']['hosts'][$field_name] = [];
-
-				foreach ($field->getValue() as $hostid) {
-					$captions['ms']['hosts'][$field_name][$hostid] = ['id' => $hostid];
-					$hostids[$hostid][] = $field_name;
-				}
-			}
-			elseif ($field instanceof CWidgetFieldItem) {
-				$field_name = $field->getName();
-				$captions['ms']['items'][$field_name] = [];
-
-				foreach ($field->getValue() as $itemid) {
-					$captions['ms']['items'][$field_name][$itemid] = ['id' => $itemid];
-					$itemids[$itemid][] = $field_name;
-				}
-			}
-		}
-
-		if ($groupids) {
-			$groups = API::HostGroup()->get([
-				'output' => ['name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
-			]);
-
-			foreach ($groups as $groupid => $group) {
-				foreach ($groupids[$groupid] as $field_name) {
-					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
-					unset($captions['ms']['groups'][$field_name][$groupid]['inaccessible']);
-				}
-			}
-		}
-
-		if ($hostids) {
-			$hosts = API::Host()->get([
-				'output' => ['name'],
-				'hostids' => array_keys($hostids),
-				'preservekeys' => true
-			]);
-
-			foreach ($hosts as $hostid => $host) {
-				foreach ($hostids[$hostid] as $field_name) {
-					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
-				}
-			}
-		}
-
-		if ($itemids) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_'],
-				'selectHosts' => ['name'],
-				'itemids' => array_keys($itemids),
-				'preservekeys' => true,
-				'webitems' => true
-			]);
-
-			$items = CMacrosResolverHelper::resolveItemNames($items);
-
-			foreach ($items as $itemid => $item) {
-				foreach ($itemids[$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] = [
-						'id' => $itemid,
-						'name' => $item['name_expanded'],
-						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
-					];
-				}
-			}
-		}
-
-		$inaccessible_resources = [
-			'groups' => _('Inaccessible group'),
-			'hosts' => _('Inaccessible host'),
-			'items' => _('Inaccessible item')
-		];
-
-		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
-			foreach ($fields_captions as &$field_captions) {
-				$n = 0;
-
-				foreach ($field_captions as &$caption) {
-					if (!array_key_exists('name', $caption)) {
-						$postfix = (++$n > 1) ? ' ('.$n.')' : '';
-						$caption['name'] = $inaccessible_resources[$resource_type].$postfix;
-						$caption['inaccessible'] = true;
-					}
-				}
-				unset($caption);
-			}
-			unset($field_captions);
-		}
-		unset($fields_captions);
 
 		return $captions;
 	}

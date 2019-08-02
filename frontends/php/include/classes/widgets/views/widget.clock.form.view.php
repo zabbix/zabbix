@@ -37,11 +37,7 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper:
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts[] = $field_itemid->getPostJS();
+	$fields['itemid']->addToForm($form, $form_list, $scripts);
 }
 
 $form->addItem($form_list);

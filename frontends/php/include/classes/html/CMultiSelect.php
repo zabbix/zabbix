@@ -177,7 +177,8 @@ class CMultiSelect extends CTag {
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
-					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types',
+					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
+					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
 					'excludeids', 'disableids', 'enrich_parent_groups'
 				];
 
@@ -243,12 +244,11 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['templated_hosts'] = true;
 				}
 
-				if (array_key_exists('with_simple_graph_items', $parameters) && $parameters['with_simple_graph_items']) {
-					$popup_parameters['with_simple_graph_items'] = '1';
-				}
-
-				if (array_key_exists('with_triggers', $parameters) && $parameters['with_triggers']) {
-					$popup_parameters['with_triggers'] = '1';
+				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
+						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
+					if (array_key_exists($name, $parameters) && $parameters[$name]) {
+						$popup_parameters[$name] = '1';
+					}
 				}
 
 				if (array_key_exists('webitems', $parameters) && $parameters['webitems']) {

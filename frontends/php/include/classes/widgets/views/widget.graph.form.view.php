@@ -40,26 +40,12 @@ $form_list->addRow(
 
 // Graph.
 if (array_key_exists('graphid', $fields)) {
-	$field = $fields['graphid'];
-
-	// Needed for popup script.
-	$form->addVar($field->getName(), $field->getValue());
-
-	$field_graphid = CWidgetHelper::getSelectResource(
-		$field,
-		($field->getValue() != 0) ? $data['captions']['simple'][$field->getResourceType()][$field->getValue()] : '',
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getLabel($fields['graphid']), $field_graphid);
+	$fields['graphid']->addToForm($form, $form_list, $scripts);
 }
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
-	);
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
-	$scripts[] = $field_itemid->getPostJS();
+	$fields['itemid']->addToForm($form, $form_list, $scripts);
 }
 
 // Show legend.

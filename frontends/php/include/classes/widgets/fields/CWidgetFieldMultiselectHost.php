@@ -19,24 +19,38 @@
 **/
 
 
-class CWidgetFieldGroup extends CWidgetField {
+class CWidgetFieldMultiselectHost extends CWidgetFieldMultiselect {
 
-	/**
-	 * Create widget field for Host Group selection.
-	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
-	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP);
-		$this->setDefault([]);
+		$this
+			->setObjectName('hosts')
+			->setPopupOptions([
+				'srctbl' => 'hosts',
+				'srcfld1' => 'hostid',
+			])
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST)
+			->setInaccessibleCaption(_('Inaccessible host'))
+		;
 	}
 
-	public function setValue($value) {
-		$this->value = (array) $value;
+	public function getCaptions($values) {
+		$hosts = API::Host()->get([
+			'output' => ['name'],
+			'hostids' => $values,
+			'preservekeys' => true
+		]);
 
-		return $this;
+		$captions = [];
+
+		foreach ($hosts as $hostid => $host) {
+			$captions[$hostid] = [
+				'id' => $hostid,
+				'name' => $host['name']
+			];
+		}
+
+		return $captions;
 	}
 }

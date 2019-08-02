@@ -19,24 +19,43 @@
 **/
 
 
-class CWidgetFieldHost extends CWidgetField {
+class CWidgetFieldMultiselectGraph extends CWidgetFieldMultiselect {
 
-	/**
-	 * Create widget field for Item selection
-	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
-		$this->setDefault([]);
+		$this
+			->setObjectName('graphs')
+			->setPopupOptions([
+				'srctbl' => 'graphs',
+				'srcfld1' => 'graphid',
+				'srcfld2' => 'name',
+				'real_hosts' => true,
+				'with_graphs' => true
+			])
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH)
+			->setInaccessibleCaption(_('Inaccessible graph'))
+		;
 	}
 
-	public function setValue($value) {
-		$this->value = (array) $value;
+	public function getCaptions($values) {
+		$graphs = API::Graph()->get([
+			'output' => ['graphid', 'name'],
+			'selectHosts' => ['name'],
+			'graphids' => $values,
+			'preservekeys' => true
+		]);
 
-		return $this;
+		$captions = [];
+
+		foreach ($graphs as $graphid => $graph) {
+			$captions[$graphid] = [
+				'id' => $graphid,
+				'name' => $graph['name'],
+				'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+			];
+		}
+
+		return $captions;
 	}
 }

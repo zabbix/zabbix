@@ -30,12 +30,10 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 	$data['known_widget_types'], $fields['rf_rate']
 );
 
+$scripts = [];
+
 // Items.
-$field_itemids = CWidgetHelper::getItem($fields['itemids'], $data['captions']['ms']['items']['itemids'],
-	$form->getName()
-);
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemids']), $field_itemids);
-$scripts = [$field_itemids->getPostJS()];
+$fields['itemids']->addToForm($form, $form_list, $scripts);
 
 // Items location.
 $form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));
