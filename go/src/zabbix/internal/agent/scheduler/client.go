@@ -56,6 +56,11 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		c.plugins[p] = info
 	}
 
+	if info.used.IsZero() {
+		p.refcount++
+	}
+	info.used = now
+
 	// handle Collector interface
 	if col, ok := p.impl.(plugin.Collector); ok {
 		if p.refcount == 0 && info.used.IsZero() {
@@ -74,21 +79,25 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
-			return err
+		if r.Itemid != 0 {
+			if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
+				return err
+			}
 		}
 		if item, ok := c.items[r.Itemid]; !ok {
 			item = &clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
-			item.task = &exporterTask{
+			task := &exporterTask{
 				taskBase: taskBase{plugin: p, active: true},
 				writer:   sink,
 				item:     item}
+
 			// cache scheduled (non direct) requests
 			if r.Itemid != 0 {
 				c.items[r.Itemid] = item
-				item.task.reschedule(now)
+				task.reschedule(now)
 			}
-			p.enqueueTask(item.task)
+			item.task = task
+			p.enqueueTask(task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
 			item.updated = now
@@ -154,11 +163,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		}
 	}
 
-	if info.used.IsZero() {
-		p.refcount++
-	}
-	info.used = now
-
 	return nil
 }
 
@@ -199,7 +203,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 					log.Debugf("[%d] released unused plugin %s", c.id, p.name())
 				} else {
 					log.Debugf("[%d] released plugin %s as not used since %s", c.id, p.name(),
-						time.Now().Format(time.Stamp))
+						info.used.Format(time.Stamp))
 				}
 			}
 		}

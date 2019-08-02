@@ -81,6 +81,8 @@ func (h *performerHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	p := old[n-1]
+	// clear slice slot, so the performer can be garbage collected later
+	old[n-1] = nil
 	*h = old[0 : n-1]
 	p.setIndex(-1)
 	return p
