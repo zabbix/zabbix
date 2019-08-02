@@ -101,16 +101,17 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
 			item.updated = now
-			if item.delay != r.Delay && !item.unsupported {
+			reschedule := item.delay != r.Delay && !item.unsupported
+			item.delay = r.Delay
+			item.key = r.Key
+			if reschedule {
 				if err = item.task.reschedule(now); err != nil {
 					item.task.deactivate()
 					return
 				}
 				p.tasks.Update(item.task)
-				log.Debugf("[%d] updated exporter task for plugin %s", c.id, p.name())
+				log.Debugf("[%d] updated exporter task for item %d %s", c.id, item.itemid, item.key)
 			}
-			item.delay = r.Delay
-			item.key = r.Key
 		}
 	}
 
