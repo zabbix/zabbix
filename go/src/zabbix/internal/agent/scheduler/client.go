@@ -30,12 +30,9 @@ import (
 )
 
 type clientItem struct {
-	itemid      uint64
-	delay       string
-	unsupported bool
-	key         string
-	task        performer
-	updated     time.Time
+	itemid uint64
+	delay  string
+	key    string
 }
 
 type pluginInfo struct {
@@ -44,9 +41,9 @@ type pluginInfo struct {
 }
 
 type client struct {
-	id      uint64
-	items   map[uint64]*clientItem
-	plugins map[*pluginAgent]*pluginInfo
+	id        uint64
+	exporters map[uint64]exporterTaskAccessor
+	plugins   map[*pluginAgent]*pluginInfo
 }
 
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
@@ -64,7 +61,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
 			task := &collectorTask{
-				taskBase: taskBase{plugin: p, active: true},
+				taskBase: taskBase{plugin: p, active: true, onetime: false},
 				seed:     uint64(h.Sum32())}
 			if err = task.reschedule(now); err != nil {
 				return
@@ -82,34 +79,34 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				return err
 			}
 		}
-		if item, ok := c.items[r.Itemid]; !ok {
-			item = &clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, updated: now}
+		if tacc, ok := c.exporters[r.Itemid]; !ok {
 			task := &exporterTask{
-				taskBase: taskBase{plugin: p, active: true},
+				taskBase: taskBase{plugin: p, active: true, onetime: r.Itemid == 0},
 				writer:   sink,
-				item:     item}
+				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+				updated:  now,
+			}
 
 			// cache scheduled (non direct) requests
 			if r.Itemid != 0 {
-				c.items[r.Itemid] = item
+				c.exporters[r.Itemid] = task
 				if err = task.reschedule(now); err != nil {
 					return
 				}
 			}
-			item.task = task
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
-			item.updated = now
-			reschedule := item.delay != r.Delay && !item.unsupported
-			item.delay = r.Delay
+			tacc.setUpdated(now)
+			item := tacc.getItem()
 			item.key = r.Key
-			if reschedule {
-				if err = item.task.reschedule(now); err != nil {
-					item.task.deactivate()
+			if item.delay != r.Delay {
+				item.delay = r.Delay
+				if err = tacc.reschedule(now); err != nil {
+					tacc.deactivate()
 					return
 				}
-				p.tasks.Update(item.task)
+				p.tasks.Update(tacc)
 				log.Debugf("[%d] updated exporter task for item %d %s", c.id, item.itemid, item.key)
 			}
 		}
@@ -119,10 +116,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Runner); ok {
 		if p.refcount == 0 {
 			task := &starterTask{
-				taskBase: taskBase{
-					plugin: p,
-					active: true,
-				}}
+				taskBase: taskBase{plugin: p, active: true, onetime: true},
+			}
 			if err = task.reschedule(now); err != nil {
 				return
 			}
@@ -137,10 +132,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if _, ok := p.impl.(plugin.Watcher); ok {
 			if info.watcher == nil {
 				info.watcher = &watcherTask{
-					taskBase: taskBase{
-						plugin: p,
-						active: true,
-					},
+					taskBase: taskBase{plugin: p, active: true, onetime: true},
 					sink:     sink,
 					requests: make([]*plugin.Request, 0, 1),
 				}
@@ -159,11 +151,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if p.refcount == 0 {
 			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
 				task := &configerTask{
-					taskBase: taskBase{
-						plugin: p,
-						active: true,
-					},
-					options: options}
+					taskBase: taskBase{plugin: p, active: true, onetime: true},
+					options:  options}
 				if err = task.reschedule(now); err != nil {
 					return
 				}
@@ -193,10 +182,10 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	}
 
 	// remove unused items
-	for _, item := range c.items {
-		if item.updated.Before(now) {
-			delete(c.items, item.itemid)
-			item.task.deactivate()
+	for _, task := range c.exporters {
+		if task.getUpdated().Before(now) {
+			delete(c.exporters, task.getItem().itemid)
+			task.deactivate()
 		}
 	}
 
@@ -232,9 +221,9 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 func newClient(id uint64) (b *client) {
 	b = &client{
-		id:      id,
-		items:   make(map[uint64]*clientItem),
-		plugins: make(map[*pluginAgent]*pluginInfo),
+		id:        id,
+		exporters: make(map[uint64]exporterTaskAccessor),
+		plugins:   make(map[*pluginAgent]*pluginInfo),
 	}
 	return
 }

@@ -43,6 +43,14 @@ type taskBase struct {
 	scheduled time.Time
 	index     int
 	active    bool
+	onetime   bool
+}
+
+type exporterTaskAccessor interface {
+	performer
+	setUpdated(now time.Time)
+	getUpdated() time.Time
+	getItem() *clientItem
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -76,8 +84,8 @@ func (t *taskBase) isActive() bool {
 	return t.active
 }
 
-func (t *taskBase) finish() bool {
-	return false
+func (t *taskBase) isOneTime() bool {
+	return t.onetime
 }
 
 type collectorTask struct {
@@ -109,15 +117,12 @@ func (t *collectorTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-func (t *collectorTask) finish() bool {
-	return true
-}
-
 type exporterTask struct {
 	taskBase
-	writer      plugin.ResultWriter
-	item        *clientItem
-	unsupported bool
+	writer  plugin.ResultWriter
+	item    clientItem
+	failed  bool
+	updated time.Time
 }
 
 func (t *exporterTask) perform(s Scheduler) {
@@ -152,9 +157,9 @@ func (t *exporterTask) perform(s Scheduler) {
 		}
 		if err != nil {
 			t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
-			t.unsupported = true
+			t.failed = true
 		} else {
-			t.unsupported = false
+			t.failed = false
 		}
 		s.FinishTask(t)
 	}(t.item.key)
@@ -162,7 +167,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, now); err != nil {
+		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.failed, now); err != nil {
 			return err
 		} else {
 			t.scheduled = nextcheck.Add(priorityExporterTaskNs)
@@ -173,13 +178,15 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 	return
 }
 
-func (t *exporterTask) finish() bool {
-	// direct metric requests are one time checks
-	if t.item.itemid == 0 {
-		return false
-	}
-	t.item.unsupported = t.unsupported
-	return true
+func (t *exporterTask) setUpdated(now time.Time) {
+	t.updated = now
+}
+func (t *exporterTask) getUpdated() (updated time.Time) {
+	return t.updated
+}
+
+func (t *exporterTask) getItem() (item *clientItem) {
+	return &t.item
 }
 
 type starterTask struct {

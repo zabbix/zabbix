@@ -141,10 +141,9 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(task performer) {
-	reschedule := task.finish()
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && reschedule {
+	if p.active() && task.isActive() && !task.isOneTime() {
 		if err := task.reschedule(time.Now()); err != nil {
 			log.Warningf("cannot reschedule plugin %s: %s", p.impl.Name(), err)
 		} else {
