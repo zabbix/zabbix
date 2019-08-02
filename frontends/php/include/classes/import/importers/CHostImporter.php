@@ -104,33 +104,31 @@ class CHostImporter extends CImporter {
 		}
 
 		// create interfaces cache interface_ref->interfaceid
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-			$dbInterfaces = API::HostInterface()->get([
-				'hostids' => $this->processedHostIds,
-				'output' => API_OUTPUT_EXTEND
-			]);
+		$dbInterfaces = API::HostInterface()->get([
+			'hostids' => $this->processedHostIds,
+			'output' => API_OUTPUT_EXTEND
+		]);
 
-			foreach ($hosts as $host) {
-				if (isset($this->processedHostIds[$host['host']])) {
-					foreach ($host['interfaces'] as $interface) {
-						$hostId = $this->processedHostIds[$host['host']];
+		foreach ($hosts as $host) {
+			if (isset($this->processedHostIds[$host['host']])) {
+				foreach ($host['interfaces'] as $interface) {
+					$hostId = $this->processedHostIds[$host['host']];
 
-						if (!isset($this->referencer->interfacesCache[$hostId])) {
-							$this->referencer->interfacesCache[$hostId] = [];
-						}
+					if (!isset($this->referencer->interfacesCache[$hostId])) {
+						$this->referencer->interfacesCache[$hostId] = [];
+					}
 
-						foreach ($dbInterfaces as $dbInterface) {
-							if ($hostId == $dbInterface['hostid']
-									&& $dbInterface['ip'] == $interface['ip']
-									&& $dbInterface['dns'] == $interface['dns']
-									&& $dbInterface['useip'] == $interface['useip']
-									&& $dbInterface['port'] == $interface['port']
-									&& $dbInterface['type'] == $interface['type']
-									&& $dbInterface['main'] == $interface['main']
-									&& (!isset($interface['bulk']) || $dbInterface['bulk'] == $interface['bulk'])) {
-								$refName = $interface['interface_ref'];
-								$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
-							}
+					foreach ($dbInterfaces as $dbInterface) {
+						if ($hostId == $dbInterface['hostid']
+								&& $dbInterface['ip'] == $interface['ip']
+								&& $dbInterface['dns'] == $interface['dns']
+								&& $dbInterface['useip'] == $interface['useip']
+								&& $dbInterface['port'] == $interface['port']
+								&& $dbInterface['type'] == $interface['type']
+								&& $dbInterface['main'] == $interface['main']
+								&& (!isset($interface['bulk']) || $dbInterface['bulk'] == $interface['bulk'])) {
+							$refName = $interface['interface_ref'];
+							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 						}
 					}
 				}
