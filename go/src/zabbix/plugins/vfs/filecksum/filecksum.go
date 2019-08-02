@@ -22,10 +22,9 @@ package filecksum
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
-	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
 )
 
 // Plugin -
@@ -90,52 +89,53 @@ var crctable []uint32 = []uint32{
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 }
 
-func crc(data []byte) uint32 {
-	var crc, flen uint32
-	for _, b := range data {
-		crc = (crc << 8) ^ crctable[((crc>>24)^uint32(b))&0xff]
-	}
-
-	flen = uint32(len(data))
-	for 0 != flen {
-		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
-		flen >>= 8
-	}
-	return ^crc
-}
-
 // Export -
 func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
-	var buf []byte
-
 	if len(params) != 1 {
 		return nil, errors.New("Wrong number of parameters")
 	}
 
 	start := time.Now()
 
-	file, err := os.Open(params[0])
+	file, err := stdOs.Open(params[0])
 	if err != nil {
 		return nil, fmt.Errorf("Cannot open file %s", params[0])
 	}
 	defer file.Close()
 
 	bnum := 16 * 1024
-	buf1 := make([]byte, bnum)
+	buf := make([]byte, bnum)
+
+	var crc, flen uint32
 
 	for bnum > 0 {
-		bnum, _ = file.Read(buf1)
-		buf = append(buf, buf1[0:bnum]...)
+		bnum, _ = file.Read(buf)
+
+		for _, b := range buf[0:bnum] {
+			crc = (crc << 8) ^ crctable[((crc>>24)^uint32(b))&0xff]
+			fmt.Printf("AKDBG crc %d byte %d\n", crc, b)
+		}
+
+		flen += uint32(bnum)
+
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > float64(agent.Options.Timeout) {
+		if elapsed.Seconds() > /*float64(agent.Options.Timeout)*/ 10000 {
 			return nil, errors.New("Timeout while processing item")
 		}
 	}
 
-	return crc(buf), nil
+	for 0 != flen {
+		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
+		fmt.Printf("AKDBG crc %d byte %d\n", crc, flen&0xff)
+		flen >>= 8
+	}
+	return ^crc, nil
 
 }
 
+var stdOs std.Os
+
 func init() {
 	plugin.RegisterMetric(&impl, "checksum", "vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm")
+	stdOs = std.NewOs()
 }
