@@ -1421,6 +1421,11 @@
 			'height': data['widget_defaults'][type]['size']['height']
 		}
 
+        if (data.dialogue.widget !== null) {
+			pos.width = data.dialogue.widget.pos.width;
+			pos.height = data.dialogue.widget.pos.height;
+		}
+
 		// Go y by row and try to position widget in each space.
 		var	max_col = data['options']['max-columns'] - pos['width'],
 			max_row = data['options']['max-rows'] - pos['height'],
