@@ -112,9 +112,8 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 	for bnum > 0 {
 		bnum, _ = file.Read(buf)
 
-		for _, b := range buf[0:bnum] {
+		for _, b := range buf[:bnum] {
 			crc = (crc << 8) ^ crctable[((crc>>24)^uint32(b))&0xff]
-			fmt.Printf("AKDBG crc %d byte %d\n", crc, b)
 		}
 
 		flen += uint32(bnum)
@@ -127,7 +126,6 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 
 	for 0 != flen {
 		crc = (crc << 8) ^ crctable[((crc>>24)^flen)&0xff]
-		fmt.Printf("AKDBG crc %d byte %d\n", crc, flen&0xff)
 		flen >>= 8
 	}
 	return ^crc, nil

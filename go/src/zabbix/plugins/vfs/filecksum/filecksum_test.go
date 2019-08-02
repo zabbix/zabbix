@@ -22,6 +22,7 @@ package filecksum
 import (
 	"reflect"
 	"testing"
+	"zabbix/internal/agent"
 	"zabbix/pkg/std"
 )
 
@@ -29,6 +30,8 @@ var CrcFile = "1234"
 
 func TestUptime(t *testing.T) {
 	stdOs = std.NewMockOs()
+
+	agent.Options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
 	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}); err != nil {
