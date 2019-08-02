@@ -222,12 +222,8 @@ class CWidgetConfig {
 				return false;
 
 			case WIDGET_PROBLEMS_BY_SV:
-				if (array_key_exists('show_type', $fields)
-						&& $fields['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
-					return false;
-				}
-
-				return true;
+				return (!array_key_exists('show_type', $fields)
+						|| $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS);
 
 			default:
 				return true;

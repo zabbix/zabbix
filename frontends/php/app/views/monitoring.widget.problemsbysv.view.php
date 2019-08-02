@@ -19,31 +19,24 @@
 **/
 
 
-$backurl = (new CUrl('zabbix.php'))->setArgument('action', 'dashboard.view');
-$data['backurl'] = $backurl->getUrl();
+$data['backurl'] = (new CUrl('zabbix.php'))
+	->setArgument('action', 'dashboard.view')
+	->getUrl();
 
 if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
-	$table = (new CTableInfo())
-		->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
-		->addClass(($data['filter']['layout'] == STYLE_HORIZONTAL)
-			? ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL
-			: ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL
-		);
-
 	if ($data['filter']['layout'] == STYLE_HORIZONTAL) {
-		$table = makeSeverityTable($data, $table);
+		$table = makeSeverityTotals($data)->addClass(ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL);
 	}
 	else {
-		$table = makeSeverityTotalsTableVertical($data, $table);
+		$table = makeSeverityTotals($data)->addClass(ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL);
 	}
+
+	$table->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET);
 }
 else {
 	$filter_severities = (array_key_exists('severities', $data['filter']) && $data['filter']['severities'])
 		? $data['filter']['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-	$hide_empty_groups = array_key_exists('hide_empty_groups', $data['filter'])
-		? $data['filter']['hide_empty_groups']
-		: 0;
 
 	$header = [[_('Host group'), (new CSpan())->addClass(ZBX_STYLE_ARROW_UP)]];
 
@@ -53,9 +46,9 @@ else {
 		}
 	}
 
-	$table = (new CTableInfo())
-		->setHeader($header)
-		->setHeadingColumn(0);
+	$hide_empty_groups = array_key_exists('hide_empty_groups', $data['filter'])
+		? $data['filter']['hide_empty_groups']
+		: 0;
 
 	$groupurl = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
@@ -67,12 +60,12 @@ else {
 		)
 		->setArgument('filter_name', array_key_exists('problem', $data['filter']) ? $data['filter']['problem'] : null)
 		->setArgument('filter_show_suppressed',
-			(array_key_exists('show_suppressed', $data['filter']) && $data['filter']['show_suppressed'] == 1)
-				? 1
-				: null
+			(array_key_exists('show_suppressed', $data['filter']) && $data['filter']['show_suppressed'] == 1) ? 1 : null
 		);
 
-	$table = makeSeverityTable($data, $table, $hide_empty_groups, $groupurl, false);
+	$table = makeSeverityTable($data, $hide_empty_groups, $groupurl)
+		->setHeader($header)
+		->setHeadingColumn(0);
 }
 
 $output = [

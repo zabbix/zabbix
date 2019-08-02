@@ -1097,11 +1097,7 @@ td.inactive-bg {
 	}
 }
 
-.by-severity-widget > tbody > tr > td {
-	@include hc-by-severity-widget;
-}
-
-// WIDGET HOST AVAILABILITY
+// WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 
@@ -1125,5 +1121,33 @@ td.inactive-bg {
 	.host-avail-unknown,
 	.host-avail-total {
 		background: transparent;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+
+	> div {
+		border-top: 1px solid $ui-border-color;
+		color: $font-color;
+		min-width: 65px;
+		padding-left: 42px;
+
+		&:after {
+			top: 50%;
+			transform: translateY(-50%);
+		}
+	}
+
+	.by-severity-count {
+		font-weight: bold;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		> div:not(:last-of-type) {
+			border-right: 1px solid $ui-border-color;
+		}
 	}
 }

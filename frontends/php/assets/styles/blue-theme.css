@@ -3508,7 +3508,8 @@ td[class] + td.disaster-bg {
   border-left: 1px dotted #ebeef0; }
 
 .na-bg {
-  color: #2a353a; }
+  color: #2a353a;
+  position: relative; }
   .na-bg a.link-action,
   .na-bg input[type="radio"]:checked + label {
     color: #2a353a; }
@@ -3519,6 +3520,7 @@ td[class] + td.disaster-bg {
 
 .normal-bg {
   color: #0e4123;
+  position: relative;
   background-color: #59db8f; }
   .normal-bg a.link-action {
     color: #0e4123; }
@@ -3528,7 +3530,8 @@ td[class] + td.disaster-bg {
   background-color: #59db8f; }
 
 .info-bg {
-  color: #00268e; }
+  color: #00268e;
+  position: relative; }
   .info-bg a.link-action,
   .info-bg input[type="radio"]:checked + label {
     color: #00268e; }
@@ -3538,7 +3541,8 @@ td[class] + td.disaster-bg {
   background-color: #7499ff; }
 
 .average-bg {
-  color: #733100; }
+  color: #733100;
+  position: relative; }
   .average-bg a.link-action,
   .average-bg input[type="radio"]:checked + label {
     color: #733100; }
@@ -3548,7 +3552,8 @@ td[class] + td.disaster-bg {
   background-color: #ffa059; }
 
 .warning-bg {
-  color: #734d00; }
+  color: #734d00;
+  position: relative; }
   .warning-bg a.link-action,
   .warning-bg input[type="radio"]:checked + label {
     color: #734d00; }
@@ -3558,7 +3563,8 @@ td[class] + td.disaster-bg {
   background-color: #ffc859; }
 
 .high-bg {
-  color: #52190b; }
+  color: #52190b;
+  position: relative; }
   .high-bg a.link-action,
   .high-bg input[type="radio"]:checked + label {
     color: #52190b; }
@@ -3568,7 +3574,8 @@ td[class] + td.disaster-bg {
   background-color: #e97659; }
 
 .disaster-bg {
-  color: #4b0c0c; }
+  color: #4b0c0c;
+  position: relative; }
   .disaster-bg a.link-action,
   .disaster-bg input[type="radio"]:checked + label {
     color: #4b0c0c; }
@@ -4932,34 +4939,13 @@ table.preprocessing-test-results .rel-container {
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 
-.by-severity-widget {
-  width: 100%;
-  height: 100%; }
-  .by-severity-widget > tbody > tr > td {
-    vertical-align: middle;
-    padding: 0 10px;
-    border-bottom: none !important;
-    border-left: none !important; }
-    .by-severity-widget > tbody > tr > td > span {
-      font-size: 16px; }
-    .by-severity-widget > tbody > tr > td:before {
-      content: '';
-      position: static;
-      display: block;
-      min-width: 65px;
-      min-height: 0; }
-  .by-severity-widget.by-severity-layout-horizontal > tbody > tr > td {
-    text-align: center; }
-    .by-severity-widget.by-severity-layout-horizontal > tbody > tr > td > span {
-      display: block; }
-  .by-severity-widget.by-severity-layout-vertical > tbody > tr > td > span {
-    margin-right: 5px; }
-
 .host-avail-widget {
   width: 100%;
   height: 100%;
   table-layout: fixed; }
   .host-avail-widget td {
+    line-height: 18px;
+    overflow: hidden;
     padding: 0 10px;
     vertical-align: middle; }
   .host-avail-widget .host-avail-count {
@@ -4967,6 +4953,7 @@ table.preprocessing-test-results .rel-container {
   .host-avail-widget.host-avail-layout-horizontal {
     min-width: 305px; }
     .host-avail-widget.host-avail-layout-horizontal td {
+      height: 100%;
       text-align: center; }
     .host-avail-widget.host-avail-layout-horizontal .host-avail-count {
       display: block; }
@@ -4982,3 +4969,34 @@ table.preprocessing-test-results .rel-container {
     background: #97aab3; }
   .host-avail-widget .host-avail-total {
     background: transparent; }
+
+.by-severity-widget {
+  height: 100%;
+  display: flex; }
+  .by-severity-widget > div {
+    flex: 1;
+    align-items: center;
+    display: flex;
+    line-height: 18px;
+    overflow: hidden;
+    padding: 0 10px;
+    position: relative; }
+  .by-severity-widget .by-severity-count {
+    font-size: 16px; }
+  .by-severity-widget.by-severity-layout-horizontal > div {
+    flex-direction: column;
+    justify-content: center;
+    min-width: 55px;
+    text-align: center; }
+  .by-severity-widget.by-severity-layout-vertical {
+    flex-direction: column; }
+    .by-severity-widget.by-severity-layout-vertical > div {
+      min-height: 26px;
+      padding-top: 3px; }
+    .by-severity-widget.by-severity-layout-vertical .by-severity-count {
+      margin-right: 5px; }
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  /* for IE11 only. Fixed cell height if table has 100% height */
+  .host-avail-widget td {
+    height: 100%; } }

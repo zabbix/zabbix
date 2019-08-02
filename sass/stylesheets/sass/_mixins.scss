@@ -55,15 +55,3 @@
 		@return darken($font-color, 8%);
 	}
 }
-
-@mixin hc-by-severity-widget {
-	border-left-width: 34px;
-	border-left-style: solid;
-
-	&:after {
-		margin: auto;
-		top: 0;
-		bottom: 0;
-		left: -28px;
-	}
-}

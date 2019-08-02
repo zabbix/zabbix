@@ -5104,6 +5104,7 @@ a.link-action {
 ) {
 	.#{$severity-type} {
 		color: darken($color, 45%);
+		position: relative;
 
 		@if $severity-type == normal-bg {
 			background-color: $color;
@@ -6841,48 +6842,7 @@ table.preprocessing-test-results {
 	}
 }
 
-.by-severity-widget {
-	width: 100%;
-	height: 100%;
-
-	> tbody > tr > td {
-		vertical-align: middle;
-		padding: 0 10px;
-		border-bottom: none !important;
-
-		@if $theme_name == 'blue' or $theme_name == 'dark' {
-			border-left: none !important;
-		}
-
-		> span {
-			font-size: 16px;
-		}
-
-		&:before {
-			content: '';
-			position: static;
-			display: block;
-			min-width: 65px;
-			min-height: 0;
-		}
-	}
-
-	&.by-severity-layout-horizontal {
-
-		> tbody > tr > td {
-			text-align: center;
-
-			> span {
-				display: block;
-			}
-		}
-	}
-	&.by-severity-layout-vertical > tbody > tr > td > span {
-		margin-right: 5px;
-	}
-}
-
-// WIDGET HOST AVAILABILITY
+// WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 	width: 100%;
@@ -6890,6 +6850,8 @@ table.preprocessing-test-results {
 	table-layout: fixed;
 
 	td {
+		line-height: 18px;
+		overflow: hidden;
 		padding: 0 10px;
 		vertical-align: middle;
 	}
@@ -6902,6 +6864,7 @@ table.preprocessing-test-results {
 		min-width: 305px;
 
 		td {
+			height: 100%;
 			text-align: center;
 		}
 
@@ -6935,6 +6898,61 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+	height: 100%;
+	display: flex;
+
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
+		line-height: 18px;
+		overflow: hidden;
+		padding: 0 10px;
+		position: relative;
+	}
+
+	.by-severity-count {
+		font-size: 16px;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
+		}
+	}
+
+	&.by-severity-layout-vertical {
+		flex-direction: column;
+
+		> div {
+			min-height: 26px;
+			padding-top: 3px;
+		}
+
+		.by-severity-count {
+			margin-right: 5px;
+		}
+	}
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+	/* for IE11 only. Fixed cell height if table has 100% height */
+	.host-avail-widget {
+
+		td {
+			height: 100%;
+		}
 	}
 }
 

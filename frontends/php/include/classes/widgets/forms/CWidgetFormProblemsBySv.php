@@ -79,8 +79,8 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		]))
 			->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
 			->setModern(true)
-			->setAction('var disabled = jQuery(this).filter("[value=\''.WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS.
-				'\']").is(":checked");'.
+			->setAction('var disabled = jQuery(this).filter("[value=\''.WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS.'\']")'.
+				'.is(":checked");'.
 				'jQuery("#hide_empty_groups").prop("disabled", !disabled);'.
 				'jQuery("#layout input").prop("disabled", disabled)'
 			);

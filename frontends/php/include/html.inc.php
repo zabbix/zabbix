@@ -975,7 +975,6 @@ function getTriggerSeverityCss($config) {
 	foreach ($severities as $class => $color) {
 		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label, .'.$class.':before, .flh-'.$class.
 			', .status-'.$class.' { background-color: #'.$color.' }'."\n";
-		$css .= '.'.$class.' { border-left-color: #'.$color.' }'."\n";
 	}
 
 	return $css;

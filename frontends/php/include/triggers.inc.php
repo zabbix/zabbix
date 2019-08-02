@@ -161,10 +161,11 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
  *                                  if $text is not null.
  * @param string|null $text         Trigger severity name.
  * @param bool        $force_normal True to return 'normal' class, false to return corresponding severity class.
+ * @param bool        $is_total     True to return severity cell as DIV element.
  *
- * @return CCol
+ * @return CDiv|CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false, $is_total = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -173,7 +174,7 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 		return new CCol($text);
 	}
 
-	return (new CCol($text))->addClass(getSeverityStyle($severity));
+	return ($is_total ? new CDiv($text) : new CCol($text))->addClass(getSeverityStyle($severity));
 }
 
 /**
