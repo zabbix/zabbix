@@ -24,14 +24,12 @@ $data['backurl'] = (new CUrl('zabbix.php'))
 	->getUrl();
 
 if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
-	if ($data['filter']['layout'] == STYLE_HORIZONTAL) {
-		$table = makeSeverityTotals($data)->addClass(ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL);
-	}
-	else {
-		$table = makeSeverityTotals($data)->addClass(ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL);
-	}
-
-	$table->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET);
+	$table = makeSeverityTotals($data)
+		->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
+		->addClass(($data['filter']['layout'] == STYLE_HORIZONTAL)
+			? ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL
+			: ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL
+		);
 }
 else {
 	$filter_severities = (array_key_exists('severities', $data['filter']) && $data['filter']['severities'])
