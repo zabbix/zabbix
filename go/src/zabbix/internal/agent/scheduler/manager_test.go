@@ -163,13 +163,13 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 	return p.requests
 }
 
-type mockConfigerPlugin struct {
+type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
 	options map[string]string
 }
 
-func (p *mockConfigerPlugin) Configure(options map[string]string) {
+func (p *mockConfiguratorPlugin) Configure(options map[string]string) {
 	p.call("$configure")
 }
 
@@ -326,7 +326,7 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 		}
 	}
 
-	// find the range start in offsetse
+	// find the range start in offsets
 	if len(offsets) != 0 {
 		for offsets[right] < from {
 			right++
@@ -390,8 +390,9 @@ func (t *mockExporterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockExporterTask) reschedule(now time.Time) {
+func (t *mockExporterTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
+	return
 }
 
 func (t *mockExporterTask) finish() bool {
@@ -408,8 +409,9 @@ func (t *mockCollectorTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) reschedule(now time.Time) {
+func (t *mockCollectorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
+	return
 }
 
 func (t *mockCollectorTask) getWeight() int {
@@ -430,7 +432,8 @@ func (t *mockStarterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStarterTask) reschedule(now time.Time) {
+func (t *mockStarterTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStarterTask) getWeight() int {
@@ -447,7 +450,8 @@ func (t *mockStopperTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStopperTask) reschedule(now time.Time) {
+func (t *mockStopperTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStopperTask) getWeight() int {
@@ -466,7 +470,8 @@ func (t *mockWatcherTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) reschedule(now time.Time) {
+func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockWatcherTask) getWeight() int {
@@ -480,11 +485,12 @@ type mockConfigerTask struct {
 }
 
 func (t *mockConfigerTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Configer).Configure(t.options)
+	t.plugin.impl.(plugin.Configurator).Configure(t.options)
 	t.sink <- t
 }
 
-func (t *mockConfigerTask) reschedule(now time.Time) {
+func (t *mockConfigerTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockConfigerTask) getWeight() int {
@@ -1473,7 +1479,7 @@ func TestPassiveRunner(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 }
 
-func TestConfiger(t *testing.T) {
+func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	options := map[string]map[string]string{
@@ -1488,7 +1494,7 @@ func TestConfiger(t *testing.T) {
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
 		name := fmt.Sprintf("debug%d", i+1)
-		plugins[i] = &mockConfigerPlugin{
+		plugins[i] = &mockConfiguratorPlugin{
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
 			options:    options[name]}

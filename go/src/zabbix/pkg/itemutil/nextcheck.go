@@ -20,6 +20,7 @@
 package itemutil
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -28,8 +29,10 @@ func GetNextcheck(itemid uint64, delay string, unsupported bool, from time.Time)
 	var simple_delay int64
 	// TODO: add flexible/scheduled interval support
 	if simple_delay, err = strconv.ParseInt(delay, 10, 64); err != nil {
+		err = fmt.Errorf("cannot parse item delay: %s", err)
 		return
 	}
+
 	from_seconds := from.Unix()
 	return time.Unix(from_seconds-from_seconds%simple_delay+simple_delay, 0), nil
 }
