@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 )
 
@@ -126,7 +127,7 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 		bnum, _ = file.Read(buf1)
 		buf = append(buf, buf1[0:bnum]...)
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > /*agent.Options.Timeot*/ 3 {
+		if elapsed.Seconds() > float64(agent.Options.Timeout) {
 			return nil, errors.New("Timeout while processing item")
 		}
 	}
