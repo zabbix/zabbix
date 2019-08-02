@@ -460,7 +460,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, i;
+	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short		port;
@@ -510,12 +510,19 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp)) ||
+				-1 == (version = zbx_get_component_version(tmp)))
+	{
+		version = ZBX_COMPONENT_VERSION(4, 2);
+	}
+
 	zbx_vector_uint64_create(&itemids);
 
 	get_list_of_active_checks(hostid, &itemids);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 	if (0 != itemids.values_num)
@@ -559,6 +566,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
+
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			substitute_key_macros(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
@@ -569,7 +577,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
 						dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
 			}
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
+
+			if (ZBX_COMPONENT_VERSION(4,4) >= version)
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			/* The agent expects ALWAYS to have lastlogsize and mtime tags. */
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);

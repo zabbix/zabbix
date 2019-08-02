@@ -4137,7 +4137,7 @@ int	proxy_get_history_count(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_protocol_version                                         *
+ * Function: zbx_get_proxy_protocol_version                                   *
  *                                                                            *
  * Purpose: extracts protocol version from json data                          *
  *                                                                            *
@@ -4149,28 +4149,20 @@ int	proxy_get_history_count(void)
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_protocol_version(struct zbx_json_parse *jp)
+int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 {
-	char	value[MAX_STRING_LEN], *pminor, *ptr;
+	char	value[MAX_STRING_LEN];
 	int	version;
 
-	if (NULL != jp &&
-			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)) &&
-			NULL != (pminor = strchr(value, '.')))
+	if (NULL != jp && SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, value, sizeof(value)) &&
+			-1 != (version = zbx_get_component_version(value)))
 	{
-		*pminor++ = '\0';
-
-		if (NULL != (ptr = strchr(pminor, '.')))
-			*ptr = '\0';
-
-		version = ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+		return version;
 	}
 	else
-		version = ZBX_COMPONENT_VERSION(3, 2);
-
-	return version;
-
+		return ZBX_COMPONENT_VERSION(3, 2);
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: process_proxy_history_data_33                                    *
@@ -4483,7 +4475,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 
 	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION) && 0 != proxy->version)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
+		zabbix_log(LOG_LEVEL_INFORMATION, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
 				ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MAJOR(diff.version),

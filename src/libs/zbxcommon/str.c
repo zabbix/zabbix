@@ -5130,3 +5130,18 @@ void	zbx_trim_float(char *str)
 {
 	zbx_trim_number(str, 0);
 }
+
+int	zbx_get_component_version(char *value)
+{
+	char	*pminor, *ptr;
+
+	if (NULL == (pminor = strchr(value, '.')))
+		return -1;
+
+	*pminor++ = '\0';
+
+	if (NULL != (ptr = strchr(pminor, '.')))
+		*ptr = '\0';
+
+	return  ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+}
