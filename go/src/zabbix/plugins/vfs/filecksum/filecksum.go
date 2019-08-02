@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/std"
 )
@@ -119,7 +120,7 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 		flen += uint32(bnum)
 
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > /*float64(agent.Options.Timeout)*/ 10000 {
+		if elapsed.Seconds() > float64(agent.Options.Timeout) {
 			return nil, errors.New("Timeout while processing item")
 		}
 	}
