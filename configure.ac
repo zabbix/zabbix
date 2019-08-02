@@ -1984,6 +1984,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/system/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
+	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
 	go/src/zabbix/plugins/debug/Makefile
 	go/src/zabbix/plugins/debug/empty/Makefile
