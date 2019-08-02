@@ -22,7 +22,6 @@ package uname
 import (
 	"errors"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
 )
 
 // Plugin -
@@ -31,7 +30,6 @@ type Plugin struct {
 }
 
 var impl Plugin
-var stdOs std.Os
 
 // Export -
 func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
@@ -42,6 +40,5 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 }
 
 func init() {
-	stdOs = std.NewOs()
 	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
 }
