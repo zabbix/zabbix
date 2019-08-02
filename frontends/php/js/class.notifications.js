@@ -391,6 +391,11 @@ ZBX_Notifications.prototype.handleTabBeforeUnload = function(removed_tab, other_
 	if (this.active && other_tabids.length) {
 		this.pushActiveTabid(other_tabids[0]);
 		this.becomeInactive();
+		/*
+		 * Only in case when naviating to another top level domain, Chrome dispatches focusin event right after beforeunload
+		 * event. It is crucial to not to respond to that, else nonexisting tab becomes active.
+		 */
+		this.becomeActive = function() {};
 	}
 	else if (this.active) {
 		this.pushAlarmState(this.alarm.produce());
