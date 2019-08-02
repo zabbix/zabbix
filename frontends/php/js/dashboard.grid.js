@@ -1603,7 +1603,8 @@
 				if (callOnDashboardReadyTrigger) {
 					doAction('onDashboardReady', $obj, data, null);
 				}
-			});
+			})
+		;
 
 		widget['initial_load'] = false;
 	}
@@ -1693,6 +1694,7 @@
 
 					if (widget === null || ('type' in widget) === false) {
 						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
+
 						var widget_data = {
 								'type': type,
 								'header': name,
@@ -1727,8 +1729,16 @@
 							.then(add_new_widget)
 						;
 					}
-					else {
-						// In case of EDIT widget.
+					else if (widget['type'] === type) {
+						// In case of EDIT widget, if widget type not changed.
+
+						widget['header'] = name;
+						widget['fields'] = fields;
+						doAction('afterUpdateWidgetConfig', $obj, data, null);
+						updateWidgetDynamic($obj, data, widget);
+						refreshWidget($obj, data, widget);
+					} else {
+						// In case of EDIT widget, if widget type has changed.
 
 						var widget_data = {
 							'type': type,
