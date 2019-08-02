@@ -89,33 +89,33 @@ class CControllerAcknowledgeCreate extends CController {
 		list($events, $editable_triggers) = $this->getEventDetails(array_keys($eventids));
 		unset($eventids);
 
+		// Group events by actions user is allowed to perform.
+		$eventid_groups = $this->groupEventsByActionsAllowed($events, $editable_triggers);
+
 		// Update selected events.
-		$event_chunks = array_chunk($events, ZBX_DB_MAX_INSERTS);
-		foreach ($event_chunks as $event_chunk) {
-			// Group events by actions user is allowed to perform.
-			$eventid_groups = $this->groupEventsByActionsAllowed($event_chunk, $editable_triggers);
+		while ($eventid_groups['readable']) {
+			$data = $this->getAcknowledgeOptions($eventid_groups);
+			/*
+			 * No actions to perform. This can happen only if user has selected action he have no permissions to do
+			 * for any of selected events. This can happen, when you will perform one action on multiple problems,
+			 * where only some of these problems can perform this action (ex. close problem).
+			 */
+			if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
+				break;
+			}
 
-			while ($eventid_groups['readable']) {
-				$data = $this->getAcknowledgeOptions($eventid_groups);
-
-				/*
-				 * No actions to perform. This can happen only if user has selected action he have no permissions to do
-				 * for any of selected events. This can happen, when you will perform one action on multiple problems,
-				 * where only some of these problems can perform this action (ex. close problem).
-				 */
-				if ($data['action'] === ZBX_PROBLEM_UPDATE_NONE) {
-					break;
-				}
-
-				if ($data['eventids']) {
+			if ($data['eventids']) {
+				$eventid_chunks = array_chunk($data['eventids'], ZBX_DB_MAX_INSERTS);
+				foreach ($eventid_chunks as $eventid_chunk) {
+					$data['eventids'] = $eventid_chunk;
 					$result = API::Event()->acknowledge($data);
 					$updated_events_count += count($data['eventids']);
 				}
+			}
 
-				// Do not continue if event.acknowledge validation fails.
-				if (!$result) {
-					break 2;
-				}
+			// Do not continue if event.acknowledge validation fails.
+			if (!$result) {
+				break 2;
 			}
 		}
 
