@@ -1721,20 +1721,49 @@
 							.animate({scrollTop: pos['y'] * data['options']['widget-height']
 								+ $('.dashbrd-grid-container').position().top - 5})
 							.promise()
-							.then(add_new_widget);
+							.then(add_new_widget)
+						;
 					}
 					else {
 						// In case of EDIT widget.
-						if (widget['type'] !== type) {
-							widget['type'] = type;
-							widget['initial_load'] = true;
-						}
 
-						widget['header'] = name;
-						widget['fields'] = fields;
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
-						updateWidgetDynamic($obj, data, widget);
-						refreshWidget($obj, data, widget);
+						var widget_data = {
+							'type': type,
+							'header': name,
+							'pos': widget['pos'],
+							'rf_rate': 0,
+							'fields': fields
+						};
+
+						removeWidget($obj, data, widget);
+
+						methods.addWidget.call($obj, widget_data);
+
+						// New widget is last element in data['widgets'] array.
+						widget = data['widgets'].slice(-1)[0];
+						updateWidgetContent($obj, data, widget);
+						setWidgetModeEdit($obj, data, widget);
+
+/*
+
+TODO: WORKING ON THIS.
+
+
+						}
+						else {
+							if (widget['type'] !== type) {
+								widget['type'] = type;
+								widget['initial_load'] = true;
+							}
+
+							widget['header'] = name;
+							widget['fields'] = fields;
+							doAction('afterUpdateWidgetConfig', $obj, data, null);
+							updateWidgetDynamic($obj, data, widget);
+							refreshWidget($obj, data, widget);
+
+						}
+*/
 					}
 
 					// Mark dashboard as updated.
@@ -2105,7 +2134,10 @@
 		makeResizable($obj, data, widget);
 	}
 
-	function deleteWidget($obj, data, widget) {
+	/**
+	 * Remove the widget.
+	 */
+	function removeWidget($obj, data, widget) {
 		var index = widget['div'].data('widget-index');
 
 		// Remove div from the grid.
@@ -2116,6 +2148,13 @@
 		for (var i = index; i < data['widgets'].length; i++) {
 			data['widgets'][i]['div'].data('widget-index', i);
 		}
+	}
+
+	/**
+	 * Delete the widget and update the dashboard.
+	 */
+	function deleteWidget($obj, data, widget) {
+		removeWidget($obj, data, widget);
 
 		// Mark dashboard as updated.
 		data['options']['updated'] = true;
