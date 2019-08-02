@@ -27,20 +27,20 @@ import (
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
-	"zabbix/pkg/comms"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxcomms"
 )
 
 type ServerListener struct {
-	listener  *comms.ZbxListener
+	listener  *zbxcomms.Listener
 	scheduler scheduler.Scheduler
 }
 
-func (sl *ServerListener) processRequest(conn *comms.ZbxConnection, data []byte) (err error) {
+func (sl *ServerListener) processRequest(conn *zbxcomms.Connection, data []byte) (err error) {
 	return errors.New("json requests are not yet supported")
 }
 
-func (sl *ServerListener) processConnection(conn *comms.ZbxConnection) (err error) {
+func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
 	defer func() {
 		if err != nil {
 			conn.Close()
@@ -98,7 +98,7 @@ func New(s scheduler.Scheduler) (sl *ServerListener) {
 }
 
 func (sl *ServerListener) Start() (err error) {
-	if sl.listener, err = comms.Listen(fmt.Sprintf(":%d", agent.Options.ListenPort)); err != nil {
+	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf(":%d", agent.Options.ListenPort)); err != nil {
 		return err
 	}
 	monitor.Register()

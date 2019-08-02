@@ -20,8 +20,8 @@
 package empty
 
 import (
-	"errors"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
 )
 
 // Plugin -
@@ -30,16 +30,13 @@ type Plugin struct {
 }
 
 var impl Plugin
+var stdOs std.Os
 
-// Export -
 func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
-	switch key {
-	case "debug.empty":
-		return nil, nil
-	}
-	return nil, errors.New("Unknown metric")
+	return nil, nil
 }
 
 func init() {
+	stdOs = std.NewOs()
 	plugin.RegisterMetric(&impl, "debug.empty", "debug.empty", "Returns empty value")
 }

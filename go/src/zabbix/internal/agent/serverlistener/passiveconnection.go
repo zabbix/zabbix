@@ -22,11 +22,11 @@ package serverlistener
 import (
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/pkg/comms"
+	"zabbix/pkg/zbxcomms"
 )
 
 type passiveConnection struct {
-	conn *comms.ZbxConnection
+	conn *zbxcomms.Connection
 }
 
 func (pc *passiveConnection) Write(data []byte) (n int, err error) {

@@ -27,9 +27,9 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"zabbix/pkg/comms"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxcomms"
 )
 
 type MockServerOptions struct {
@@ -43,7 +43,7 @@ type MockServerOptions struct {
 
 var options MockServerOptions
 
-func handleConnection(c *comms.ZbxConnection, activeChecks []byte, tFlag int) {
+func handleConnection(c *zbxcomms.Connection, activeChecks []byte, tFlag int) {
 	defer c.Close()
 
 	js, err := c.Read(time.Second * time.Duration(tFlag))
@@ -149,7 +149,7 @@ func main() {
 		return
 	}
 
-	listener, err := comms.Listen(":" + strconv.Itoa(options.Port))
+	listener, err := zbxcomms.Listen(":" + strconv.Itoa(options.Port))
 	if err != nil {
 		log.Critf("Listen failed: %s\n", err)
 		return

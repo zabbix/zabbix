@@ -29,7 +29,8 @@ import (
 
 // task priority within the same second is done by setting nanosecond component
 const (
-	priorityStarterTaskNs = iota
+	priorityConfigerTaskNs = iota
+	priorityStarterTaskNs
 	priorityCollectorTaskNs
 	priorityWatcherTaskNs
 	priorityExporterTaskNs
@@ -74,11 +75,13 @@ func (t *taskBase) isActive() bool {
 	return t.active
 }
 
-func (t *taskBase) finish() {
+func (t *taskBase) finish() bool {
+	return false
 }
 
 type collectorTask struct {
 	taskBase
+	seed uint64
 }
 
 func (t *collectorTask) perform(s Scheduler) {
@@ -91,14 +94,17 @@ func (t *collectorTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *collectorTask) reschedule() bool {
+func (t *collectorTask) reschedule(now time.Time) {
 	collector, _ := t.plugin.impl.(plugin.Collector)
-	t.scheduled = t.scheduled.Add(time.Duration(collector.Period()) * time.Second)
-	return true
+	t.scheduled = time.Unix(now.Unix()+int64(t.seed)%int64(collector.Period())+1, priorityCollectorTaskNs)
 }
 
 func (t *collectorTask) getWeight() int {
 	return t.plugin.capacity
+}
+
+func (t *collectorTask) finish() bool {
+	return true
 }
 
 type exporterTask struct {
@@ -148,17 +154,21 @@ func (t *exporterTask) perform(s Scheduler) {
 	}(t.item.key)
 }
 
-func (t *exporterTask) reschedule() bool {
-	// direct metric requests are one time checks and must not be rescheduled
+func (t *exporterTask) reschedule(now time.Time) {
+	if t.item.itemid != 0 {
+		t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, now)
+	} else {
+		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
+	}
+}
+
+func (t *exporterTask) finish() bool {
+	// direct metric requests are one time checks
 	if t.item.itemid == 0 {
 		return false
 	}
-	t.scheduled, _ = itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.item.unsupported, time.Now())
-	return true
-}
-
-func (t *exporterTask) finish() {
 	t.item.unsupported = t.unsupported
+	return true
 }
 
 type starterTask struct {
@@ -173,8 +183,8 @@ func (t *starterTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *starterTask) reschedule() bool {
-	return false
+func (t *starterTask) reschedule(now time.Time) {
+	t.scheduled = time.Unix(now.Unix(), priorityStarterTaskNs)
 }
 
 func (t *starterTask) getWeight() int {
@@ -193,8 +203,8 @@ func (t *stopperTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *stopperTask) reschedule() bool {
-	return false
+func (t *stopperTask) reschedule(now time.Time) {
+	t.scheduled = time.Unix(now.Unix(), priorityStopperTaskNs)
 }
 
 func (t *stopperTask) getWeight() int {
@@ -215,10 +225,31 @@ func (t *watcherTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *watcherTask) reschedule() bool {
-	return false
+func (t *watcherTask) reschedule(now time.Time) {
+	t.scheduled = time.Unix(now.Unix(), priorityWatcherTaskNs)
 }
 
 func (t *watcherTask) getWeight() int {
+	return t.plugin.capacity
+}
+
+type configerTask struct {
+	taskBase
+	options map[string]string
+}
+
+func (t *configerTask) perform(s Scheduler) {
+	go func() {
+		config, _ := t.plugin.impl.(plugin.Configer)
+		config.Configure(t.options)
+		s.FinishTask(t)
+	}()
+}
+
+func (t *configerTask) reschedule(now time.Time) {
+	t.scheduled = time.Unix(now.Unix(), priorityConfigerTaskNs)
+}
+
+func (t *configerTask) getWeight() int {
 	return t.plugin.capacity
 }

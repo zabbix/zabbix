@@ -43,6 +43,11 @@ type Watcher interface {
 	Watch(requests []*Request, sink ResultWriter)
 }
 
+// Configer - interface for plugin configuration in agent conf files
+type Configer interface {
+	Configure(options map[string]string)
+}
+
 type ResultWriter interface {
 	Write(result *Result)
 }

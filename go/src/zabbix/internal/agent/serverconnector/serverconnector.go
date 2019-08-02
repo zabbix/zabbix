@@ -31,8 +31,8 @@ import (
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/comms"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxcomms"
 )
 
 type Connector struct {
@@ -103,7 +103,7 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, err := comms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), request)
+	data, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), request)
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
@@ -148,7 +148,7 @@ func (c *Connector) refreshActiveChecks() {
 // Write function is used by ResultCache to upload cached history. It will be callled from
 // different goroutine.
 func (c *Connector) Write(data []byte) (n int, err error) {
-	b, err := comms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), data)
+	b, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), data)
 	if err != nil {
 		return 0, err
 	}
