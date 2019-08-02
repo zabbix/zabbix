@@ -115,7 +115,6 @@ type exporterTask struct {
 }
 
 func (t *exporterTask) perform(s Scheduler) {
-	log.Debugf("ExporterTask.perform(%d)", t.item.itemid)
 	go func(itemkey string) {
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
@@ -164,7 +163,6 @@ func (t *exporterTask) reschedule(now time.Time) {
 }
 
 func (t *exporterTask) finish() bool {
-	log.Debugf("ExporterTask.finish(%d)", t.item.itemid)
 	// direct metric requests are one time checks
 	if t.item.itemid == 0 {
 		return false

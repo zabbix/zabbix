@@ -157,7 +157,7 @@ func (m *Manager) processFinishRequest(task performer) {
 func (m *Manager) rescheduleQueue(now time.Time) {
 	// easier to rebuild queues than update each element
 	queue := make(pluginHeap, 0, len(m.queue))
-	for _, p := range queue {
+	for _, p := range m.queue {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for _, t := range tasks {
