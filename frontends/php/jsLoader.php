@@ -130,7 +130,10 @@ $tranStrings = [
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Success message' => _('Success message'),
+		'Error message' => _('Error message'),
+		'Warning message' => _('Warning message')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
