@@ -174,7 +174,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 		return new CCol($text);
 	}
 
-	return ($return_as_div ? new CDiv($text) : new CCol($text))->addClass(getSeverityStyle($severity));
+	$return = $return_as_div ? new CDiv($text) : new CCol($text);
+	return $return->addClass(getSeverityStyle($severity));
 }
 
 /**
