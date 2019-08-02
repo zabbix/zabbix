@@ -17,18 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+// This is placeholder for debug.log plugin based on Watcher
+package log
 
-type AgentOptions struct {
-	LogType             string `conf:",,,console"`
-	LogFile             string `conf:",optional"`
-	DebugLevel          int    `conf:",,0:5,3"`
-	ServerActive        string `conf:",optional"`
-	RefreshActiveChecks int    `conf:",,30:3600,120"`
-	Timeout             int    `conf:",,1-30,3"`
-	Hostname            string
-	ListenPort          int `conf:",,1024:32767,10050"`
-	Plugins             map[string]map[string]string
+import (
+	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
-var Options AgentOptions
+var impl Plugin
+var stdOs std.Os
+
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	return nil, nil
+}
+
+func init() {
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "debug.log", "debug.log", "Returns empty value")
+}

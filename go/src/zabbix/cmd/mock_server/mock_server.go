@@ -27,9 +27,9 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"zabbix/pkg/comms"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxcomms"
 )
 
 type MockServerOptions struct {
@@ -43,7 +43,7 @@ type MockServerOptions struct {
 
 var options MockServerOptions
 
-func handleConnection(c comms.ZbxConnection, activeChecks []byte, tFlag int) {
+func handleConnection(c *zbxcomms.Connection, activeChecks []byte, tFlag int) {
 	defer c.Close()
 
 	js, err := c.Read(time.Second * time.Duration(tFlag))
@@ -67,6 +67,13 @@ func handleConnection(c comms.ZbxConnection, activeChecks []byte, tFlag int) {
 			log.Warningf("Write failed: %s\n", err)
 			return
 		}
+	case "agent data":
+		err = c.WriteString("{\"response\":\"success\",\"info\":\"processed: 0; failed: 0; total: 0; seconds spent: 0.042523\"}", time.Second*time.Duration(tFlag))
+		if err != nil {
+			log.Warningf("Write failed: %s\n", err)
+			return
+		}
+
 	default:
 		log.Warningf("Unsupported request: %s\n", pairs["request"])
 		return
@@ -142,24 +149,19 @@ func main() {
 		return
 	}
 
-	var ln comms.ZbxListener
-
-	err = ln.Listen(":" + strconv.Itoa(options.Port))
+	listener, err := zbxcomms.Listen(":" + strconv.Itoa(options.Port))
 	if err != nil {
 		log.Critf("Listen failed: %s\n", err)
 		return
 	}
-	defer ln.Close()
+	defer listener.Close()
 
 	for {
-		var c comms.ZbxConnection
-
-		err = c.Accept(&ln)
+		c, err := listener.Accept()
 		if err != nil {
 			log.Critf("Accept failed: %s\n", err)
 			return
 		}
-
 		go handleConnection(c, activeChecks, options.Timeout)
 	}
 }

@@ -16,46 +16,27 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-package agent
+
+package empty
 
 import (
-	"testing"
-	"time"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/log"
+	"zabbix/pkg/std"
 )
 
-type mockWriter struct {
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
-func (w *mockWriter) Write(data []byte) (n int, err error) {
-	log.Debugf("WRITE: %s", string(data))
-	return len(data), nil
+var impl Plugin
+var stdOs std.Os
+
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	return nil, nil
 }
 
-func TestResultCache(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
-	var cache ResultCache
-	var writer mockWriter
-
-	cache.Start()
-
-	value := "xyz"
-	result := plugin.Result{
-		Itemid: 1,
-		Value:  &value,
-		Ts:     time.Now(),
-	}
-
-	cache.Write(&result)
-	cache.FlushOutput(&writer)
-
-	cache.SetOutput(&writer)
-	cache.Write(&result)
-	cache.Write(&result)
-	cache.Flush()
-
-	time.Sleep(time.Second)
-	cache.Stop()
-
+func init() {
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "debug.empty", "debug.empty", "Returns empty value")
 }

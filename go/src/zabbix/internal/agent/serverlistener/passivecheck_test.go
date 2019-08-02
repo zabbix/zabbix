@@ -17,18 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package serverlistener
 
-type AgentOptions struct {
-	LogType             string `conf:",,,console"`
-	LogFile             string `conf:",optional"`
-	DebugLevel          int    `conf:",,0:5,3"`
-	ServerActive        string `conf:",optional"`
-	RefreshActiveChecks int    `conf:",,30:3600,120"`
-	Timeout             int    `conf:",,1-30,3"`
-	Hostname            string
-	ListenPort          int `conf:",,1024:32767,10050"`
-	Plugins             map[string]map[string]string
+import (
+	"testing"
+)
+
+func TestFormatError(t *testing.T) {
+	const notsupported = "ZBX_NOTSUPPORTED"
+	const message = "error message"
+	pc := &passiveCheck{}
+	result := pc.formatError(message)
+
+	if string(result[:len(notsupported)]) != notsupported {
+		t.Errorf("Expected error message to start with '%s' while got '%s'", notsupported,
+			string(result[:len(notsupported)]))
+		return
+	}
+	if result[len(notsupported)] != 0 {
+		t.Errorf("Expected terminating zero after ZBX_NOTSUPPORTED error prefix")
+		return
+	}
+
+	if string(result[len(notsupported)+1:]) != message {
+		t.Errorf("Expected error description '%s' while got '%s'", message, string(result[len(notsupported)+1:]))
+		return
+	}
 }
-
-var Options AgentOptions

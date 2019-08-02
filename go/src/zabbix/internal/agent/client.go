@@ -19,16 +19,12 @@
 
 package agent
 
-type AgentOptions struct {
-	LogType             string `conf:",,,console"`
-	LogFile             string `conf:",optional"`
-	DebugLevel          int    `conf:",,0:5,3"`
-	ServerActive        string `conf:",optional"`
-	RefreshActiveChecks int    `conf:",,30:3600,120"`
-	Timeout             int    `conf:",,1-30,3"`
-	Hostname            string
-	ListenPort          int `conf:",,1024:32767,10050"`
-	Plugins             map[string]map[string]string
-}
+import "sync/atomic"
 
-var Options AgentOptions
+var lastClientID uint64
+
+// Internal client id assigned to each active server and unique passive bulk request.
+// Single checks (internal and old style passive checks) has built-in client id 0.
+func NewClientID() uint64 {
+	return atomic.AddUint64(&lastClientID, 1)
+}

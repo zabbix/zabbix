@@ -33,38 +33,38 @@ type Manager struct {
 	input   chan interface{}
 	plugins map[string]*pluginAgent
 	queue   pluginHeap
-	owners  map[plugin.ResultWriter]*batch
+	clients map[uint64]*client
 }
 
 type updateRequest struct {
+	clientID uint64
 	sink     plugin.ResultWriter
 	requests []*plugin.Request
 }
 
 type Scheduler interface {
-	UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request)
 	FinishTask(task performer)
 }
 
-func (m *Manager) processUpdateRequest(update *updateRequest) {
+func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: owner expiry - remove unused owners after tiemout (day+?)
-	var owner *batch
+	// TODO: client expiry - remove unused owners after tiemout (day+?)
+	var requestClient *client
 	var ok bool
-	if owner, ok = m.owners[update.sink]; !ok {
-		owner = newBatch()
-		m.owners[update.sink] = owner
+	if requestClient, ok = m.clients[update.clientID]; !ok {
+		requestClient = newClient(update.clientID)
+		m.clients[update.clientID] = requestClient
 	}
 
-	now := time.Now()
 	for _, r := range update.requests {
 		var key string
 		var err error
 		var p *pluginAgent
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
-				err = errors.New("unknown metric")
+				err = errors.New("Unknown metric")
 			}
 		}
 		if err != nil {
@@ -72,7 +72,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
-		if err = owner.addRequest(p, r, update.sink, now); err != nil {
+		if err = requestClient.addRequest(p, r, update.sink, now); err != nil {
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			continue
 		}
@@ -84,14 +84,14 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 		}
 	}
 
-	released := owner.cleanup(m.plugins, now)
+	released := requestClient.cleanup(m.plugins, now)
 	for _, p := range released {
 		if p.refcount != 0 {
 			continue
 		}
+		log.Debugf("deactivate unused plugin %s", p.name())
 		p.tasks = p.tasks[:0]
 		if _, ok := p.impl.(plugin.Runner); ok {
-			log.Debugf("start stopper task for plugin %s", p.impl.Name())
 			task := &stopperTask{
 				taskBase: taskBase{
 					plugin:    p,
@@ -99,6 +99,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 					active:    true,
 				}}
 			p.enqueueTask(task)
+			log.Debugf("created stopper task for plugin %s", p.name())
 
 			if !p.queued() {
 				heap.Push(&m.queue, p)
@@ -135,10 +136,11 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(task performer) {
-	task.finish()
+	reschedule := task.finish()
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && task.reschedule() {
+	if p.active() && task.isActive() && reschedule {
+		task.reschedule(time.Now())
 		p.enqueueTask(task)
 	}
 	if !p.queued() && p.hasCapacity() {
@@ -146,22 +148,50 @@ func (m *Manager) processFinishRequest(task performer) {
 	}
 }
 
+// rescheduleQueue reschedules all queued tasks. This is done whenever time
+// difference between ticks exceeds limits (for example during daylight saving changes).
+func (m *Manager) rescheduleQueue(now time.Time) {
+	// easier to rebuild queues than update each element
+	queue := make(pluginHeap, 0, len(m.queue))
+	for _, p := range queue {
+		tasks := p.tasks
+		p.tasks = make(performerHeap, 0, len(tasks))
+		for _, t := range tasks {
+			t.reschedule(now)
+			p.enqueueTask(t)
+		}
+		heap.Push(&queue, p)
+	}
+	m.queue = queue
+}
+
 func (m *Manager) run() {
 	defer log.PanicHook()
-	log.Debugf("starting Manager")
+	log.Debugf("starting manager")
+	// Adjust ticker creation at the 0 nanosecond timestamp. In reality it will have at least
+	// some microseconds, which will be enough to include all scheduled tasks at this second
+	// even with nanosecond priority adjustment.
+	lastTick := time.Now()
+	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			m.processQueue(time.Now())
+			now := time.Now()
+			diff := now.Sub(lastTick)
+			interval := time.Second * 10
+			if diff <= -interval || diff >= interval {
+				m.rescheduleQueue(now)
+			}
+			m.processQueue(now)
 		case v := <-m.input:
 			if v == nil {
 				break run
 			}
 			switch v.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v.(*updateRequest))
+				m.processUpdateRequest(v.(*updateRequest), time.Now())
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v.(performer))
@@ -170,14 +200,14 @@ run:
 		}
 	}
 	close(m.input)
-	log.Debugf("Manager has been stopped")
+	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
 
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
-	m.owners = make(map[plugin.ResultWriter]*batch)
+	m.clients = make(map[uint64]*client)
 
 	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
@@ -193,7 +223,6 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	m.init()
 	monitor.Register()
 	go m.run()
 }
@@ -202,11 +231,17 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := updateRequest{sink: writer, requests: requests}
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request) {
+	r := updateRequest{clientID: clientID, sink: writer, requests: requests}
 	m.input <- &r
 }
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func NewManager() *Manager {
+	var m Manager
+	m.init()
+	return &m
 }

@@ -1,1 +1,1 @@
-{"response":"success","data":[{"key":"agent.ping","delay":30,"lastlogsize":0,"mtime":0},{"key":"agent.version","delay":30,"lastlogsize":0,"mtime":0}]}
+{"response":"success","data":[{"itemid":1, "key":"system.uptime","delay":"5","lastlogsize":1,"mtime":2},{"itemid":2,"key":"systemd.unit.info[dbus.service]","delay":"5","lastlogsize":0,"mtime":0}]}

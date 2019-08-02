@@ -27,13 +27,29 @@ import (
 	"syscall"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
+	"zabbix/internal/agent/serverconnector"
+	"zabbix/internal/agent/serverlistener"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
 
-var taskManager scheduler.Manager
+func run() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+
+	for {
+		sig := <-sigs
+		switch sig {
+		case syscall.SIGINT, syscall.SIGTERM:
+			return
+		case syscall.SIGUSR1:
+			log.Debugf("user signal received")
+			return
+		}
+	}
+}
 
 func main() {
 	var confFlag string
@@ -135,7 +151,14 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
-	greeting := fmt.Sprintf("Starting Zabbix Agent [(hostname placeholder)]. (version placeholder)")
+
+	addresses, err := serverconnector.ParseServerActive()
+	if err != nil {
+		log.Critf("%s", err)
+		os.Exit(1)
+	}
+
+	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (version placeholder)", agent.Options.Hostname)
 	log.Infof(greeting)
 
 	if foregroundFlag {
@@ -147,21 +170,30 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+	taskManager := scheduler.NewManager()
+	listener := serverlistener.New(taskManager)
 
 	taskManager.Start()
 
-loop:
-	for {
-		sig := <-sigs
-		switch sig {
-		case syscall.SIGINT, syscall.SIGTERM:
-			break loop
-		case syscall.SIGUSR1:
-			log.Debugf("user signal received")
-			break loop
-		}
+	serverConnectors := make([]*serverconnector.Connector, len(addresses))
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
+		serverConnectors[i].Start()
+	}
+
+	err = listener.Start()
+
+	if err == nil {
+		run()
+	} else {
+		log.Errf("cannot start agent: %s", err.Error())
+	}
+
+	listener.Stop()
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Stop()
 	}
 
 	taskManager.Stop()

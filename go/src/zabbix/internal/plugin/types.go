@@ -38,9 +38,14 @@ type Runner interface {
 	Stop()
 }
 
-// Watcher - interface for fully custom monitorin
+// Watcher - interface for fully custom monitoring
 type Watcher interface {
 	Watch(requests []*Request, sink ResultWriter)
+}
+
+// Configer - interface for plugin configuration in agent conf files
+type Configer interface {
+	Configure(options map[string]string)
 }
 
 type ResultWriter interface {
@@ -57,9 +62,9 @@ type Result struct {
 }
 
 type Request struct {
-	Itemid      uint64
-	Key         string
-	Delay       string
-	LastLogsize uint64
-	Mtime       int
+	Itemid      uint64 `json:"itemid"`
+	Key         string `json:"key"`
+	Delay       string `json:"delay"`
+	LastLogsize uint64 `json:"lastlogsize"`
+	Mtime       int    `json:"mtime"`
 }

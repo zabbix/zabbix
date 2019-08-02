@@ -1972,16 +1972,22 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/log/Makefile
 	go/src/zabbix/pkg/std/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
-	go/src/zabbix/pkg/comms/Makefile
+	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
+	go/src/zabbix/internal/agent/serverconnector/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
+	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/system/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
+	go/src/zabbix/plugins/debug/Makefile
+	go/src/zabbix/plugins/debug/empty/Makefile
+	go/src/zabbix/plugins/debug/log/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
 	])
