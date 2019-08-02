@@ -77,6 +77,7 @@ func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
 		"system.uptime",
+		"system.uname",
 	}
 
 	for _, metric := range metrics {

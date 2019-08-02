@@ -17,12 +17,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package uname
 
 import (
-	//	_ "zabbix/plugins/debug/empty"
-	//	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
+	"errors"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+var stdOs std.Os
+
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
+	}
+	return getUname()
+}
+
+func init() {
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
+}
