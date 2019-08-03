@@ -1309,9 +1309,7 @@
 
 		if (getIteratorTooSmallState(iterator) && iterator['update_pending']) {
 			setIteratorTooSmallState(iterator, false);
-
 			showPreloader(iterator);
-
 			updateWidgetContent($obj, data, iterator);
 
 			return;
@@ -1372,7 +1370,7 @@
 		}, widget_of_iterator, {
 			'rf_rate': 0,
 			'iterator': false,
-			'widget_of_iterator': true,
+			'widget_of_iterator': iterator,
 			'new_widget': false
 		});
 
@@ -1496,6 +1494,73 @@
 		}
 	}
 
+	function isDeletedWidget($obj, data, widget) {
+		if (widget['widget_of_iterator']) {
+			if (isDeletedWidget($obj, data, widget['widget_of_iterator'])) {
+				return true;
+			}
+
+			var search_widgets = widget['widget_of_iterator']['widgets_of_iterator'];
+		}
+		else {
+			var search_widgets = data['widgets'];
+		}
+
+		var widgets_found = search_widgets.filter(function(w) {
+			return (w['uniqueid'] === widget['uniqueid']);
+		});
+
+		return !widgets_found.length;
+	}
+
+	function updateWidgetReady($obj, data, widget) {
+		if (widget['ready']) {
+			return;
+		}
+
+		var check_dashboard_ready = false;
+
+		if (widget['iterator']) {
+			if (!widget['widgets_of_iterator'].length) {
+				// Set empty iterator to ready state.
+
+				widget['ready'] = true;
+				check_dashboard_ready = true;
+			}
+		}
+		else if (widget['widget_of_iterator']) {
+			widget['ready'] = true;
+
+			var widgets_of_iterator = widget['widget_of_iterator']['widgets_of_iterator'],
+				widgets_of_iterator_not_ready = widgets_of_iterator.filter(function(widget) {
+					return !widget['ready'];
+				})
+			;
+
+			if (!widgets_of_iterator_not_ready.length) {
+				// Set parent iterator to ready state.
+
+				widget['widget_of_iterator']['ready'] = true;
+				check_dashboard_ready = true;
+			}
+		}
+		else {
+			widget['ready'] = true; // Leave this before registerDataExchangeCommit.
+			check_dashboard_ready = true;
+			methods.registerDataExchangeCommit.call($obj);
+		}
+
+		if (check_dashboard_ready) {
+			var widgets_not_ready = data['widgets'].filter(function(widget) {
+				return !widget['ready'];
+			})
+
+			if (!widgets_not_ready.length) {
+				doAction('onDashboardReady', $obj, data, null);
+			}
+		}
+	}
+
 	function updateWidgetContent($obj, data, widget) {
 		if (++widget['update_attempts'] > 1) {
 			return;
@@ -1516,10 +1581,8 @@
 				// 2. Set the Iterator to reload the contents as soon as it is shown again.
 
 				stopPreloader(widget);
-
 				setIteratorTooSmallState(widget, true);
 				widget['update_pending'] = true;
-
 				widget['update_attempts'] = 0;
 
 				return;
@@ -1571,42 +1634,34 @@
 
 		startPreloader(widget);
 
-		jQuery.ajax({
+		widget['ajax'] = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
 			dataType: 'json'
 		})
-			.then(function(response) {
+			.done(function(response) {
+				if (isDeletedWidget($obj, data, widget)) {
+					return;
+				}
+
 				if (widget["iterator"]) {
 					updateWidgetIteratorCallback($obj, data, widget, response);
-				} else {
+				}
+				else {
 					updateWidgetCallback($obj, data, widget, response);
 				}
-			}, function() {
+
+				updateWidgetReady($obj, data, widget);
+
+				widget['initial_load'] = false;
+			})
+			.fail(function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
 				startWidgetRefreshTimer($obj, data, widget, 3);
 			})
-			.then(function() {
-				var callOnDashboardReadyTrigger = false;
-				if (!widget['ready']) {
-					widget['ready'] = true; // leave it before registerDataExchangeCommit.
-					methods.registerDataExchangeCommit.call($obj);
-
-					// If this is the last trigger loaded, then set callOnDashboardReadyTrigger to be true.
-					callOnDashboardReadyTrigger
-						= (data['widgets'].filter(function(widget) {return !widget['ready']}).length == 0);
-				}
-				widget['ready'] = true;
-
-				if (callOnDashboardReadyTrigger) {
-					doAction('onDashboardReady', $obj, data, null);
-				}
-			})
 		;
-
-		widget['initial_load'] = false;
 	}
 
 	function refreshWidget($obj, data, widget) {
@@ -1693,7 +1748,7 @@
 					overlayDialogueDestroy('widgetConfg');
 
 					if (widget === null || ('type' in widget) === false) {
-						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
+						// In case of ADD widget, create and add widget to the dashboard.
 
 						var widget_data = {
 								'type': type,
@@ -1729,16 +1784,17 @@
 							.then(add_new_widget)
 						;
 					}
-					else if (widget['type'] === type) {
-						// In case of EDIT widget, if widget type not changed.
+					else if (false && widget['type'] === type) {
+						// In case of EDIT widget, if type has not changed, update the widget.
 
 						widget['header'] = name;
 						widget['fields'] = fields;
+
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
 						refreshWidget($obj, data, widget);
 					} else {
-						// In case of EDIT widget, if widget type has changed.
+						// In case of EDIT widget, if type has changed, replace the widget.
 
 						var widget_data = {
 							'type': type,
@@ -1753,9 +1809,7 @@
 
 						// Disable position/size checking.
 						data['pos-action'] = 'updateWidgetConfig';
-
 						methods.addWidget.call($obj, widget_data);
-
 						data['pos-action'] = '';
 
 						// New widget is last element in data['widgets'] array.
@@ -2133,30 +2187,17 @@
 		makeResizable($obj, data, widget);
 	}
 
-	function deleteWidget($obj, data, widget) {
-		var index = widget['div'].data('widget-index');
-
-		// Remove div from the grid.
-		widget['div'].remove();
-		data['widgets'].splice(index, 1);
-
-		// Update widget-index for all following widgets.
-		for (var i = index; i < data['widgets'].length; i++) {
-			data['widgets'][i]['div'].data('widget-index', i);
-		}
-
-		if (typeof widget['old_widget'] === 'undefined') {
-			// Mark dashboard as updated.
-			data['options']['updated'] = true;
-			resizeDashboardGrid($obj, data);
-		}
-	}
-
 	/**
 	 * Remove the widget without updating the dashboard.
 	 */
 	function removeWidget($obj, data, widget) {
 		var index = widget['div'].data('widget-index');
+
+		if (widget['iterator']) {
+			widget['widgets_of_iterator'].forEach(function(widget_of_iterator) {
+				widget_of_iterator['div'].remove();
+			});
+		}
 
 		// Remove div from the grid.
 		widget['div'].remove();
