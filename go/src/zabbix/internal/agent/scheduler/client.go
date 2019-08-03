@@ -41,9 +41,10 @@ type pluginInfo struct {
 }
 
 type client struct {
-	id        uint64
-	exporters map[uint64]exporterTaskAccessor
-	plugins   map[*pluginAgent]*pluginInfo
+	id                 uint64
+	exporters          map[uint64]exporterTaskAccessor
+	plugins            map[*pluginAgent]*pluginInfo
+	refreshUnsupported int
 }
 
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
@@ -75,7 +76,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		if r.Itemid != 0 {
-			if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
+			if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
 		}
@@ -219,11 +220,13 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	return
 }
 
-func newClient(id uint64) (b *client) {
+func newClient(id uint64, refreshUnsupported int) (b *client) {
 	b = &client{
-		id:        id,
-		exporters: make(map[uint64]exporterTaskAccessor),
-		plugins:   make(map[*pluginAgent]*pluginInfo),
+		id:                 id,
+		exporters:          make(map[uint64]exporterTaskAccessor),
+		plugins:            make(map[*pluginAgent]*pluginInfo),
+		refreshUnsupported: refreshUnsupported,
 	}
+
 	return
 }

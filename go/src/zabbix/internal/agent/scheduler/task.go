@@ -119,10 +119,11 @@ func (t *collectorTask) getWeight() int {
 
 type exporterTask struct {
 	taskBase
-	writer  plugin.ResultWriter
-	item    clientItem
-	failed  bool
-	updated time.Time
+	writer             plugin.ResultWriter
+	item               clientItem
+	failed             bool
+	updated            time.Time
+	refreshUnsupported int
 }
 
 func (t *exporterTask) perform(s Scheduler) {
@@ -167,7 +168,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.failed, now); err != nil {
+		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.refreshUnsupported); err != nil {
 			return err
 		} else {
 			t.scheduled = nextcheck.Add(priorityExporterTaskNs)

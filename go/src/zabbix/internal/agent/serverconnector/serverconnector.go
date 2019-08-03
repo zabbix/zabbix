@@ -142,7 +142,8 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, response.Data)
+	// TODO: retrieve correct refresh unsupported interval from server
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache, 60, response.Data)
 }
 
 // Write function is used by ResultCache to upload cached history. It will be callled from
@@ -195,7 +196,7 @@ run:
 	monitor.Unregister()
 }
 
-func New(taskManager *scheduler.Manager, address string) *Connector {
+func New(taskManager scheduler.Scheduler, address string) *Connector {
 	c := &Connector{
 		taskManager: taskManager,
 		address:     address,

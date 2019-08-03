@@ -42,13 +42,14 @@ type Manager struct {
 }
 
 type updateRequest struct {
-	clientID uint64
-	sink     plugin.ResultWriter
-	requests []*plugin.Request
+	clientID           uint64
+	sink               plugin.ResultWriter
+	requests           []*plugin.Request
+	refreshUnsupported int
 }
 
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request)
 	FinishTask(task performer)
 }
 
@@ -59,7 +60,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
-		requestClient = newClient(update.clientID)
+		requestClient = newClient(update.clientID, update.refreshUnsupported)
 		m.clients[update.clientID] = requestClient
 	}
 
@@ -281,8 +282,8 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := updateRequest{clientID: clientID, sink: writer, requests: requests}
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request) {
+	r := updateRequest{clientID: clientID, sink: writer, requests: requests, refreshUnsupported: refreshUnsupported}
 	m.input <- &r
 }
 

@@ -48,7 +48,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 
 func (pc *passiveCheck) handleCheck(data []byte) {
 	pc.results = make(chan *plugin.Result)
-	pc.scheduler.UpdateTasks(0, pc, []*plugin.Request{&plugin.Request{Key: string(data)}})
+	pc.scheduler.UpdateTasks(0, pc, 0, []*plugin.Request{&plugin.Request{Key: string(data)}})
 	var response []byte
 	select {
 	case r := <-pc.results:
