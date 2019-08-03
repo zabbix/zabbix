@@ -101,136 +101,112 @@ $screenFormList = (new CFormList())
  * Screen item: Graph
  */
 if ($resourceType == SCREEN_RESOURCE_GRAPH) {
-	$caption = '';
-	$id = 0;
+	$graph = false;
 
-	$graphs = API::Graph()->get([
-		'graphids' => $resourceId,
-		'selectHosts' => ['hostid', 'name', 'status'],
-		'output' => API_OUTPUT_EXTEND
-	]);
-	if (!empty($graphs)) {
-		$id = $resourceId;
-		$graph = reset($graphs);
+	if ($resourceId > 0) {
+		$graphs = API::Graph()->get([
+			'output' => ['name'],
+			'selectHosts' => ['name'],
+			'graphids' => $resourceId,
+		]);
 
-		order_result($graph['hosts'], 'name');
-		$graph['host'] = reset($graph['hosts']);
+		if ($graphs) {
+			$graph = reset($graphs);
 
-		$caption = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
+			order_result($graph['hosts'], 'name');
+			$graph['host'] = reset($graph['hosts']);
+		}
 	}
 
-	if ($this->data['screen']['templateid']) {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
+	$screenFormList->addRow(
+		(new CLabel(_('Graph'), 'resourceid_ms'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'object_name' => 'graphs',
+			'multiple' => false,
+			'data' => $graph
+				? [
+					[
+						'id' => $resourceId,
+						'prefix' => $graph['host']['name'].NAME_DELIMITER,
+						'name' => $graph['name']
+					]
+				]
+				: [],
+			'popup' => [
+				'parameters' => array_merge([
 					'srctbl' => 'graphs',
 					'srcfld1' => 'graphid',
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
+				], $this->data['screen']['templateid'] ? [
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid']
-				]).', null, this);'
-			);
-	}
-	else {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'graphs',
-					'srcfld1' => 'graphid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
+				] : [
 					'real_hosts' => '1',
 					'with_graphs' => '1'
-				]).', null, this);'
-			);
-	}
-
-	$form->addVar('resourceid', $id);
-	$screenFormList->addRow((new CLabel(_('Graph'), 'caption'))->setAsteriskMark(), [
-		(new CTextBox('caption', $caption, true))
+				]),
+			]
+		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$selectButton
-	]);
+			->setAriaRequired(true)
+	);
 }
 
 /*
  * Screen item: Graph prototype
  */
 elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
-	$caption = '';
-	$id = 0;
+	$graph_prototype = false;
 
-	$graphPrototypes = API::GraphPrototype()->get([
-		'output' => ['name'],
-		'graphids' => $resourceId,
-		'selectHosts' => ['name']
-	]);
+	if ($resourceId > 0) {
+		$graph_prototypes = API::GraphPrototype()->get([
+			'output' => ['name'],
+			'selectHosts' => ['name'],
+			'graphids' => $resourceId,
+		]);
 
-	if ($graphPrototypes) {
-		$id = $resourceId;
-		$graphPrototype = reset($graphPrototypes);
+		if ($graph_prototypes) {
+			$graph_prototype = reset($graph_prototypes);
 
-		order_result($graphPrototype['hosts'], 'name');
-		$graphPrototype['host'] = reset($graphPrototype['hosts']);
-
-		$caption = $graphPrototype['host']['name'].NAME_DELIMITER.$graphPrototype['name'];
+			order_result($graph_prototype['hosts'], 'name');
+			$graph_prototype['host'] = reset($graph_prototype['hosts']);
+		}
 	}
-
-	if ($this->data['screen']['templateid']) {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'graph_prototypes',
-					'srcfld1' => 'graphid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
-					'templated_hosts' => '1',
-					'only_hostid' => $data['screen']['templateid']
-				]).', null, this);'
-			);
-	}
-	else {
-		$selectButton = (new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'graph_prototypes',
-					'srcfld1' => 'graphid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
-					'real_hosts' => '1'
-				]).', null, this);'
-			);
-	}
-
-	$form->addVar('resourceid', $id);
-	$screenFormList->addRow((new CLabel(_('Graph prototype'), 'caption'))->setAsteriskMark(), [
-		(new CTextBox('caption', $caption, true))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$selectButton
-	]);
 
 	$screenFormList->addRow(
-		(new CLabel(_('Max columns'), 'max_columns'))->setAsteriskMark(),
-		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CLabel(_('Graph prototype'), 'resourceid_ms'))->setAsteriskMark(),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'object_name' => 'graph_prototypes',
+			'multiple' => false,
+			'data' => $graph_prototype
+				? [
+					[
+						'id' => $resourceId,
+						'prefix' => $graph_prototype['host']['name'].NAME_DELIMITER,
+						'name' => $graph_prototype['name']
+					]
+				]
+				: [],
+			'popup' => [
+				'parameters' => array_merge([
+					'srctbl' => 'graph_prototypes',
+					'srcfld1' => 'graphid',
+					'srcfld2' => 'name',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'resourceid',
+				], $this->data['screen']['templateid'] ? [
+					'templated_hosts' => '1',
+					'only_hostid' => $data['screen']['templateid']
+				] : [
+					'real_hosts' => '1',
+				]),
+			]
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(true)
 	);
 }
 

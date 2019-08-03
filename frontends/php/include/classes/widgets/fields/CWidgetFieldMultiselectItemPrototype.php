@@ -37,7 +37,7 @@ class CWidgetFieldMultiselectItemPrototype extends CWidgetFieldMultiselect {
 	}
 
 	public function getCaptions($values) {
-		$items = API::Item()->get([
+		$items = API::ItemPrototype()->get([
 			'output' => ['itemid', 'hostid', 'name', 'key_'],
 			'selectHosts' => ['name'],
 			'itemids' => $values,

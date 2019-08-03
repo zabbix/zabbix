@@ -63,7 +63,6 @@ class CWidgetHelper {
 		;
 	}
 
-
 	public static function getSelectResource($field, $caption, $form_name) {
 		return [
 			(new CTextBox($field->getName().'_caption', $caption, true))
@@ -76,7 +75,6 @@ class CWidgetHelper {
 					CJs::encodeJson($field->getPopupOptions($form_name)).', null, this);')
 		];
 	}
-
 
 	/**
 	 * Creates label linked to the field.
