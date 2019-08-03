@@ -17,19 +17,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package zbxlib
 
-type AgentOptions struct {
-	LogType             string `conf:",,,console"`
-	LogFile             string `conf:",optional"`
-	DebugLevel          int    `conf:",,0:5,3"`
-	ServerActive        string `conf:",optional"`
-	RefreshActiveChecks int    `conf:",,30:3600,120"`
-	Timeout             int    `conf:",,1:30,3"`
-	Hostname            string
-	ListenPort          int `conf:",,1024:32767,10050"`
-	MaxLinesPerSecond   int `conf:",,1:1000,20"`
-	Plugins             map[string]map[string]string
+import (
+	"C"
+	"unsafe"
+)
+import (
+	"errors"
+	"time"
+	"zabbix/internal/plugin"
+)
+
+//export processValue
+func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) {
+	var value string
+	var err error
+	if cstate == ItemStateNormal {
+		value = C.GoString(cvalue)
+	} else {
+		err = errors.New(C.GoString(cvalue))
+	}
+
+	item := (*LogItem)(citem)
+
+	lastLogsize := uint64(clastLogsize)
+	mtime := int(cmtime)
+	result := &plugin.Result{
+		Itemid:      item.Itemid,
+		Value:       &value,
+		Ts:          time.Now(),
+		Error:       err,
+		LastLogsize: &lastLogsize,
+		Mtime:       &mtime,
+	}
+	item.Output.Write(result)
 }
-
-var Options AgentOptions

@@ -44,7 +44,7 @@ type Runner interface {
 
 // Watcher - interface for fully custom monitoring
 type Watcher interface {
-	Watch(requests []*Request, sink ResultWriter)
+	Watch(clientid uint64, requests []*Request, sink ResultWriter)
 }
 
 // Configurator - interface for plugin configuration in agent conf files

@@ -26,6 +26,7 @@ import (
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxlib"
 )
 
 // task priority within the same second is done by setting nanosecond component
@@ -43,7 +44,7 @@ type taskBase struct {
 	scheduled time.Time
 	index     int
 	active    bool
-	onetime   bool
+	recurring bool
 }
 
 type exporterTaskAccessor interface {
@@ -84,8 +85,8 @@ func (t *taskBase) isActive() bool {
 	return t.active
 }
 
-func (t *taskBase) isOneTime() bool {
-	return t.onetime
+func (t *taskBase) isRecurring() bool {
+	return t.recurring
 }
 
 type collectorTask struct {
@@ -168,7 +169,7 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.refreshUnsupported); err != nil {
+		if nextcheck, err := zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.refreshUnsupported); err != nil {
 			return err
 		} else {
 			t.scheduled = nextcheck.Add(priorityExporterTaskNs)
@@ -236,12 +237,13 @@ type watcherTask struct {
 	taskBase
 	requests []*plugin.Request
 	sink     plugin.ResultWriter
+	clientid uint64
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t.sink)
+		watcher.Watch(t.clientid, t.requests, t.sink)
 		s.FinishTask(t)
 	}()
 }

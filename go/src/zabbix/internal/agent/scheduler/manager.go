@@ -73,13 +73,16 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 				err = errors.New("Unknown metric")
 			}
 		}
+		if err == nil {
+			err = requestClient.addRequest(p, r, update.sink, now)
+		}
 		if err != nil {
+			if task, ok := requestClient.exporters[r.Itemid]; ok {
+				log.Debugf("deactivate task")
+				task.deactivate()
+			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
-			continue
-		}
-		if err = requestClient.addRequest(p, r, update.sink, now); err != nil {
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			continue
 		}
 
@@ -96,10 +99,24 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			continue
 		}
 		log.Debugf("deactivate unused plugin %s", p.name())
-		p.tasks = make([]performer, 0)
+
+		// deactivate recurring tasks
+		for deactivate := true; deactivate; {
+			deactivate = false
+			for _, t := range p.tasks {
+				if t.isRecurring() {
+					t.deactivate()
+					// deactivation can change tasks ordering, so repeat the iteraton if task was deactivated
+					deactivate = true
+					break
+				}
+			}
+		}
+
+		// queue stopper task if plugin has Runner interface
 		if _, ok := p.impl.(plugin.Runner); ok {
 			task := &stopperTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: true},
+				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err := task.reschedule(now); err != nil {
 				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
@@ -108,13 +125,16 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			p.enqueueTask(task)
 			log.Debugf("created stopper task for plugin %s", p.name())
 
-			if !p.queued() {
-				heap.Push(&m.queue, p)
-			} else {
+			if p.queued() {
 				m.queue.Update(p)
 			}
-		} else {
-			m.queue.Remove(p)
+		}
+
+		// queue plugin if there are still some tasks left to be finished before deactivating
+		if len(p.tasks) != 0 {
+			if !p.queued() {
+				heap.Push(&m.queue, p)
+			}
 		}
 	}
 }
@@ -145,7 +165,7 @@ func (m *Manager) processQueue(now time.Time) {
 func (m *Manager) processFinishRequest(task performer) {
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && !task.isOneTime() {
+	if p.active() && task.isActive() && task.isRecurring() {
 		if err := task.reschedule(time.Now()); err != nil {
 			log.Warningf("cannot reschedule plugin %s: %s", p.impl.Name(), err)
 		} else {
@@ -251,25 +271,29 @@ func (m *Manager) init() {
 	sort.Slice(metrics, func(i, j int) bool {
 		return metrics[i].Name() < metrics[j].Name()
 	})
+	lastPlugin := ""
 	for _, acc := range metrics {
-		interfaces := ""
-		if _, ok := acc.(plugin.Exporter); ok {
-			interfaces += "exporter, "
+		if acc.Name() != lastPlugin {
+			interfaces := ""
+			if _, ok := acc.(plugin.Exporter); ok {
+				interfaces += "exporter, "
+			}
+			if _, ok := acc.(plugin.Collector); ok {
+				interfaces += "collector, "
+			}
+			if _, ok := acc.(plugin.Runner); ok {
+				interfaces += "runner, "
+			}
+			if _, ok := acc.(plugin.Watcher); ok {
+				interfaces += "watcher, "
+			}
+			if _, ok := acc.(plugin.Configurator); ok {
+				interfaces += "configurator, "
+			}
+			interfaces = interfaces[:len(interfaces)-2]
+			log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
+			lastPlugin = acc.Name()
 		}
-		if _, ok := acc.(plugin.Collector); ok {
-			interfaces += "collector, "
-		}
-		if _, ok := acc.(plugin.Runner); ok {
-			interfaces += "runner, "
-		}
-		if _, ok := acc.(plugin.Watcher); ok {
-			interfaces += "watcher, "
-		}
-		if _, ok := acc.(plugin.Configurator); ok {
-			interfaces += "configurator, "
-		}
-		interfaces = interfaces[:len(interfaces)-2]
-		log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
 	}
 }
 

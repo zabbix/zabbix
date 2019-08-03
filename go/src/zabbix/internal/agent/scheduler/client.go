@@ -25,8 +25,8 @@ import (
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxlib"
 )
 
 type clientItem struct {
@@ -62,7 +62,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
 			task := &collectorTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: false},
+				taskBase: taskBase{plugin: p, active: true, recurring: true},
 				seed:     uint64(h.Sum32())}
 			if err = task.reschedule(now); err != nil {
 				return
@@ -76,13 +76,13 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		if r.Itemid != 0 {
-			if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
+			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
 		}
 		if tacc, ok := c.exporters[r.Itemid]; !ok {
 			task := &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: r.Itemid == 0},
+				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
 				writer:   sink,
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
@@ -117,7 +117,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Runner); ok {
 		if p.refcount == 0 {
 			task := &starterTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: true},
+				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err = task.reschedule(now); err != nil {
 				return
@@ -133,9 +133,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if _, ok := p.impl.(plugin.Watcher); ok {
 			if info.watcher == nil {
 				info.watcher = &watcherTask{
-					taskBase: taskBase{plugin: p, active: true, onetime: true},
+					taskBase: taskBase{plugin: p, active: true},
 					sink:     sink,
 					requests: make([]*plugin.Request, 0, 1),
+					clientid: c.id,
 				}
 				if err = info.watcher.reschedule(now); err != nil {
 					return
@@ -149,10 +150,13 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle configurator interface for inactive plugins
 	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
+		log.Debugf("check configurator")
 		if p.refcount == 0 {
+			log.Debugf("check options %s in %v", strings.Title(p.impl.Name()), agent.Options.Plugins)
 			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
+				log.Debugf("create task: %v", options)
 				task := &configerTask{
-					taskBase: taskBase{plugin: p, active: true, onetime: true},
+					taskBase: taskBase{plugin: p, active: true},
 					options:  options}
 				if err = task.reschedule(now); err != nil {
 					return
@@ -204,6 +208,26 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	for _, p := range plugins {
 		if info, ok := c.plugins[p]; ok {
 			if info.used.Before(expiry) {
+				// perform empty watch task before closing
+				if c.id != 0 {
+					if _, ok := p.impl.(plugin.Watcher); ok {
+						task := &watcherTask{
+							taskBase: taskBase{plugin: p, active: true},
+							sink:     nil,
+							requests: make([]*plugin.Request, 0),
+							clientid: c.id,
+						}
+						if err := task.reschedule(now); err == nil {
+							p.enqueueTask(task)
+							log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
+						} else {
+							// currently watcher rescheduling cannot fail, but log a warning for future
+							log.Warningf("[%d] cannot reschedule plugin '%s' closing watcher task: %s",
+								c.id, p.impl.Name(), err)
+						}
+					}
+				}
+
 				released = append(released, p)
 				delete(c.plugins, p)
 				p.refcount--

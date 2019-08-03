@@ -83,7 +83,7 @@ func (p *Plugin) Stop() {
 	close(p.input)
 }
 
-func (p *Plugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *Plugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
 	p.Debugf("watch")
 	p.input <- &watchRequest{sink: sink, requests: requests}
 }

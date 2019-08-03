@@ -29,14 +29,12 @@ var Metrics map[string]Accessor = make(map[string]Accessor)
 func RegisterMetric(impl Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
 		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
-		return
 	}
 
 	switch impl.(type) {
 	case Exporter, Collector, Runner, Watcher, Configurator:
 	default:
 		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
-		return
 	}
 
 	impl.Init(name, key, description)

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package itemutil
+package zbxlib
 
 /*
 #cgo LDFLAGS: -Wl,--start-group
@@ -34,16 +34,8 @@ package itemutil
 
 #include "../../../../../include/common.h"
 
-const char	*progname = NULL;
-const char	title_message[] = "agent";
-const char	syslog_app_name[] = "agent";
-const char	*usage_message[] = {};
-unsigned char	program_type	= 0x80;
-const char	*help_message[] = {};
-
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
 		int refresh_unsupported, int *nextcheck, char **error);
-
 */
 import "C"
 
@@ -53,22 +45,16 @@ import (
 	"unsafe"
 )
 
-const (
-	ITEM_STATE_NORMAL       = 0
-	ITEM_STATE_NOTSUPPORTED = 1
-)
-
 func GetNextcheck(itemid uint64, delay string, from time.Time, unsupported bool, refresh_unsupported int) (nextcheck time.Time, err error) {
-
 	var cnextcheck C.int
 	var cerr *C.char
 	var state int
 	cdelay := C.CString(delay)
 
 	if unsupported {
-		state = ITEM_STATE_NOTSUPPORTED
+		state = ItemStateNotsupported
 	} else {
-		state = ITEM_STATE_NORMAL
+		state = ItemStateNormal
 	}
 	now := from.Unix()
 	ret := C.zbx_get_agent_item_nextcheck(C.ulong(itemid), cdelay, C.uchar(state), C.int(now),

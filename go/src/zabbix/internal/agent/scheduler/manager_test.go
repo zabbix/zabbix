@@ -131,8 +131,9 @@ type mockWatcherPlugin struct {
 	requests []*plugin.Request
 }
 
-func (p *mockWatcherPlugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockWatcherPlugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
 	p.call("$watch")
+	log.Debugf("WATCH %s %v", p.Name(), requests)
 	p.requests = requests
 }
 
@@ -154,7 +155,7 @@ func (p *mockRunnerWatcherPlugin) Stop() {
 	p.call("$stop")
 }
 
-func (p *mockRunnerWatcherPlugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockRunnerWatcherPlugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
 	p.call("$watch")
 	p.requests = requests
 }
@@ -240,7 +241,7 @@ func (m *mockManager) mockTasks() {
 						scheduled: getNextcheck(fmt.Sprintf("%d", collector.Period()), m.now).Add(priorityCollectorTaskNs),
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   false,
+						recurring: true,
 					},
 					sink: m.sink,
 				}
@@ -253,7 +254,7 @@ func (m *mockManager) mockTasks() {
 						scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   false,
+						recurring: true,
 					},
 					sink: m.sink,
 					item: e.item,
@@ -267,7 +268,6 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now,
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   true,
 					},
 					sink: m.sink,
 				}
@@ -279,7 +279,6 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now.Add(priorityStopperTaskNs),
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   true,
 					},
 					sink: m.sink,
 				}
@@ -292,11 +291,11 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now.Add(priorityWatcherTaskNs),
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   true,
 					},
 					sink:       m.sink,
 					resultSink: w.sink,
 					requests:   w.requests,
+					clientid:   w.clientid,
 				}
 				p.enqueueTask(mockTask)
 			case *configerTask:
@@ -307,7 +306,6 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now.Add(priorityWatcherTaskNs),
 						index:     -1,
 						active:    task.isActive(),
-						onetime:   true,
 					},
 					options: c.options,
 					sink:    m.sink,
@@ -480,10 +478,12 @@ type mockWatcherTask struct {
 	sink       chan performer
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
+	clientid   uint64
 }
 
 func (t *mockWatcherTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Watcher).Watch(t.requests, t.resultSink)
+	log.Debugf("%s %v", t.plugin.impl.Name(), t.requests)
+	t.plugin.impl.(plugin.Watcher).Watch(t.clientid, t.requests, t.resultSink)
 	t.sink <- t
 }
 
@@ -698,8 +698,8 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 1 {
-		t.Errorf("Expected %d plugins queued while got %d", 1, len(manager.queue))
+	if len(manager.plugins["debug1"].tasks) != 0 {
+		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug1"].tasks))
 	}
 }
 
@@ -748,8 +748,8 @@ func TestTaskDelete(t *testing.T) {
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 2 {
-		t.Errorf("Expected %d plugins queued while got %d", 2, len(manager.queue))
+	if len(manager.plugins["debug3"].tasks) != 0 {
+		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug3"].tasks))
 	}
 
 	checkExporterTasks(t, manager, 1, items)
@@ -1127,7 +1127,7 @@ func TestWatcher(t *testing.T) {
 	calls := []map[string][]int{
 		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
 		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
-		map[string][]int{"$watch": []int{1, 2, 5}},
+		map[string][]int{"$watch": []int{1, 2, 3, 5}},
 	}
 
 	var cache resultCacheMock
@@ -1250,9 +1250,9 @@ func TestRunnerWatcher(t *testing.T) {
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 6, 11}, "$start": []int{1}, "$stop": []int{16}},
-		map[string][]int{"$watch": []int{2, 6, 22}, "$start": []int{1, 21}, "$stop": []int{11, 26}},
-		map[string][]int{"$watch": []int{2, 27}, "$start": []int{1, 26}, "$stop": []int{6}},
+		map[string][]int{"$watch": []int{2, 6, 11, 16}, "$start": []int{1}, "$stop": []int{17}},
+		map[string][]int{"$watch": []int{2, 6, 11, 22, 26}, "$start": []int{1, 21}, "$stop": []int{12, 27}},
+		map[string][]int{"$watch": []int{2, 6, 27}, "$start": []int{1, 26}, "$stop": []int{7}},
 	}
 
 	var cache resultCacheMock
@@ -1383,7 +1383,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 3, 6, 17, 21}, "$start": []int{1, 16}, "$stop": []int{11}},
+		map[string][]int{"$watch": []int{2, 3, 6, 7, 11, 17, 21}, "$start": []int{1, 16}, "$stop": []int{12}},
 	}
 
 	var cache resultCacheMock
