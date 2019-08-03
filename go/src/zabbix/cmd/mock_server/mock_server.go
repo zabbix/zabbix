@@ -43,7 +43,7 @@ type MockServerOptions struct {
 
 var options MockServerOptions
 
-func handleConnection(c *zbxcomms.Connection, activeChecks []byte, tFlag int) {
+func handleConnection(c *zbxcomms.Connection, tFlag int) {
 	defer c.Close()
 
 	js, err := c.Read(time.Second * time.Duration(tFlag))
@@ -62,7 +62,10 @@ func handleConnection(c *zbxcomms.Connection, activeChecks []byte, tFlag int) {
 
 	switch pairs["request"] {
 	case "active checks":
-		err = c.Write(activeChecks, time.Second*time.Duration(tFlag))
+		activeChecks, err := ioutil.ReadFile(options.ActiveChecksFile)
+		if err == nil {
+			err = c.Write(activeChecks, time.Second*time.Duration(tFlag))
+		}
 		if err != nil {
 			log.Warningf("Write failed: %s\n", err)
 			return
@@ -143,12 +146,6 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	activeChecks, err := ioutil.ReadFile(options.ActiveChecksFile)
-	if err != nil {
-		log.Critf("Cannot read active checks file: %s\n", err)
-		return
-	}
-
 	listener, err := zbxcomms.Listen(":" + strconv.Itoa(options.Port))
 	if err != nil {
 		log.Critf("Listen failed: %s\n", err)
@@ -162,6 +159,6 @@ func main() {
 			log.Critf("Accept failed: %s\n", err)
 			return
 		}
-		go handleConnection(c, activeChecks, options.Timeout)
+		go handleConnection(c, options.Timeout)
 	}
 }

@@ -95,14 +95,15 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			continue
 		}
 		log.Debugf("deactivate unused plugin %s", p.name())
-		p.tasks = p.tasks[:0]
+		p.tasks = make([]performer, 0)
 		if _, ok := p.impl.(plugin.Runner); ok {
 			task := &stopperTask{
-				taskBase: taskBase{
-					plugin:    p,
-					scheduled: now.Add(priorityStopperTaskNs),
-					active:    true,
-				}}
+				taskBase: taskBase{plugin: p, active: true, onetime: true},
+			}
+			if err := task.reschedule(now); err != nil {
+				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				continue
+			}
 			p.enqueueTask(task)
 			log.Debugf("created stopper task for plugin %s", p.name())
 
