@@ -38,7 +38,8 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	queue        logHeap
+	queue logHeap
+	// log monitoring tasks, mapped as clientid->itemid->task
 	tasks        map[uint64]map[uint64]*logTask
 	capacity     int
 	runningTasks int
@@ -188,6 +189,8 @@ func (p *Plugin) Configure(options map[string]string) {
 		}
 	}
 	// TODO: either access gobal configuration or move MaxLinesPerSecond to plugin configuration
+	// TODO: MaxLinesPerSecond will be accessed from C code in multiple goroutines -
+	// some update synchronzation would be preferable.
 	zbxlib.SetMaxLinesPerSecond(agent.Options.MaxLinesPerSecond)
 }
 
