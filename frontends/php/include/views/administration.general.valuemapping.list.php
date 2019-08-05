@@ -70,7 +70,14 @@ $form->addItem([
 	$table,
 	$data['paging'],
 	new CActionButtonList('action', 'valuemapids', [
-		'valuemap.export' => ['name' => _('Export')],
+		'valuemap.export' => ['name' => _('Export'), 'redirect' =>
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'export.valuemaps.xml')
+				->setArgument('backurl', (new CUrl('adm.valuemapping.php'))
+					->setArgument('page', getPageNumber())
+					->getUrl())
+				->getUrl()
+		],
 		'valuemap.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
 	])
 ]);

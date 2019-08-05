@@ -1,0 +1,115 @@
+---
+test case: Fail query '' from 'abc'
+in:
+  data: abc
+  path: 
+out:
+  return: FAIL
+---
+test case: Fail query $abc from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |-
+      {"a":{"b":[1, 2, 3]}}
+  path: $abc
+out:
+  return: FAIL
+---
+test case: Fail query $.abc from {"a":{"b":[1, 2, 3]}}
+in:
+  value:
+  data: |-
+    {"a":{"b":[1, 2, 3]}}
+  path: $.abc
+out:
+  return: FAIL
+---
+test case: Success query $.a from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a
+out:
+  return: SUCCEED
+  value: |-
+    {"b":[1, 2, 3]}
+---
+test case: Success query $.a['b'] from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a['b']
+out:
+  return: SUCCEED
+  value: |-
+    [1, 2, 3]
+---
+test case: Success query $.a['b'][1] from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a['b'][1]
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Success query $.a['b c'] from {"a":{"b c":["one", "two", "three"]}}
+in:
+  data: |- 
+    {"a":{"b c":["one", "two", "three"]}}
+  path: $.a['b c']
+out:
+  return: SUCCEED
+  value: |-
+    ["one", "two", "three"]
+---
+test case: Success query $.a['b c'][1] from {"a":{"b c":["one", "two \"2\"", "three"]}}
+in:
+  data: |- 
+    {"a":{"b c":["one", "two \"2\"", "three"]}}
+  path: $.a['b c'][1]
+out:
+  return: SUCCEED
+  value: two "2"
+---
+test case: Success query $.a['b c'][0] from {"a":{"b c":["one", "two \"2\"", 3]}}
+in:
+  data: |- 
+    {"a":{"b c":["one", "two \"2\"", 3]}}
+  path: $.a['b c'][0]
+out:
+  return: SUCCEED
+  value: one
+---
+test case: Success query $.a['b c'][2] from {"a":{"b c":["one", "two \"2\"", 3]}}
+in:
+  data: |- 
+    {"a":{"b c":["one", "two \"2\"", 3]}}
+  path: $.a['b c'][2]
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Fail query $.a['b'][3] from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a['b'][3]
+out:
+  return: FAIL
+---
+test case: Fail query $.a['b'][ from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a['b'][
+out:
+  return: FAIL
+---
+test case: Fail query $.a['b][3] from {"a":{"b":[1, 2, 3]}}
+in:
+  data: |- 
+    {"a":{"b":[1, 2, 3]}}
+  path: $.a['b][3]
+out:
+  return: FAIL
+...

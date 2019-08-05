@@ -453,7 +453,7 @@ class testFormUser extends CWebTest {
 						'Name' => 'Bugs',
 						'Surname' => 'Bunny',
 						'Groups' => [
-							'Selenium user group',
+							'Selenium user group in configuration',
 							'Zabbix administrators'
 						],
 						'Password' => '!@#$%^&*()_+',
@@ -854,7 +854,7 @@ class testFormUser extends CWebTest {
 						'Name' => 'Test_Name',
 						'Surname' => 'Test_Surname',
 						'Groups' => [
-							'Selenium user group'
+							'Selenium user group in configuration'
 						],
 						'Language' => 'English (en_US)',
 						'Theme' => 'Dark',
@@ -878,7 +878,7 @@ class testFormUser extends CWebTest {
 						'Name' => 'Road',
 						'Surname' => 'Runner',
 						'Groups' => [
-							'Selenium user group'
+							'Selenium user group in configuration'
 						],
 						'Language' => 'English (en_US)',
 						'Theme' => 'High-contrast light',
