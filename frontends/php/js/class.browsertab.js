@@ -83,6 +83,7 @@ ZBX_BrowserTab.prototype.handleKeepAliveTick = function() {
  * Registers focus event. Begins a loop to see if any tab of tabs has crashed.
  */
 ZBX_BrowserTab.prototype.bindEventHandlers = function() {
+	this.handleKeepAliveTick();
 	setInterval(this.handleKeepAliveTick.bind(this), ZBX_BrowserTab.keep_alive_interval * 1000);
 
 	window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
