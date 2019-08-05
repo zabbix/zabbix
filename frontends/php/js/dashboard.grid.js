@@ -1239,16 +1239,14 @@
 		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
-	function stopWidgetRefresh($obj, data, widget) {
-		if (typeof widget['rf_timeoutid'] !== 'undefined') {
-			clearTimeout(widget['rf_timeoutid']);
+	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
+		clearUpdateWidgetContentTimer($obj, data, widget);
 
-			delete widget['rf_timeoutid'];
+		if (widget['update_in_progress']) {
+			// Waiting for another AJAX request to either complete of fail.
+
+			return;
 		}
-	}
-
-	function startWidgetRefresh($obj, data, widget, rf_rate) {
-		stopWidgetRefresh($obj, data, widget);
 
 		if (typeof rf_rate === 'undefined') {
 			rf_rate = widget['rf_rate'];
@@ -1267,9 +1265,17 @@
 				}
 				else {
 					// widget was updated, start next timeout.
-					startWidgetRefresh($obj, data, widget);
+					setUpdateWidgetContentTimer($obj, data, widget);
 				}
 			}, rf_rate * 1000);
+		}
+	}
+
+	function clearUpdateWidgetContentTimer($obj, data, widget) {
+		if (typeof widget['rf_timeoutid'] !== 'undefined') {
+			clearTimeout(widget['rf_timeoutid']);
+
+			delete widget['rf_timeoutid'];
 		}
 	}
 
@@ -1362,7 +1368,7 @@
 			'header': '',
 			'preloader_timeout': 10000,	// in milliseconds
 			'preloader_fadespeed': 500,
-			'update_attempts': 0,
+			'update_in_progress': false,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -1434,16 +1440,6 @@
 				});
 			}
 		}
-
-		if (iterator['update_attempts'] == 1) {
-			iterator['update_attempts'] = 0;
-			startWidgetRefresh($obj, data, iterator);
-			doAction('onContentUpdated', $obj, data, null);
-		}
-		else {
-			iterator['update_attempts'] = 0;
-			updateWidgetContent($obj, data, iterator);
-		}
 	}
 
 	function updateWidgetCallback($obj, data, widget, response) {
@@ -1480,16 +1476,6 @@
 			var new_script = $('<script>')
 				.text(response.script_inline);
 			widget['content_script'].append(new_script);
-		}
-
-		if (widget['update_attempts'] == 1) {
-			widget['update_attempts'] = 0;
-			startWidgetRefresh($obj, data, widget);
-			doAction('onContentUpdated', $obj, data, null);
-		}
-		else {
-			widget['update_attempts'] = 0;
-			updateWidgetContent($obj, data, widget);
 		}
 	}
 
@@ -1561,12 +1547,17 @@
 	}
 
 	function updateWidgetContent($obj, data, widget) {
-		if (++widget['update_attempts'] > 1) {
+		clearUpdateWidgetContentTimer($obj, data, widget);
+
+		if (widget['update_in_progress']) {
+			// Waiting for another AJAX request to either complete of fail.
+
 			return;
 		}
-		else if (widget['update_paused'] == true) {
-			widget['update_attempts'] = 0;
-			startWidgetRefresh($obj, data, widget);
+
+		if (widget['update_paused'] == true) {
+			setUpdateWidgetContentTimer($obj, data, widget);
+
 			return;
 		}
 
@@ -1582,7 +1573,6 @@
 				stopPreloader(widget);
 				setIteratorTooSmallState(widget, true);
 				widget['update_pending'] = true;
-				widget['update_attempts'] = 0;
 
 				return;
 			}
@@ -1633,6 +1623,8 @@
 
 		startPreloader(widget);
 
+		widget['update_in_progress'] = true;
+
 		widget['ajax'] = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1654,18 +1646,21 @@
 				updateWidgetReady($obj, data, widget);
 
 				widget['initial_load'] = false;
+
+				widget['update_in_progress'] = false;
+
+				setUpdateWidgetContentTimer($obj, data, widget);
+
+				doAction('onContentUpdated', $obj, data, null);
 			})
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
-				widget['update_attempts'] = 0;
-				startWidgetRefresh($obj, data, widget, 3);
+
+				widget['update_in_progress'] = false;
+
+				setUpdateWidgetContentTimer($obj, data, widget, 3);
 			})
 		;
-	}
-
-	function refreshWidget($obj, data, widget) {
-		stopWidgetRefresh($obj, data, widget);
-		updateWidgetContent($obj, data, widget);
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
@@ -1755,24 +1750,15 @@
 								'pos': pos,
 								'rf_rate': 0,
 								'fields': fields
-							},
-							add_new_widget = function() {
-								methods.addWidget.call($obj, widget_data);
-								// New widget is last element in data['widgets'] array.
-								widget = data['widgets'].slice(-1)[0];
-								updateWidgetContent($obj, data, widget);
-								setWidgetModeEdit($obj, data, widget);
-								// Remove height attribute set for scroll animation.
-								$('body').css('height', '');
 							}
 						;
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
 							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
+
 							// Body height should be adjusted to animate scrollTop work.
 							$('body').css('height', Math.max(
-								$('body').height(),
-								(pos['y'] + pos['height']) * data['options']['widget-height']
+								$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
 							));
 						}
 
@@ -1781,7 +1767,17 @@
 							.animate({scrollTop: pos['y'] * data['options']['widget-height']
 								+ $('.dashbrd-grid-container').position().top - 5})
 							.promise()
-							.then(add_new_widget)
+							.then(function() {
+								methods.addWidget.call($obj, widget_data);
+
+								// New widget is last element in data['widgets'] array.
+								widget = data['widgets'].slice(-1)[0];
+								updateWidgetContent($obj, data, widget);
+								setWidgetModeEdit($obj, data, widget);
+
+								// Remove height attribute set for scroll animation.
+								$('body').css('height', '');
+							})
 						;
 					}
 					else if (widget['type'] === type) {
@@ -1792,8 +1788,7 @@
 
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
-
-						refreshWidget($obj, data, widget);
+						updateWidgetContent($obj, data, widget);
 					} else {
 						// In case of EDIT widget, if type has changed, replace the widget.
 
@@ -2182,7 +2177,7 @@
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 		removeWidgetInfoButtons(widget['content_header']);
-		stopWidgetRefresh($obj, data, widget);
+		clearUpdateWidgetContentTimer($obj, data, widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
 	}
@@ -2544,7 +2539,7 @@
 				'padding': null,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
-				'update_attempts': 0,
+				'update_in_progress': false,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
@@ -2607,7 +2602,7 @@
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid) {
 						widget['rf_rate'] = rf_rate;
-						startWidgetRefresh($this, data, widget);
+						setUpdateWidgetContentTimer($this, data, widget);
 					}
 				});
 			});
@@ -2620,7 +2615,7 @@
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
-						refreshWidget($this, data, widget);
+						updateWidgetContent($obj, data, widget);
 					}
 				});
 			});
