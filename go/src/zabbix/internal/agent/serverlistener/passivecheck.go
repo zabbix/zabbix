@@ -37,6 +37,14 @@ func (pc *passiveCheck) Write(r *plugin.Result) {
 	pc.results <- r
 }
 
+func (pc *passiveCheck) IsFull() bool {
+	return false
+}
+
+func (pc *passiveCheck) IsPersistentFull() bool {
+	return false
+}
+
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	const notsupported = "ZBX_NOTSUPPORTED"
 

@@ -181,6 +181,14 @@ func (c *resultCacheMock) Write(r *plugin.Result) {
 	c.results = append(c.results, r)
 }
 
+func (pc *resultCacheMock) IsFull() bool {
+	return false
+}
+
+func (pc *resultCacheMock) IsPersistentFull() bool {
+	return false
+}
+
 type mockManager struct {
 	Manager
 	sink      chan performer

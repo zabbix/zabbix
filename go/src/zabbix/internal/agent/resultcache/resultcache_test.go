@@ -21,8 +21,10 @@ package resultcache
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"testing"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/log"
 )
@@ -58,10 +60,11 @@ func (w *mockWriter) Addr() string {
 }
 
 func TestResultCache(t *testing.T) {
+	agent.Options.BufferSize = 10
 	_ = log.Open(log.Console, log.Debug, "")
 
 	writer := mockWriter{lastid: 1, t: t}
-	cache := NewActive(0, &writer)
+	cache := NewActive(0, nil)
 
 	value := "xyz"
 	result := plugin.Result{
@@ -97,4 +100,320 @@ func TestToken(t *testing.T) {
 		}
 		tokens[token] = true
 	}
+}
+
+func checkBuffer(t *testing.T, rc *ResultCache, input []*plugin.Result, expected []*AgentData) {
+	for _, r := range input {
+		rc.write(r)
+	}
+
+	if !reflect.DeepEqual(rc.results, expected) {
+		t.Errorf("Expected:")
+		for _, d := range expected {
+			t.Errorf("    %+v", *d)
+		}
+		t.Errorf("While got:")
+		for _, d := range rc.results {
+			t.Errorf("    %+v", *d)
+		}
+	}
+}
+
+func TestBuffer(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 1, Itemid: 1},
+		&AgentData{Id: 2, Itemid: 2},
+		&AgentData{Id: 3, Itemid: 3},
+		&AgentData{Id: 4, Itemid: 4},
+		&AgentData{Id: 5, Itemid: 5},
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 11},
+		&plugin.Result{Itemid: 12},
+		&plugin.Result{Itemid: 13},
+		&plugin.Result{Itemid: 14},
+		&plugin.Result{Itemid: 15},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 11},
+		&AgentData{Id: 12, Itemid: 12},
+		&AgentData{Id: 13, Itemid: 13},
+		&AgentData{Id: 14, Itemid: 14},
+		&AgentData{Id: 15, Itemid: 15},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5ReplaceFirst(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 1},
+		&AgentData{Id: 12, Itemid: 2},
+		&AgentData{Id: 13, Itemid: 3},
+		&AgentData{Id: 14, Itemid: 4},
+		&AgentData{Id: 15, Itemid: 5},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5ReplaceLast(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 1, Itemid: 1},
+		&AgentData{Id: 2, Itemid: 2},
+		&AgentData{Id: 3, Itemid: 3},
+		&AgentData{Id: 4, Itemid: 4},
+		&AgentData{Id: 5, Itemid: 5},
+		&AgentData{Id: 11, Itemid: 6},
+		&AgentData{Id: 12, Itemid: 7},
+		&AgentData{Id: 13, Itemid: 8},
+		&AgentData{Id: 14, Itemid: 9},
+		&AgentData{Id: 15, Itemid: 10},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5ReplacInterleaved(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 9},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 2, Itemid: 2},
+		&AgentData{Id: 4, Itemid: 4},
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 1},
+		&AgentData{Id: 12, Itemid: 3},
+		&AgentData{Id: 13, Itemid: 5},
+		&AgentData{Id: 14, Itemid: 7},
+		&AgentData{Id: 15, Itemid: 9},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5OneItem(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 1},
+		&plugin.Result{Itemid: 1},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 2, Itemid: 2},
+		&AgentData{Id: 3, Itemid: 3},
+		&AgentData{Id: 4, Itemid: 4},
+		&AgentData{Id: 5, Itemid: 5},
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 15, Itemid: 1},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull4OneItemPersistent(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 1, Itemid: 1, persistent: true},
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 1, persistent: true},
+		&AgentData{Id: 12, Itemid: 1, persistent: true},
+		&AgentData{Id: 13, Itemid: 1, persistent: true},
+		&AgentData{Id: 14, Itemid: 1, persistent: true},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}
+
+func TestBufferFull5OneItemPersistent(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 1, Itemid: 1, persistent: true},
+		&AgentData{Id: 6, Itemid: 6},
+		&AgentData{Id: 7, Itemid: 7},
+		&AgentData{Id: 8, Itemid: 8},
+		&AgentData{Id: 9, Itemid: 9},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 1, persistent: true},
+		&AgentData{Id: 12, Itemid: 1, persistent: true},
+		&AgentData{Id: 13, Itemid: 1, persistent: true},
+		&AgentData{Id: 14, Itemid: 1, persistent: true},
+		&AgentData{Id: 15, Itemid: 1, persistent: true},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
 }

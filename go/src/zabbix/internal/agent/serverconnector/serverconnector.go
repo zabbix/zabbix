@@ -36,12 +36,14 @@ import (
 )
 
 type Connector struct {
-	clientID    uint64
-	input       chan interface{}
-	address     string
-	lastError   error
-	resultCache *resultcache.ResultCache
-	taskManager scheduler.Scheduler
+	clientID             uint64
+	input                chan interface{}
+	address              string
+	lastError            error
+	maxUploadInterval    time.Duration
+	activeChecksInterval time.Duration
+	resultCache          *resultcache.ResultCache
+	taskManager          scheduler.Scheduler
 }
 
 type activeChecksRequest struct {
@@ -171,7 +173,8 @@ func (c *Connector) Write(data []byte) (n int, err error) {
 }
 
 func (c *Connector) run() {
-	var start time.Time
+	var lastRefresh time.Time
+	var lastFlush time.Time
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for '%s'", c.clientID, c.address)
@@ -181,18 +184,33 @@ run:
 	for {
 		select {
 		case <-ticker.C:
-			c.resultCache.Flush()
-			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
-				c.refreshActiveChecks()
-				start = time.Now()
+			now := time.Now()
+			if now.Sub(lastFlush) >= c.maxUploadInterval {
+				c.resultCache.Flush()
+				lastFlush = now
 			}
-		case <-c.input:
-			break run
+			if now.Sub(lastRefresh) > c.activeChecksInterval {
+				c.refreshActiveChecks()
+				lastRefresh = time.Now()
+			}
+		case v := <-c.input:
+			if v == nil {
+				break run
+			}
+			switch v.(type) {
+			case *agent.AgentOptions:
+				c.updateOptions(v.(*agent.AgentOptions))
+			}
 		}
 	}
 	close(c.input)
 	log.Debugf("[%d] server connector has been stopped", c.clientID)
 	monitor.Unregister()
+}
+
+func (c *Connector) updateOptions(options *agent.AgentOptions) {
+	c.maxUploadInterval = time.Duration(options.BufferSend) * time.Second
+	c.activeChecksInterval = time.Duration(agent.Options.RefreshActiveChecks) * time.Second
 }
 
 func New(taskManager *scheduler.Manager, address string) *Connector {
@@ -202,8 +220,8 @@ func New(taskManager *scheduler.Manager, address string) *Connector {
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
 	}
+	c.updateOptions(&agent.Options)
 	c.resultCache = resultcache.NewActive(c.clientID, c)
-
 	return c
 }
 
@@ -216,4 +234,8 @@ func (c *Connector) Start() {
 func (c *Connector) Stop() {
 	c.input <- nil
 	c.resultCache.Stop()
+}
+
+func (c *Connector) UpdateOptions() {
+	c.input <- &agent.Options
 }

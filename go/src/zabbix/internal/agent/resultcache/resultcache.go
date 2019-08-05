@@ -25,6 +25,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
+	"sync/atomic"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
@@ -33,14 +34,24 @@ import (
 	"zabbix/pkg/log"
 )
 
+const (
+	cacheStateNormal  = 0
+	cacheStateLimited = 1 << (iota - 1)
+	cacheStateFull
+)
+
 type ResultCache struct {
-	input      chan interface{}
-	output     Uploader
-	results    []*plugin.Result
-	token      string
-	lastDataID uint64
-	clientID   uint64
-	lastError  error
+	input              chan interface{}
+	output             Uploader
+	results            []*AgentData
+	token              string
+	lastDataID         uint64
+	clientID           uint64
+	lastError          error
+	maxBufferSize      int
+	totalValueNum      int
+	persistentValueNum int
+	state              uint32
 }
 
 type AgentData struct {
@@ -52,14 +63,15 @@ type AgentData struct {
 	Value       *string `json:"value,omitempty"`
 	Clock       int     `json:"clock,omitempty"`
 	Ns          int     `json:"ns,omitempty"`
+	persistent  bool
 }
 
 type AgentDataRequest struct {
-	Request   string      `json:"request"`
-	Data      []AgentData `json:"data"`
-	Sessionid string      `json:"sessionid"`
-	Host      string      `json:"host"`
-	Version   string      `json:"version"`
+	Request   string       `json:"request"`
+	Data      []*AgentData `json:"data"`
+	Sessionid string       `json:"sessionid"`
+	Host      string       `json:"host"`
+	Version   string       `json:"version"`
 }
 
 type Uploader interface {
@@ -75,34 +87,14 @@ func (c *ResultCache) flushOutput(u Uploader) {
 
 	request := AgentDataRequest{
 		Request:   "agent data",
-		Data:      make([]AgentData, len(c.results)),
+		Data:      c.results,
 		Sessionid: c.token,
 		Host:      agent.Options.Hostname,
 		Version:   "TODO",
 	}
 
-	lastDataID := c.lastDataID
-
-	for i, r := range c.results {
-		d := &request.Data[i]
-		lastDataID++
-		d.Id = lastDataID
-		d.Itemid = r.Itemid
-		d.LastLogsize = r.LastLogsize
-		d.Mtime = r.Mtime
-		d.Clock = int(r.Ts.Unix())
-		d.Ns = r.Ts.Nanosecond()
-		if r.Error == nil {
-			d.Value = r.Value
-		} else {
-			errmsg := r.Error.Error()
-			d.Value = &errmsg
-			state := itemutil.StateNotSupported
-			d.State = &state
-		}
-	}
-	var data []byte
 	var err error
+	var data []byte
 
 	if data, err = json.Marshal(&request); err != nil {
 		log.Errf("[%d] cannot convert cached history to json: %s", c.clientID, err.Error())
@@ -125,12 +117,116 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		c.lastError = nil
 	}
 
-	c.lastDataID = lastDataID
-	c.results = make([]*plugin.Result, 0)
+	// clear results slice to ensure that the data is garbage collected
+	c.results[0] = nil
+	for i := 1; i < len(c.results); i *= 2 {
+		copy(c.results[i:], c.results[:i])
+	}
+	c.results = c.results[:0]
+
+	c.totalValueNum = 0
+	c.persistentValueNum = 0
+	atomic.StoreUint32(&c.state, cacheStateNormal)
 }
 
-func (c *ResultCache) write(result *plugin.Result) {
+func (c *ResultCache) addResult(result *AgentData) {
+	if len(c.results) == cap(c.results) {
+		newResults := make([]*AgentData, cap(c.results), cap(c.results)+16)
+		copy(newResults, c.results)
+		c.results = newResults
+		log.Debugf("[%d] extended result cache to %d records (default %d)", c.clientID, cap(c.results), c.maxBufferSize)
+	}
+
 	c.results = append(c.results, result)
+	c.totalValueNum++
+	if result.persistent {
+		c.persistentValueNum++
+	}
+
+	state := uint32(cacheStateNormal)
+	if c.persistentValueNum >= c.maxBufferSize/2 {
+		state |= cacheStateLimited
+	}
+	if c.totalValueNum >= c.maxBufferSize {
+		state |= cacheStateFull
+	}
+	if state != cacheStateNormal && atomic.LoadUint32(&c.state) == cacheStateNormal {
+		c.Flush()
+	}
+	atomic.StoreUint32(&c.state, state)
+}
+
+func (c *ResultCache) insertResult(result *AgentData) {
+	index := -1
+	if !result.persistent {
+		for i, r := range c.results {
+			if r.Itemid == result.Itemid {
+				index = i
+				break
+			}
+		}
+	}
+	if index == -1 && (!result.persistent || c.persistentValueNum < c.maxBufferSize/2) {
+		for i, r := range c.results {
+			if !r.persistent {
+				index = i
+				break
+			}
+		}
+	}
+	if index == -1 {
+		log.Warningf("[%d] cache is full and cannot cannot find a value to replace, adding new instead", c.clientID)
+		c.addResult(result)
+		return
+	}
+
+	if result.persistent {
+		c.persistentValueNum++
+		if c.persistentValueNum >= c.maxBufferSize/2 {
+			atomic.StoreUint32(&c.state, atomic.LoadUint32(&c.state)|cacheStateLimited)
+		}
+	}
+
+	copy(c.results[index:], c.results[index+1:])
+	c.results[len(c.results)-1] = result
+}
+
+func (c *ResultCache) write(r *plugin.Result) {
+	c.lastDataID++
+	var value *string
+	var state *int
+	if r.Error == nil {
+		value = r.Value
+	} else {
+		errmsg := r.Error.Error()
+		value = &errmsg
+		tmp := itemutil.StateNotSupported
+		state = &tmp
+	}
+
+	var clock, ns int
+	if !r.Ts.IsZero() {
+		clock = int(r.Ts.Unix())
+		ns = r.Ts.Nanosecond()
+	}
+
+	data := &AgentData{
+		Id:          c.lastDataID,
+		Itemid:      r.Itemid,
+		LastLogsize: r.LastLogsize,
+		Mtime:       r.Mtime,
+		Clock:       clock,
+		Ns:          ns,
+		Value:       value,
+		State:       state,
+		persistent:  r.Persistent,
+	}
+
+	if atomic.LoadUint32(&c.state) == cacheStateNormal {
+		c.addResult(data)
+	} else {
+		c.insertResult(data)
+	}
 }
 
 func (c *ResultCache) run() {
@@ -148,6 +244,8 @@ func (c *ResultCache) run() {
 		case *plugin.Result:
 			r := v.(*plugin.Result)
 			c.write(r)
+		case *agent.AgentOptions:
+			c.updateOptions(v.(*agent.AgentOptions))
 		}
 	}
 	close(c.input)
@@ -161,9 +259,17 @@ func newToken() string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func (c *ResultCache) Start() {
+func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
+	c.maxBufferSize = options.BufferSize
+}
+
+func (c *ResultCache) init() {
+	c.updateOptions(&agent.Options)
 	c.input = make(chan interface{}, 100)
-	c.results = make([]*plugin.Result, 0)
+	c.results = make([]*AgentData, 0, c.maxBufferSize)
+}
+
+func (c *ResultCache) Start() {
 	monitor.Register()
 	go c.run()
 }
@@ -173,11 +279,15 @@ func (c *ResultCache) Stop() {
 }
 
 func NewActive(clientid uint64, output Uploader) *ResultCache {
-	return &ResultCache{clientID: clientid, output: output, token: newToken()}
+	cache := &ResultCache{clientID: clientid, output: output, token: newToken(), state: cacheStateNormal}
+	cache.init()
+	return cache
 }
 
 func NewPassive(clientid uint64) *ResultCache {
-	return &ResultCache{clientID: clientid, token: newToken()}
+	cache := &ResultCache{clientID: clientid, token: newToken(), state: cacheStateNormal}
+	cache.init()
+	return cache
 }
 
 func (c *ResultCache) FlushOutput(u Uploader) {
@@ -193,4 +303,17 @@ func (c *ResultCache) Flush() {
 
 func (c *ResultCache) Write(result *plugin.Result) {
 	c.input <- result
+}
+
+func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
+	c.input <- options
+}
+
+func (c *ResultCache) IsFull() bool {
+
+	return atomic.LoadUint32(&c.state)&cacheStateFull != 0
+}
+
+func (c *ResultCache) IsPersistentFull() bool {
+	return atomic.LoadUint32(&c.state)&cacheStateLimited != 0
 }

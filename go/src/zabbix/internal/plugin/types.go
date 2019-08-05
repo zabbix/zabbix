@@ -54,6 +54,8 @@ type Configurator interface {
 
 type ResultWriter interface {
 	Write(result *Result)
+	IsFull() bool
+	IsPersistentFull() bool
 }
 
 type Result struct {
@@ -63,6 +65,7 @@ type Result struct {
 	Error       error
 	LastLogsize *uint64
 	Mtime       *int
+	Persistent  bool
 }
 
 type Request struct {
