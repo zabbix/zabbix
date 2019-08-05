@@ -2008,7 +2008,7 @@ class CConfigurationImport {
 	 * @return null
 	 */
 	protected function deleteMissingDiscoveryRules() {
-		if (!$this->options['discoveryRules']['deleteMissing']) {
+		if (!$this->options['discoveryRules']['updateExisting'] && !$this->options['discoveryRules']['deleteMissing']) {
 			return;
 		}
 
@@ -2026,36 +2026,40 @@ class CConfigurationImport {
 
 		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 
-		if ($allDiscoveryRules) {
-			foreach ($allDiscoveryRules as $host => $discoveryRules) {
-				$hostId = $this->referencer->resolveHostOrTemplate($host);
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
-				foreach ($discoveryRules as $discoveryRule) {
-					$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+			foreach ($discoveryRules as $discoveryRule) {
+				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
 
-					if ($discoveryRuleId) {
-						$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
-					}
+				if ($discoveryRuleId) {
+					$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
 				}
 			}
 		}
 
-		$dbDiscoveryRuleIds = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
-			'hostids' => $processedHostIds,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'inherited' => false
-		]);
+		if ($this->options['discoveryRules']['deleteMissing']) {
+			$dbDiscoveryRuleIds = API::DiscoveryRule()->get([
+				'output' => ['itemid'],
+				'hostids' => $processedHostIds,
+				'preservekeys' => true,
+				'nopermissions' => true,
+				'inherited' => false
+			]);
 
-		$discoveryRulesToDelete = array_diff_key($dbDiscoveryRuleIds, $discoveryRuleIdsXML);
+			$discoveryRulesToDelete = array_diff_key($dbDiscoveryRuleIds, $discoveryRuleIdsXML);
 
-		if ($discoveryRulesToDelete) {
-			API::DiscoveryRule()->delete(array_keys($discoveryRulesToDelete));
+			if ($discoveryRulesToDelete) {
+				API::DiscoveryRule()->delete(array_keys($discoveryRulesToDelete));
+			}
+
+			// refresh discovery rules because templated ones can be inherited to host and used for prototypes
+			$this->referencer->refreshItems();
 		}
 
-		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
-		$this->referencer->refreshItems();
+		if (!$this->options['discoveryRules']['updateExisting']) {
+			return;
+		}
 
 		$hostPrototypeIdsXML = [];
 		$triggerPrototypeIdsXML = [];
@@ -2130,7 +2134,7 @@ class CConfigurationImport {
 		// delete missing trigger prototypes
 		$dbTriggerPrototypeIds = API::TriggerPrototype()->get([
 			'output' => ['triggerid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $discoveryRuleIdsXML,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -2146,7 +2150,7 @@ class CConfigurationImport {
 		// delete missing graph prototypes
 		$dbGraphPrototypeIds = API::GraphPrototype()->get([
 			'output' => ['graphid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $discoveryRuleIdsXML,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
@@ -2162,7 +2166,7 @@ class CConfigurationImport {
 		// delete missing item prototypes
 		$dbItemPrototypeIds = API::ItemPrototype()->get([
 			'output' => ['itemid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $discoveryRuleIdsXML,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
