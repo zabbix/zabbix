@@ -899,17 +899,17 @@
 			realignResize(data, widget);
 
 			if (widget['iterator']) {
-				positionWidgetsOfIterator($obj, data, widget, widget['current_pos']);
+				alignIteratorContents($obj, data, widget, widget['current_pos']);
 			}
 
 			data.widgets.each(function(box) {
 				if (widget.uniqueid !== box.uniqueid) {
-					// Reposition children of the Iterator if size changed.
+					// Align children of Iterator if size changed.
 					if (box['iterator']) {
 						var box_pos = calcDivPosition($obj, data, box['div']);
 						if (box_pos['width'] !== box['current_pos']['width']
 								|| box_pos['height'] !== box['current_pos']['height']) {
-							positionWidgetsOfIterator($obj, data, box, box['current_pos']);
+							alignIteratorContents($obj, data, box, box['current_pos']);
 						}
 					}
 
@@ -1168,7 +1168,7 @@
 				}
 
 				if (widget['iterator']) {
-					positionWidgetsOfIterator($obj, data, widget, widget['pos']);
+					alignIteratorContents($obj, data, widget, widget['pos']);
 				}
 
 				widget['div'].removeClass('resizing-top').removeClass('resizing-left');
@@ -1300,7 +1300,7 @@
 		}
 	}
 
-	function positionWidgetsOfIterator($obj, data, iterator, pos) {
+	function alignIteratorContents($obj, data, iterator, pos) {
 		if (isIteratorTooSmall(iterator, pos)) {
 			setIteratorTooSmallState(iterator, true);
 
@@ -1322,9 +1322,9 @@
 			num_rows = numIteratorRows(iterator)
 		;
 
-		for (var i = 0, count = num_columns * num_rows; i < count; i++) {
-			var cell_column = i % num_columns,
-				cell_row = Math.floor(i / num_columns),
+		for (var index = 0, count = num_columns * num_rows; index < count; index++) {
+			var cell_column = index % num_columns,
+				cell_row = Math.floor(index / num_columns),
 				cell_width_min = Math.floor(pos['width'] / num_columns),
 				cell_height_min = Math.floor(pos['height'] / num_rows),
 				num_enlarged_columns = pos['width'] - cell_width_min * num_columns,
@@ -1341,11 +1341,11 @@
 				}
 			;
 
-			if (i < iterator['children'].length) {
-				iterator['children'][i]['div'].css(css);
+			if (index < iterator['children'].length) {
+				iterator['children'][index]['div'].css(css);
 			}
 			else {
-				$placeholders.eq(i - iterator['children'].length).css(css);
+				$placeholders.eq(index - iterator['children'].length).css(css);
 			}
 		}
 	}
@@ -1385,7 +1385,7 @@
 		showPreloader(child);
 	}
 
-	function updateWidgetIteratorCallback($obj, data, iterator, response) {
+	function updateIteratorCallback($obj, data, iterator, response) {
 		stopPreloader(iterator);
 
 		var $content_header = $('h4', iterator['content_header']);
@@ -1424,11 +1424,11 @@
 					numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['children'].length
 				);
 
-				positionWidgetsOfIterator($obj, data, iterator,
+				alignIteratorContents($obj, data, iterator,
 					(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
 				);
 
-				$.each(iterator['children'], function(index, child) {
+				iterator['children'].forEach(function(child) {
 					updateWidgetContent($obj, data, child);
 				});
 			}
@@ -1644,7 +1644,7 @@
 				}
 
 				if (widget["iterator"]) {
-					updateWidgetIteratorCallback($obj, data, widget, response);
+					updateIteratorCallback($obj, data, widget, response);
 				}
 				else {
 					updateWidgetCallback($obj, data, widget, response);
@@ -1718,14 +1718,16 @@
 				pos = findEmptyPosition($obj, data, type);
 			}
 
-			$placeholder = $('<div>').css({
+			$placeholder = $('<div>')
+				.css({
 					position: 'absolute',
 					top: (pos.y * data.options['widget-height']) + 'px',
 					left: (pos.x * data.options['widget-width']) + '%',
 					height: (pos.height * data.options['widget-height']) + 'px',
 					width: (pos.width * data.options['widget-width']) + '%'
 				})
-				.appendTo($obj);
+				.appendTo($obj)
+			;
 		}
 
 		$.ajax({
@@ -1764,7 +1766,8 @@
 								setWidgetModeEdit($obj, data, widget);
 								// Remove height attribute set for scroll animation.
 								$('body').css('height', '');
-							};
+							}
+						;
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
 							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
@@ -1806,7 +1809,7 @@
 
 						removeWidget($obj, data, widget);
 
-						// Disable position/size checking.
+						// Disable position/size checking during addWidget call.
 						data['pos-action'] = 'updateWidgetConfig';
 						methods.addWidget.call($obj, widget_data);
 						data['pos-action'] = '';
