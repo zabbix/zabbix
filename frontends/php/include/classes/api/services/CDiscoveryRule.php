@@ -788,7 +788,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
-				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'opdata'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
