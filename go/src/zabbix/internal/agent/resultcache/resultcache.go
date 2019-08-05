@@ -57,7 +57,7 @@ type AgentData struct {
 type AgentDataRequest struct {
 	Request   string      `json:"request"`
 	Data      []AgentData `json:"data"`
-	Sessionid string      `json:"sessionid"`
+	Sessionid string      `json:"session"`
 	Host      string      `json:"host"`
 	Version   string      `json:"version"`
 }
