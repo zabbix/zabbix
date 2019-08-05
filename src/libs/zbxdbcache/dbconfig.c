@@ -6382,7 +6382,7 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 	{
 		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, psk_buf_len);
-		*psk_usage = ZBX_PSK_FOR_HOST;
+		*psk_usage |= ZBX_PSK_FOR_HOST;
 	}
 
 	/* Does it match autoregistration PSK? */
