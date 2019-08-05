@@ -584,17 +584,11 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
-			if ($stat['count_unack'] != 0 || $is_total) {
-				return getSeverityCell($severity, $data['severity_names'], [
-					(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
-						->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
-					$severity_name
-				], false, $is_total);
-			}
-			else {
-				return getSeverityCell($severity, $data['severity_names'], [$allTriggersNum, $severity_name], false,
-					$is_total);
-			}
+			return getSeverityCell($severity, $data['severity_names'], [
+				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
+					->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				$severity_name
+			], false, $is_total);
 
 		default:
 			return '';
