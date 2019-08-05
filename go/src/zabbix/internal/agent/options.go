@@ -25,7 +25,9 @@ type AgentOptions struct {
 	DebugLevel          int    `conf:",,0:5,3"`
 	ServerActive        string `conf:",optional"`
 	RefreshActiveChecks int    `conf:",,30:3600,120"`
-	Timeout             int    `conf:",,1-30,3"`
+	BufferSend          int    `conf:",,1:3600,5"`
+	BufferSize          int    `conf:",,2:65535,100"`
+	Timeout             int    `conf:",,1:30,3"`
 	Hostname            string
 	ListenPort          int `conf:",,1024:32767,10050"`
 	Plugins             map[string]map[string]string

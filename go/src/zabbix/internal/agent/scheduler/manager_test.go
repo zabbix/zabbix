@@ -181,6 +181,14 @@ func (c *resultCacheMock) Write(r *plugin.Result) {
 	c.results = append(c.results, r)
 }
 
+func (pc *resultCacheMock) SlotsAvailable() bool {
+	return true
+}
+
+func (pc *resultCacheMock) PersistSlotsAvailable() bool {
+	return true
+}
+
 type mockManager struct {
 	Manager
 	sink      chan performer

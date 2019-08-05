@@ -37,6 +37,14 @@ func (pc *passiveCheck) Write(r *plugin.Result) {
 	pc.results <- r
 }
 
+func (pc *passiveCheck) SlotsAvailable() bool {
+	return true
+}
+
+func (pc *passiveCheck) PersistSlotsAvailable() bool {
+	return true
+}
+
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	const notsupported = "ZBX_NOTSUPPORTED"
 
