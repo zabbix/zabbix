@@ -1627,7 +1627,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Adds triggers and trigger prorotypes from template to hosts.
+	 * Adds triggers and trigger prototypes from template to hosts.
 	 *
 	 * @param array $data
 	 */
@@ -1638,7 +1638,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
