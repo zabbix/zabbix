@@ -1239,8 +1239,22 @@
 		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
-	function startWidgetRefreshTimer($obj, data, widget, rf_rate) {
-		if (rf_rate != 0) {
+	function stopWidgetRefresh($obj, data, widget) {
+		if (typeof widget['rf_timeoutid'] !== 'undefined') {
+			clearTimeout(widget['rf_timeoutid']);
+
+			delete widget['rf_timeoutid'];
+		}
+	}
+
+	function startWidgetRefresh($obj, data, widget, rf_rate) {
+		stopWidgetRefresh($obj, data, widget);
+
+		if (typeof rf_rate === 'undefined') {
+			rf_rate = widget['rf_rate'];
+		}
+
+		if (rf_rate) {
 			widget['rf_timeoutid'] = setTimeout(function() {
 				// Do not update widget content if there are active popup or hintbox.
 				var active = widget['content_body'].find('[data-expanded="true"]');
@@ -1253,23 +1267,12 @@
 				}
 				else {
 					// widget was updated, start next timeout.
-					startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+					startWidgetRefresh($obj, data, widget);
 				}
 			}, rf_rate * 1000);
 		}
-	}
 
-	function stopWidgetRefreshTimer(widget) {
-		clearTimeout(widget['rf_timeoutid']);
-		delete widget['rf_timeoutid'];
-	}
-
-	function startWidgetRefresh($obj, data, widget) {
-		if (typeof widget['rf_timeoutid'] !== 'undefined') {
-			stopWidgetRefreshTimer(widget);
-		}
-
-		startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+		startWidgetRefresh($obj, data, widget);
 	}
 
 	function setIteratorTooSmallState(iterator, enabled) {
@@ -1436,7 +1439,7 @@
 
 		if (iterator['update_attempts'] == 1) {
 			iterator['update_attempts'] = 0;
-			startWidgetRefreshTimer($obj, data, iterator, iterator['rf_rate']);
+			startWidgetRefresh($obj, data, iterator, iterator['rf_rate']);
 			doAction('onContentUpdated', $obj, data, null);
 		}
 		else {
@@ -1483,7 +1486,7 @@
 
 		if (widget['update_attempts'] == 1) {
 			widget['update_attempts'] = 0;
-			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+			startWidgetRefresh($obj, data, widget);
 			doAction('onContentUpdated', $obj, data, null);
 		}
 		else {
@@ -1565,7 +1568,7 @@
 		}
 		else if (widget['update_paused'] == true) {
 			widget['update_attempts'] = 0;
-			startWidgetRefreshTimer($obj, data, widget, widget['rf_rate']);
+			startWidgetRefresh($obj, data, widget, widget['rf_rate']);
 			return;
 		}
 
@@ -1657,16 +1660,13 @@
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer($obj, data, widget, 3);
+				startWidgetRefresh($obj, data, widget, 3);
 			})
 		;
 	}
 
 	function refreshWidget($obj, data, widget) {
-		if (typeof widget['rf_timeoutid'] !== 'undefined') {
-			stopWidgetRefreshTimer(widget);
-		}
-
+		stopWidgetRefresh($obj, data, widget);
 		updateWidgetContent($obj, data, widget);
 	}
 
@@ -1786,7 +1786,7 @@
 							.then(add_new_widget)
 						;
 					}
-					else if (false && widget['type'] === type) {
+					else if (widget['type'] === type) {
 						// In case of EDIT widget, if type has not changed, update the widget.
 
 						widget['header'] = name;
@@ -1794,6 +1794,7 @@
 
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
+
 						refreshWidget($obj, data, widget);
 					} else {
 						// In case of EDIT widget, if type has changed, replace the widget.
@@ -2183,7 +2184,7 @@
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 		removeWidgetInfoButtons(widget['content_header']);
-		stopWidgetRefreshTimer(widget);
+		stopWidgetRefresh($obj, data, widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
 	}
