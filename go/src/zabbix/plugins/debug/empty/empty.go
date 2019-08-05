@@ -33,10 +33,11 @@ var impl Plugin
 var stdOs std.Os
 
 func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	p.Debugf("export %s%v", key, params)
 	return nil, nil
 }
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "debug.empty", "debug.empty", "Returns empty value")
+	plugin.RegisterMetric(&impl, "debugempty", "debug.empty", "Returns empty value")
 }

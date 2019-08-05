@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// This is placeholder for debug.log plugin based on Watcher
-package log
+package uname
 
 import (
+	"errors"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
 )
 
 // Plugin -
@@ -31,13 +30,15 @@ type Plugin struct {
 }
 
 var impl Plugin
-var stdOs std.Os
 
+// Export -
 func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
-	return nil, nil
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
+	}
+	return getUname()
 }
 
 func init() {
-	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "debug.log", "debug.log", "Returns empty value")
+	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
 }

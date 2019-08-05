@@ -17,40 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package uname
 
 import (
-	"errors"
 	"fmt"
+	"syscall"
 )
 
-var Metrics map[string]Accessor = make(map[string]Accessor)
-
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := Metrics[key]; ok {
-		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
-		return
+func arrayToString(unameArray *[65]int8) string {
+	var byteString [65]byte
+	var indexLength int
+	for ; indexLength < len(unameArray); indexLength++ {
+		if 0 == unameArray[indexLength] {
+			break
+		}
+		byteString[indexLength] = uint8(unameArray[indexLength])
 	}
-
-	switch impl.(type) {
-	case Exporter, Collector, Runner, Watcher, Configurator:
-	default:
-		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
-		return
-	}
-
-	impl.Init(name, key, description)
-	Metrics[key] = impl
+	return string(byteString[:indexLength])
 }
 
-func Get(key string) (acc Accessor, err error) {
-	var ok bool
-	if acc, ok = Metrics[key]; ok {
+func getUname() (uname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
 		return
 	}
-	return nil, errors.New("no plugin found")
-}
+	uname = fmt.Sprintf("%s %s %s %s %s", arrayToString(&utsname.Sysname), arrayToString(&utsname.Nodename),
+		arrayToString(&utsname.Release), arrayToString(&utsname.Version), arrayToString(&utsname.Machine))
 
-func ClearRegistry() {
-	Metrics = make(map[string]Accessor)
+	return uname, nil
 }

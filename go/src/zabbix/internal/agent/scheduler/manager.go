@@ -10,7 +10,7 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more detailm.
+** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
@@ -22,7 +22,12 @@ package scheduler
 import (
 	"container/heap"
 	"errors"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
@@ -50,7 +55,7 @@ type Scheduler interface {
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: client expiry - remove unused owners after tiemout (day+?)
+	// TODO: client expiry - remove unused owners after timeout (day+?)
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
@@ -90,14 +95,15 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			continue
 		}
 		log.Debugf("deactivate unused plugin %s", p.name())
-		p.tasks = p.tasks[:0]
+		p.tasks = make([]performer, 0)
 		if _, ok := p.impl.(plugin.Runner); ok {
 			task := &stopperTask{
-				taskBase: taskBase{
-					plugin:    p,
-					scheduled: now.Add(priorityStopperTaskNs),
-					active:    true,
-				}}
+				taskBase: taskBase{plugin: p, active: true, onetime: true},
+			}
+			if err := task.reschedule(now); err != nil {
+				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				continue
+			}
 			p.enqueueTask(task)
 			log.Debugf("created stopper task for plugin %s", p.name())
 
@@ -136,12 +142,14 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(task performer) {
-	reschedule := task.finish()
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && reschedule {
-		task.reschedule(time.Now())
-		p.enqueueTask(task)
+	if p.active() && task.isActive() && !task.isOneTime() {
+		if err := task.reschedule(time.Now()); err != nil {
+			log.Warningf("cannot reschedule plugin %s: %s", p.impl.Name(), err)
+		} else {
+			p.enqueueTask(task)
+		}
 	}
 	if !p.queued() && p.hasCapacity() {
 		heap.Push(&m.queue, p)
@@ -153,12 +161,13 @@ func (m *Manager) processFinishRequest(task performer) {
 func (m *Manager) rescheduleQueue(now time.Time) {
 	// easier to rebuild queues than update each element
 	queue := make(pluginHeap, 0, len(m.queue))
-	for _, p := range queue {
+	for _, p := range m.queue {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for _, t := range tasks {
-			t.reschedule(now)
-			p.enqueueTask(t)
+			if err := t.reschedule(now); err == nil {
+				p.enqueueTask(t)
+			}
 		}
 		heap.Push(&queue, p)
 	}
@@ -182,8 +191,11 @@ run:
 			diff := now.Sub(lastTick)
 			interval := time.Second * 10
 			if diff <= -interval || diff >= interval {
+				log.Warningf("detected %d time difference between queue checks, rescheduling tasks",
+					int(math.Abs(float64(diff))/1e9))
 				m.rescheduleQueue(now)
 			}
+			lastTick = now
 			m.processQueue(now)
 		case v := <-m.input:
 			if v == nil {
@@ -209,16 +221,54 @@ func (m *Manager) init() {
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
 
+	metrics := make([]plugin.Accessor, 0, len(plugin.Metrics))
 	m.plugins = make(map[string]*pluginAgent)
 	for key, acc := range plugin.Metrics {
+		capacity := plugin.DefaultCapacity
+		section := strings.Title(acc.Name())
+		if options, ok := agent.Options.Plugins[section]; ok {
+			if cap, ok := options["Capacity"]; ok {
+				var err error
+				if capacity, err = strconv.Atoi(cap); err != nil {
+					log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
+						section, cap, plugin.DefaultCapacity)
+				}
+			}
+		}
 		m.plugins[key] = &pluginAgent{
 			impl:         acc,
 			tasks:        make(performerHeap, 0),
-			capacity:     10,
+			capacity:     capacity,
 			usedCapacity: 0,
 			index:        -1,
 			refcount:     0,
 		}
+		metrics = append(metrics, acc)
+	}
+
+	// log available plugins
+	sort.Slice(metrics, func(i, j int) bool {
+		return metrics[i].Name() < metrics[j].Name()
+	})
+	for _, acc := range metrics {
+		interfaces := ""
+		if _, ok := acc.(plugin.Exporter); ok {
+			interfaces += "exporter, "
+		}
+		if _, ok := acc.(plugin.Collector); ok {
+			interfaces += "collector, "
+		}
+		if _, ok := acc.(plugin.Runner); ok {
+			interfaces += "runner, "
+		}
+		if _, ok := acc.(plugin.Watcher); ok {
+			interfaces += "watcher, "
+		}
+		if _, ok := acc.(plugin.Configurator); ok {
+			interfaces += "configurator, "
+		}
+		interfaces = interfaces[:len(interfaces)-2]
+		log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
 	}
 }
 

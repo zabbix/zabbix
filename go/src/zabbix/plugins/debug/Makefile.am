@@ -2,5 +2,6 @@
 
 SUBDIRS = \
 	empty \
-	log
+	log \
+	collector
 

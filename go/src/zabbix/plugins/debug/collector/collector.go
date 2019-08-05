@@ -17,40 +17,50 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package empty
 
 import (
-	"errors"
-	"fmt"
+	"strconv"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
 )
 
-var Metrics map[string]Accessor = make(map[string]Accessor)
-
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := Metrics[key]; ok {
-		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
-		return
-	}
-
-	switch impl.(type) {
-	case Exporter, Collector, Runner, Watcher, Configurator:
-	default:
-		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
-		return
-	}
-
-	impl.Init(name, key, description)
-	Metrics[key] = impl
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	interval int
+	counter  int
 }
 
-func Get(key string) (acc Accessor, err error) {
-	var ok bool
-	if acc, ok = Metrics[key]; ok {
-		return
-	}
-	return nil, errors.New("no plugin found")
+var impl Plugin
+var stdOs std.Os
+
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	p.Debugf("export %s%v", key, params)
+	return p.counter, nil
 }
 
-func ClearRegistry() {
-	Metrics = make(map[string]Accessor)
+func (p *Plugin) Collect() error {
+	p.Debugf("collect")
+	p.counter++
+	return nil
+}
+
+func (p *Plugin) Period() int {
+	return p.interval
+}
+
+func (p *Plugin) Configure(options map[string]string) {
+	p.Debugf("configure")
+	if val, ok := options["Interval"]; ok {
+		p.interval, _ = strconv.Atoi(val)
+	} else {
+		p.interval = 10
+	}
+}
+
+func init() {
+	stdOs = std.NewOs()
+	impl.interval = 1
+	plugin.RegisterMetric(&impl, "debugcollector", "debug.collector", "Returns empty value")
 }
