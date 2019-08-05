@@ -17,14 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package filecksum
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
+	"reflect"
+	"testing"
+	"zabbix/internal/agent"
+	"zabbix/pkg/std"
 )
+
+var CrcFile = "1234"
+
+func TestUptime(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	agent.Options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}); err != nil {
+		t.Errorf("vfs.file.cksum returned error %s", err.Error())
+	} else {
+		if crc, ok := result.(uint32); !ok {
+			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if crc != 3582362371 {
+				t.Errorf("vfs.file.cksum returned invalid result")
+			}
+		}
+	}
+}
