@@ -68,7 +68,7 @@ type mockExporterPlugin struct {
 	mockPlugin
 }
 
-func (p *mockExporterPlugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -94,7 +94,7 @@ type mockCollectorExporterPlugin struct {
 	period int
 }
 
-func (p *mockCollectorExporterPlugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -131,7 +131,7 @@ type mockWatcherPlugin struct {
 	requests []*plugin.Request
 }
 
-func (p *mockWatcherPlugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockWatcherPlugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.call("$watch")
 	log.Debugf("WATCH %s %v", p.Name(), requests)
 	p.requests = requests
@@ -155,7 +155,7 @@ func (p *mockRunnerWatcherPlugin) Stop() {
 	p.call("$stop")
 }
 
-func (p *mockRunnerWatcherPlugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockRunnerWatcherPlugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.call("$watch")
 	p.requests = requests
 }
@@ -256,8 +256,10 @@ func (m *mockManager) mockTasks() {
 						active:    task.isActive(),
 						recurring: true,
 					},
-					sink: m.sink,
-					item: e.item,
+					sink:     m.sink,
+					item:     e.item,
+					clientid: e.clientid,
+					data:     e.data,
 				}
 				p.enqueueTask(mockTask)
 				m.clients[index[e]].exporters[e.item.itemid] = mockTask
@@ -296,6 +298,7 @@ func (m *mockManager) mockTasks() {
 					resultSink: w.sink,
 					requests:   w.requests,
 					clientid:   w.clientid,
+					data:       w.data,
 				}
 				p.enqueueTask(mockTask)
 			case *configerTask:
@@ -391,14 +394,16 @@ func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accesso
 
 type mockExporterTask struct {
 	taskBase
-	item    clientItem
-	updated time.Time
-	sink    chan performer
+	item     clientItem
+	updated  time.Time
+	sink     chan performer
+	clientid uint64
+	data     interface{}
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
 	key, params, _ := itemutil.ParseKey(t.item.key)
-	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params)
+	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params, t)
 	t.sink <- t
 }
 
@@ -416,6 +421,27 @@ func (t *mockExporterTask) getUpdated() (updated time.Time) {
 
 func (t *mockExporterTask) getItem() (item *clientItem) {
 	return &t.item
+}
+
+// plugin.ContextProvider interface
+
+func (t *mockExporterTask) ClientID() (clientid uint64) {
+	return t.clientid
+}
+
+func (t *mockExporterTask) ItemID() (itemid uint64) {
+	return 0
+}
+
+func (t *mockExporterTask) Output() (output plugin.ResultWriter) {
+	return nil
+}
+func (t *mockExporterTask) SetData(data interface{}) {
+	t.data = data
+}
+
+func (t *mockExporterTask) Data() (data interface{}) {
+	return t.data
 }
 
 type mockCollectorTask struct {
@@ -479,11 +505,12 @@ type mockWatcherTask struct {
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
 	clientid   uint64
+	data       interface{}
 }
 
 func (t *mockWatcherTask) perform(s Scheduler) {
 	log.Debugf("%s %v", t.plugin.impl.Name(), t.requests)
-	t.plugin.impl.(plugin.Watcher).Watch(t.clientid, t.requests, t.resultSink)
+	t.plugin.impl.(plugin.Watcher).Watch(t.requests, t)
 	t.sink <- t
 }
 
@@ -493,6 +520,27 @@ func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
 
 func (t *mockWatcherTask) getWeight() int {
 	return t.plugin.capacity
+}
+
+// plugin.ContextProvider interface
+
+func (t *mockWatcherTask) ClientID() (clientid uint64) {
+	return t.clientid
+}
+
+func (t *mockWatcherTask) ItemID() (itemid uint64) {
+	return 0
+}
+
+func (t *mockWatcherTask) Output() (output plugin.ResultWriter) {
+	return t.resultSink
+}
+func (t *mockWatcherTask) SetData(data interface{}) {
+	t.data = data
+}
+
+func (t *mockWatcherTask) Data() (data interface{}) {
+	return t.data
 }
 
 type mockConfigerTask struct {

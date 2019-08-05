@@ -86,6 +86,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				writer:   sink,
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
+				clientid: c.id,
 			}
 
 			// cache scheduled (non direct) requests

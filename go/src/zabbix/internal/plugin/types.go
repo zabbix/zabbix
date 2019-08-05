@@ -33,7 +33,7 @@ type Collector interface {
 
 // Exporter - interface for exporting collected metrics
 type Exporter interface {
-	Export(key string, params []string) (interface{}, error)
+	Export(key string, params []string, context ContextProvider) (interface{}, error)
 }
 
 // Runner - interface for managing background processes
@@ -44,7 +44,7 @@ type Runner interface {
 
 // Watcher - interface for fully custom monitoring
 type Watcher interface {
-	Watch(clientid uint64, requests []*Request, sink ResultWriter)
+	Watch(requests []*Request, context ContextProvider)
 }
 
 // Configurator - interface for plugin configuration in agent conf files
@@ -54,6 +54,15 @@ type Configurator interface {
 
 type ResultWriter interface {
 	Write(result *Result)
+}
+
+type ContextProvider interface {
+	ClientID() uint64
+	ItemID() uint64
+	Output() ResultWriter
+	SetData(data interface{})
+	Data() interface{}
+	// TODO: add function for global regexps
 }
 
 type Result struct {

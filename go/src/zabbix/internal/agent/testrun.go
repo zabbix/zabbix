@@ -52,7 +52,7 @@ func CheckMetric(metric string) (err error) {
 	}
 
 	var v interface{}
-	if v, err = exporter.Export(key, params); err != nil {
+	if v, err = exporter.Export(key, params, nil); err != nil {
 		return
 	}
 

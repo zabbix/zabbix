@@ -32,7 +32,7 @@ type Plugin struct {
 var impl Plugin
 var stdOs std.Os
 
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
 	return nil, nil
 }

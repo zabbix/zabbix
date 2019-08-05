@@ -174,8 +174,8 @@ func (p *Plugin) Stop() {
 	p.input <- nil
 }
 
-func (p *Plugin) Watch(clientid uint64, requests []*plugin.Request, sink plugin.ResultWriter) {
-	p.input <- &clientRequest{clientid: clientid, requests: requests, sink: sink}
+func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
+	p.input <- &clientRequest{clientid: ctx.ClientID(), requests: requests, sink: ctx.Output()}
 }
 
 func (p *Plugin) Configure(options map[string]string) {
@@ -190,7 +190,7 @@ func (p *Plugin) Configure(options map[string]string) {
 	}
 	// TODO: either access gobal configuration or move MaxLinesPerSecond to plugin configuration
 	// TODO: MaxLinesPerSecond will be accessed from C code in multiple goroutines -
-	// some update synchronzation would be preferable.
+	// some update synchronization would be preferable.
 	zbxlib.SetMaxLinesPerSecond(agent.Options.MaxLinesPerSecond)
 }
 

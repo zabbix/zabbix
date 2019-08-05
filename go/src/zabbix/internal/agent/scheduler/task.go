@@ -125,6 +125,8 @@ type exporterTask struct {
 	failed             bool
 	updated            time.Time
 	refreshUnsupported int
+	clientid           uint64
+	data               interface{}
 }
 
 func (t *exporterTask) perform(s Scheduler) {
@@ -136,7 +138,7 @@ func (t *exporterTask) perform(s Scheduler) {
 		var err error
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			if ret, err = exporter.Export(key, params); err == nil {
+			if ret, err = exporter.Export(key, params, t); err == nil {
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
@@ -191,6 +193,27 @@ func (t *exporterTask) getItem() (item *clientItem) {
 	return &t.item
 }
 
+// plugin.ContextProvider interface
+
+func (t *exporterTask) ClientID() (clientid uint64) {
+	return t.clientid
+}
+
+func (t *exporterTask) ItemID() (itemid uint64) {
+	return t.item.itemid
+}
+
+func (t *exporterTask) Output() (output plugin.ResultWriter) {
+	return t.writer
+}
+func (t *exporterTask) SetData(data interface{}) {
+	t.data = data
+}
+
+func (t *exporterTask) Data() (data interface{}) {
+	return t.data
+}
+
 type starterTask struct {
 	taskBase
 }
@@ -238,12 +261,13 @@ type watcherTask struct {
 	requests []*plugin.Request
 	sink     plugin.ResultWriter
 	clientid uint64
+	data     interface{}
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.clientid, t.requests, t.sink)
+		watcher.Watch(t.requests, t)
 		s.FinishTask(t)
 	}()
 }
@@ -255,6 +279,27 @@ func (t *watcherTask) reschedule(now time.Time) (err error) {
 
 func (t *watcherTask) getWeight() int {
 	return t.plugin.capacity
+}
+
+// plugin.ContextProvider interface
+
+func (t *watcherTask) ClientID() (clientid uint64) {
+	return t.clientid
+}
+
+func (t *watcherTask) ItemID() (itemid uint64) {
+	return 0
+}
+
+func (t *watcherTask) Output() (output plugin.ResultWriter) {
+	return t.sink
+}
+func (t *watcherTask) SetData(data interface{}) {
+	t.data = data
+}
+
+func (t *watcherTask) Data() (data interface{}) {
+	return t.data
 }
 
 type configerTask struct {
