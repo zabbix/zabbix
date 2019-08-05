@@ -315,6 +315,8 @@ ZBX_Notifications.prototype.becomeActive = function() {
 	this.active = true;
 
 	this.pushActiveTabid(this.tab.uid);
+	this.fetchUpdates();
+	this.consumeAlarmState(this._cached_alarm_state);
 	this.renderAudio();
 };
 
