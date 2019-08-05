@@ -20,8 +20,11 @@
 package plugins
 
 import (
-	//	_ "zabbix/plugins/debug/empty"
-	//	_ "zabbix/plugins/debug/log"
+	_ "zabbix/plugins/debug/collector"
+	_ "zabbix/plugins/debug/empty"
+	_ "zabbix/plugins/debug/log"
+	_ "zabbix/plugins/system/uname"
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
+	_ "zabbix/plugins/vfs/filecksum"
 )

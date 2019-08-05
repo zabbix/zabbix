@@ -77,6 +77,8 @@ func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
 		"system.uptime",
+		"system.uname",
+		"vfs.file.cksum",
 	}
 
 	for _, metric := range metrics {

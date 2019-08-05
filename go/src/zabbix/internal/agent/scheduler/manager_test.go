@@ -163,13 +163,13 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 	return p.requests
 }
 
-type mockConfigerPlugin struct {
+type mockConfiguratorPlugin struct {
 	plugin.Base
 	mockPlugin
 	options map[string]string
 }
 
-func (p *mockConfigerPlugin) Configure(options map[string]string) {
+func (p *mockConfiguratorPlugin) Configure(options map[string]string) {
 	p.call("$configure")
 }
 
@@ -220,6 +220,13 @@ func (m *mockManager) update(update *updateRequest) {
 }
 
 func (m *mockManager) mockTasks() {
+	index := make(map[exporterTaskAccessor]uint64)
+	for clientid, client := range m.clients {
+		for _, task := range client.exporters {
+			index[task] = clientid
+		}
+		client.exporters = make(map[uint64]exporterTaskAccessor)
+	}
 	for _, p := range m.plugins {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
@@ -233,24 +240,26 @@ func (m *mockManager) mockTasks() {
 						scheduled: getNextcheck(fmt.Sprintf("%d", collector.Period()), m.now).Add(priorityCollectorTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   false,
 					},
 					sink: m.sink,
 				}
 				p.enqueueTask(mockTask)
 			case *exporterTask:
-				e := tasks[j].(*exporterTask)
+				e := task.(*exporterTask)
 				mockTask := &mockExporterTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
 						scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   false,
 					},
 					sink: m.sink,
 					item: e.item,
 				}
-				e.item.task = mockTask
 				p.enqueueTask(mockTask)
+				m.clients[index[e]].exporters[e.item.itemid] = mockTask
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -258,6 +267,7 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now,
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   true,
 					},
 					sink: m.sink,
 				}
@@ -269,18 +279,20 @@ func (m *mockManager) mockTasks() {
 						scheduled: m.now.Add(priorityStopperTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   true,
 					},
 					sink: m.sink,
 				}
 				p.enqueueTask(mockTask)
 			case *watcherTask:
-				w := tasks[j].(*watcherTask)
+				w := task.(*watcherTask)
 				mockTask := &mockWatcherTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
 						scheduled: m.now.Add(priorityWatcherTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   true,
 					},
 					sink:       m.sink,
 					resultSink: w.sink,
@@ -288,13 +300,14 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 			case *configerTask:
-				c := tasks[j].(*configerTask)
+				c := task.(*configerTask)
 				mockTask := &mockConfigerTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
 						scheduled: m.now.Add(priorityWatcherTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						onetime:   true,
 					},
 					options: c.options,
 					sink:    m.sink,
@@ -326,7 +339,7 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 		}
 	}
 
-	// find the range start in offsetse
+	// find the range start in offsets
 	if len(offsets) != 0 {
 		for offsets[right] < from {
 			right++
@@ -380,8 +393,9 @@ func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accesso
 
 type mockExporterTask struct {
 	taskBase
-	item *clientItem
-	sink chan performer
+	item    clientItem
+	updated time.Time
+	sink    chan performer
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
@@ -390,12 +404,20 @@ func (t *mockExporterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockExporterTask) reschedule(now time.Time) {
+func (t *mockExporterTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
+	return
 }
 
-func (t *mockExporterTask) finish() bool {
-	return true
+func (t *mockExporterTask) setUpdated(now time.Time) {
+	t.updated = now
+}
+func (t *mockExporterTask) getUpdated() (updated time.Time) {
+	return t.updated
+}
+
+func (t *mockExporterTask) getItem() (item *clientItem) {
+	return &t.item
 }
 
 type mockCollectorTask struct {
@@ -408,16 +430,13 @@ func (t *mockCollectorTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) reschedule(now time.Time) {
+func (t *mockCollectorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
+	return
 }
 
 func (t *mockCollectorTask) getWeight() int {
 	return t.plugin.capacity
-}
-
-func (t *mockCollectorTask) finish() bool {
-	return true
 }
 
 type mockStarterTask struct {
@@ -430,7 +449,8 @@ func (t *mockStarterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStarterTask) reschedule(now time.Time) {
+func (t *mockStarterTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStarterTask) getWeight() int {
@@ -447,7 +467,8 @@ func (t *mockStopperTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStopperTask) reschedule(now time.Time) {
+func (t *mockStopperTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStopperTask) getWeight() int {
@@ -466,7 +487,8 @@ func (t *mockWatcherTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) reschedule(now time.Time) {
+func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockWatcherTask) getWeight() int {
@@ -480,11 +502,12 @@ type mockConfigerTask struct {
 }
 
 func (t *mockConfigerTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Configer).Configure(t.options)
+	t.plugin.impl.(plugin.Configurator).Configure(t.options)
 	t.sink <- t
 }
 
-func (t *mockConfigerTask) reschedule(now time.Time) {
+func (t *mockConfigerTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockConfigerTask) getWeight() int {
@@ -521,20 +544,21 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 	}
 
 	for _, item := range items {
-		if it, ok := requestClient.items[item.itemid]; ok {
-			if it.delay != item.delay {
-				t.Errorf("Expected item %d delay %s while got %s", item.itemid, item.delay, it.delay)
+		if task, ok := requestClient.exporters[item.itemid]; ok {
+			ti := task.getItem()
+			if ti.delay != item.delay {
+				t.Errorf("Expected item %d delay %s while got %s", item.itemid, item.delay, ti.delay)
 			}
-			if it.key != item.key {
-				t.Errorf("Expected item %d key %s while got %s", item.itemid, item.key, it.key)
+			if ti.key != item.key {
+				t.Errorf("Expected item %d key %s while got %s", item.itemid, item.key, ti.key)
 			}
 		} else {
 			t.Errorf("Item %d was not queued", item.itemid)
 		}
 	}
 
-	if len(items) != len(requestClient.items) {
-		t.Errorf("Expected %d queued items while got %d", len(items), len(requestClient.items))
+	if len(items) != len(requestClient.exporters) {
+		t.Errorf("Expected %d queued items while got %d", len(items), len(requestClient.exporters))
 	}
 }
 
@@ -1473,13 +1497,13 @@ func TestPassiveRunner(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 }
 
-func TestConfiger(t *testing.T) {
+func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "")
 
 	options := map[string]map[string]string{
-		"debug1": map[string]string{"delay": "5"},
-		"debug2": map[string]string{"delay": "30"},
-		"debug3": map[string]string{"delay": "60"},
+		"Debug1": map[string]string{"delay": "5"},
+		"Debug2": map[string]string{"delay": "30"},
+		"Debug3": map[string]string{"delay": "60"},
 	}
 	agent.Options.Plugins = options
 
@@ -1488,7 +1512,7 @@ func TestConfiger(t *testing.T) {
 	plugins := make([]plugin.Accessor, 3)
 	for i := range plugins {
 		name := fmt.Sprintf("debug%d", i+1)
-		plugins[i] = &mockConfigerPlugin{
+		plugins[i] = &mockConfiguratorPlugin{
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
 			options:    options[name]}

@@ -88,7 +88,7 @@ func NewOs() Os {
 	return &sysOs{}
 }
 
-// NewMockOs returns Os interface that repalces supported os package functionality with mock functions.
+// NewMockOs returns Os interface that replaces supported os package functionality with mock functions.
 func NewMockOs() Os {
 	return &mockOs{
 		files: make(map[string][]byte),

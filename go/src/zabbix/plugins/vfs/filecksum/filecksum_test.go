@@ -17,40 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package filecksum
 
 import (
-	"errors"
-	"fmt"
+	"reflect"
+	"testing"
+	"zabbix/internal/agent"
+	"zabbix/pkg/std"
 )
 
-var Metrics map[string]Accessor = make(map[string]Accessor)
+var CrcFile = "1234"
 
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := Metrics[key]; ok {
-		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
-		return
+func TestUptime(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	agent.Options.Timeout = 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}); err != nil {
+		t.Errorf("vfs.file.cksum returned error %s", err.Error())
+	} else {
+		if crc, ok := result.(uint32); !ok {
+			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if crc != 3582362371 {
+				t.Errorf("vfs.file.cksum returned invalid result")
+			}
+		}
 	}
-
-	switch impl.(type) {
-	case Exporter, Collector, Runner, Watcher, Configurator:
-	default:
-		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
-		return
-	}
-
-	impl.Init(name, key, description)
-	Metrics[key] = impl
-}
-
-func Get(key string) (acc Accessor, err error) {
-	var ok bool
-	if acc, ok = Metrics[key]; ok {
-		return
-	}
-	return nil, errors.New("no plugin found")
-}
-
-func ClearRegistry() {
-	Metrics = make(map[string]Accessor)
 }

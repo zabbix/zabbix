@@ -21,6 +21,10 @@ package plugin
 
 import "time"
 
+const (
+	DefaultCapacity = 10
+)
+
 // Collector - interface for periodical metric collection
 type Collector interface {
 	Collect() error
@@ -43,8 +47,8 @@ type Watcher interface {
 	Watch(requests []*Request, sink ResultWriter)
 }
 
-// Configer - interface for plugin configuration in agent conf files
-type Configer interface {
+// Configurator - interface for plugin configuration in agent conf files
+type Configurator interface {
 	Configure(options map[string]string)
 }
 

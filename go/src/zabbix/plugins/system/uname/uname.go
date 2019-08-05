@@ -17,40 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugin
+package uname
 
 import (
 	"errors"
-	"fmt"
+	"zabbix/internal/plugin"
 )
 
-var Metrics map[string]Accessor = make(map[string]Accessor)
-
-func RegisterMetric(impl Accessor, name string, key string, description string) {
-	if _, ok := Metrics[key]; ok {
-		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
-		return
-	}
-
-	switch impl.(type) {
-	case Exporter, Collector, Runner, Watcher, Configurator:
-	default:
-		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
-		return
-	}
-
-	impl.Init(name, key, description)
-	Metrics[key] = impl
+// Plugin -
+type Plugin struct {
+	plugin.Base
 }
 
-func Get(key string) (acc Accessor, err error) {
-	var ok bool
-	if acc, ok = Metrics[key]; ok {
-		return
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
 	}
-	return nil, errors.New("no plugin found")
+	return getUname()
 }
 
-func ClearRegistry() {
-	Metrics = make(map[string]Accessor)
+func init() {
+	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
 }
