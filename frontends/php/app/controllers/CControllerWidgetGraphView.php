@@ -371,6 +371,5 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		];
 
 		$this->setResponse(new CControllerResponseData($response));
-		sleep(3);
 	}
 }

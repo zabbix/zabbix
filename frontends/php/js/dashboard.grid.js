@@ -31,7 +31,7 @@
 			))
 		;
 
-		if (!widget['widget_of_iterator']) {
+		if (!widget['parent']) {
 			widget['content_header'].append(
 				$('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
 					.append((data['options']['editable'] && !data['options']['kioskmode'])
@@ -116,7 +116,7 @@
 			'class': widget['iterator'] ? 'dashbrd-grid-widget-iterator' : 'dashbrd-grid-widget'
 		}).toggleClass('new-widget', widget['new_widget']);
 
-		if (!widget['widget_of_iterator']) {
+		if (!widget['parent']) {
 			$div
 				.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 				.css({
@@ -1341,21 +1341,21 @@
 				}
 			;
 
-			if (i < iterator['widgets_of_iterator'].length) {
-				iterator['widgets_of_iterator'][i]['div'].css(css);
+			if (i < iterator['children'].length) {
+				iterator['children'][i]['div'].css(css);
 			}
 			else {
-				$placeholders.eq(i - iterator['widgets_of_iterator'].length).css(css);
+				$placeholders.eq(i - iterator['children'].length).css(css);
 			}
 		}
 	}
 
-	function addWidgetOfIterator($obj, data, iterator, widget_of_iterator) {
+	function addWidgetOfIterator($obj, data, iterator, child) {
 		// If no fields are given, 'fields' will contain empty array instead of simple object.
-		if (widget_of_iterator['fields'].length === 0) {
-			widget_of_iterator['fields'] = {};
+		if (child['fields'].length === 0) {
+			child['fields'] = {};
 		}
-		widget_of_iterator = $.extend({
+		child = $.extend({
 			'widgetid': '',
 			'type': '',
 			'header': '',
@@ -1367,22 +1367,22 @@
 			'ready': false,
 			'fields': {},
 			'storage': {}
-		}, widget_of_iterator, {
+		}, child, {
 			'rf_rate': 0,
 			'iterator': false,
-			'widget_of_iterator': iterator,
+			'parent': iterator,
 			'new_widget': false
 		});
 
-		widget_of_iterator['uniqueid'] = generateUniqueId($obj, data);
-		widget_of_iterator['div'] = makeWidgetDiv($obj, data, widget_of_iterator);
+		child['uniqueid'] = generateUniqueId($obj, data);
+		child['div'] = makeWidgetDiv($obj, data, child);
 
-		updateWidgetDynamic($obj, data, widget_of_iterator);
+		updateWidgetDynamic($obj, data, child);
 
-		iterator['content_body'].append(widget_of_iterator['div']);
-		iterator['widgets_of_iterator'].push(widget_of_iterator);
+		iterator['content_body'].append(child['div']);
+		iterator['children'].push(child);
 
-		showPreloader(widget_of_iterator);
+		showPreloader(child);
 	}
 
 	function updateWidgetIteratorCallback($obj, data, iterator, response) {
@@ -1397,7 +1397,7 @@
 		}
 
 		iterator['content_body'].empty();
-		iterator['widgets_of_iterator'] = [];
+		iterator['children'] = [];
 
 		if (getIteratorTooSmallState(iterator)) {
 			iterator['update_pending'] = true;
@@ -1414,24 +1414,22 @@
 				iterator['update_pending'] = true;
 			}
 			else {
-				var widgets_of_iterator = response.widgets_of_iterator.slice(0,
-					numIteratorColumns(iterator) * numIteratorRows(iterator)
-				);
+				var children = response.children.slice(0, numIteratorColumns(iterator) * numIteratorRows(iterator));
 
-				$.each(widgets_of_iterator, function(index, widget_of_iterator) {
-					addWidgetOfIterator($obj, data, iterator, widget_of_iterator);
+				$.each(children, function(index, child) {
+					addWidgetOfIterator($obj, data, iterator, child);
 				});
 
 				addIteratorPlaceholders(iterator,
-					numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['widgets_of_iterator'].length
+					numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['children'].length
 				);
 
 				positionWidgetsOfIterator($obj, data, iterator,
 					(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
 				);
 
-				$.each(iterator['widgets_of_iterator'], function(index, widget_of_iterator) {
-					updateWidgetContent($obj, data, widget_of_iterator);
+				$.each(iterator['children'], function(index, child) {
+					updateWidgetContent($obj, data, child);
 				});
 			}
 		}
@@ -1495,12 +1493,12 @@
 	}
 
 	function isDeletedWidget($obj, data, widget) {
-		if (widget['widget_of_iterator']) {
-			if (isDeletedWidget($obj, data, widget['widget_of_iterator'])) {
+		if (widget['parent']) {
+			if (isDeletedWidget($obj, data, widget['parent'])) {
 				return true;
 			}
 
-			var search_widgets = widget['widget_of_iterator']['widgets_of_iterator'];
+			var search_widgets = widget['parent']['children'];
 		}
 		else {
 			var search_widgets = data['widgets'];
@@ -1521,26 +1519,26 @@
 		var check_dashboard_ready = false;
 
 		if (widget['iterator']) {
-			if (!widget['widgets_of_iterator'].length) {
+			if (!widget['children'].length) {
 				// Set empty iterator to ready state.
 
 				widget['ready'] = true;
 				check_dashboard_ready = true;
 			}
 		}
-		else if (widget['widget_of_iterator']) {
+		else if (widget['parent']) {
 			widget['ready'] = true;
 
-			var widgets_of_iterator = widget['widget_of_iterator']['widgets_of_iterator'],
-				widgets_of_iterator_not_ready = widgets_of_iterator.filter(function(widget) {
+			var children = widget['parent']['children'],
+				children_not_ready = children.filter(function(widget) {
 					return !widget['ready'];
 				})
 			;
 
-			if (!widgets_of_iterator_not_ready.length) {
+			if (!children_not_ready.length) {
 				// Set parent iterator to ready state.
 
-				widget['widget_of_iterator']['ready'] = true;
+				widget['parent']['ready'] = true;
 				check_dashboard_ready = true;
 			}
 		}
@@ -1573,7 +1571,7 @@
 
 		if (widget['iterator']) {
 			widget['content_body'].empty();
-			widget['widgets_of_iterator'] = [];
+			widget['children'] = [];
 
 			var pos = (typeof widget['current_pos'] === "object") ? widget['current_pos'] : widget['pos'];
 			if (isIteratorTooSmall(widget, pos)) {
@@ -1734,13 +1732,14 @@
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: ajax_data,
-			success: function(resp) {
-				if (typeof resp.errors !== 'undefined') {
+			data: ajax_data
+		})
+			.done(function(response) {
+				if (typeof response.errors !== 'undefined') {
 					// Error returned. Remove previous errors.
 
 					$('.msg-bad', data.dialogue['body']).remove();
-					data.dialogue['body'].prepend(resp.errors);
+					data.dialogue['body'].prepend(response.errors);
 				}
 				else {
 					// No errors, proceed with update.
@@ -1821,8 +1820,7 @@
 					// Mark dashboard as updated.
 					data['options']['updated'] = true;
 				}
-			}
-		})
+			})
 			.always(function() {
 				if ($placeholder) {
 					$placeholder.remove();
@@ -2194,8 +2192,8 @@
 		var index = widget['div'].data('widget-index');
 
 		if (widget['iterator']) {
-			widget['widgets_of_iterator'].forEach(function(widget_of_iterator) {
-				widget_of_iterator['div'].remove();
+			widget['children'].forEach(function(child) {
+				child['div'].remove();
 			});
 		}
 
@@ -2261,28 +2259,29 @@
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: ajax_data,
-			success: function(resp) {
+			data: ajax_data
+		})
+			.done(function(response) {
 				// We can have redirect with errors.
-				if ('redirect' in resp) {
+				if ('redirect' in response) {
 					// There are no more unsaved changes.
 					data['options']['updated'] = false;
 					/*
 					 * Replace add possibility to remove previous url (as ..&new=1) from the document history.
 					 * It allows to use back browser button more user-friendly.
 					 */
-					window.location.replace(resp.redirect);
+					window.location.replace(response.redirect);
 				}
-				else if ('errors' in resp) {
+				else if ('errors' in response) {
 					// Error returned.
-					dashboardAddMessages(resp.errors);
+					dashboardAddMessages(response.errors);
 				}
-			},
-			complete: function() {
+			})
+			.always(function() {
 				var ul = $('#dashbrd-config').closest('ul');
 				$('#dashbrd-save', ul).prop('disabled', false);
-			}
-		});
+			})
+		;
 	}
 
 	function confirmExit($obj, data) {
@@ -2454,7 +2453,7 @@
 					options: options,
 					widget_defaults: {},
 					widgets: [],
-					widgets_of_iterator: {},
+					children: {},
 					triggers: {},
 					placeholder: $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).hide().appendTo($this),
 					new_widget_placeholder: new_widget_placeholder,
@@ -2550,7 +2549,7 @@
 				'fields': {},
 				'storage': {},
 			}, widget, {
-				'widget_of_iterator': false,
+				'parent': false,
 			});
 
 			if (typeof widget['new_widget'] === 'undefined') {
@@ -2570,7 +2569,7 @@
 
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
-						'widgets_of_iterator': [],
+						'children': [],
 						'update_pending': false,
 						'padding': false
 					});
@@ -2825,15 +2824,16 @@
 									.addClass('preloader-container')
 									.append($('<div>').addClass('preloader'))
 								));
-					},
-					success: function(resp) {
+					}
+				})
+					.done(function(response) {
 						body.empty();
-						body.append(resp.body);
-						if (typeof resp.debug !== 'undefined') {
-							body.append(resp.debug);
+						body.append(response.body);
+						if (typeof response.debug !== 'undefined') {
+							body.append(response.debug);
 						}
-						if (typeof resp.messages !== 'undefined') {
-							body.append(resp.messages);
+						if (typeof response.messages !== 'undefined') {
+							body.append(response.messages);
 						}
 
 						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
@@ -2846,8 +2846,8 @@
 
 						// Enable save button after successful form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
-					},
-					complete: function() {
+					})
+					.always(function() {
 						if (data.dialogue['widget_type'] === 'svggraph') {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
 						}
@@ -2856,8 +2856,8 @@
 						}
 
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
-					}
-				});
+					})
+				;
 			});
 		},
 
