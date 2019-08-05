@@ -691,7 +691,7 @@ function convert_units($options = []) {
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
 		if (preg_match('/\.\d+$/', $options['value'])) {
 			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
-				? '%.'.ZBX_UNITS_ROUNDOFF_UPPER_LIMIT.'f'
+				? '%.'.ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT.'f'
 				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
 			$options['value'] = sprintf($format, $options['value']);
 		}

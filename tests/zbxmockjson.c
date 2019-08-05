@@ -24,6 +24,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
+#include "zbxmockjson.h"
 
 #define _FAIL(file, line, prefix, message, ...)						\
 											\
@@ -112,7 +113,7 @@ static void	json_flatten_object(struct zbx_json_parse *jp, const char *prefix, z
 {
 	const char	*pnext = NULL;
 	char		*path = NULL, key[MAX_STRING_LEN];
-	size_t		path_alloc = 0, path_offset = 0;
+	size_t		path_alloc = 0, path_offset;
 
 	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, key, sizeof(key))))
 	{
@@ -129,10 +130,9 @@ static void	json_flatten_object(struct zbx_json_parse *jp, const char *prefix, z
 
 static void	json_flatten_array(struct zbx_json_parse *jp, const char *parent, zbx_vector_ptr_pair_t *props)
 {
-	const char		*pnext;
-	char			*path, *value = NULL;
-	int			index = 0;
-
+	const char	*pnext;
+	char		*path, *value = NULL;
+	int		index = 0;
 
 	for (pnext = NULL; NULL != (pnext = zbx_json_next(jp, pnext));)
 	{
@@ -243,14 +243,14 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 		_FAIL(file, line, prefix_msg, "Did not expect key \"%s\"", pair_returned->first);
 	}
 
-	for (i = 0; i <  props_expected.values_num; i++)
+	for (i = 0; i < props_expected.values_num; i++)
 	{
 		zbx_free(props_expected.values[i].first);
 		zbx_free(props_expected.values[i].second);
 	}
 	zbx_vector_ptr_pair_destroy(&props_expected);
 
-	for (i = 0; i <  props_returned.values_num; i++)
+	for (i = 0; i < props_returned.values_num; i++)
 	{
 		zbx_free(props_returned.values[i].first);
 		zbx_free(props_returned.values[i].second);

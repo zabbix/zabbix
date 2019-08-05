@@ -26,4 +26,4 @@ void	__zbx_mock_assert_json_eq(const char *file, int line, const char *prefix_ms
 #define zbx_mock_assert_json_eq(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_json_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
-#endif /* BUILD_TESTS_ZBXMOCKDB_H_ */
+#endif

@@ -70,12 +70,13 @@ function getMessageSettings() {
 		$messages[$profile['source']] = $profile['value_str'];
 	}
 
-	if (is_null($messages['triggers.severities'])) {
+	if ($messages['triggers.severities'] === null) {
 		$messages['triggers.severities'] = $defSeverities;
 	}
 	else {
 		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
 	}
+
 	return $messages;
 }
 

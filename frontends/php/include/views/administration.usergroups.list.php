@@ -139,7 +139,7 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 				$users[] = ', ';
 			}
 
-			$users[] = (new CLink(getUserFullname($user), 'users.php?form=update&userid='.$user['userid']))
+			$users[] = (new CLink(getUserFullname($user), 'zabbix.php?action=user.edit&userid='.$user['userid']))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $user['users_status'] == GROUP_STATUS_DISABLED
 						? ZBX_STYLE_RED
@@ -152,7 +152,9 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupTable->addRow([
 		new CCheckBox('group_groupid['.$userGroupId.']', $userGroupId),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[new CLink(_('Users'), 'users.php?filter_usrgrpid='.$userGroupId), CViewHelper::showNum(count($usrgrp['users']))],
+		[new CLink(_('Users'), 'zabbix.php?action=user.list&filter_usrgrpid='.$userGroupId),
+			CViewHelper::showNum(count($usrgrp['users']))
+		],
 		$users,
 		$guiAccess,
 		$debugMode,

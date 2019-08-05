@@ -1082,51 +1082,65 @@ td.inactive-bg {
 .icon-action-command::before {
 	background-position: -249px -325px;
 }
+
 .icon-action-close::before {
 	background-position: -224px -325px;
 }
+
 .icon-action-msg::before {
 	background-position: -299px -325px;
 }
+
 .icon-action-severity-up::before {
 	background-position: -349px -325px;
 }
+
 .icon-action-severity-down::before {
 	background-position: -374px -325px;
 }
+
 .icon-action-severity-changed::before {
 	background-position: -399px -325px;
 }
+
 .icon-action-message::before {
 	background-position: -199px -325px;
 }
+
 .icon-action-ack::before {
 	background-position: -323px -325px;
 }
+
 .icon-invisible::before {
 	background-position: -401px -803px;
 }
+
 .icon-problem-generated::before {
 	background-position: -449px -325px;
 }
+
 .icon-problem-recovery::before {
 	background-position: -424px -325px;
 }
+
 .icon-action-msgs {
 	&::before {
 		background-position: -474px -325px;
 	}
 }
+
 .icon-actions-number-gray {
 	&::before {
 		background-position: -499px -325px;
 	}
 }
+
 .icon-actions-number-yellow {
 	&::before {
 		background-position: -549px -325px;
 	}
 }
+
 .icon-actions-number-red {
 	&::before {
 		background-position: -524px -325px;
@@ -1134,7 +1148,9 @@ td.inactive-bg {
 }
 
 // OVERRIDES
+
 .overrides-options-list {
+
 	> li > div {
 		border: 1px solid $ui-tab-bg-selected-color;
 		background-color: transparent !important;
@@ -1143,5 +1159,32 @@ td.inactive-bg {
 			border: none !important;
 			top: 0;
 		}
+	}
+}
+
+// WIDGET HOST AVAILABILITY
+
+.host-avail-widget {
+
+	tr {
+		border-top: 1px solid $ui-border-color;
+	}
+
+	&.host-avail-layout-horizontal {
+
+		td:not(:last-of-type) {
+			border-right: 1px solid $ui-border-color;
+		}
+	}
+
+	.host-avail-count {
+		font-weight: bold;
+	}
+
+	.host-avail-true,
+	.host-avail-false,
+	.host-avail-unknown,
+	.host-avail-total {
+		background: transparent;
 	}
 }
