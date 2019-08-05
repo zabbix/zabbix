@@ -54,8 +54,8 @@ type Configurator interface {
 
 type ResultWriter interface {
 	Write(result *Result)
-	IsFull() bool
-	IsPersistentFull() bool
+	SlotsAvailable() bool
+	PersistSlotsAvailable() bool
 }
 
 type Result struct {

@@ -417,3 +417,47 @@ func TestBufferFull5OneItemPersistent(t *testing.T) {
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
 }
+
+func TestBufferFull10PersistentAndNormal(t *testing.T) {
+	input := []*plugin.Result{
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 2},
+		&plugin.Result{Itemid: 3},
+		&plugin.Result{Itemid: 4},
+		&plugin.Result{Itemid: 5},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 7},
+		&plugin.Result{Itemid: 8},
+		&plugin.Result{Itemid: 9},
+		&plugin.Result{Itemid: 10},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 1, Persistent: true},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 6},
+		&plugin.Result{Itemid: 11},
+		&plugin.Result{Itemid: 12},
+		&plugin.Result{Itemid: 13},
+	}
+
+	expected := []*AgentData{
+		&AgentData{Id: 1, Itemid: 1, persistent: true},
+		&AgentData{Id: 10, Itemid: 10},
+		&AgentData{Id: 11, Itemid: 1, persistent: true},
+		&AgentData{Id: 12, Itemid: 1, persistent: true},
+		&AgentData{Id: 13, Itemid: 1, persistent: true},
+		&AgentData{Id: 14, Itemid: 1, persistent: true},
+		&AgentData{Id: 15, Itemid: 1, persistent: true},
+		&AgentData{Id: 17, Itemid: 6},
+		&AgentData{Id: 18, Itemid: 11},
+		&AgentData{Id: 19, Itemid: 12},
+		&AgentData{Id: 20, Itemid: 13},
+	}
+
+	_ = log.Open(log.Console, log.Debug, "")
+	agent.Options.BufferSize = 10
+	cache := NewActive(0, nil)
+	checkBuffer(t, cache, input, expected)
+}

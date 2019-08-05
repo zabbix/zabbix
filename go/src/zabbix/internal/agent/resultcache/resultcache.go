@@ -17,6 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+// package resultcache provides result caching component.
+//
+// ResultCache runs in separate goroutine, caches results and flushes data to the
+// specified output interface in json format when requested or cache is full.
+// The cache limits are specified by configuration file (BufferSize). If cache
+// limits are reached the following logic is applied to new results:
+// * non persistent results replaces either oldest result of the same item, or
+//   oldest non persistent result if item was not yet cached.
+// * persistent results replaces oldest non persistent result if the total number
+//   of persistent results is less than half maximum cache size. Otherwise the result
+//   is appended, extending cache beyond configured limit.
+//
+// Because of asynchronous nature of the communications it's not possible for
+// result cache to return error if it cannot accept new persistent result. So
+// instead before writing result to the cache the caller (plugin) must check
+// the result cache state with PersistSlotsAvailable() function. This still
+// can lead to more results written than cache limits allow. However it's not a
+// big problem because cache buffer is not static and will be extended as required.
+// The cache limit (BufferSize) is treated more like recommendation than hard limit.
+//
 package resultcache
 
 import (
@@ -67,11 +87,11 @@ type AgentData struct {
 }
 
 type AgentDataRequest struct {
-	Request   string       `json:"request"`
-	Data      []*AgentData `json:"data"`
-	Sessionid string       `json:"sessionid"`
-	Host      string       `json:"host"`
-	Version   string       `json:"version"`
+	Request string       `json:"request"`
+	Data    []*AgentData `json:"data"`
+	Session string       `json:"session"`
+	Host    string       `json:"host"`
+	Version string       `json:"version"`
 }
 
 type Uploader interface {
@@ -86,11 +106,11 @@ func (c *ResultCache) flushOutput(u Uploader) {
 	}
 
 	request := AgentDataRequest{
-		Request:   "agent data",
-		Data:      c.results,
-		Sessionid: c.token,
-		Host:      agent.Options.Hostname,
-		Version:   "TODO",
+		Request: "agent data",
+		Data:    c.results,
+		Session: c.token,
+		Host:    agent.Options.Hostname,
+		Version: "TODO",
 	}
 
 	var err error
@@ -129,6 +149,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 	atomic.StoreUint32(&c.state, cacheStateNormal)
 }
 
+// addResult appends received result at the end of results slice
 func (c *ResultCache) addResult(result *AgentData) {
 	if len(c.results) == cap(c.results) {
 		newResults := make([]*AgentData, cap(c.results), cap(c.results)+16)
@@ -156,6 +177,8 @@ func (c *ResultCache) addResult(result *AgentData) {
 	atomic.StoreUint32(&c.state, state)
 }
 
+// insertResult attempts to insert the received result into results slice by replacing existing value.
+// If no appropriate target was found it calls addResult to append value.
 func (c *ResultCache) insertResult(result *AgentData) {
 	index := -1
 	if !result.persistent {
@@ -309,11 +332,10 @@ func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
 	c.input <- options
 }
 
-func (c *ResultCache) IsFull() bool {
-
+func (c *ResultCache) SlotsAvailable() bool {
 	return atomic.LoadUint32(&c.state)&cacheStateFull != 0
 }
 
-func (c *ResultCache) IsPersistentFull() bool {
+func (c *ResultCache) PersistSlotsAvailable() bool {
 	return atomic.LoadUint32(&c.state)&cacheStateLimited != 0
 }
