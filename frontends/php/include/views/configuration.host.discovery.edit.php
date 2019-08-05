@@ -516,6 +516,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('Executed script'), 'params_es'))->setAsteriskMark(),
 		(new CTextArea('params_es', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'label_executed_script'
@@ -523,6 +524,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('SQL query'), 'params_ap'))->setAsteriskMark(),
 		(new CTextArea('params_ap', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'label_params'
