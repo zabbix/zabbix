@@ -949,7 +949,7 @@ function parseUrlString(url) {
 /**
  * Message formatting function.
  *
- * @param {string}       type            Message type. ('msg-good'|'msg-bad'|'msg-warning')
+ * @param {string}       type            Message type. ('good'|'bad'|'warning')
  * @param {string|array} messages        Array with details messages or message string with normal font.
  * @param {string}       title           Larger font title.
  * @param {bool}         show_close_box  Show close button.
@@ -958,10 +958,10 @@ function parseUrlString(url) {
  * @return {string}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = false) {
-	var classes = ['msg-good', 'msg-bad', 'msg-warning'],
-		index = classes.indexOf(type);
+	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
+		msg_class = classes[type];
 
-	if (index === -1) {
+	if (msg_class === undefined) {
 		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
 	}
 
@@ -969,10 +969,10 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		$msg_details = jQuery('<div>')
 			.addClass('msg-details')
 			.append($list),
-		aria_labels = [t('Success message'), t('Error message'), t('Warning message')],
+		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
 		$msg_box = jQuery('<output>')
-			.addClass(type).attr('role', 'contentinfo')
-			.attr('aria-label', aria_labels[index]),
+			.addClass(msg_class).attr('role', 'contentinfo')
+			.attr('aria-label', aria_labels[type]),
 		$details_arrow = jQuery('<span>')
 			.attr('id', 'details-arrow')
 			.addClass(show_details ? 'arrow-up' : 'arrow-down'),
