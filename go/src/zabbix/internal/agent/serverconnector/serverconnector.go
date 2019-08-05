@@ -71,7 +71,7 @@ func ParseServerActive() ([]string, error) {
 			}
 			addresses[i] += ":10051"
 		} else {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+			if _, _, err := net.SplitHostPort(addresses[i]); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
 			}
 		}

@@ -79,7 +79,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Data:      make([]AgentData, len(c.results)),
 		Sessionid: c.token,
 		Host:      agent.Options.Hostname,
-		Version:   "TODO",
+		Version:   "4.4", // TODO
 	}
 
 	lastDataID := c.lastDataID
