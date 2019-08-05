@@ -1437,7 +1437,7 @@
 
 		if (iterator['update_attempts'] == 1) {
 			iterator['update_attempts'] = 0;
-			startWidgetRefresh($obj, data, iterator, iterator['rf_rate']);
+			startWidgetRefresh($obj, data, iterator);
 			doAction('onContentUpdated', $obj, data, null);
 		}
 		else {
@@ -1566,7 +1566,7 @@
 		}
 		else if (widget['update_paused'] == true) {
 			widget['update_attempts'] = 0;
-			startWidgetRefresh($obj, data, widget, widget['rf_rate']);
+			startWidgetRefresh($obj, data, widget);
 			return;
 		}
 
