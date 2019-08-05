@@ -262,7 +262,6 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 {
 	char	buffer[MAX_STRING_LEN];
 	char	*err = NULL;
-
 	zbx_strlcpy(buffer, params, sizeof(buffer));
 
 	zbx_trim_float(buffer);
@@ -1340,6 +1339,8 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 		zbx_lrtrim(*error, " \t\n\r");
 		if ('\0' == **error)
 			zbx_free(*error);
+		else
+			ret = FAIL;
 	}
 out:
 	zbx_variant_clear(&value_str);
@@ -1435,6 +1436,8 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 	zbx_lrtrim(*error, " \t\n\r");
 	if ('\0' == **error)
 		zbx_free(*error);
+	else
+		ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
 
@@ -1506,6 +1509,8 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 		zbx_lrtrim(*error, " \t\n\r");
 		if ('\0' == **error)
 			zbx_free(*error);
+		else
+			ret = FAIL;
 	}
 out:
 	zbx_variant_clear(&value_str);
