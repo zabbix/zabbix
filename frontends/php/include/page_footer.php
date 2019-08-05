@@ -31,7 +31,7 @@ if (!defined('PAGE_HEADER_LOADED')) {
 }
 
 // last page
-if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
+if (!defined('ZBX_PAGE_NO_MENU')) {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 }
 

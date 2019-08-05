@@ -29,6 +29,8 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char	program_type;
+
 static int	DBpatch_4030000(void)
 {
 	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -121,6 +123,26 @@ static int	DBpatch_4030010(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030011(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter.usrgrpid'"
+				" where idx='web.users.filter.usrgrpid'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sort'"
+				" where idx='web.users.php.sort'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sortorder'"
+				" where idx='web.users.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4030)
@@ -138,5 +160,6 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
+DBPATCH_ADD(4030011, 0, 1)
 
 DBPATCH_END()
