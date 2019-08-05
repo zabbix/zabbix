@@ -3494,13 +3494,13 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   border: 2px solid #ffc859;
   background-color: #fff; }
   .msg-warning .link-action {
-    color: #033003;
+    color: #4d4014;
     margin-right: 10px;
     font-size: 0.85em; }
     .msg-warning .link-action .arrow-up {
-      border-bottom-color: #033003; }
+      border-bottom-color: #4d4014; }
     .msg-warning .link-action .arrow-down {
-      border-top-color: #033003; }
+      border-top-color: #4d4014; }
   .msg-warning .overlay-close-btn {
     color: #333; }
   .msg-warning ul {

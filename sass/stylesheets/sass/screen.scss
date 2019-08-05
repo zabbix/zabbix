@@ -5096,15 +5096,15 @@ td.inactive-bg {
 	@extend %msg;
 
 	.link-action {
-		color: darken(desaturate($green, 10%), 20%);
+		color: darken(desaturate($yellow, 10%), 20%);
 		margin-right: 10px;
 		font-size: $font-msg-reset-size;
 
 		.arrow-up {
-			border-bottom-color: darken(desaturate($green, 10%), 20%);
+			border-bottom-color: darken(desaturate($yellow, 10%), 20%);
 		}
 		.arrow-down {
-			border-top-color: darken(desaturate($green, 10%), 20%);
+			border-top-color: darken(desaturate($yellow, 10%), 20%);
 		}
 	}
 

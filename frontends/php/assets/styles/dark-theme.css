@@ -3531,13 +3531,13 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   border: 2px solid #ffc859;
   background-color: #2b2b2b; }
   .msg-warning .link-action {
-    color: #2f9f5e;
+    color: #4d4014;
     margin-right: 10px;
     font-size: 0.85em; }
     .msg-warning .link-action .arrow-up {
-      border-bottom-color: #2f9f5e; }
+      border-bottom-color: #4d4014; }
     .msg-warning .link-action .arrow-down {
-      border-top-color: #2f9f5e; }
+      border-top-color: #4d4014; }
   .msg-warning .overlay-close-btn {
     color: #737373; }
   .msg-warning ul {
