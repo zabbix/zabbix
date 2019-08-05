@@ -987,6 +987,8 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			$link_details = jQuery('<a>')
 				.text(t('Details') + ' ')
 				.addClass('link-action')
+				.attr('href', 'javascript:void(0)')
+				.attr('role', 'button')
 				.append($details_arrow)
 				.attr('aria-expanded', show_details ? 'true' : 'false');
 
