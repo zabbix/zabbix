@@ -102,10 +102,10 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			natsort($graphs_collected);
 		}
 
-		$widgets_of_iterator = [];
+		$children = [];
 
 		foreach ($graphs_collected as $graphid => $name) {
-			$widgets_of_iterator[] = [
+			$children[] = [
 				'widgetid' => (string) $graphid,
 				'type' => 'graph',
 				'header' => $name,
@@ -120,7 +120,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'header' =>
 				$this->getInput('name', $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name']),
 
-			'widgets_of_iterator' => $widgets_of_iterator
+			'children' => $children
 		];
 	}
 
@@ -179,10 +179,10 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			natsort($items_collected);
 		}
 
-		$widgets_of_iterator = [];
+		$children = [];
 
 		foreach ($items_collected as $itemid => $name) {
-			$widgets_of_iterator[] = [
+			$children[] = [
 				'widgetid' => (string) $itemid,
 				'type' => 'graph',
 				'header' => $name,
@@ -197,7 +197,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'header' =>
 				$this->getInput('name', $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name']),
 
-			'widgets_of_iterator' => $widgets_of_iterator
+			'children' => $children
 		];
 	}
 }

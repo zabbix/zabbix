@@ -4976,7 +4976,7 @@ table.preprocessing-test-results .rel-container {
 
 
 
-.dashbrd-grid-widget-iterator {
+.dashbrd-grid-iterator {
 	position: absolute;
 }
 .dashbrd-grid-widget-container.iterator {
@@ -4993,11 +4993,11 @@ table.preprocessing-test-results .rel-container {
 	border: 0;
 	background-color: transparent;
 }
-.dashbrd-grid-widget-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-widget-container.iterator {
+.dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-widget-container.iterator {
 	top: auto;
 	bottom: 0;
 }
-.dashbrd-grid-widget-iterator.ui-resizable-resizing.resizing-left .dashbrd-grid-widget-container.iterator {
+.dashbrd-grid-iterator.ui-resizable-resizing.resizing-left .dashbrd-grid-widget-container.iterator {
 	left: auto;
 	right: 0;
 }
@@ -5008,12 +5008,12 @@ table.preprocessing-test-results .rel-container {
 	margin: 0.25rem;
 	display: none;
 }
-.dashbrd-grid-widget-iterator.ui-resizable-resizing .dashbrd-grid-widget-head.iterator,
-.dashbrd-grid-widget-iterator:hover .dashbrd-grid-widget-head.iterator,
-.dashbrd-grid-widget-iterator.ui-draggable-dragging .dashbrd-grid-widget-head.iterator {
+.dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-widget-head.iterator,
+.dashbrd-grid-iterator:hover .dashbrd-grid-widget-head.iterator,
+.dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-widget-head.iterator {
 	display: block;
 }
-.dashbrd-grid-widget-iterator.iterator-messages .dashbrd-grid-widget-content.iterator {
+.dashbrd-grid-iterator.iterator-messages .dashbrd-grid-widget-content.iterator {
 	position: absolute;
 	top: 0.25rem;
 	left: 0.25rem;
@@ -5025,16 +5025,16 @@ table.preprocessing-test-results .rel-container {
 	border: 1px solid #dfe4e7;
 	background-color: #fff;
 }
-.dashbrd-grid-widget-iterator-placeholder {
+.dashbrd-grid-iterator-placeholder {
 	position: absolute;
 	display: flex;
 	opacity: 0;
 	transition: opacity 0.2s ease-out;
 }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-iterator-placeholder {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-placeholder {
 	opacity: 1;
 }
-.dashbrd-grid-widget-iterator-placeholder div {
+.dashbrd-grid-iterator-placeholder div {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
@@ -5046,7 +5046,7 @@ table.preprocessing-test-results .rel-container {
 .dashbrd-grid-widget-placeholder.iterator {
 	visibility: hidden;
 }
-.dashbrd-grid-widget-iterator-too-small {
+.dashbrd-grid-iterator-too-small {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -5058,13 +5058,13 @@ table.preprocessing-test-results .rel-container {
 
 	display: none;
 }
-.dashbrd-grid-widget-iterator.iterator-too-small .dashbrd-grid-widget-iterator-too-small {
+.dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-too-small {
 	display: block;
 }
-.dashbrd-grid-widget-iterator.iterator-too-small .dashbrd-grid-widget-content.iterator {
+.dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-widget-content.iterator {
 	display: none;
 }
-.dashbrd-grid-widget-iterator-too-small > div {
+.dashbrd-grid-iterator-too-small > div {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

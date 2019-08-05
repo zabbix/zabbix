@@ -98,7 +98,7 @@
 
 		if (widget['iterator']) {
 			widget['container']
-				.append($('<div>', {'class': 'dashbrd-grid-widget-iterator-too-small'})
+				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
 					.append($('<div>')
 						.html(t('Widget is too small for the specified number of columns and rows.'))
 					)
@@ -113,7 +113,7 @@
 		}
 
 		var $div = $('<div>', {
-			'class': widget['iterator'] ? 'dashbrd-grid-widget-iterator' : 'dashbrd-grid-widget'
+			'class': widget['iterator'] ? 'dashbrd-grid-iterator' : 'dashbrd-grid-widget'
 		}).toggleClass('new-widget', widget['new_widget']);
 
 		if (!widget['parent']) {
@@ -1295,7 +1295,7 @@
 	function addIteratorPlaceholders(iterator, count) {
 		for (var index = 0; index < count; index++) {
 			iterator['content_body'].append(
-				$('<div>', {'class': 'dashbrd-grid-widget-iterator-placeholder'}).append('<div>')
+				$('<div>', {'class': 'dashbrd-grid-iterator-placeholder'}).append('<div>')
 			);
 		}
 	}
@@ -1317,7 +1317,7 @@
 
 		setIteratorTooSmallState(iterator, false);
 
-		var $placeholders = iterator['content_body'].find('.dashbrd-grid-widget-iterator-placeholder'),
+		var $placeholders = iterator['content_body'].find('.dashbrd-grid-iterator-placeholder'),
 			num_columns = numIteratorColumns(iterator),
 			num_rows = numIteratorRows(iterator)
 		;
