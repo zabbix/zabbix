@@ -1271,8 +1271,6 @@
 				}
 			}, rf_rate * 1000);
 		}
-
-		startWidgetRefresh($obj, data, widget);
 	}
 
 	function setIteratorTooSmallState(iterator, enabled) {
