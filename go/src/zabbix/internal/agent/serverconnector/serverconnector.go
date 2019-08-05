@@ -87,6 +87,14 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
+type hostMetadataWriter struct {
+	input chan *plugin.Result
+}
+
+func (h hostMetadataWriter) Write(result *plugin.Result) {
+	h.input <- result
+}
+
 // Write function is used by ResultCache to print diagnostic information. It will be callled from
 // different goroutine.
 func (c *Connector) Addr() (s string) {
@@ -96,11 +104,24 @@ func (c *Connector) Addr() (s string) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
+	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: "4.4"}
+
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
-	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: "4.4",
-		HostMetadata: agent.Options.HostMetadata})
+	if len(agent.Options.HostMetadata) > 0 {
+		a.HostMetadata = agent.Options.HostMetadata
+	} else if len(agent.Options.HostMetadataItem) > 0 {
+		log.Debugf("[%d] retrieving HostMetadataItem [%s]", c.clientID, agent.Options.HostMetadataItem)
+		h := hostMetadataWriter{input: make(chan *plugin.Result)}
+
+		c.taskManager.UpdateTasks(0, h, []*plugin.Request{{Key: agent.Options.HostMetadataItem}})
+		r := <-h.input
+		a.HostMetadata = *r.Value
+		log.Debugf("[%d] retrieved HostMetadataItem [%s] value [%s]", c.clientID, agent.Options.HostMetadataItem, a.HostMetadata)
+	}
+
+	request, err := json.Marshal(&a)
 	if err != nil {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address, err)
 		return
