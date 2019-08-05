@@ -109,13 +109,14 @@ class CControllerAcknowledgeCreate extends CController {
 				foreach ($eventid_chunks as $eventid_chunk) {
 					$data['eventids'] = $eventid_chunk;
 					$result = API::Event()->acknowledge($data);
+
+					// Do not continue if event.acknowledge validation fails.
+					if (!$result) {
+						break 2;
+					}
+
 					$updated_events_count += count($data['eventids']);
 				}
-			}
-
-			// Do not continue if event.acknowledge validation fails.
-			if (!$result) {
-				break 2;
 			}
 		}
 
