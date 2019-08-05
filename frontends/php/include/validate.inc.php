@@ -343,7 +343,7 @@ function check_field(&$fields, &$field, $checks) {
 
 	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
 		if ($validation == NOT_EMPTY) {
-			info(_s('Incorrect value for field "%1$s": cannot be empty.', $caption));
+			info(_s('Incorrect value for field "%1$s": %2$s.', $caption, _('cannot be empty')));
 		}
 
 		// check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&

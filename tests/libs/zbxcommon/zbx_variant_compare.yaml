@@ -414,5 +414,27 @@ in:
     value: 12 34 56 78 90
 out:
   return: less
+---
+test case: none < uint64
+in:
+  value1:
+    type: ZBX_VARIANT_NONE
+    value:
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 123
+out:
+  return: less
+---
+test case: uint64 > none
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 123
+  value2:
+    type: ZBX_VARIANT_NONE
+    value:
+out:
+  return: greater
 ...
 

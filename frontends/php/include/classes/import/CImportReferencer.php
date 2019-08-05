@@ -613,16 +613,6 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add screen name association with screen id.
-	 *
-	 * @param string $name
-	 * @param string $screenId
-	 */
-	public function addScreenRef($name, $screenId) {
-		$this->screensRefs[$name] = $screenId;
-	}
-
-	/**
 	 * Add template screen name association with template screen ID.
 	 *
 	 * @param string $screenName

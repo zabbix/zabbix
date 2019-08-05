@@ -17,9 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "jsonpath_next_test.h"
+#ifndef ZABBIX_JSON_H
+#define ZABBIX_JSON_H
 
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type)
-{
-	return jsonpath_next(path, pnext, loc, type);
-}
+#define SKIP_WHITESPACE(src)	\
+	while ('\0' != *(src) && NULL != strchr(ZBX_WHITESPACE, *(src))) (src)++
+
+/* can only be used on non empty string */
+#define SKIP_WHITESPACE_NEXT(src)\
+	(src)++; \
+	SKIP_WHITESPACE(src)
+
+void	zbx_set_json_strerror(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
+
+#endif

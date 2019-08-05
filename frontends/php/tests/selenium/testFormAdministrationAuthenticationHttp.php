@@ -307,7 +307,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						],
 						[
-							'page' => 'users.php',
+							'page' => 'zabbix.php?action=user.list',
 							'error' => 'Access denied'
 						],
 //						// Redirect to HTTP login form and user is signed on hosts page.
@@ -362,7 +362,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						],
 						[
-							'page' => 'users.php',
+							'page' => 'zabbix.php?action=user.list',
 							'error' => 'Access denied'
 						],
 //						// wait for ZBX-14774.
@@ -535,12 +535,12 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 			// Check user data in DB after login.
 			$session = $this->webDriver->manage()->getCookieNamed(ZBX_SESSION_NAME);
-			$user_data = DBfetch(DBselect(
+			$user_data = CDBHelper::getRow(
 				'SELECT u.alias'.
 				' FROM users u,sessions s'.
 				' WHERE u.userid=s.userid'.
 					' AND sessionid='.zbx_dbstr($session['value'])
-			));
+			);
 			if (array_key_exists('user_case_sensitive', $data)) {
 				$this->assertEquals($user_data['alias'], $data['user_case_sensitive']);
 			}

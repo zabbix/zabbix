@@ -420,10 +420,6 @@ class CConfigurationImport {
 						case SCREEN_RESOURCE_MAP:
 							$mapsRefs[$resource['name']] = $resource['name'];
 							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$screensRefs[$resource['name']] = $resource['name'];
-							break;
 					}
 				}
 			}

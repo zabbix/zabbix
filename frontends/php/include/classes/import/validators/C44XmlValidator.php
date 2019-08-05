@@ -1581,7 +1581,6 @@ class C44XmlValidator {
 					break;
 
 				case SCREEN_RESOURCE_MAP:
-				case SCREEN_RESOURCE_SCREEN:
 				case SCREEN_RESOURCE_TRIGGER_OVERVIEW:
 				case SCREEN_RESOURCE_DATA_OVERVIEW:
 					$rules = ['type' => XML_ARRAY, 'rules' => [

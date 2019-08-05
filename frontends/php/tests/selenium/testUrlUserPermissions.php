@@ -156,7 +156,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'screens.php?elementid=200009',
+				'url' => 'screens.php?elementid=200000',
 				'title' =>	'Custom screens [refreshed every 30 sec.]',
 				'no_permissions_to_object' => true,
 				'users' => [
@@ -660,7 +660,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'users.php',
+				'url' => 'zabbix.php?action=user.list',
 				'title' =>	'Configuration of users',
 				'users' => [
 					'guest' => false,
@@ -707,7 +707,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'profile.php',
+				'url' => 'zabbix.php?action=userprofile.edit',
 				'title' =>	'User profile',
 				'header' => 'User profile: ',
 				'users' => [
@@ -744,7 +744,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
 				$this->zbxTestCheckTitle($data['title']);
-				if ($data['url'] == 'profile.php') {
+				if ($data['url'] === 'zabbix.php?action=userprofile.edit') {
 					$this->zbxTestCheckHeader($data['header'].$alias);
 				}
 				else {
