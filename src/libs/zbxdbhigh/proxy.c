@@ -3632,7 +3632,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 		if (SUCCEED != DCconfig_get_hostid_by_name(tmp, &hostid))
 		{
 			*info = zbx_dsprintf(*info, "unknown host '%s'", tmp);
-			ret = FAIL;
+			ret = SUCCEED;
 			goto out;
 		}
 
