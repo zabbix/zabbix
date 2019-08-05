@@ -5131,6 +5131,18 @@ void	zbx_trim_float(char *str)
 	zbx_trim_number(str, 0);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_component_version                                        *
+ *                                                                            *
+ * Purpose: extracts protocol version from value                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     value      - [IN] textual representation of version                    *
+ *                                                                            *
+ * Return value: The protocol version if it was successfully extracted,       *
+ *               otherwise -1                                                 *
+ ******************************************************************************/
 int	zbx_get_component_version(char *value)
 {
 	char	*pminor, *ptr;

@@ -4499,7 +4499,7 @@ void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int com
 
 	if (0 != (diff.flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION) && 0 != proxy->version)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
+		zabbix_log(LOG_LEVEL_DEBUG, "proxy \"%s\" protocol version updated from %d.%d to %d.%d", proxy->host,
 				ZBX_COMPONENT_VERSION_MAJOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MINOR(proxy->version),
 				ZBX_COMPONENT_VERSION_MAJOR(diff.version),
