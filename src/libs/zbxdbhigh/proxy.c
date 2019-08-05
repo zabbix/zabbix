@@ -127,9 +127,6 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
 					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
 					ZBX_PROTO_TAG_JMX_ERROR};
 
-static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
-		void *validator_args, struct zbx_json_parse *jp_data, zbx_data_session_t *session, char **info);
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_proxy_check_permissions                                      *
@@ -3265,6 +3262,111 @@ static int	proxy_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, c
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_history_data_by_itemids                                  *
+ *                                                                            *
+ * Purpose: parses history data array and process the data                    *
+ *                                                                            *
+ * Parameters: proxy        - [IN] the proxy                                  *
+ *             jp_data      - [IN] JSON with history data array               *
+ *             session      - [IN] the data session                           *
+ *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
+ *                                     unique value of timestamps             *
+ *             info         - [OUT] address of a pointer to the info          *
+ *                                     string (should be freed by the caller) *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ * Comments: This function is used to parse the new proxy history data        *
+ *           protocol introduced in Zabbix v3.3.                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
+		void *validator_args, struct zbx_json_parse *jp_data, zbx_data_session_t *session, char **info)
+{
+	const char		*pnext = NULL;
+	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
+	double			sec;
+	DC_ITEM			*items;
+	char			*error = NULL;
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
+	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
+	zbx_timespec_t		unique_shift = {0, 0};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
+
+	sec = zbx_time();
+
+	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
+			&unique_shift, &error) && 0 != values_num)
+	{
+		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
+
+		for (i = 0; i < values_num; i++)
+		{
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			/* check and discard if duplicate data */
+			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_valueid)
+			{
+				DCconfig_clean_items(&items[i], &errcodes[i], 1);
+				errcodes[i] = FAIL;
+				continue;
+			}
+
+			if (SUCCEED != validator_func(&items[i], sock, validator_args, &error))
+			{
+				if (NULL != error)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					zbx_free(error);
+				}
+
+				DCconfig_clean_items(&items[i], &errcodes[i], 1);
+				errcodes[i] = FAIL;
+			}
+		}
+
+		processed_num += process_history_data(items, values, errcodes, values_num);
+
+		total_num += read_num;
+
+		if (NULL != session)
+			session->last_valueid = values[values_num - 1].id;
+
+		DCconfig_clean_items(items, errcodes, values_num);
+		zbx_agent_values_clean(values, values_num);
+
+		if (NULL == pnext)
+			break;
+	}
+
+	zbx_free(errcodes);
+	zbx_free(items);
+
+	if (NULL == error)
+	{
+		ret = SUCCEED;
+		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
+				processed_num, total_num - processed_num, total_num, zbx_time() - sec);
+	}
+	else
+	{
+		zbx_free(*info);
+		*info = error;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: agent_item_validator                                             *
  *                                                                            *
  * Purpose: validates item received from active agent                         *
@@ -4188,111 +4290,6 @@ int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
 	}
 	else
 		return ZBX_COMPONENT_VERSION(3, 2);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: process_history_data_by_itemids                                  *
- *                                                                            *
- * Purpose: parses history data array and process the data                    *
- *                                                                            *
- * Parameters: proxy        - [IN] the proxy                                  *
- *             jp_data      - [IN] JSON with history data array               *
- *             session      - [IN] the data session                           *
- *             unique_shift - [IN/OUT] auto increment nanoseconds to ensure   *
- *                                     unique value of timestamps             *
- *             info         - [OUT] address of a pointer to the info          *
- *                                     string (should be freed by the caller) *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- * Comments: This function is used to parse the new proxy history data        *
- *           protocol introduced in Zabbix v3.3.                              *
- *                                                                            *
- ******************************************************************************/
-static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
-		void *validator_args, struct zbx_json_parse *jp_data, zbx_data_session_t *session, char **info)
-{
-	const char		*pnext = NULL;
-	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
-	double			sec;
-	DC_ITEM			*items;
-	char			*error = NULL;
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX];
-	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
-	zbx_timespec_t		unique_shift = {0, 0};
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
-	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
-
-	sec = zbx_time();
-
-	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
-			&unique_shift, &error) && 0 != values_num)
-	{
-		DCconfig_get_items_by_itemids(items, itemids, errcodes, values_num);
-
-		for (i = 0; i < values_num; i++)
-		{
-			if (SUCCEED != errcodes[i])
-				continue;
-
-			/* check and discard if duplicate data */
-			if (NULL != session && 0 != values[i].id && values[i].id <= session->last_valueid)
-			{
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
-				errcodes[i] = FAIL;
-				continue;
-			}
-
-			if (SUCCEED != validator_func(&items[i], sock, validator_args, &error))
-			{
-				if (NULL != error)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
-					zbx_free(error);
-				}
-
-				DCconfig_clean_items(&items[i], &errcodes[i], 1);
-				errcodes[i] = FAIL;
-			}
-		}
-
-		processed_num += process_history_data(items, values, errcodes, values_num);
-
-		total_num += read_num;
-
-		if (NULL != session)
-			session->last_valueid = values[values_num - 1].id;
-
-		DCconfig_clean_items(items, errcodes, values_num);
-		zbx_agent_values_clean(values, values_num);
-
-		if (NULL == pnext)
-			break;
-	}
-
-	zbx_free(errcodes);
-	zbx_free(items);
-
-	if (NULL == error)
-	{
-		ret = SUCCEED;
-		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
-				processed_num, total_num - processed_num, total_num, zbx_time() - sec);
-	}
-	else
-	{
-		zbx_free(*info);
-		*info = error;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /******************************************************************************
