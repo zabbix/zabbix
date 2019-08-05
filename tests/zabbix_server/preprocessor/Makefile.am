@@ -1,6 +1,6 @@
 if SERVER
 
-SERVER_tests =
+SERVER_tests = zbx_item_preproc_jsonpath
 
 if HAVE_LIBXML2
 SERVER_tests +=	item_preproc_xpath
@@ -41,4 +41,15 @@ item_preproc_xpath_LDADD += @SERVER_LIBS@
 item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@
 
 item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
+
+zbx_item_preproc_jsonpath_SOURCES = \
+	../../../src/zabbix_server/preprocessor/item_preproc.c \
+	zbx_item_preproc_jsonpath.c 
+
+zbx_item_preproc_jsonpath_LDADD = $(JSON_LIBS)
+
+zbx_item_preproc_jsonpath_LDADD += @SERVER_LIBS@
+zbx_item_preproc_jsonpath_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_item_preproc_jsonpath_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
 endif
