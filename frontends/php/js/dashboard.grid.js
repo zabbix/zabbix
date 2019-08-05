@@ -1673,7 +1673,6 @@
 				if (event.type === 'mouseenter' && data['pos-action'] === '') {
 					data.new_widget_placeholder.container.show();
 					data.new_widget_placeholder.setPositioning();
-					return;
 				}
 				else if (!drag && !$target.is($obj) && !$target.is(data.new_widget_placeholder.container)
 						&& data.new_widget_placeholder.container.has($target).length == 0) {
@@ -1690,20 +1689,23 @@
 					x = Math.min(data.options['max-columns'] - 1,
 							Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
 						),
-					pos = {
-						x: x,
-						y: y,
-						width: (x < data.options['max-columns'] - 1) ? 1 : 2,
-						height: data.options['widget-min-rows']
-					},
 					overlap = false;
+
+				if (isNaN(x) || isNaN(y)) {
+					return;
+				}
+
+				var	pos = {
+					x: x,
+					y: y,
+					width: (x < data.options['max-columns'] - 1) ? 1 : 2,
+					height: data.options['widget-min-rows']
+				};
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
-						data.add_widget_dimension = $.extend(data.add_widget_dimension, {
-							left: x,
-							top: Math.min(y, data.add_widget_dimension.y)
-						});
+						data.add_widget_dimension.left = x;
+						data.add_widget_dimension.top = Math.min(y, data.add_widget_dimension.y);
 					}
 
 					pos = {
