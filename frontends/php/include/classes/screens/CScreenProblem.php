@@ -1210,10 +1210,10 @@ class CScreenProblem extends CScreenBase {
 				$value_str,
 				implode(', ', $hosts),
 				$problem['name'],
+				$opdata,
 				($problem['r_eventid'] != 0)
 					? zbx_date2age($problem['clock'], $problem['r_clock'])
 					: zbx_date2age($problem['clock']),
-				$opdata,
 				($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
 				implode(', ', $actions_performed),
 				implode(', ', $tags[$problem['eventid']])
@@ -1285,7 +1285,7 @@ class CScreenProblem extends CScreenBase {
 				$latest_values[] = ', ';
 			}
 			else {
-				$latest_values[] = $last_value;
+				$latest_values[] = $last_value['value'];
 			}
 		}
 
