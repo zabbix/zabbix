@@ -143,6 +143,21 @@ static int	DBpatch_4030011(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030012(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_4030013(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -161,5 +176,7 @@ DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
 DBPATCH_ADD(4030011, 0, 1)
+DBPATCH_ADD(4030012, 0, 1)
+DBPATCH_ADD(4030013, 0, 1)
 
 DBPATCH_END()
