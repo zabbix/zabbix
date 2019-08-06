@@ -26,7 +26,6 @@ import (
 	"net"
 	"strings"
 	"time"
-	"unicode/utf8"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
@@ -93,14 +92,6 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
-type hostMetadataWriter struct {
-	input chan *plugin.Result
-}
-
-func (h hostMetadataWriter) Write(result *plugin.Result) {
-	h.input <- result
-}
-
 // Write function is used by ResultCache to print diagnostic information. It will be callled from
 // different goroutine.
 func (c *Connector) Addr() (s string) {
@@ -118,36 +109,12 @@ func (c *Connector) refreshActiveChecks() {
 	if len(agent.Options.HostMetadata) > 0 {
 		a.HostMetadata = agent.Options.HostMetadata
 	} else if len(agent.Options.HostMetadataItem) > 0 {
-		log.Debugf("[%d] retrieving HostMetadataItem [%s]", c.clientID, agent.Options.HostMetadataItem)
+		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second, hostMetadataLen)
 
-		h := hostMetadataWriter{input: make(chan *plugin.Result)}
-
-		c.taskManager.UpdateTasks(0, h, []*plugin.Request{{Key: agent.Options.HostMetadataItem}})
-		select {
-		case r := <-h.input:
-			a.HostMetadata = *r.Value
-		case <-time.After(time.Duration(agent.Options.Timeout) * time.Second):
-			log.Errf("[%d] timeout while getting host metadata using \"%s\" item specified by \"HostMetadataItem\" configuration parameter", c.clientID, agent.Options.HostMetadataItem)
+		if err != nil {
+			log.Errf("cannot get host metadata: %s", err)
 			return
 		}
-
-		if !utf8.ValidString(a.HostMetadata) {
-			log.Warningf("cannot get host metadata using \"%s\" item specified by \"HostMetadataItem\" configuration parameter: returned value is not an UTF-8 string", agent.Options.HostMetadataItem)
-			return
-		}
-
-		var l int
-
-		for i := range a.HostMetadata {
-			if i > hostMetadataLen {
-				log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter is too long, using first %d characters", agent.Options.HostMetadataItem, l)
-				a.HostMetadata = a.HostMetadata[:l]
-				break
-			}
-			l = i
-		}
-
-		log.Debugf("[%d] retrieved HostMetadataItem [%s] value [%s]", c.clientID, agent.Options.HostMetadataItem, a.HostMetadata)
 	}
 
 	if len(agent.Options.ListenIP) > 0 {

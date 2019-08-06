@@ -22,11 +22,13 @@ package scheduler
 import (
 	"container/heap"
 	"errors"
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
@@ -50,6 +52,7 @@ type updateRequest struct {
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request)
 	FinishTask(task performer)
+	PerformTask(key string, timeout time.Duration, n int) (s string, err error)
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
@@ -284,6 +287,43 @@ func (m *Manager) Stop() {
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, requests []*plugin.Request) {
 	r := updateRequest{clientID: clientID, sink: writer, requests: requests}
 	m.input <- &r
+}
+
+func (m *Manager) PerformTask(key string, timeout time.Duration, n int) (s string, err error) {
+	w := resultWriter{input: make(chan *plugin.Result)}
+	m.UpdateTasks(0, w, []*plugin.Request{{Key: key}})
+
+	select {
+	case r := <-w.input:
+		s = *r.Value
+	case <-time.After(timeout):
+		return s, fmt.Errorf("timeout while executing \"%s\"", key)
+	}
+
+	if !utf8.ValidString(s) {
+		return s, fmt.Errorf("\"%s\" item returned value is not an UTF-8 string", key)
+	}
+
+	var l int
+
+	for i := range s {
+		if i > n {
+			log.Warningf("the returned value of \"%s\" is too long, using first %d characters", key, l)
+			s = s[:l]
+			break
+		}
+		l = i
+	}
+
+	return s, nil
+}
+
+type resultWriter struct {
+	input chan *plugin.Result
+}
+
+func (r resultWriter) Write(result *plugin.Result) {
+	r.input <- result
 }
 
 func (m *Manager) FinishTask(task performer) {
