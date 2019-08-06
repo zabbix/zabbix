@@ -212,7 +212,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function isScrollable($type) {
+	private static function isScrollable($type) {
 		switch ($type) {
 			case WIDGET_GRAPH:
 			case WIDGET_GRAPH_PROTOTYPE:
@@ -233,7 +233,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type)
+	private static function hasPadding($type)
 	{
 		switch ($type) {
 			case WIDGET_HOST_AVAIL:

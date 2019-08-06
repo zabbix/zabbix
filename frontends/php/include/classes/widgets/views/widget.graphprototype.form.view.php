@@ -51,7 +51,8 @@ if (array_key_exists('itemid', $fields)) {
 // Dynamic item.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
 
-CWidgetHelper::addIteratorFields($form_list, $fields);
+// Columns and Rows.
+CWidgetHelper::addIteratorFields($form_list, $fields['columns'], $fields['rows']);
 
 $form->addItem($form_list);
 

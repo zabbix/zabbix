@@ -56,10 +56,10 @@ class CWidgetHelper {
 			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
 	}
 
-	public static function addIteratorFields($form_list, $fields) {
+	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
 		$form_list
-			->addRow(self::getLabel($fields['columns']), self::getIntegerBox($fields['columns']))
-			->addRow(self::getLabel($fields['rows']), self::getIntegerBox($fields['rows']))
+			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
+			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows))
 		;
 	}
 

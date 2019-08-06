@@ -203,8 +203,8 @@
 		return $(window).height() - $obj.offset().top - parseInt($(document.body).css('margin-bottom'), 10);
 	}
 
-	function getWidgetByTarget(widgets, $div) {
-		return widgets[$div.data('widget-index')];
+	function getWidgetIndexByTarget($div) {
+		return $div.prevAll('.dashbrd-grid-widget, .dashbrd-grid-iterator').length;
 	}
 
 	function generateRandomString(length) {
@@ -218,7 +218,7 @@
 	}
 
 	function calcDivPosition($obj, data, $div) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
+		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
 			pos = $div.position(),
 			cell_w = data['cell-width'],
 			cell_h = data['options']['widget-height']
@@ -371,8 +371,6 @@
 
 		widgets.sort(function(box1, box2) {
 			return by_current ? box1.current_pos.y - box2.current_pos.y : box1.pos.y - box2.pos.y;
-		}).each(function(box, index) {
-			box.div.data('widget-index', index);
 		});
 
 		return widgets;
@@ -890,7 +888,7 @@
 	 * @param {object} data  Dashboard data object.
 	 */
 	function doWidgetResize($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
+		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
 			pos = calcDivPosition($obj, data, $div),
 			rows = 0;
 
@@ -935,7 +933,7 @@
 	 * @param {object} data  Dashboard data object.
 	 */
 	function doWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
+		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
 			pos = calcDivPosition($obj, data, $div),
 			rows = 0,
 			overflow = false;
@@ -977,7 +975,7 @@
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
-		var widget = getWidgetByTarget(data['widgets'], $div);
+		var widget = data['widgets'][getWidgetIndexByTarget($div)];
 
 		data['placeholder'].hide();
 		data['pos-action'] = '';
@@ -1017,11 +1015,9 @@
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
 			start: function(event, ui) {
-				var	widget = getWidgetByTarget(data.widgets, ui.helper);
-
 				data.calculated = {
-					'left-max': $obj.width() - ui.helper.width(),
-					'top-max': data.options['max-rows'] * data.options['widget-height'] - ui.helper.height()
+					'left-max': $obj.width() - widget['div'].width(),
+					'top-max': data.options['max-rows'] * data.options['widget-height'] - widget['div'].height()
 				};
 
 				setResizableState('disable', data.widgets, '');
@@ -1042,7 +1038,7 @@
 					top: Math.max(0, Math.min(ui.position.top, data.calculated['top-max']))
 				};
 
-				doWidgetPositioning($obj, ui.helper, data);
+				doWidgetPositioning($obj, widget['div'], data);
 			},
 			stop: function(event, ui) {
 				delete data.calculated;
@@ -1055,7 +1051,7 @@
 				});
 
 				setResizableState('enable', data.widgets, '');
-				stopWidgetPositioning($obj, ui.helper, data);
+				stopWidgetPositioning($obj, widget['div'], data);
 
 				data['options']['rows'] = data['options']['rows_actual'];
 				resizeDashboardGrid($obj, data, data['options']['rows_actual']);
@@ -1240,7 +1236,7 @@
 	}
 
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
-		clearUpdateWidgetContentTimer($obj, data, widget);
+		clearUpdateWidgetContentTimer(widget);
 
 		if (widget['update_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -1271,7 +1267,7 @@
 		}
 	}
 
-	function clearUpdateWidgetContentTimer($obj, data, widget) {
+	function clearUpdateWidgetContentTimer(widget) {
 		if (typeof widget['rf_timeoutid'] !== 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
 
@@ -1300,6 +1296,8 @@
 	}
 
 	function addIteratorPlaceholders(iterator, count) {
+		$('.dashbrd-grid-iterator-placeholder', iterator['content_body']).remove();
+
 		for (var index = 0; index < count; index++) {
 			iterator['content_body'].append(
 				$('<div>', {'class': 'dashbrd-grid-iterator-placeholder'}).append('<div>')
@@ -1406,7 +1404,7 @@
 		iterator['div'].removeClass('iterator-messages');
 	}
 
-	function updateIteratorCallback($obj, data, iterator, response) {
+	function updateIteratorCallback($obj, data, iterator, response, options) {
 		if (getIteratorTooSmallState(iterator) || typeof response.messages !== 'undefined') {
 			clearIterator($obj, data, iterator);
 
@@ -1470,15 +1468,20 @@
 		);
 
 		iterator['children'].forEach(function(child) {
-			if (!doAction('timer_refresh', $obj, data, child)) {
-				// No refresh triggers for widget => update the conventional way.
+			// 1. New child widgets MUST be initialized regardless of options['prevent_update'].
+			// 2. Existing child widgets are updated if not prevented.
 
-				updateWidgetContent($obj, data, child);
+			if ($.inArray(child['widgetid'], reused_widgetids) === -1 || !options['prevent_update']) {
+				if (!doAction('timer_refresh', $obj, data, child)) {
+					// No refresh triggers for widget => update the conventional way.
+
+					updateWidgetContent($obj, data, child);
+				}
 			}
 		});
 	}
 
-	function updateWidgetCallback($obj, data, widget, response) {
+	function updateWidgetCallback($obj, data, widget, response, options) {
 		widget['content_body'].empty();
 		if (typeof response.messages !== 'undefined') {
 			widget['content_body'].append(response.messages);
@@ -1573,8 +1576,25 @@
 		}
 	}
 
-	function updateWidgetContent($obj, data, widget) {
-		clearUpdateWidgetContentTimer($obj, data, widget);
+	function hasWidgetSizeChanged(widget) {
+		if (typeof widget['size'] === 'undefined') {
+			return true;
+		}
+
+		return (widget['size']['content_width'] != Math.floor(widget['content_body'].width())
+			|| widget['size']['content_height'] != Math.floor(widget['content_body'].height())
+		);
+	}
+
+	function saveWidgetSize(widget) {
+		widget['size'] = {
+			'content_width': Math.floor(widget['content_body'].width()),
+			'content_height': Math.floor(widget['content_body'].height())
+		};
+	}
+
+	function updateWidgetContent($obj, data, widget, options) {
+		clearUpdateWidgetContentTimer(widget);
 
 		if (widget['update_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
@@ -1625,10 +1645,9 @@
 		};
 
 		if (!widget['iterator']) {
-			$.extend(ajax_data, {
-				'content_width': Math.floor(widget['content_body'].width()),
-				'content_height': Math.floor(widget['content_body'].height())
-			});
+			saveWidgetSize(widget);
+
+			$.extend(ajax_data, widget['size']);
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1649,7 +1668,7 @@
 
 		widget['update_in_progress'] = true;
 
-		widget['ajax'] = jQuery.ajax({
+		return jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
@@ -1670,11 +1689,15 @@
 					$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
 				}
 
+				if (typeof options === 'undefined') {
+					options = {};
+				}
+
 				if (widget['iterator']) {
-					updateIteratorCallback($obj, data, widget, response);
+					updateIteratorCallback($obj, data, widget, response, options);
 				}
 				else {
-					updateWidgetCallback($obj, data, widget, response);
+					updateWidgetCallback($obj, data, widget, response, options);
 				}
 
 				setWidgetReady($obj, data, widget);
@@ -2213,7 +2236,7 @@
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 		removeWidgetInfoButtons(widget['content_header']);
-		clearUpdateWidgetContentTimer($obj, data, widget);
+		clearUpdateWidgetContentTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
 	}
@@ -2232,14 +2255,11 @@
 			widget['div'].remove();
 		}
 		else {
-			var index = widget['div'].data('widget-index');
+			var index = getWidgetIndexByTarget(widget['div']);
 
 			widget['div'].remove();
-			data['widgets'].splice(index, 1);
 
-			for (var i = index; i < data['widgets'].length; i++) {
-				data['widgets'][i]['div'].data('widget-index', i);
-			}
+			data['widgets'].splice(index, 1);
 		}
 	}
 
@@ -2360,6 +2380,26 @@
 		return ref;
 	}
 
+	function onIteratorResizeEnd($obj, data, iterator) {
+		// 1. Ensure that the child widgets are still current; replace if otherwise.
+		// 2. When complete, call the onResizeEnd trigger for the child widgets.
+
+		updateWidgetContent($obj, data, iterator, {
+			'prevent_update': true
+		})
+			.done(function() {
+				// On successful request.
+
+				iterator['children'].forEach(function(child) {
+					if (data['pos-action'] === '' || hasWidgetSizeChanged(child)) {
+						doAction('onResizeEnd', $obj, data, child);
+						saveWidgetSize(child);
+					}
+				});
+			})
+		;
+	}
+
 	/**
 	 * Performs action added by addAction function.
 	 *
@@ -2386,6 +2426,7 @@
 				}
 			});
 		}
+
 		triggers.sort(function(a,b) {
 			var priority_a = (typeof a['options']['priority'] !== 'undefined') ? a['options']['priority'] : 10;
 			var priority_b = (typeof b['options']['priority'] !== 'undefined') ? b['options']['priority'] : 10;
@@ -2400,7 +2441,17 @@
 		});
 
 		$.each(triggers, function(index, trigger) {
-			if (typeof window[trigger['function']] !== typeof Function) {
+			var trigger_function = null;
+			if (typeof trigger['function'] === typeof Function) {
+				// A function given?
+				trigger_function = trigger['function'];
+			}
+			else if (typeof window[trigger['function']] === typeof Function) {
+				// A name of function given?
+				trigger_function = window[trigger['function']];
+			}
+
+			if (trigger_function === null) {
 				return true;
 			}
 
@@ -2408,6 +2459,7 @@
 			if (typeof trigger['options']['parameters'] !== 'undefined') {
 				params = trigger['options']['parameters'];
 			}
+
 			if (typeof trigger['options']['grid'] !== 'undefined') {
 				var grid = {};
 				if (typeof trigger['options']['grid']['widget'] !== 'undefined'
@@ -2434,7 +2486,7 @@
 			}
 
 			try {
-				window[trigger['function']].apply(null, params);
+				trigger_function.apply(null, params);
 			}
 			catch(e) {}
 		});
@@ -2506,7 +2558,10 @@
 				var resize_delay,
 					resize_handler = function () {
 						data.widgets.each(function(widget) {
-							doAction('onResizeEnd', $this, data, widget);
+							if (hasWidgetSizeChanged(widget)) {
+								doAction('onResizeEnd', $this, data, widget);
+								saveWidgetSize(widget);
+							}
 						});
 					};
 
@@ -2605,15 +2660,12 @@
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
 						'children': [],
-						'update_pending': false,
-						'padding': false
+						'update_pending': false
 					});
 				}
 
 				widget_local['uniqueid'] = generateUniqueId($this, data);
-
 				widget_local['div'] = makeWidgetDiv($this, data, widget_local);
-				widget_local['div'].data('widget-index', data['widgets'].length);
 
 				updateWidgetDynamic($this, data, widget_local);
 
@@ -2629,6 +2681,13 @@
 
 				showPreloader(widget_local);
 				data.new_widget_placeholder.container.hide();
+
+				if (widget_local['iterator']) {
+					$this.dashboardGrid('addAction', 'onResizeEnd', onIteratorResizeEnd, widget_local['uniqueid'], {
+						parameters: [$this, data, widget_local],
+						trigger_name: 'onIteratorResizeEnd_' + widget_local['uniqueid']
+					});
+				}
 			});
 		},
 
@@ -2653,7 +2712,7 @@
 
 				$.each(data['widgets'], function(index, widget) {
 					if (widget['widgetid'] == widgetid || widget['uniqueid'] === widgetid) {
-						updateWidgetContent($obj, data, widget);
+						updateWidgetContent($this, data, widget);
 					}
 				});
 			});
