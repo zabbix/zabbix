@@ -37,7 +37,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupPrototypes' => null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
-			'selectInventory' 		=> null,
 			'editable'				=> false,
 			'nopermissions'			=> null,
 			'sortfield'    			=> '',
@@ -511,7 +510,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'selectInventory' => API_OUTPUT_EXTEND,
 			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
 			'preservekeys' => true
 		]);
@@ -858,7 +856,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectInventory' => ['inventory_mode']
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
@@ -1278,29 +1275,6 @@ class CHostPrototype extends CHostBase {
 						: '0';
 				}
 			}
-		}
-
-		// adding inventory
-		if ($options['selectInventory'] !== null) {
-			$inventory = API::getApiService()->select('host_inventory', [
-				'output' => ['hostid', 'inventory_mode'],
-				'filter' => ['hostid' => $hostPrototypeIds],
-				'preservekeys' => true
-			]);
-
-			foreach ($hostPrototypeIds as $host_prototypeid) {
-				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
-				if (!array_key_exists($host_prototypeid, $inventory)) {
-					$inventory[$host_prototypeid] = [
-						'hostid' => (string) $host_prototypeid,
-						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
-					];
-				}
-			}
-
-			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
-			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
 		return $result;

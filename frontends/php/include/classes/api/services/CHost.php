@@ -1442,18 +1442,13 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true
 			]);
 
-			foreach ($hostids as $hostid) {
-				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
-				if (!array_key_exists($hostid, $inventory)) {
-					$inventory[$hostid] = [
-						'hostid' => (string) $hostid,
-						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
-					];
-				}
+			foreach ($inventory as &$inventory_fields) {
+				unset($inventory_fields['hostid']);
+				unset($inventory_fields['inventory_mode']);
 			}
+			unset($inventory_fields);
 
 			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
