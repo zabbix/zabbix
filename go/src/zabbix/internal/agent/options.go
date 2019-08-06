@@ -19,6 +19,10 @@
 
 package agent
 
+import (
+	"zabbix/pkg/log"
+)
+
 type AgentOptions struct {
 	LogType             string `conf:",,,console"`
 	LogFile             string `conf:",optional"`
@@ -27,6 +31,7 @@ type AgentOptions struct {
 	RefreshActiveChecks int    `conf:",,30:3600,120"`
 	Timeout             int    `conf:",,1-30,3"`
 	Hostname            string
+	HostnameItem        string `conf:",optional"`
 	HostMetadata        string `conf:",optional"`
 	HostMetadataItem    string `conf:",optional"`
 	ListenIP            string `conf:",optional"`
@@ -35,3 +40,18 @@ type AgentOptions struct {
 }
 
 var Options AgentOptions
+
+func CutAfterN(s string, n int) string {
+	var l int
+
+	for i := range s {
+		if i > n {
+			log.Warningf("value is too long, using first %d characters", l)
+			s = s[:l]
+			break
+		}
+		l = i
+	}
+
+	return s
+}

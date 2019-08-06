@@ -26,6 +26,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
@@ -109,12 +110,18 @@ func (c *Connector) refreshActiveChecks() {
 	if len(agent.Options.HostMetadata) > 0 {
 		a.HostMetadata = agent.Options.HostMetadata
 	} else if len(agent.Options.HostMetadataItem) > 0 {
-		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second, hostMetadataLen)
-
+		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second)
 		if err != nil {
 			log.Errf("cannot get host metadata: %s", err)
 			return
 		}
+
+		if !utf8.ValidString(a.HostMetadata) {
+			log.Errf("cannot get host metadata: value is not an UTF-8 string")
+			return
+		}
+
+		a.HostMetadata = agent.CutAfterN(a.HostMetadata, hostMetadataLen)
 	}
 
 	if len(agent.Options.ListenIP) > 0 {
