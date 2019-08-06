@@ -548,7 +548,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 		config_name = "HostMetadataItem";
 		config_type = "metadata";
 	}
-	else // CONFIG_HOST_INTERFACE_ITEM
+	else /* CONFIG_HOST_INTERFACE_ITEM */
 	{
 		config_name = "HostInterfaceItem";
 		config_type = "interface";
