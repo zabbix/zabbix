@@ -288,26 +288,36 @@ func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, reque
 	m.input <- &r
 }
 
+type resultWriter chan *plugin.Result
+
+func (r resultWriter) Write(result *plugin.Result) {
+	r <- result
+}
+
 func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
-	w := resultWriter{input: make(chan *plugin.Result)}
+	w := make(resultWriter)
+
 	m.UpdateTasks(0, w, []*plugin.Request{{Key: key}})
 
 	select {
-	case r := <-w.input:
-		s = *r.Value
+	case r := <-w:
+		if r.Error == nil {
+			if r.Value != nil {
+				s = *r.Value
+			} else {
+				// TODO: check what must be returned on empty result
+				s = "(null)"
+			}
+		} else {
+			err = fmt.Errorf(r.Error.Error())
+		}
 	case <-time.After(timeout):
-		return s, fmt.Errorf("timeout while executing \"%s\"", key)
+		err = fmt.Errorf("timeout occurred")
 	}
 
-	return s, nil
-}
+	close(w)
 
-type resultWriter struct {
-	input chan *plugin.Result
-}
-
-func (r resultWriter) Write(result *plugin.Result) {
-	r.input <- result
+	return s, err
 }
 
 func (m *Manager) FinishTask(task performer) {
