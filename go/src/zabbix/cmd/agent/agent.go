@@ -38,6 +38,7 @@ import (
 
 func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error {
 	var err error
+	const hostNameLen = 128
 
 	if len(o.Hostname) == 0 {
 		if len(o.HostnameItem) == 0 {
@@ -51,14 +52,23 @@ func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error 
 
 		if len(o.Hostname) == 0 {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", o.HostnameItem)
-
 		}
 
-		var n int
-		const hostNameLen = 128
+		if len(o.Hostname) > hostNameLen {
+			o.Hostname = o.Hostname[:hostNameLen]
+			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", o.HostnameItem, hostNameLen)
+		}
 
-		if agent.Options.Hostname, n = agent.CutAfterN(o.Hostname, hostNameLen); n != hostNameLen {
-			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", o.HostnameItem, n)
+		if err = agent.CheckHostname(o.Hostname); nil != err {
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", o.HostnameItem, err.Error())
+		}
+
+	} else {
+		if len(o.Hostname) > hostNameLen {
+			return fmt.Errorf("invalid \"Hostname\" configuration parameter: configuration parameter cannot be longer than %d characters", hostNameLen)
+		}
+		if err = agent.CheckHostname(o.Hostname); nil != err {
+			return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
 		}
 	}
 

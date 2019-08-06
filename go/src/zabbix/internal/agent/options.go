@@ -19,6 +19,11 @@
 
 package agent
 
+import (
+	"fmt"
+	"unicode"
+)
+
 type AgentOptions struct {
 	LogType             string `conf:",,,console"`
 	LogFile             string `conf:",optional"`
@@ -49,4 +54,21 @@ func CutAfterN(s string, n int) (string, int) {
 	}
 
 	return s, l
+}
+
+func CheckHostname(s string) error {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' ||
+			(s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9') {
+			continue
+		}
+
+		if unicode.IsPrint(rune(s[i])) {
+			return fmt.Errorf("character \"%c\" is not allowed in host name", s[i])
+		} else {
+			return fmt.Errorf("character 0x%02x is not allowed in host name", s[i])
+		}
+	}
+
+	return nil
 }
