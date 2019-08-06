@@ -121,7 +121,11 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 
-		a.HostMetadata = agent.CutAfterN(a.HostMetadata, hostMetadataLen)
+		var n int
+
+		if a.HostMetadata, n = agent.CutAfterN(a.HostMetadata, hostMetadataLen); n != hostMetadataLen {
+			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter is too long, using first %d characters", agent.Options.HostMetadataItem, n)
+		}
 	}
 
 	if len(agent.Options.ListenIP) > 0 {

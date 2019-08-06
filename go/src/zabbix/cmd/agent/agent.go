@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/agent/serverconnector"
@@ -34,6 +35,35 @@ import (
 	"zabbix/pkg/log"
 	_ "zabbix/plugins"
 )
+
+func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error {
+	var err error
+
+	if len(o.Hostname) == 0 {
+		if len(o.HostnameItem) == 0 {
+			o.HostnameItem = "system.hostname"
+		}
+
+		o.Hostname, err = taskManager.PerformTask(o.HostnameItem, time.Second*time.Duration(o.Timeout))
+		if err != nil {
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", o.HostnameItem, err.Error())
+		}
+
+		if len(o.Hostname) == 0 {
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", o.HostnameItem)
+
+		}
+
+		var n int
+		const hostNameLen = 128
+
+		if agent.Options.Hostname, n = agent.CutAfterN(o.Hostname, hostNameLen); n != hostNameLen {
+			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", o.HostnameItem, n)
+		}
+	}
+
+	return nil
+}
 
 func run() {
 	sigs := make(chan os.Signal, 1)
@@ -175,25 +205,29 @@ func main() {
 
 	taskManager.Start()
 
-	serverConnectors := make([]*serverconnector.Connector, len(addresses))
+	if err = configDefault(taskManager, &agent.Options); err == nil {
+		serverConnectors := make([]*serverconnector.Connector, len(addresses))
 
-	for i := 0; i < len(serverConnectors); i++ {
-		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
-		serverConnectors[i].Start()
-	}
+		for i := 0; i < len(serverConnectors); i++ {
+			serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
+			serverConnectors[i].Start()
+		}
 
-	err = listener.Start()
+		err = listener.Start()
 
-	if err == nil {
-		run()
+		if err == nil {
+			run()
+		} else {
+			log.Errf("cannot start agent: %s", err.Error())
+		}
+
+		listener.Stop()
+
+		for i := 0; i < len(serverConnectors); i++ {
+			serverConnectors[i].Stop()
+		}
 	} else {
-		log.Errf("cannot start agent: %s", err.Error())
-	}
-
-	listener.Stop()
-
-	for i := 0; i < len(serverConnectors); i++ {
-		serverConnectors[i].Stop()
+		log.Critf("%s", err)
 	}
 
 	taskManager.Stop()
