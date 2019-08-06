@@ -540,15 +540,15 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 {
 	char		**value;
 	AGENT_RESULT	result;
-	char		*config_name;
-	char		*config_type;
+	const char	*config_name;
+	const char	*config_type;
 
 	if (CONFIG_HOST_METADATA_ITEM == config)
 	{
 		config_name = "HostMetadataItem";
 		config_type = "metadata";
 	}
-	else if (CONFIG_HOST_INTERFACE_ITEM == config)
+	else //CONFIG_HOST_INTERFACE_ITEM
 	{
 		config_name = "HostInterfaceItem";
 		config_type = "interface";
