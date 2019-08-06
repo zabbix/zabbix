@@ -1978,6 +1978,7 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/pkg/zbxlib/Makefile
+	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile

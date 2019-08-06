@@ -4,4 +4,5 @@ SUBDIRS = \
 	std \
 	itemutil \
 	zbxcomms \
-	zbxlib
+	zbxlib \
+	version

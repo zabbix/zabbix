@@ -33,6 +33,7 @@ import (
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/version"
 	"zabbix/pkg/zbxlib"
 	_ "zabbix/plugins"
 )
@@ -136,9 +137,17 @@ func main() {
 	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
 	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorhand)")
 
+	var versionFlag bool
+	const (
+		versionDefault     = false
+		versionDescription = "Print programm version and exit"
+	)
+	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
+	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorhand)")
+
 	flag.Parse()
 
-	var argConfig, argTest, argPrint bool
+	var argConfig, argTest, argPrint, argVersion bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -150,8 +159,15 @@ func main() {
 			argPrint = true
 		case "c", "config":
 			argConfig = true
+		case "v", "version":
+			argVersion = true
 		}
 	})
+
+	if argVersion {
+		version.Display()
+		os.Exit(0)
+	}
 
 	if argConfig {
 		if err := conf.Load(confFlag, &agent.Options); err != nil {
