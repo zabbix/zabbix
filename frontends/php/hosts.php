@@ -342,8 +342,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 
 		// filter only normal and discovery created hosts
 		$options = [
-			'output' => ['hostid'],
-			'selectInventory' => ['inventory_mode'],
+			'output' => ['hostid', 'inventory_mode'],
 			'hostids' => $hostids,
 			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		];
@@ -498,8 +497,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			if (array_key_exists('inventory_mode', $new_values)) {
 				$host['inventory'] = $host_inventory;
 			}
-			elseif (array_key_exists('inventory_mode', $host['inventory'])
-					&& $host['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+			elseif ($host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 				$host['inventory'] = $host_inventory;
 			}
 			else {
@@ -1012,14 +1010,14 @@ elseif (hasRequest('form')) {
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
 					'ipmi_username', 'ipmi_password', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-					'tls_subject', 'tls_psk_identity', 'tls_psk'
+					'tls_subject', 'tls_psk_identity', 'tls_psk', 'inventory_mode'
 				],
 				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => ['hostmacroid', 'macro', 'value'],
 				'selectDiscoveryRule' => ['itemid', 'name'],
 				'selectHostDiscovery' => ['parent_hostid'],
-				'selectInventory' => true,
+				'selectInventory' => API_OUTPUT_EXTEND,
 				'selectTags' => ['tag', 'value'],
 				'hostids' => [$data['hostid']]
 			]);
@@ -1082,11 +1080,8 @@ elseif (hasRequest('form')) {
 			unset($interface);
 
 			// Host inventory
-			$data['inventory_mode'] = array_key_exists('inventory_mode', $dbHost['inventory'])
-				? $dbHost['inventory']['inventory_mode']
-				: HOST_INVENTORY_DISABLED;
+			$data['inventory_mode'] = $dbHost['inventory_mode'];
 			$data['host_inventory'] = $dbHost['inventory'];
-			unset($data['host_inventory']['inventory_mode']);
 
 			// Encryption
 			$data['tls_connect'] = $dbHost['tls_connect'];
