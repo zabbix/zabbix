@@ -1134,7 +1134,7 @@
 
 				if (widget['iterator']) {
 					if (getIteratorTooSmallState(widget)) {
-						$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr("style");
+						$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr('style');
 					} else {
 						$('.dashbrd-grid-widget-container.iterator', widget['div']).css({
 							'width': data['placeholder'].width(),
@@ -1150,7 +1150,7 @@
 				stopWidgetPositioning($obj, $(event.target), data);
 
 				if (widget['iterator']) {
-					$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr("style");
+					$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr('style');
 				}
 
 				// Hide resize handles for situation when mouse button was released outside dashboard container area.
@@ -1257,14 +1257,14 @@
 				// Do not update widget content if there are active popup or hintbox.
 				var active = widget['content_body'].find('[data-expanded="true"]');
 
-				widget['div'][active.length ? 'addClass' : 'removeClass']('dashbrd-grid-widget-no-refresh');
+				if (!active.length && !doAction('timer_refresh', $obj, data, widget)) {
+					// No active popup or hintbox AND no triggers executed => update now.
 
-				if (active.length == 0 && doAction('timer_refresh', $obj, data, widget) == 0) {
-					// widget was not updated, update it's content
 					updateWidgetContent($obj, data, widget);
 				}
 				else {
-					// widget was updated, start next timeout.
+					// Active popup or hintbox OR triggers executed => just setup the next cycle.
+
 					setUpdateWidgetContentTimer($obj, data, widget);
 				}
 			}, rf_rate * 1000);
@@ -1392,68 +1392,90 @@
 		showPreloader(child);
 	}
 
-	function updateIteratorCallback($obj, data, iterator, response) {
-		stopPreloader(iterator);
-
-		var $content_header = $('h4', iterator['content_header']);
-
-		$content_header.text(response.header);
-
-		if (typeof response.aria_label !== 'undefined') {
-			$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
-		}
+	/**
+	* Clear and reset the state of the iterator.
+	*/
+	function clearIterator($obj, data, iterator) {
+		iterator['children'].forEach(function(child) {
+			removeWidget($obj, data, child);
+		});
 
 		iterator['content_body'].empty();
 		iterator['children'] = [];
 
-		if (getIteratorTooSmallState(iterator)) {
-			iterator['update_pending'] = true;
-		}
-		else if (typeof response.messages !== 'undefined') {
-			iterator['div'].addClass('iterator-messages');
+		iterator['div'].removeClass('iterator-messages');
+	}
 
-			iterator['content_body'].append(response.messages);
-		}
-		else {
-			iterator['div'].removeClass('iterator-messages');
+	function updateIteratorCallback($obj, data, iterator, response) {
+		if (getIteratorTooSmallState(iterator) || typeof response.messages !== 'undefined') {
+			clearIterator($obj, data, iterator);
 
-			if (getIteratorTooSmallState(iterator)) {
-				iterator['update_pending'] = true;
+			if (typeof response.messages !== 'undefined') {
+				iterator['div'].addClass('iterator-messages');
+
+				iterator['content_body'].append(response.messages);
 			}
 			else {
-				var children = response.children.slice(0, numIteratorColumns(iterator) * numIteratorRows(iterator));
-
-				$.each(children, function(index, child) {
-					addWidgetOfIterator($obj, data, iterator, child);
-				});
-
-				addIteratorPlaceholders(iterator,
-					numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['children'].length
-				);
-
-				alignIteratorContents($obj, data, iterator,
-					(typeof iterator['current_pos'] === "object") ? iterator['current_pos'] : iterator['pos']
-				);
-
-				iterator['children'].forEach(function(child) {
-					updateWidgetContent($obj, data, child);
-				});
+				iterator['update_pending'] = true;
 			}
+
+			return;
 		}
+
+		var current_children = iterator['children'],
+			current_children_by_widgetid = {}
+		;
+
+		iterator['children'] = [];
+
+		current_children.forEach(function(child) {
+			if (child['widgetid'] !== '') {
+				current_children_by_widgetid[child['widgetid']] = child;
+			}
+			else {
+				// Child widgets without "uniqueid" are never persisted.
+				removeWidget($obj, data, child);
+			}
+		});
+
+		var reused_widgetids = [];
+		response.children.slice(0, numIteratorColumns(iterator) * numIteratorRows(iterator))
+			.forEach(function(child) {
+				if (typeof child['widgetid'] !== 'undefined' && current_children_by_widgetid[child['widgetid']]) {
+					iterator['children'].push(current_children_by_widgetid[child['widgetid']]);
+
+					reused_widgetids.push(child['widgetid']);
+				}
+				else {
+					addWidgetOfIterator($obj, data, iterator, child);
+				}
+			})
+		;
+
+		$.each(current_children_by_widgetid, function(index, child) {
+			if ($.inArray(child['widgetid'], reused_widgetids) === -1) {
+				removeWidget($obj, data, child);
+			}
+		});
+
+		addIteratorPlaceholders(iterator,
+			numIteratorColumns(iterator) * numIteratorRows(iterator) - iterator['children'].length
+		);
+
+		alignIteratorContents($obj, data, iterator,
+			(typeof iterator['current_pos'] === 'object') ? iterator['current_pos'] : iterator['pos']
+		);
+
+		iterator['children'].forEach(function(child) {
+			if (!doAction('timer_refresh', $obj, data, child)) {
+				// No refresh triggers for widget => update the conventional way.
+
+				updateWidgetContent($obj, data, child);
+			}
+		});
 	}
 
 	function updateWidgetCallback($obj, data, widget, response) {
-		stopPreloader(widget);
-
-		var $content_header = $('h4', widget['content_header']),
-			debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
-
-		$content_header.text(response.header);
-
-		if (typeof response.aria_label !== 'undefined') {
-			$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
-		}
-
 		widget['content_body'].empty();
 		if (typeof response.messages !== 'undefined') {
 			widget['content_body'].append(response.messages);
@@ -1461,6 +1483,8 @@
 		widget['content_body'].append(response.body).css('overflow', '');
 
 		if (typeof response.debug !== 'undefined') {
+			var debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
+
 			$(response.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 		}
 
@@ -1498,7 +1522,7 @@
 		return !widgets_found.length;
 	}
 
-	function updateWidgetReady($obj, data, widget) {
+	function setWidgetReady($obj, data, widget) {
 		if (widget['ready']) {
 			return;
 		}
@@ -1562,13 +1586,10 @@
 		}
 
 		if (widget['iterator']) {
-			widget['content_body'].empty();
-			widget['children'] = [];
+			var pos = (typeof widget['current_pos'] === 'object') ? widget['current_pos'] : widget['pos'];
 
-			var pos = (typeof widget['current_pos'] === "object") ? widget['current_pos'] : widget['pos'];
 			if (isIteratorTooSmall(widget, pos)) {
-				// 1. Put the Iterator into "too small" state.
-				// 2. Set the Iterator to reload the contents as soon as it is shown again.
+				clearIterator($obj, data, widget);
 
 				stopPreloader(widget);
 				setIteratorTooSmallState(widget, true);
@@ -1632,26 +1653,38 @@
 			dataType: 'json'
 		})
 			.done(function(response) {
+				widget['update_in_progress'] = false;
+
+				stopPreloader(widget);
+
 				if (isDeletedWidget($obj, data, widget)) {
 					return;
 				}
 
-				if (widget["iterator"]) {
+				var $content_header = $('h4', widget['content_header']);
+				$content_header.text(response.header);
+				if (typeof response.aria_label !== 'undefined') {
+					$content_header.attr('aria-label', (response.aria_label !== '') ? response.aria_label : null);
+				}
+
+				if (widget['iterator']) {
 					updateIteratorCallback($obj, data, widget, response);
 				}
 				else {
 					updateWidgetCallback($obj, data, widget, response);
 				}
 
-				updateWidgetReady($obj, data, widget);
+				setWidgetReady($obj, data, widget);
 
-				widget['initial_load'] = false;
+				if (!widget['parent']) {
+					// Iterator child widgets are excluded here.
 
-				widget['update_in_progress'] = false;
-
-				setUpdateWidgetContentTimer($obj, data, widget);
+					setUpdateWidgetContentTimer($obj, data, widget);
+				}
 
 				doAction('onContentUpdated', $obj, data, null);
+
+				widget['initial_load'] = false;
 			})
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
@@ -2186,21 +2219,24 @@
 	 * Remove the widget without updating the dashboard.
 	 */
 	function removeWidget($obj, data, widget) {
-		var index = widget['div'].data('widget-index');
-
 		if (widget['iterator']) {
 			widget['children'].forEach(function(child) {
 				child['div'].remove();
 			});
 		}
 
-		// Remove div from the grid.
-		widget['div'].remove();
-		data['widgets'].splice(index, 1);
+		if (widget['parent']) {
+			widget['div'].remove();
+		}
+		else {
+			var index = widget['div'].data('widget-index');
 
-		// Update widget-index for all following widgets.
-		for (var i = index; i < data['widgets'].length; i++) {
-			data['widgets'][i]['div'].data('widget-index', i);
+			widget['div'].remove();
+			data['widgets'].splice(index, 1);
+
+			for (var i = index; i < data['widgets'].length; i++) {
+				data['widgets'][i]['div'].data('widget-index', i);
+			}
 		}
 	}
 
@@ -2210,9 +2246,11 @@
 	function deleteWidget($obj, data, widget) {
 		removeWidget($obj, data, widget);
 
-		// Mark dashboard as updated.
-		data['options']['updated'] = true;
-		resizeDashboardGrid($obj, data);
+		if (!widget['parent']) {
+			data['options']['updated'] = true;
+
+			resizeDashboardGrid($obj, data);
+		}
 	}
 
 	function saveChanges($obj, data) {
@@ -2289,8 +2327,8 @@
 
 	function updateWidgetDynamic($obj, data, widget) {
 		// This function may be called for widget that is not in data['widgets'] array yet.
-		if (typeof widget['fields']['dynamic'] !== 'undefined' && widget['fields']['dynamic'] === '1') {
-			if (data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
+		if (typeof widget['fields']['dynamic'] !== 'undefined') {
+			if (widget['fields']['dynamic'] === '1' && data['dashboard']['dynamic']['has_dynamic_widgets'] === true) {
 				widget['dynamic'] = {
 					'hostid': data['dashboard']['dynamic']['hostid'],
 					'groupid': data['dashboard']['dynamic']['groupid']
@@ -2299,9 +2337,6 @@
 			else {
 				delete widget['dynamic'];
 			}
-		}
-		else if (typeof widget['dynamic'] !== 'undefined') {
-			delete widget['dynamic'];
 		}
 	}
 
