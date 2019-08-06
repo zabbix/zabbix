@@ -409,8 +409,8 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 				value: value
 			},
 			clickCallback: function() {
-				var obj = jQuery(this),
-					currentRate = obj.data('value');
+				var $obj = jQuery(this),
+					currentRate = $obj.data('value');
 
 				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
 				if (options.multiplier) {
@@ -420,10 +420,13 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 							widgetRefreshRate: currentRate
 						}),
 						dataType: 'script',
-						success: function(js) { js }
+						success: function() {
+							// Set new refresh rate as current in slideshow controls.
+							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
+						}
 					});
 
-					jQuery('a', obj.closest('.menu-popup')).each(function() {
+					jQuery('a', $obj.closest('.menu-popup')).each(function() {
 						var link = jQuery(this);
 
 						if (link.data('value') == currentRate) {
@@ -438,7 +441,7 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 						}
 					});
 
-					obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
+					$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 				}
 				else {
 					var url = new Curl('zabbix.php');
@@ -452,8 +455,8 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 							'widgetid': options.widgetName,
 							'rf_rate': currentRate
 						},
-						success: function(resp) {
-							jQuery('a', obj.closest('.menu-popup')).each(function() {
+						success: function() {
+							jQuery('a', $obj.closest('.menu-popup')).each(function() {
 								var link = jQuery(this);
 
 								if (link.data('value') == currentRate) {
@@ -468,13 +471,16 @@ function getMenuPopupRefresh(options, trigger_elmnt) {
 								}
 							});
 
-							obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
+							// Set new refresh rate as current in widget controls.
+							trigger_elmnt.data('menu-popup').data.currentRate = currentRate;
+
+							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 
 							jQuery('.dashbrd-grid-container')
 								.dashboardGrid('setWidgetRefreshRate', options.widgetName, parseInt(currentRate));
 						},
 						error: function() {
-							obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
+							$obj.closest('.menu-popup').menuPopup('close', trigger_elmnt);
 							// TODO: gentle message about failed saving of widget refresh rate
 						}
 					});
