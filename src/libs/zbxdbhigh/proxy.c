@@ -116,6 +116,7 @@ static zbx_history_table_t	areg = {
 		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
 		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
+		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
@@ -3972,7 +3973,8 @@ json_parse_return:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **error)
+static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
+		char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -3983,6 +3985,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	autoreg_hosts;
+	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4016,10 +4019,24 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			*host_metadata = '\0';
 		}
 
-		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
-			break;
+		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_FLAGS, tmp, sizeof(tmp)))
+		{
+			flag = (zbx_conn_flags_t)atoi(tmp);
+			if (ZBX_CONN_DNS != flag && ZBX_CONN_IP != flag)
+				flag = ZBX_CONN_DEFAULT;
+		}
 
-		if (SUCCEED != is_ip(ip))
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
+		{
+			if (ZBX_CONN_DNS == flag)
+			{
+				*ip = '\0';
+				ret = SUCCEED;
+			}
+			else
+				break;
+		}
+		else if (SUCCEED != is_ip(ip))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid IP address", __func__, ip);
 			continue;
@@ -4056,7 +4073,8 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			continue;
 		}
 
-		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, itemtime);
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag,
+				itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)

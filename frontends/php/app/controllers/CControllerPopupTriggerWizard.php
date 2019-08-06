@@ -129,7 +129,7 @@ class CControllerPopupTriggerWizard extends CController {
 
 			// Trigger validation.
 			if ($page_options['description'] === '') {
-				error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Name')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 				$trigger_valid = false;
 			}
 

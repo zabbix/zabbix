@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0alpha2');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',	4030015);
+define('ZABBIX_DB_VERSION',	4030018);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -1627,6 +1627,7 @@ define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
 define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
+define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');

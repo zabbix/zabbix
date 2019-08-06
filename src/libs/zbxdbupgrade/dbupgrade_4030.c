@@ -21,13 +21,13 @@
 #include "db.h"
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
 /*
  * 4.4 development database patches
  */
 
 #ifndef HAVE_SQLITE3
+
+extern unsigned char	program_type;
 
 static int	DBpatch_4030000(void)
 {
@@ -124,26 +124,60 @@ static int	DBpatch_4030010(void)
 
 static int	DBpatch_4030011(void)
 {
-	const ZBX_FIELD	field = {"autoreg_tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
-	return DBadd_field("config", &field);
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter.usrgrpid'"
+				" where idx='web.users.filter.usrgrpid'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sort'"
+				" where idx='web.users.php.sort'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sortorder'"
+				" where idx='web.users.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_4030012(void)
 {
-	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("autoreg_host", &field);
 }
 
 static int	DBpatch_4030013(void)
 {
-	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy_autoreg_host", &field);
 }
 
 static int	DBpatch_4030014(void)
+{
+	const ZBX_FIELD	field = {"autoreg_tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_4030015(void)
+{
+	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_4030016(void)
+{
+	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
+static int	DBpatch_4030017(void)
 {
 	const ZBX_TABLE table =
 		{"config_autoreg_tls", "autoreg_tlsid", 0,
@@ -159,7 +193,7 @@ static int	DBpatch_4030014(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4030015(void)
+static int	DBpatch_4030018(void)
 {
 	return DBcreate_index("config_autoreg_tls", "config_autoreg_tls_1", "tls_psk_identity", 1);
 }
@@ -186,5 +220,8 @@ DBPATCH_ADD(4030012, 0, 1)
 DBPATCH_ADD(4030013, 0, 1)
 DBPATCH_ADD(4030014, 0, 1)
 DBPATCH_ADD(4030015, 0, 1)
+DBPATCH_ADD(4030016, 0, 1)
+DBPATCH_ADD(4030017, 0, 1)
+DBPATCH_ADD(4030018, 0, 1)
 
 DBPATCH_END()
