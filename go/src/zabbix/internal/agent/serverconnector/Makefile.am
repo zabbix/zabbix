@@ -9,5 +9,5 @@ clean:
 	go clean
 
 check:
-	go test
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
 

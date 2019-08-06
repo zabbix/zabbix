@@ -5,5 +5,6 @@ SUBDIRS = \
 	log \
 	system \
 	systemd \
-	vfs
+	vfs \
+	zabbixagent
 

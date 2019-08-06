@@ -9,8 +9,8 @@ clean:
 	go clean
 
 install:
-	go install
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go install
 
 check:
-	go test
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
 

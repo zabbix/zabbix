@@ -34,15 +34,6 @@ typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef char * char_lp_t;
 
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	return FAIL;
-}
-
-void zbx_on_exit(int ret)
-{
-}
-
 ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
 {
 	ZBX_ACTIVE_METRIC *metric = malloc(sizeof(ZBX_ACTIVE_METRIC));

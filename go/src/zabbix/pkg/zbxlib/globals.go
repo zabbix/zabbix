@@ -29,10 +29,13 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsys/libzbxsys.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxnix/libzbxnix.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxconf/libzbxconf.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxhttp/libzbxhttp.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcompress/libzbxcompress.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxregexp/libzbxregexp.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/libzbxagentsysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/common/libcommonsysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxjson/libzbxjson.a
 #cgo LDFLAGS: -Wl,--end-group
@@ -49,6 +52,8 @@ int CONFIG_MAX_LINES_PER_SECOND = 20;
 char *CONFIG_HOSTNAME = NULL;
 int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
+int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+char	*CONFIG_SOURCE_IP		= NULL;
 
 const char	*progname = NULL;
 const char	title_message[] = "agent";
@@ -58,9 +63,12 @@ unsigned char	program_type	= 0x80;
 const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_agent[] = {NULL};
-ZBX_METRIC	parameters_common[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
 ZBX_METRIC	parameters_simple[] = {NULL};
+
+void zbx_on_exit(int ret)
+{
+}
 */
 import "C"
 
