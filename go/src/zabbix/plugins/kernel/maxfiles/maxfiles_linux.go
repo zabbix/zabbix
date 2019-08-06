@@ -17,16 +17,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package maxfiles
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/kernel/maxfiles"
-	_ "zabbix/plugins/kernel/maxproc"
+	"bufio"
+	"fmt"
+	"strconv"
+	"zabbix/pkg/std"
 )
+
+func getMaxfiles() (maxfiles uint64, err error) {
+	var file std.File
+	var line string
+
+	file, err = stdOs.Open("/proc/sys/fs/file-max")
+	if err != nil {
+		return 0, fmt.Errorf("Cannot read /proc/sys/fs/file-max: %s", err.Error())
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	line, err = reader.ReadString('\n')
+	if err != nil {
+		return 0, fmt.Errorf("Cannot read number of files: %s", err.Error())
+	}
+
+	maxfiles, err = strconv.ParseUint(line[:len(line)-1], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("Cannot read number of files: %s", err.Error())
+	}
+
+	return maxfiles, nil
+}

@@ -17,16 +17,35 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package maxproc
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/kernel/maxfiles"
-	_ "zabbix/plugins/kernel/maxproc"
+	"bufio"
+	"fmt"
+	"strconv"
+	"zabbix/pkg/std"
 )
+
+func getMaxproc() (maxproc uint64, err error) {
+	var file std.File
+	var line string
+
+	file, err = stdOs.Open("/proc/sys/kernel/pid_max")
+	if err != nil {
+		return 0, fmt.Errorf("Cannot open /proc/sys/kernel/pid_max: %s", err.Error())
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	line, err = reader.ReadString('\n')
+	if err != nil {
+		return 0, fmt.Errorf("Cannot read number of processes: %s", err.Error())
+	}
+
+	maxproc, err = strconv.ParseUint(line[:len(line)-1], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("Cannot read number of processes: %s", err.Error())
+	}
+
+	return maxproc, nil
+}

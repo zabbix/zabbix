@@ -1,9 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	system \
-	systemd\
-	debug\
-	vfs\
-	kernel
+	maxfiles \
+	maxproc
 
