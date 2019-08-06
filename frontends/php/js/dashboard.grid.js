@@ -1577,17 +1577,17 @@
 	}
 
 	function hasWidgetSizeChanged(widget) {
-		if (typeof widget['size'] === 'undefined') {
+		if (typeof widget['content_size'] === 'undefined') {
 			return true;
 		}
 
-		return (widget['size']['content_width'] != Math.floor(widget['content_body'].width())
-			|| widget['size']['content_height'] != Math.floor(widget['content_body'].height())
+		return (widget['content_size']['content_width'] != Math.floor(widget['content_body'].width())
+			|| widget['content_size']['content_height'] != Math.floor(widget['content_body'].height())
 		);
 	}
 
 	function saveWidgetSize(widget) {
-		widget['size'] = {
+		widget['content_size'] = {
 			'content_width': Math.floor(widget['content_body'].width()),
 			'content_height': Math.floor(widget['content_body'].height())
 		};
@@ -1647,7 +1647,7 @@
 		if (!widget['iterator']) {
 			saveWidgetSize(widget);
 
-			$.extend(ajax_data, widget['size']);
+			$.extend(ajax_data, widget['content_size']);
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -2381,6 +2381,10 @@
 	}
 
 	function onIteratorResizeEnd($obj, data, iterator) {
+		if (getIteratorTooSmallState(iterator)) {
+			return;
+		}
+
 		// 1. Ensure that the child widgets are still current; replace if otherwise.
 		// 2. When complete, call the onResizeEnd trigger for the child widgets.
 
