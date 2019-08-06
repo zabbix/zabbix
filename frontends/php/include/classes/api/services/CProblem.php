@@ -404,9 +404,9 @@ class CProblem extends CApiService {
 		if ($this->outputIsRequested('opdata', $options['output'])) {
 			$problems = DBFetchArrayAssoc(DBselect(
 				'SELECT p.eventid,p.clock,p.ns,t.triggerid,t.expression,t.opdata'.
-					' FROM problem p'.
-						' JOIN triggers t ON t.triggerid=p.objectid'.
-					' WHERE '.dbConditionInt('p.eventid', $eventids)
+				' FROM problem p'.
+				' JOIN triggers t ON t.triggerid=p.objectid'.
+				' WHERE '.dbConditionInt('p.eventid', $eventids)
 			), 'eventid');
 
 			foreach ($result as $eventid => $problem) {

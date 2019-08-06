@@ -1191,8 +1191,8 @@ class CScreenProblem extends CScreenBase {
 
 			$actions_performed = [];
 			if ($data['actions']['messages'][$problem['eventid']]['count'] > 0) {
-				$actions_performed[] =
-						_('Messages').' ('.$data['actions']['messages'][$problem['eventid']]['count'].')';
+				$actions_performed[] = _('Messages').
+					' ('.$data['actions']['messages'][$problem['eventid']]['count'].')';
 			}
 			if ($data['actions']['severities'][$problem['eventid']]['count'] > 0) {
 				$actions_performed[] = _('Severity changes');

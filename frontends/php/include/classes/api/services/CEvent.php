@@ -913,9 +913,9 @@ class CEvent extends CApiService {
 		if ($this->outputIsRequested('opdata', $options['output'])) {
 			$events = DBFetchArrayAssoc(DBselect(
 				'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
-					' FROM events e'.
-						' JOIN triggers t ON t.triggerid=e.objectid'.
-					' WHERE '.dbConditionInt('e.eventid', $eventids)
+				' FROM events e'.
+				' JOIN triggers t ON t.triggerid=e.objectid'.
+				' WHERE '.dbConditionInt('e.eventid', $eventids)
 			), 'eventid');
 
 			foreach ($result as $eventid => $event) {
