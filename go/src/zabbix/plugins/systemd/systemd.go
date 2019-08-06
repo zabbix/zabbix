@@ -3,9 +3,9 @@ package systemd
 import (
 	"encoding/json"
 	"fmt"
-	"zabbix/internal/plugin"
 	"path/filepath"
 	"sync"
+	"zabbix/internal/plugin"
 
 	"github.com/godbus/dbus"
 )
@@ -78,7 +78,7 @@ func zbxNum2hex(c byte) byte {
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (interface{}, error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
 	conn, err := p.getConnection()
 
 	if nil != err {

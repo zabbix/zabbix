@@ -22,19 +22,39 @@ package itemutil
 import (
 	"fmt"
 	"strconv"
+	"time"
+	"zabbix/internal/plugin"
 )
 
 const StateNotSupported = 1
 
-func ValueToString(value interface{}) string {
-	switch value.(type) {
+func ValueToResult(itemid uint64, ts time.Time, v interface{}) (result *plugin.Result) {
+	var value string
+	switch v.(type) {
+	case *plugin.Result:
+		return v.(*plugin.Result)
+	case plugin.Result:
+		r := v.(plugin.Result)
+		return &r
 	case string:
-		return value.(string)
+		value = v.(string)
 	case *string:
-		return *value.(*string)
+		value = *v.(*string)
 	case int:
-		return strconv.Itoa(value.(int))
+		value = strconv.Itoa(v.(int))
+	case int64:
+		value = strconv.Itoa(v.(int))
+	case uint:
+		value = strconv.Itoa(v.(int))
+	case uint64:
+		value = strconv.Itoa(v.(int))
+	case float32:
+		value = strconv.FormatFloat(float64(v.(float32)), 'g', -1, 64)
+	case float64:
+		value = strconv.FormatFloat(v.(float64), 'g', -1, 64)
 	default:
-		return fmt.Sprintf("%v", value)
+		// note that this conversion is slow and
+		value = fmt.Sprintf("%v", v)
 	}
+	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
 }

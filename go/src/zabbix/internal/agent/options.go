@@ -30,6 +30,7 @@ type AgentOptions struct {
 	Timeout             int    `conf:",,1:30,3"`
 	Hostname            string
 	ListenPort          int `conf:",,1024:32767,10050"`
+	MaxLinesPerSecond   int `conf:",,1:1000,20"`
 	Plugins             map[string]map[string]string
 }
 
