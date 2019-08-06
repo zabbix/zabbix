@@ -26,6 +26,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
@@ -34,6 +35,8 @@ import (
 	"zabbix/pkg/log"
 	"zabbix/pkg/zbxcomms"
 )
+
+const hostMetadataLen = 255
 
 type Connector struct {
 	clientID    uint64
@@ -113,11 +116,34 @@ func (c *Connector) refreshActiveChecks() {
 		a.HostMetadata = agent.Options.HostMetadata
 	} else if len(agent.Options.HostMetadataItem) > 0 {
 		log.Debugf("[%d] retrieving HostMetadataItem [%s]", c.clientID, agent.Options.HostMetadataItem)
+
 		h := hostMetadataWriter{input: make(chan *plugin.Result)}
 
 		c.taskManager.UpdateTasks(0, h, []*plugin.Request{{Key: agent.Options.HostMetadataItem}})
-		r := <-h.input
-		a.HostMetadata = *r.Value
+		select {
+		case r := <-h.input:
+			a.HostMetadata = *r.Value
+		case <-time.After(time.Duration(agent.Options.Timeout) * time.Second):
+			log.Errf("[%d] timeout while getting host metadata using \"%s\" item specified by \"HostMetadataItem\" configuration parameter", c.clientID, agent.Options.HostMetadataItem)
+			return
+		}
+
+		if !utf8.ValidString(a.HostMetadata) {
+			log.Warningf("cannot get host metadata using \"%s\" item specified by \"HostMetadataItem\" configuration parameter: returned value is not an UTF-8 string", agent.Options.HostMetadataItem)
+			return
+		}
+
+		var l int
+
+		for i := range a.HostMetadata {
+			if i > hostMetadataLen {
+				log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter is too long, using first %d characters", agent.Options.HostMetadataItem, l)
+				a.HostMetadata = a.HostMetadata[:l]
+				break
+			}
+			l = i
+		}
+
 		log.Debugf("[%d] retrieved HostMetadataItem [%s] value [%s]", c.clientID, agent.Options.HostMetadataItem, a.HostMetadata)
 	}
 
