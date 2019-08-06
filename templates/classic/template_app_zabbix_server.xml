@@ -2889,6 +2889,7 @@
                     </screen_items>
                 </screen>
             </screens>
+	    <tags/>
         </template>
     </templates>
     <triggers>

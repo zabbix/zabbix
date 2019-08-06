@@ -14,31 +14,44 @@
 		jQuery('#user_medias_' + index + '_description').remove();
 	}
 
+	function autologoutHandler() {
+		var	$autologout_visible = jQuery('#autologout_visible'),
+			disabled = !$autologout_visible.prop('checked'),
+			$autologout = jQuery('#autologout'),
+			$hidden = $autologout.prev('input[type=hidden][name="' + $autologout.prop('name') + '"]');
+
+		$autologout.prop('disabled', disabled);
+
+		if (!disabled) {
+			$hidden.remove();
+		}
+		else if (!$hidden.length) {
+			jQuery('<input>', {'type': 'hidden', 'name': $autologout.prop('name')})
+				.val('0')
+				.insertBefore($autologout);
+		}
+	}
+
 	jQuery(function($) {
 		var $autologin_cbx = $('#autologin'),
-			$autologout_cbx = $('#autologout_visible'),
-			$autologout_txt = $('#autologout');
+			$autologout_cbx = $('#autologout_visible');
 
 		$autologin_cbx.on('click', function() {
 			if (this.checked) {
 				$autologout_cbx.prop('checked', false);
 			}
-			$autologout_txt.prop('disabled', this.checked || !$autologin_cbx.prop('checked'));
+			autologoutHandler();
 		});
 
 		$autologout_cbx.on('click', function() {
 			if (this.checked) {
-				$autologin_cbx.prop('checked', false);
+				$autologin_cbx.prop('checked', false).change();
 			}
-			$autologout_txt.prop('disabled', !this.checked);
+			autologoutHandler();
 		});
+	});
 
-		<?php if ($this->data['is_profile']): ?>
-		$('#messages_enabled').on('change', function() {
-			$('input, button, select', $('#messagingTab'))
-				.not('[name="messages[enabled]"]')
-				.prop('disabled', !this.checked);
-		}).trigger('change');
-		<?php endif ?>
+	jQuery(document).ready(function($) {
+		autologoutHandler();
 	});
 </script>
