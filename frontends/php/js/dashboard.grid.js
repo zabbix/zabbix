@@ -1414,21 +1414,17 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos = {
-			'x': 0,
-			'y': 0,
-			'width': data['widget_defaults'][type]['size']['width'],
-			'height': data['widget_defaults'][type]['size']['height']
-		}
-
-		if (data.dialogue.widget !== null) {
-			pos.width = data.dialogue.widget.pos.width;
-			pos.height = data.dialogue.widget.pos.height;
-		}
+		var pos_type = (type === undefined) ? Object.keys(data.widget_defaults)[0] : type,
+			pos = {
+				'x': 0,
+				'y': 0,
+				'width': data.widget_defaults[pos_type].size.width,
+				'height': data.widget_defaults[pos_type].size.height
+			};
 
 		// Go y by row and try to position widget in each space.
-		var	max_col = data['options']['max-columns'] - pos['width'],
-			max_row = data['options']['max-rows'] - pos['height'],
+		var	max_col = data.options['max-columns'] - pos.width,
+			max_row = data.options['max-rows'] - pos.height,
 			found = false,
 			x, y;
 
@@ -2434,12 +2430,8 @@
 							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
-						var type = (data.dialogue['widget_type'] === undefined)
-								? 'actionlog'
-								: data.dialogue['widget_type'];
-
-						if ($this.children('.dashbrd-grid-new-widget-placeholder').is(':hidden') &&
-								!findEmptyPosition($this, data, type)) {
+						if (data.dialogue.widget === null
+								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
 							showMessageExhausted(data);
 						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
