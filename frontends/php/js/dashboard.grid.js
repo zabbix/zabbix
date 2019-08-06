@@ -1442,6 +1442,9 @@
 		response.children.slice(0, numIteratorColumns(iterator) * numIteratorRows(iterator))
 			.forEach(function(child) {
 				if (typeof child['widgetid'] !== 'undefined' && current_children_by_widgetid[child['widgetid']]) {
+					// Please note, that the order of widgets inside of iterator['content_body'] is not important,
+					// since the absolute positioning is done based on widget order in the iterator['children'].
+
 					iterator['children'].push(current_children_by_widgetid[child['widgetid']]);
 
 					reused_widgetids.push(child['widgetid']);
