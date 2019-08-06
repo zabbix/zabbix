@@ -17,6 +17,10 @@ COMMON_SUBDIRS = libs
 else
 if PROXY
 COMMON_SUBDIRS = libs
+else
+if GO
+COMMON_SUBDIRS = libs
+endif
 endif
 endif
 endif
@@ -26,6 +30,11 @@ AGENT_SUBDIRS = \
 	zabbix_agent \
 	zabbix_get \
 	zabbix_sender
+else
+if GO
+AGENT_SUBDIRS = \
+	zabbix_agent
+endif
 endif
 
 if SERVER

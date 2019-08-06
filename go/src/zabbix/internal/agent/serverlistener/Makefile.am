@@ -3,7 +3,7 @@
 all: build
 
 build:
-	go build
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go build
 
 clean:
 	go clean

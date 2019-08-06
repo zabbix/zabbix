@@ -36,7 +36,6 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxjson/libzbxjson.a
 #cgo LDFLAGS: -Wl,--end-group
-#cgo LDFLAGS: -lz -lcurl -lresolv -lpcre
 
 #include "common.h"
 #include "sysinfo.h"
