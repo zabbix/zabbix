@@ -19,7 +19,10 @@
 
 package plugin
 
-import "time"
+import (
+	"sync/atomic"
+	"time"
+)
 
 const (
 	DefaultCapacity = 10
@@ -56,12 +59,33 @@ type ResultWriter interface {
 	Write(result *Result)
 }
 
+type Meta struct {
+	lastLogsize uint64
+	mtime       int32
+	Data        interface{}
+}
+
+func (m *Meta) SetLastLogsize(value uint64) {
+	atomic.StoreUint64(&m.lastLogsize, value)
+}
+
+func (m *Meta) LastLogsize() uint64 {
+	return atomic.LoadUint64(&m.lastLogsize)
+}
+
+func (m *Meta) SetMtime(value int32) {
+	atomic.StoreInt32(&m.mtime, value)
+}
+
+func (m *Meta) Mtime() int32 {
+	return atomic.LoadInt32(&m.mtime)
+}
+
 type ContextProvider interface {
 	ClientID() uint64
 	ItemID() uint64
 	Output() ResultWriter
-	SetData(data interface{})
-	Data() interface{}
+	Meta() *Meta
 	// TODO: add function for global regexps
 }
 

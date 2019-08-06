@@ -249,17 +249,19 @@ func (m *mockManager) mockTasks() {
 			case *exporterTask:
 				e := task.(*exporterTask)
 				mockTask := &mockExporterTask{
-					taskBase: taskBase{
-						plugin:    task.getPlugin(),
-						scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
-						index:     -1,
-						active:    task.isActive(),
-						recurring: true,
+					exporterTask: exporterTask{
+						taskBase: taskBase{
+							plugin:    task.getPlugin(),
+							scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
+							index:     -1,
+							active:    task.isActive(),
+							recurring: true,
+						},
+						item:     e.item,
+						clientid: e.clientid,
+						meta:     e.meta,
 					},
-					sink:     m.sink,
-					item:     e.item,
-					clientid: e.clientid,
-					data:     e.data,
+					sink: m.sink,
 				}
 				p.enqueueTask(mockTask)
 				m.clients[index[e]].exporters[e.item.itemid] = mockTask
@@ -295,10 +297,9 @@ func (m *mockManager) mockTasks() {
 						active:    task.isActive(),
 					},
 					sink:       m.sink,
-					resultSink: w.sink,
+					resultSink: w.output,
 					requests:   w.requests,
 					clientid:   w.clientid,
-					data:       w.data,
 				}
 				p.enqueueTask(mockTask)
 			case *configerTask:
@@ -393,12 +394,8 @@ func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accesso
 }
 
 type mockExporterTask struct {
-	taskBase
-	item     clientItem
-	updated  time.Time
-	sink     chan performer
-	clientid uint64
-	data     interface{}
+	exporterTask
+	sink chan performer
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
@@ -412,15 +409,8 @@ func (t *mockExporterTask) reschedule(now time.Time) (err error) {
 	return
 }
 
-func (t *mockExporterTask) setUpdated(now time.Time) {
-	t.updated = now
-}
-func (t *mockExporterTask) getUpdated() (updated time.Time) {
-	return t.updated
-}
-
-func (t *mockExporterTask) getItem() (item *clientItem) {
-	return &t.item
+func (t *mockExporterTask) task() (task *exporterTask) {
+	return &t.exporterTask
 }
 
 // plugin.ContextProvider interface
@@ -436,12 +426,9 @@ func (t *mockExporterTask) ItemID() (itemid uint64) {
 func (t *mockExporterTask) Output() (output plugin.ResultWriter) {
 	return nil
 }
-func (t *mockExporterTask) SetData(data interface{}) {
-	t.data = data
-}
 
-func (t *mockExporterTask) Data() (data interface{}) {
-	return t.data
+func (t *mockExporterTask) Meta() (meta *plugin.Meta) {
+	return &t.meta
 }
 
 type mockCollectorTask struct {
@@ -505,7 +492,6 @@ type mockWatcherTask struct {
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
 	clientid   uint64
-	data       interface{}
 }
 
 func (t *mockWatcherTask) perform(s Scheduler) {
@@ -535,12 +521,9 @@ func (t *mockWatcherTask) ItemID() (itemid uint64) {
 func (t *mockWatcherTask) Output() (output plugin.ResultWriter) {
 	return t.resultSink
 }
-func (t *mockWatcherTask) SetData(data interface{}) {
-	t.data = data
-}
 
-func (t *mockWatcherTask) Data() (data interface{}) {
-	return t.data
+func (t *mockWatcherTask) Meta() (meta *plugin.Meta) {
+	return nil
 }
 
 type mockConfigerTask struct {
@@ -592,8 +575,8 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 	}
 
 	for _, item := range items {
-		if task, ok := requestClient.exporters[item.itemid]; ok {
-			ti := task.getItem()
+		if tacc, ok := requestClient.exporters[item.itemid]; ok {
+			ti := tacc.task().item
 			if ti.delay != item.delay {
 				t.Errorf("Expected item %d delay %s while got %s", item.itemid, item.delay, ti.delay)
 			}

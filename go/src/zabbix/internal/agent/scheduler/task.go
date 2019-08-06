@@ -48,10 +48,7 @@ type taskBase struct {
 }
 
 type exporterTaskAccessor interface {
-	performer
-	setUpdated(now time.Time)
-	getUpdated() time.Time
-	getItem() *clientItem
+	task() *exporterTask
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -120,17 +117,22 @@ func (t *collectorTask) getWeight() int {
 
 type exporterTask struct {
 	taskBase
-	writer             plugin.ResultWriter
+	output             plugin.ResultWriter
 	item               clientItem
 	failed             bool
 	updated            time.Time
 	refreshUnsupported int
 	clientid           uint64
-	data               interface{}
+	meta               plugin.Meta
+	// note that any data that can be changed during active checks update and is exposed
+	// by ContextProvider interface can be written and accessed at the same time.
+	// Easiest way to protect such variables would be through pointers using atomic load/store.
+	// Example of shared data - global regular expressions.
 }
 
 func (t *exporterTask) perform(s Scheduler) {
 	go func(itemkey string) {
+		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
@@ -147,24 +149,27 @@ func (t *exporterTask) perform(s Scheduler) {
 					case reflect.Array:
 						s := reflect.ValueOf(ret)
 						for i := 0; i < s.Len(); i++ {
-							value := itemutil.ValueToString(s.Index(i))
-							t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+							t.output.Write(result)
 						}
 					default:
-						value := itemutil.ValueToString(ret)
-						t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+						result = itemutil.ValueToResult(t.item.itemid, now, ret)
+						t.output.Write(result)
 					}
-				} else {
-					t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Ts: now})
 				}
 			}
 		}
 		if err != nil {
-			t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
+			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
+			t.output.Write(result)
+		}
+		// set failed state based on last result
+		if result != nil && result.Error != nil {
 			t.failed = true
 		} else {
 			t.failed = false
 		}
+
 		s.FinishTask(t)
 	}(t.item.key)
 }
@@ -182,15 +187,8 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 	return
 }
 
-func (t *exporterTask) setUpdated(now time.Time) {
-	t.updated = now
-}
-func (t *exporterTask) getUpdated() (updated time.Time) {
-	return t.updated
-}
-
-func (t *exporterTask) getItem() (item *clientItem) {
-	return &t.item
+func (t *exporterTask) task() (task *exporterTask) {
+	return t
 }
 
 // plugin.ContextProvider interface
@@ -204,14 +202,11 @@ func (t *exporterTask) ItemID() (itemid uint64) {
 }
 
 func (t *exporterTask) Output() (output plugin.ResultWriter) {
-	return t.writer
-}
-func (t *exporterTask) SetData(data interface{}) {
-	t.data = data
+	return t.output
 }
 
-func (t *exporterTask) Data() (data interface{}) {
-	return t.data
+func (t *exporterTask) Meta() (meta *plugin.Meta) {
+	return &t.meta
 }
 
 type starterTask struct {
@@ -259,9 +254,8 @@ func (t *stopperTask) getWeight() int {
 type watcherTask struct {
 	taskBase
 	requests []*plugin.Request
-	sink     plugin.ResultWriter
+	output   plugin.ResultWriter
 	clientid uint64
-	data     interface{}
 }
 
 func (t *watcherTask) perform(s Scheduler) {
@@ -292,14 +286,11 @@ func (t *watcherTask) ItemID() (itemid uint64) {
 }
 
 func (t *watcherTask) Output() (output plugin.ResultWriter) {
-	return t.sink
-}
-func (t *watcherTask) SetData(data interface{}) {
-	t.data = data
+	return t.output
 }
 
-func (t *watcherTask) Data() (data interface{}) {
-	return t.data
+func (t *watcherTask) Meta() (meta *plugin.Meta) {
+	return nil
 }
 
 type configerTask struct {

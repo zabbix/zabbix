@@ -20,186 +20,80 @@
 package log
 
 import (
-	"container/heap"
-	"strconv"
-	"strings"
+	"runtime"
 	"time"
+	"unsafe"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/itemutil"
 	"zabbix/pkg/zbxlib"
-)
-
-// Plugin -
-
-const (
-	defaultcapacity = 1
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	queue logHeap
-	// log monitoring tasks, mapped as clientid->itemid->task
-	tasks        map[uint64]map[uint64]*logTask
-	capacity     int
-	runningTasks int
-	newTasks     chan *logTask
-	input        chan interface{}
-}
-
-type clientRequest struct {
-	clientid uint64
-	requests []*plugin.Request
-	sink     plugin.ResultWriter
-}
-
-func (p *Plugin) processQueue(now time.Time) {
-	seconds := now.Unix()
-	for task := p.queue.Peek(); task != nil; task = p.queue.Peek() {
-		if p.capacity == p.runningTasks {
-			return
-		}
-		if task.scheduled.Unix() > seconds {
-			return
-		}
-		heap.Pop(&p.queue)
-		if task.active {
-			p.runningTasks++
-			// TODO: update task with latest configuration data
-
-			// pass item key as parameter to allow task updates without worrying about synchronization
-			go task.perform(task.key, p, now)
-		}
-	}
-}
-
-// updateTasks creates/update log monitoring tasks for the corresponding client.
-func (p *Plugin) updateTasks(request *clientRequest, now time.Time) {
-	var tasks map[uint64]*logTask
-	var ok bool
-	if tasks, ok = p.tasks[request.clientid]; !ok {
-		tasks = make(map[uint64]*logTask)
-		p.tasks[request.clientid] = tasks
-	}
-
-	for _, r := range request.requests {
-		data, err := zbxlib.NewActiveMetric(r.Key, r.LastLogsize, r.Mtime)
-		if err != nil {
-			request.sink.Write(&plugin.Result{Itemid: r.Itemid, Ts: time.Now(), Error: err})
-			continue
-		}
-
-		var task *logTask
-		if task, ok = tasks[r.Itemid]; !ok {
-			task = &logTask{
-				clientid: request.clientid,
-				output:   request.sink,
-				active:   true,
-				itemid:   r.Itemid,
-				key:      r.Key,
-				delay:    r.Delay,
-				data:     data,
-			}
-			task.reschedule(now)
-			tasks[r.Itemid] = task
-			heap.Push(&p.queue, task)
-		} else {
-			task.key = r.Key
-			if task.delay != r.Delay {
-				task.delay = r.Delay
-				p.queue.Update(task)
-			}
-		}
-		task.updated = now
-	}
-
-	// remove tasks for items not monitored anymore
-	for _, t := range tasks {
-		if t.updated.Before(now) {
-			t.deactivate()
-			delete(tasks, t.itemid)
-		}
-	}
-	if len(tasks) == 0 {
-		delete(p.tasks, request.clientid)
-		p.Debugf("removing client %d", request.clientid)
-	}
-}
-
-func (p *Plugin) run() {
-	p.Debugf("started log monitoring")
-	ticker := time.NewTicker(time.Second)
-run:
-	for {
-		select {
-		case <-ticker.C:
-			p.processQueue(time.Now())
-		case v := <-p.input:
-			if v == nil {
-				break run
-			}
-			switch v.(type) {
-			case *logTask:
-				now := time.Now()
-				p.runningTasks--
-				task := v.(*logTask)
-				if task.active {
-					task.reschedule(now)
-					heap.Push(&p.queue, task)
-				}
-				p.processQueue(now)
-			case *clientRequest:
-				now := time.Now()
-				p.updateTasks(v.(*clientRequest), now)
-				p.processQueue(now)
-			}
-		}
-	}
-
-	close(p.newTasks)
-	close(p.input)
-	p.Debugf("stopped log monitoring")
-}
-
-// plugin interfaces
-
-func (p *Plugin) Start() {
-	p.newTasks = make(chan *logTask, 100)
-	p.input = make(chan interface{}, 100)
-
-	go p.run()
-}
-
-func (p *Plugin) Stop() {
-	p.input <- nil
-}
-
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
-	p.input <- &clientRequest{clientid: ctx.ClientID(), requests: requests, sink: ctx.Output()}
 }
 
 func (p *Plugin) Configure(options map[string]string) {
-	if val, ok := options["Capacity"]; ok {
-		var err error
-		if p.capacity, err = strconv.Atoi(val); err != nil {
-			p.Warningf("invalid configuration parameter Plugins.%s.Workers value '%s', using default %d",
-				strings.Title(p.Name()), val, defaultcapacity)
-		} else {
-			p.Debugf("setting maximum capacity to %d", p.capacity)
+	zbxlib.SetMaxLinesPerSecond(agent.Options.MaxLinesPerSecond)
+}
+
+type metadata struct {
+	key       string
+	params    []string
+	blob      unsafe.Pointer
+	lastcheck time.Time
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	meta := ctx.Meta()
+
+	var data *metadata
+	if meta.Data == nil {
+		data = &metadata{key: key, params: params}
+		meta.Data = data
+		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
+	} else {
+		data = meta.Data.(*metadata)
+		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {
+			p.Debugf("item %d key has been changed, resetting log metadata", ctx.ItemID())
+			zbxlib.FreeActiveMetric(data.blob)
+			data.blob = nil
+			data.key = key
+			data.params = params
 		}
 	}
-	// TODO: either access gobal configuration or move MaxLinesPerSecond to plugin configuration
-	// TODO: MaxLinesPerSecond will be accessed from C code in multiple goroutines -
-	// some update synchronization would be preferable.
-	zbxlib.SetMaxLinesPerSecond(agent.Options.MaxLinesPerSecond)
+
+	if data.blob == nil {
+		var err error
+		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+			return nil, err
+		}
+	}
+
+	// with flexible checks there are no guaranteed refresh time,
+	// so using number of seconds elapsed since last check
+	now := time.Now()
+	var refresh int
+	if data.lastcheck.IsZero() {
+		refresh = 1
+	} else {
+		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
+	}
+
+	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*plugin.Result, 0)}
+	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh)
+	data.lastcheck = now
+
+	if len(logitem.Results) != 0 {
+		return logitem.Results, nil
+	}
+	return nil, nil
 }
 
 var impl Plugin
 
 func init() {
-	impl.capacity = defaultcapacity
-	impl.tasks = make(map[uint64]map[uint64]*logTask)
-
 	plugin.RegisterMetric(&impl, "log", "log", "Log file monitoring.")
 	plugin.RegisterMetric(&impl, "log", "logrt", "Log file monitoring with log rotation support.")
 	plugin.RegisterMetric(&impl, "log", "log.count", "Count of matched lines in log file monitoring.")

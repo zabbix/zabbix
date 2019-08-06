@@ -36,12 +36,13 @@ import (
 )
 
 type Connector struct {
-	clientID    uint64
-	input       chan interface{}
-	address     string
-	lastError   error
-	resultCache *resultcache.ResultCache
-	taskManager scheduler.Scheduler
+	clientID      uint64
+	input         chan interface{}
+	address       string
+	lastError     error
+	resultCache   *resultcache.ResultCache
+	taskManager   scheduler.Scheduler
+	refreshConfig int
 }
 
 type activeChecksRequest struct {
@@ -183,7 +184,7 @@ run:
 		select {
 		case <-ticker.C:
 			c.resultCache.Flush()
-			if time.Since(start) > time.Duration(agent.Options.RefreshActiveChecks)*time.Second {
+			if time.Since(start) > time.Duration(c.refreshConfig)*time.Second {
 				c.refreshActiveChecks()
 				start = time.Now()
 			}
@@ -198,10 +199,11 @@ run:
 
 func New(taskManager scheduler.Scheduler, address string) *Connector {
 	c := &Connector{
-		taskManager: taskManager,
-		address:     address,
-		input:       make(chan interface{}, 10),
-		clientID:    agent.NewClientID(),
+		taskManager:   taskManager,
+		address:       address,
+		input:         make(chan interface{}, 10),
+		clientID:      agent.NewClientID(),
+		refreshConfig: agent.Options.RefreshActiveChecks,
 	}
 	c.resultCache = resultcache.NewActive(c.clientID, c)
 

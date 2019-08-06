@@ -147,17 +147,11 @@ const (
 )
 
 type LogItem struct {
-	Itemid uint64
-	Output plugin.ResultWriter
+	Itemid  uint64
+	Results []*plugin.Result
 }
 
-func NewActiveMetric(metric string, lastLogsize uint64, mtime int) (data unsafe.Pointer, err error) {
-	ckey := C.CString(metric)
-	var key string
-	key, _, err = itemutil.ParseKey(metric)
-	if err != nil {
-		return
-	}
+func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int32) (data unsafe.Pointer, err error) {
 	flags := MetricFlagNew | MetricFlagPersistent
 	switch key {
 	case "log":
@@ -171,6 +165,8 @@ func NewActiveMetric(metric string, lastLogsize uint64, mtime int) (data unsafe.
 	default:
 		return nil, fmt.Errorf("Unsupported item key: %s", key)
 	}
+	ckey := C.CString(itemutil.MakeKey(key, params))
+
 	return unsafe.Pointer(C.new_metric(ckey, C.ulong(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 
@@ -208,7 +204,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
 			Ts:     time.Now(),
 			Error:  err,
 		}
-		item.Output.Write(result)
+		item.Results = append(item.Results, result)
 	} else {
 		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent, clastLogsizeLast,
 			cmtimeLast)
@@ -223,7 +219,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
 				LastLogsize: &lastLogsize,
 				Mtime:       &mtime,
 			}
-			item.Output.Write(result)
+			item.Results = append(item.Results, result)
 		}
 	}
 }

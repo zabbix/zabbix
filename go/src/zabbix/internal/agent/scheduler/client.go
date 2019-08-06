@@ -80,16 +80,17 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				return err
 			}
 		}
+		var task *exporterTask
 		if tacc, ok := c.exporters[r.Itemid]; !ok {
-			task := &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
-				writer:   sink,
-				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
-				updated:  now,
-				clientid: c.id,
+			task = &exporterTask{
+				taskBase:           taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
+				output:             sink,
+				item:               clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+				updated:            now,
+				clientid:           c.id,
+				refreshUnsupported: c.refreshUnsupported,
 			}
-
-			// cache scheduled (non direct) requests
+			// cache scheduled (non direct) request tasks
 			if r.Itemid != 0 {
 				c.exporters[r.Itemid] = task
 				if err = task.reschedule(now); err != nil {
@@ -99,19 +100,22 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
-			tacc.setUpdated(now)
-			item := tacc.getItem()
-			item.key = r.Key
-			if item.delay != r.Delay {
-				item.delay = r.Delay
-				if err = tacc.reschedule(now); err != nil {
-					tacc.deactivate()
+			task = tacc.task()
+			task.updated = now
+			task.refreshUnsupported = c.refreshUnsupported
+			task.item.key = r.Key
+			if task.item.delay != r.Delay {
+				task.item.delay = r.Delay
+				if err = task.reschedule(now); err != nil {
+					task.deactivate()
 					return
 				}
-				p.tasks.Update(tacc)
-				log.Debugf("[%d] updated exporter task for item %d %s", c.id, item.itemid, item.key)
+				p.tasks.Update(task)
+				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
 			}
 		}
+		task.meta.SetLastLogsize(r.LastLogsize)
+		task.meta.SetMtime(int32(r.Mtime))
 	}
 
 	// handle runner interface for inactive plugins
@@ -135,7 +139,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if info.watcher == nil {
 				info.watcher = &watcherTask{
 					taskBase: taskBase{plugin: p, active: true},
-					sink:     sink,
+					output:   sink,
 					requests: make([]*plugin.Request, 0, 1),
 					clientid: c.id,
 				}
@@ -185,9 +189,10 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	}
 
 	// remove unused items
-	for _, task := range c.exporters {
-		if task.getUpdated().Before(now) {
-			delete(c.exporters, task.getItem().itemid)
+	for _, tacc := range c.exporters {
+		task := tacc.task()
+		if task.updated.Before(now) {
+			delete(c.exporters, task.item.itemid)
 			task.deactivate()
 		}
 	}
@@ -211,7 +216,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 					if _, ok := p.impl.(plugin.Watcher); ok {
 						task := &watcherTask{
 							taskBase: taskBase{plugin: p, active: true},
-							sink:     nil,
+							output:   nil,
 							requests: make([]*plugin.Request, 0),
 							clientid: c.id,
 						}

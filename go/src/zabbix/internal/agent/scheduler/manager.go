@@ -77,9 +77,9 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			err = requestClient.addRequest(p, r, update.sink, now)
 		}
 		if err != nil {
-			if task, ok := requestClient.exporters[r.Itemid]; ok {
+			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
 				log.Debugf("deactivate task")
-				task.deactivate()
+				tacc.task().deactivate()
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
@@ -106,7 +106,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			for _, t := range p.tasks {
 				if t.isRecurring() {
 					t.deactivate()
-					// deactivation can change tasks ordering, so repeat the iteraton if task was deactivated
+					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
 					deactivate = true
 					break
 				}

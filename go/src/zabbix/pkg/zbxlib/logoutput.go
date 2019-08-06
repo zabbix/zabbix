@@ -51,5 +51,5 @@ func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsi
 		LastLogsize: &lastLogsize,
 		Mtime:       &mtime,
 	}
-	item.Output.Write(result)
+	item.Results = append(item.Results, result)
 }
