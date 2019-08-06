@@ -1471,7 +1471,7 @@
 			// 1. New child widgets MUST be initialized regardless of options['prevent_update'].
 			// 2. Existing child widgets are updated if not prevented.
 
-			if ($.inArray(child['widgetid'], reused_widgetids) === -1 || !options['prevent_update']) {
+			if ($.inArray(child['widgetid'], reused_widgetids) === -1 || !options['prevent_timer_refresh']) {
 				if (!doAction('timer_refresh', $obj, data, child)) {
 					// No refresh triggers for widget => update the conventional way.
 
@@ -2385,12 +2385,13 @@
 		// 2. When complete, call the onResizeEnd trigger for the child widgets.
 
 		updateWidgetContent($obj, data, iterator, {
-			'prevent_update': true
+			'prevent_timer_refresh': true
 		})
 			.done(function() {
 				// On successful request.
 
 				iterator['children'].forEach(function(child) {
+					// If not resizing OR if resizing and the size of the child has actually changed.
 					if (data['pos-action'] === '' || hasWidgetSizeChanged(child)) {
 						doAction('onResizeEnd', $obj, data, child);
 						saveWidgetSize(child);
