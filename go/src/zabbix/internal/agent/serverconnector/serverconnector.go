@@ -37,6 +37,7 @@ import (
 )
 
 const hostMetadataLen = 255
+const defaultAgentPort = 10050
 
 type Connector struct {
 	clientID    uint64
@@ -53,6 +54,7 @@ type activeChecksRequest struct {
 	Version      string `json:"version"`
 	HostMetadata string `json:"host_metadata,omitempty"`
 	ListenIP     string `json:"ip,omitempty"`
+	ListenPort   int    `json:"port,omitempty"`
 }
 
 type activeChecksResponse struct {
@@ -154,6 +156,10 @@ func (c *Connector) refreshActiveChecks() {
 		} else {
 			a.ListenIP = agent.Options.ListenIP
 		}
+	}
+
+	if agent.Options.ListenPort != defaultAgentPort {
+		a.ListenPort = agent.Options.ListenPort
 	}
 
 	request, err := json.Marshal(&a)
