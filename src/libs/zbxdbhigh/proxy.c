@@ -4016,9 +4016,19 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_FLAGS, tmp, sizeof(tmp)))
 		{
-			flag = atoi(tmp);
-			if (ZBX_CONN_DNS != flag && ZBX_CONN_IP != flag)
+			int flag_int;
+
+			flag_int = atoi(tmp);
+
+			if (0 <= flag_int && flag_int <= 2 )
+			{
+				flag = (zbx_conn_flags_t)flag_int;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":", flag_int, host);
 				flag = ZBX_CONN_DEFAULT;
+			}
 		}
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
