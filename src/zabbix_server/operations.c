@@ -458,7 +458,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
-			flags = (zbx_conn_flags_t)atoi(row[5]);
+			flags = atoi(row[5]);
 			if (ZBX_CONN_DNS == flags)
 				useip = 0;
 
