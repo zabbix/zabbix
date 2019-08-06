@@ -29,6 +29,7 @@ type AgentOptions struct {
 	Hostname            string
 	HostMetadata        string `conf:",optional"`
 	HostMetadataItem    string `conf:",optional"`
+	ListenIP            string `conf:",optional"`
 	ListenPort          int    `conf:",,1024:32767,10050"`
 	Plugins             map[string]map[string]string
 }

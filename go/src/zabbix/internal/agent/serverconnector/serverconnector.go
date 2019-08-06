@@ -52,6 +52,7 @@ type activeChecksRequest struct {
 	Host         string `json:"host"`
 	Version      string `json:"version"`
 	HostMetadata string `json:"host_metadata,omitempty"`
+	ListenIP     string `json:"ip,omitempty"`
 }
 
 type activeChecksResponse struct {
@@ -145,6 +146,14 @@ func (c *Connector) refreshActiveChecks() {
 		}
 
 		log.Debugf("[%d] retrieved HostMetadataItem [%s] value [%s]", c.clientID, agent.Options.HostMetadataItem, a.HostMetadata)
+	}
+
+	if len(agent.Options.ListenIP) > 0 {
+		if i := strings.IndexByte(agent.Options.ListenIP, ','); i != -1 {
+			a.ListenIP = agent.Options.ListenIP[:i]
+		} else {
+			a.ListenIP = agent.Options.ListenIP
+		}
 	}
 
 	request, err := json.Marshal(&a)
