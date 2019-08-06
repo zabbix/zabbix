@@ -2066,7 +2066,7 @@ out:
 	return ret;
 }
 
-int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
 		const char *perfcounter, AGENT_RESULT *result)
 {
 	char			*url, *mode, *name;

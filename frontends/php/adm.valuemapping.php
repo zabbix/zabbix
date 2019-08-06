@@ -21,6 +21,11 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
+$page['title'] = _('Configuration of value mapping');
+$page['file'] = 'adm.valuemapping.php';
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'valuemapids' =>	[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		null],
@@ -37,29 +42,7 @@ $fields = [
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-
-function prepare_page_header($type) {
-	global $page;
-
-	if ($type === 'html') {
-		$page['title'] = _('Configuration of value mapping');
-		$page['file'] = 'adm.valuemapping.php';
-	}
-	elseif ($type === 'xml') {
-		$page['file'] = 'zbx_export_valuemaps.xml';
-		$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	}
-}
-
-$fields_error = check_fields_raw($fields);
-if ($fields_error & ZBX_VALID_ERROR) {
-	// Halt on a HTML page with errors.
-
-	prepare_page_header('html');
-	require_once dirname(__FILE__).'/include/page_header.php';
-
-	invalid_url();
-}
+check_fields($fields);
 
 /*
  * Permissions
@@ -71,50 +54,9 @@ if (hasRequest('valuemapid')) {
 	]);
 
 	if (!$valuemaps) {
-		// Halt on a HTML page with errors.
-
-		prepare_page_header('html');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
 		access_deny();
 	}
 }
-
-/*
- * Export
- */
-if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
-	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids')]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-
-	$export_data = $export->export();
-
-	if ($export_data === false) {
-		prepare_page_header('html');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		access_deny();
-	}
-	elseif (hasErrorMesssages()) {
-		prepare_page_header('html');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		show_messages();
-	}
-	else {
-		prepare_page_header('xml');
-		require_once dirname(__FILE__).'/include/page_header.php';
-
-		print($export_data);
-	}
-
-	exit;
-}
-
-// Using HTML for the rest of functions.
-prepare_page_header('html');
-require_once dirname(__FILE__).'/include/page_header.php';
 
 /*
  * Actions
