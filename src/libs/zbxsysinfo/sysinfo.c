@@ -352,6 +352,8 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue)
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
+ * Comments: thread-safe                                                      *
+ *                                                                            *
  ******************************************************************************/
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
