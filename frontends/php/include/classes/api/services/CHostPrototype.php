@@ -338,9 +338,8 @@ class CHostPrototype extends CHostBase {
 				'group_prototypeid' =>	['type' => API_ID],
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory' =>			['type' => API_OBJECT, 'fields' => [
-				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
+			'inventory_mode' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null,
+				'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -505,8 +504,8 @@ class CHostPrototype extends CHostBase {
 			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
 		}
 
-		$exHostPrototypes = $this->get([
-			'output' => ['hostid'],
+		$ex_host_prototypes = $this->get([
+			'output' => ['hostid', 'inventory_mode'],
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
@@ -555,14 +554,14 @@ class CHostPrototype extends CHostBase {
 			}
 
 			// inventory
-			if (isset($hostPrototype['inventory']) ) {
-				$inventory = zbx_array_mintersect(['inventory_mode'], $hostPrototype['inventory']);
+			if ($host_prototype['inventory_mode'] !== null) {
+				if ($host_prototype['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					$inventory_deleteids[] = $host_prototype['hostid'];
+				}
+				else {
+					$inventory = ['inventory_mode' => $host_prototype['inventory_mode']];
 
-				if (array_key_exists('inventory_mode', $inventory)
-					&& ($inventory['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $inventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-
-					if ($exHostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+					if ($ex_host_prototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 						DB::update('host_inventory', [
 							'values' => $inventory,
 							'where' => ['hostid' => $hostPrototype['hostid']]
@@ -571,9 +570,6 @@ class CHostPrototype extends CHostBase {
 					else {
 						$inventoryCreate[] = $inventory + ['hostid' => $hostPrototype['hostid']];
 					}
-				}
-				else {
-					$inventoryDeleteIds[] = $hostPrototype['hostid'];
 				}
 			}
 		}
