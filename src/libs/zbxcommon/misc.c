@@ -2739,29 +2739,6 @@ int	is_time_suffix(const char *str, int *value, int length)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_time2bool                                                    *
- *                                                                            *
- * Purpose: check if the string is a zero with or without time suffix         *
- *                                                                            *
- * Parameters: value_raw - [IN] string to check                               *
- *                                                                            *
- * Return value: 0 - the string is equivalent to zero                         *
- *               1 - the string is not equivalent to zero or not a number     *
- *                     with time unit suffix at all                           *
- *                                                                            *
- ******************************************************************************/
-unsigned char	zbx_time2bool(const char *value_raw)
-{
-	int	value;
-
-	if (SUCCEED != is_time_suffix(value_raw, &value, ZBX_LENGTH_UNLIMITED))
-		return 1;
-
-	return 0 != value;
-}
-
 #ifdef _WINDOWS
 int	_wis_uint(const wchar_t *wide_string)
 {

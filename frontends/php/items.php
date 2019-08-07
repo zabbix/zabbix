@@ -53,7 +53,9 @@ $fields = [
 		_('Update interval')
 	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})',
+	'history_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
 		_('History storage period')
 	],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
@@ -67,9 +69,10 @@ $fields = [
 									]),
 									'isset({add}) || isset({update})'
 								],
+	'trends_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && '.
-			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+		'(isset({add}) || isset({update})) && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
+			' && isset({value_type}) && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
 	],
 	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
@@ -620,8 +623,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
 				'units' => getRequest('units', ''),
 				'delay' => $delay,
-				'history' => getRequest('history', DB::getDefault('items', 'history')),
-				'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
+				'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: getRequest('history', DB::getDefault('items', 'history')),
+				'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: getRequest('trends', DB::getDefault('items', 'trends')),
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -781,11 +788,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
 				}
-				if ($db_item['history'] != getRequest('history', DB::getDefault('items', 'history'))) {
-					$item['history'] = getRequest('history', DB::getDefault('items', 'history'));
+				$def_item_history = (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: DB::getDefault('items', 'history');
+				if ((string) $db_item['history'] !== (string) getRequest('history', $def_item_history)) {
+					$item['history'] = getRequest('history', $def_item_history);
 				}
-				if ($db_item['trends'] != getRequest('trends', DB::getDefault('items', 'trends'))) {
-					$item['trends'] = getRequest('trends', DB::getDefault('items', 'trends'));
+				$def_item_trends = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: DB::getDefault('items', 'trends');
+				if ((string) $db_item['trends'] !== (string) getRequest('trends', $def_item_trends)) {
+					$item['trends'] = getRequest('trends', $def_item_trends);
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
@@ -1051,7 +1064,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'interfaceid' => getRequest('interfaceid'),
 					'description' => getRequest('description'),
 					'delay' => $delay,
-					'history' => getRequest('history'),
+					'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+						? ITEM_NO_STORAGE_VALUE
+						: getRequest('history'),
 					'type' => getRequest('type'),
 					'snmp_community' => getRequest('snmp_community'),
 					'snmp_oid' => getRequest('snmp_oid'),
@@ -1066,7 +1081,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 					'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 					'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-					'trends' => getRequest('trends'),
+					'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+						? ITEM_NO_STORAGE_VALUE
+						: getRequest('trends'),
 					'logtimefmt' => getRequest('logtimefmt'),
 					'valuemapid' => getRequest('valuemapid'),
 					'authtype' => getRequest('authtype'),
@@ -1411,6 +1428,24 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
+	$history_in_seconds = timeUnitToSeconds($data['history']);
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
+		$data['history'] = DB::getDefault('items', 'history');
+	}
+	else {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
+	}
+
+	$trends_in_seconds = timeUnitToSeconds($data['trends']);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
+		$data['trends'] = $data['trends_default'];
+	}
+	else {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
+	}
+
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
 		['field' => 'main', 'order' => ZBX_SORT_DOWN]
@@ -1603,6 +1638,24 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 	}
 
 	$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+
+	$history_in_seconds = timeUnitToSeconds($data['history']);
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
+		$data['history'] = DB::getDefault('items', 'history');
+	}
+	else {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
+	}
+
+	$trends_in_seconds = timeUnitToSeconds($data['trends']);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
+		$data['trends'] = DB::getDefault('items', 'trends');
+	}
+	else {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.massupdate', $data);

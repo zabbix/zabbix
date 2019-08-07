@@ -1815,6 +1815,10 @@ output {
 				}
 			}
 		}
+
+		.wrap-multiple-controls {
+			display: flex;
+		}
 	}
 
 	.table-forms-td-right {

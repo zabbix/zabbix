@@ -386,7 +386,14 @@ function invalid_url($msg = null) {
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
-function check_fields(&$fields, $show_messages = true, $add_messages_to_message_stack = false) {
+/**
+ * Validate request fields and return result flags.
+ *
+ * @param array $fields field schema together with validation rules
+ *
+ * @return integer appropriate result flags ZBX_VALID_OK | ZBX_VALID_ERROR | ZBX_VALID_WARNING
+ */
+function check_fields_raw(&$fields) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = [
 		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
@@ -411,15 +418,26 @@ function check_fields(&$fields, $show_messages = true, $add_messages_to_message_
 
 	$fields = null;
 
-	if ($err&ZBX_VALID_ERROR) {
+	return $err;
+}
+
+/**
+ * Validate request fields and return true on success, false on error.
+ *
+ * @param array $fields field schema together with validation rules
+ * @param bool $show_messages do show messages on error
+ *
+ * @return bool true on success, false on error.
+ */
+function check_fields(&$fields, $show_messages = true) {
+	$err = check_fields_raw($fields);
+
+	if ($err & ZBX_VALID_ERROR) {
 		invalid_url();
 	}
 
 	if ($show_messages && $err != ZBX_VALID_OK) {
-		show_messages(($err == ZBX_VALID_OK), null, _('Page received incorrect data'));
-	}
-	elseif ($add_messages_to_message_stack && $err != ZBX_VALID_OK) {
-		error(_('Page received incorrect data'));
+		show_messages(false, null, _('Page received incorrect data'));
 	}
 
 	return ($err == ZBX_VALID_OK);

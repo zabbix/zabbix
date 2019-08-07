@@ -124,11 +124,12 @@ jQuery(function ($) {
 							item.data = data.data;
 
 							item.clickCallback = function(e) {
-								$(this).closest('.menu-popup-top').menuPopup('close', null, true);
-
 								var args = [$obj];
 								$(this).data('args').each(function(a) {args.push(a)});
 								methods[$(this).data('callback')].apply($obj, args);
+
+								// Remove menu only after .data() has been read from <a>.
+								$(this).closest('.menu-popup-top').menuPopup('close', null, true);
 
 								cancelEvent(e);
 							};

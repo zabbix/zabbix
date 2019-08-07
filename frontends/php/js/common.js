@@ -493,11 +493,11 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} dialogueid	Unique overlay element identifier.
- * @param {object} element		UI element which must be focused when overlay UI element will be closed.
- * @param {object} type			Type of overlay UI element.
- * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
- *								type 'popup' only.
+ * @param {string} id       Unique overlay element identifier.
+ * @param {object} element  UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type     Type of overlay UI element.
+ * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
+ *                          type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
 	var index = null,
