@@ -328,9 +328,11 @@ func (r resultWriter) PersistSlotsAvailable() bool {
 }
 
 func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
-	w := make(resultWriter)
+	var lastLogsize uint64
+	var mtime int
 
-	m.UpdateTasks(0, w, 0, []*plugin.Request{{Key: key}})
+	w := make(resultWriter)
+	m.UpdateTasks(0, w, 0, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
