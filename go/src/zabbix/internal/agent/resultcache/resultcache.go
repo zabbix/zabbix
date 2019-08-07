@@ -111,7 +111,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Data:    c.results,
 		Session: c.token,
 		Host:    agent.Options.Hostname,
-		Version: "TODO",
+		Version: "4.4",
 	}
 
 	var err error
