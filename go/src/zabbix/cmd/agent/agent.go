@@ -229,8 +229,12 @@ func main() {
 
 	taskManager.Start()
 
-	if err = configDefault(taskManager, &agent.Options); err == nil {
-		serverConnectors := make([]*serverconnector.Connector, len(addresses))
+	var serverConnectors []*serverconnector.Connector
+
+	err = configDefault(taskManager, &agent.Options)
+
+	if err == nil {
+		serverConnectors = make([]*serverconnector.Connector, len(addresses))
 
 		for i := 0; i < len(serverConnectors); i++ {
 			serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
@@ -238,20 +242,18 @@ func main() {
 		}
 
 		err = listener.Start()
+	}
 
-		if err == nil {
-			run()
-		} else {
-			log.Errf("cannot start agent: %s", err.Error())
-		}
-
-		listener.Stop()
-
-		for i := 0; i < len(serverConnectors); i++ {
-			serverConnectors[i].Stop()
-		}
+	if err == nil {
+		run()
 	} else {
-		log.Critf("%s", err)
+		log.Errf("cannot start agent: %s", err.Error())
+	}
+
+	listener.Stop()
+
+	for i := 0; i < len(serverConnectors); i++ {
+		serverConnectors[i].Stop()
 	}
 
 	taskManager.Stop()
