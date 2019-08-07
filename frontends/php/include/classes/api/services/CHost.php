@@ -300,28 +300,28 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_item_prototypes, with_simple_graph_items, with_simple_graph_item_prototypes, with_monitored_items
+		// with_items, with_simple_graph_items, with_monitored_items, with_item_prototypes, with_simple_graph_item_prototypes
 		if ($options['with_items'] !== null
-				|| $options['with_item_prototypes'] !== null
 				|| $options['with_simple_graph_items'] !== null
-				|| $options['with_simple_graph_item_prototypes'] !== null
-				|| $options['with_monitored_items'] !== null) {
+				|| $options['with_monitored_items'] !== null
+				|| $options['with_item_prototypes'] !== null
+				|| $options['with_simple_graph_item_prototypes'] !== null) {
 
 			$select_or = [];
 
 			// Item related subset selection.
 			$and = [];
 			if ($options['with_items'] !== null) {
-				$and[] = 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')';
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
 			}
 			elseif ($options['with_monitored_items'] !== null) {
-				$and[] = 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')';
-				$and[] = 'i.status='.ITEM_STATUS_ACTIVE;
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			}
 			elseif ($options['with_simple_graph_items'] !== null) {
-				$and[] = 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')';
-				$and[] = 'i.status='.ITEM_STATUS_ACTIVE;
-				$and[] = 'i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')';
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
+				$and[] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 			if ($and) {
 				$select_or[] = implode(' AND ', $and);
@@ -330,12 +330,12 @@ class CHost extends CHostGeneral {
 			// Item prototype related subset selection.
 			$and = [];
 			if ($options['with_item_prototypes'] !== null) {
-				$and[] = 'i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE;
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			elseif ($options['with_simple_graph_item_prototypes'] !== null) {
-				$and[] = 'i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE;
-				$and[] = 'i.status='.ITEM_STATUS_ACTIVE;
-				$and[] = 'i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')';
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
+				$and[] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 			if ($and) {
 				$select_or[] = implode(' AND ', $and);

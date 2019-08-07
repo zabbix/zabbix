@@ -58,9 +58,10 @@ class CHostGroup extends CApiService {
 			'real_hosts'							=> null,
 			'with_hosts_and_templates'				=> null,
 			'with_items'							=> null,
-			'with_monitored_items'					=> null,
+			'with_item_prototypes'					=> null,
 			'with_simple_graph_items'				=> null,
 			'with_simple_graph_item_prototypes'		=> null,
+			'with_monitored_items'					=> null,
 			'with_triggers'							=> null,
 			'with_monitored_triggers'				=> null,
 			'with_httptests'						=> null,
@@ -198,36 +199,60 @@ class CHostGroup extends CApiService {
 			);
 		}
 
-		// with_items, with_monitored_items, with_simple_graph_items, with_simple_graph_item_prototypes
-		if ($options['with_items'] !== null) {
-			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-			);
-		}
-		elseif ($options['with_monitored_items'] !== null) {
-			$sub_sql_parts['from']['i'] = 'items i';
-			$sub_sql_parts['from']['h'] = 'hosts h';
-			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
-			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('h.status', [HOST_STATUS_MONITORED]);
-			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
-			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-			);
-		}
-		elseif ($options['with_simple_graph_items'] !== null
+		// with_items, with_simple_graph_items, with_monitored_items, with_item_prototypes, with_simple_graph_item_prototypes
+		if ($options['with_items'] !== null
+				|| $options['with_simple_graph_items'] !== null
+				|| $options['with_monitored_items'] !== null
+				|| $options['with_item_prototypes'] !== null
 				|| $options['with_simple_graph_item_prototypes'] !== null) {
+
 			$sub_sql_parts['from']['i'] = 'items i';
 			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
-			$sub_sql_parts['where'][] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-			$sub_sql_parts['where'][] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
-			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
-				($options['with_simple_graph_item_prototypes'] !== null)
-					? [ZBX_FLAG_DISCOVERY_PROTOTYPE]
-					: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-			);
+
+			$select_or = [];
+
+			// Item related subset selection.
+			if ($options['with_items'] !== null) {
+				$select_or[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+			}
+			else {
+				if ($options['with_monitored_items'] !== null) {
+					$sub_sql_parts['from']['h'] = 'hosts h';
+					$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+
+					$select_or[] = implode(' AND ', [
+						dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
+						dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]),
+						dbConditionInt('h.status', [HOST_STATUS_MONITORED])
+					]);
+				}
+				if ($options['with_simple_graph_items'] !== null) {
+					$select_or[] = implode(' AND ', [
+						dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]),
+						dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]),
+						dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+					]);
+				}
+			}
+
+			// Item prototype related subset selection.
+			$and = [];
+			if ($options['with_item_prototypes'] !== null) {
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+			}
+			elseif ($options['with_simple_graph_item_prototypes'] !== null) {
+				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
+				$and[] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+			}
+			if ($and) {
+				$select_or[] = implode(' AND ', $and);
+			}
+
+			$sub_sql_parts['where'][] = count($select_or) == 1
+				? $select_or[0]
+				: implode(' OR ', $select_or)
+			;
 		}
 
 		// with_triggers, with_monitored_triggers
