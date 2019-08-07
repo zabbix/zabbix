@@ -344,7 +344,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 				s = "(null)"
 			}
 		} else {
-			err = fmt.Errorf(r.Error.Error())
+			err = r.Error
 		}
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
