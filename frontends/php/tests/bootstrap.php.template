@@ -21,3 +21,6 @@
 	define('PHPUNIT_CONFIG_DIR', '{CONFIG_DIR}');
 	define('PHPUNIT_COMPONENT_DIR', '{COMPONENT_DIR}');
 	define('PHPUNIT_PORT_PREFIX', '{PORT_PREFIX}');
+
+	// PHP runtime error log file for unit tests.
+	define('PHPUNIT_ERROR_LOG', '{PHPUNIT_ERROR_LOG}');
