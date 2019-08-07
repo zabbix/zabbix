@@ -114,8 +114,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
 			}
 		}
-		task.meta.SetLastLogsize(r.LastLogsize)
-		task.meta.SetMtime(int32(r.Mtime))
+		task.meta.SetLastLogsize(*r.LastLogsize)
+		task.meta.SetMtime(int32(*r.Mtime))
 	}
 
 	// handle runner interface for inactive plugins

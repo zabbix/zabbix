@@ -319,6 +319,14 @@ func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
 }
 
+func (r resultWriter) SlotsAvailable() bool {
+	return true
+}
+
+func (r resultWriter) PersistSlotsAvailable() bool {
+	return true
+}
+
 func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
 	w := make(resultWriter)
 
