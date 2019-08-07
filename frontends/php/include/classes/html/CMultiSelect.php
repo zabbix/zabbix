@@ -185,7 +185,7 @@ class CMultiSelect extends CTag {
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'reference'
+					'excludeids', 'disableids', 'enrich_parent_groups'
 				];
 
 				foreach ($parameters as $field => $value) {
