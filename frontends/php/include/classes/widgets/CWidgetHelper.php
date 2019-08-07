@@ -56,24 +56,18 @@ class CWidgetHelper {
 			->addRow(self::getLabel($field_rf_rate), self::getComboBox($field_rf_rate));
 	}
 
+	/**
+	* Add Columns and Rows fields to the form of iterator.
+	*
+	* @param CFormList $form_list
+	* @param CWidgetFieldIntegerBox $field_columns
+	* @param CWidgetFieldIntegerBox $field_rows
+	*/
 	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
 		$form_list
 			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
 			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows))
 		;
-	}
-
-	public static function getSelectResource($field, $caption, $form_name) {
-		return [
-			(new CTextBox($field->getName().'_caption', $caption, true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field)),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic",'.
-					CJs::encodeJson($field->getPopupOptions($form_name)).', null, this);')
-		];
 	}
 
 	/**
@@ -326,6 +320,19 @@ class CWidgetHelper {
 			'real_hosts' => true,
 			'with_graph_prototypes' => true
 		] + $field->getFilterParameters());
+	}
+
+	public static function getSelectResource($field, $caption, $form_name) {
+		return [
+			(new CTextBox($field->getName().'_caption', $caption, true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired(self::isAriaRequired($field)),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup.generic",'.
+					CJs::encodeJson($field->getPopupOptions($form_name)).', null, this);')
+		];
 	}
 
 	/**
