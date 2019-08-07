@@ -60,11 +60,11 @@ type activeChecksRequest struct {
 }
 
 type regexp struct {
-	Name           string `json:"name"`
-	Expression     string `json:"expression"`
-	ExpressionType int    `json:"expression_type"`
-	ExpDelimiter   string `json:"exp_delimiter"`
-	CaseSensitive  int    `json:"case_sensitive"`
+	Name           string  `json:"name"`
+	Expression     string  `json:"expression"`
+	ExpressionType *int    `json:"expression_type"`
+	ExpDelimiter   *string `json:"exp_delimiter"`
+	CaseSensitive  *int    `json:"case_sensitive"`
 }
 
 type activeChecksResponse struct {
@@ -242,6 +242,38 @@ func (c *Connector) refreshActiveChecks() {
 		if response.Data[i].Mtime == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
 				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+	}
+
+	for i := 0; i < len(response.Regexp); i++ {
+		if len(response.Regexp[i].Name) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"name\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if len(response.Regexp[i].Expression) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].ExpressionType == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression_type\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].ExpDelimiter == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"exp_delimiter\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].CaseSensitive == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"case_sensitive\"",
+				c.clientID, c.address)
 			return
 		}
 	}
