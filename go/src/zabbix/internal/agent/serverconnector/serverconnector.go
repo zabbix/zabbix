@@ -59,11 +59,20 @@ type activeChecksRequest struct {
 	ListenPort   int    `json:"port,omitempty"`
 }
 
+type regexp struct {
+	Name           string `json:"name"`
+	Expression     string `json:"expression"`
+	ExpressionType int    `json:"expression_type"`
+	ExpDelimiter   string `json:"exp_delimiter"`
+	CaseSensitive  int    `json:"case_sensitive"`
+}
+
 type activeChecksResponse struct {
 	Response           string            `json:"response"`
 	Info               string            `json:"info"`
 	Data               []*plugin.Request `json:"data"`
 	RefreshUnsupported *int              `json:"refresh_unsupported"`
+	Regexp             []regexp          `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -237,7 +246,6 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	// TODO: retrieve correct refresh unsupported interval from server
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Data)
 }
 
