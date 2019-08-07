@@ -512,7 +512,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		goto error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp)) ||
-				-1 == (version = zbx_get_component_version(tmp)))
+			FAIL == (version = zbx_get_component_version(tmp)))
 	{
 		version = ZBX_COMPONENT_VERSION(4, 2);
 	}

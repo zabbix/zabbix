@@ -5148,7 +5148,7 @@ int	zbx_get_component_version(char *value)
 	char	*pminor, *ptr;
 
 	if (NULL == (pminor = strchr(value, '.')))
-		return -1;
+		return FAIL;
 
 	*pminor++ = '\0';
 
