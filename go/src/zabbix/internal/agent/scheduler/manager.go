@@ -80,7 +80,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 		if err != nil {
 			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate task")
+				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 				tacc.task().deactivate()
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})

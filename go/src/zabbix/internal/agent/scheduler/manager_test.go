@@ -310,8 +310,8 @@ func (m *mockManager) mockTasks() {
 					clientid:   w.clientid,
 				}
 				p.enqueueTask(mockTask)
-			case *configerTask:
-				c := task.(*configerTask)
+			case *configuratorTask:
+				c := task.(*configuratorTask)
 				mockTask := &mockConfigerTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),

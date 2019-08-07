@@ -152,13 +152,6 @@ func (c *ResultCache) flushOutput(u Uploader) {
 
 // addResult appends received result at the end of results slice
 func (c *ResultCache) addResult(result *AgentData) {
-	if len(c.results) == cap(c.results) {
-		newResults := make([]*AgentData, cap(c.results), cap(c.results)+16)
-		copy(newResults, c.results)
-		c.results = newResults
-		log.Debugf("[%d] extended result cache to %d records (default %d)", c.clientID, cap(c.results), c.maxBufferSize)
-	}
-
 	c.results = append(c.results, result)
 	c.totalValueNum++
 	if result.persistent {
@@ -173,7 +166,9 @@ func (c *ResultCache) addResult(result *AgentData) {
 		state |= cacheStateFull
 	}
 	if state != cacheStateNormal && atomic.LoadUint32(&c.state) == cacheStateNormal {
-		c.Flush()
+		if c.output != nil {
+			c.flushOutput(c.output)
+		}
 	}
 	atomic.StoreUint32(&c.state, state)
 }

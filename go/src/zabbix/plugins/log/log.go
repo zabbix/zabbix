@@ -80,7 +80,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
 	}
-
 	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*plugin.Result, 0)}
 	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh)
 	data.lastcheck = now
