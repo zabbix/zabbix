@@ -1337,7 +1337,7 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 
 	if (NULL != *error)
 	{
-		zbx_lrtrim(*error, " \t\n\r");
+		zbx_lrtrim(*error, ZBX_WHITESPACE);
 		if ('\0' == **error)
 			zbx_free(*error);
 		else
