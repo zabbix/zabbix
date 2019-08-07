@@ -108,6 +108,10 @@ func (c *Connector) refreshActiveChecks() {
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
 	if len(agent.Options.HostMetadata) > 0 {
+		if len(agent.Options.HostMetadataItem) > 0 {
+			log.Warningf("both \"HostMetadata\" and \"HostMetadataItem\" configuration parameter defined, using \"HostMetadata\"")
+		}
+
 		a.HostMetadata = agent.Options.HostMetadata
 	} else if len(agent.Options.HostMetadataItem) > 0 {
 		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second)

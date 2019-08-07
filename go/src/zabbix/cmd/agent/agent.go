@@ -62,8 +62,11 @@ func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error 
 		if err = agent.CheckHostname(o.Hostname); nil != err {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", o.HostnameItem, err.Error())
 		}
-
 	} else {
+		if len(o.HostnameItem) == 0 {
+			log.Warningf("both \"Hostname\" and \"HostnameItem\" configuration parameter defined, using \"Hostname\"")
+		}
+
 		if len(o.Hostname) > hostNameLen {
 			return fmt.Errorf("invalid \"Hostname\" configuration parameter: configuration parameter cannot be longer than %d characters", hostNameLen)
 		}
