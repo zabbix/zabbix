@@ -40,12 +40,20 @@ $form_list->addRow(
 
 // Graph.
 if (array_key_exists('graphid', $fields)) {
-	$fields['graphid']->addToForm($form, $form_list, $scripts);
+	$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['ms']['graphs']['graphid'],
+		$form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid);
+	$scripts[] = $field_graphid->getPostJS();
 }
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
-	$fields['itemid']->addToForm($form, $form_list, $scripts);
+	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
+		$form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+	$scripts[] = $field_itemid->getPostJS();
 }
 
 // Show legend.

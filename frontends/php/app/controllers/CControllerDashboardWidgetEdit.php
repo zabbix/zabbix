@@ -86,7 +86,7 @@ class CControllerDashboardWidgetEdit extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		$captions = ['simple' => []];
+		$captions = ['simple' => [], 'ms' => []];
 
 		foreach ($form->getFields() as $field) {
 			if ($field instanceof CWidgetFieldSelectResource) {
@@ -128,6 +128,177 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 		unset($list);
+
+		// Prepare data for CMultiSelect controls.
+		$groupids = [];
+		$hostids = [];
+		$itemids = [];
+		$graphids = [];
+		$prototype_itemids = [];
+		$prototype_graphids = [];
+
+		foreach ($form->getFields() as $field) {
+			if ($field instanceof CWidgetFieldMultiselectGroup) {
+				$key = 'groups';
+				$var = 'groupids';
+			} elseif ($field instanceof CWidgetFieldMultiselectHost) {
+				$key = 'hosts';
+				$var = 'hostids';
+			} elseif ($field instanceof CWidgetFieldMultiselectItem) {
+				$key = 'items';
+				$var = 'itemids';
+			} elseif ($field instanceof CWidgetFieldMultiselectGraph) {
+				$key = 'graphs';
+				$var = 'graphids';
+			} elseif ($field instanceof CWidgetFieldMultiselectItemPrototype) {
+				$key = 'item_prototypes';
+				$var = 'prototype_itemids';
+			} elseif ($field instanceof CWidgetFieldMultiselectGraphPrototype) {
+				$key = 'graph_prototypes';
+				$var = 'prototype_graphids';
+			} else {
+				continue;
+			}
+
+			$field_name = $field->getName();
+			$captions['ms'][$key][$field_name] = [];
+
+			foreach ($field->getValue() as $id) {
+				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
+				$$var[$id][] = $field_name;
+			}
+		}
+
+		if ($groupids) {
+			$groups = API::HostGroup()->get([
+				'output' => ['name'],
+				'groupids' => array_keys($groupids),
+				'preservekeys' => true
+			]);
+
+			foreach ($groups as $groupid => $group) {
+				foreach ($groupids[$groupid] as $field_name) {
+					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
+				}
+			}
+		}
+
+		if ($hostids) {
+			$hosts = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => array_keys($hostids),
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as $hostid => $host) {
+				foreach ($hostids[$hostid] as $field_name) {
+					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
+				}
+			}
+		}
+
+		if ($itemids) {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name'],
+				'itemids' => array_keys($itemids),
+				'webitems' => true,
+				'preservekeys' => true
+			]);
+
+			$items = CMacrosResolverHelper::resolveItemNames($items);
+
+			foreach ($items as $itemid => $item) {
+				foreach ($itemids[$itemid] as $field_name) {
+					$captions['ms']['items'][$field_name][$itemid] += [
+						'name' => $item['name_expanded'],
+						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($graphids) {
+			$graphs = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['name'],
+				'graphids' => array_keys($graphids),
+				'preservekeys' => true
+			]);
+
+			foreach ($graphs as $graphid => $graph) {
+				foreach ($graphids[$graphid] as $field_name) {
+					$captions['ms']['graphs'][$field_name][$graphid] += [
+						'name' => $graph['name'],
+						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($prototype_itemids) {
+			$item_prototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name'],
+				'itemids' => array_keys($prototype_itemids),
+				'preservekeys' => true
+			]);
+
+			$item_prototypes = CMacrosResolverHelper::resolveItemNames($item_prototypes);
+
+			foreach ($item_prototypes as $itemid => $item) {
+				foreach ($prototype_itemids[$itemid] as $field_name) {
+					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
+						'name' => $item['name_expanded'],
+						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($prototype_graphids) {
+			$graph_prototypes = API::GraphPrototype()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['name'],
+				'graphids' => array_keys($prototype_graphids),
+				'preservekeys' => true
+			]);
+
+			foreach ($graph_prototypes as $graphid => $graph) {
+				foreach ($prototype_graphids[$graphid] as $field_name) {
+					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
+						'name' => $graph['name'],
+						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		$inaccessible_resources = [
+			'groups' => _('Inaccessible group'),
+			'hosts' => _('Inaccessible host'),
+			'items' => _('Inaccessible item'),
+			'graphs' => _('Inaccessible graph'),
+			'item_prototypes' => _('Inaccessible item prototype'),
+			'graph_prototypes' => _('Inaccessible graph prototype')
+		];
+
+		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
+			foreach ($fields_captions as &$field_captions) {
+				$n = 0;
+
+				foreach ($field_captions as &$caption) {
+					if (!array_key_exists('name', $caption)) {
+						$postfix = (++$n > 1) ? ' ('.$n.')' : '';
+						$caption['name'] = $inaccessible_resources[$resource_type].$postfix;
+						$caption['inaccessible'] = true;
+					}
+				}
+				unset($caption);
+			}
+			unset($field_captions);
+		}
+		unset($fields_captions);
 
 		return $captions;
 	}

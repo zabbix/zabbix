@@ -40,12 +40,20 @@ $form_list->addRow(
 
 // Graph prototype.
 if (array_key_exists('graphid', $fields)) {
-	$fields['graphid']->addToForm($form, $form_list, $scripts);
+	$field_graphid = CWidgetHelper::getGraphPrototype($fields['graphid'],
+		$data['captions']['ms']['graph_prototypes']['graphid'], $form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid);
+	$scripts[] = $field_graphid->getPostJS();
 }
 
 // Item prototype.
 if (array_key_exists('itemid', $fields)) {
-	$fields['itemid']->addToForm($form, $form_list, $scripts);
+	$field_itemid = CWidgetHelper::getItemPrototype($fields['itemid'],
+		$data['captions']['ms']['item_prototypes']['itemid'], $form->getName()
+	);
+	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+	$scripts[] = $field_itemid->getPostJS();
 }
 
 // Dynamic item.

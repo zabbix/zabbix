@@ -24,40 +24,6 @@ class CWidgetFieldMultiselectItem extends CWidgetFieldMultiselect {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this
-			->setObjectName('items')
-			->setPopupOptions([
-				'srctbl' => 'items',
-				'srcfld1' => 'itemid',
-				'real_hosts' => true,
-				'webitems' => true
-			])
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM)
-			->setInaccessibleCaption(_('Inaccessible item'))
-		;
-	}
-
-	public function getCaptions($values) {
-		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'key_'],
-			'selectHosts' => ['name'],
-			'itemids' => $values,
-			'webitems' => true,
-			'preservekeys' => true
-		]);
-
-		$items = CMacrosResolverHelper::resolveItemNames($items);
-
-		$captions = [];
-
-		foreach ($items as $itemid => $item) {
-			$captions[$itemid] = [
-				'id' => $itemid,
-				'name' => $item['name_expanded'],
-				'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
-			];
-		}
-
-		return $captions;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 	}
 }

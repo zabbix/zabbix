@@ -24,33 +24,6 @@ class CWidgetFieldMultiselectHost extends CWidgetFieldMultiselect {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this
-			->setObjectName('hosts')
-			->setPopupOptions([
-				'srctbl' => 'hosts',
-				'srcfld1' => 'hostid',
-			])
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST)
-			->setInaccessibleCaption(_('Inaccessible host'))
-		;
-	}
-
-	public function getCaptions($values) {
-		$hosts = API::Host()->get([
-			'output' => ['name'],
-			'hostids' => $values,
-			'preservekeys' => true
-		]);
-
-		$captions = [];
-
-		foreach ($hosts as $hostid => $host) {
-			$captions[$hostid] = [
-				'id' => $hostid,
-				'name' => $host['name']
-			];
-		}
-
-		return $captions;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
 	}
 }

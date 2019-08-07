@@ -185,6 +185,150 @@ class CWidgetHelper {
 	}
 
 	/**
+	 * Creates label linked to the multiselect field.
+	 *
+	 * @param CWidgetFieldMultiselect $field
+	 *
+	 * @return CLabel
+	 */
+	public static function getMultiselectLabel($field) {
+		$field_name = $field->getName();
+
+		if ($field instanceof CWidgetFieldMultiselect) {
+			$field_name .= ($field->isMultiple() ? '[]' : '');
+		} else {
+			$field_name .= '[]';
+		}
+
+		return (new CLabel($field->getLabel(), $field_name.'_ms'))
+			->setAsteriskMark(self::isAriaRequired($field))
+		;
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselect $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
+		return (new CMultiSelect([
+			'name' => $field_name,
+			'object_name' => $object_name,
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'popup' => [
+				'parameters' => [
+					'dstfrm' => $form_name,
+					'dstfld1' => zbx_formatDomId($field_name)
+				] + $popup_options
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
+		;
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectGroup $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getGroup($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'hostGroup', [
+			'srctbl' => 'host_groups',
+			'srcfld1' => 'groupid',
+			'real_hosts' => true,
+			'enrich_parent_groups' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectHost $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getHost($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'hosts', [
+			'srctbl' => 'hosts',
+			'srcfld1' => 'hostid'
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectItem $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getItem($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'items', [
+			'srctbl' => 'items',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true,
+			'webitems' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectGraph $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getGraph($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graphs', [
+			'srctbl' => 'graphs',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graphs' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectItemPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getItemPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'item_prototypes', [
+			'srctbl' => 'item_prototypes',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectGraphPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getGraphPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graph_prototypes', [
+			'srctbl' => 'graph_prototypes',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graph_prototypes' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
 	 * Creates CComboBox field without values, to later fill it by JS script.
 	 *
 	 * @param CWidgetFieldWidgetListComboBox $field

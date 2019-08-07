@@ -24,38 +24,6 @@ class CWidgetFieldMultiselectGraph extends CWidgetFieldMultiselect {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this
-			->setObjectName('graphs')
-			->setPopupOptions([
-				'srctbl' => 'graphs',
-				'srcfld1' => 'graphid',
-				'srcfld2' => 'name',
-				'real_hosts' => true,
-				'with_graphs' => true
-			])
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH)
-			->setInaccessibleCaption(_('Inaccessible graph'))
-		;
-	}
-
-	public function getCaptions($values) {
-		$graphs = API::Graph()->get([
-			'output' => ['graphid', 'name'],
-			'selectHosts' => ['name'],
-			'graphids' => $values,
-			'preservekeys' => true
-		]);
-
-		$captions = [];
-
-		foreach ($graphs as $graphid => $graph) {
-			$captions[$graphid] = [
-				'id' => $graphid,
-				'name' => $graph['name'],
-				'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
-			];
-		}
-
-		return $captions;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 	}
 }

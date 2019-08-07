@@ -24,35 +24,6 @@ class CWidgetFieldMultiselectGroup extends CWidgetFieldMultiselect {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this
-			->setObjectName('hostGroup')
-			->setPopupOptions([
-				'srctbl' => 'host_groups',
-				'srcfld1' => 'groupid',
-				'real_hosts' => true,
-				'enrich_parent_groups' => true
-			])
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP)
-			->setInaccessibleCaption(_('Inaccessible group'))
-		;
-	}
-
-	public function getCaptions($values) {
-		$groups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => $values,
-			'preservekeys' => true
-		]);
-
-		$captions = [];
-
-		foreach ($groups as $groupid => $group) {
-			$captions[$groupid] = [
-				'id' => $groupid,
-				'name' => $group['name']
-			];
-		}
-
-		return $captions;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP);
 	}
 }

@@ -24,38 +24,6 @@ class CWidgetFieldMultiselectGraphPrototype extends CWidgetFieldMultiselect {
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this
-			->setObjectName('graph_prototypes')
-			->setPopupOptions([
-				'srctbl' => 'graph_prototypes',
-				'srcfld1' => 'graphid',
-				'srcfld2' => 'name',
-				'real_hosts' => true,
-				'with_graph_prototypes' => true
-			])
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE)
-			->setInaccessibleCaption(_('Inaccessible graph prototype'))
-		;
-	}
-
-	public function getCaptions($values) {
-		$graph_prototypes = API::GraphPrototype()->get([
-			'output' => ['graphid', 'name'],
-			'selectHosts' => ['name'],
-			'graphids' => $values,
-			'preservekeys' => true
-		]);
-
-		$captions = [];
-
-		foreach ($graph_prototypes as $graphid => $graph) {
-			$captions[$graphid] = [
-				'id' => $graphid,
-				'name' => $graph['name'],
-				'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
-			];
-		}
-
-		return $captions;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE);
 	}
 }

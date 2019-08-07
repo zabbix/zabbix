@@ -21,24 +21,15 @@
 
 class CWidgetFieldMultiselect extends CWidgetField {
 
-	// CMultiSelect object_name, used for auto-complete functionality.
-	protected $object_name;
-
-	// The options for the popup selector window.
-	protected $popup_options;
-
-	// The options for the popup selector window.
-	protected $inaccessible_caption;
-
 	// Is selecting multiple objects or a single one?
 	protected $multiple = true;
 
-	// Additional filter parameters for the popup window, set by the user.
+	// Additional filter parameters used for data selection.
 	protected $filter_parameters = [];
 
 	/**
-	 * Select resource type widget field. Will create text box field with select button,
-	 * that will allow to select specified resource.
+	 * Multiselect widget field.
+	 * Will create text box field with select button, that will allow to select specified resource.
 	 *
 	 * @param string $name  Field name in form.
 	 * @param string $label Label for the field in form.
@@ -72,6 +63,15 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	}
 
 	/**
+	 * @return CWidgetFieldMultiselect
+	 */
+	public function setValue($value) {
+		$this->value = (array) $value;
+
+		return $this;
+	}
+
+	/**
 	 * Is selecting multiple values or a single value?
 	 *
 	 * @return bool
@@ -81,7 +81,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	}
 
 	/**
-	 * Set field to multiple items mode.
+	 * Set field to multiple objects mode.
 	 *
 	 * @param bool $multiple
 	 *
@@ -94,7 +94,16 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	}
 
 	/**
-	 * Set an additional filter parameter for the popup window.
+	 * Get additional filter parameters.
+	 *
+	 * @return array
+	 */
+	public function getFilterParameters() {
+		return $this->filter_parameters;
+	}
+
+	/**
+	 * Set an additional filter parameter for data selection.
 	 *
 	 * @param string $name
 	 * @param mixed $value
@@ -105,121 +114,5 @@ class CWidgetFieldMultiselect extends CWidgetField {
 		$this->filter_parameters[$name] = $value;
 
 		return $this;
-	}
-
-	/**
-	 * @return CWidgetFieldMultiselect
-	 */
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	/**
-	 * Add field to the form.
-	 *
-	 * @param CForm $form
-	 * @param CFormList $form_list
-	 * @param array $scripts
-	 *
-	 * @return CWidgetFieldMultiselect
-	 */
-	public function addToForm($form, $form_list, &$scripts) {
-		$multiselect = $this->createMultiselect($form->getName());
-
-		$form_list->addRow(
-			(new CLabel($this->getLabel(), $this->getName().($this->multiple ? '[]' : '').'_ms'))
-				->setAsteriskMark($this->getFlags() & self::FLAG_LABEL_ASTERISK),
-			$multiselect
-		);
-
-		$scripts[] = $multiselect->getPostJS();
-
-		return $this;
-	}
-
-	/**
-	 * @param string $object_name CMultiSelect object_name, used for auto-complete functionality.
-	 *
-	 * @return CWidgetFieldMultiselect
-	 */
-	protected function setObjectName($object_name) {
-		$this->object_name = $object_name;
-
-		return $this;
-	}
-
-	/**
-	 * @param array $popup_options The options for the popup selector window.
-	 *
-	 * @return CWidgetFieldMultiselect
-	 */
-	protected function setPopupOptions(array $popup_options) {
-		$this->popup_options = $popup_options;
-
-		return $this;
-	}
-
-	/**
-	 * @param string $inaccessible_caption The caption for inaccessible items.
-	 *
-	 * @return CWidgetFieldMultiselect
-	 */
-	protected function setInaccessibleCaption($inaccessible_caption) {
-		$this->inaccessible_caption = $inaccessible_caption;
-
-		return $this;
-	}
-
-	/**
-	 * Prepare captions for the current values.
-	 *
-	 * @param string $form_name
-	 *
-	 * @return CMultiSelect
-	 */
-	protected function prepareCaptions() {
-		$values = $this->getValue();
-
-		$captions = $this->getCaptions($values);
-
-		foreach (array_values(array_diff($values, array_keys($captions))) as $n => $id) {
-			$captions[$id] = [
-				'id' => $id,
-				'name' => $this->inaccessible_caption.(($n > 0) ? ' ('.($n + 1).')' : ''),
-				'inaccessible' => true
-			];
-		}
-
-		return $captions;
-	}
-
-	/**
-	 * Get the created CMultiSelect field.
-	 *
-	 * @param string $form_name
-	 *
-	 * @return CMultiSelect
-	 */
-	protected function createMultiselect($form_name) {
-		$field_name = $this->getName().($this->multiple ? '[]' : '');
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => $this->object_name,
-			'multiple' => $this->multiple,
-			'data' => $this->prepareCaptions(),
-			'popup' => [
-				'parameters' => [
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name)
-				] + $this->popup_options + $this->filter_parameters
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired($this->getFlags() & self::FLAG_LABEL_ASTERISK)
-		;
 	}
 }
