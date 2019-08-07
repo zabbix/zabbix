@@ -63,7 +63,7 @@ func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error 
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", o.HostnameItem, err.Error())
 		}
 	} else {
-		if len(o.HostnameItem) == 0 {
+		if len(o.HostnameItem) != 0 {
 			log.Warningf("both \"Hostname\" and \"HostnameItem\" configuration parameter defined, using \"Hostname\"")
 		}
 
