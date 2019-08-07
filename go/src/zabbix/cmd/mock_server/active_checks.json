@@ -87,6 +87,12 @@
 		"exp_delimiter": ",",
 		"case_sensitive": 0
 	}, {
+		"name": "Character string included",
+		"expression": "foo",
+		"expression_type": 0,
+		"exp_delimiter": ",",
+		"case_sensitive": 0
+	}, {
 		"name": "Any character string included insensitive",
 		"expression": "FOO.BAR.BAZ",
 		"expression_type": 1,
