@@ -633,8 +633,16 @@ func TestTaskCreate(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 
 	manager.processUpdateRequest(&update, time.Now())
@@ -678,8 +686,16 @@ func TestTaskUpdate(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
@@ -689,7 +705,13 @@ func TestTaskUpdate(t *testing.T) {
 	}
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
@@ -725,15 +747,29 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
 	items[0].delay = "xyz"
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
@@ -774,8 +810,16 @@ func TestTaskDelete(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
@@ -783,7 +827,13 @@ func TestTaskDelete(t *testing.T) {
 	items = items[:cap(items)-4]
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
@@ -826,8 +876,16 @@ func TestSchedule(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -871,8 +929,16 @@ func TestScheduleCapacity(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -913,8 +979,16 @@ func TestScheduleUpdate(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -968,8 +1042,16 @@ func TestCollectorSchedule(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1009,8 +1091,16 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1074,8 +1164,16 @@ func TestRunner(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1176,8 +1274,16 @@ func TestWatcher(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1256,8 +1362,16 @@ func TestCollectorExporterSchedule(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1301,8 +1415,16 @@ func TestRunnerWatcher(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1380,8 +1502,16 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	update.clientID = 2
@@ -1432,8 +1562,16 @@ func TestMultiRunnerWatcher(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	update.clientID = 2
@@ -1503,8 +1641,16 @@ func TestPassiveRunner(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	manager.update(&update)
 	manager.mockTasks()
@@ -1578,8 +1724,16 @@ func TestConfigurator(t *testing.T) {
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 	update.requests = update.requests[:1]
 	manager.update(&update)
