@@ -461,15 +461,17 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			port = (unsigned short)atoi(row[4]);
 			flags_int = atoi(row[5]);
 
-			if (0 <= flags_int && flags_int <= 2 )
+			switch (flags_int)
 			{
-				flags = (zbx_conn_flags_t)flags_int;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":", flags_int,
-						row[1]);
-				flags = ZBX_CONN_DEFAULT;
+				case ZBX_CONN_DEFAULT:
+				case ZBX_CONN_IP:
+				case ZBX_CONN_DNS:
+					flags = (zbx_conn_flags_t)flags_int;
+					break;
+				default:
+					flags = ZBX_CONN_DEFAULT;
+					zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":",
+						     flags_int, row[1]);
 			}
 
 			if (ZBX_CONN_DNS == flags)

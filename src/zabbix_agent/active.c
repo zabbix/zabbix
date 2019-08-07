@@ -536,7 +536,7 @@ out:
  *             proto  - configuration parameter prototype                        *
  *                                                                               *
  ********************************************************************************/
-static void process_config_item(struct zbx_json *json, char *config, size_t length, char *proto)
+static void process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
 {
 	char		**value;
 	AGENT_RESULT	result;

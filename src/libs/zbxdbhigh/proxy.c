@@ -3982,7 +3982,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
+	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4016,24 +4016,27 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 		if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_FLAGS, tmp, sizeof(tmp)))
 		{
-			int flag_int;
+			int flags_int;
 
-			flag_int = atoi(tmp);
+			flags_int = atoi(tmp);
 
-			if (0 <= flag_int && flag_int <= 2 )
+			switch (flags_int)
 			{
-				flag = (zbx_conn_flags_t)flag_int;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":", flag_int, host);
-				flag = ZBX_CONN_DEFAULT;
+				case ZBX_CONN_DEFAULT:
+				case ZBX_CONN_IP:
+				case ZBX_CONN_DNS:
+					flags = (zbx_conn_flags_t)flags_int;
+					break;
+				default:
+					flags = ZBX_CONN_DEFAULT;
+					zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":",
+					                                    flags_int, host);
 			}
 		}
 
 		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip))))
 		{
-			if (ZBX_CONN_DNS == flag)
+			if (ZBX_CONN_DNS == flags)
 			{
 				*ip = '\0';
 				ret = SUCCEED;
@@ -4067,7 +4070,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			continue;
 		}
 
-		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, flag, itemtime);
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, flags, itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)
