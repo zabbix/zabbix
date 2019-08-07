@@ -103,6 +103,9 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
+define('WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS',	0);
+define('WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS',	1);
+
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
@@ -1627,6 +1630,7 @@ define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
 define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
+define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
@@ -1759,6 +1763,12 @@ define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
 define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
 define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
 define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
+
+// Widget "Problems by severity" styles.
+define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL', 'by-severity-layout-horizontal');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL', 'by-severity-layout-vertical');
+define('ZBX_STYLE_BY_SEVERITY_COUNT', 'by-severity-count');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

@@ -114,6 +114,7 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
+		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
