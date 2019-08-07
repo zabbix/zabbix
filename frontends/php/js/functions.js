@@ -961,7 +961,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
-	if (msg_class === undefined) {
+	if (typeof msg_class === 'undefined') {
 		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
 	}
 
@@ -1030,7 +1030,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 		var $button = jQuery('<button>')
 				.addClass('overlay-close-btn')
 				.attr('title', t('Close'))
-				.click(function(){
+				.click(function() {
 					jQuery(this)
 						.closest('.' + classes[index])
 						.remove();
