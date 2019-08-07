@@ -542,6 +542,77 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'patternselect.get':
+		$config = select_config();
+		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
+		$result = [];
+
+		switch ($data['objectName']) {
+			case 'hosts':
+				$options = [
+					'output' => ['name'],
+					'search' => ['name' => $search],
+					'limit' => $config['search_limit'],
+					'preservekeys' => true
+				];
+
+				if (strstr($search, '*')) {
+					$result = API::Host()->get($options + ['searchWildcardsEnabled' => true]);
+				}
+
+				$result += API::Host()->get($options);
+				break;
+
+			case 'items':
+				$options = [
+					'output' => ['name'],
+					'search' => [
+						'name' => $search
+					],
+					'filter' => [
+						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
+						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+					],
+					'webitems' => true,
+					'searchWildcardsEnabled' => true,
+					'limit' => $config['search_limit']
+				];
+
+				if (strstr($search, '*')) {
+					$result = API::Item()->get($options + ['searchWildcardsEnabled' => true]);
+				}
+
+				$result += API::Item()->get($options);
+				break;
+		}
+
+		if ($result) {
+			// Unset duplicates.
+			foreach ($result as &$row) {
+				$row = $row['name'];
+			}
+			unset($row);
+			$result = array_keys(array_flip($result));
+
+			foreach ($result as &$row) {
+				$row = [
+					'name' => $row,
+					'id' => $row
+				];
+			}
+			unset($row);
+		}
+
+		// Add wildcard containing pattern to the list of results.
+		if (strstr($search, '*')) {
+			array_unshift($result, ['name' => $search, 'id' => $search]);
+		}
+
+		if (array_key_exists('limit', $data)) {
+			$result = array_slice($result, 0, $data['limit']);
+		}
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

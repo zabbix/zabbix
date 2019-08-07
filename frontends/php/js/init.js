@@ -261,30 +261,6 @@ jQuery(function($) {
 				}
 			}
 		}
-		else if ($('[name="' + data.parentId + '"]').hasClass('patternselect')) {
-			/**
-			 * Pattern select allows to enter multiple comma or newline separated values in same editable field. Values
-			 * passed to add.popup should be appended at the end of existing value string.
-			 *
-			 * values_arr is used to catch duplicates.
-			 * values_str is used to store user's original syntax.
-			 */
-			var values_str = $('[name="' + data.parentId + '"]').val(),
-				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
-
-			data.values.forEach(function(val) {
-				if (values_arr.indexOf(val[data.object]) == -1) {
-					if (values_str !== '') {
-						values_str += ', ';
-					}
-					values_str += val[data.object];
-				}
-			});
-
-			$('[name="' + data.parentId + '"]')
-				.val(values_str)
-				.trigger('change');
-		}
 		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
 				&& typeof addPopupValues !== 'undefined') {
 			// execute function if they exist

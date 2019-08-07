@@ -25,6 +25,8 @@ class CMultiSelect extends CTag {
 	 */
 	const ZBX_STYLE_CLASS = 'multiselect-control';
 
+	protected $search_method = 'multiselect.get';
+
 	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
@@ -51,10 +53,14 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
+		if (array_key_exists('search_method', $options)) {
+			$this->search_method = $options['search_method'];
+		}
+
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
-			->setArgument('method', 'multiselect.get')
+			->setArgument('method', $this->search_method)
 			->setArgument('objectName', $options['objectName']);
 
 		if (array_key_exists('objectOptions', $options)) {
@@ -126,9 +132,9 @@ class CMultiSelect extends CTag {
 	 *
 	 * @return array
 	 */
-	private function mapOptions(array $options) {
+	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
-			'add_post_js', 'styles', 'popup'
+			'add_post_js', 'styles', 'popup', 'search_method'
 		];
 
 		foreach ($options as $field => $value) {
@@ -146,6 +152,7 @@ class CMultiSelect extends CTag {
 			'data' => 'data',
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
+			'search_method' => 'search_method',
 			'styles' => 'styles'
 		];
 
@@ -178,7 +185,7 @@ class CMultiSelect extends CTag {
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups'
+					'excludeids', 'disableids', 'enrich_parent_groups', 'reference'
 				];
 
 				foreach ($parameters as $field => $value) {

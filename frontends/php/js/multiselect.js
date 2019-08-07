@@ -304,6 +304,10 @@ jQuery(function($) {
 		return this.each(function() {
 			var obj = $(this);
 
+			if (typeof obj.data('multiSelect') !== 'undefined') {
+				return;
+			}
+
 			options = $.extend({}, {
 				required: (typeof obj.attr('aria-required') !== 'undefined') ? obj.attr('aria-required') : false
 			}, options);
@@ -618,7 +622,8 @@ jQuery(function($) {
 								}
 							}
 							else if (e.which == KEY.BACKSPACE) {
-								/* Pressing Backspace on empty input field should select last element in
+								/*
+								 * Pressing Backspace on empty input field should select last element in
 								 * multiselect. For next Backspace press to be able to remove it.
 								 */
 								var $selected = $('.selected li:last-child', $obj).addClass('selected');

@@ -1099,6 +1099,16 @@ output {
     bottom: 0;
     z-index: -1; }
 
+.multiselect-collapsed.multiselect-control, .list-vertical-accordion .multiselect-control.list-accordion-item-closed,
+.multiselect-collapsed .multiselect,
+.list-vertical-accordion .list-accordion-item-closed .multiselect {
+  overflow: hidden;
+  max-height: 24px; }
+  .multiselect-collapsed.multiselect-control input[type="text"], .list-vertical-accordion .multiselect-control.list-accordion-item-closed input[type="text"],
+  .multiselect-collapsed .multiselect input[type="text"],
+  .list-vertical-accordion .list-accordion-item-closed .multiselect input[type="text"] {
+    display: none; }
+
 .multiselect-button, .multiselect {
   display: inline-block;
   vertical-align: top; }
@@ -4281,15 +4291,6 @@ svg {
     height: 30px; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
       display: none; }
-    .list-vertical-accordion .list-accordion-item-closed .patternselect {
-      overflow: hidden;
-      max-height: 24px;
-      line-height: 24px;
-      padding: 0 5px;
-      height: 24px; }
-
-.patternselect {
-  line-height: 14px; }
 
 ul.checkbox-list {
   line-height: 20px;

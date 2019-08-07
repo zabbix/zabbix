@@ -1538,7 +1538,6 @@ define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
-define('ZBX_STYLE_PATTERNSELECT', 'patternselect');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
