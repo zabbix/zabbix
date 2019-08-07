@@ -37,7 +37,7 @@ import (
 	_ "zabbix/plugins"
 )
 
-func configDefault(taskManager *scheduler.Manager, o *agent.AgentOptions) error {
+func configDefault(taskManager scheduler.Scheduler, o *agent.AgentOptions) error {
 	var err error
 	const hostNameLen = 128
 
