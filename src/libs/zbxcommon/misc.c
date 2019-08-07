@@ -154,8 +154,8 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
-	ZBX_THREAD_LOCAL static zbx_timespec_t	last_ts = {0, 0};
-	ZBX_THREAD_LOCAL static int		corr = 0;
+	static ZBX_THREAD_LOCAL zbx_timespec_t	last_ts = {0, 0};
+	static ZBX_THREAD_LOCAL int		corr = 0;
 #ifdef _WINDOWS
 	ZBX_THREAD_LOCAL static LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;

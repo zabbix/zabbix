@@ -1811,7 +1811,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 		const char *server, unsigned short port, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
 {
-	ZBX_THREAD_LOCAL static char	*buf = NULL;
+	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
 	int				ret, nbytes, regexp_ret;
 	const char			*cr, *lf, *p_end;
