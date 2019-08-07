@@ -494,14 +494,14 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Updates the host prototypes and propagates the changes to linked hosts and templates.
 	 *
-	 * @param array $hostPrototypes
+	 * @param array $host_prototypes
 	 *
 	 * @return array
 	 */
-	protected function updateReal(array $hostPrototypes) {
+	protected function updateReal(array $host_prototypes) {
 		// save the host prototypes
-		foreach ($hostPrototypes as $hostPrototype) {
-			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
+		foreach ($host_prototypes as $host_prototype) {
+			DB::updateByPk($this->tableName(), $host_prototype['hostid'], $host_prototype);
 		}
 
 		$ex_host_prototypes = $this->get([
@@ -509,48 +509,48 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
 			'preservekeys' => true
 		]);
 
 		// update related objects
-		$inventoryCreate = [];
-		$inventoryDeleteIds = [];
-		foreach ($hostPrototypes as $key => $hostPrototype) {
-			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
+		$inventory_create = [];
+		$inventory_deleteids = [];
+		foreach ($host_prototypes as $key => $host_prototype) {
+			$ex_host_prototype = $ex_host_prototypes[$host_prototype['hostid']];
 
 			// group prototypes
-			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
-					$groupPrototype['hostid'] = $hostPrototype['hostid'];
+			if (isset($host_prototype['groupPrototypes'])) {
+				foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+					$group_prototype['hostid'] = $host_prototype['hostid'];
 				}
-				unset($groupPrototype);
+				unset($group_prototype);
 
 				// save group prototypes
-				$exGroupPrototypes = zbx_toHash(
-					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
+				$ex_group_prototypes = zbx_toHash(
+					array_merge($ex_host_prototype['groupLinks'], $ex_host_prototype['groupPrototypes']),
 					'group_prototypeid'
 				);
-				$modifiedGroupPrototypes = [];
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					if (isset($groupPrototype['group_prototypeid'])) {
-						unset($exGroupPrototypes[$groupPrototype['group_prototypeid']]);
+				$modified_group_prototypes = [];
+				foreach ($host_prototype['groupPrototypes'] as $group_prototype) {
+					if (isset($group_prototype['group_prototypeid'])) {
+						unset($ex_group_prototypes[$group_prototype['group_prototypeid']]);
 					}
 
-					$modifiedGroupPrototypes[] = $groupPrototype;
+					$modified_group_prototypes[] = $group_prototype;
 				}
-				if ($exGroupPrototypes) {
-					$this->deleteGroupPrototypes(array_keys($exGroupPrototypes));
+				if ($ex_group_prototypes) {
+					$this->deleteGroupPrototypes(array_keys($ex_group_prototypes));
 				}
-				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
+				$host_prototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modified_group_prototypes);
 			}
 
 			// templates
-			if (isset($hostPrototype['templates'])) {
-				$existingTemplateIds = zbx_objectValues($exHostPrototype['templates'], 'templateid');
-				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
-				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), [$hostPrototype['hostid']]);
-				$this->link(array_diff($newTemplateIds, $existingTemplateIds), [$hostPrototype['hostid']]);
+			if (isset($host_prototype['templates'])) {
+				$existing_templateids = zbx_objectValues($ex_host_prototype['templates'], 'templateid');
+				$new_templateids = zbx_objectValues($host_prototype['templates'], 'templateid');
+				$this->unlink(array_diff($existing_templateids, $new_templateids), [$host_prototype['hostid']]);
+				$this->link(array_diff($new_templateids, $existing_templateids), [$host_prototype['hostid']]);
 			}
 
 			// inventory
@@ -564,21 +564,21 @@ class CHostPrototype extends CHostBase {
 					if ($ex_host_prototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 						DB::update('host_inventory', [
 							'values' => $inventory,
-							'where' => ['hostid' => $hostPrototype['hostid']]
+							'where' => ['hostid' => $host_prototype['hostid']]
 						]);
 					}
 					else {
-						$inventoryCreate[] = $inventory + ['hostid' => $hostPrototype['hostid']];
+						$inventory_create[] = $inventory + ['hostid' => $host_prototype['hostid']];
 					}
 				}
 			}
 		}
 
 		// save inventory
-		DB::insert('host_inventory', $inventoryCreate, false);
-		DB::delete('host_inventory', ['hostid' => $inventoryDeleteIds]);
+		DB::insert('host_inventory', $inventory_create, false);
+		DB::delete('host_inventory', ['hostid' => $inventory_deleteids]);
 
-		return $hostPrototypes;
+		return $host_prototypes;
 	}
 
 	/**

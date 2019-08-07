@@ -1431,6 +1431,14 @@ function zbx_toCSV($values) {
 	return $csv;
 }
 
+/**
+ * Filters associative array containing keys provided.
+ *
+ * @param array $keys   Keys array or an arrays of keys arrays.
+ * @param array $array  Associative array.
+ *
+ * @return array
+ */
 function zbx_array_mintersect($keys, $array) {
 	$result = [];
 
