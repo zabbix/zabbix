@@ -163,9 +163,8 @@ class CHostPrototype extends CHostBase {
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory' =>			['type' => API_OBJECT, 'fields' => [
-				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
+			'inventory_mode' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null,
+				'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -278,12 +277,11 @@ class CHostPrototype extends CHostBase {
 			];
 
 			// inventory
-			if (isset($hostPrototype['inventory']['inventory_mode'])
-					&& ($hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
+			if ($hostPrototype['inventory_mode'] !== null
+					&& $hostPrototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 				$hostPrototypeInventory[] = [
 					'hostid' => $hostPrototype['hostid'],
-					'inventory_mode' => $hostPrototype['inventory']['inventory_mode']
+					'inventory_mode' => $hostPrototype['inventory_mode']
 				];
 			}
 		}
