@@ -3,4 +3,5 @@ SUBDIRS = \
 	conf \
 	std \
 	itemutil \
-	zbxcomms
+	zbxcomms \
+	zbxlib

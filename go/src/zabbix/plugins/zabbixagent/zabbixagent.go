@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package zabbixagent
 
 import (
-	"errors"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/std"
+	"zabbix/pkg/zbxlib"
 )
 
 // Plugin -
@@ -30,15 +31,14 @@ type Plugin struct {
 }
 
 var impl Plugin
+var stdOs std.Os
 
-// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
-	}
-	return Options.Hostname, nil
+	return zbxlib.ExecuteCheck(key, params)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
+	plugin.RegisterMetric(&impl, "zabbixagent", "system.localtime", "Returns system local time")
+	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns", "Checks if DNS service is up")
+	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns.record", "Performs DNS query")
 }

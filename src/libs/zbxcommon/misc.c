@@ -3712,3 +3712,37 @@ void	zbx_update_env(double time_now)
 #endif
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_agent_item_nextcheck                                  *
+ *                                                                            *
+ * Purpose: calculate item nextcheck for zabix agent type items               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
+		int refresh_unsupported, int *nextcheck, char **error)
+{
+
+	if (ITEM_STATE_NORMAL == state)
+	{
+		int			simple_interval;
+		zbx_custom_interval_t	*custom_intervals;
+
+		if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
+		{
+			*nextcheck = ZBX_JAN_2038;
+			return FAIL;
+		}
+
+		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
+		zbx_custom_interval_free(custom_intervals);
+	}
+	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+	{
+		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, refresh_unsupported, NULL, now);
+	}
+
+	return SUCCEED;
+}
+

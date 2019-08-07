@@ -17,22 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package itemutil
+package zbxlib
 
 import (
-	"fmt"
-	"strconv"
-	"time"
+	"C"
 )
+import "zabbix/pkg/log"
 
-func GetNextcheck(itemid uint64, delay string, unsupported bool, from time.Time) (nextcheck time.Time, err error) {
-	var simple_delay int64
-	// TODO: add flexible/scheduled interval support
-	if simple_delay, err = strconv.ParseInt(delay, 10, 64); err != nil {
-		err = fmt.Errorf("cannot parse item delay: %s", err)
-		return
+//export handleZabbixLog
+func handleZabbixLog(clevel C.int, cmessage *C.char) {
+	message := C.GoString(cmessage)
+	switch int(clevel) {
+	case log.Empty:
+	case log.Crit:
+		log.Critf(message)
+	case log.Err:
+		log.Errf(message)
+	case log.Warning:
+		log.Warningf(message)
+	case log.Debug:
+		log.Debugf(message)
+	case log.Trace:
+		log.Tracef(message)
+	case log.Info:
+		log.Infof(message)
 	}
-
-	from_seconds := from.Unix()
-	return time.Unix(from_seconds-from_seconds%simple_delay+simple_delay, 0), nil
 }

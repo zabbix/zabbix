@@ -33,6 +33,7 @@ import (
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxlib"
 	_ "zabbix/plugins"
 )
 
@@ -194,6 +195,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
+
+	zbxlib.SetLogLevel(logLevel)
 
 	addresses, err := serverconnector.ParseServerActive()
 	if err != nil {

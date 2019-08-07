@@ -1761,7 +1761,7 @@ AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 dnl Check for libpcre, used by Zabbix for regular expressions
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$go" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1812,6 +1812,9 @@ AC_SUBST(PROXY_LIBS)
 
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
+
+CGO_LDFLAGS="$LIBS"
+AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
 AC_SUBST(ZBXGET_LIBS)
@@ -1929,6 +1932,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
+	src/zabbix_agent/logs/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
@@ -1973,6 +1977,7 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/std/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
+	go/src/zabbix/pkg/zbxlib/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
@@ -1982,6 +1987,7 @@ AC_OUTPUT([
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
+	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/system/uname/Makefile
@@ -1992,6 +1998,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/debug/collector/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
+	go/src/zabbix/plugins/zabbixagent/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

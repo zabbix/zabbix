@@ -35,8 +35,11 @@ type AgentOptions struct {
 	HostnameItem        string `conf:",optional"`
 	HostMetadata        string `conf:",optional"`
 	HostMetadataItem    string `conf:",optional"`
+	BufferSend          int    `conf:",,1:3600,5"`
+	BufferSize          int    `conf:",,2:65535,100"`
 	ListenIP            string `conf:",optional"`
 	ListenPort          int    `conf:",,1024:32767,10050"`
+	MaxLinesPerSecond   int    `conf:",,1:1000,20"`
 	Plugins             map[string]map[string]string
 }
 

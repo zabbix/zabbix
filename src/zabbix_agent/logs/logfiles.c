@@ -20,7 +20,7 @@
 #include "common.h"
 #include "logfiles.h"
 #include "log.h"
-#include "active.h"
+#include "sysinfo.h"
 
 #if defined(_WINDOWS)
 #	include "symbols.h"
@@ -39,6 +39,9 @@
 #define ZBX_FILE_PLACE_UNKNOWN	-1	/* cannot compare file device and inode numbers */
 #define ZBX_FILE_PLACE_OTHER	0	/* both files have different device or inode numbers */
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
+
+extern int	CONFIG_MAX_LINES_PER_SECOND;
+extern char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -117,6 +120,8 @@ out:
  * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
  *           "filename_regexp" is freed.                                      *
+ *                                                                            *
+ *           Thread-safe if linked to thread-safe zbx_strerror() function.    *
  *                                                                            *
  ******************************************************************************/
 static int	split_filename(const char *filename, char **directory, char **filename_regexp, char **err_msg)
@@ -564,6 +569,8 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
  *           We can never say that it IS the same file and it has not been    *
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
+ * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *                                                                            *
  ******************************************************************************/
 static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
 		char **err_msg)
@@ -723,6 +730,8 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           In other cases it COULD BE the same file or copy.                *
+ *                                                                            *
+ *           Thread-safe if linked to thread-safe zbx_strerror() function.    *
  *                                                                            *
  ******************************************************************************/
 static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
@@ -1149,6 +1158,8 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *       old2new[i][j] = '2' - the j-th new file is a copy of the i-th old    *
  *                             file                                           *
  *                                                                            *
+ *    Thread-safe if linked to thread-safe zbx_strerror() function.           *
+ *                                                                            *
  ******************************************************************************/
 static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old_files, int num_old,
 		struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
@@ -1441,6 +1452,13 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  *                                                                            *
  * Comments: This is a helper function for make_logfile_list()                *
  *                                                                            *
+ * Comments: Thead-safety - readdir() is a gray area, supposed to work on     *
+ *           modern implementations when the directory stream is not shared   *
+ *           between threads.                                                 *
+ *           pick_logfile()->zbx_regexp_match_precompiled()->regexp_exec() -  *
+ *           uses static buffer to optimize match storing for matched groups  *
+ *           < 10 - not thread-safe!                                          *
+ *                                                                            *
  ******************************************************************************/
 static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *re, int *use_ino,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
@@ -1560,6 +1578,8 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
+ * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
 static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, int use_ino, char **err_msg)
@@ -1617,6 +1637,8 @@ clean:
  * Return value: SUCCEED - file list successfully built,                      *
  *               ZBX_NO_FILE_ERROR - file(s) do not exist,                    *
  *               FAIL - other errors                                          *
+ *                                                                            *
+ * Comments: Not thread-safe! See pick_logfiles() comments.                   *
  *                                                                            *
  ******************************************************************************/
 static int	make_logfile_list(unsigned char flags, const char *filename, int mtime,
@@ -1776,6 +1798,13 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: update_new_list_from_old                                         *
+ *                                                                            *
+ * Comments: Not thread-safe, uses static buffer                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
 		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
@@ -2105,6 +2134,9 @@ out:
  *                                                                            *
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *
+ *                                                                            *
+ *           Not thread-safe! Called functions (zbx_read2(),                  *
+ *           regexp_sub_ex()...regexp_prepare()) have static variables.       *
  *                                                                            *
  ******************************************************************************/
 static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
@@ -2688,6 +2720,8 @@ out:
  *                                                                            *
  * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
  *                                                                            *
+ * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *                                                                            *
  ******************************************************************************/
 static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num,
 		int *jump_from_to, int *seq, zbx_uint64_t *lastlogsize, int *mtime, const char *encoding,
@@ -2830,6 +2864,13 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: update_new_list_from_old                                         *
+ *                                                                            *
+ * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *                                                                            *
+ ******************************************************************************/
 static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfiles_old, int logfiles_num_old,
 		struct st_logfile *logfiles, int logfiles_num, int use_ino, int *seq, int *start_idx,
 		zbx_uint64_t *lastlogsize, char **err_msg)
@@ -2922,7 +2963,7 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Dmitry Borovikov (logrotation)                                     *
+ * Comments: Not thread-safe! See process_log() function comments.            *
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
@@ -3191,6 +3232,366 @@ out:
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *request, char **error)
+{
+	int	parameter_num, max_parameter_num;
+
+	if (0 == (parameter_num = get_rparams_num(request)))
+	{
+		*error = zbx_strdup(*error, "Invalid number of parameters.");
+		return FAIL;
+	}
+
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags) && 0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log.count */
+		max_parameter_num = 6;
+	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
+		max_parameter_num = 8;
+	else
+		max_parameter_num = 7;	/* log or logrt.count */
+
+	if (max_parameter_num < parameter_num)
+	{
+		*error = zbx_strdup(*error, "Too many parameters.");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: init_max_lines_per_sec                                           *
+ *                                                                            *
+ * Comments: thread-safe if CONFIG_MAX_LINES_PER_SECOND is updated when log   *
+ *           checks are not running                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *request, int *max_lines_per_sec,
+		char **error)
+{
+	const char	*p;
+	int		rate;
+
+	if (NULL == (p = get_rparam(request, 3)) || '\0' == *p)
+	{
+		if (0 == is_count_item)				/* log[], logrt[] */
+			*max_lines_per_sec = CONFIG_MAX_LINES_PER_SECOND;
+		else						/* log.count[], logrt.count[] */
+			*max_lines_per_sec = MAX_VALUE_LINES_MULTIPLIER * CONFIG_MAX_LINES_PER_SECOND;
+
+		return SUCCEED;
+	}
+
+	if (MIN_VALUE_LINES > (rate = atoi(p)) ||
+			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
+			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
+	{
+		*error = zbx_strdup(*error, "Invalid fourth parameter.");
+		return FAIL;
+	}
+
+	*max_lines_per_sec = rate;
+	return SUCCEED;
+}
+
+static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float *max_delay, char **error)
+{
+	const char	*max_delay_str;
+	float		max_delay_tmp;
+	int		max_delay_par_nr;
+
+	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
+
+	if (0 == is_count_item)
+		max_delay_par_nr = 6;
+	else
+		max_delay_par_nr = 5;
+
+	if (NULL == (max_delay_str = get_rparam(request, max_delay_par_nr)) || '\0' == *max_delay_str)
+	{
+		*max_delay = 0.0f;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay_tmp = (float)atof(max_delay_str)))
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
+		return FAIL;
+	}
+
+	*max_delay = max_delay_tmp;
+	return SUCCEED;
+}
+
+static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request, int *rotation_type, char **error)
+{
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))
+	{
+		char	*options;
+		int	options_par_nr;
+
+		if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* logrt */
+			options_par_nr = 7;
+		else						/* logrt.count */
+			options_par_nr = 6;
+
+		if (NULL != (options = get_rparam(request, options_par_nr)) && '\0' != *options)
+		{
+			if (0 == strcmp(options, "copytruncate"))
+			{
+				*rotation_type = ZBX_LOG_ROTATION_LOGCPT;
+				return SUCCEED;
+			}
+
+			if (0 != strcmp(options, "rotate"))
+			{
+				*error = zbx_dsprintf(*error, "Invalid %s parameter.", (6 == options_par_nr) ?
+						"seventh" : "eighth");
+				return FAIL;
+			}
+		}
+	}
+
+	*rotation_type = ZBX_LOG_ROTATION_LOGRT;	/* default */
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_log_check                                                *
+ *                                                                            *
+ * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
+ *           while log checks are running. Uses callback function             *
+ *           process_value_cb, so overall thread-safety depends on caller.    *
+ *           process_logrt() is not yet reviewed                              *
+ *                                                                            *
+ ******************************************************************************/
+int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
+		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
+		char **error)
+{
+	AGENT_REQUEST		request;
+	const char		*filename, *regexp, *encoding, *skip, *output_template;
+	char			*encoding_uc = NULL;
+	int			max_lines_per_sec, ret = FAIL, s_count, p_count, s_count_orig, is_count_item,
+				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0, rotation_type;
+	zbx_uint64_t		lastlogsize_orig;
+	float			max_delay;
+	struct st_logfile	*logfiles_new = NULL;
+
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+		is_count_item = 1;
+	else
+		is_count_item = 0;
+
+	init_request(&request);
+
+	/* Expected parameters by item: */
+	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>]            7 params */
+	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>]            6 params */
+	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
+	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
+
+	if (SUCCEED != parse_item_key(metric->key, &request))
+	{
+		*error = zbx_strdup(*error, "Invalid item key format.");
+		goto out;
+	}
+
+	if (SUCCEED != check_number_of_parameters(metric->flags, &request, error))
+		goto out;
+
+	/* parameter 'file' or 'file_regexp' */
+
+	if (NULL == (filename = get_rparam(&request, 0)) || '\0' == *filename)
+	{
+		*error = zbx_strdup(*error, "Invalid first parameter.");
+		goto out;
+	}
+
+	/* parameter 'regexp' */
+
+	if (NULL == (regexp = get_rparam(&request, 1)))
+	{
+		regexp = "";
+	}
+	else if ('@' == *regexp && SUCCEED != zbx_global_regexp_exists(regexp + 1, regexps))
+	{
+		*error = zbx_dsprintf(*error, "Global regular expression \"%s\" does not exist.", regexp + 1);
+		goto out;
+	}
+
+	/* parameter 'encoding' */
+
+	if (NULL == (encoding = get_rparam(&request, 2)))
+	{
+		encoding = "";
+	}
+	else
+	{
+		encoding_uc = zbx_strdup(encoding_uc, encoding);
+		zbx_strupper(encoding_uc);
+		encoding = encoding_uc;
+	}
+
+	/* parameter 'maxlines' or 'maxproclines' */
+	if (SUCCEED !=  init_max_lines_per_sec(is_count_item, &request, &max_lines_per_sec, error))
+		goto out;
+
+	/* parameter 'mode' */
+
+	if (NULL == (skip = get_rparam(&request, 4)) || '\0' == *skip || 0 == strcmp(skip, "all"))
+	{
+		metric->skip_old_data = 0;
+	}
+	else if (0 != strcmp(skip, "skip"))
+	{
+		*error = zbx_strdup(*error, "Invalid fifth parameter.");
+		goto out;
+	}
+
+	/* parameter 'output' (not used for log.count[], logrt.count[]) */
+	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+		output_template = "";
+
+	/* parameter 'maxdelay' */
+	if (SUCCEED != init_max_delay(is_count_item, &request, &max_delay, error))
+		goto out;
+
+	/* parameter 'options' */
+	if (SUCCEED != init_rotation_type(metric->flags, &request, &rotation_type, error))
+		goto out;
+
+	/* jumping over fast growing log files is not supported with 'copytruncate' */
+	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 0.0f != max_delay)
+	{
+		*error = zbx_strdup(*error, "maxdelay > 0 is not supported with copytruncate option.");
+		goto out;
+	}
+
+	/* do not flood Zabbix server if file grows too fast */
+	s_count = max_lines_per_sec * metric->refresh;
+
+	/* do not flood local system if file grows too fast */
+	if (0 == is_count_item)
+	{
+		p_count = MAX_VALUE_LINES_MULTIPLIER * s_count;	/* log[], logrt[] */
+	}
+	else
+	{
+		/* In log.count[] and logrt.count[] items the variable 's_count' (max number of lines allowed to be */
+		/* sent to server) is used for counting matching lines in logfile(s). 's_count' is counted from max */
+		/* value down towards 0. */
+
+		p_count = s_count_orig = s_count;
+
+		/* remember current state, we may need to restore it if log.count[] or logrt.count[] result cannot */
+		/* be sent to server */
+
+		lastlogsize_orig = metric->lastlogsize;
+		mtime_orig = metric->mtime;
+		big_rec_orig = metric->big_rec;
+
+		/* process_logrt() may modify old log file list 'metric->logfiles' but currently modifications are */
+		/* limited to 'retry' flag in existing list elements. We do not preserve original 'retry' flag values */
+		/* as there is no need to "rollback" their modifications if log.count[] or logrt.count[] result can */
+		/* not be sent to server. */
+	}
+
+	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
+			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
+			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
+			output_template, &p_count, &s_count, process_value_cb, server, port, CONFIG_HOSTNAME,
+			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
+			rotation_type);
+
+	if (0 == is_count_item && NULL != logfiles_new)
+	{
+		/* for log[] and logrt[] items - switch to the new log file list */
+
+		destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
+		metric->logfiles = logfiles_new;
+		metric->logfiles_num = logfiles_num_new;
+	}
+
+	if (SUCCEED == ret)
+	{
+		metric->error_count = 0;
+
+		if (1 == is_count_item)
+		{
+			/* send log.count[] or logrt.count[] item value to server */
+
+			int	match_count;			/* number of matching lines */
+			char	buf[ZBX_MAX_UINT64_LEN];
+
+			match_count = s_count_orig - s_count;
+
+			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
+
+			if (SUCCEED == process_value_cb(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
+					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
+			{
+				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
+				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */
+				/* after jump */
+
+				*lastlogsize_sent = metric->lastlogsize;
+				*mtime_sent = metric->mtime;
+
+				/* switch to the new log file list */
+				destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
+				metric->logfiles = logfiles_new;
+				metric->logfiles_num = logfiles_num_new;
+			}
+			else
+			{
+				/* unable to send data and no jump took place, restore original state to try again */
+				/* during the next check */
+
+				metric->lastlogsize = lastlogsize_orig;
+				metric->mtime =  mtime_orig;
+				metric->big_rec = big_rec_orig;
+
+				/* the old log file list 'metric->logfiles' stays in its place, drop the new list */
+				destroy_logfile_list(&logfiles_new, NULL, &logfiles_num_new);
+			}
+		}
+	}
+	else
+	{
+		metric->error_count++;
+
+		if (1 == is_count_item)
+		{
+			/* restore original state to try again during the next check */
+
+			metric->lastlogsize = lastlogsize_orig;
+			metric->mtime =  mtime_orig;
+			metric->big_rec = big_rec_orig;
+
+			/* the old log file list 'metric->logfiles' stays in its place, drop the new list */
+			destroy_logfile_list(&logfiles_new, NULL, &logfiles_num_new);
+		}
+
+		/* suppress first two errors */
+		if (3 > metric->error_count)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt)(.count) processing error #%d: %s",
+					metric->error_count, NULL != *error ? *error : "unknown error");
+
+			zbx_free(*error);
+			ret = SUCCEED;
+		}
+	}
+out:
+	zbx_free(encoding_uc);
+	free_request(&request);
 
 	return ret;
 }

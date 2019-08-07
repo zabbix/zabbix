@@ -44,8 +44,8 @@ type performer interface {
 	isActive() bool
 	// deactivates task, removing from plugin task queue if necessary
 	deactivate()
-	// true if the task has to be performed only once
-	isOneTime() bool
+	// true if the task has to be rescheduled after performing
+	isRecurring() bool
 }
 
 // performerHeap -

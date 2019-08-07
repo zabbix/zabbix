@@ -20,6 +20,7 @@
 package itemutil
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 )
@@ -147,7 +148,7 @@ func unquoteParam(data []byte) (param []byte) {
 	return
 }
 
-// expandArray expands array parameter by removing eclosing brackets '[]' and,
+// expandArray expands array parameter by removing enclosing brackets '[]' and,
 // removing whitespace before normal array items and around quoted items.
 func expandArray(data []byte) (param []byte) {
 	param = make([]byte, 0, len(data))
@@ -248,13 +249,14 @@ func parseParams(data []byte) (params []string, err error) {
 // the parsed key and parameteres.
 func ParseKey(text string) (key string, params []string, err error) {
 	if text == "" {
-		err = errors.New("empty key")
+		err = errors.New("Cannot parse empty item key")
 		return
 	}
 	data := []byte(text)
 	for i, c := range data {
 		if !isKeyChar(c) {
 			if params, err = parseParams(data[i:]); err != nil {
+				err = fmt.Errorf("Cannot parse item key: %s", err)
 				return
 			}
 			key = string(data[:i])
@@ -263,4 +265,63 @@ func ParseKey(text string) (key string, params []string, err error) {
 	}
 	key = text
 	return
+}
+
+func mustQuote(param string) bool {
+	for _, b := range param {
+		switch b {
+		case ',', ']':
+			return true
+		}
+	}
+	return false
+}
+
+func quoteParam(buf *bytes.Buffer, param string) {
+	buf.WriteByte('"')
+	for _, b := range param {
+		if b == '"' {
+			buf.WriteByte('\\')
+		}
+		buf.WriteRune(b)
+	}
+	buf.WriteByte('"')
+}
+
+func MakeKey(key string, params []string) (text string) {
+	buf := bytes.Buffer{}
+	buf.WriteString(key)
+
+	if len(params) > 0 {
+		buf.WriteByte('[')
+		for i, p := range params {
+			if i != 0 {
+				buf.WriteByte(',')
+			}
+			if !mustQuote(p) {
+				buf.WriteString(p)
+			} else {
+				quoteParam(&buf, p)
+			}
+		}
+		buf.WriteByte(']')
+	}
+
+	return buf.String()
+}
+
+func CompareKeysParams(key1 string, params1 []string, key2 string, params2 []string) bool {
+	if key1 != key2 {
+		return false
+	}
+	if len(params1) != len(params2) {
+		return false
+	}
+
+	for i := 0; i < len(params1); i++ {
+		if params1[i] != params2[i] {
+			return false
+		}
+	}
+	return true
 }

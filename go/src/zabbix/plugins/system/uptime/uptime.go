@@ -34,7 +34,7 @@ var impl Plugin
 var stdOs std.Os
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters")
 	}

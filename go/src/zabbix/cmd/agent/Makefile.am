@@ -2,15 +2,15 @@
 
 all: build
 
-build: 
-	go build
+build:
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go build
 
-clean: 
+clean:
 	go clean
 
 install:
-	go install
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go install
 
-check: 
-	go test
+check:
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
 

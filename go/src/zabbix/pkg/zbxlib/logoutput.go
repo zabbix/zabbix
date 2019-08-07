@@ -17,28 +17,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package zbxlib
 
 import (
+	"C"
+	"unsafe"
+)
+import (
 	"errors"
+	"time"
 	"zabbix/internal/plugin"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+//export processValue
+func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) {
+	var value string
+	var err error
+	if cstate == ItemStateNormal {
+		value = C.GoString(cvalue)
+	} else {
+		err = errors.New(C.GoString(cvalue))
 	}
-	return Options.Hostname, nil
-}
 
-func init() {
-	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
+	item := (*LogItem)(citem)
+
+	lastLogsize := uint64(clastLogsize)
+	mtime := int(cmtime)
+	result := &plugin.Result{
+		Itemid:      item.Itemid,
+		Value:       &value,
+		Ts:          time.Now(),
+		Error:       err,
+		LastLogsize: &lastLogsize,
+		Mtime:       &mtime,
+	}
+	item.Results = append(item.Results, result)
 }
