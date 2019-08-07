@@ -60,9 +60,10 @@ type activeChecksRequest struct {
 }
 
 type activeChecksResponse struct {
-	Response string            `json:"response"`
-	Info     string            `json:"info"`
-	Data     []*plugin.Request `json:"data"`
+	Response           string            `json:"response"`
+	Info               string            `json:"info"`
+	Data               []*plugin.Request `json:"data"`
+	RefreshUnsupported *int              `json:"refresh_unsupported"`
 }
 
 type agentDataResponse struct {
@@ -192,6 +193,12 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
+	if response.RefreshUnsupported == nil {
+		log.Errf("[%d] cannot parse list of active checks from [%s]: refresh_unsupported tag is missing",
+			c.clientID, c.address)
+		return
+	}
+
 	for i := 0; i < len(response.Data); i++ {
 		if len(response.Data[i].Key) == 0 {
 			if response.Data[i].Itemid == 0 {
@@ -231,7 +238,7 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	// TODO: retrieve correct refresh unsupported interval from server
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, 60, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Data)
 }
 
 // Write function is used by ResultCache to upload cached history. It will be callled from
