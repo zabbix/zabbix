@@ -1353,7 +1353,7 @@ out:
 }
 #else
 
-ZBX_THREAD_LOCAL static zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
+static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
 
 zbx_uint32_t get_thread_global_mutex_flag()
 {
