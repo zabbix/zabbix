@@ -30,14 +30,12 @@ import (
 	"time"
 	"unsafe"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/log"
 )
 
 //export processValue
 func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) C.int {
 	item := (*LogItem)(citem)
 	if !item.Output.PersistSlotsAvailable() {
-		log.Debugf("NO SLOTS")
 		return C.FAIL
 	}
 	var value string
