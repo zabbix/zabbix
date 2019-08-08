@@ -1414,7 +1414,7 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos_type = (type === undefined) ? Object.keys(data.widget_defaults)[0] : type,
+		var pos_type = (typeof type === 'undefined') ? Object.keys(data.widget_defaults)[0] : type,
 			pos = {
 				'x': 0,
 				'y': 0,
