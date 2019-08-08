@@ -59,10 +59,10 @@ class CSvgGraphBar extends CSvgGroup {
 			$this->addItem(
 				(new CSvgPolygon(
 					[
-						[$point[0], $this->options['zero_point']],
-						[$point[0], $point[1]],
-						[$point[0] + $point[3], $point[1]],
-						[$point[0] + $point[3], $this->options['zero_point']]
+						[floor($point[0]), ceil($this->options['zero_point'])],
+						[floor($point[0]), ceil($point[1])],
+						[ceil($point[0] + $point[3]), ceil($point[1])],
+						[ceil($point[0] + $point[3]), ceil($this->options['zero_point'])]
 					]
 				))
 					// Value.
