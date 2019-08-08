@@ -7416,6 +7416,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'view_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 			'x' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -7439,7 +7445,7 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '2',
-			],
+			]
 		],
 	],
 	'widget_field' => [
