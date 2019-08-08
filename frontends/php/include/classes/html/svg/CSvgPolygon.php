@@ -27,7 +27,7 @@ class CSvgPolygon extends CSvgTag {
 		$p = '';
 
 		foreach ($points as $point) {
-			$p .= ' '.$point[0].','.$point[1];
+			$p .= ' '.round($point[0]).','.round($point[1]);
 		}
 
 		$this->setAttribute('points', ltrim($p));
