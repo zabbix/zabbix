@@ -67,6 +67,7 @@ class C44XmlValidator {
 						'name' =>					['type' => XML_STRING]
 					]],
 					'status' =>					['type' => XML_STRING | XML_REQUIRED],
+					'inventory_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_authtype' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_privilege' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_username' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -591,7 +592,6 @@ class C44XmlValidator {
 						]]
 					]],
 					'inventory' =>				['type' => XML_ARRAY, 'rules' => [
-						'inventory_mode' =>			['type' => XML_STRING],
 						'type' =>					['type' => XML_STRING],
 						'type_full' =>				['type' => XML_STRING],
 						'name' =>					['type' => XML_STRING],
