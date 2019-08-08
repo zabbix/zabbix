@@ -547,7 +547,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 		}
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, 0, tag, dbrow);	/* fictious rowid 0 is used, there is only 1 record */
+			dbsync_add_row(sync, 0, tag, dbrow);	/* fictitious rowid 0 is used, there is only 1 record */
 
 		num_records = 1;
 	}

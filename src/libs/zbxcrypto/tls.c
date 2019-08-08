@@ -4612,7 +4612,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 	}
 
-	/* Is this TLS conection using certificate or PSK? */
+	/* Is this TLS connection using certificate or PSK? */
 
 	info = ssl_ciphersuite_from_id(s->tls_ctx->ctx->session->ciphersuite);
 
@@ -4860,7 +4860,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 	}
 
-	/* Is this TLS conection using certificate or PSK? */
+	/* Is this TLS connection using certificate or PSK? */
 
 	if (GNUTLS_CRD_CERTIFICATE == (creds = gnutls_auth_get_type(s->tls_ctx->ctx)))
 	{
@@ -5114,7 +5114,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		goto out;
 	}
 
-	/* Is this TLS conection using certificate or PSK? */
+	/* Is this TLS connection using certificate or PSK? */
 
 	cipher_name = SSL_get_cipher(s->tls_ctx->ctx);
 
@@ -5444,7 +5444,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 	{
 		info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
-		/* After TLS shutdown the TCP conection will be closed. So, there is no need to do a bidirectional */
+		/* After TLS shutdown the TCP connection will be closed. So, there is no need to do a bidirectional */
 		/* TLS shutdown - unidirectional shutdown is ok. */
 		if (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 		{
