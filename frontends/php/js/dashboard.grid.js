@@ -1637,18 +1637,13 @@
 					return;
 				}
 
-				data.new_widget_placeholder.lock_resize = true;
-				setTimeout(function() {
-					data.new_widget_placeholder.lock_resize = false;
-				}, 100);
-
 				setResizableState('disable', data.widgets, '');
 				data['pos-action'] = 'add';
 				data.new_widget_placeholder.setResizing();
 
 				return cancelEvent(event);
 			})
-			.on('mouseleave', function() {
+			.on('mouseleave', function(event) {
 				if (data['pos-action']) {
 					return;
 				}
@@ -1731,10 +1726,6 @@
 							: data.add_widget_dimension.top - y + 2
 						)
 					};
-
-					if (data.new_widget_placeholder.lock_resize) {
-						return;
-					}
 
 					$.each(data.widgets, function(_, box) {
 						overlap |= rectOverlap(box.pos, pos);
