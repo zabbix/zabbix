@@ -975,7 +975,7 @@ class CSvgGraph extends CSvg {
 
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $this->paths)) {
-				$metric['options']['zero_point'] = $metric['options']['axisy']
+				$metric['options']['y_zero'] = $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT
 					? $this->right_y_zero
 					: $this->left_y_zero;
 				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));

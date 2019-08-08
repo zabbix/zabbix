@@ -59,22 +59,16 @@ class CSvgGraphBar extends CSvgGroup {
 			$this->addItem(
 				(new CSvgPolygon(
 					[
-						[floor($point[0]), ceil($this->options['zero_point'])],
+						[floor($point[0]), ceil($this->options['y_zero'])],
 						[floor($point[0]), ceil($point[1])],
 						[ceil($point[0] + $point[3]), ceil($point[1])],
-						[ceil($point[0] + $point[3]), ceil($this->options['zero_point'])]
+						[ceil($point[0] + $point[3]), ceil($this->options['y_zero'])]
 					]
 				))
 					// Value.
 					->setAttribute('label', $point[2])
-					// Bar X.
-					->setAttribute('data-cx', $point[0])
-					// Bar Y.
-					->setAttribute('data-cy', $point[1])
-					// Bar width.
-					->setAttribute('data-width', round($point[3] / 2))
 					// X for tooltip.
-					->setAttribute('data-px', $point[4])
+					->setAttribute('data-px', floor($point[4]))
 			);
 		}
 	}
