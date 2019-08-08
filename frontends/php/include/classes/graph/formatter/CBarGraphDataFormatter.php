@@ -86,10 +86,6 @@ class CBarGraphDataFormatter implements CDataFormatter {
 
 		$datasets = $this->getDatasetByBarType($paths, $metrics);
 
-		if (count($datasets) === 0) {
-			return 0;
-		}
-
 		foreach ($datasets as $axis => $value) {
 			$width = [];
 
