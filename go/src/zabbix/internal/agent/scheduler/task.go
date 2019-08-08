@@ -293,12 +293,12 @@ func (t *watcherTask) Meta() (meta *plugin.Meta) {
 	return nil
 }
 
-type configerTask struct {
+type configuratorTask struct {
 	taskBase
 	options map[string]string
 }
 
-func (t *configerTask) perform(s Scheduler) {
+func (t *configuratorTask) perform(s Scheduler) {
 	go func() {
 		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)
@@ -306,11 +306,11 @@ func (t *configerTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *configerTask) reschedule(now time.Time) (err error) {
+func (t *configuratorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityConfiguratorTaskNs)
 	return
 }
 
-func (t *configerTask) getWeight() int {
+func (t *configuratorTask) getWeight() int {
 	return t.plugin.capacity
 }

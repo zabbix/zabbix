@@ -114,8 +114,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
 			}
 		}
-		task.meta.SetLastLogsize(r.LastLogsize)
-		task.meta.SetMtime(int32(r.Mtime))
+		task.meta.SetLastLogsize(*r.LastLogsize)
+		task.meta.SetMtime(int32(*r.Mtime))
 	}
 
 	// handle runner interface for inactive plugins
@@ -157,7 +157,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
 		if p.refcount == 0 {
 			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
-				task := &configerTask{
+				task := &configuratorTask{
 					taskBase: taskBase{plugin: p, active: true},
 					options:  options}
 				if err = task.reschedule(now); err != nil {

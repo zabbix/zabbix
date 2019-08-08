@@ -22,6 +22,7 @@ package scheduler
 import (
 	"container/heap"
 	"errors"
+	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -51,6 +52,7 @@ type updateRequest struct {
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request)
 	FinishTask(task performer)
+	PerformTask(key string, timeout time.Duration) (s string, err error)
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
@@ -78,7 +80,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 		if err != nil {
 			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate task")
+				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 				tacc.task().deactivate()
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
@@ -309,6 +311,48 @@ func (m *Manager) Stop() {
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request) {
 	r := updateRequest{clientID: clientID, sink: writer, requests: requests, refreshUnsupported: refreshUnsupported}
 	m.input <- &r
+}
+
+type resultWriter chan *plugin.Result
+
+func (r resultWriter) Write(result *plugin.Result) {
+	r <- result
+}
+
+func (r resultWriter) SlotsAvailable() bool {
+	return true
+}
+
+func (r resultWriter) PersistSlotsAvailable() bool {
+	return true
+}
+
+func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
+	var lastLogsize uint64
+	var mtime int
+
+	w := make(resultWriter)
+	m.UpdateTasks(0, w, 0, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+
+	select {
+	case r := <-w:
+		if r.Error == nil {
+			if r.Value != nil {
+				s = *r.Value
+			} else {
+				// TODO: check what must be returned on empty result
+				s = "(null)"
+			}
+		} else {
+			err = r.Error
+		}
+	case <-time.After(timeout):
+		err = fmt.Errorf("timeout occurred")
+	}
+
+	close(w)
+
+	return s, err
 }
 
 func (m *Manager) FinishTask(task performer) {

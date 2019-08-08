@@ -47,27 +47,25 @@ type metadata struct {
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	meta := ctx.Meta()
-
 	var data *metadata
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
 		meta.Data = data
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
+		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+			return nil, err
+		}
 	} else {
 		data = meta.Data.(*metadata)
 		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {
 			p.Debugf("item %d key has been changed, resetting log metadata", ctx.ItemID())
 			zbxlib.FreeActiveMetric(data.blob)
-			data.blob = nil
 			data.key = key
 			data.params = params
-		}
-	}
-
-	if data.blob == nil {
-		var err error
-		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
-			return nil, err
+			// reset lastlogsize/mtime if item key has been changed
+			if data.blob, err = zbxlib.NewActiveMetric(key, params, 0, 0); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -80,8 +78,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
 	}
-
-	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*plugin.Result, 0)}
+	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*plugin.Result, 0), Output: ctx.Output()}
 	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh)
 	data.lastcheck = now
 

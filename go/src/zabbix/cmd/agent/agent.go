@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/agent/serverconnector"
@@ -35,6 +36,56 @@ import (
 	"zabbix/pkg/zbxlib"
 	_ "zabbix/plugins"
 )
+
+func configDefault(taskManager scheduler.Scheduler, o *agent.AgentOptions) error {
+	var err error
+	const hostNameLen = 128
+
+	if len(o.Hostname) == 0 {
+		var hostnameItem string
+
+		if len(o.HostnameItem) == 0 {
+			hostnameItem = "system.hostname"
+		} else {
+			hostnameItem = o.HostnameItem
+		}
+
+		o.Hostname, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(o.Timeout))
+		if err != nil {
+			if len(o.HostnameItem) == 0 {
+				return fmt.Errorf("cannot get system hostname using \"%s\" item as default for \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
+			}
+
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
+		}
+
+		if len(o.Hostname) == 0 {
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
+		}
+
+		if len(o.Hostname) > hostNameLen {
+			o.Hostname = o.Hostname[:hostNameLen]
+			log.Warningf("the returned value of \"%s\" item specified by \"HostnameItem\" configuration parameter is too long, using first %d characters", hostnameItem, hostNameLen)
+		}
+
+		if err = agent.CheckHostname(o.Hostname); nil != err {
+			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
+		}
+	} else {
+		if len(o.HostnameItem) != 0 {
+			log.Warningf("both \"Hostname\" and \"HostnameItem\" configuration parameter defined, using \"Hostname\"")
+		}
+
+		if len(o.Hostname) > hostNameLen {
+			return fmt.Errorf("invalid \"Hostname\" configuration parameter: configuration parameter cannot be longer than %d characters", hostNameLen)
+		}
+		if err = agent.CheckHostname(o.Hostname); nil != err {
+			return fmt.Errorf("invalid \"Hostname\" configuration parameter: %s", err.Error())
+		}
+	}
+
+	return nil
+}
 
 func run() {
 	sigs := make(chan os.Signal, 1)
@@ -178,14 +229,20 @@ func main() {
 
 	taskManager.Start()
 
-	serverConnectors := make([]*serverconnector.Connector, len(addresses))
+	var serverConnectors []*serverconnector.Connector
 
-	for i := 0; i < len(serverConnectors); i++ {
-		serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
-		serverConnectors[i].Start()
+	err = configDefault(taskManager, &agent.Options)
+
+	if err == nil {
+		serverConnectors = make([]*serverconnector.Connector, len(addresses))
+
+		for i := 0; i < len(serverConnectors); i++ {
+			serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
+			serverConnectors[i].Start()
+		}
+
+		err = listener.Start()
 	}
-
-	err = listener.Start()
 
 	if err == nil {
 		run()

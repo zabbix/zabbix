@@ -26,6 +26,7 @@ import (
 	"net"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
@@ -34,6 +35,9 @@ import (
 	"zabbix/pkg/log"
 	"zabbix/pkg/zbxcomms"
 )
+
+const hostMetadataLen = 255
+const defaultAgentPort = 10050
 
 type Connector struct {
 	clientID             uint64
@@ -47,14 +51,28 @@ type Connector struct {
 }
 
 type activeChecksRequest struct {
-	Request string `json:"request"`
-	Host    string `json:"host"`
+	Request      string `json:"request"`
+	Host         string `json:"host"`
+	Version      string `json:"version"`
+	HostMetadata string `json:"host_metadata,omitempty"`
+	ListenIP     string `json:"ip,omitempty"`
+	ListenPort   int    `json:"port,omitempty"`
+}
+
+type regexp struct {
+	Name           string  `json:"name"`
+	Expression     string  `json:"expression"`
+	ExpressionType *int    `json:"expression_type"`
+	ExpDelimiter   *string `json:"exp_delimiter"`
+	CaseSensitive  *int    `json:"case_sensitive"`
 }
 
 type activeChecksResponse struct {
-	Response string            `json:"response"`
-	Info     string            `json:"info"`
-	Data     []*plugin.Request `json:"data"`
+	Response           string            `json:"response"`
+	Info               string            `json:"info"`
+	Data               []*plugin.Request `json:"data"`
+	RefreshUnsupported *int              `json:"refresh_unsupported"`
+	Regexp             []regexp          `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -72,7 +90,7 @@ func ParseServerActive() ([]string, error) {
 			}
 			addresses[i] += ":10051"
 		} else {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+			if _, _, err := net.SplitHostPort(addresses[i]); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
 			}
 		}
@@ -96,10 +114,49 @@ func (c *Connector) Addr() (s string) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
+	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: "4.4"}
+
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
-	request, err := json.Marshal(&activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname})
+	if len(agent.Options.HostMetadata) > 0 {
+		if len(agent.Options.HostMetadataItem) > 0 {
+			log.Warningf("both \"HostMetadata\" and \"HostMetadataItem\" configuration parameter defined, using \"HostMetadata\"")
+		}
+
+		a.HostMetadata = agent.Options.HostMetadata
+	} else if len(agent.Options.HostMetadataItem) > 0 {
+		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second)
+		if err != nil {
+			log.Errf("cannot get host metadata: %s", err)
+			return
+		}
+
+		if !utf8.ValidString(a.HostMetadata) {
+			log.Errf("cannot get host metadata: value is not an UTF-8 string")
+			return
+		}
+
+		var n int
+
+		if a.HostMetadata, n = agent.CutAfterN(a.HostMetadata, hostMetadataLen); n != hostMetadataLen {
+			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter is too long, using first %d characters", agent.Options.HostMetadataItem, n)
+		}
+	}
+
+	if len(agent.Options.ListenIP) > 0 {
+		if i := strings.IndexByte(agent.Options.ListenIP, ','); i != -1 {
+			a.ListenIP = agent.Options.ListenIP[:i]
+		} else {
+			a.ListenIP = agent.Options.ListenIP
+		}
+	}
+
+	if agent.Options.ListenPort != defaultAgentPort {
+		a.ListenPort = agent.Options.ListenPort
+	}
+
+	request, err := json.Marshal(&a)
 	if err != nil {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address, err)
 		return
@@ -139,13 +196,89 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	if nil == response.Data {
-		log.Errf("[%d] cannot parse list of active checks: data array is missing", c.clientID)
+	if response.Data == nil {
+		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
+			c.address)
 		return
 	}
 
-	// TODO: retrieve correct refresh unsupported interval from server
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, 60, response.Data)
+	if response.RefreshUnsupported == nil {
+		log.Errf("[%d] cannot parse list of active checks from [%s]: refresh_unsupported tag is missing",
+			c.clientID, c.address)
+		return
+	}
+
+	for i := 0; i < len(response.Data); i++ {
+		if len(response.Data[i].Key) == 0 {
+			if response.Data[i].Itemid == 0 {
+				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
+					c.clientID, c.address)
+				return
+			}
+
+			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].Itemid == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
+				c.clientID, c.address, response.Data[i].Key)
+			return
+		}
+
+		if len(response.Data[i].Delay) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].LastLogsize == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+
+		if response.Data[i].Mtime == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
+				c.clientID, c.address, response.Data[i].Itemid)
+			return
+		}
+	}
+
+	for i := 0; i < len(response.Regexp); i++ {
+		if len(response.Regexp[i].Name) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"name\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if len(response.Regexp[i].Expression) == 0 {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].ExpressionType == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression_type\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].ExpDelimiter == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"exp_delimiter\"",
+				c.clientID, c.address)
+			return
+		}
+
+		if response.Regexp[i].CaseSensitive == nil {
+			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"case_sensitive\"",
+				c.clientID, c.address)
+			return
+		}
+	}
+
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Data)
 }
 
 // Write function is used by ResultCache to upload cached history. It will be callled from

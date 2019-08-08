@@ -19,19 +19,59 @@
 
 package agent
 
+import (
+	"fmt"
+	"unicode"
+)
+
 type AgentOptions struct {
 	LogType             string `conf:",,,console"`
 	LogFile             string `conf:",optional"`
 	DebugLevel          int    `conf:",,0:5,3"`
 	ServerActive        string `conf:",optional"`
 	RefreshActiveChecks int    `conf:",,30:3600,120"`
+	Timeout             int    `conf:",,1-30,3"`
+	Hostname            string `conf:",optional"`
+	HostnameItem        string `conf:",optional"`
+	HostMetadata        string `conf:",optional"`
+	HostMetadataItem    string `conf:",optional"`
 	BufferSend          int    `conf:",,1:3600,5"`
 	BufferSize          int    `conf:",,2:65535,100"`
-	Timeout             int    `conf:",,1:30,3"`
-	Hostname            string
-	ListenPort          int `conf:",,1024:32767,10050"`
-	MaxLinesPerSecond   int `conf:",,1:1000,20"`
+	ListenIP            string `conf:",optional"`
+	ListenPort          int    `conf:",,1024:32767,10050"`
+	MaxLinesPerSecond   int    `conf:",,1:1000,20"`
 	Plugins             map[string]map[string]string
 }
 
 var Options AgentOptions
+
+func CutAfterN(s string, n int) (string, int) {
+	var l int
+
+	for i := range s {
+		if i > n {
+			s = s[:l]
+			break
+		}
+		l = i
+	}
+
+	return s, l
+}
+
+func CheckHostname(s string) error {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '.' || s[i] == ' ' || s[i] == '_' || s[i] == '-' ||
+			(s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9') {
+			continue
+		}
+
+		if unicode.IsPrint(rune(s[i])) {
+			return fmt.Errorf("character \"%c\" is not allowed in host name", s[i])
+		} else {
+			return fmt.Errorf("character 0x%02x is not allowed in host name", s[i])
+		}
+	}
+
+	return nil
+}

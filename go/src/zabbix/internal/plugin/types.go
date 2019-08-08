@@ -102,9 +102,9 @@ type Result struct {
 }
 
 type Request struct {
-	Itemid      uint64 `json:"itemid"`
-	Key         string `json:"key"`
-	Delay       string `json:"delay"`
-	LastLogsize uint64 `json:"lastlogsize"`
-	Mtime       int    `json:"mtime"`
+	Itemid      uint64  `json:"itemid"`
+	Key         string  `json:"key"`
+	Delay       string  `json:"delay"`
+	LastLogsize *uint64 `json:"lastlogsize"`
+	Mtime       *int    `json:"mtime"`
 }
