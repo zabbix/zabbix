@@ -300,51 +300,53 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_simple_graph_items, with_monitored_items, with_item_prototypes, with_simple_graph_item_prototypes
+		// with_items, with_simple_graph_items, with_monitored_items
 		if ($options['with_items'] !== null
 				|| $options['with_simple_graph_items'] !== null
-				|| $options['with_monitored_items'] !== null
-				|| $options['with_item_prototypes'] !== null
-				|| $options['with_simple_graph_item_prototypes'] !== null) {
+				|| $options['with_monitored_items'] !== null) {
 
-			$select_or = [];
-
-			// Item related subset selection.
-			$and = [];
 			if ($options['with_items'] !== null) {
-				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
+				$where_and =
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
+				;
 			}
 			elseif ($options['with_monitored_items'] !== null) {
-				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
-				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
+				$where_and =
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE])
+				;
 			}
 			elseif ($options['with_simple_graph_items'] !== null) {
-				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
-				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
-				$and[] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-			}
-			if ($and) {
-				$select_or[] = implode(' AND ', $and);
+				$where_and =
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]).
+					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+				;
 			}
 
-			// Item prototype related subset selection.
-			$and = [];
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i'.
+				' WHERE h.hostid=i.hostid'.
+					$where_and.
+				')'
+			;
+		}
+
+		// with_item_prototypes, with_simple_graph_item_prototypes
+		if ($options['with_item_prototypes'] !== null || $options['with_simple_graph_item_prototypes'] !== null) {
 			if ($options['with_item_prototypes'] !== null) {
-				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+				$where_and =
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
+				;
 			}
 			elseif ($options['with_simple_graph_item_prototypes'] !== null) {
-				$and[] = dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-				$and[] = dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
-				$and[] = dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+				$where_and =
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]).
+					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+				;
 			}
-			if ($and) {
-				$select_or[] = implode(' AND ', $and);
-			}
-
-			$where_and = count($select_or) == 1
-				? ' AND '.$select_or[0]
-				: ' AND ('.implode(' OR ', $select_or).')'
-			;
 
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
@@ -392,27 +394,28 @@ class CHost extends CHostGeneral {
 				')';
 		}
 
-		// with_graphs, with_graph_prototypes
-		if ($options['with_graphs'] !== null || $options['with_graph_prototypes'] !== null) {
-			$flags = [];
-			if ($options['with_graphs'] !== null) {
-				$flags += [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED];
-			}
-			if ($options['with_graph_prototypes'] !== null) {
-				$flags += [ZBX_FLAG_DISCOVERY_PROTOTYPE];
-			}
-			$where_and = count($flags) == 1
-				? ' AND g.flags='.$flags[0]
-				: ' AND g.flags IN ('.implode(',', $flags).')'
-			;
-
+		// with_graphs
+		if ($options['with_graphs'] !== null) {
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM items i,graphs_items gi,graphs g'.
 				' WHERE i.hostid=h.hostid'.
 					' AND i.itemid=gi.itemid '.
 					' AND gi.graphid=g.graphid'.
-					$where_and.
+					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+				')'
+			;
+		}
+
+		// with_graph_prototypes
+		if ($options['with_graph_prototypes'] !== null) {
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i,graphs_items gi,graphs g'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.itemid=gi.itemid '.
+					' AND gi.graphid=g.graphid'.
+					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
 				')'
 			;
 		}
