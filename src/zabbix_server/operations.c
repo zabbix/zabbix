@@ -470,7 +470,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 					break;
 				default:
 					flags = ZBX_CONN_DEFAULT;
-					zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":",
+					zabbix_log(LOG_LEVEL_WARNING, "wrong flags value: %d for host \"%s\":",
 							flags_int, row[1]);
 			}
 

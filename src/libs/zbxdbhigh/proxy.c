@@ -4029,7 +4029,7 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 					break;
 				default:
 					flags = ZBX_CONN_DEFAULT;
-					zabbix_log(LOG_LEVEL_WARNING, "wrong flag value: %d for host \"%s\":",
+					zabbix_log(LOG_LEVEL_WARNING, "wrong flags value: %d for host \"%s\":",
 							flags_int, host);
 			}
 		}
