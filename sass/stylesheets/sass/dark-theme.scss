@@ -244,3 +244,24 @@ $ok-ack-fg-color: #00ff00;
 		color: $font-selected-color;
 	}
 }
+
+.msg-warning {
+	.link-action {
+		color: $yellow;
+
+		.arrow-up {
+			border-bottom-color: $yellow;
+		}
+		.arrow-down {
+			border-top-color: $yellow;
+		}
+		&:hover {
+		color: $link-hover-color;
+		}
+	}
+
+	button {
+		color: $btn-alt-font-color;
+	}
+}
+

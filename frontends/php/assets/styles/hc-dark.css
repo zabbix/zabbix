@@ -5334,6 +5334,17 @@ td.inactive-bg {
 .msg-good button {
   color: #fff; }
 
+.msg-warning .link-action {
+  color: #a78820; }
+  .msg-warning .link-action .arrow-up {
+    border-bottom-color: #a78820; }
+  .msg-warning .link-action .arrow-down {
+    border-top-color: #a78820; }
+  .msg-warning .link-action:hover {
+    color: #fff; }
+.msg-warning button {
+  color: #fff; }
+
 .graph-selection {
   background-color: rgba(255, 255, 255, 0.2);
   border: none;

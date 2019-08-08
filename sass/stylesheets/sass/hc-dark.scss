@@ -1112,6 +1112,26 @@ td.inactive-bg {
 	}
 }
 
+.msg-warning {
+	.link-action {
+		color: $yellow;
+
+		.arrow-up {
+			border-bottom-color: $yellow;
+		}
+		.arrow-down {
+			border-top-color: $yellow;
+		}
+		&:hover {
+		color: $link-hover-color;
+		}
+	}
+
+	button {
+		color: $btn-alt-font-color;
+	}
+}
+
 // GRAPH AND MAP
 .graph-selection {
 	background-color: rgba($font-color,0.2);

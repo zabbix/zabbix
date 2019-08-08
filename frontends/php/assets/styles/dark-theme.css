@@ -4728,3 +4728,14 @@ svg {
 
 .icon-actions-number-gray[data-count]::after {
   color: #f2f2f2; }
+
+.msg-warning .link-action {
+  color: #a78820; }
+  .msg-warning .link-action .arrow-up {
+    border-bottom-color: #a78820; }
+  .msg-warning .link-action .arrow-down {
+    border-top-color: #a78820; }
+  .msg-warning .link-action:hover {
+    color: #4796c4; }
+.msg-warning button {
+  color: #768d99; }
