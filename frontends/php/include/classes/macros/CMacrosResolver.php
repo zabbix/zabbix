@@ -1676,7 +1676,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'([0-9]+['.ZBX_TIME_SUFFIXES.']?)?'.
 				'\)}{1})/Uux';
 
-		if (preg_match_all($pattern, $label, $matches) != false && array_key_exists('macros', $matches)) {
+		if (preg_match_all($pattern, $label, $matches) !== false && array_key_exists('macros', $matches)) {
+			// $replaceHosts with key '0' is used for macros without reference.
+			if ($replaceHosts !== null && array_key_exists(0, $replaceHosts)) {
+				$replaceHosts[''] = $replaceHosts[0];
+				unset($replaceHosts[0]);
+			}
+
 			// For each functional macro.
 			foreach ($matches['macros'] as $expr) {
 				$macro = $expr;
@@ -2015,7 +2021,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			/**
+			/*
 			 * If macros are found, put elementid to list of elements to fetch API.
 			 * Since only supported host-group macro is {HOSTGROUP.ID}, it's useless to collect host group id-s in order
 			 * to fetch additional details from database.
@@ -2134,7 +2140,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$matched_macros = $macros_by_selementid[$selid];
-			$hosts_by_nr = [];
+			$hosts_by_nr = null;
 			$trigger = null;
 			$host = null;
 			$map = null;
@@ -2197,6 +2203,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					if (array_key_exists($elementid, $hosts)) {
 						$host = $hosts[$elementid];
+						$hosts_by_nr = [0 => $host];
 					}
 					break;
 			}
@@ -2347,6 +2354,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
+				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
+				$sel['label'] = $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr);
+
 				// Replace macros by resolved values in selement label.
 				$macros_position = $this->getMacroPositions($sel['label'], $types);
 				foreach (array_reverse($macros_position, true) as $pos => $macro) {
@@ -2355,9 +2365,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						: UNRESOLVED_MACRO_STRING;
 					$sel['label'] = substr_replace($sel['label'], $value, $pos, strlen($macro));
 				}
-
-				// Resolve functional macros. Macros used in functional macros are already replaced at this point.
-				$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
 			}
 
 			// Replace macros in selement URLs.

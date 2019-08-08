@@ -241,7 +241,7 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 				/* result history is kept to report results of steps before failing step, */
 				/* which means it can be omitted for the last step.                       */
 				if (i != steps_num - 1)
-					zbx_variant_set_variant(&results[i].value, value);
+					zbx_variant_copy(&results[i].value, value);
 				else
 					zbx_variant_set_none(&results[i].value);
 			}
@@ -302,7 +302,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_preprocessor_unpack_task(&itemid, &value_type, &ts, &value, &history_in, &steps, &steps_num,
 			message->data);
 
-	zbx_variant_set_variant(&value_start, &value);
+	zbx_variant_copy(&value_start, &value);
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
 	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
 
@@ -385,7 +385,7 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 			message->data);
 
 	zbx_variant_set_str(&value, value_str);
-	zbx_variant_set_variant(&value_start, &value);
+	zbx_variant_copy(&value_start, &value);
 
 	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
 	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);

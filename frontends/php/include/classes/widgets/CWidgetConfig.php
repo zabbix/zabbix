@@ -211,12 +211,13 @@ class CWidgetConfig {
 	 *
 	 * @static
 	 *
-	 * @param string $type  Widget type
-	 * @param int $view_mode Widget view mode. ZBX_WIDGET_VIEW_MODE_NORMAL by default
+	 * @param string $type       Widget type
+	 * @param array  $fields     Widget form fields
+	 * @param int    $view_mode  Widget view mode. ZBX_WIDGET_VIEW_MODE_NORMAL by default
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type, $view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL)
+	public static function hasPadding($type, $fields, $view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL)
 	{
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
@@ -234,6 +235,10 @@ class CWidgetConfig {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
 					return false;
+
+				case WIDGET_PROBLEMS_BY_SV:
+					return (!array_key_exists('show_type', $fields)
+						|| $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS);
 
 				default:
 					return true;

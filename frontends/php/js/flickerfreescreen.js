@@ -192,10 +192,8 @@
 					self.refreshImg(id);
 					break;
 
-				// SCREEN_RESOURCE_SCREEN
 				// SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 				// SCREEN_RESOURCE_LLD_GRAPH
-				case 8:
 				case 20:
 				case 19:
 					self.refreshProfile(id, ajax_url);

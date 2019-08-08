@@ -1132,7 +1132,6 @@ class CConfigurationExport {
 	 * @param array $exportScreens
 	 */
 	protected function prepareScreenExport(array &$exportScreens) {
-		$screenIds = [];
 		$sysmapIds = [];
 		$groupIds = [];
 		$hostIds = [];
@@ -1171,10 +1170,6 @@ class CConfigurationExport {
 							$sysmapIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
 
-						case SCREEN_RESOURCE_SCREEN:
-							$screenIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
 						case SCREEN_RESOURCE_CLOCK:
 							if ($screenItem['style'] == TIME_TYPE_HOST) {
 								$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -1185,7 +1180,6 @@ class CConfigurationExport {
 			}
 		}
 
-		$screens = $this->getScreensReferences($screenIds);
 		$sysmaps = $this->getMapsReferences($sysmapIds);
 		$groups = $this->getGroupsReferences($groupIds);
 		$hosts = $this->getHostsReferences($hostIds);
@@ -1223,10 +1217,6 @@ class CConfigurationExport {
 
 						case SCREEN_RESOURCE_MAP:
 							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
 							break;
 
 						case SCREEN_RESOURCE_CLOCK:
@@ -1402,34 +1392,6 @@ class CConfigurationExport {
 
 		foreach ($hosts as $id => $host) {
 			$ids[$id] = ['host' => $host['host']];
-		}
-
-		return $ids;
-	}
-
-	/**
-	 * Get screens references by screen ids.
-	 *
-	 * @param array $screenIds
-	 *
-	 * @return array
-	 */
-	protected function getScreensReferences(array $screenIds) {
-		$ids = [];
-
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-
-		// Access denied for some objects?
-		if (count($screens) != count($screenIds)) {
-			throw new CConfigurationExportException();
-		}
-
-		foreach ($screens as $id => $screen) {
-			$ids[$id] = ['name' => $screen['name']];
 		}
 
 		return $ids;

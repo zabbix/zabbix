@@ -24,6 +24,7 @@
 #include "dbcache.h"
 
 #include "operations.h"
+#include "zbxserver.h"
 
 typedef enum
 {
@@ -427,7 +428,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
 
-				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port);
+				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port, ZBX_CONN_DEFAULT);
 
 				zbx_free(host_unique);
 				zbx_free(host_visible_unique);
@@ -435,26 +436,31 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
-				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port);
+				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port, ZBX_CONN_DEFAULT);
 		}
 		DBfree_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
 		result = DBselect(
-				"select proxy_hostid,host,listen_ip,listen_dns,listen_port"
+				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags"
 				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			char		*sql = NULL;
-			zbx_uint64_t	host_proxy_hostid;
+			char			*sql = NULL;
+			zbx_uint64_t		host_proxy_hostid;
+			zbx_conn_flags_t	flags;
+			unsigned char		useip = 1;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
+			flags = (zbx_conn_flags_t)atoi(row[5]);
+			if (ZBX_CONN_DNS == flags)
+				useip = 0;
 
 			result2 = DBselect(
 					"select null"
@@ -499,7 +505,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
+				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}
@@ -516,7 +522,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 							DBsql_id_ins(proxy_hostid), hostid);
 				}
 
-				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
+				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 			}
 			DBfree_result(result2);
 out:

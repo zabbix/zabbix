@@ -123,7 +123,9 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach($ldap_fields as $field) {
 			if (trim($config[$field]) === '') {
-				$this->response->setMessageError(_s('Incorrect value for field "%1$s": cannot be empty.', $field));
+				$this->response->setMessageError(
+					_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+				);
 				$is_valid = false;
 				break;
 			}
