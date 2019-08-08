@@ -228,7 +228,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (version placeholder)", agent.Options.Hostname)
+	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.VersionLong())
 	log.Infof(greeting)
 
 	if foregroundFlag {
@@ -275,7 +275,7 @@ func main() {
 	taskManager.Stop()
 	monitor.Wait()
 
-	farewell := fmt.Sprintf("Zabbix Agent stopped. (version placeholder)")
+	farewell := fmt.Sprintf("Zabbix Agent stopped. (%s)", version.VersionLong())
 	log.Infof(farewell)
 
 	if foregroundFlag {

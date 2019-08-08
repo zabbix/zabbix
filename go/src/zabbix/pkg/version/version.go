@@ -74,7 +74,7 @@ func RC() string {
 
 func VersionLong() string {
 	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
-	if 0 < len(RC()) {
+	if len(RC()) != 0 {
 		ver += " " + RC()
 	}
 	return ver
@@ -122,7 +122,7 @@ func TitleMessage() string {
 		}
 	}
 
-	if len(compileMode) > 0 {
+	if len(compileMode) != 0 {
 		title += fmt.Sprintf(" (%s)", compileMode)
 	}
 

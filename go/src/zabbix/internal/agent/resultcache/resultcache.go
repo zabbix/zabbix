@@ -52,6 +52,7 @@ import (
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/version"
 )
 
 const (
@@ -111,7 +112,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Data:    c.results,
 		Session: c.token,
 		Host:    agent.Options.Hostname,
-		Version: "4.4", // TODO
+		Version: version.VersionShort(),
 	}
 
 	var err error
