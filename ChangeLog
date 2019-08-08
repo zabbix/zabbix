@@ -1,3 +1,10 @@
+Changes for 4.4.0alpha2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.4.0alpha1
 
 New features:
@@ -18,6 +25,18 @@ Bug fixes:
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 ..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
 ..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.2.5
+
+4.2.5rc1 was released as 4.2.5 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.2.5rc1
@@ -509,6 +528,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.12rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.11
+
+4.0.11rc1 was released as 4.0.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.11rc1

@@ -2023,7 +2023,7 @@
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
 						new_widget_placeholder.container.addClass('disabled');
 					}
 					else {
@@ -2038,6 +2038,7 @@
 					}
 				}
 				else {
+					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
 					new_widget_placeholder.container.addClass('disabled');
 				}
 

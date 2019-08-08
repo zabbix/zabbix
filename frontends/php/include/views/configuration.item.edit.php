@@ -630,6 +630,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('Executed script'), 'params_es'))->setAsteriskMark(),
 		(new CTextArea('params_es', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setReadonly($discovered_item),
@@ -638,6 +639,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('SQL query'), 'params_ap'))->setAsteriskMark(),
 		(new CTextArea('params_ap', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setReadonly($discovered_item),
@@ -646,6 +648,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('Formula'), 'params_f'))->setAsteriskMark(),
 		(new CTextArea('params_f', $data['params'], $discovered_item))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setReadonly($discovered_item),

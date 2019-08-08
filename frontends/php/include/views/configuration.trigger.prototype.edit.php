@@ -100,6 +100,7 @@ $expression_row = [
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -301,6 +302,7 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
