@@ -22,9 +22,12 @@ package scheduler
 import (
 	"hash/fnv"
 	"strings"
+	"sync/atomic"
 	"time"
+	"unsafe"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
 	"zabbix/pkg/zbxlib"
 )
@@ -45,6 +48,40 @@ type client struct {
 	exporters          map[uint64]exporterTaskAccessor
 	plugins            map[*pluginAgent]*pluginInfo
 	refreshUnsupported int
+	globalRegexp       unsafe.Pointer
+	output             plugin.ResultWriter
+}
+
+type ClientAccessor interface {
+	RefreshUnsupported() int
+	Output() plugin.ResultWriter
+	GlobalRegexp() *glexpr.Bundle
+	ID() uint64
+}
+
+// RefreshUnsupported is used only by scheduler, no synchronization is required
+func (c *client) RefreshUnsupported() int {
+	return c.refreshUnsupported
+}
+
+// GlobalRegexp() is used by tasks to implement ContextProvider interface.
+// In theory it can be accessed by plugins and replaced by scheduler at the same time,
+// so pointer access must be synchronized. The global regexp contents are never changed,
+// only replaced, so pointer synchronization is enough.
+func (c *client) GlobalRegexp() *glexpr.Bundle {
+	return (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))
+}
+
+// While ID() is used by tasks to implement ContextProvider interface, client ID cannot
+// change, so no synchronization is required.
+func (c *client) ID() uint64 {
+	return c.id
+}
+
+// While Output() is used by tasks to implement ContextProvider interface, client output cannot
+// change, so no synchronization is required.
+func (c *client) Output() plugin.ResultWriter {
+	return c.output
 }
 
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
@@ -83,12 +120,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		var task *exporterTask
 		if tacc, ok := c.exporters[r.Itemid]; !ok {
 			task = &exporterTask{
-				taskBase:           taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
-				output:             sink,
-				item:               clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
-				updated:            now,
-				clientid:           c.id,
-				refreshUnsupported: c.refreshUnsupported,
+				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
+				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+				updated:  now,
+				client:   c,
 			}
 			// cache scheduled (non direct) request tasks
 			if r.Itemid != 0 {
@@ -102,7 +137,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		} else {
 			task = tacc.task()
 			task.updated = now
-			task.refreshUnsupported = c.refreshUnsupported
 			task.item.key = r.Key
 			if task.item.delay != r.Delay {
 				task.item.delay = r.Delay
@@ -139,9 +173,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if info.watcher == nil {
 				info.watcher = &watcherTask{
 					taskBase: taskBase{plugin: p, active: true},
-					output:   sink,
 					requests: make([]*plugin.Request, 0, 1),
-					clientid: c.id,
+					client:   c,
 				}
 				if err = info.watcher.reschedule(now); err != nil {
 					return
@@ -216,9 +249,8 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 					if _, ok := p.impl.(plugin.Watcher); ok {
 						task := &watcherTask{
 							taskBase: taskBase{plugin: p, active: true},
-							output:   nil,
 							requests: make([]*plugin.Request, 0),
-							clientid: c.id,
+							client:   c,
 						}
 						if err := task.reschedule(now); err == nil {
 							p.enqueueTask(task)
@@ -247,12 +279,28 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	return
 }
 
-func newClient(id uint64, refreshUnsupported int) (b *client) {
+func (c *client) updateExpressions(expressions []*glexpr.Expression) {
+	// reset expressions if changed
+	var grxp *glexpr.Bundle
+	if c.globalRegexp != nil {
+		grxp = (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))
+		if !grxp.CompareExpressions(expressions) {
+			grxp = nil
+		}
+	}
+
+	if grxp == nil {
+		grxp = glexpr.NewBundle(expressions)
+		atomic.StorePointer(&c.globalRegexp, unsafe.Pointer(grxp))
+	}
+}
+
+func newClient(id uint64, output plugin.ResultWriter) (b *client) {
 	b = &client{
-		id:                 id,
-		exporters:          make(map[uint64]exporterTaskAccessor),
-		plugins:            make(map[*pluginAgent]*pluginInfo),
-		refreshUnsupported: refreshUnsupported,
+		id:        id,
+		exporters: make(map[uint64]exporterTaskAccessor),
+		plugins:   make(map[*pluginAgent]*pluginInfo),
+		output:    output,
 	}
 
 	return

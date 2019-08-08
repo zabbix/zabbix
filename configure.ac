@@ -1991,6 +1991,7 @@ AC_OUTPUT([
 	go/src/zabbix/cmd/mock_server/Makefile
 	go/src/zabbix/pkg/Makefile
 	go/src/zabbix/pkg/conf/Makefile
+	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/log/Makefile
 	go/src/zabbix/pkg/std/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile

@@ -83,12 +83,16 @@ func (m *Meta) Mtime() int32 {
 	return atomic.LoadInt32(&m.mtime)
 }
 
+type RegexpMatcher interface {
+	Match(value string, pattern string, mode int, output_template *string) (match bool, output string)
+}
+
 type ContextProvider interface {
 	ClientID() uint64
 	ItemID() uint64
 	Output() ResultWriter
 	Meta() *Meta
-	// TODO: add function for global regexps
+	GlobalRegexp() RegexpMatcher
 }
 
 type Result struct {

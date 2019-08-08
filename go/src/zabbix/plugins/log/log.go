@@ -25,6 +25,7 @@ import (
 	"unsafe"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/zbxlib"
 )
@@ -78,12 +79,23 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
 	}
-	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*plugin.Result, 0), Output: ctx.Output()}
-	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh)
+	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
+	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
+	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
 	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
-		return logitem.Results, nil
+		results := make([]plugin.Result, len(logitem.Results))
+		for i, r := range logitem.Results {
+			results[i].Itemid = ctx.ItemID()
+			results[i].Value = r.Value
+			results[i].Error = r.Error
+			results[i].Ts = r.Ts
+			results[i].LastLogsize = &r.LastLogsize
+			results[i].Mtime = &r.Mtime
+			results[i].Persistent = true
+			return results, nil
+		}
 	}
 	return nil, nil
 }

@@ -22,7 +22,6 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
-
 #include "common.h"
 #include "sysinfo.h"
 #include "../src/zabbix_agent/metrics.h"
@@ -122,7 +121,6 @@ import (
 	"fmt"
 	"time"
 	"unsafe"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 )
 
@@ -136,10 +134,22 @@ const (
 	MetricFlagLog         = MetricFlagLogLog | MetricFlagLogLogrt | MetricFlagLogEventlog
 )
 
+type ResultWriter interface {
+	PersistSlotsAvailable() bool
+}
+
 type LogItem struct {
 	Itemid  uint64
-	Results []*plugin.Result
-	Output  plugin.ResultWriter
+	Results []*LogResult
+	Output  ResultWriter
+}
+
+type LogResult struct {
+	Value       *string
+	Ts          time.Time
+	Error       error
+	LastLogsize uint64
+	Mtime       int
 }
 
 func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int32) (data unsafe.Pointer, err error) {
@@ -165,7 +175,7 @@ func FreeActiveMetric(data unsafe.Pointer) {
 }
 
 // TODO: add global regexp parameter
-func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
+func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
 	var clastLogsizeSent, clastLogsizeLast C.ulong
@@ -175,7 +185,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
 	cmtimeLast = cmtimeSent
 
 	var cerrmsg *C.char
-	ret := C.process_log_check(C.char_lp_t(unsafe.Pointer(item)), 0, C.zbx_vector_ptr_lp_t(nil),
+	ret := C.process_log_check(C.char_lp_t(unsafe.Pointer(item)), 0, C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent, &cmtimeSent,
 		&cerrmsg)
 
@@ -189,10 +199,9 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
 		} else {
 			err = errors.New("Unknown error.")
 		}
-		result := &plugin.Result{
-			Itemid: item.Itemid,
-			Ts:     time.Now(),
-			Error:  err,
+		result := &LogResult{
+			Ts:    time.Now(),
+			Error: err,
 		}
 		item.Results = append(item.Results, result)
 	} else {
@@ -201,13 +210,10 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int) {
 
 		if ret == Succeed {
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtimeLast)
-			lastLogsize := uint64(clastLogsizeLast)
-			mtime := int(cmtimeLast)
-			result := &plugin.Result{
-				Itemid:      item.Itemid,
+			result := &LogResult{
 				Ts:          time.Now(),
-				LastLogsize: &lastLogsize,
-				Mtime:       &mtime,
+				LastLogsize: uint64(clastLogsizeLast),
+				Mtime:       int(cmtimeLast),
 			}
 			item.Results = append(item.Results, result)
 		}
