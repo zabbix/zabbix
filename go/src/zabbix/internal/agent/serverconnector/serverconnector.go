@@ -115,7 +115,7 @@ func (c *Connector) Addr() (s string) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
-	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: version.VersionShort()}
+	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: version.Short()}
 
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
