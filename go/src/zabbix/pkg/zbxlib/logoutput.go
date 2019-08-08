@@ -19,18 +19,27 @@
 
 package zbxlib
 
-import (
-	"C"
-	"unsafe"
-)
+/*
+#cgo CFLAGS: -I${SRCDIR}/../../../../../include
+#include "common.h"
+*/
+import "C"
+
 import (
 	"errors"
 	"time"
+	"unsafe"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/log"
 )
 
 //export processValue
-func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) {
+func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) C.int {
+	item := (*LogItem)(citem)
+	if !item.Output.PersistSlotsAvailable() {
+		log.Debugf("NO SLOTS")
+		return C.FAIL
+	}
 	var value string
 	var err error
 	if cstate == ItemStateNormal {
@@ -38,8 +47,6 @@ func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsi
 	} else {
 		err = errors.New(C.GoString(cvalue))
 	}
-
-	item := (*LogItem)(citem)
 
 	lastLogsize := uint64(clastLogsize)
 	mtime := int(cmtime)
@@ -52,4 +59,5 @@ func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsi
 		Mtime:       &mtime,
 	}
 	item.Results = append(item.Results, result)
+	return C.SUCCEED
 }

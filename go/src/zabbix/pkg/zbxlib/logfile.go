@@ -104,15 +104,14 @@ void	metric_free(ZBX_ACTIVE_METRIC *metric)
 	zbx_free(metric);
 }
 
-void processValue(void *server, const char *value, int state, zbx_uint64_t lastlogsize, int mtime);
+int processValue(void *server, const char *value, int state, zbx_uint64_t lastlogsize, int mtime);
 
 int	process_value_cb(const char *server, unsigned short port, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	processValue((void *)server, value, (int)state, *lastlogsize, *mtime);
-	return SUCCEED;
+	return processValue((void *)server, value, (int)state, *lastlogsize, *mtime);
 }
 
 */
@@ -140,6 +139,7 @@ const (
 type LogItem struct {
 	Itemid  uint64
 	Results []*plugin.Result
+	Output  plugin.ResultWriter
 }
 
 func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int32) (data unsafe.Pointer, err error) {
@@ -157,7 +157,6 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		return nil, fmt.Errorf("Unsupported item key: %s", key)
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
-
 	return unsafe.Pointer(C.new_metric(ckey, C.ulong(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 

@@ -138,9 +138,12 @@ func unquoteParam(data []byte) (param []byte) {
 			param = append(param, c)
 		case '\\':
 			if last == '\\' {
-				param = append(param, c)
+				param = append(param, '\\')
 			}
 		default:
+			if last == '\\' {
+				param = append(param, '\\')
+			}
 			param = append(param, c)
 		}
 		last = c

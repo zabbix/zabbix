@@ -104,7 +104,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		return
 	}
 
-	log.Debugf("[%d] upload history data, %d value(s)", c.clientID, len(c.results))
+	log.Debugf("[%d] upload history data, %d/%d value(s)", c.clientID, len(c.results), cap(c.results))
 
 	request := AgentDataRequest{
 		Request: "agent data",
@@ -329,9 +329,9 @@ func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
 }
 
 func (c *ResultCache) SlotsAvailable() bool {
-	return atomic.LoadUint32(&c.state)&cacheStateFull != 0
+	return atomic.LoadUint32(&c.state)&cacheStateFull == 0
 }
 
 func (c *ResultCache) PersistSlotsAvailable() bool {
-	return atomic.LoadUint32(&c.state)&cacheStateLimited != 0
+	return atomic.LoadUint32(&c.state)&cacheStateLimited == 0
 }
