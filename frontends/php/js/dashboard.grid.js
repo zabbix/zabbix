@@ -81,13 +81,19 @@
 		widget['content_script'] = $('<div>');
 
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
-			.append(widget['content_header'])
+			.append(widget['content_header'].on('focusin focusout', function(event) {
+				var $widget = $(this).closest('.dashbrd-grid-widget');
+				$widget.toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
+				if ($widget.hasClass('dashbrd-grid-widget-hidden-header') && $widget.position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
+				}
+			}))
 			.append(widget['content_body'])
 			.append(widget['content_script'])
 			.toggleClass('no-padding', !widget['padding']);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget',
+			'class': 'dashbrd-grid-widget' + (widget['view_mode'] == 1 ? ' dashbrd-grid-widget-hidden-header' : ''),
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
@@ -96,8 +102,10 @@
 			.toggleClass('new-widget', !widget['widgetid'].length)
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 			.append(widget['container'])
-			.on('focusin focusout', function(event) {
-				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin')
+			.on('mouseenter mouseleave', function(event) {
+				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
+				}
 			});
 	}
 
@@ -1204,7 +1212,8 @@
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
 			'content_width': Math.floor(widget['content_body'].width()),
-			'content_height': Math.floor(widget['content_body'].height())
+			'content_height': Math.floor(widget['content_body'].height()),
+			'view_mode': widget['view_mode']
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1312,15 +1321,18 @@
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
+			view_mode = (fields['show_header'] == 1) ? 0 : 1,
 			ajax_data = {
 				type: type,
-				name: name
+				name: name,
+				view_mode: view_mode
 			},
 			pos,
 			$placeholder;
 
 		delete fields['type'];
 		delete fields['name'];
+		delete fields['show_header'];
 
 		url.setArgument('action', 'dashboard.widget.check');
 
@@ -1385,6 +1397,7 @@
 						var widget_data = {
 								'type': type,
 								'header': name,
+								'view_mode': view_mode,
 								'pos': pos,
 								'rf_rate': 0,
 								'fields': fields
@@ -1423,6 +1436,7 @@
 						}
 
 						widget['header'] = name;
+						widget['view_mode'] = view_mode;
 						widget['fields'] = fields;
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
@@ -1828,6 +1842,7 @@
 	function setWidgetModeEdit($obj, data, widget) {
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
+		$('.dashbrd-grid-widget').removeClass('dashbrd-grid-widget-hidden-header');
 		removeWidgetInfoButtons(widget['content_header']);
 		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
@@ -1869,6 +1884,7 @@
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
+			ajax_widget['view_mode'] = widget['view_mode'];
 			if (Object.keys(widget['fields']).length != 0) {
 				ajax_widget['fields'] = JSON.stringify(widget['fields']);
 			}
@@ -2058,7 +2074,7 @@
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
 						new_widget_placeholder.container.addClass('disabled');
 					}
 					else {
@@ -2073,6 +2089,7 @@
 					}
 				}
 				else {
+					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
 					new_widget_placeholder.container.addClass('disabled');
 				}
 
@@ -2159,6 +2176,7 @@
 				'widgetid': '',
 				'type': '',
 				'header': '',
+				'view_mode': 0,
 				'pos': {
 					'x': 0,
 					'y': 0,
@@ -2173,7 +2191,8 @@
 				'initial_load': true,
 				'ready': false,
 				'fields': {},
-				'storage': {}
+				'storage': {},
+				'padding': true
 			}, widget);
 
 			return this.each(function() {
@@ -2382,7 +2401,10 @@
 
 					if (data.dialogue['widget_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
+						ajax_data['view_mode'] = (fields['show_header'] == 1) ? 0 : 1
+
 						delete fields['name'];
+						delete fields['show_header'];
 					}
 					else {
 						// Get default config if widget type changed.
@@ -2393,6 +2415,7 @@
 					// Open form with current config.
 					ajax_data['type'] = widget['type'];
 					ajax_data['name'] = widget['header'];
+					ajax_data['view_mode'] = widget['view_mode'];
 					fields = widget['fields'];
 				}
 				else {
