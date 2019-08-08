@@ -24,7 +24,7 @@
  */
 class CDashboard extends CApiService {
 
-	const MAX_X = 11; // DASHBOARD_MAX_COLUMNS - 1;
+	const MAX_X = 23; // DASHBOARD_MAX_COLUMNS - 1;
 	const MAX_Y = 62; // DASHBOARD_MAX_ROWS - 2;
 
 	protected $tableName = 'dashboard';
@@ -59,7 +59,7 @@ class CDashboard extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['dashboardid', 'name', 'userid', 'private']), 'default' => API_OUTPUT_EXTEND],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['userid', 'permission']), 'default' => null],
 			'selectUserGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['usrgrpid', 'permission']), 'default' => null],
-			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height', 'fields']), 'default' => null],
+			'selectWidgets' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height', 'fields']), 'default' => null],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -212,6 +212,7 @@ class CDashboard extends CApiService {
 			'widgets' =>			['type' => API_OBJECTS, 'fields' => [
 				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name'), 'default' => DB::getDefault('widget', 'name')],
+				'view_mode' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]), 'default' => DB::getDefault('widget', 'view_mode')],
 				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X, 'default' => DB::getDefault('widget', 'x')],
 				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y, 'default' => DB::getDefault('widget', 'y')],
 				'width' =>				['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS, 'default' => DB::getDefault('widget', 'width')],
@@ -322,6 +323,7 @@ class CDashboard extends CApiService {
 				'widgetid' =>			['type' => API_ID],
 				'type' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('widget', 'type')],
 				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('widget', 'name')],
+				'view_mode' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]), 'default' => DB::getDefault('widget', 'view_mode')],
 				'x' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_X],
 				'y' =>					['type' => API_INT32, 'in' => '0:'.self::MAX_Y],
 				'width' =>				['type' => API_INT32, 'in' => '1:'.DASHBOARD_MAX_COLUMNS],
@@ -345,7 +347,7 @@ class CDashboard extends CApiService {
 		$db_dashboards = $this->get([
 			'output' => ['dashboardid', 'name', 'userid', 'private'],
 			'dashboardids' => zbx_objectValues($dashboards, 'dashboardid'),
-			'selectWidgets' => ['widgetid', 'type', 'name', 'x', 'y', 'width', 'height'],
+			'selectWidgets' => ['widgetid', 'type', 'name', 'view_mode', 'x', 'y', 'width', 'height'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -356,6 +358,7 @@ class CDashboard extends CApiService {
 
 		$widget_defaults = [
 			'name' => DB::getDefault('widget', 'name'),
+			'view_mode' => DB::getDefault('widget', 'view_mode'),
 			'x' => DB::getDefault('widget', 'x'),
 			'y' => DB::getDefault('widget', 'y'),
 			'width' => DB::getDefault('widget', 'width'),
@@ -1006,7 +1009,7 @@ class CDashboard extends CApiService {
 
 		$field_names = [
 			'str' => ['type', 'name'],
-			'int' => ['x', 'y', 'width', 'height']
+			'int' => ['view_mode', 'x', 'y', 'width', 'height']
 		];
 
 		foreach ($dashboards as $dashboard) {

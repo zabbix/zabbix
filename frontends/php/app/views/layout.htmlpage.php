@@ -96,7 +96,7 @@ function local_generateHeader($data) {
 		echo $pageMenu->getOutput();
 	}
 
-	echo '<main>';
+	echo '<main'.(CView::getLayoutMode() === ZBX_LAYOUT_KIOSKMODE ? ' class="'.ZBX_STYLE_LAYOUT_KIOSKMODE.'"' : '').'>';
 
 	// should be replaced with addPostJS() at some point
 	zbx_add_post_js('initMessages();');

@@ -453,13 +453,28 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			char			*sql = NULL;
 			zbx_uint64_t		host_proxy_hostid;
 			zbx_conn_flags_t	flags;
+			int			flags_int;
 			unsigned char		useip = 1;
 			int			tls_accepted;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
-			flags = (zbx_conn_flags_t)atoi(row[5]);
+			flags_int = atoi(row[5]);
+
+			switch (flags_int)
+			{
+				case ZBX_CONN_DEFAULT:
+				case ZBX_CONN_IP:
+				case ZBX_CONN_DNS:
+					flags = (zbx_conn_flags_t)flags_int;
+					break;
+				default:
+					flags = ZBX_CONN_DEFAULT;
+					zabbix_log(LOG_LEVEL_WARNING, "wrong flags value: %d for host \"%s\":",
+							flags_int, row[1]);
+			}
+
 			if (ZBX_CONN_DNS == flags)
 				useip = 0;
 

@@ -14,7 +14,6 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
-
 	<?= (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
@@ -28,7 +27,9 @@
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->addClass('sortable')->toString()
+		]))
+			->addClass('sortable')
+			->toString()
 	?>
 </script>
 
@@ -40,12 +41,12 @@
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
 				->setAttribute('data-type', 'name')
-				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 			'&rArr;',
 			(new CTextBox(null, '#{value}'))
 				->setAttribute('placeholder', _('value'))
 				->setAttribute('data-type', 'value')
-				->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 			(new CCol(
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

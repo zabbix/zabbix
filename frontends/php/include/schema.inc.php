@@ -7458,6 +7458,12 @@ return [
 				'length' => 10,
 				'default' => '2',
 			],
+			'view_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'widget_field' => [
