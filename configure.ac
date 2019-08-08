@@ -1813,7 +1813,25 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-CGO_LDFLAGS="$LIBS $AGENT_LIBS"
+CGO_LDFLAGS="-Wl,--start-group \
+	\${abs_top_builddir}/src/zabbix_agent/logs/libzbxlogs.a \
+	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
+	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
+	\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
+	\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
+	\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
+	\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+	\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
+	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+	$LIBS $AGENT_LIBS \
+	-Wl,--end-group"
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
@@ -1978,6 +1996,7 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/pkg/zbxlib/Makefile
+	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
