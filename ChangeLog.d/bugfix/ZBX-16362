@@ -1,1 +1,1 @@
-..F....... [ZBX-16362] fixed when keyboard navigation is able to move focus away from SVG graph hintboxes in graph dashboard widget (vasilijs)
+..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
