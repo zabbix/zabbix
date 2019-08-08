@@ -557,7 +557,8 @@ class CConfigurationExportBuilder {
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
+				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
+				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
 		}
 

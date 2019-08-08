@@ -448,6 +448,7 @@ class C44XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
+									'inventory_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1025,6 +1026,7 @@ class C44XmlValidator {
 									'host' =>					['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
+									'inventory_mode' =>			['type' => XML_STRING | XML_REQUIRED],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
 											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
