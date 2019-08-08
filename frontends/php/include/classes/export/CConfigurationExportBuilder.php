@@ -101,6 +101,7 @@ class CConfigurationExportBuilder {
 				'description' => $host['description'],
 				'proxy' => $host['proxy'],
 				'status' => $host['status'],
+				'inventory_mode' => $host['inventory_mode'],
 				'ipmi_authtype' => $host['ipmi_authtype'],
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
