@@ -112,7 +112,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Data:    c.results,
 		Session: c.token,
 		Host:    agent.Options.Hostname,
-		Version: version.VersionShort(),
+		Version: version.Short(),
 	}
 
 	var err error
