@@ -3,7 +3,6 @@ Changes for 4.0.12rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-16031] reworked event update controller, making partly closed set of events closable (miks)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.11
