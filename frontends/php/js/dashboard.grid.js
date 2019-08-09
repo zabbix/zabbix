@@ -29,6 +29,15 @@
 				? widget['header']
 				: data['widget_defaults'][widget['type']]['header']
 			))
+			.on('focusin focusout', function(event) {
+				var $widget = $(this).closest('.dashbrd-grid-widget, .dashbrd-grid-iterator');
+
+				$widget.toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
+
+				if ($widget.hasClass('dashbrd-grid-widget-hidden-header') && $widget.position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
+				}
+			});
 		;
 
 		if (!widget['parent']) {
@@ -114,7 +123,10 @@
 
 		var $div = $('<div>', {
 			'class': widget['iterator'] ? 'dashbrd-grid-iterator' : 'dashbrd-grid-widget'
-		}).toggleClass('new-widget', widget['new_widget']);
+		})
+			.toggleClass('dashbrd-grid-widget-hidden-header', widget['view_mode'] == 1)
+			.toggleClass('new-widget', widget['new_widget'])
+		;
 
 		if (!widget['parent']) {
 			$div
@@ -126,9 +138,12 @@
 			;
 		}
 
-		$div.append(widget['container'])
-			.on('focusin focusout', function(event) {
-				$(this).toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin')
+		$div
+			.append(widget['container'])
+			.on('mouseenter mouseleave', function(event) {
+				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
+				}
 			})
 		;
 
@@ -203,8 +218,8 @@
 		return $(window).height() - $obj.offset().top - parseInt($(document.body).css('margin-bottom'), 10);
 	}
 
-	function getWidgetIndexByTarget($div) {
-		return $div.prevAll('.dashbrd-grid-widget, .dashbrd-grid-iterator').length;
+	function getWidgetByTarget(widgets, $div) {
+		return widgets[$div.data('widget-index')];
 	}
 
 	function generateRandomString(length) {
@@ -218,7 +233,7 @@
 	}
 
 	function calcDivPosition($obj, data, $div) {
-		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
+		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = $div.position(),
 			cell_w = data['cell-width'],
 			cell_h = data['options']['widget-height']
@@ -236,11 +251,10 @@
 			;
 		}
 		else {
-			var place_w = Math.round($div.width() / cell_w),
-				place_h = Math.round($div.height() / cell_h),
-				place_x = Math.round(pos.left / cell_w),
-				place_y = Math.round(pos.top / cell_h)
-			;
+			var place_x = Math.round(pos.left / cell_w),
+				place_y = Math.round(pos.top / cell_h),
+				place_w = Math.round(($div.width() + pos.left - place_x * cell_w) / cell_w),
+				place_h = Math.round(($div.height() + pos.top - place_y * cell_h) / cell_h);
 		}
 
 		if (data['pos-action'] === 'resize') {
@@ -265,10 +279,10 @@
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			left: (data['options']['widget-width'] * pos['x']) + '%',
-			top: (data['options']['widget-height'] * pos['y']) + 'px',
-			width: (data['options']['widget-width'] * pos['width']) + '%',
-			height: (data['options']['widget-height'] * pos['height']) + 'px'
+			'left': (data['options']['widget-width'] * pos['x']) + '%',
+			'top': (data['options']['widget-height'] * pos['y']) + 'px',
+			'width': (data['options']['widget-width'] * pos['width']) + '%',
+			'height': (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -369,9 +383,14 @@
 	function sortWidgets(widgets, by_current) {
 		var by_current = by_current || false;
 
-		widgets.sort(function(box1, box2) {
-			return by_current ? box1.current_pos.y - box2.current_pos.y : box1.pos.y - box2.pos.y;
-		});
+		widgets
+			.sort(function(box1, box2) {
+				return by_current ? box1.current_pos.y - box2.current_pos.y : box1.pos.y - box2.pos.y;
+			})
+			.each(function(box, index) {
+				box.div.data('widget-index', index);
+			})
+		;
 
 		return widgets;
 	}
@@ -887,9 +906,8 @@
 	 * @param {object} $div  Widget DOM element.
 	 * @param {object} data  Dashboard data object.
 	 */
-	function doWidgetResize($obj, $div, data) {
-		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
-			pos = calcDivPosition($obj, data, $div),
+	function doWidgetResize($obj, data, widget) {
+		var	pos = calcDivPosition($obj, data, widget['div']),
 			rows = 0;
 
 		if (!posEquals(pos, widget['current_pos'])) {
@@ -933,7 +951,7 @@
 	 * @param {object} data  Dashboard data object.
 	 */
 	function doWidgetPositioning($obj, $div, data) {
-		var	widget = data['widgets'][getWidgetIndexByTarget($div)],
+		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = calcDivPosition($obj, data, $div),
 			rows = 0,
 			overflow = false;
@@ -975,7 +993,7 @@
 	}
 
 	function stopWidgetPositioning($obj, $div, data) {
-		var widget = data['widgets'][getWidgetIndexByTarget($div)];
+		var	widget = getWidgetByTarget(data['widgets'], $div);
 
 		data['placeholder'].hide();
 		data['pos-action'] = '';
@@ -1089,7 +1107,7 @@
 				startWidgetPositioning($obj, data, widget, 'resize');
 				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				widget.prev_pos.axis_correction = {};
-				doWidgetResize($obj, $(event.target), data);
+				doWidgetResize($obj, data, widget);
 
 				var _class = event.currentTarget.className;
 				widget['div']
@@ -1098,6 +1116,7 @@
 				;
 			},
 			resize: function(event, ui) {
+				console.log(data);
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
 				if (SF) {
 					$.each(data['widgets'], function() {
@@ -1107,26 +1126,15 @@
 					});
 				}
 
-				if (ui.position.left < 0) {
-					ui.size.width += ui.position.left;
-					ui.position.left = 0;
-				}
-
-				if (ui.position.top < 0) {
-					ui.size.height += ui.position.top;
-					ui.position.top = 0;
-				}
-
+				// 1. Prevent physically resizing widgets beyond the allowed limits.
+				// 2. Prevent browser's vertical scrollbar from appearing when resizing right size of the widgets.
 				widget['div'].css({
-					'top': ui.position.top,
-					'left': ui.position.left,
-					'width': ui.size.width,
-					'height': ui.size.height,
-					'max-width': data['cell-width'] * data['options']['max-columns'] - ui.position.left,
-					'max-height': data.options['widget-max-rows'] * data.options['widget-height'],
+					'max-width': data['cell-width'] * data['options']['max-columns'] - Math.max(0, ui.position.left),
+					'max-height':
+						data.options['widget-max-rows'] * data.options['widget-height'] - Math.max(0, ui.position.top)
 				});
 
-				doWidgetResize($obj, widget['div'], data);
+				doWidgetResize($obj, data, widget);
 
 				if (widget['iterator']) {
 					if (getIteratorTooSmallState(widget)) {
@@ -1167,7 +1175,14 @@
 					alignIteratorContents($obj, data, widget, widget['pos']);
 				}
 
-				widget['div'].removeClass('resizing-top').removeClass('resizing-left');
+				widget['div']
+					.removeClass('resizing-top')
+					.removeClass('resizing-left')
+					.css({
+						'max-width': '',
+						'max-height': ''
+					})
+				;
 
 				// Invoke onResizeEnd on every affected widget.
 				data.widgets.each(function(box) {
@@ -1364,6 +1379,7 @@
 			'widgetid': '',
 			'type': '',
 			'header': '',
+			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
 			'preloader_fadespeed': 500,
 			'update_in_progress': false,
@@ -1576,21 +1592,35 @@
 		}
 	}
 
-	function hasWidgetSizeChanged(widget) {
-		if (typeof widget['content_size'] === 'undefined') {
-			return true;
-		}
-
-		return (widget['content_size']['content_width'] != Math.floor(widget['content_body'].width())
-			|| widget['content_size']['content_height'] != Math.floor(widget['content_body'].height())
-		);
-	}
-
-	function saveWidgetSize(widget) {
-		widget['content_size'] = {
+	function getWidgetContentSize(widget) {
+		return {
 			'content_width': Math.floor(widget['content_body'].width()),
 			'content_height': Math.floor(widget['content_body'].height())
 		};
+	}
+
+	function saveWidgetContentSize(widget) {
+		console.log('saveWidgetContentSize');
+
+		widget['content_size'] = getWidgetContentSize(widget);
+	}
+
+	function hasWidgetContentSizeChanged(widget) {
+		if (typeof widget['content_size'] === 'undefined') {
+			console.log('hasWidgetContentSizeChanged:true');
+			return true;
+		}
+
+		var content_size = getWidgetContentSize(widget);
+
+		var x = (widget['content_size']['content_width'] != content_size['content_width']
+			|| widget['content_size']['content_height'] != content_size['content_height']
+		);
+		console.log('hasWidgetContentSizeChanged:' + (x ? 'true' : 'false'));
+
+		return (widget['content_size']['content_width'] != content_size['content_width']
+			|| widget['content_size']['content_height'] != content_size['content_height']
+		);
 	}
 
 	function updateWidgetContent($obj, data, widget, options) {
@@ -1641,13 +1671,12 @@
 			'uniqueid': widget['uniqueid'],
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage']
+			'storage': widget['storage'],
+			'view_mode': widget['view_mode']
 		};
 
 		if (!widget['iterator']) {
-			saveWidgetSize(widget);
-
-			$.extend(ajax_data, widget['content_size']);
+			$.extend(ajax_data, getWidgetContentSize(widget));
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1727,15 +1756,18 @@
 			fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
+			view_mode = (fields['show_header'] == 1) ? 0 : 1,
 			ajax_data = {
 				type: type,
-				name: name
+				name: name,
+				view_mode: view_mode
 			},
 			pos,
 			$placeholder;
 
 		delete fields['type'];
 		delete fields['name'];
+		delete fields['show_header'];
 
 		url.setArgument('action', 'dashboard.widget.check');
 
@@ -1806,6 +1838,7 @@
 						var widget_data = {
 								'type': type,
 								'header': name,
+								'view_mode': view_mode,
 								'pos': pos,
 								'rf_rate': 0,
 								'fields': fields
@@ -1843,6 +1876,7 @@
 						// In case of EDIT widget, if type has not changed, update the widget.
 
 						widget['header'] = name;
+						widget['view_mode'] = view_mode;
 						widget['fields'] = fields;
 
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
@@ -2235,6 +2269,7 @@
 	function setWidgetModeEdit($obj, data, widget) {
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
+		$('.dashbrd-grid-widget, .dashbrd-grid-iterator').removeClass('dashbrd-grid-widget-hidden-header');
 		removeWidgetInfoButtons(widget['content_header']);
 		clearUpdateWidgetContentTimer(widget);
 		makeDraggable($obj, data, widget);
@@ -2255,11 +2290,15 @@
 			widget['div'].remove();
 		}
 		else {
-			var index = getWidgetIndexByTarget(widget['div']);
+			var index = widget['div'].data('widget-index');
 
 			widget['div'].remove();
 
 			data['widgets'].splice(index, 1);
+
+			for (var i = index; i < data['widgets'].length; i++) {
+				data['widgets'][i]['div'].data('widget-index', i);
+			}
 		}
 	}
 
@@ -2294,6 +2333,7 @@
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
+			ajax_widget['view_mode'] = widget['view_mode'];
 			if (Object.keys(widget['fields']).length != 0) {
 				ajax_widget['fields'] = JSON.stringify(widget['fields']);
 			}
@@ -2381,6 +2421,7 @@
 	}
 
 	function onIteratorResizeEnd($obj, data, iterator) {
+		console.log(1);
 		if (getIteratorTooSmallState(iterator)) {
 			return;
 		}
@@ -2396,9 +2437,9 @@
 
 				iterator['children'].forEach(function(child) {
 					// If not resizing OR if resizing and the size of the child has actually changed.
-					if (data['pos-action'] === '' || hasWidgetSizeChanged(child)) {
+					if (data['pos-action'] === '' || hasWidgetContentSizeChanged(child)) {
 						doAction('onResizeEnd', $obj, data, child);
-						saveWidgetSize(child);
+						saveWidgetContentSize(child);
 					}
 				});
 			})
@@ -2520,7 +2561,7 @@
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
 						new_widget_placeholder.container.addClass('disabled');
 					}
 					else {
@@ -2535,6 +2576,7 @@
 					}
 				}
 				else {
+					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
 					new_widget_placeholder.container.addClass('disabled');
 				}
 
@@ -2563,9 +2605,11 @@
 				var resize_delay,
 					resize_handler = function () {
 						data.widgets.each(function(widget) {
-							if (hasWidgetSizeChanged(widget)) {
+							console.log('onResizeEnd?');
+							if (hasWidgetContentSizeChanged(widget)) {
 								doAction('onResizeEnd', $this, data, widget);
-								saveWidgetSize(widget);
+								console.log('tiešām?');
+								saveWidgetContentSize(widget);
 							}
 						});
 					};
@@ -2625,6 +2669,7 @@
 				'widgetid': '',
 				'type': '',
 				'header': '',
+				'view_mode': 0,
 				'pos': {
 					'x': 0,
 					'y': 0,
@@ -2643,6 +2688,7 @@
 				'ready': false,
 				'fields': {},
 				'storage': {},
+				'padding': true,
 			}, widget, {
 				'parent': false,
 			});
@@ -2658,9 +2704,8 @@
 					widget_type_defaults = data['widget_defaults'][widget_local['type']]
 				;
 
-				$(['iterator', 'scrollable', 'padding']).each(function(index, key) {
-					widget_local[key] = widget_type_defaults[key];
-				});
+				widget_local['iterator'] = widget_type_defaults['iterator'];
+				widget_local['scrollable'] = widget_type_defaults['scrollable'];
 
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
@@ -2671,6 +2716,7 @@
 
 				widget_local['uniqueid'] = generateUniqueId($this, data);
 				widget_local['div'] = makeWidgetDiv($this, data, widget_local);
+				widget_local['div'].data('widget-index', data['widgets'].length);
 
 				updateWidgetDynamic($this, data, widget_local);
 
@@ -2881,7 +2927,10 @@
 
 					if (data.dialogue['widget_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
+						ajax_data['view_mode'] = (fields['show_header'] == 1) ? 0 : 1
+
 						delete fields['name'];
+						delete fields['show_header'];
 					}
 					else {
 						// Get default config if widget type changed.
@@ -2892,6 +2941,7 @@
 					// Open form with current config.
 					ajax_data['type'] = widget['type'];
 					ajax_data['name'] = widget['header'];
+					ajax_data['view_mode'] = widget['view_mode'];
 					fields = widget['fields'];
 				}
 				else {
