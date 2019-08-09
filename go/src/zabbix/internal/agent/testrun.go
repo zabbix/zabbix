@@ -79,6 +79,7 @@ func CheckMetrics() {
 		"system.uptime",
 		"system.uname",
 		"vfs.file.cksum",
+		"vfs.file.contents",
 	}
 
 	for _, metric := range metrics {

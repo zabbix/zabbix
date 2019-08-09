@@ -30,4 +30,5 @@ import (
 	_ "zabbix/plugins/vfs/filecksum"
 	_ "zabbix/plugins/zabbix/async"
 	_ "zabbix/plugins/zabbix/sync"
+	_ "zabbix/plugins/vfs/filecontents"
 )
