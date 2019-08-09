@@ -239,7 +239,7 @@ func main() {
 	}
 
 	log.Infof("using configuration file: %s", confFlag)
-
+	agent.InitUserParameterPlugin()
 	taskManager := scheduler.NewManager()
 	listener := serverlistener.New(taskManager)
 
