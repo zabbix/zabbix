@@ -44,13 +44,11 @@ check_fields($fields);
 if (hasRequest('update')) {
 	DBstart();
 
-	if (hasRequest('update')) {
-		$result = API::Autoregistration()->update([
-			'tls_accept' => getRequest('tls_accept'),
-			'tls_psk_identity' => getRequest('tls_psk_identity'),
-			'tls_psk' => getRequest('tls_psk')
-		]);
-	}
+	$result = API::Autoregistration()->update([
+		'tls_accept' => getRequest('tls_accept'),
+		'tls_psk_identity' => getRequest('tls_psk_identity'),
+		'tls_psk' => getRequest('tls_psk')
+	]);
 
 	$result = DBend($result);
 
