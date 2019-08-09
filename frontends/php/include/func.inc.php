@@ -1854,7 +1854,12 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
-		(new CView('general.warning', $data))->render();
+		if (detect_page_type() == PAGE_TYPE_JS) {
+			(new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->render();
+		}
+		else {
+			(new CView('general.warning', $data))->render();
+		}
 		exit;
 	}
 }
