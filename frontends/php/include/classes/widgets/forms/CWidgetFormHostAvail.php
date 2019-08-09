@@ -36,7 +36,7 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		$this->fields[$field_groups->getName()] = $field_groups;
 
 		// Availability type.
-		$field_availtype = new CWidgetFieldMultiCheckBox('availtype', _('Availability type'));
+		$field_availtype = new CWidgetFieldCheckBoxList('availtype', _('Availability type'));
 
 		if (array_key_exists('availtype', $this->data)) {
 			$field_availtype->setValue($this->data['availtype']);

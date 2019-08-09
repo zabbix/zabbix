@@ -353,39 +353,29 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
-
-		if ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_HORIZONTAL) {
-			$severities->addClass(ZBX_STYLE_HOR_LIST);
-		}
+		$severities = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities->addItem(
-				(new CCheckBox($field->getName().'[]', $severity))
-					->setLabel(getSeverityName($severity, $config))
-					->setId($field->getName().'_'.$severity)
-					->setChecked(in_array($severity, $field->getValue()))
-					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			);
+			$severities[$severity] = getSeverityName($severity, $config);
 		}
 
-		return $severities;
+		return self::getCheckBoxList($field, $severities);
 	}
 
 	/**
-	 * @param CWidgetFieldMultiCheckBox $field
+	 * @param CWidgetFieldCheckBoxList $field
 	 * @param array $config
 	 *
 	 * @return CList
 	 */
-	public static function getMultiCheckBox($field, array $values) {
+	public static function getCheckBoxList($field, array $config) {
 		$checkbox = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
-		if ($field->getOrientation() == CWidgetFieldMultiCheckBox::ORIENTATION_HORIZONTAL) {
+		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
 			$checkbox->addClass(ZBX_STYLE_HOR_LIST);
 		}
 
-		foreach ($values as $key => $label) {
+		foreach ($config as $key => $label) {
 			$checkbox->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
 					->setLabel($label)

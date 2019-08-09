@@ -40,7 +40,7 @@ $scripts = [$field_groupids->getPostJS()];
 // Availability type.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['availtype']),
-	CWidgetHelper::getMultiCheckBox($fields['availtype'], [
+	CWidgetHelper::getCheckBoxList($fields['availtype'], [
 		HOST_AVAILABLE_TYPE_AGENT => _('Zabbix agent'),
 		HOST_AVAILABLE_TYPE_SNMP => _('SNMP'),
 		HOST_AVAILABLE_TYPE_JMX => _('JMX'),

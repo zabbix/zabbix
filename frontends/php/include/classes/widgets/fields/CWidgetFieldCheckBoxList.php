@@ -19,7 +19,7 @@
 **/
 
 
-class CWidgetFieldMultiCheckBox extends CWidgetField {
+class CWidgetFieldCheckBoxList extends CWidgetField {
 
 	const ORIENTATION_HORIZONTAL = 0;
 	const ORIENTATION_VERTICAL = 1;
