@@ -29,7 +29,6 @@ import (
 	"errors"
 	"time"
 	"unsafe"
-	"zabbix/internal/plugin"
 )
 
 //export processValue
@@ -46,15 +45,12 @@ func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsi
 		err = errors.New(C.GoString(cvalue))
 	}
 
-	lastLogsize := uint64(clastLogsize)
-	mtime := int(cmtime)
-	result := &plugin.Result{
-		Itemid:      item.Itemid,
+	result := &LogResult{
 		Value:       &value,
 		Ts:          time.Now(),
 		Error:       err,
-		LastLogsize: &lastLogsize,
-		Mtime:       &mtime,
+		LastLogsize: uint64(clastLogsize),
+		Mtime:       int(cmtime),
 	}
 	item.Results = append(item.Results, result)
 	return C.SUCCEED

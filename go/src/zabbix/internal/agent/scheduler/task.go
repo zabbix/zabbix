@@ -117,20 +117,16 @@ func (t *collectorTask) getWeight() int {
 
 type exporterTask struct {
 	taskBase
-	output             plugin.ResultWriter
-	item               clientItem
-	failed             bool
-	updated            time.Time
-	refreshUnsupported int
-	clientid           uint64
-	meta               plugin.Meta
-	// note that any data that can be changed during active checks update and is exposed
-	// by ContextProvider interface can be written and accessed at the same time.
-	// Easiest way to protect such variables would be through pointers using atomic load/store.
-	// Example of shared data - global regular expressions.
+	item    clientItem
+	failed  bool
+	updated time.Time
+	client  ClientAccessor
+	meta    plugin.Meta
 }
 
 func (t *exporterTask) perform(s Scheduler) {
+	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
+	// from performer goroutine
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -150,18 +146,18 @@ func (t *exporterTask) perform(s Scheduler) {
 						s := reflect.ValueOf(ret)
 						for i := 0; i < s.Len(); i++ {
 							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-							t.output.Write(result)
+							t.client.Output().Write(result)
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
-						t.output.Write(result)
+						t.client.Output().Write(result)
 					}
 				}
 			}
 		}
 		if err != nil {
 			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
-			t.output.Write(result)
+			t.client.Output().Write(result)
 		}
 		// set failed state based on last result
 		if result != nil && result.Error != nil {
@@ -176,11 +172,12 @@ func (t *exporterTask) perform(s Scheduler) {
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		if nextcheck, err := zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.refreshUnsupported); err != nil {
-			return err
-		} else {
-			t.scheduled = nextcheck.Add(priorityExporterTaskNs)
+		var nextcheck time.Time
+		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
+		if err != nil {
+			return
 		}
+		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	} else {
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
@@ -194,19 +191,23 @@ func (t *exporterTask) task() (task *exporterTask) {
 // plugin.ContextProvider interface
 
 func (t *exporterTask) ClientID() (clientid uint64) {
-	return t.clientid
+	return t.client.ID()
+}
+
+func (t *exporterTask) Output() (output plugin.ResultWriter) {
+	return t.client.Output()
 }
 
 func (t *exporterTask) ItemID() (itemid uint64) {
 	return t.item.itemid
 }
 
-func (t *exporterTask) Output() (output plugin.ResultWriter) {
-	return t.output
-}
-
 func (t *exporterTask) Meta() (meta *plugin.Meta) {
 	return &t.meta
+}
+
+func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type starterTask struct {
@@ -254,8 +255,7 @@ func (t *stopperTask) getWeight() int {
 type watcherTask struct {
 	taskBase
 	requests []*plugin.Request
-	output   plugin.ResultWriter
-	clientid uint64
+	client   ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
@@ -278,19 +278,23 @@ func (t *watcherTask) getWeight() int {
 // plugin.ContextProvider interface
 
 func (t *watcherTask) ClientID() (clientid uint64) {
-	return t.clientid
+	return t.client.ID()
+}
+
+func (t *watcherTask) Output() (output plugin.ResultWriter) {
+	return t.client.Output()
 }
 
 func (t *watcherTask) ItemID() (itemid uint64) {
 	return 0
 }
 
-func (t *watcherTask) Output() (output plugin.ResultWriter) {
-	return t.output
-}
-
 func (t *watcherTask) Meta() (meta *plugin.Meta) {
 	return nil
+}
+
+func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type configuratorTask struct {

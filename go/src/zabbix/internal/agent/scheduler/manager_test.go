@@ -265,9 +265,9 @@ func (m *mockManager) mockTasks() {
 							active:    task.isActive(),
 							recurring: true,
 						},
-						item:     e.item,
-						clientid: e.clientid,
-						meta:     e.meta,
+						item:   e.item,
+						client: e.client,
+						meta:   e.meta,
 					},
 					sink: m.sink,
 				}
@@ -304,10 +304,9 @@ func (m *mockManager) mockTasks() {
 						index:     -1,
 						active:    task.isActive(),
 					},
-					sink:       m.sink,
-					resultSink: w.output,
-					requests:   w.requests,
-					clientid:   w.clientid,
+					sink:     m.sink,
+					requests: w.requests,
+					client:   w.client,
 				}
 				p.enqueueTask(mockTask)
 			case *configuratorTask:
@@ -423,20 +422,16 @@ func (t *mockExporterTask) task() (task *exporterTask) {
 
 // plugin.ContextProvider interface
 
-func (t *mockExporterTask) ClientID() (clientid uint64) {
-	return t.clientid
-}
-
-func (t *mockExporterTask) ItemID() (itemid uint64) {
-	return 0
-}
-
 func (t *mockExporterTask) Output() (output plugin.ResultWriter) {
 	return nil
 }
 
 func (t *mockExporterTask) Meta() (meta *plugin.Meta) {
 	return &t.meta
+}
+
+func (t *mockExporterTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type mockCollectorTask struct {
@@ -499,7 +494,7 @@ type mockWatcherTask struct {
 	sink       chan performer
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
-	clientid   uint64
+	client     ClientAccessor
 }
 
 func (t *mockWatcherTask) perform(s Scheduler) {
@@ -519,7 +514,7 @@ func (t *mockWatcherTask) getWeight() int {
 // plugin.ContextProvider interface
 
 func (t *mockWatcherTask) ClientID() (clientid uint64) {
-	return t.clientid
+	return t.client.ID()
 }
 
 func (t *mockWatcherTask) ItemID() (itemid uint64) {
@@ -532,6 +527,10 @@ func (t *mockWatcherTask) Output() (output plugin.ResultWriter) {
 
 func (t *mockWatcherTask) Meta() (meta *plugin.Meta) {
 	return nil
+}
+
+func (t *mockWatcherTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type mockConfigerTask struct {

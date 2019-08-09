@@ -21,6 +21,7 @@ package zbxlib
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
+
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/zabbix_agent/logs/libzbxlogs.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcomms/libzbxcomms.a
@@ -38,6 +39,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxjson/libzbxjson.a
+#cgo LDFLAGS: -lz -lpcre -lresolv
 #cgo LDFLAGS: -Wl,--end-group
 
 #include "common.h"

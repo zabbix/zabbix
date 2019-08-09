@@ -32,7 +32,9 @@ import (
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
+	"zabbix/pkg/version"
 	"zabbix/pkg/zbxcomms"
 )
 
@@ -59,20 +61,12 @@ type activeChecksRequest struct {
 	ListenPort   int    `json:"port,omitempty"`
 }
 
-type regexp struct {
-	Name           string  `json:"name"`
-	Expression     string  `json:"expression"`
-	ExpressionType *int    `json:"expression_type"`
-	ExpDelimiter   *string `json:"exp_delimiter"`
-	CaseSensitive  *int    `json:"case_sensitive"`
-}
-
 type activeChecksResponse struct {
-	Response           string            `json:"response"`
-	Info               string            `json:"info"`
-	Data               []*plugin.Request `json:"data"`
-	RefreshUnsupported *int              `json:"refresh_unsupported"`
-	Regexp             []regexp          `json:"regexp"`
+	Response           string               `json:"response"`
+	Info               string               `json:"info"`
+	Data               []*plugin.Request    `json:"data"`
+	RefreshUnsupported *int                 `json:"refresh_unsupported"`
+	Expressions        []*glexpr.Expression `json:"regexp"`
 }
 
 type agentDataResponse struct {
@@ -114,7 +108,7 @@ func (c *Connector) Addr() (s string) {
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
-	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: "4.4"}
+	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: version.Short()}
 
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
@@ -246,39 +240,39 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	for i := 0; i < len(response.Regexp); i++ {
-		if len(response.Regexp[i].Name) == 0 {
+	for i := 0; i < len(response.Expressions); i++ {
+		if len(response.Expressions[i].Name) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"name\"",
 				c.clientID, c.address)
 			return
 		}
 
-		if len(response.Regexp[i].Expression) == 0 {
+		if len(response.Expressions[i].Body) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression\"",
 				c.clientID, c.address)
 			return
 		}
 
-		if response.Regexp[i].ExpressionType == nil {
+		if response.Expressions[i].Type == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression_type\"",
 				c.clientID, c.address)
 			return
 		}
 
-		if response.Regexp[i].ExpDelimiter == nil {
+		if response.Expressions[i].Delimiter == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"exp_delimiter\"",
 				c.clientID, c.address)
 			return
 		}
 
-		if response.Regexp[i].CaseSensitive == nil {
+		if response.Expressions[i].Mode == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"case_sensitive\"",
 				c.clientID, c.address)
 			return
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
 // Write function is used by ResultCache to upload cached history. It will be callled from

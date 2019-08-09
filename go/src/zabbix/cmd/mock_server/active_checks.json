@@ -91,13 +91,13 @@
 		"expression": "foo",
 		"expression_type": 0,
 		"exp_delimiter": ",",
-		"case_sensitive": 0
+		"case_sensitive": 1
 	}, {
 		"name": "Any character string included insensitive",
 		"expression": "FOO.BAR.BAZ",
 		"expression_type": 1,
 		"exp_delimiter": ".",
-		"case_sensitive": 1
+		"case_sensitive": 0
 	}, {
 		"name": "Character string not included",
 		"expression": "foo",

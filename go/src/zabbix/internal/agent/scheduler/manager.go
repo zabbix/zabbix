@@ -31,6 +31,7 @@ import (
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
 )
@@ -47,10 +48,12 @@ type updateRequest struct {
 	sink               plugin.ResultWriter
 	requests           []*plugin.Request
 	refreshUnsupported int
+	expressions        []*glexpr.Expression
 }
 
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
+		requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration) (s string, err error)
 }
@@ -62,9 +65,12 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
-		requestClient = newClient(update.clientID, update.refreshUnsupported)
+		requestClient = newClient(update.clientID, update.sink)
 		m.clients[update.clientID] = requestClient
 	}
+
+	requestClient.refreshUnsupported = update.refreshUnsupported
+	requestClient.updateExpressions(update.expressions)
 
 	for _, r := range update.requests {
 		var key string
@@ -308,8 +314,14 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, requests []*plugin.Request) {
-	r := updateRequest{clientID: clientID, sink: writer, requests: requests, refreshUnsupported: refreshUnsupported}
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
+	expressions []*glexpr.Expression, requests []*plugin.Request) {
+	r := updateRequest{clientID: clientID,
+		sink:               writer,
+		requests:           requests,
+		refreshUnsupported: refreshUnsupported,
+		expressions:        expressions,
+	}
 	m.input <- &r
 }
 
@@ -332,7 +344,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	var mtime int
 
 	w := make(resultWriter)
-	m.UpdateTasks(0, w, 0, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
