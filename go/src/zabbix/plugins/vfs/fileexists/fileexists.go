@@ -37,8 +37,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if len(params) != 1 {
 		return nil, errors.New("Wrong number of parameters")
 	}
+	if "" == params[0] {
+		return nil, errors.New("Invalid first parameter")
+	}
+	ret := 0
 
-	return 0, nil
+	if f, err := stdOs.Stat(params[0]); err == nil {
+		if mode := f.Mode(); mode.IsRegular() {
+			ret = 1
+		}
+	} else if stdOs.IsExist(err) {
+		ret = 1
+	}
+	return ret, nil
 
 }
 
