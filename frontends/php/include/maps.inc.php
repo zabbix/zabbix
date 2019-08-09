@@ -735,8 +735,8 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 	// get host inventories
 	if ($sysmap['iconmapid']) {
-		$hostInventories = API::Host()->get([
-			'output' => ['hostid'],
+		$host_inventories = API::Host()->get([
+			'output' => ['hostid', 'inventory_mode'],
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'hostids' => $hostsToGetInventories,
 			'preservekeys' => true
@@ -1078,9 +1078,11 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 
 				$info[$selementId] = getHostsInfo($selement, $i, $sysmap['show_unack']);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
-					$info[$selementId]['iconid'] = getIconByMapping($iconMap,
-						$hostInventories[$selement['elements'][0]['hostid']]
-					);
+					$host_inventory = $host_inventories[$selement['elements'][0]['hostid']];
+
+					$info[$selementId]['iconid'] = ($host_inventory['inventory_mode'] == HOST_INVENTORY_DISABLED)
+						? $iconMap['default_iconid']
+						: getIconByMapping($iconMap, $host_inventory['inventory']);
 				}
 				break;
 
@@ -1573,29 +1575,27 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 /**
  * Get icon id by mapping.
  *
- * @param array $iconMap
+ * @param array $icon_map
  * @param array $inventory
  *
  * @return int
  */
-function getIconByMapping($iconMap, $inventory) {
-	if ($inventory['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-		$inventories = getHostInventories();
+function getIconByMapping($icon_map, $inventory) {
+	$inventories = getHostInventories();
 
-		foreach ($iconMap['mappings'] as $mapping) {
-			try {
-				$expr = new CGlobalRegexp($mapping['expression']);
-				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
-					return $mapping['iconid'];
-				}
+	foreach ($icon_map['mappings'] as $mapping) {
+		try {
+			$expr = new CGlobalRegexp($mapping['expression']);
+			if ($expr->match($inventory[$inventories[$mapping['inventory_link']]['db_field']])) {
+				return $mapping['iconid'];
 			}
-			catch(Exception $e) {
-				continue;
-			}
+		}
+		catch(Exception $e) {
+			continue;
 		}
 	}
 
-	return $iconMap['default_iconid'];
+	return $icon_map['default_iconid'];
 }
 
 /**
