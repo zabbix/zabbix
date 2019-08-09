@@ -57,8 +57,8 @@ type Configurator interface {
 
 type ResultWriter interface {
 	Write(result *Result)
-	SlotsAvailable() bool
-	PersistSlotsAvailable() bool
+	SlotsAvailable() int
+	PersistSlotsAvailable() int
 }
 
 type Meta struct {

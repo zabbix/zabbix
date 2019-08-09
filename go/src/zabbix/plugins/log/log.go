@@ -79,7 +79,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
 	}
-	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
+	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
 	data.lastcheck = now
@@ -94,8 +94,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			results[i].LastLogsize = &r.LastLogsize
 			results[i].Mtime = &r.Mtime
 			results[i].Persistent = true
-			return results, nil
 		}
+		return results, nil
 	}
 	return nil, nil
 }

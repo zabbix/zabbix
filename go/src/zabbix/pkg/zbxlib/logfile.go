@@ -103,6 +103,71 @@ void	metric_free(ZBX_ACTIVE_METRIC *metric)
 	zbx_free(metric);
 }
 
+typedef struct
+{
+	char *value;
+	int state;
+	zbx_uint64_t lastlogsize;
+	int mtime;
+}
+log_value_t;
+
+typedef struct
+{
+	zbx_vector_ptr_t values;
+	int slots;
+}
+log_result_t, *log_result_lp_t;
+
+static log_result_t *new_log_result(int slots)
+{
+	log_result_t *result;
+
+	result = (log_result_t *)zbx_malloc(NULL, sizeof(log_result_t));
+	zbx_vector_ptr_create(&result->values);
+	result->slots = slots;
+	return result;
+}
+
+static void add_log_value(log_result_t *result, const char *value, int state, zbx_uint64_t lastlogsize, int mtime)
+{
+	log_value_t *log;
+	log = (log_value_t *)zbx_malloc(NULL, sizeof(log_value_t));
+	log->value = zbx_strdup(NULL, value);
+	log->state = state;
+	log->lastlogsize = lastlogsize;
+	log->mtime = mtime;
+	zbx_vector_ptr_append(&result->values, log);
+}
+
+static int get_log_value(log_result_t *result, int index, char **value, int *state, zbx_uint64_t *lastlogsize, int *mtime)
+{
+	log_value_t *log;
+
+	if (index == result->values.values_num)
+		return FAIL;
+
+	log = (log_value_t *)result->values.values[index];
+	*value = log->value;
+	*state = log->state;
+	*lastlogsize = log->lastlogsize;
+	*mtime = log->mtime;
+	return SUCCEED;
+}
+
+static void free_log_value(log_value_t *log)
+{
+	zbx_free(log->value);
+	zbx_free(log);
+}
+
+static void free_log_result(log_result_t *result)
+{
+	zbx_vector_ptr_clear_ext(&result->values, (zbx_clean_func_t)free_log_value);
+	zbx_vector_ptr_destroy(&result->values);
+	zbx_free(result);
+}
+
 int processValue(void *server, const char *value, int state, zbx_uint64_t lastlogsize, int mtime);
 
 int	process_value_cb(const char *server, unsigned short port, const char *host, const char *key,
@@ -110,9 +175,13 @@ int	process_value_cb(const char *server, unsigned short port, const char *host, 
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	return processValue((void *)server, value, (int)state, *lastlogsize, *mtime);
-}
+	log_result_t *result = (log_result_t *)server;
+	if (result->values.values_num == result->slots)
+		return FAIL;
 
+	add_log_value(result, value, state, *lastlogsize, *mtime);
+	return SUCCEED;
+}
 */
 import "C"
 
@@ -135,11 +204,10 @@ const (
 )
 
 type ResultWriter interface {
-	PersistSlotsAvailable() bool
+	PersistSlotsAvailable() int
 }
 
 type LogItem struct {
-	Itemid  uint64
 	Results []*LogResult
 	Output  ResultWriter
 }
@@ -174,7 +242,6 @@ func FreeActiveMetric(data unsafe.Pointer) {
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
-// TODO: add global regexp parameter
 func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
@@ -184,12 +251,38 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	clastLogsizeLast = clastLogsizeSent
 	cmtimeLast = cmtimeSent
 
+	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
+
 	var cerrmsg *C.char
-	ret := C.process_log_check(C.char_lp_t(unsafe.Pointer(item)), 0, C.zbx_vector_ptr_lp_t(cblob),
+	ret := C.process_log_check(C.char_lp_t(unsafe.Pointer(result)), 0, C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent, &cmtimeSent,
 		&cerrmsg)
 
-	if ret == Fail {
+	// add cached results
+	var cvalue *C.char
+	var clastlogsize C.ulong
+	var cstate, cmtime C.int
+	for i := 0; C.get_log_value(result, C.int(i), &cvalue, &cstate, &clastlogsize, &cmtime) != C.FAIL; i++ {
+		var value string
+		var err error
+		if cstate == C.ITEM_STATE_NORMAL {
+			value = C.GoString(cvalue)
+		} else {
+			err = errors.New(C.GoString(cvalue))
+		}
+
+		result := &LogResult{
+			Value:       &value,
+			Ts:          time.Now(),
+			Error:       err,
+			LastLogsize: uint64(clastlogsize),
+			Mtime:       int(cmtime),
+		}
+		item.Results = append(item.Results, result)
+	}
+	C.free_log_result(result)
+
+	if ret == C.FAIL {
 		C.metric_set_unsupported(C.ZBX_ACTIVE_METRIC_LP(data))
 
 		var err error

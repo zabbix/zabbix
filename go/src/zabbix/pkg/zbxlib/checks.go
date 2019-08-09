@@ -19,6 +19,8 @@
 
 package zbxlib
 
+/* cspell:disable */
+
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
