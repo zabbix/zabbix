@@ -53,7 +53,7 @@ func ValueToResult(itemid uint64, ts time.Time, v interface{}) (result *plugin.R
 	case float64:
 		value = strconv.FormatFloat(v.(float64), 'g', -1, 64)
 	default:
-		// note that this conversion is slow and
+		// note that this conversion is slow and it's better to return known value type
 		value = fmt.Sprintf("%v", v)
 	}
 	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}

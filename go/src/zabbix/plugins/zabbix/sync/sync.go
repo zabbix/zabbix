@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixagent
+package zabbixsync
 
 import (
 	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -30,15 +29,13 @@ type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
-var stdOs std.Os
+var impl Plugin = Plugin{plugin.Base{MaxCapacity: 1}}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	return zbxlib.ExecuteCheck(key, params)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "zabbixagent", "system.localtime", "Returns system local time")
-	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns", "Checks if DNS service is up")
-	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns.record", "Performs DNS query")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns", "Checks if DNS service is up")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
 }

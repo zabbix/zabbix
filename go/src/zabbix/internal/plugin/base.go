@@ -29,15 +29,20 @@ type Accessor interface {
 	Name() string
 	Key() string
 	Description() string
+	Capacity() int
 }
 
 type Base struct {
 	name        string
 	key         string
 	description string
+	MaxCapacity int
 }
 
 func (b *Base) Init(name string, key string, description string) {
+	if b.MaxCapacity == 0 {
+		b.MaxCapacity = DefaultCapacity
+	}
 	b.name = name
 	b.key = key
 	b.description = description
@@ -53,6 +58,10 @@ func (b *Base) Description() string {
 
 func (b *Base) Key() string {
 	return b.key
+}
+
+func (b *Base) Capacity() int {
+	return b.MaxCapacity
 }
 
 func (b *Base) Debugf(format string, args ...interface{}) {

@@ -21,7 +21,6 @@ package scheduler
 
 import (
 	"container/heap"
-	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -78,7 +77,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		var p *pluginAgent
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
-				err = errors.New("Unknown metric")
+				err = fmt.Errorf("Unknown metric %s", key)
 			}
 		}
 		if err == nil {
@@ -249,59 +248,71 @@ func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
-
-	metrics := make([]plugin.Accessor, 0, len(plugin.Metrics))
 	m.plugins = make(map[string]*pluginAgent)
-	for key, acc := range plugin.Metrics {
-		capacity := plugin.DefaultCapacity
-		section := strings.Title(acc.Name())
-		if options, ok := agent.Options.Plugins[section]; ok {
-			if cap, ok := options["Capacity"]; ok {
-				var err error
-				if capacity, err = strconv.Atoi(cap); err != nil {
-					log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-						section, cap, plugin.DefaultCapacity)
-				}
-			}
-		}
-		m.plugins[key] = &pluginAgent{
-			impl:         acc,
-			tasks:        make(performerHeap, 0),
-			capacity:     capacity,
-			usedCapacity: 0,
-			index:        -1,
-			refcount:     0,
-		}
-		metrics = append(metrics, acc)
+
+	type metric struct {
+		acc plugin.Accessor
+		key string
 	}
 
-	// log available plugins
+	metrics := make([]*metric, 0, len(plugin.Metrics))
+
+	for key, acc := range plugin.Metrics {
+		metrics = append(metrics, &metric{acc: acc, key: key})
+	}
 	sort.Slice(metrics, func(i, j int) bool {
-		return metrics[i].Name() < metrics[j].Name()
+		return metrics[i].acc.Name() < metrics[j].acc.Name()
 	})
-	lastPlugin := ""
-	for _, acc := range metrics {
-		if acc.Name() != lastPlugin {
+
+	plug := &pluginAgent{}
+	for _, mt := range metrics {
+		if mt.acc != plug.impl {
+			capacity := mt.acc.Capacity()
+			section := strings.Title(mt.acc.Name())
+			if options, ok := agent.Options.Plugins[section]; ok {
+				if cap, ok := options["Capacity"]; ok {
+					var err error
+					if capacity, err = strconv.Atoi(cap); err != nil {
+						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
+							section, cap, plugin.DefaultCapacity)
+					}
+				}
+			}
+			if capacity > mt.acc.Capacity() {
+				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					mt.acc.Name(), mt.acc.Capacity(), capacity)
+				capacity = mt.acc.Capacity()
+			}
+
+			plug = &pluginAgent{
+				impl:         mt.acc,
+				tasks:        make(performerHeap, 0),
+				capacity:     capacity,
+				usedCapacity: 0,
+				index:        -1,
+				refcount:     0,
+			}
+
 			interfaces := ""
-			if _, ok := acc.(plugin.Exporter); ok {
+			if _, ok := mt.acc.(plugin.Exporter); ok {
 				interfaces += "exporter, "
 			}
-			if _, ok := acc.(plugin.Collector); ok {
+			if _, ok := mt.acc.(plugin.Collector); ok {
 				interfaces += "collector, "
 			}
-			if _, ok := acc.(plugin.Runner); ok {
+			if _, ok := mt.acc.(plugin.Runner); ok {
 				interfaces += "runner, "
 			}
-			if _, ok := acc.(plugin.Watcher); ok {
+			if _, ok := mt.acc.(plugin.Watcher); ok {
 				interfaces += "watcher, "
 			}
-			if _, ok := acc.(plugin.Configurator); ok {
+			if _, ok := mt.acc.(plugin.Configurator); ok {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
-			lastPlugin = acc.Name()
+			log.Infof("using plugin '%s' providing following interfaces: %s", mt.acc.Name(), interfaces)
 		}
+		m.plugins[mt.key] = plug
 	}
 }
 

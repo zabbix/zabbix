@@ -121,7 +121,7 @@ out:
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
  *           "filename_regexp" is freed.                                      *
  *                                                                            *
- *           Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *           Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	split_filename(const char *filename, char **directory, char **filename_regexp, char **err_msg)
@@ -569,7 +569,7 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
  *           We can never say that it IS the same file and it has not been    *
  *           truncated and replaced with a similar one.                       *
  *                                                                            *
- * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
@@ -731,7 +731,7 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           In other cases it COULD BE the same file or copy.                *
  *                                                                            *
- *           Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ *           Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
@@ -1158,7 +1158,7 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *       old2new[i][j] = '2' - the j-th new file is a copy of the i-th old    *
  *                             file                                           *
  *                                                                            *
- *    Thread-safe if linked to thread-safe zbx_strerror() function.           *
+ *    Thread-safe                                                             *
  *                                                                            *
  ******************************************************************************/
 static char	*create_old2new_and_copy_of(int rotation_type, struct st_logfile *old_files, int num_old,
@@ -1455,9 +1455,6 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  * Comments: Thead-safety - readdir() is a gray area, supposed to work on     *
  *           modern implementations when the directory stream is not shared   *
  *           between threads.                                                 *
- *           pick_logfile()->zbx_regexp_match_precompiled()->regexp_exec() -  *
- *           uses static buffer to optimize match storing for matched groups  *
- *           < 10 - not thread-safe!                                          *
  *                                                                            *
  ******************************************************************************/
 static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *re, int *use_ino,
@@ -1578,7 +1575,7 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
- * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
@@ -1638,7 +1635,7 @@ clean:
  *               ZBX_NO_FILE_ERROR - file(s) do not exist,                    *
  *               FAIL - other errors                                          *
  *                                                                            *
- * Comments: Not thread-safe! See pick_logfiles() comments.                   *
+ * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
  *                                                                            *
  ******************************************************************************/
 static int	make_logfile_list(unsigned char flags, const char *filename, int mtime,
@@ -1802,7 +1799,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
  *                                                                            *
  * Function: update_new_list_from_old                                         *
  *                                                                            *
- * Comments: Not thread-safe, uses static buffer                              *
+ * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
@@ -2135,8 +2132,7 @@ out:
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *
  *                                                                            *
- *           Not thread-safe! Called functions (zbx_read2(),                  *
- *           regexp_sub_ex()...regexp_prepare()) have static variables.       *
+ *           Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
@@ -2720,7 +2716,7 @@ out:
  *                                                                            *
  * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
  *                                                                            *
- * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num,
@@ -2868,7 +2864,7 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
  *                                                                            *
  * Function: update_new_list_from_old                                         *
  *                                                                            *
- * Comments: Thread-safe if linked to thread-safe zbx_strerror() function.    *
+ * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfiles_old, int logfiles_num_old,
@@ -2963,7 +2959,7 @@ static int	update_new_list_from_old(int rotation_type, struct st_logfile *logfil
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Comments: Not thread-safe! See process_log() function comments.            *
+ * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
@@ -3367,7 +3363,8 @@ static int	init_rotation_type(unsigned char flags, const AGENT_REQUEST *request,
  * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
  *           while log checks are running. Uses callback function             *
  *           process_value_cb, so overall thread-safety depends on caller.    *
- *           process_logrt() is not yet reviewed                              *
+ *           Otherwise supposed to be thread-safe, see pick_logfiles()        *
+ *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
 int	process_log_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,

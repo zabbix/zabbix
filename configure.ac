@@ -1991,10 +1991,10 @@ AC_OUTPUT([
 	go/src/zabbix/cmd/mock_server/Makefile
 	go/src/zabbix/pkg/Makefile
 	go/src/zabbix/pkg/conf/Makefile
-	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/log/Makefile
 	go/src/zabbix/pkg/std/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
+	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/pkg/zbxlib/Makefile
 	go/src/zabbix/pkg/version/Makefile
@@ -2018,7 +2018,9 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/debug/collector/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
-	go/src/zabbix/plugins/zabbixagent/Makefile
+	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/sync/Makefile
+	go/src/zabbix/plugins/zabbix/async/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
