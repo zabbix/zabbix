@@ -67,7 +67,7 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			if (FAIL != zbx_item_preproc_convert_value_to_numeric(&value_num, &value, value_type, &error))
 			{
 				history_value_local.timestamp = *ts;
-				zbx_variant_set_variant(&history_value_local.value, &value_num);
+				zbx_variant_copy(&history_value_local.value, &value_num);
 				history_value = &history_value_local;
 			}
 
