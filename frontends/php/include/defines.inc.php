@@ -1745,6 +1745,10 @@ define('ZBX_STYLE_TOP_NAV_SUPPORT', 'top-nav-support');
 define('ZBX_STYLE_TOP_NAV_ZBBSHARE', 'top-nav-zbbshare');
 define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
+define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
+define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
+define('ZBX_STYLE_TOTALS_LIST_VERTICAL', 'totals-list-vertical');
+define('ZBX_STYLE_TOTALS_LIST_COUNT', 'count');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
@@ -1773,9 +1777,6 @@ define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 
 // Widget "Host availability" styles.
 define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
-define('ZBX_STYLE_HOST_AVAIL_LAYOUT_HORIZONTAL', 'host-avail-layout-horizontal');
-define('ZBX_STYLE_HOST_AVAIL_LAYOUT_VERTICAL', 'host-avail-layout-vertical');
-define('ZBX_STYLE_HOST_AVAIL_COUNT', 'host-avail-count');
 define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
 define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
 define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
@@ -1783,9 +1784,6 @@ define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
 
 // Widget "Problems by severity" styles.
 define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
-define('ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL', 'by-severity-layout-horizontal');
-define('ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL', 'by-severity-layout-vertical');
-define('ZBX_STYLE_BY_SEVERITY_COUNT', 'by-severity-count');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

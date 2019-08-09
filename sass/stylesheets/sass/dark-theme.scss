@@ -248,26 +248,23 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+.totals-list {
+	color: darken($font-color, 85%);
+}
+
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
-	color: darken($font-color, 85%);
 
-	.host-avail-total,
-	&.list-table tbody th {
-		color: $font-color;
-	}
-}
-
-// WIDGET "PROBLEMS BY SEVERITY"
-
-.by-severity-widget {
-
-	> div {
+	&.list-table {
 		color: darken($font-color, 85%);
+
+		tbody th {
+			color: $font-color;
+		}
 	}
 
-	.by-severity-count {
+	.host-avail-total {
 		color: $font-color;
 	}
 }

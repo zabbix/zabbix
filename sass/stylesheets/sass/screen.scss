@@ -6925,46 +6925,58 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET "HOST AVAILABILITY"
+.totals-list {
 
-.host-avail-widget {
-	width: 100%;
-	height: 100%;
-	table-layout: fixed;
+	&:not(.list-table) {
+		display: flex;
+		height: 100%;
+	}
 
-	td {
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
 		line-height: 18px;
 		overflow: hidden;
 		padding: 0 10px;
-		vertical-align: middle;
+		position: relative;
 	}
 
-	.host-avail-count {
+	.count {
 		font-size: 16px;
 	}
 
-	&.host-avail-layout-horizontal {
-		min-width: 305px;
+	&.totals-list-horizontal {
 
-		td {
-			height: 100%;
-			text-align: center;
-		}
-
-		.host-avail-count {
-			display: block;
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
 		}
 	}
 
-	&.host-avail-layout-vertical {
+	&.totals-list-vertical {
+		flex-direction: column;
 
-		td {
+		> div {
+			min-height: 26px;
 			padding-top: 3px;
 		}
 
-		.host-avail-count {
+		.count {
 			margin-right: 5px;
 		}
+	}
+}
+
+// WIDGET "HOST AVAILABILITY"
+
+.host-avail-widget {
+
+	td:not(:first-child) {
+		border-left: 1px dotted $table-border-color;
+
 	}
 
 	.host-avail-true {
@@ -6981,61 +6993,6 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
-	}
-}
-
-// WIDGET "PROBLEMS BY SEVERITY"
-
-.by-severity-widget {
-	height: 100%;
-	display: flex;
-
-	> div {
-		flex: 1;
-		align-items: center;
-		display: flex;
-		line-height: 18px;
-		overflow: hidden;
-		padding: 0 10px;
-		position: relative;
-	}
-
-	.by-severity-count {
-		font-size: 16px;
-	}
-
-	&.by-severity-layout-horizontal {
-
-		> div {
-			flex-direction: column;
-			justify-content: center;
-			min-width: 55px;
-			text-align: center
-		}
-	}
-
-	&.by-severity-layout-vertical {
-		flex-direction: column;
-
-		> div {
-			min-height: 26px;
-			padding-top: 3px;
-		}
-
-		.by-severity-count {
-			margin-right: 5px;
-		}
-	}
-}
-
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-
-	/* for IE11 only. Fixed cell height if table has 100% height */
-	.host-avail-widget {
-
-		td {
-			height: 100%;
-		}
 	}
 }
 
