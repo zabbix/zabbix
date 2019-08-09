@@ -107,7 +107,7 @@ class CBarGraphDataFormatter implements CDataFormatter {
 				$min_nearby = null;
 				foreach ($dataset as $v) {
 					if (!$min_nearby) {
-						$min_nearby = $v[0] - $last_nearby_x;
+						$min_nearby = $v[0];
 					}
 
 					if ($min_nearby > $v[0] - $last_nearby_x) {
