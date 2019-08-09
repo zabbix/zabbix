@@ -102,6 +102,33 @@ class CBarGraphDataFormatter implements CDataFormatter {
 				}
 
 				$width[] = $graph_width;
+
+				$last_nearby_x = 0;
+				$min_nearby = null;
+				foreach ($dataset as $v) {
+					if (!$min_nearby) {
+						$min_nearby = $v[0] - $last_nearby_x;
+					}
+
+					if ($min_nearby > $v[0] - $last_nearby_x) {
+						$min_nearby = $v[0] - $last_nearby_x;
+
+						if ($min_nearby <= 1) {
+							$min_nearby = 1;
+							break;
+						}
+					}
+
+					$last_nearby_x = $v[0];
+				}
+				unset($last_nearby_x);
+
+				$nearby_gap = $min_nearby * 0.25;
+				if (self::MIN_BAR_GAP_WIDTH > $nearby_gap) {
+					$nearby_gap = 0;
+				}
+
+				$width[] = $min_nearby - $nearby_gap;
 			}
 
 			$result[$axis] = min($width);
