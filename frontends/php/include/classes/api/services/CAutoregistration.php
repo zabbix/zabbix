@@ -137,13 +137,16 @@ class CAutoregistration extends CApiService {
 		$this->validateUpdate($autoreg, $db_autoreg, $autoreg_tlsid);
 		$update = [];
 
-		if (!empty($autoreg)) {
+		if ($autoreg) {
 			update_config(['autoreg_tls_accept' => $autoreg['tls_accept']]);
+			unset($autoreg['tls_accept']);
 
-			$update[] = [
-				'values' => $autoreg,
-				'where' => ['autoreg_tlsid' => $autoreg_tlsid]
-			];
+			if ($autoreg) {
+				$update[] = [
+					'values' => $autoreg,
+					'where' => ['autoreg_tlsid' => $autoreg_tlsid]
+				];
+			}
 		}
 		DB::update('config_autoreg_tls', $update);
 
