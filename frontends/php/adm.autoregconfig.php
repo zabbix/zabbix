@@ -32,7 +32,6 @@ $fields = [
 							],
 	'tls_psk_identity' =>	[T_ZBX_STR, O_OPT, null, null, null],
 	'tls_psk' =>			[T_ZBX_STR, O_OPT, null, null, null],
-
 	// actions
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null, null, null]
@@ -65,16 +64,16 @@ $autoreg = API::Autoregistration()->get(['output' => API_OUTPUT_EXTEND]);
 
 if (hasRequest('form_refresh')) {
 	$data = [
-		'tls_accept'		=> getRequest('tls_accept', $autoreg['tls_accept']),
-		'tls_psk_identity'	=> getRequest('tls_psk_identity', $autoreg['tls_psk_identity']),
-		'tls_psk'			=> getRequest('tls_psk', $autoreg['tls_psk'])
+		'tls_accept' => getRequest('tls_accept', $autoreg['tls_accept']),
+		'tls_psk_identity' => getRequest('tls_psk_identity', $autoreg['tls_psk_identity']),
+		'tls_psk' => getRequest('tls_psk', $autoreg['tls_psk'])
 	];
 }
 else {
 	$data = [
-		'tls_accept'		=> $autoreg['tls_accept'] == null ? HOST_ENCRYPTION_NONE : $autoreg['tls_accept'],
-		'tls_psk_identity'	=> $autoreg['tls_psk_identity'],
-		'tls_psk'			=> $autoreg['tls_psk']
+		'tls_accept' => ($autoreg['tls_accept'] == null) ? HOST_ENCRYPTION_NONE : $autoreg['tls_accept'],
+		'tls_psk_identity' => $autoreg['tls_psk_identity'],
+		'tls_psk' => $autoreg['tls_psk']
 	];
 }
 

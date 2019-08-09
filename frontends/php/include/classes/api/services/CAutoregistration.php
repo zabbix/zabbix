@@ -58,23 +58,21 @@ class CAutoregistration extends CApiService {
 	 * @return array
 	 */
 	protected function getAutoreg($options) {
-		$result = [];
-
-		$sqlParts = [
-			'select'	=> ['config_autoreg_tls' => 'ca.autoreg_tlsid'],
-			'from'		=> ['config_autoreg_tls' => 'config_autoreg_tls ca'],
-			'where'		=> [],
-			'group'		=> [],
-			'order'		=> [],
-			'limit'		=> null
+		$sql_parts = [
+			'select' => ['config_autoreg_tls' => 'ca.autoreg_tlsid'],
+			'from' => ['config_autoreg_tls' => 'config_autoreg_tls ca'],
+			'where'	=> [],
+			'group'	=> [],
+			'order'	=> [],
+			'limit'	=> null
 		];
 
-		$defOptions = [
+		$def_options = [
 			// output
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => false
 		];
-		$options = zbx_array_merge($defOptions, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 		$ini_autoreg = [];
 
@@ -83,11 +81,12 @@ class CAutoregistration extends CApiService {
 			$ini_autoreg['tls_accept'] = $config['autoreg_tls_accept'];
 		}
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($autoreg = DBfetch($res)) {
-			$autoreg = $ini_autoreg + $autoreg;
-			$result[$autoreg['autoreg_tlsid']] = $autoreg;
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$result = $this->extractResult($sql_parts, $ini_autoreg);
+
+		if (!$result) {
+			$this->getAutoregTlsId(false);
+			$result = $this->extractResult($sqlParts, $ini_autoreg);
 		}
 
 		if ($options['preservekeys']) {
@@ -101,12 +100,31 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
+	 * Extract result from db.
+	 *
+	 * @param array  $sql_parts
+	 * @param array  $ini_autoreg
+	 *
+	 * @return array
+	 */
+	protected function extractResult(array $sql_parts, array $ini_autoreg = []) {
+		$result = [];
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		while ($autoreg = DBfetch($res)) {
+			$autoreg = $ini_autoreg + $autoreg;
+			$result[$autoreg['autoreg_tlsid']] = $autoreg;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Update auto registration configuration.
 	 *
-	 * @param array  $autoreg
-	 * @param int    $autoreg['tls_accept']
-	 * @param string $autoreg['tls_psk_identity']
-	 * @param string $autoreg['tls_psk']
+	 * @param array   $autoreg
+	 * @param int     $autoreg['tls_accept']
+	 * @param string  $autoreg['tls_psk_identity']
+	 * @param string  $autoreg['tls_psk']
 	 *
 	 * @throws APIException if incorrect encryption options.
 	 *
@@ -135,11 +153,11 @@ class CAutoregistration extends CApiService {
 	/**
 	 * Get the ID of an existing configuration entry or create a new one.
 	 *
-	 * @param array $db_autoreg
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['tls_accept']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk']
+	 * @param array   $db_autoreg
+	 * @param int     $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
+	 * @param int     $db_autoreg[<autoreg_tlsid>]['tls_accept']
+	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
+	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk']
 	 *
 	 * @return int
 	 */
@@ -163,16 +181,16 @@ class CAutoregistration extends CApiService {
 	/**
 	 * Validate auto registration connections and PSK fields.
 	 *
-	 * @param array  $autoreg
-	 * @param int    $autoreg['tls_accept']
-	 * @param string $autoreg['tls_psk_identity']
-	 * @param string $autoreg['tls_psk']
-	 * @param array  $db_autoreg                 (optional)
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['tls_accept']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk']
-	 * @param int $autoreg_tlsid
+	 * @param array   $autoreg
+	 * @param int     $autoreg['tls_accept']
+	 * @param string  $autoreg['tls_psk_identity']
+	 * @param string  $autoreg['tls_psk']
+	 * @param array   $db_autoreg                 (optional)
+	 * @param int     $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
+	 * @param int     $db_autoreg[<autoreg_tlsid>]['tls_accept']
+	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
+	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk']
+	 * @param int     $autoreg_tlsid
 	 *
 	 * @throws APIException if incorrect encryption options.
 	 */
@@ -235,7 +253,5 @@ class CAutoregistration extends CApiService {
 				);
 			}
 		}
-
 	}
-
 }

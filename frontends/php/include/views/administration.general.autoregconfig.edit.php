@@ -33,7 +33,7 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$autoregTab = (new CFormList())
+$autoreg_tab = (new CFormList())
 	->addRow(_('Encryption level'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
@@ -61,16 +61,16 @@ $autoregTab = (new CFormList())
 		'tls_psk'
 	);
 
-$autoregView = (new CTabView())
-	->addTab('autoreg', _('Auto registration'), $autoregTab)
+$autoreg_view = (new CTabView())
+	->addTab('autoreg', _('Auto registration'), $autoreg_tab)
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
-$autoregForm = (new CForm())
-	->setAttribute('id', 'autoregconfigForm')
+$autoreg_form = (new CForm())
+	->setAttribute('id', 'autoregconfig_form')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addItem($autoregView);
+	->addItem($autoreg_view);
 
-$widget->addItem($autoregForm);
+$widget->addItem($autoreg_form);
 
 return $widget;

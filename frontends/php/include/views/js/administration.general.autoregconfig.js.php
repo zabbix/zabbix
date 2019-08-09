@@ -9,7 +9,7 @@
 		}
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		$('#autoregconfigForm').submit(function() {
+		$('#autoregconfig_form').submit(function() {
 			var tls_accept = 0x00;
 
 			if ($('#tls_in_none').is(':checked')) {
