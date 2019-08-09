@@ -2032,7 +2032,7 @@ function getMapLinktriggerInfo($sysmap, $options) {
 
 	$problem_options = [
 		'show_suppressed' => $sysmap['show_suppressed'],
-		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? true : null
+		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null
 	];
 
 	return getTriggersWithActualSeverity($trigger_options, $problem_options);
