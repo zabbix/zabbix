@@ -2019,6 +2019,8 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
 	go/src/zabbix/plugins/zabbixagent/Makefile
+	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/stats/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

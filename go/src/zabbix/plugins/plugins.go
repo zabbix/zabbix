@@ -28,5 +28,6 @@ import (
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
 	_ "zabbix/plugins/vfs/filecksum"
+	_ "zabbix/plugins/zabbix/stats"
 	_ "zabbix/plugins/zabbixagent"
 )
