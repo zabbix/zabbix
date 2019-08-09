@@ -415,6 +415,188 @@ function makeSystemStatus(array $filter, array $data, array $config, $backurl) {
 	return $table;
 }
 
+/**
+ * @param array  $data
+ * @param array  $data['groups']
+ * @param string $data['groups'][]['groupid']
+ * @param string $data['groups'][]['name']
+ * @param bool   $data['groups'][]['has_problems']
+ * @param array  $data['groups'][]['stats']
+ * @param int    $data['groups'][]['stats'][]['count']
+ * @param array  $data['groups'][]['stats'][]['problems']
+ * @param int    $data['groups'][]['stats'][]['count_unack']
+ * @param array  $data['groups'][]['stats'][]['problems_unack']
+ * @param array  $severity_names
+ *
+ * @return array
+ */
+function getSystemStatusTotals(array $data, array $severity_names) {
+	$groups_totals = [
+		0 => [
+			'groupid' => 0,
+			'stats' => []
+		]
+	];
+
+	foreach (array_reverse($severity_names) as $key => $value) {
+		$i = explode('_', $key)[2];
+		$groups_totals[0]['stats'][$i] = [
+			'count' => 0,
+			'problems' => [],
+			'count_unack' => 0,
+			'problems_unack' => []
+		];
+	}
+
+	foreach ($data['groups'] as $group) {
+		foreach ($group['stats'] as $severity => $stat) {
+			$groups_totals[0]['stats'][$severity]['count'] += $stat['count'];
+			foreach ($stat['problems'] as $problem) {
+				$groups_totals[0]['stats'][$severity]['problems'][] = $problem;
+			}
+			$groups_totals[0]['stats'][$severity]['count_unack'] += $stat['count_unack'];
+			foreach ($stat['problems_unack'] as $problem) {
+				$groups_totals[0]['stats'][$severity]['problems_unack'][] = $problem;
+			}
+		}
+	}
+
+	return $groups_totals;
+}
+
+/**
+ * @param array      $data
+ * @param array      $data['data']
+ * @param array      $data['data']['groups']
+ * @param array      $data['data']['groups'][]['stats']
+ * @param array      $data['filter']
+ * @param array      $data['filter']['severities']
+ * @param boolean    $hide_empty_groups
+ * @param CUrl       $groupurl
+ *
+ * @return CTableInfo
+ */
+function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupurl = null) {
+	$table = new CTableInfo();
+
+	foreach ($data['data']['groups'] as $group) {
+		if ($hide_empty_groups && !$group['has_problems']) {
+			// Skip row.
+			continue;
+		}
+
+		$groupurl->setArgument('filter_groupids', [$group['groupid']]);
+		$row = [new CLink($group['name'], $groupurl->getUrl())];
+
+		foreach ($group['stats'] as $severity => $stat) {
+			if ($data['filter']['severities'] && !in_array($severity, $data['filter']['severities'])) {
+				// Skip cell.
+				continue;
+			}
+
+			$row[] = getSeverityTableCell($severity, $data, $stat);
+		}
+
+		$table->addRow($row);
+	}
+
+	return $table;
+}
+
+/**
+ * @param array      $data
+ * @param array      $data['data']
+ * @param array      $data['data']['groups']
+ * @param array      $data['data']['groups'][]['stats']
+ * @param array      $data['filter']
+ * @param array      $data['filter']['severities']
+ *
+ * @return CDiv
+ */
+function makeSeverityTotals(array $data) {
+	$table = new CDiv();
+
+	foreach ($data['data']['groups'] as $group) {
+		foreach ($group['stats'] as $severity => $stat) {
+			if ($data['filter']['severities'] && !in_array($severity, $data['filter']['severities'])) {
+				// Skip cell.
+				continue;
+			}
+			$table->addItem(getSeverityTableCell($severity, $data, $stat, true));
+		}
+	}
+
+	return $table;
+}
+
+/**
+ * @param int     $severity
+ * @param array   $data
+ * @param array   $data['data']
+ * @param array   $data['data']['triggers']
+ * @param array   $data['data']['actions']
+ * @param array   $data['filter']
+ * @param array   $data['filter']['ext_ack']
+ * @param array   $data['severity_names']
+ * @param array   $data['backurl']
+ * @param array   $stat
+ * @param int     $stats['count']
+ * @param array   $stats['problems']
+ * @param int     $stats['count_unack']
+ * @param array   $stats['problems_unack']
+ * @param boolean $is_total
+ *
+ * @return CCol|string
+ */
+function getSeverityTableCell($severity, array $data, array $stat, $is_total = false) {
+	if (!$is_total && $stat['count'] == 0 && $stat['count_unack'] == 0) {
+		return '';
+	}
+
+	$severity_name = $is_total ? ' '.getSeverityName($severity, $data['severity_names']) : '';
+	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
+
+	$allTriggersNum = $stat['count'];
+	if ($allTriggersNum) {
+		$allTriggersNum = (new CLinkAction($allTriggersNum))
+			->setHint(makeProblemsPopup($stat['problems'], $data['data']['triggers'], $data['backurl'],
+				$data['data']['actions'], $data['severity_names'], $data['filter']
+			));
+	}
+
+	$unackTriggersNum = $stat['count_unack'];
+	if ($unackTriggersNum) {
+		$unackTriggersNum = (new CLinkAction($unackTriggersNum))
+			->setHint(makeProblemsPopup($stat['problems_unack'], $data['data']['triggers'], $data['backurl'],
+				$data['data']['actions'], $data['severity_names'], $data['filter']
+			));
+	}
+
+	switch ($ext_ack) {
+		case EXTACK_OPTION_ALL:
+			return getSeverityCell($severity, null, [
+				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				$severity_name
+			], false, $is_total);
+
+		case EXTACK_OPTION_UNACK:
+			return getSeverityCell($severity, null, [
+				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				$severity_name
+			], false, $is_total);
+
+		case EXTACK_OPTION_BOTH:
+			return getSeverityCell($severity, $data['severity_names'], [
+				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
+					->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				$severity_name
+			], false, $is_total);
+
+		default:
+			return '';
+	}
+}
+
 function make_status_of_zbx() {
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;

@@ -5069,6 +5069,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  *             ip     - [IN] IP address                                       *
  *             dns    - [IN] DNS address                                      *
  *             port   - [IN] port                                             *
+ *             flags  - [IN] the used connection type                         *
  *                                                                            *
  * Return value: upon successful completion return interface identificator    *
  *                                                                            *
@@ -5077,8 +5078,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
-		unsigned char useip, const char *ip, const char *dns, unsigned short port)
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
+		const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -5106,24 +5107,69 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		if (1 == db_main)
 			main_ = 0;
 
-		if (db_useip != useip)
-			continue;
+		if (ZBX_CONN_DEFAULT == flags)
+		{
+			if (db_useip != useip)
+				continue;
+			if (useip && 0 != strcmp(db_ip, ip))
+				continue;
 
-		if (useip && 0 != strcmp(db_ip, ip))
-			continue;
+			if (!useip && 0 != strcmp(db_dns, dns))
+				continue;
 
-		if (!useip && 0 != strcmp(db_dns, dns))
-			continue;
+			zbx_free(tmp);
+			tmp = strdup(row[4]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+					&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+				continue;
 
-		zbx_free(tmp);
-		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
-				&tmp, MACRO_TYPE_COMMON, NULL, 0);
-		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
-			continue;
+			ZBX_STR2UINT64(interfaceid, row[0]);
+			break;
+		}
 
-		ZBX_STR2UINT64(interfaceid, row[0]);
-		break;
+		/* update main interface if explicit connection flags were passed (flags != ZBX_CONN_DEFAULT) */
+		if (1 == db_main)
+		{
+			char	*update = NULL, delim = ' ';
+			size_t	update_alloc = 0, update_offset = 0;
+
+			ZBX_STR2UINT64(interfaceid, row[0]);
+
+			if (db_useip != useip)
+			{
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_IP == flags && 0 != strcmp(db_ip, ip))
+			{
+				ip_esc = DBdyn_escape_field("interface", "ip", ip);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
+				zbx_free(ip_esc);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_DNS == flags && 0 != strcmp(db_dns, dns))
+			{
+				dns_esc = DBdyn_escape_field("interface", "dns", dns);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cdns='%s'", delim,
+						dns_esc);
+				zbx_free(dns_esc);
+				delim = ',';
+			}
+
+			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
+
+			if (0 != update_alloc)
+			{
+				DBexecute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
+						interfaceid);
+				zbx_free(update);
+			}
+			break;
+		}
 	}
 	DBfree_result(result);
 

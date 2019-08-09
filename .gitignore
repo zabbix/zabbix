@@ -61,6 +61,8 @@ frontends/php/local/conf/brand.conf.php
 frontends/php/locale/POTFILES.in
 frontends/php/locale/frontend.pot
 frontends/php/tests/bootstrap.php
+frontends/php/tests/vendor
+frontends/php/tests/composer.*
 include/config.h
 include/config.h.in
 include/stamp-h1
