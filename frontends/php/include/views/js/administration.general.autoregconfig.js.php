@@ -30,9 +30,6 @@
 			}
 			else {
 				$('.tls_psk').hide().find('input').val('');
-				if (!($('#tls_in_none').is(':checked'))) {
-					$('#tls_in_none').prop('checked', true);
-				}
 			}
 		});
 		if (!$('#tls_in_psk').is(':checked')) {
