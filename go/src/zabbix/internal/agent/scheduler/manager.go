@@ -250,25 +250,20 @@ func (m *Manager) init() {
 	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
 
-	type metric struct {
-		acc plugin.Accessor
-		key string
-	}
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
 
-	metrics := make([]*metric, 0, len(plugin.Metrics))
-
-	for key, acc := range plugin.Metrics {
-		metrics = append(metrics, &metric{acc: acc, key: key})
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
 	}
 	sort.Slice(metrics, func(i, j int) bool {
-		return metrics[i].acc.Name() < metrics[j].acc.Name()
+		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
 	})
 
-	plug := &pluginAgent{}
-	for _, mt := range metrics {
-		if mt.acc != plug.impl {
-			capacity := mt.acc.Capacity()
-			section := strings.Title(mt.acc.Name())
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl {
+			capacity := metric.Plugin.Capacity()
+			section := strings.Title(metric.Plugin.Name())
 			if options, ok := agent.Options.Plugins[section]; ok {
 				if cap, ok := options["Capacity"]; ok {
 					var err error
@@ -278,14 +273,14 @@ func (m *Manager) init() {
 					}
 				}
 			}
-			if capacity > mt.acc.Capacity() {
+			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
-					mt.acc.Name(), mt.acc.Capacity(), capacity)
-				capacity = mt.acc.Capacity()
+					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
+				capacity = metric.Plugin.Capacity()
 			}
 
-			plug = &pluginAgent{
-				impl:         mt.acc,
+			pagent = &pluginAgent{
+				impl:         metric.Plugin,
 				tasks:        make(performerHeap, 0),
 				capacity:     capacity,
 				usedCapacity: 0,
@@ -294,25 +289,25 @@ func (m *Manager) init() {
 			}
 
 			interfaces := ""
-			if _, ok := mt.acc.(plugin.Exporter); ok {
+			if _, ok := metric.Plugin.(plugin.Exporter); ok {
 				interfaces += "exporter, "
 			}
-			if _, ok := mt.acc.(plugin.Collector); ok {
+			if _, ok := metric.Plugin.(plugin.Collector); ok {
 				interfaces += "collector, "
 			}
-			if _, ok := mt.acc.(plugin.Runner); ok {
+			if _, ok := metric.Plugin.(plugin.Runner); ok {
 				interfaces += "runner, "
 			}
-			if _, ok := mt.acc.(plugin.Watcher); ok {
+			if _, ok := metric.Plugin.(plugin.Watcher); ok {
 				interfaces += "watcher, "
 			}
-			if _, ok := mt.acc.(plugin.Configurator); ok {
+			if _, ok := metric.Plugin.(plugin.Configurator); ok {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", mt.acc.Name(), interfaces)
+			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
 		}
-		m.plugins[mt.key] = plug
+		m.plugins[metric.Key] = pagent
 	}
 }
 
@@ -372,7 +367,6 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
 	}
-
 	close(w)
 
 	return s, err

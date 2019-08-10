@@ -122,6 +122,7 @@ type exporterTask struct {
 	updated time.Time
 	client  ClientAccessor
 	meta    plugin.Meta
+	output  plugin.ResultWriter
 }
 
 func (t *exporterTask) perform(s Scheduler) {
@@ -146,18 +147,18 @@ func (t *exporterTask) perform(s Scheduler) {
 						s := reflect.ValueOf(ret)
 						for i := 0; i < s.Len(); i++ {
 							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-							t.client.Output().Write(result)
+							t.output.Write(result)
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
-						t.client.Output().Write(result)
+						t.output.Write(result)
 					}
 				}
 			}
 		}
 		if err != nil {
 			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
-			t.client.Output().Write(result)
+			t.output.Write(result)
 		}
 		// set failed state based on last result
 		if result != nil && result.Error != nil {
@@ -195,7 +196,7 @@ func (t *exporterTask) ClientID() (clientid uint64) {
 }
 
 func (t *exporterTask) Output() (output plugin.ResultWriter) {
-	return t.client.Output()
+	return t.output
 }
 
 func (t *exporterTask) ItemID() (itemid uint64) {
