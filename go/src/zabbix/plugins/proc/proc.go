@@ -17,18 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package proc
 
-import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/sync"
+type procQuery struct {
+	name    string
+	user    string
+	cmdline string
+}
+
+const (
+	procInfoPid = 1 << iota
+	procInfoName
+	procInfoUser
+	procInfoCmdline
 )
+
+type procInfo struct {
+	pid     int64
+	name    string
+	userid  int64
+	cmdline string
+	arg0    string
+}
+
+type cpuUtil struct {
+	utime   uint64
+	stime   uint64
+	started uint64
+	err     error
+}

@@ -57,50 +57,8 @@ type Scheduler interface {
 	PerformTask(key string, timeout time.Duration) (s string, err error)
 }
 
-func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("processing update request (%d requests)", len(update.requests))
-
-	// TODO: client expiry - remove unused owners after timeout (day+?)
-	var requestClient *client
-	var ok bool
-	if requestClient, ok = m.clients[update.clientID]; !ok {
-		requestClient = newClient(update.clientID, update.sink)
-		m.clients[update.clientID] = requestClient
-	}
-
-	requestClient.refreshUnsupported = update.refreshUnsupported
-	requestClient.updateExpressions(update.expressions)
-
-	for _, r := range update.requests {
-		var key string
-		var err error
-		var p *pluginAgent
-		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			if p, ok = m.plugins[key]; !ok {
-				err = fmt.Errorf("Unknown metric %s", key)
-			}
-		}
-		if err == nil {
-			err = requestClient.addRequest(p, r, update.sink, now)
-		}
-		if err != nil {
-			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
-				tacc.task().deactivate()
-			}
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
-			continue
-		}
-
-		if !p.queued() {
-			heap.Push(&m.queue, p)
-		} else {
-			m.queue.Update(p)
-		}
-	}
-
-	released := requestClient.cleanup(m.plugins, now)
+func (m *Manager) cleanupClient(c *client, now time.Time) {
+	released := c.cleanup(m.plugins, now)
 	for _, p := range released {
 		if p.refcount != 0 {
 			continue
@@ -144,6 +102,52 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			}
 		}
 	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
+	log.Debugf("processing update request (%d requests)", len(update.requests))
+
+	// TODO: client expiry - remove unused owners after timeout (day+?)
+	var requestClient *client
+	var ok bool
+	if requestClient, ok = m.clients[update.clientID]; !ok {
+		requestClient = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = requestClient
+	}
+
+	requestClient.refreshUnsupported = update.refreshUnsupported
+	requestClient.updateExpressions(update.expressions)
+
+	for _, r := range update.requests {
+		var key string
+		var err error
+		var p *pluginAgent
+		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
+			if p, ok = m.plugins[key]; !ok {
+				err = fmt.Errorf("Unknown metric %s", key)
+			}
+		}
+		if err == nil {
+			err = requestClient.addRequest(p, r, update.sink, now)
+		}
+		if err != nil {
+			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+				tacc.task().deactivate()
+			}
+			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
+			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			continue
+		}
+
+		if !p.queued() {
+			heap.Push(&m.queue, p)
+		} else {
+			m.queue.Update(p)
+		}
+	}
+
+	m.cleanupClient(requestClient, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
@@ -209,6 +213,7 @@ func (m *Manager) run() {
 	// some microseconds, which will be enough to include all scheduled tasks at this second
 	// even with nanosecond priority adjustment.
 	lastTick := time.Now()
+	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
@@ -225,6 +230,13 @@ run:
 			}
 			lastTick = now
 			m.processQueue(now)
+			// cleanup plugins used by passive checks
+			if now.Sub(cleaned) >= time.Hour {
+				if passive, ok := m.clients[0]; ok {
+					m.cleanupClient(passive, now)
+				}
+				cleaned = now
+			}
 		case v := <-m.input:
 			if v == nil {
 				break run
@@ -359,7 +371,6 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 				s = *r.Value
 			} else {
 				// TODO: check what must be returned on empty result
-				s = "(null)"
 			}
 		} else {
 			err = r.Error

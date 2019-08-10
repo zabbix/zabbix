@@ -95,7 +95,7 @@ func (t *collectorTask) perform(s Scheduler) {
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
-			log.Warningf("Plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
+			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
 		s.FinishTask(t)
 	}()
@@ -152,6 +152,12 @@ func (t *exporterTask) perform(s Scheduler) {
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
 						t.output.Write(result)
+					}
+				} else {
+					if t.client.ID() == 0 {
+						// for direct requests (internal/old passive checks) return empty result
+						// on nil value
+						t.output.Write(&plugin.Result{})
 					}
 				}
 			}

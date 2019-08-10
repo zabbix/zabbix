@@ -3,6 +3,7 @@
 SUBDIRS = \
 	debug \
 	log \
+	proc \
 	system \
 	systemd \
 	vfs \
