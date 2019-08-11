@@ -20,6 +20,7 @@
 package watch
 
 import (
+	"sync"
 	"time"
 	"zabbix/internal/plugin"
 )
@@ -32,6 +33,8 @@ type EventSource interface {
 	Subscribe() error
 	// stop generating events
 	Unsubscribe()
+	// create new event writer
+	NewFilter(key string) (filter EventFilter, err error)
 }
 
 // EventProvider interface provides methods to get event source by item key or event source URI.
@@ -40,6 +43,15 @@ type EventSource interface {
 type EventProvider interface {
 	EventSourceByKey(key string) (EventSource, error)
 	EventSourceByURI(uri string) (EventSource, error)
+}
+
+type EventFilter interface {
+	Convert(data interface{}) (value *string, err error)
+}
+
+type EventWriter struct {
+	output plugin.ResultWriter
+	filter EventFilter
 }
 
 type Item struct {
@@ -60,7 +72,8 @@ type Client struct {
 type Manager struct {
 	eventProvider EventProvider
 	clients       map[uint64]*Client
-	subscriptions map[string]map[Source]plugin.ResultWriter
+	subscriptions map[string]map[Source]*EventWriter
+	mutex         sync.Mutex
 }
 
 func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests []*plugin.Request) {
@@ -73,13 +86,12 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 
 	now := time.Now()
 	for _, r := range requests {
-		var sub map[Source]plugin.ResultWriter
+		var sub map[Source]*EventWriter
 		source := Source{Clientid: client.ID, Itemid: r.Itemid}
 		if item, ok := client.Items[r.Itemid]; ok {
 			if item.Key != r.Key {
-				if event, err := m.eventProvider.EventSourceByKey(item.Key); err != nil {
-
-					if sub, ok := m.subscriptions[event.URI()]; ok {
+				if es, err := m.eventProvider.EventSourceByKey(item.Key); err == nil {
+					if sub, ok := m.subscriptions[es.URI()]; ok {
 						delete(sub, source)
 					}
 					item.Key = r.Key
@@ -94,7 +106,7 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 		if es, err := m.eventProvider.EventSourceByKey(r.Key); err == nil {
 			if sub, ok = m.subscriptions[es.URI()]; !ok {
 				if err := es.Subscribe(); err == nil {
-					sub = make(map[Source]plugin.ResultWriter)
+					sub = make(map[Source]*EventWriter)
 					m.subscriptions[es.URI()] = sub
 				} else {
 					output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
@@ -102,7 +114,11 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 			}
 			if sub != nil {
 				if _, ok = sub[source]; !ok {
-					sub[source] = output
+					if filter, err := es.NewFilter(r.Key); err != nil {
+						output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
+					} else {
+						sub[source] = &EventWriter{output: output, filter: filter}
+					}
 				}
 			}
 		} else {
@@ -129,20 +145,34 @@ func (m *Manager) Update(clientid uint64, output plugin.ResultWriter, requests [
 	}
 }
 
-func (m *Manager) Notify(es EventSource, value *string, err error) {
+func (m *Manager) Notify(es EventSource, data interface{}) {
 	now := time.Now()
 	if sub, ok := m.subscriptions[es.URI()]; ok {
-		for source, output := range sub {
-			output.Write(&plugin.Result{Itemid: source.Itemid, Ts: now, Value: value, Error: err})
+		outputs := make(map[plugin.ResultWriter]bool)
+		for source, writer := range sub {
+			if value, err := writer.filter.Convert(data); value != nil || err != nil {
+				writer.output.Write(&plugin.Result{Itemid: source.Itemid, Ts: now, Value: value, Error: err})
+				outputs[writer.output] = true
+			}
+		}
+		for output := range outputs {
 			output.Flush()
 		}
 	}
 }
 
+func (m *Manager) Lock() {
+	m.mutex.Lock()
+}
+
+func (m *Manager) Unlock() {
+	m.mutex.Unlock()
+}
+
 func NewManager(e EventProvider) (manager *Manager) {
 	manager = &Manager{
 		clients:       make(map[uint64]*Client),
-		subscriptions: make(map[string]map[Source]plugin.ResultWriter),
+		subscriptions: make(map[string]map[Source]*EventWriter),
 		eventProvider: e,
 	}
 	return

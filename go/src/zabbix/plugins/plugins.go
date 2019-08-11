@@ -25,6 +25,7 @@ import (
 
 	//	_ "zabbix/plugins/debug/filewatcher"
 	_ "zabbix/plugins/debug/log"
+	_ "zabbix/plugins/debug/trapper"
 	_ "zabbix/plugins/log"
 	_ "zabbix/plugins/proc"
 	_ "zabbix/plugins/system/uname"

@@ -20,6 +20,7 @@
 package filemonitor
 
 import (
+	"fmt"
 	"io/ioutil"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
@@ -54,15 +55,13 @@ func (p *Plugin) run() {
 			p.manager.Update(r.clientid, r.output, r.targets)
 		case event := <-p.watcher.Events:
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				var value *string
-				var err error
 				var b []byte
-				if b, err = ioutil.ReadFile(event.Name); err == nil {
-					tmp := string(b)
-					value = &tmp
+				var v interface{}
+				if b, v = ioutil.ReadFile(event.Name); v == nil {
+					v = b
 				}
 				es, _ := p.EventSourceByURI(event.Name)
-				p.manager.Notify(es, value, err)
+				p.manager.Notify(es, v)
 			}
 		}
 	}
@@ -96,6 +95,21 @@ type fileWatcher struct {
 	watcher *fsnotify.Watcher
 }
 
+type eventFilter struct {
+}
+
+func (w *eventFilter) Convert(v interface{}) (value *string, err error) {
+	if b, ok := v.([]byte); !ok {
+		if err, ok = v.(error); !ok {
+			err = fmt.Errorf("unexpected input type %T", v)
+		}
+		return
+	} else {
+		tmp := string(b)
+		return &tmp, nil
+	}
+}
+
 func (w *fileWatcher) URI() (uri string) {
 	return w.path
 }
@@ -106,6 +120,10 @@ func (w *fileWatcher) Subscribe() (err error) {
 
 func (w *fileWatcher) Unsubscribe() {
 	_ = w.watcher.Remove(w.path)
+}
+
+func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error) {
+	return &eventFilter{}, nil
 }
 
 func (p *Plugin) EventSourceByURI(uri string) (es watch.EventSource, err error) {
