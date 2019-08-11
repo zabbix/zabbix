@@ -5,5 +5,6 @@ SUBDIRS = \
 	log \
 	std \
 	version \
+	watch \
 	zbxcomms \
 	zbxlib

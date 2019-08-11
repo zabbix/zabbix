@@ -20,19 +20,13 @@
 package filemonitor
 
 import (
-	"errors"
 	"io/ioutil"
-	"time"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/watch"
 
 	"github.com/fsnotify/fsnotify"
 )
-
-type watchItem struct {
-	filepath string
-	updated  time.Time
-}
 
 type watchRequest struct {
 	clientid uint64
@@ -40,122 +34,35 @@ type watchRequest struct {
 	output   plugin.ResultWriter
 }
 
-type watchClient struct {
-	id    uint64
-	items map[uint64]*watchItem
-}
-
-type watchID struct {
-	itemid   uint64
-	clientid uint64
-}
-
 // Plugin
 type Plugin struct {
 	plugin.Base
 	watcher *fsnotify.Watcher
 	input   chan *watchRequest
-	clients map[uint64]*watchClient
-	files   map[string]map[watchID]plugin.ResultWriter
+	manager *watch.Manager
 }
 
 var impl Plugin
 
-func (p *Plugin) updateClient(request *watchRequest, now time.Time) {
-	var client *watchClient
-	var ok bool
-	if client, ok = p.clients[request.clientid]; !ok {
-		client = &watchClient{id: request.clientid, items: make(map[uint64]*watchItem)}
-		p.clients[request.clientid] = client
-	}
-
-	for _, r := range request.targets {
-		_, params, err := itemutil.ParseKey(r.Key)
-		if err != nil {
-			request.output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
-			continue
-		}
-		if len(params) != 1 {
-			err = errors.New("Invalid number of parameters.")
-			request.output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
-			continue
-		}
-		var watchers map[watchID]plugin.ResultWriter
-		watchid := watchID{clientid: client.id, itemid: r.Itemid}
-		if item, ok := client.items[r.Itemid]; ok {
-			if item.filepath != params[0] {
-				if watchers, ok = p.files[item.filepath]; ok {
-					delete(watchers, watchid)
-				}
-				item.filepath = params[0]
-			}
-			item.updated = now
-		} else {
-			client.items[r.Itemid] = &watchItem{filepath: params[0], updated: now}
-		}
-		if watchers, ok = p.files[params[0]]; !ok {
-			if err := p.watcher.Add(params[0]); err != nil {
-				request.output.Write(&plugin.Result{Itemid: r.Itemid, Ts: now, Error: err})
-				p.Debugf(`cannot watch file "%s": %s`, params[0], err)
-			} else {
-				watchers = make(map[watchID]plugin.ResultWriter)
-				p.files[params[0]] = watchers
-				p.Debugf(`start watching file "%s"`, params[0])
-			}
-		}
-		if watchers != nil {
-			if _, ok = watchers[watchid]; !ok {
-				watchers[watchid] = request.output
-			}
-		}
-	}
-
-	for itemid, item := range client.items {
-		if !item.updated.Equal(now) {
-			if watchers, ok := p.files[item.filepath]; ok {
-				delete(watchers, watchID{clientid: client.id, itemid: itemid})
-			}
-			delete(client.items, itemid)
-		}
-	}
-
-	for path, watchers := range p.files {
-		if len(watchers) == 0 {
-			p.Debugf(`stop watching file "%s"`, path)
-			if err := p.watcher.Remove(path); err != nil {
-				p.Debugf(`cannot remove file "%s" from fsnotify watcher: %s`, path, err)
-			}
-			delete(p.files, path)
-		}
-	}
-}
-
 func (p *Plugin) run() {
-
-run:
 	for {
 		select {
 		case r := <-p.input:
 			if r == nil {
-				break run
+				return
 			}
-			p.updateClient(r, time.Now())
+			p.manager.Update(r.clientid, r.output, r.targets)
 		case event := <-p.watcher.Events:
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				if watchers, ok := p.files[event.Name]; ok {
-					var value *string
-					var err error
-					var b []byte
-					if b, err = ioutil.ReadFile(event.Name); err == nil {
-						tmp := string(b)
-						value = &tmp
-					}
-					now := time.Now()
-					for source, output := range watchers {
-						output.Write(&plugin.Result{Itemid: source.itemid, Ts: now, Value: value, Error: err})
-						output.Flush()
-					}
+				var value *string
+				var err error
+				var b []byte
+				if b, err = ioutil.ReadFile(event.Name); err == nil {
+					tmp := string(b)
+					value = &tmp
 				}
+				es, _ := p.EventSourceByURI(event.Name)
+				p.manager.Notify(es, value, err)
 			}
 		}
 	}
@@ -184,9 +91,37 @@ func (p *Plugin) Stop() {
 	}
 }
 
+type fileWatcher struct {
+	path    string
+	watcher *fsnotify.Watcher
+}
+
+func (w *fileWatcher) URI() (uri string) {
+	return w.path
+}
+
+func (w *fileWatcher) Subscribe() (err error) {
+	return w.watcher.Add(w.path)
+}
+
+func (w *fileWatcher) Unsubscribe() {
+	_ = w.watcher.Remove(w.path)
+}
+
+func (p *Plugin) EventSourceByURI(uri string) (es watch.EventSource, err error) {
+	return &fileWatcher{path: uri, watcher: p.watcher}, nil
+}
+
+func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
+	var params []string
+	if _, params, err = itemutil.ParseKey(key); err != nil {
+		return
+	}
+	return &fileWatcher{path: params[0], watcher: p.watcher}, nil
+}
+
 func init() {
-	impl.clients = make(map[uint64]*watchClient)
-	impl.files = make(map[string]map[watchID]plugin.ResultWriter)
+	impl.manager = watch.NewManager(&impl)
 
 	plugin.RegisterMetric(&impl, "filewatcher", "file.watch", "Monitor file contents")
 }
