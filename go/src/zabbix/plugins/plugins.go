@@ -22,6 +22,8 @@ package plugins
 import (
 	_ "zabbix/plugins/debug/collector"
 	_ "zabbix/plugins/debug/empty"
+
+	//	_ "zabbix/plugins/debug/filewatcher"
 	_ "zabbix/plugins/debug/log"
 	_ "zabbix/plugins/log"
 	_ "zabbix/plugins/proc"

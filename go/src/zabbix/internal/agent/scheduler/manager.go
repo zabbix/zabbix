@@ -349,6 +349,9 @@ func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
 }
 
+func (r resultWriter) Flush() {
+}
+
 func (r resultWriter) SlotsAvailable() int {
 	return 1
 }
@@ -378,7 +381,6 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
 	}
-	close(w)
 
 	return s, err
 }
