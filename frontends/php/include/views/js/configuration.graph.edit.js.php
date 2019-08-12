@@ -404,7 +404,9 @@
 				$('<img />').attr('src', name + '?period=3600' + src).on('load', function() {
 					preview_chart
 						.removeAttr('class')
-						.append($(this));
+						.append($(this))
+						// Call to `height` method will force IE11 to recalculate styles.
+						.height();
 				});
 			}
 		});
