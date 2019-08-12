@@ -2021,6 +2021,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
+	go/src/zabbix/plugins/vfs/fileregexp/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile

@@ -32,6 +32,7 @@ import (
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
 	_ "zabbix/plugins/vfs/filecksum"
+	_ "zabbix/plugins/vfs/fileregexp"
 	_ "zabbix/plugins/zabbix/async"
 	_ "zabbix/plugins/zabbix/sync"
 )
