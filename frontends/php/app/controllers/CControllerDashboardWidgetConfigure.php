@@ -31,9 +31,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
-				'configuration' => [],
-			])]));
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
