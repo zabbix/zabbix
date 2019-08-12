@@ -21,10 +21,6 @@
 
 class CControllerDashboardWidgetConfigure extends CController {
 
-	public function __construct() {
-		parent::__construct();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
