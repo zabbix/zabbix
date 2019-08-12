@@ -1136,11 +1136,11 @@ class CHostPrototype extends CHostBase {
 
 				if ($null_position !== false) {
 					array_splice($inventory_mode_query, $null_position, 1);
-					$inventory_mode_where[] = 'hi.inventory_mode IS NULL';
+					$inventory_mode_where[] = 'hinv.inventory_mode IS NULL';
 				}
 
 				if ($inventory_mode_query) {
-					$inventory_mode_where[] = dbConditionInt('hi.inventory_mode', $inventory_mode_query);
+					$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
 				}
 
 				if (count($inventory_mode_where) > 1) {
