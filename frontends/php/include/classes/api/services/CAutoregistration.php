@@ -37,6 +37,15 @@ class CAutoregistration extends CApiService {
 	 * @return array
 	 */
 	public function get($options) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'output' =>			['type' => API_OUTPUT, 'in' => implode(',',
+				['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND],
+			'preservekeys' =>	['type' => API_BOOLEAN, 'default' => false]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$sql_parts = [
 			'select' => ['config_autoreg_tls' => 'ca.autoreg_tlsid'],
 			'from' => ['config_autoreg_tls' => 'config_autoreg_tls ca'],
@@ -64,12 +73,17 @@ class CAutoregistration extends CApiService {
 			$ini_autoreg['tls_accept'] = $config['autoreg_tls_accept'];
 		}
 
+		$result = [];
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$result = $this->extractResult($sql_parts, $ini_autoreg);
+
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		while ($autoreg = DBfetch($res)) {
+			$autoreg = $ini_autoreg + $autoreg;
+			$result[$autoreg['autoreg_tlsid']] = $autoreg;
+		}
 
 		if (!$result) {
-			$this->getAutoregTlsId(false);
-			$result = $this->extractResult($sqlParts, $ini_autoreg);
+			return $result;
 		}
 
 		if ($options['preservekeys']) {
@@ -78,25 +92,6 @@ class CAutoregistration extends CApiService {
 
 		$result = reset($result);
 		unset($result['autoreg_tlsid']);
-
-		return $result;
-	}
-
-	/**
-	 * Extract result from db.
-	 *
-	 * @param array  $sql_parts
-	 * @param array  $ini_autoreg
-	 *
-	 * @return array
-	 */
-	protected function extractResult(array $sql_parts, array $ini_autoreg = []) {
-		$result = [];
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
-		while ($autoreg = DBfetch($res)) {
-			$autoreg = $ini_autoreg + $autoreg;
-			$result[$autoreg['autoreg_tlsid']] = $autoreg;
-		}
 
 		return $result;
 	}
@@ -115,53 +110,31 @@ class CAutoregistration extends CApiService {
 	 */
 	public function update($autoreg) {
 		$db_autoreg = $this->get(['preservekeys' => true]);
-		$autoreg_tlsid = $this->getAutoregTlsId($db_autoreg);
+		reset($db_autoreg);
+		$autoreg['autoreg_tlsid'] = key($db_autoreg);
 
-		$this->validateUpdate($autoreg, $db_autoreg, $autoreg_tlsid);
+		$this->validateUpdate($autoreg, $db_autoreg);
 		$update = [];
 
 		if ($autoreg) {
+			if ($autoreg['tls_accept'] == HOST_ENCRYPTION_NONE) {
+				$autoreg['tls_psk_identity'] = '';
+				$autoreg['tls_psk'] = '';
+			}
+
 			update_config(['autoreg_tls_accept' => $autoreg['tls_accept']]);
 			unset($autoreg['tls_accept']);
 
 			if ($autoreg) {
 				$update[] = [
 					'values' => $autoreg,
-					'where' => ['autoreg_tlsid' => $autoreg_tlsid]
+					'where' => ['autoreg_tlsid' => $autoreg['autoreg_tlsid']]
 				];
 			}
 		}
 		DB::update('config_autoreg_tls', $update);
 
 		return true;
-	}
-
-	/**
-	 * Get the ID of an existing configuration entry or create a new one.
-	 *
-	 * @param array   $db_autoreg
-	 * @param int     $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
-	 * @param int     $db_autoreg[<autoreg_tlsid>]['tls_accept']
-	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
-	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk']
-	 *
-	 * @return int
-	 */
-	protected function getAutoregTlsId($db_autoreg) {
-		if ($db_autoreg) {
-			reset($db_autoreg);
-			$autoreg_tlsid = key($db_autoreg);
-		}
-		else {
-			$db_autoreg = [
-				'tls_psk_identity' => '',
-				'tls_psk' => ''
-			];
-			$autoreg_tlsids = DB::insert('config_autoreg_tls', zbx_toArray($db_autoreg));
-			$autoreg_tlsid = reset($autoreg_tlsids);
-		}
-
-		return $autoreg_tlsid;
 	}
 
 	/**
@@ -180,7 +153,7 @@ class CAutoregistration extends CApiService {
 	 *
 	 * @throws APIException if incorrect encryption options.
 	 */
-	protected function validateUpdate(array $autoreg, array $db_autoreg = [], $autoreg_tlsid = null) {
+	protected function validateUpdate(array $autoreg, array $db_autoreg = []) {
 		// Check permissions.
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -190,23 +163,29 @@ class CAutoregistration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$min_accept_type = HOST_ENCRYPTION_NONE;
-		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK;
-
-		$tls_accept = array_key_exists('tls_accept', $autoreg)
-			? $autoreg['tls_accept']
-			: ($db_autoreg ? $db_autoreg[$autoreg_tlsid]['tls_accept'] : HOST_ENCRYPTION_NONE);
-
-		if ($tls_accept < $min_accept_type || $tls_accept > $max_accept_type) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
-				_s('unexpected value "%1$s"', $tls_accept)
-			));
-		}
-
-		foreach (['tls_psk_identity', 'tls_psk'] as $field_name) {
+		foreach (['tls_accept', 'tls_psk_identity', 'tls_psk'] as $field_name) {
 			$$field_name = array_key_exists($field_name, $autoreg)
 				? $autoreg[$field_name]
-				: ($db_autoreg ? $db_autoreg[$autoreg_tlsid][$field_name] : '');
+				: ($db_autoreg
+					? $db_autoreg[$autoreg['autoreg_tlsid']][$field_name]
+					: (($field_name === 'tls_accept') ? HOST_ENCRYPTION_NONE : ''));
+		}
+
+		$autoreg['tls_accept'] = $tls_accept;
+
+		$tls_accept_in = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK];
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE,
+			'uniq' => [['autoreg_tlsid']], 'fields' => [
+				'autoreg_tlsid' => ['type' => API_ID, 'flags' => API_REQUIRED],
+				'tls_accept' =>	['type' => API_INT32, 'in' => implode(',', $tls_accept_in)],
+				'tls_psk_identity' => ['type' => API_STRING_UTF8],
+				'tls_psk' => ['type' => API_STRING_UTF8]
+			]
+		];
+
+		if (!CApiInputValidator::validate($api_input_rules, $autoreg, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// PSK validation.
@@ -236,13 +215,15 @@ class CAutoregistration extends CApiService {
 			}
 		}
 		else {
-			if ($tls_psk_identity !== '') {
+			$autoreg = reset($autoreg);
+
+			if (array_key_exists('tls_psk_identity', $autoreg) && $autoreg['tls_psk_identity'] !== '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('should be empty'))
 				);
 			}
 
-			if ($tls_psk !== '') {
+			if (array_key_exists('tls_psk', $autoreg) && $autoreg['tls_psk'] !== '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('should be empty'))
 				);
