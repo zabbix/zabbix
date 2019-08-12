@@ -48,7 +48,6 @@ class CControllerDashboardWidgetConfigure extends CController {
 	}
 
 	protected function doAction() {
-		sleep(2);
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'configuration' => CWidgetConfig::getConfiguration(
 				$this->getInput('type'),
