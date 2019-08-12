@@ -1448,6 +1448,11 @@
 				});
 			})
 			.then(function(resp) {
+				var configuration = {};
+				if ('configuration' in resp) {
+					configuration = resp['configuration'];
+				}
+
 				if (widget === null || ('type' in widget) === false) {
 					// In case of ADD widget, create widget with required selected fields and add it to dashboard.
 					var widget_data = {
@@ -1457,7 +1462,7 @@
 							'pos': pos,
 							'rf_rate': 0,
 							'fields': fields,
-							'configuration': resp['configuration']
+							'configuration': configuration
 						},
 						add_new_widget = function() {
 							methods.addWidget.call($obj, widget_data);
@@ -1495,7 +1500,7 @@
 					widget['header'] = name;
 					widget['view_mode'] = view_mode;
 					widget['fields'] = fields;
-					applyWidgetConfiguration($obj, data, widget, resp['configuration']);
+					applyWidgetConfiguration($obj, data, widget, configuration);
 					doAction('afterUpdateWidgetConfig', $obj, data, null);
 					updateWidgetDynamic($obj, data, widget);
 					refreshWidget($obj, data, widget);
