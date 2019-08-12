@@ -87,12 +87,20 @@ func InitUserParameterPlugin() {
 			log.Critf("cannot add user parameter \"%s\": not comma-separated", Options.UserParameter[i])
 		}
 
-		key, _, err := itemutil.ParseKey(s[0])
+		key, p, err := itemutil.ParseKey(s[0])
 		if err != nil {
 			log.Critf("cannot add user parameter \"%s\": %s", Options.UserParameter[i], err)
 		}
 
-		userParameter.parameters[key] = parameterInfo{cmd: s[1]}
+		parameter := parameterInfo{cmd: s[1]}
+
+		if len(p) == 1 && p[0] == "*" {
+			parameter.flexible = true
+		} else if len(p) != 0 {
+			log.Critf("cannot add user parameter \"%s\": syntax error, parameter must be empty or '[*]'", Options.UserParameter[i])
+		}
+
+		userParameter.parameters[key] = parameter
 		plugin.RegisterMetric(&userParameter, "userparameter", key, "test")
 	}
 }
