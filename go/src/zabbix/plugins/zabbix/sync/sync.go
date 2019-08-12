@@ -39,5 +39,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns", "Checks if DNS service is up")
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
 	plugin.RegisterMetric(&impl, "zabbixsync", "proc.mem", "Memory used by process in bytes")
+	plugin.RegisterMetric(&impl, "zabbixsync", "proc.num", "The number of processes")
 	impl.SetCapacity(1)
 }
