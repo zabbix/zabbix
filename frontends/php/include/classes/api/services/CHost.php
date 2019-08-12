@@ -498,10 +498,10 @@ class CHost extends CHostGeneral {
 		if ($this->outputIsRequested('inventory_mode', $options['output'])
 			|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 
-			$sqlParts['select']['inventory_mode'] = 'COALESCE(hi.inventory_mode, ' . HOST_INVENTORY_DISABLED . ') AS inventory_mode';
+			$sqlParts['select']['inventory_mode'] = 'COALESCE(hinv.inventory_mode, ' . HOST_INVENTORY_DISABLED . ') AS inventory_mode';
 			$sqlParts['left_join'][] = [
-				'from' => 'host_inventory hi',
-				'on' => $this->tableAlias() . '.' . $this->pk() . '=hi.' . $this->pk()
+				'from' => 'host_inventory hinv',
+				'on' => $this->tableAlias() . '.' . $this->pk() . '=hinv.' . $this->pk()
 			];
 			$sqlParts['left_table'] = $this->tableName();
 		}
