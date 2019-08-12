@@ -20,8 +20,11 @@
 package agent
 
 import (
+	"context"
 	"fmt"
+	"os/exec"
 	"strings"
+	"time"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
@@ -36,8 +39,21 @@ var userparameter UserParameterPlugin
 
 // Export -
 func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	cmdCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
 
-	return key, nil
+	cmd := exec.CommandContext(cmdCtx, "sleep", "5")
+	stdoutStderr, err := cmd.CombinedOutput()
+
+	if err != nil {
+		if cmdCtx.Err() == context.DeadlineExceeded {
+			return nil, fmt.Errorf("Timeout while executing a shell script.")
+		}
+
+		return nil, fmt.Errorf("Failed to execute command \"%s\": %s", "command", err)
+	}
+
+	return stdoutStderr, nil
 }
 
 func InitUserParameterPlugin() {
@@ -55,6 +71,4 @@ func InitUserParameterPlugin() {
 
 		plugin.RegisterMetric(&userparameter, "userparameter", k, "test")
 	}
-	fmt.Println("test", Options.UserParameter)
-
 }
