@@ -427,8 +427,10 @@ switch ($data['popup_type']) {
 					$item['key_'],
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
-					(new CSpan(itemIndicator($item['status'], $item['state'])))
-						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+					($data['popup_type'] === 'items')
+						? (new CSpan(itemIndicator($item['status'], $item['state'])))
+							->addClass(itemIndicatorStyle($item['status'], $item['state']))
+						: null
 				]);
 
 				if ($data['multiselect']) {
@@ -461,8 +463,10 @@ switch ($data['popup_type']) {
 					$item['key_'],
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
-					(new CSpan(itemIndicator($item['status'], $item['state'])))
-						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+					($data['popup_type'] === 'items')
+						? (new CSpan(itemIndicator($item['status'], $item['state'])))
+							->addClass(itemIndicatorStyle($item['status'], $item['state']))
+						: null
 				]);
 
 				$item = [
