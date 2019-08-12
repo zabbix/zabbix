@@ -21,6 +21,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -30,45 +31,68 @@ import (
 	"zabbix/pkg/log"
 )
 
+type parameterInfo struct {
+	cmd      string
+	flexible bool
+}
+
 // Plugin -
 type UserParameterPlugin struct {
 	plugin.Base
+	parameters map[string]parameterInfo
 }
 
-var userparameter UserParameterPlugin
+var userParameter UserParameterPlugin
 
 // Export -
 func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	cmdCtx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	parameter := p.parameters[key]
+
+	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), parameter.cmd)
+
+	cmdCtx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(Options.Timeout))
 	defer cancel()
 
-	cmd := exec.CommandContext(cmdCtx, "sleep", "5")
+	cmd := exec.CommandContext(cmdCtx, "sh", "-c", parameter.cmd)
+
 	stdoutStderr, err := cmd.CombinedOutput()
 
 	if err != nil {
 		if cmdCtx.Err() == context.DeadlineExceeded {
+			p.Debugf("Failed to execute command \"%s\": timeout", parameter.cmd)
 			return nil, fmt.Errorf("Timeout while executing a shell script.")
 		}
 
-		return nil, fmt.Errorf("Failed to execute command \"%s\": %s", "command", err)
+		if len(stdoutStderr) == 0 {
+			p.Debugf("Failed to execute command \"%s\": %s", parameter.cmd, err)
+			return nil, err
+		}
+
+		p.Debugf("Failed to execute command \"%s\": %s", parameter.cmd, string(stdoutStderr))
+		return nil, errors.New(string(stdoutStderr))
 	}
 
-	return stdoutStderr, nil
+	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), parameter.cmd, len(stdoutStderr), string(stdoutStderr))
+
+	return string(stdoutStderr), nil
 }
 
 func InitUserParameterPlugin() {
-	for i := 0; i < len(Options.UserParameter); i++ {
-		keyCommand := strings.SplitN(Options.UserParameter[i], ",", 2)
+	userParameter.parameters = make(map[string]parameterInfo)
 
-		if len(keyCommand) != 2 {
+	for i := 0; i < len(Options.UserParameter); i++ {
+		s := strings.SplitN(Options.UserParameter[i], ",", 2)
+
+		if len(s) != 2 {
 			log.Critf("cannot add user parameter \"%s\": not comma-separated", Options.UserParameter[i])
 		}
 
-		k, _, err := itemutil.ParseKey(keyCommand[0])
+		key, _, err := itemutil.ParseKey(s[0])
 		if err != nil {
 			log.Critf("cannot add user parameter \"%s\": %s", Options.UserParameter[i], err)
 		}
 
-		plugin.RegisterMetric(&userparameter, "userparameter", k, "test")
+		userParameter.parameters[key] = parameterInfo{cmd: s[1]}
+		plugin.RegisterMetric(&userParameter, "userparameter", key, "test")
 	}
 }
