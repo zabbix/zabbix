@@ -138,13 +138,9 @@
 	}
 
 	function setWidgetPadding($obj, data, widget, padding) {
-		if (padding !== widget['configuration']['padding']) {
+		if (widget['configuration']['padding'] !== padding) {
 			widget['configuration']['padding'] = padding;
-
-			widget['container']
-				.toggleClass('no-padding', !padding)
-			;
-
+			widget['container'].toggleClass('no-padding', !padding);
 			doAction('onResizeEnd', $obj, data, widget);
 		}
 	}
