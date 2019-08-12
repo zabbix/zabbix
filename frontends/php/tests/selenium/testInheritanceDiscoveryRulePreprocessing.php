@@ -49,6 +49,13 @@ class testInheritanceDiscoveryRulePreprocessing extends CWebTest {
 						'error_handler' => 'Discard value'
 					],
 					[
+						'type' => 'XML XPath',
+						'parameter_1' => '/new/path',
+						'on_fail' => true,
+						'error_handler' => 'Set value to',
+						'error_handler_params' => 'Custom_text'
+					],
+					[
 						'type' => 'JSONPath',
 						'parameter_1' => '$.data.test',
 						'on_fail' => true,
@@ -66,6 +73,11 @@ class testInheritanceDiscoveryRulePreprocessing extends CWebTest {
 						'type' => 'Check for error in JSON',
 						'parameter_1' => '$.new.path'
 					],
+					[
+						'type' => 'Check for error in XML',
+						'parameter_1' => '/new/path/error'
+					],
+
 					[
 						'type' => 'Discard unchanged with heartbeat',
 						'parameter_1' => '30'
@@ -122,6 +134,7 @@ class testInheritanceDiscoveryRulePreprocessing extends CWebTest {
 
 			switch ($options['type']) {
 				case 'Regular expression':
+				case 'XML XPath':
 				case 'JSONPath':
 				case 'Does not match regular expression':
 					$this->assertTrue($step['on_fail']->isSelected());
@@ -129,6 +142,7 @@ class testInheritanceDiscoveryRulePreprocessing extends CWebTest {
 					break;
 
 				case 'Check for error in JSON':
+				case 'Check for error in XML':
 				case 'Discard unchanged with heartbeat':
 					$this->assertFalse($step['on_fail']->isSelected());
 					break;
