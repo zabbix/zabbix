@@ -57,13 +57,15 @@ $currentYear = date('Y');
 // fetch media types
 $media_types = [];
 $db_media_types = API::MediaType()->get([
-	'output' => ['description', 'mediatypeid']
+	'output' => ['description'],
+	'preservekeys' => true
 ]);
 
 CArrayHelper::sort($db_media_types, ['description']);
-array_map(function($media_type) use (&$media_types) {
-	$media_types[$media_type['mediatypeid']] = $media_type['description'];
-}, $db_media_types);
+
+foreach ($db_media_types as $mediatypeid => $db_media_type) {
+	$media_types[$mediatypeid] = $db_media_type['description'];
+}
 
 $widget = (new CWidget())->setTitle(_('Notifications'));
 
