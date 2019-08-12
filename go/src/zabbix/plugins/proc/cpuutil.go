@@ -65,14 +65,6 @@ func (h historyIndex) inc() historyIndex {
 	return h
 }
 
-func (h historyIndex) add(value historyIndex) historyIndex {
-	h += value
-	for h >= maxHistory {
-		h -= maxHistory
-	}
-	return h
-}
-
 func (h historyIndex) dec() historyIndex {
 	h--
 	if h < 0 {
@@ -146,17 +138,17 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 	now := time.Now()
 	flags = procInfoPid
 
-	p.mutex.Lock()
 	queries = make([]*cpuUtilQuery, 0, len(p.queries))
+	p.mutex.Lock()
 	for q, stats := range p.queries {
 		if now.Sub(stats.accessed) > maxInactivityPeriod {
-			p.Debugf("removed unused query %+v", q)
+			p.Debugf("removed unused CPU utilisation query %+v", q)
 			delete(p.queries, q)
 			continue
 		}
 		var query *cpuUtilQuery
 		if query, stats.err = newCpuUtilQuery(&q, stats.cmdlinePattern); stats.err != nil {
-			p.Debugf("cannot create query %+v: %s", q, stats.err)
+			p.Debugf("cannot create CPU utilisation query %+v: %s", q, stats.err)
 			continue
 		}
 		queries = append(queries, query)
@@ -202,7 +194,7 @@ func (p *Plugin) Collect() (err error) {
 	for pid, stat := range stats {
 		p.getProcCpuUtil(pid, stat)
 		if stat.err != nil {
-			p.Debugf("cannot get process %d cpu utilisation statistics: %s", pid, stat.err)
+			p.Debugf("cannot get process %d CPU utilisation statistics: %s", pid, stat.err)
 		}
 	}
 
@@ -320,11 +312,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if stats, ok := p.queries[query]; ok {
 		stats.accessed = now
 		if stats.err != nil {
-			p.Debugf("gathering error %s", err)
+			p.Debugf("CPU utilisation gathering error %s", err)
 			return nil, stats.err
 		}
 		if stats.tail == stats.head {
-			p.Debugf("empty history")
+			p.Debugf("empty CPU utilisation history")
 			return
 		}
 		totalnum := stats.tail - stats.head
@@ -355,9 +347,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	if err == nil {
 		p.queries[query] = stats
+		p.Debugf("registered new CPU utilisation query: %s, %s, %s", name, user, cmdline)
+	} else {
+		p.Debugf("cannot register CPU utilisation query: %s", err)
 	}
-	p.Debugf("registered new query: %s, %s, %s", name, user, cmdline)
-
 	return
 }
 

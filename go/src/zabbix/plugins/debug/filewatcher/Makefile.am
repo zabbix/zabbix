@@ -8,6 +8,3 @@ build:
 clean:
 	go clean
 
-check:
-	go test
-
