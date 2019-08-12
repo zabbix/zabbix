@@ -48,11 +48,12 @@ class CControllerDashboardWidgetConfigure extends CController {
 	}
 
 	protected function doAction() {
+		$type = $this->getInput('type');
+		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'configuration' => CWidgetConfig::getConfiguration(
-				$this->getInput('type'),
-				$this->getInput('fields'),
-				$this->getInput('view_mode')
+				$type, $form->getFieldsData(), $this->getInput('view_mode')
 			)
 		])]));
 	}
