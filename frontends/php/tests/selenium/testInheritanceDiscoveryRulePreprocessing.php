@@ -77,7 +77,6 @@ class testInheritanceDiscoveryRulePreprocessing extends CWebTest {
 						'type' => 'Check for error in XML',
 						'parameter_1' => '/new/path/error'
 					],
-
 					[
 						'type' => 'Discard unchanged with heartbeat',
 						'parameter_1' => '30'
