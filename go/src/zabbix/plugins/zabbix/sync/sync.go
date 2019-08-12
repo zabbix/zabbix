@@ -38,5 +38,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns", "Checks if DNS service is up")
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
+	plugin.RegisterMetric(&impl, "zabbixsync", "proc.mem", "Memory used by process in bytes")
 	impl.SetCapacity(1)
 }
