@@ -181,6 +181,15 @@ class CAutoregistration extends CApiService {
 	 * @throws APIException if incorrect encryption options.
 	 */
 	protected function validateUpdate(array $autoreg, array $db_autoreg = [], $autoreg_tlsid = null) {
+		// Check permissions.
+		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		if (!$autoreg) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$min_accept_type = HOST_ENCRYPTION_NONE;
 		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK;
 
