@@ -1023,6 +1023,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'JSONPath':
+				case 'XML XPath':
 				case 'Does not match regular expression':
 					// Check preprocessing in frontend.
 					$this->assertTrue($steps[$i]['on_fail']->isSelected());
