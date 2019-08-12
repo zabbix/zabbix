@@ -17,23 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var ZABBIX = ZABBIX || {};
-
-ZABBIX.namespace = function(namespace) {
-	var parts = namespace.split('.'),
-		parent = this,
-		i;
-
-	for (i = 0; i < parts.length; i++) {
-		if (typeof parent[parts[i]] === 'undefined') {
-			parent[parts[i]] = {};
-		}
-
-		parent = parent[parts[i]];
-	}
-
-	return parent;
-};
 
 ZABBIX.namespace('classes.Observer');
 
@@ -226,7 +209,7 @@ ZABBIX.apps.map = (function($) {
 			// initialize selectable
 			this.container.selectable({
 				start: $.proxy(function(event) {
-					this.hideContextMenus();
+					this.hideMenuPopups();
 
 					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
@@ -649,7 +632,7 @@ ZABBIX.apps.map = (function($) {
 
 					// Recreate menu everytime due copy/paste function availability changes.
 					if (item_data.popupid) {
-						$('#' + item_data.popupid).filter('.action-menu').remove();
+						$('#' + item_data.popupid).filter('.menu-popup').remove();
 					}
 
 					var items = [
@@ -660,7 +643,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'last');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -668,7 +651,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'next');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -676,7 +659,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'previous');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -684,7 +667,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_reorder,
 									clickCallback: function() {
 										that.reorderShapes(that.selection.shapes, 'first');
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								}
 							]
@@ -696,7 +679,7 @@ ZABBIX.apps.map = (function($) {
 									disabled: !can_copy,
 									clickCallback: function() {
 										that.copypaste_buffer = that.getSelectionBuffer(that);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 									}
 								},
 								{
@@ -716,7 +699,7 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, true);
 										that.selectElements(selectedids, false);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -738,7 +721,7 @@ ZABBIX.apps.map = (function($) {
 										);
 										selectedids = that.pasteSelectionBuffer(delta_x, delta_y, that, false);
 										that.selectElements(selectedids, false);
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.updateImage();
 										that.linkForm.updateList(that.selection.selements);
 									}
@@ -759,7 +742,7 @@ ZABBIX.apps.map = (function($) {
 
 										}
 
-										that.hideContextMenus();
+										that.hideMenuPopups();
 										that.toggleForm();
 										that.updateImage();
 									}
@@ -1465,8 +1448,8 @@ ZABBIX.apps.map = (function($) {
 				this.updateImage();
 			},
 
-			hideContextMenus: function () {
-				$('.action-menu').each(function() {
+			hideMenuPopups: function () {
+				$('.menu-popup').each(function() {
 					$(this).data('is-active', false).fadeOut(0);
 				});
 			},

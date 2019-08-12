@@ -69,7 +69,10 @@ if (!empty($data['templates'])) {
 
 if ($discovered_trigger) {
 	$triggersFormList->addRow(_('Discovered by'), new CLink($data['discoveryRule']['name'],
-		'trigger_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+		(new CUrl('trigger_prototypes.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+			->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
 	));
 }
 
@@ -118,6 +121,7 @@ $expression_row = [
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -318,6 +322,7 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

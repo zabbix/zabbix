@@ -181,6 +181,7 @@ $widget->addItem($filter);
 
 // create form
 $triggers_form = (new CForm())
+	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->setName('triggersForm');
 
 $url = (new CUrl('triggers.php'))->getUrl();
@@ -220,7 +221,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
 			CHtml::encode($trigger['discoveryRule']['name']),
-			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid']))
+			(new CUrl('trigger_prototypes.php'))->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
@@ -330,7 +332,8 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
-		]
+		],
+		$data['checkbox_hash']
 	)
 ]);
 

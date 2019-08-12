@@ -99,7 +99,7 @@ if (!CWebUser::$data) {
 
 // page title
 (new CPageHeader(_('Installation')))
-	->addCssFile('styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

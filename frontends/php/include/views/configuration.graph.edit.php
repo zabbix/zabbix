@@ -69,7 +69,10 @@ if ($is_templated || $discovered_graph) {
 
 if ($discovered_graph) {
 	$graphFormList->addRow(_('Discovered by'), new CLink($data['discoveryRule']['name'],
-		'graphs.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+		(new CUrl('graphs.php'))
+			->setArgument('form', 'update')
+			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+			->setArgument('graphid', $data['graphDiscovery']['parent_graphid'])
 	));
 }
 

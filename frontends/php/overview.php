@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -83,7 +82,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// ack status
-	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', 0), PROFILE_TYPE_INT);
 
 	// update host inventory filter
 	$inventoryFields = [];
@@ -192,12 +191,12 @@ if ($type == SHOW_TRIGGERS) {
 			'filter' => [
 				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 			],
-			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null
 		];
 
 		$problem_options = [
+			'show_recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'show_suppressed' => $filter['show_suppressed'],
+			'acknowledged' => $filter['ackStatus'],
 			'min_severity' => $filter['showSeverity'],
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];

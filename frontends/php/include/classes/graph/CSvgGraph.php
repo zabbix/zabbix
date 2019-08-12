@@ -623,7 +623,7 @@ class CSvgGraph extends CSvg {
 		$grid_values = [];
 
 		foreach ($grid as $value) {
-			$relative_pos = $this->canvas_height - $this->canvas_height * ($max_value - $value) / $delta;
+			$relative_pos = $this->canvas_height - intval($this->canvas_height * ($max_value - $value) / $delta);
 
 			if ($relative_pos >= 0 && $relative_pos <= $this->canvas_height) {
 				$grid_values[$relative_pos] = convert_units([
@@ -631,31 +631,6 @@ class CSvgGraph extends CSvg {
 					'units' => $units,
 					'convert' => ITEM_CONVERT_NO_UNITS
 				]);
-			}
-		}
-
-		/*
-		 * This will fix a rare corner case when values on Y axes are aligned in such a way that calculated Y=0 (based
-		 * on steps calculated by self::getValueGrid) is out of the allowed area (typically by less then 1px) and are
-		 * not drawn on Y axis. Fix will calculate the real value on Y=0. The interval will always be smaller than
-		 * interval between any other 2 grid values.
-		 *
-		 * This is done on left side Y axis only, because on right side Y axis we will not draw label on Y=0 to not
-		 * overlap the arrow on X axis.
-		 *
-		 * This is also done only if distance between Y=0 and next lowest Y value is larger than 25px, to avoid label
-		 * overlapping.
-		 */
-		if ($side == GRAPH_YAXIS_SIDE_LEFT) {
-			$lowest = key($grid_values);
-
-			if (!array_key_exists(0, $grid_values) && $lowest > 25) {
-				$grid_values[0] = convert_units([
-					'value' => $grid_values[$lowest] - ($lowest * ($max_value - $min_value) / $this->canvas_height),
-					'units' => $units,
-					'convert' => ITEM_CONVERT_NO_UNITS
-				]);
-				ksort($grid_values);
 			}
 		}
 

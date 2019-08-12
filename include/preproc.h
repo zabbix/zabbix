@@ -43,7 +43,8 @@ zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 void	zbx_preproc_op_free(zbx_preproc_op_t *op);
 void	zbx_preproc_result_free(zbx_preproc_result_t *result);
 
-int	zbx_preprocessor_test(unsigned char value_type, const char *value, const char *last_value, const char *last_ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, char **preproc_error, char **error);
+int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
+		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
+		char **preproc_error, char **error);
 
 #endif /* ZABBIX_PREPROC_H */

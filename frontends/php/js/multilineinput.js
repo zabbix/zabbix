@@ -92,28 +92,29 @@
 
 		var height_offset = 190,
 			$content = $('<div>', {class: 'multilineinput-container'}),
+			monospace_font = obj.options.monospace_font ? ' monospace-font' : '',
 			$textarea = $('<textarea>', {
-				class: 'multilineinput-textarea',
+				class: 'multilineinput-textarea' + monospace_font,
 				text: obj.$hidden.val(),
 				maxlength: obj.options.maxlength,
 				readonly: obj.options.readonly ? true : null,
 				placeholder: obj.options.placeholder_textarea
 			}).attr('wrap', 'off'),
-			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers'}).append('<li>'),
+			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers' + monospace_font}).append('<li>'),
 			$footer = $('<div>', {class: 'multilineinput-symbols-remaining'})
 				.html(sprintf(t('S_N_SYMBOLS_REMAINING'), '<span>0</span>'));
 
 		overlayDialogue({
 			'title': obj.options.title,
-			'class': 'multilineinput-modal' + (obj.options.monospace_font ? ' monospace-font' : ''),
+			'class': 'multilineinput-modal',
 			'content': $content,
 			'footer': $footer,
 			'buttons': [
 				{
 					title: t('S_APPLY'),
 					action: function() {
-						var value = $.trim($textarea.val());
-						obj.$input.val(value.split("\n")[0]);
+						var value = $textarea.val();
+						obj.$input.val($.trim(value).split("\n")[0]);
 						obj.$hidden.val(value);
 					},
 					enabled: !obj.options.readonly
@@ -127,14 +128,14 @@
 		}, obj.$button);
 
 		if (obj.options.label_before.length) {
-			height_offset += $('<div>', {class: 'multilineinput-label'})
+			height_offset += $('<div>', {class: 'multilineinput-label' + monospace_font})
 				.html(obj.options.label_before)
 				.insertBefore($content)
 				.height();
 		}
 
 		if (obj.options.label_after.length) {
-			height_offset += $('<div>', {class: 'multilineinput-label'})
+			height_offset += $('<div>', {class: 'multilineinput-label' + monospace_font})
 				.html(obj.options.label_after)
 				.insertAfter($content)
 				.height();
@@ -226,9 +227,8 @@
 					var $this = $(this),
 						obj = $this.data('multilineInput');
 
-					value = $.trim(value);
 					obj.$hidden.val(value);
-					obj.$input.val(value.split("\n")[0]);
+					obj.$input.val($.trim(value).split("\n")[0]);
 					$this.trigger('change');
 				});
 			}

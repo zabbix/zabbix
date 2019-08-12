@@ -44,6 +44,7 @@ $widget->addItem($data['main_filter']);
 
 // create form
 $itemForm = (new CForm())->setName('items');
+$itemForm->addVar('checkbox_hash', $data['checkbox_hash']);
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
 }
@@ -86,7 +87,7 @@ foreach ($data['items'] as $item) {
 
 	if (!empty($item['discoveryRule'])) {
 		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
-			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid']
+			(new CUrl('disc_prototypes.php'))->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
@@ -247,7 +248,8 @@ $itemForm->addItem([
 			'item.masscopyto' => ['name' => _('Copy')],
 			'item.massupdateform' => ['name' => _('Mass update')],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
-		]
+		],
+		$data['checkbox_hash']
 	)
 ]);
 

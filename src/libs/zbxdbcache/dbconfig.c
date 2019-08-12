@@ -235,14 +235,14 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_counted_in_item_queue                                         *
+ * Function: zbx_is_counted_in_item_queue                                     *
  *                                                                            *
  * Purpose: determine whether the given item type is counted in item queue    *
  *                                                                            *
  * Return value: SUCCEED if item is counted in the queue, FAIL otherwise      *
  *                                                                            *
  ******************************************************************************/
-static int	is_counted_in_item_queue(unsigned char type, const char *key)
+int	zbx_is_counted_in_item_queue(unsigned char type, const char *key)
 {
 	switch (type)
 	{
@@ -2381,16 +2381,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		item->flags = (unsigned char)atoi(row[24]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[25]);
 
-		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
-		{
+		if (SUCCEED != is_time_suffix(row[31], &item->history_sec, ZBX_LENGTH_UNLIMITED))
+			item->history_sec = ZBX_HK_PERIOD_MAX;
+
+		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.history_global)
 			item->history_sec = config->config->hk.history;
-			item->history = (0 != config->config->hk.history);
-		}
-		else
-		{
-			is_time_suffix(row[31], &(item->history_sec), ZBX_LENGTH_UNLIMITED);
-			item->history = zbx_time2bool(row[31]);
-		}
+
+		item->history = (0 != item->history_sec);
 
 		ZBX_STR2UCHAR(item->inventory_link, row[33]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[34]);
@@ -2457,12 +2454,17 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
+			int	trends_sec;
+
 			numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
 
-			if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				numitem->trends = (0 != config->config->hk.trends);
-			else
-				numitem->trends = zbx_time2bool(row[32]);
+			if (SUCCEED != is_time_suffix(row[32], &trends_sec, ZBX_LENGTH_UNLIMITED))
+				trends_sec = ZBX_HK_PERIOD_MAX;
+
+			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
+				trends_sec = config->config->hk.trends;
+
+			numitem->trends = (0 != trends_sec);
 
 			DCstrpool_replace(found, &numitem->units, row[35]);
 		}
@@ -2783,7 +2785,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		{
 			DCitem_poller_type_update(item, host, flags);
 
-			if (SUCCEED == is_counted_in_item_queue(item->type, item->key))
+			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
 			{
 				char	*error = NULL;
 
@@ -8136,7 +8138,7 @@ static void	dc_requeue_items(const zbx_uint64_t *itemids, const unsigned char *s
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
+		if (SUCCEED != zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
 
 		switch (errcodes[i])
@@ -9578,7 +9580,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (SUCCEED != is_counted_in_item_queue(dc_item->type, dc_item->key))
+		if (SUCCEED != zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
 			continue;
 
 		if (NULL == (dc_host = (const ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -11448,7 +11450,7 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 			continue;
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
-		if (SUCCEED == is_counted_in_item_queue(dc_item->type, dc_item->key))
+		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
 			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
 	}
 

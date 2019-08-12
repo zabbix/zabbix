@@ -100,7 +100,14 @@ class CControllerPopupTriggerWizard extends CController {
 			'item_name' => ''
 		];
 
-		$exprs = $this->getInput('expressions', []);
+		$input = $this->getInput('expressions', []);
+		$exprs = [];
+
+		while ($input) {
+			// Merge array with 'value' and array with 'type' into single array with both attributes.
+			$exprs[] = array_shift($input) + array_shift($input);
+		}
+
 		$constructor = new CTextTriggerConstructor(new CTriggerExpression());
 
 		if ($this->hasInput('triggerid')) {
@@ -122,7 +129,7 @@ class CControllerPopupTriggerWizard extends CController {
 
 			// Trigger validation.
 			if ($page_options['description'] === '') {
-				error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Name')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 				$trigger_valid = false;
 			}
 

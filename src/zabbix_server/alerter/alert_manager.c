@@ -2050,7 +2050,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	zbx_vector_ptr_create(&alerts);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
 		now = time_now;
@@ -2176,11 +2176,14 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			zbx_ipc_client_release(client);
 	}
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
+
 	zbx_ipc_service_close(&alerter_service);
 	am_destroy(&manager);
 	zbx_vector_ptr_destroy(&alerts);
 
 	DBclose();
-
-	return 0;
 }

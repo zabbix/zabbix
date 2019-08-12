@@ -162,6 +162,8 @@ static int	zbx_yaml_include(yaml_document_t *dst_doc, yaml_node_pair_t *dst, con
 		if (-1 != (index = zbx_yaml_add_node(dst_doc, &doc, src_root)))
 			dst->value = index;
 	}
+	else
+		printf("Cannot parse include file '%s'\n", filename);
 
 	__real_fclose(fp);
 

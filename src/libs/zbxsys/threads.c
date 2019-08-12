@@ -57,11 +57,15 @@ void	zbx_child_fork(pid_t *pid)
 {
 	sigset_t	mask, orig_mask;
 
-	/* block SIGTERM, SIGINT and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
+	/* block signals during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGABRT);
 	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGCHLD);
+
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	/* set process id instead of returning, this is to avoid race condition when signal arrives before return */
@@ -198,6 +202,34 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 /******************************************************************************
  *                                                                            *
+ * Function: threads_kill                                                     *
+ *                                                                            *
+ * Purpose: sends termination signal to "threads"                             *
+ *                                                                            *
+ * Parameters: threads     - [IN] handles to threads or processes             *
+ *             threads_num - [IN] number of handles                           *
+ *             ret         - [IN] terminate thread politely on SUCCEED or ask *
+ *                                threads to exit immediately on FAIL         *
+ *                                                                            *
+ ******************************************************************************/
+static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, int ret)
+{
+	int	i;
+
+	for (i = 0; i < threads_num; i++)
+	{
+		if (!threads[i])
+			continue;
+
+		if (SUCCEED != ret)
+			zbx_thread_kill_fatal(threads[i]);
+		else
+			zbx_thread_kill(threads[i]);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_threads_wait                                                 *
  *                                                                            *
  * Purpose: Waits until the "threads" are in the signalled state              *
@@ -206,7 +238,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
  *                                                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num)
+void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
 {
 	int		i;
 #if !defined(_WINDOWS)
@@ -216,20 +248,34 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, int threads_num)
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
 	sigprocmask(SIG_BLOCK, &set, NULL);
-#else
-	/* wait for threads to finish first. although listener threads will never end */
-	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-#endif
-	for (i = 0; i < threads_num; i++)
-	{
-		if (threads[i])
-			zbx_thread_kill(threads[i]);
-	}
+
+	/* signal all threads to go into idle state and wait for flagged threads to exit */
+	threads_kill(threads, threads_num, ret);
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (threads[i])
-			zbx_thread_wait(threads[i]);
+		if (!threads[i] || ZBX_THREAD_WAIT_EXIT != threads_flags[i])
+			continue;
+
+		zbx_thread_wait(threads[i]);
+
+		threads[i] = ZBX_THREAD_HANDLE_NULL;
+	}
+
+	/* signal idle threads to exit */
+	threads_kill(threads, threads_num, FAIL);
+#else
+	/* wait for threads to finish first. although listener threads will never end */
+	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
+	threads_kill(threads, threads_num, ret);
+#endif
+
+	for (i = 0; i < threads_num; i++)
+	{
+		if (!threads[i])
+			continue;
+
+		zbx_thread_wait(threads[i]);
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}

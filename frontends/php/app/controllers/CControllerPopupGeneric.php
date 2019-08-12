@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
@@ -285,14 +284,6 @@ class CControllerPopupGeneric extends CController {
 					'name' => 'sysmapform',
 					'id' => 'sysmaps'
 				],
-				'table_columns' => [
-					_('Name')
-				]
-			],
-			'screens2' => [
-				'title' => _('Screens'),
-				'min_user_type' => USER_TYPE_ZABBIX_USER,
-				'allowed_src_fields' => 'screenid,name',
 				'table_columns' => [
 					_('Name')
 				]
@@ -737,7 +728,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::HostGroup()->get($options);
 				if (array_key_exists('enrich_parent_groups', $page_options)) {
-					$records = CPageFilter::enrichParentGroups($records, [
+					$records = enrichParentGroups($records, [
 						'real_hosts' => null
 					] + $options);
 				}
@@ -962,30 +953,6 @@ class CControllerPopupGeneric extends CController {
 				}
 
 				$records = API::Screen()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'screens2':
-				require_once dirname(__FILE__).'/../../include/screens.inc.php';
-
-				$options = [
-					'output' => ['screenid', 'name'],
-					'preservekeys' => true
-				];
-
-				if (array_key_exists('writeonly', $page_options)) {
-					$options['editable'] = true;
-				}
-
-				$records = API::Screen()->get($options);
-
-				foreach ($records as $item) {
-					if (array_key_exists('screenid', $page_options)
-							&& check_screen_recursion($page_options['screenid'], $item['screenid'])) {
-						unset($records[$item['screenid']]);
-					}
-				}
-
 				CArrayHelper::sort($records, ['name']);
 				break;
 

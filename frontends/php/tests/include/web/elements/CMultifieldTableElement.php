@@ -303,18 +303,6 @@ class CMultifieldTableElement extends CTableElement {
 	}
 
 	/**
-	 * Find row indexes by row data.
-	 *
-	 * @param string $name     row field name
-	 * @param string $value    row field value
-	 *
-	 * @return array
-	 */
-	public function findRows($name, $value) {
-		return $this->findRowsByFields([$name => $value]);
-	}
-
-	/**
 	 * Fill table with specified data.
 	 * For example, if there is a two control row, with mapping set to ['tag', 'value'], the following $data values
 	 * can be used:

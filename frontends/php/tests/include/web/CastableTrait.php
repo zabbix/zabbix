@@ -31,7 +31,7 @@ trait CastableTrait {
 	 * @return CElement
 	 */
 	public function asElement($options = []) {
-		return $this->cast('CElement', $options);
+		return $this->cast(CElement::class, $options);
 	}
 
 	/**
@@ -42,7 +42,7 @@ trait CastableTrait {
 	 * @return CCheckboxElement
 	 */
 	public function asCheckbox($options = []) {
-		return $this->cast('CCheckboxElement', $options);
+		return $this->cast(CCheckboxElement::class, $options);
 	}
 
 	/**
@@ -53,7 +53,7 @@ trait CastableTrait {
 	 * @return CCheckboxElement
 	 */
 	public function asCheckboxList($options = []) {
-		return $this->cast('CCheckboxListElement', $options);
+		return $this->cast(CCheckboxListElement::class, $options);
 	}
 
 	/**
@@ -64,7 +64,7 @@ trait CastableTrait {
 	 * @return CDashboardElement
 	 */
 	public function asDashboard($options = []) {
-		return $this->cast('CDashboardElement', $options);
+		return $this->cast(CDashboardElement::class, $options);
 	}
 
 	/**
@@ -75,7 +75,7 @@ trait CastableTrait {
 	 * @return CDropdownElement
 	 */
 	public function asDropdown($options = []) {
-		return $this->cast('CDropdownElement', $options);
+		return $this->cast(CDropdownElement::class, $options);
 	}
 
 	/**
@@ -86,7 +86,7 @@ trait CastableTrait {
 	 * @return CFormElement
 	 */
 	public function asForm($options = []) {
-		return $this->cast('CFormElement', $options);
+		return $this->cast(CFormElement::class, $options);
 	}
 
 	/**
@@ -97,7 +97,7 @@ trait CastableTrait {
 	 * @return CMessageElement
 	 */
 	public function asMessage($options = []) {
-		return $this->cast('CMessageElement', $options);
+		return $this->cast(CMessageElement::class, $options);
 	}
 
 	/**
@@ -108,7 +108,7 @@ trait CastableTrait {
 	 * @return CMultiselectElement
 	 */
 	public function asMultiselect($options = []) {
-		return $this->cast('CMultiselectElement', $options);
+		return $this->cast(CMultiselectElement::class, $options);
 	}
 
 	/**
@@ -119,7 +119,7 @@ trait CastableTrait {
 	 * @return COverlayDialogElement
 	 */
 	public function asOverlayDialog($options = []) {
-		return $this->cast('COverlayDialogElement', $options);
+		return $this->cast(COverlayDialogElement::class, $options);
 	}
 
 	/**
@@ -130,7 +130,7 @@ trait CastableTrait {
 	 * @return CTableElement
 	 */
 	public function asTable($options = []) {
-		return $this->cast('CTableElement', $options);
+		return $this->cast(CTableElement::class, $options);
 	}
 
 	/**
@@ -141,7 +141,7 @@ trait CastableTrait {
 	 * @return CTableRowElement
 	 */
 	public function asTableRow($options = []) {
-		return $this->cast('CTableRowElement', $options);
+		return $this->cast(CTableRowElement::class, $options);
 	}
 
 	/**
@@ -152,7 +152,7 @@ trait CastableTrait {
 	 * @return CWidgetElement
 	 */
 	public function asWidget($options = []) {
-		return $this->cast('CWidgetElement', $options);
+		return $this->cast(CWidgetElement::class, $options);
 	}
 
 	/**
@@ -163,7 +163,7 @@ trait CastableTrait {
 	 * @return CSegmentedRadioElement
 	 */
 	public function asSegmentedRadio($options = []) {
-		return $this->cast('CSegmentedRadioElement', $options);
+		return $this->cast(CSegmentedRadioElement::class, $options);
 	}
 
 	/**
@@ -174,7 +174,7 @@ trait CastableTrait {
 	 * @return CRangeControlElement
 	 */
 	public function asRangeControl($options = []) {
-		return $this->cast('CRangeControlElement', $options);
+		return $this->cast(CRangeControlElement::class, $options);
 	}
 
 	/**
@@ -185,7 +185,7 @@ trait CastableTrait {
 	 * @return CMultifieldTableElement
 	 */
 	public function asMultifieldTable($options = []) {
-		return $this->cast('CMultifieldTableElement', $options);
+		return $this->cast(CMultifieldTableElement::class, $options);
 	}
 
 	/**
@@ -196,6 +196,17 @@ trait CastableTrait {
 	 * @return RemoteWebElement
 	 */
 	public function asBaseType($options = []) {
-		return $this->cast('RemoteWebElement', $options);
+		return $this->cast(RemoteWebElement::class, $options);
+	}
+
+	/**
+	 * Cast object to Multiline element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CMultilineElement
+	 */
+	public function asMultiline($options = []) {
+		return $this->cast(CMultilineElement::class, $options);
 	}
 }

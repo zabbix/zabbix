@@ -41,15 +41,23 @@ include dirname(__FILE__).'/editabletable.js.php';
 </script>
 <script type="text/x-jquery-tmpl" id="lld_macro_path-row">
 	<?= (new CRow([
-			(new CTextBox('lld_macro_paths[#{rowNum}][lld_macro]', '', false,
-				DB::getFieldLength('lld_macro_path', 'lld_macro')
-			))
-				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->addClass(ZBX_STYLE_UPPERCASE)
-				->setAttribute('placeholder', '{#MACRO}'),
-			(new CTextBox('lld_macro_paths[#{rowNum}][path]', '', false, DB::getFieldLength('lld_macro_path', 'path')))
-				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				->setAttribute('placeholder', _('$.path.to.node')),
+			(new CCol(
+				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '', [
+					'add_post_js' => false,
+					'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
+				]))
+					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+					->addClass(ZBX_STYLE_UPPERCASE)
+					->setAttribute('placeholder', '{#MACRO}')
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
+				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
+					'add_post_js' => false,
+					'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
+				]))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('$.path.to.node'))
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
@@ -129,9 +137,11 @@ include dirname(__FILE__).'/editabletable.js.php';
 				}
 			}).trigger('change');
 
-			$('#lld_macro_paths').dynamicRows({
-				template: '#lld_macro_path-row'
-			});
+			$('#lld_macro_paths')
+				.dynamicRows({template: '#lld_macro_path-row'})
+				.on('click', 'button.element-table-add', function() {
+					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+				});
 		});
 	})(jQuery);
 </script>

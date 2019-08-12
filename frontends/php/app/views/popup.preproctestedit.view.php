@@ -25,20 +25,28 @@ $form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('value_type', $data['value_type'])
 	->addVar('test_type', $data['test_type'])
+	->addVar('show_final_result', $data['show_final_result'])
 	->setId('preprocessing-test-form');
 
 // Create macros table.
-$macros_table = $data['macros'] ? new CTable() : null;
+$macros_table = $data['macros'] ? (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER) : null;
+
+$i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
-		(new CTextBox(null, $macro_name, true))
-			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-			->removeId(),
-		'&rArr;',
-		(new CTextBox('macros['.$macro_name.']', $macro_value))
-			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-			->setAttribute('placeholder', _('value'))
-			->removeId()
+		(new CCol(
+			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
+				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+				->removeAttribute('name')
+				->removeId()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol('&rArr;'))->addStyle('vertical-align: top;'),
+		(new CCol(
+			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
+				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				->setAttribute('placeholder', _('value'))
+				->removeId()
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
 }
 
@@ -116,6 +124,14 @@ $form_list->addRow(
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('width: 100%;')
 );
+
+if ($data['show_final_result']) {
+	$form_list->addRow(
+		_('Result'),
+		new CDiv(),
+		'final-result'
+	);
+}
 
 $form
 	->addItem($form_list)

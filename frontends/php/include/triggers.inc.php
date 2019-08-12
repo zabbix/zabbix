@@ -156,15 +156,16 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 /**
  * Returns HTML representation of trigger severity cell containing severity name and color.
  *
- * @param int         $severity     Trigger, Event or Problem severity.
- * @param array|null  $config       Array of configuration parameters to get trigger severity name; can be omitted
- *                                  if $text is not null.
- * @param string|null $text         Trigger severity name.
- * @param bool        $force_normal True to return 'normal' class, false to return corresponding severity class.
+ * @param int         $severity       Trigger, Event or Problem severity.
+ * @param array|null  $config         Array of configuration parameters to get trigger severity name; can be omitted
+ *                                    if $text is not null.
+ * @param string|null $text           Trigger severity name.
+ * @param bool        $force_normal   True to return 'normal' class, false to return corresponding severity class.
+ * @param bool        $return_as_div  True to return severity cell as DIV element.
  *
- * @return CCol
+ * @return CDiv|CCol
  */
-function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false) {
+function getSeverityCell($severity, array $config = null, $text = null, $force_normal = false, $return_as_div = false) {
 	if ($text === null) {
 		$text = CHtml::encode(getSeverityName($severity, $config));
 	}
@@ -173,7 +174,8 @@ function getSeverityCell($severity, array $config = null, $text = null, $force_n
 		return new CCol($text);
 	}
 
-	return (new CCol($text))->addClass(getSeverityStyle($severity));
+	$return = $return_as_div ? new CDiv($text) : new CCol($text);
+	return $return->addClass(getSeverityStyle($severity));
 }
 
 /**
@@ -702,7 +704,7 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 		$applications = API::Application()->get([
 			'output' => [],
 			'hostids' => $hostids,
-			'filter' => ['name' => $application],
+			'search' => ['name' => $application],
 			'preservekeys' => true
 		]);
 		$trigger_options['applicationids'] = array_keys($applications);
@@ -738,7 +740,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE
+				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
 			$problem_triggerids[] = $triggerid;
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
@@ -750,7 +753,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'acknowledged' => $problem_options['acknowledged'],
+			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
+			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
+				? false
+				: null,
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -766,10 +772,16 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		}
 
 		foreach ($triggers as $triggerid => $trigger) {
-			if (!array_key_exists($triggerid, $objectids)) {
+			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+				continue;
+			}
+
+			if (!array_key_exists('only_true', $trigger_options)
+					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
+				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
 				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
 			}
-			elseif ($trigger['priority'] < $problem_options['min_severity']) {
+			else {
 				unset($triggers[$triggerid]);
 			}
 		}
@@ -1430,12 +1442,13 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$image = $next[$i] ? 'top_right_bottom' : 'top_right';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right';
 		}
 		else {
-			$image = $next[$i] ? 'top_bottom' : 'space';
+			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty';
 		}
-		$expr[] = new CImg('images/general/tr_'.$image.'.gif', 'tr', 12, 12);
+
+		$expr[] = (new CSpan(''))->addClass($class_name);
 	}
 	return $expr;
 }

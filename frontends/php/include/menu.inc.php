@@ -270,13 +270,15 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'zabbix.php',
+					'action' => 'user.list',
+					'active_if' => ['user.edit', 'user.list'],
+					'label' => _('Users')
+				],
+				[
+					'url' => 'zabbix.php',
 					'action' => 'usergroup.list',
 					'active_if' => ['usergroup.list', 'usergroup.edit', 'usergrp.create'],
 					'label' => _('User groups NEW')
-				],
-				[
-					'url' => 'users.php',
-					'label' => _('Users')
 				],
 				[
 					'url' => 'zabbix.php',
@@ -303,7 +305,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'pages' => [
 				[
 					'url' => 'index.php',
-					'sub_pages' => ['profile.php']
+					'sub_pages' => ['zabbix.php']
 				]
 			]
 		]

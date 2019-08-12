@@ -85,10 +85,10 @@ if ($this->data['screen']['templateid']) {
 	unset(
 		$screenResources[SCREEN_RESOURCE_DATA_OVERVIEW], $screenResources[SCREEN_RESOURCE_ACTIONS],
 		$screenResources[SCREEN_RESOURCE_EVENTS], $screenResources[SCREEN_RESOURCE_HOST_INFO],
-		$screenResources[SCREEN_RESOURCE_MAP], $screenResources[SCREEN_RESOURCE_SCREEN],
-		$screenResources[SCREEN_RESOURCE_SERVER_INFO], $screenResources[SCREEN_RESOURCE_HOSTGROUP_TRIGGERS],
-		$screenResources[SCREEN_RESOURCE_HOST_TRIGGERS], $screenResources[SCREEN_RESOURCE_SYSTEM_STATUS],
-		$screenResources[SCREEN_RESOURCE_TRIGGER_INFO], $screenResources[SCREEN_RESOURCE_TRIGGER_OVERVIEW]
+		$screenResources[SCREEN_RESOURCE_MAP], $screenResources[SCREEN_RESOURCE_SERVER_INFO],
+		$screenResources[SCREEN_RESOURCE_HOSTGROUP_TRIGGERS], $screenResources[SCREEN_RESOURCE_HOST_TRIGGERS],
+		$screenResources[SCREEN_RESOURCE_SYSTEM_STATUS], $screenResources[SCREEN_RESOURCE_TRIGGER_INFO],
+		$screenResources[SCREEN_RESOURCE_TRIGGER_OVERVIEW]
 	);
 }
 
@@ -658,55 +658,6 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGER_OVERVIEW, SCREEN_RESOUR
 					'dstfld1' => 'application',
 					'real_hosts' => '1',
 					'with_applications' => '1'
-				]).', null, this);'
-			)
-	]);
-}
-
-/*
- * Screen item: Screens
- */
-elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
-	$caption = '';
-	$id = 0;
-
-	if ($resourceId > 0) {
-		$db_screens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE s.screenid='.zbx_dbstr($resourceId));
-
-		while ($row = DBfetch($db_screens)) {
-			$screen = API::Screen()->get([
-				'screenids' => $row['screenid'],
-				'output' => ['screenid']
-			]);
-			if (empty($screen)) {
-				continue;
-			}
-			if (check_screen_recursion($_REQUEST['screenid'], $row['screenid'])) {
-				continue;
-			}
-
-			$caption = $row['name'];
-			$id = $resourceId;
-		}
-	}
-
-	$form->addVar('resourceid', $id);
-	$screenFormList->addRow((new CLabel(_('Screen'), 'caption'))->setAsteriskMark(), [
-		(new CTextBox('caption', $caption, true))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('select', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				CJs::encodeJson([
-					'srctbl' => 'screens2',
-					'srcfld1' => 'screenid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
-					'dstfld2' => 'caption',
-					'screenid' => getRequest('screenid')
 				]).', null, this);'
 			)
 	]);

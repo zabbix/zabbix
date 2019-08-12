@@ -109,14 +109,6 @@ abstract class CAbstractScreenImporter extends CImporter {
 						}
 						break;
 
-					case SCREEN_RESOURCE_SCREEN:
-						$screenItem['resourceid'] = $this->referencer->resolveScreen($resource['name']);
-						if (!$screenItem['resourceid']) {
-							throw new Exception(_s('Cannot find screen "%1$s" used in screen "%2$s".',
-								$resource['name'], $screen['name']));
-						}
-						break;
-
 					default:
 						$screenItem['resourceid'] = 0;
 						break;
