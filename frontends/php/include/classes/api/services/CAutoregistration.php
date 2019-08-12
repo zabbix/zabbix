@@ -30,34 +30,13 @@ class CAutoregistration extends CApiService {
 	/**
 	 * Get auto registration configuration.
 	 *
-	 * @param array   $options
-	 * @param array   $options['output']
+	 * @param array    $options
+	 * @param array    $options['output']
+	 * @param boolean  $options['preservekeys']
 	 *
 	 * @return array
 	 */
 	public function get($options) {
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			return [];
-		}
-
-		if ($options && count($options) == 1 && array_key_exists('output', $options)) {
-			return $this->getAutoreg($options);
-		}
-		else {
-			return [];
-		}
-	}
-
-	/**
-	 * Get auto registration configuration.
-	 *
-	 * @param array   $options
-	 * @param array   $options['output']
-	 * @param boolean $options['preservekeys'] (internal use only)
-	 *
-	 * @return array
-	 */
-	protected function getAutoreg($options) {
 		$sql_parts = [
 			'select' => ['config_autoreg_tls' => 'ca.autoreg_tlsid'],
 			'from' => ['config_autoreg_tls' => 'config_autoreg_tls ca'],
@@ -73,6 +52,10 @@ class CAutoregistration extends CApiService {
 			'preservekeys' => false
 		];
 		$options = zbx_array_merge($def_options, $options);
+
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+			return [];
+		}
 
 		$ini_autoreg = [];
 
@@ -131,7 +114,7 @@ class CAutoregistration extends CApiService {
 	 * @return true if no errors
 	 */
 	public function update($autoreg) {
-		$db_autoreg = $this->getAutoreg(['preservekeys' => true]);
+		$db_autoreg = $this->get(['preservekeys' => true]);
 		$autoreg_tlsid = $this->getAutoregTlsId($db_autoreg);
 
 		$this->validateUpdate($autoreg, $db_autoreg, $autoreg_tlsid);
