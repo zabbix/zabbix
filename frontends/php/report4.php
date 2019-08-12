@@ -62,7 +62,6 @@ $db_media_types = API::MediaType()->get([
 ]);
 
 CArrayHelper::sort($db_media_types, ['description']);
-
 foreach ($db_media_types as $mediatypeid => $db_media_type) {
 	$media_types[$mediatypeid] = $db_media_type['description'];
 }
