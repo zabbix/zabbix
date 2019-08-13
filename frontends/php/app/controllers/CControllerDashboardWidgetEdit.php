@@ -143,22 +143,28 @@ class CControllerDashboardWidgetEdit extends CController {
 			if ($field instanceof CWidgetFieldMultiselectGroup) {
 				$key = 'groups';
 				$var = 'groupids';
-			} elseif ($field instanceof CWidgetFieldMultiselectHost) {
+			}
+			elseif ($field instanceof CWidgetFieldMultiselectHost) {
 				$key = 'hosts';
 				$var = 'hostids';
-			} elseif ($field instanceof CWidgetFieldMultiselectItem) {
+			}
+			elseif ($field instanceof CWidgetFieldMultiselectItem) {
 				$key = 'items';
 				$var = 'itemids';
-			} elseif ($field instanceof CWidgetFieldMultiselectGraph) {
+			}
+			elseif ($field instanceof CWidgetFieldMultiselectGraph) {
 				$key = 'graphs';
 				$var = 'graphids';
-			} elseif ($field instanceof CWidgetFieldMultiselectItemPrototype) {
+			}
+			elseif ($field instanceof CWidgetFieldMultiselectItemPrototype) {
 				$key = 'item_prototypes';
 				$var = 'prototype_itemids';
-			} elseif ($field instanceof CWidgetFieldMultiselectGraphPrototype) {
+			}
+			elseif ($field instanceof CWidgetFieldMultiselectGraphPrototype) {
 				$key = 'graph_prototypes';
 				$var = 'prototype_graphids';
-			} else {
+			}
+			else {
 				continue;
 			}
 
