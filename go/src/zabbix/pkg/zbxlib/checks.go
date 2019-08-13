@@ -48,6 +48,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -135,6 +136,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
 	case "system.cpu.intr":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
+	case "system.hw.chassis":
+		cfunc = unsafe.Pointer(C.SYSTEM_HW_CHASSIS)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)

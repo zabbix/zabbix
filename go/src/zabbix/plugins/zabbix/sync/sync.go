@@ -40,5 +40,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
 	plugin.RegisterMetric(&impl, "zabbixsync", "proc.mem", "Memory used by process in bytes")
 	plugin.RegisterMetric(&impl, "zabbixsync", "proc.num", "The number of processes")
+	plugin.RegisterMetric(&impl, "zabbixsync", "system.hw.chassis", "Chassis information")
 	impl.SetCapacity(1)
 }
