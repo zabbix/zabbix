@@ -45,4 +45,8 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.port", "Checks if it is possible to make TCP connection to specified port")
 	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.service", "Checks if service is running and accepting TCP connections")
 	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.service.perf", "Checks performance of TCP service")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.listen", "Checks if this UDP port is in LISTEN state")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.service", "Checks if service is running and responding to UDP requests")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.service.perf", "Checks performance of UDP service")
+	plugin.RegisterMetric(&impl, "zabbixasync", "sensor", "Hardware sensor reading")
 }
