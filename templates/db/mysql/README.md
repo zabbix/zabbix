@@ -117,4 +117,10 @@ There are no template links in this template.
 |MySQL: The slave I/O thread is not connected to a replication master||mysql.slave_sql_running[{#MASTERHOST}].count(#1,"Yes",ne)=1|Warning|
 |MySQL: The SQL thread is not running|Whether the SQL thread for executing events in the relay log is running.|mysql.slave_sql_running[{#MASTERHOST}].count(#1,"No",eq)=1|Warning|
 
+## Feedback
+Please report any issues with the template at https://support.zabbix.com 
+
+You can also provide feedback, discuss the template or ask for help with it at
+[ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql).
+
 ## References
