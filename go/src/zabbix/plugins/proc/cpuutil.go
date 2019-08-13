@@ -260,6 +260,10 @@ const (
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if ctx == nil {
+		return nil, errors.New("This item is available only in daemon mode.")
+	}
+
 	var name, user, cmdline, mode, utiltype string
 	switch len(params) {
 	case 5:
