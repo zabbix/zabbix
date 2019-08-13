@@ -17,22 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package hostname
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-
-	//	_ "zabbix/plugins/debug/filewatcher"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/debug/trapper"
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/system/hostname"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/sync"
+	"fmt"
+	"syscall"
 )
+
+func arrayToString(hostnameArray *[65]int8) string {
+	var byteString [65]byte
+	var indexLength int
+	for ; indexLength < len(hostnameArray); indexLength++ {
+		if 0 == hostnameArray[indexLength] {
+			break
+		}
+		byteString[indexLength] = uint8(hostnameArray[indexLength])
+	}
+	return string(byteString[:indexLength])
+}
+
+func getHostname() (hostname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
+		return
+	}
+	hostname = fmt.Sprintf("%s", uname.arrayToString(&utsname.Nodename))
+
+	return hostname, nil
+}

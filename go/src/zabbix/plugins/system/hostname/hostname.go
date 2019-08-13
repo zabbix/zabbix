@@ -17,22 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package hostname
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-
-	//	_ "zabbix/plugins/debug/filewatcher"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/debug/trapper"
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/system/hostname"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/sync"
+	"errors"
+	"zabbix/internal/plugin"
 )
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+var impl Plugin
+
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters")
+	}
+	return getHostname()
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "hostname", "system.hostname", "Returns system host name")
+}
