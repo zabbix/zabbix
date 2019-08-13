@@ -49,4 +49,5 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.service", "Checks if service is running and responding to UDP requests")
 	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.service.perf", "Checks performance of UDP service")
 	plugin.RegisterMetric(&impl, "zabbixasync", "sensor", "Hardware sensor reading")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.load", "CPU load")
 }

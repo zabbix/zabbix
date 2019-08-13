@@ -44,6 +44,7 @@ int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -123,6 +124,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "sensor":
 		cfunc = unsafe.Pointer(C.GET_SENSOR)
+	case "system.cpu.load":
+		cfunc = unsafe.Pointer(C.SYSTEM_CPU_LOAD)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
