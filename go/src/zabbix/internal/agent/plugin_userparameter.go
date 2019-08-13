@@ -30,7 +30,6 @@ import (
 	"unicode"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
-	"zabbix/pkg/log"
 )
 
 type parameterInfo struct {
@@ -122,19 +121,19 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 	return string(stdoutStderr), nil
 }
 
-func InitUserParameterPlugin() {
+func InitUserParameterPlugin() error {
 	userParameter.parameters = make(map[string]parameterInfo)
 
 	for i := 0; i < len(Options.UserParameter); i++ {
 		s := strings.SplitN(Options.UserParameter[i], ",", 2)
 
 		if len(s) != 2 {
-			log.Critf("cannot add user parameter \"%s\": not comma-separated", Options.UserParameter[i])
+			return fmt.Errorf("cannot add user parameter \"%s\": not comma-separated", Options.UserParameter[i])
 		}
 
 		key, p, err := itemutil.ParseKey(s[0])
 		if err != nil {
-			log.Critf("cannot add user parameter \"%s\": %s", Options.UserParameter[i], err)
+			return fmt.Errorf("cannot add user parameter \"%s\": %s", Options.UserParameter[i], err)
 		}
 
 		parameter := parameterInfo{cmd: s[1]}
@@ -142,10 +141,12 @@ func InitUserParameterPlugin() {
 		if len(p) == 1 && p[0] == "*" {
 			parameter.flexible = true
 		} else if len(p) != 0 {
-			log.Critf("cannot add user parameter \"%s\": syntax error, parameter must be empty or '[*]'", Options.UserParameter[i])
+			return fmt.Errorf("cannot add user parameter \"%s\": syntax error", Options.UserParameter[i])
 		}
 
 		userParameter.parameters[key] = parameter
 		plugin.RegisterMetric(&userParameter, "userparameter", key, "test")
 	}
+
+	return nil
 }
