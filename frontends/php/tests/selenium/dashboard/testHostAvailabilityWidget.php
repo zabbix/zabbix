@@ -23,7 +23,19 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 /**
  * @backup widget
  */
-class testPageWidgetHostAvailability extends CWebTest {
+class testHostAvailabilityWidget extends CWebTest {
+
+	/*
+	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
+	 * because it can change.
+	 */
+	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name';
+
 
 	public static function getCreateWidgetData() {
 		return [
@@ -98,7 +110,7 @@ class testPageWidgetHostAvailability extends CWebTest {
 	/**
 	 * @dataProvider getCreateWidgetData
 	 */
-	public function testPageWidgetHostAvailability_Create($data) {
+	public function testHostAvailabilityWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -114,7 +126,6 @@ class testPageWidgetHostAvailability extends CWebTest {
 		$header = CTestArrayHelper::get($data['fields'], 'Name', 'Host availability');
 		$dashboard->getWidget($header);
 		$dashboard->save();
-		$this->page->waitUntilReady();
 
 		// Check that Dashboard has been saved and that widget has been added.
 		$this->checkDashboardUpdateMessage();
@@ -206,7 +217,7 @@ class testPageWidgetHostAvailability extends CWebTest {
 	 * @backup widget
 	 * @dataProvider getUpdateWidgetData
 	 */
-	public function testPageWidgetHostAvailability_Update($data) {
+	public function testHostAvailabilityWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference widget')->edit();
@@ -220,7 +231,6 @@ class testPageWidgetHostAvailability extends CWebTest {
 		// Verify that a widget with the corresponding header exists.
 		$dashboard->getWidget($header);
 		$dashboard->save();
-		$this->page->waitUntilReady();
 
 		// Check that Dashboard has been saved and that widget has been added.
 		$this->checkDashboardUpdateMessage();
@@ -229,9 +239,8 @@ class testPageWidgetHostAvailability extends CWebTest {
 		$this->verifyWidgetContent($data, $header);
 	}
 
-	public function testPageWidgetHostAvailability_SimpleUpdate() {
-		$widget_sql = 'SELECT * FROM widget_field wf INNER JOIN widget w ON w.widgetid=wf.widgetid';
-		$initial_values = CDBHelper::getHash($widget_sql);
+	public function testHostAvailabilityWidget_SimpleUpdate() {
+		$initial_values = CDBHelper::getHash($this->sql);
 
 		// Open a dashboard widget and then save it without applying any changes
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
@@ -242,11 +251,10 @@ class testPageWidgetHostAvailability extends CWebTest {
 
 		$dashboard->getWidget('Reference widget');
 		$dashboard->save();
-		$this->page->waitUntilReady();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->checkDashboardUpdateMessage();
-		$this->assertEquals($initial_values, CDBHelper::getHash($widget_sql));
+		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
 	}
 
 
@@ -286,9 +294,8 @@ class testPageWidgetHostAvailability extends CWebTest {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testPageWidgetHostAvailability_Cancel($data) {
-		$sql_hash = 'SELECT * FROM widget_field wf INNER JOIN widget w ON w.widgetid=wf.widgetid';
-		$old_hash = CDBHelper::getHash($sql_hash);
+	public function testHostAvailabilityWidget_Cancel($data) {
+		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one();
@@ -339,10 +346,10 @@ class testPageWidgetHostAvailability extends CWebTest {
 		}
 
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testPageWidgetHostAvailability_Delete() {
+	public function testHostAvailabilityWidget_Delete() {
 		$name = 'Reference widget to delete';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
@@ -355,8 +362,8 @@ class testPageWidgetHostAvailability extends CWebTest {
 		// Check that Dashboard has been saved
 		$this->checkDashboardUpdateMessage();
 		// Confirm that widget is not present on dashboard.
-		$this->assertTrue($dashboard->query('xpath:.//div[@class="dashbrd-grid-widget-head"]/h4[text()='.
-				CXPathHelper::escapeQuotes($class).']')	->count() === 0);
+		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class,"dashbrd-grid-widget-head")]/h4[text()='.
+				CXPathHelper::escapeQuotes($name).']')->count() === 0);
 	}
 
 	private function checkDashboardUpdateMessage() {
