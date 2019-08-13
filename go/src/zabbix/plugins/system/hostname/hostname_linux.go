@@ -42,7 +42,7 @@ func getHostname() (hostname string, err error) {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
 		return
 	}
-	hostname = fmt.Sprintf("%s", uname.arrayToString(&utsname.Nodename))
+	hostname = fmt.Sprintf("%s", arrayToString(&utsname.Nodename))
 
 	return hostname, nil
 }
