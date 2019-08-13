@@ -28,18 +28,20 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'json',
-			'dynamic_hostid' => 'db hosts.hostid',
+			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+		$view_mode = $this->getInput('view_mode');
 
 		if ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-			$return = $this->doGraphPrototype($fields);
+			$return = $this->doGraphPrototype($fields, $view_mode);
 		}
 		elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			$return = $this->doSimpleGraphPrototype($fields);
+			$return = $this->doSimpleGraphPrototype($fields, $view_mode);
 		}
 		else {
 			error(_('Page received incorrect data'));
@@ -52,7 +54,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		echo (new CJson())->encode($return);
 	}
 
-	protected function doGraphPrototype($fields) {
+	protected function doGraphPrototype($fields, $view_mode) {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['name'],
@@ -115,8 +117,8 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'widgetid' => (string) $graphid,
 				'type' => 'graph',
 				'header' => $name,
-				'padding' => true, // unless new CWidgetConfig::getConfiguration() is merged.
-				'fields' => $child_fields
+				'fields' => $child_fields,
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $view_mode)
 			];
 		}
 
@@ -128,7 +130,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		];
 	}
 
-	protected function doSimpleGraphPrototype($fields) {
+	protected function doSimpleGraphPrototype($fields, $view_mode) {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
@@ -194,8 +196,8 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'widgetid' => (string) $itemid,
 				'type' => 'graph',
 				'header' => $name,
-				'padding' => true, // unless new CWidgetConfig::getConfiguration() is merged.
-				'fields' => $child_fields
+				'fields' => $child_fields,
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $view_mode)
 			];
 		}
 

@@ -97,13 +97,11 @@
 		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + _add_class});
 
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container' + _add_class})
-			.toggleClass('no-padding', !widget['padding'])
-		;
+			.toggleClass('no-padding', !widget['configuration']['padding']);
 
 		widget['container']
 			.append(widget['content_header'])
-			.append(widget['content_body'])
-		;
+			.append(widget['content_body']);
 
 		if (widget['iterator']) {
 			widget['container']
@@ -111,22 +109,18 @@
 					.append($('<div>')
 						.html(t('Widget is too small for the specified number of columns and rows.'))
 					)
-				)
-			;
+				);
 		}
 		else {
 			widget['content_script'] = $('<div>');
-			widget['container']
-				.append(widget['content_script'])
-			;
+			widget['container'].append(widget['content_script']);
 		}
 
 		var $div = $('<div>', {
 			'class': widget['iterator'] ? 'dashbrd-grid-iterator' : 'dashbrd-grid-widget'
 		})
 			.toggleClass('dashbrd-grid-widget-hidden-header', widget['view_mode'] == 1)
-			.toggleClass('new-widget', widget['new_widget'])
-		;
+			.toggleClass('new-widget', widget['new_widget']);
 
 		if (!widget['parent']) {
 			$div
@@ -134,8 +128,7 @@
 				.css({
 					'min-height': '' + data['options']['widget-height'] + 'px',
 					'min-width': '' + data['options']['widget-width'] + '%'
-				})
-			;
+				});
 		}
 
 		$div
@@ -144,8 +137,7 @@
 				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
 					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
 				}
-			})
-		;
+			});
 
 		return $div;
 	}
@@ -176,6 +168,28 @@
 
 	function removeWidgetInfoButtons($content_header) {
 		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
+	}
+
+	function setWidgetPadding($obj, data, widget, padding) {
+		if (widget['configuration']['padding'] !== padding) {
+			widget['configuration']['padding'] = padding;
+			widget['container'].toggleClass('no-padding', !padding);
+			doAction('onResizeEnd', $obj, data, widget);
+		}
+	}
+
+	function setWidgetScrollable(widget, scrollable) {
+		widget['configuration']['scrollable'] = scrollable;
+	}
+
+	function applyWidgetConfiguration($obj, data, widget, configuration) {
+		if ('padding' in configuration) {
+			setWidgetPadding($obj, data, widget, configuration['padding']);
+		}
+
+		if ('scrollable' in configuration) {
+			setWidgetScrollable(widget, configuration['scrollable']);
+		}
 	}
 
 	/**
@@ -1368,10 +1382,14 @@
 	}
 
 	function addWidgetOfIterator($obj, data, iterator, child) {
-		// If no fields are given, 'fields' will contain empty array instead of simple object.
-		if (child['fields'].length === 0) {
+		// Replace empty arrays (or anything non-object) with empty objects.
+		if (typeof child['fields'] !== 'object') {
 			child['fields'] = {};
 		}
+		if (typeof child['configuration'] !== 'object') {
+			child['configuration'] = {};
+		}
+
 		child = $.extend({
 			'widgetid': '',
 			'type': '',
@@ -1383,11 +1401,8 @@
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
-			'fields': {},
-			'storage': {},
-			'padding': true
+			'storage': {}
 		}, child, {
-			'rf_rate': 0,
 			'iterator': false,
 			'parent': iterator,
 			'new_widget': false
@@ -1685,7 +1700,7 @@
 			}
 		}
 
-		if (!widget['scrollable']) {
+		if (!widget['configuration']['scrollable']) {
 			// For Internet Explorer 11 to calculate content_body size properly.
 			widget['content_body'].css('overflow', 'hidden');
 		}
@@ -1783,66 +1798,28 @@
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
-		var	url = new Curl('zabbix.php'),
-			fields = $('form', data.dialogue['body']).serializeJSON(),
+		var	fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
-			view_mode = (fields['show_header'] == 1) ? 0 : 1,
-			ajax_data = {
-				type: type,
-				name: name,
-				view_mode: view_mode
-			},
-			pos,
-			$placeholder;
+			view_mode = (fields['show_header'] == 1) ? 0 : 1;
 
 		delete fields['type'];
 		delete fields['name'];
 		delete fields['show_header'];
 
+		// Prepare to call dashboard.widget.check.
+
+		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'dashboard.widget.check');
+
+		var ajax_data = {
+			type: type,
+			name: name,
+			view_mode: view_mode
+		};
 
 		if (Object.keys(fields).length != 0) {
 			ajax_data['fields'] = JSON.stringify(fields);
-		}
-
-		if (widget === null || ('type' in widget) === false) {
-			if (widget && 'pos' in widget) {
-				// Pos contains unused properties left and top for some reason.
-				pos = $.extend({}, data.widget_defaults[type].size, widget.pos);
-
-				$.map(data.widgets, function(box) {
-					return rectOverlap(box.pos, pos) ? box : null;
-				}).each(function(box) {
-					if (!rectOverlap(box.pos, pos)) {
-						return;
-					}
-
-					if (pos.x + pos.width > box.pos.x && pos.x < box.pos.x) {
-						pos.width = box.pos.x - pos.x;
-					}
-					else if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
-						pos.height = box.pos.y - pos.y;
-					}
-				});
-
-				pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
-				pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
-			}
-			else {
-				pos = findEmptyPosition($obj, data, type);
-			}
-
-			$placeholder = $('<div>')
-				.css({
-					position: 'absolute',
-					top: (pos.y * data.options['widget-height']) + 'px',
-					left: (pos.x * data.options['widget-width']) + '%',
-					height: (pos.height * data.options['widget-height']) + 'px',
-					width: (pos.width * data.options['widget-width']) + '%'
-				})
-				.appendTo($obj)
-			;
 		}
 
 		$.ajax({
@@ -1851,109 +1828,159 @@
 			dataType: 'json',
 			data: ajax_data
 		})
-			.done(function(response) {
-				if (typeof response.errors !== 'undefined') {
+			.then(function(response) {
+				if (typeof(response.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(response.errors);
+
+					return $.Deferred().reject();
 				}
 				else {
 					// No errors, proceed with update.
-
 					overlayDialogueDestroy('widgetConfg');
+				}
+			})
+			.then(function() {
+				// Prepare to call dashboard.widget.configure.
 
-					if (widget === null || ('type' in widget) === false) {
-						// In case of ADD widget, create and add widget to the dashboard.
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'dashboard.widget.configure');
 
-						var widget_data = {
-								'type': type,
-								'header': name,
-								'view_mode': view_mode,
-								'pos': pos,
-								'rf_rate': 0,
-								'fields': fields
-							};
+				var ajax_data = {
+					type: type,
+					view_mode: view_mode
+				};
 
-						if (pos['y'] + pos['height'] > data['options']['rows']) {
-							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
+				if (Object.keys(fields).length != 0) {
+					ajax_data['fields'] = JSON.stringify(fields);
+				}
 
-							// Body height should be adjusted to animate scrollTop work.
-							$('body').css('height', Math.max(
-								$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
-							));
-						}
+				return $.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					dataType: 'json',
+					data: ajax_data
+				});
+			})
+			.then(function(response) {
+				var configuration = {};
+				if ('configuration' in response) {
+					configuration = response['configuration'];
+				}
 
-						// 5px shift is widget padding.
-						$('html, body')
-							.animate({scrollTop: pos['y'] * data['options']['widget-height']
-								+ $('.dashbrd-grid-container').position().top - 5})
-							.promise()
-							.then(function() {
-								methods.addWidget.call($obj, widget_data);
+				if (widget === null || ('type' in widget) === false) {
+					// In case of ADD widget, create and add widget to the dashboard.
 
-								// New widget is last element in data['widgets'] array.
-								widget = data['widgets'].slice(-1)[0];
-								updateWidgetContent($obj, data, widget);
-								setWidgetModeEdit($obj, data, widget);
+					var pos;
 
-								// Remove height attribute set for scroll animation.
-								$('body').css('height', '');
-							});
+					if (widget && 'pos' in widget) {
+						pos = $.extend({}, data.widget_defaults[type].size, widget.pos);
+
+						$.map(data.widgets, function(box) {
+							return rectOverlap(box.pos, pos) ? box : null;
+						}).each(function(box) {
+							if (!rectOverlap(box.pos, pos)) {
+								return;
+							}
+
+							if (pos.x + pos.width > box.pos.x && pos.x < box.pos.x) {
+								pos.width = box.pos.x - pos.x;
+							}
+							else if (pos.y + pos.height > box.pos.y && pos.y < box.pos.y) {
+								pos.height = box.pos.y - pos.y;
+							}
+						});
+
+						pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
+						pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
 					}
-					else if (widget['type'] === type) {
-						// In case of EDIT widget, if type has not changed, update the widget.
+					else {
+						pos = findEmptyPosition($obj, data, type);
+					}
 
-						widget['header'] = name;
-						widget['view_mode'] = view_mode;
-						widget['fields'] = fields;
-
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
-						updateWidgetDynamic($obj, data, widget);
-
-						if (widget['iterator']) {
-							updateWidgetContent($obj, data, widget, {
-								'update_policy': 'resize_or_refresh'
-							});
-						}
-						else {
-							updateWidgetContent($obj, data, widget);
-						}
-					} else {
-						// In case of EDIT widget, if type has changed, replace the widget.
-
-						var widget_data = {
+					var widget_data = {
 							'type': type,
 							'header': name,
-							'pos': widget['pos'],
-							'rf_rate': 0,
+							'view_mode': view_mode,
+							'pos': pos,
 							'fields': fields,
-							'new_widget': false
+							'configuration': configuration
 						};
 
-						removeWidget($obj, data, widget);
+					if (pos['y'] + pos['height'] > data['options']['rows']) {
+						resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
 
-						// Disable position/size checking during addWidget call.
-						data['pos-action'] = 'updateWidgetConfig';
-						methods.addWidget.call($obj, widget_data);
-						data['pos-action'] = '';
-
-						// New widget is last element in data['widgets'] array.
-						widget = data['widgets'].slice(-1)[0];
-						updateWidgetContent($obj, data, widget);
-						setWidgetModeEdit($obj, data, widget);
+						// Body height should be adjusted to animate scrollTop work.
+						$('body').css('height', Math.max(
+							$('body').height(), (pos['y'] + pos['height']) * data['options']['widget-height']
+						));
 					}
 
-					// Mark dashboard as updated.
-					data['options']['updated'] = true;
+					// 5px shift is widget padding.
+					$('html, body')
+						.animate({scrollTop: pos['y'] * data['options']['widget-height']
+							+ $('.dashbrd-grid-container').position().top - 5})
+						.promise()
+						.then(function() {
+							methods.addWidget.call($obj, widget_data);
+
+							// New widget is last element in data['widgets'] array.
+							widget = data['widgets'].slice(-1)[0];
+							updateWidgetContent($obj, data, widget);
+							setWidgetModeEdit($obj, data, widget);
+
+							// Remove height attribute set for scroll animation.
+							$('body').css('height', '');
+						});
 				}
-			})
-			.always(function() {
-				if ($placeholder) {
-					$placeholder.remove();
+				else if (widget['type'] === type) {
+					// In case of EDIT widget, if type has not changed, update the widget.
+
+					widget['header'] = name;
+					widget['view_mode'] = view_mode;
+					widget['fields'] = fields;
+					applyWidgetConfiguration($obj, data, widget, configuration);
+					doAction('afterUpdateWidgetConfig', $obj, data, null);
+					updateWidgetDynamic($obj, data, widget);
+
+					if (widget['iterator']) {
+						updateWidgetContent($obj, data, widget, {
+							'update_policy': 'resize_or_refresh'
+						});
+					}
+					else {
+						updateWidgetContent($obj, data, widget);
+					}
+				} else {
+					// In case of EDIT widget, if type has changed, replace the widget.
+
+					removeWidget($obj, data, widget);
+
+					var widget_data = {
+						'type': type,
+						'header': name,
+						'pos': widget['pos'],
+						'fields': fields,
+						'configuration': configuration,
+						'new_widget': false
+					};
+
+					// Disable position/size checking during addWidget call.
+					data['pos-action'] = 'updateWidgetConfig';
+					methods.addWidget.call($obj, widget_data);
+					data['pos-action'] = '';
+
+					// New widget is last element in data['widgets'] array.
+					widget = data['widgets'].slice(-1)[0];
+					updateWidgetContent($obj, data, widget);
+					setWidgetModeEdit($obj, data, widget);
 				}
-			})
-		;
+
+				// Mark dashboard as updated.
+				data['options']['updated'] = true;
+			});
 	}
 
 	function findEmptyPosition($obj, data, type) {
@@ -2718,10 +2745,14 @@
 		},
 
 		addWidget: function(widget) {
-			// If no fields are given, 'fields' will contain empty array instead of simple object.
-			if (widget['fields'].length === 0) {
+			// Replace empty arrays (or anything non-object) with empty objects.
+			if (typeof widget['fields'] !== 'object') {
 				widget['fields'] = {};
 			}
+			if (typeof widget['configuration'] !== 'object') {
+				widget['configuration'] = {};
+			}
+
 			widget = $.extend({
 				'widgetid': '',
 				'type': '',
@@ -2734,17 +2765,13 @@
 					'height': 1
 				},
 				'rf_rate': 0,
-				'scrollable': null,
-				'iterator': null,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_in_progress': false,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
-				'fields': {},
-				'storage': {},
-				'padding': true
+				'storage': {}
 			}, widget, {
 				'parent': false
 			});
@@ -2761,7 +2788,6 @@
 				;
 
 				widget_local['iterator'] = widget_type_defaults['iterator'];
-				widget_local['scrollable'] = widget_type_defaults['scrollable'];
 
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
