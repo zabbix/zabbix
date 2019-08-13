@@ -177,7 +177,11 @@ static int	DBpatch_4030011(void)
 			zbx_lrtrim(token, " \t\r");
 
 			if ('\0' == token[0])
+			{
+				tmp_token = strtok(NULL, ",\n");
+
 				continue;
+			}
 
 			if (id != next_id || 0 != strcmp(row[3], token))
 			{
