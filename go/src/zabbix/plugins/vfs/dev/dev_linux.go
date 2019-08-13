@@ -31,6 +31,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"golang.org/x/sys/unix"
 )
@@ -226,4 +227,31 @@ func (p *Plugin) getDeviceStats(name string) (stats *devStats, err error) {
 		return
 	}
 	return p.scanDeviceStats(name, &buf)
+}
+
+func (p *Plugin) collectDeviceStats(devices map[string]*devUnit) (err error) {
+	var file *os.File
+	if file, err = os.Open(diskstatLocation); err != nil {
+		return
+	}
+
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(file)
+	file.Close()
+	if err != nil {
+		return
+	}
+	now := time.Now()
+
+	for _, dev := range devices {
+		if stats, tmperr := p.getDeviceStats(dev.name); tmperr == nil {
+			stats.clock = now.UnixNano()
+			dev.history[dev.tail] = *stats
+			dev.tail = dev.tail.inc()
+			if dev.tail == dev.head {
+				dev.head = dev.head.inc()
+			}
+		}
+	}
+	return
 }

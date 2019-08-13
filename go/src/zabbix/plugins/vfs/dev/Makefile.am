@@ -10,4 +10,3 @@ clean:
 
 check:
 	go test
-

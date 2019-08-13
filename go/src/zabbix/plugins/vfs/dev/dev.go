@@ -92,7 +92,7 @@ type devStats struct {
 
 type devUnit struct {
 	name       string
-	head, tail int
+	head, tail historyIndex
 	accessed   time.Time
 	history    []devStats
 }
@@ -100,15 +100,35 @@ type devUnit struct {
 var typeParams map[string]int = map[string]int{
 	"":           statTypeSPS,
 	"sps":        statTypeSPS,
+	"ops":        statTypeOPS,
 	"sectors":    statTypeSectors,
 	"operations": statTypeOperations,
 }
 
-var rangeParams map[string]int = map[string]int{
+var rangeParams map[string]historyIndex = map[string]historyIndex{
 	"":      60,
 	"avg1":  60,
 	"avg5":  60 * 5,
 	"avg15": 60 * 15,
+}
+
+func (p *Plugin) Collect() (err error) {
+	now := time.Now()
+	p.mutex.Lock()
+	for key, dev := range p.devices {
+		if now.Sub(dev.accessed) > maxInactivityPeriod {
+			p.Debugf(`removed unused device "%s" disk collector `, dev.name)
+			delete(p.devices, key)
+			continue
+		}
+	}
+	err = p.collectDeviceStats(p.devices)
+	p.mutex.Unlock()
+	return
+}
+
+func (p *Plugin) Period() int {
+	return 1
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -175,7 +195,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("This item is available only in daemon mode.")
 	}
 
-	var statRange int
+	var statRange historyIndex
 	if statRange, ok = rangeParams[rangeParam]; !ok {
 		return nil, errors.New("Invalid third parameter.")
 	}
@@ -185,14 +205,40 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Cannot obtain device name: %s", err)
 	}
 
+	now := time.Now()
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
 	if dev, ok := p.devices[devName]; ok {
-		// TODO: retrieve dev statistics
-		return nil, fmt.Errorf("Not implemented. %v %d %d", *dev, statRange, mode)
+		dev.accessed = now
+		totalnum := dev.tail - dev.head
+		if totalnum < 0 {
+			totalnum += maxHistory
+		}
+		if totalnum < 2 {
+			p.Debugf("no device statistics have been gathered")
+			return
+		}
+		if totalnum < statRange {
+			statRange = totalnum
+		}
+		tail := &dev.history[dev.tail.dec()]
+		head := &dev.history[dev.tail.sub(statRange)]
+
+		var tailio, headio *devIO
+		if mode == ioModeRead {
+			tailio = &tail.rx
+			headio = &head.rx
+		} else {
+			tailio = &tail.tx
+			headio = &head.tx
+		}
+		if statType == statTypeSPS {
+			return float64(tailio.sectors-headio.sectors) * float64(time.Second) / float64(tail.clock-head.clock), nil
+		}
+		return float64(tailio.operations-headio.operations) * float64(time.Second) / float64(tail.clock-head.clock), nil
 	} else {
-		p.devices[devName] = &devUnit{name: devName, accessed: time.Now(), history: make([]devStats, maxHistory)}
+		p.devices[devName] = &devUnit{name: devName, accessed: now, history: make([]devStats, maxHistory)}
 		return
 	}
 }
