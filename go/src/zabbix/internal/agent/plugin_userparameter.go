@@ -20,6 +20,7 @@
 package agent
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -46,33 +47,55 @@ var userParameter UserParameterPlugin
 
 // Export -
 func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	parameter := p.parameters[key]
+	var b bytes.Buffer
 
-	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), parameter.cmd)
+	parameter := p.parameters[key]
+	s := parameter.cmd
+
+	b.Grow(len(s))
+
+	for i := strings.IndexByte(s, '$'); i != -1; i = strings.IndexByte(s, '$') {
+		if len(s) > i+1 && s[i+1] >= '1' && s[i+1] <= '9' && int(s[i+1]-'0') <= len(params) {
+			b.WriteString(s[:i])
+			b.WriteString(params[s[i+1]-'0'-1])
+			s = s[i+2:]
+		} else {
+			b.WriteString(s[:i+1])
+			s = s[i+1:]
+		}
+	}
+
+	if len(s) != 0 {
+		b.WriteString(s)
+	}
+
+	s = b.String()
+
+	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), s)
 
 	cmdCtx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(Options.Timeout))
 	defer cancel()
 
-	cmd := exec.CommandContext(cmdCtx, "sh", "-c", parameter.cmd)
+	cmd := exec.CommandContext(cmdCtx, "sh", "-c", s)
 
 	stdoutStderr, err := cmd.CombinedOutput()
 
 	if err != nil {
 		if cmdCtx.Err() == context.DeadlineExceeded {
-			p.Debugf("Failed to execute command \"%s\": timeout", parameter.cmd)
+			p.Debugf("Failed to execute command \"%s\": timeout", s)
 			return nil, fmt.Errorf("Timeout while executing a shell script.")
 		}
 
 		if len(stdoutStderr) == 0 {
-			p.Debugf("Failed to execute command \"%s\": %s", parameter.cmd, err)
+			p.Debugf("Failed to execute command \"%s\": %s", s, err)
 			return nil, err
 		}
 
-		p.Debugf("Failed to execute command \"%s\": %s", parameter.cmd, string(stdoutStderr))
+		p.Debugf("Failed to execute command \"%s\": %s", s, string(stdoutStderr))
 		return nil, errors.New(string(stdoutStderr))
 	}
 
-	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), parameter.cmd, len(stdoutStderr), string(stdoutStderr))
+	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), s, len(stdoutStderr), string(stdoutStderr))
 
 	return string(stdoutStderr), nil
 }
