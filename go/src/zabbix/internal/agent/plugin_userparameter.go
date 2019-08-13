@@ -116,9 +116,10 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 		return nil, errors.New(string(stdoutStderr))
 	}
 
-	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), s, len(stdoutStderr), string(stdoutStderr))
+	cmdResult := strings.TrimRight(string(stdoutStderr), " \t\r\n")
+	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), s, len(cmdResult), cmdResult)
 
-	return string(stdoutStderr), nil
+	return cmdResult, nil
 }
 
 func InitUserParameterPlugin() error {
@@ -145,7 +146,7 @@ func InitUserParameterPlugin() error {
 		}
 
 		userParameter.parameters[key] = parameter
-		plugin.RegisterMetric(&userParameter, "userparameter", key, "test")
+		plugin.RegisterMetric(&userParameter, "userparameter", key, "")
 	}
 
 	return nil

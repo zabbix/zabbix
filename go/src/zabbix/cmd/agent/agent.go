@@ -240,6 +240,8 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
+	err = agent.InitUserParameterPlugin()
+
 	taskManager := scheduler.NewManager()
 	listener := serverlistener.New(taskManager)
 
@@ -247,10 +249,8 @@ func main() {
 
 	var serverConnectors []*serverconnector.Connector
 
-	err = configDefault(taskManager, &agent.Options)
-
 	if err == nil {
-		err = agent.InitUserParameterPlugin()
+		err = configDefault(taskManager, &agent.Options)
 	}
 
 	if err == nil {
