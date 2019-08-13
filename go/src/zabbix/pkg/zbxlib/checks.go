@@ -42,8 +42,8 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-
-
+int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -115,10 +115,14 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
 	case "net.tcp.port":
 		cfunc = unsafe.Pointer(C.NET_TCP_PORT)
-	case "net.tcp.service":
+	case "net.tcp.service", "net.udp.service":
 		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
-	case "net.tcp.service.perf":
+	case "net.tcp.service.perf", "net.udp.service.perf":
 		cfunc = unsafe.Pointer(C.CHECK_SERVICE_PERF)
+	case "net.udp.listen":
+		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
+	case "sensor":
+		cfunc = unsafe.Pointer(C.GET_SENSOR)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
