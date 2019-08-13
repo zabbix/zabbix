@@ -27,6 +27,7 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"unicode"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
@@ -52,24 +53,45 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 	parameter := p.parameters[key]
 	s := parameter.cmd
 
-	b.Grow(len(s))
+	if parameter.flexible {
+		var n int
 
-	for i := strings.IndexByte(s, '$'); i != -1; i = strings.IndexByte(s, '$') {
-		if len(s) > i+1 && s[i+1] >= '1' && s[i+1] <= '9' && int(s[i+1]-'0') <= len(params) {
-			b.WriteString(s[:i])
-			b.WriteString(params[s[i+1]-'0'-1])
-			s = s[i+2:]
-		} else {
-			b.WriteString(s[:i+1])
-			s = s[i+1:]
+		for i := 0; i < len(params); i++ {
+			n += len(params[i])
 		}
-	}
 
-	if len(s) != 0 {
-		b.WriteString(s)
-	}
+		b.Grow(len(s) + n)
 
-	s = b.String()
+		for i := strings.IndexByte(s, '$'); i != -1; i = strings.IndexByte(s, '$') {
+			if len(s) > i+1 && s[i+1] >= '1' && s[i+1] <= '9' && int(s[i+1]-'0') <= len(params) {
+				p := params[s[i+1]-'0'-1]
+				if Options.UnsafeUserParameters == 0 {
+					if j := strings.IndexAny(p, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
+						if unicode.IsPrint(rune(p[j])) {
+							return nil, fmt.Errorf("Character \"%c\" is not allowed", p[j])
+						} else {
+							return nil, fmt.Errorf("Character 0x%02x is not allowed", p[j])
+						}
+					}
+				}
+
+				b.WriteString(s[:i])
+				b.WriteString(p)
+				s = s[i+2:]
+			} else {
+				b.WriteString(s[:i+1])
+				s = s[i+1:]
+			}
+		}
+
+		if len(s) != 0 {
+			b.WriteString(s)
+		}
+
+		s = b.String()
+	} else if len(params) > 0 {
+		return nil, fmt.Errorf("Parameters are not allowed.")
+	}
 
 	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), s)
 
