@@ -34,6 +34,7 @@ int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -93,6 +94,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.PROC_MEM)
 	case "proc.num":
 		cfunc = unsafe.Pointer(C.PROC_NUM)
+	case "system.boottime":
+		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
 	}
