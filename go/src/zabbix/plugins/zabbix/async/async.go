@@ -37,4 +37,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.localtime", "Returns system local time")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.boottime", "Returns system boot time")
 }
