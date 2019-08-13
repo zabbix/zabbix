@@ -41,4 +41,8 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.get", "Get content of web page")
 	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.perf", "Loading time of full web page (in seconds)")
 	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.regexp", "Find string on a web page")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.listen", "Checks if this TCP port is in LISTEN state")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.port", "Checks if it is possible to make TCP connection to specified port")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.service", "Checks if service is running and accepting TCP connections")
+	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.service.perf", "Checks performance of TCP service")
 }
