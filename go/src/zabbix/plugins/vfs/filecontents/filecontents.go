@@ -30,9 +30,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"time"
 	"unsafe"
-	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/std"
 )
@@ -62,22 +60,33 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	}
 
 	inlen := len(inbuf)
-	outlen := 4 * inlen
-	locbuf := make([]byte, outlen)
+	outbuffer := []byte{}
 	inbytes := C.size_t(inlen)
-	inptr := &inbuf[0]
-	outbytes := C.size_t(outlen)
-	outptr := &locbuf[0]
+	outbytes := C.size_t(inlen)
+	ret := -1
+	wr := 0
+	sz := inlen
 
-	for inbytes > 0 {
-		C.call_iconv(cd,
+	for ret == -1 && int(inbytes) != 0 {
+		inptr := &inbuf[inlen-int(inbytes)]
+		tmp := make([]byte, sz)
+		copy(tmp[:wr], outbuffer)
+		outptr := &tmp[wr]
+		outbytes = C.size_t(inlen)
+
+		ret = int(C.call_iconv(cd,
 			(*C.char)(unsafe.Pointer(inptr)), &inbytes,
-			(*C.char)(unsafe.Pointer(outptr)), &outbytes)
-		outptr = &locbuf[C.size_t(outlen)-outbytes]
+			(*C.char)(unsafe.Pointer(outptr)), &outbytes))
+
+		wr += inlen - int(outbytes)
+		sz = wr + inlen
+
+		outbuffer = tmp
 	}
 
 	C.iconv_close(cd)
-	return locbuf[:outlen-int(outbytes)]
+	return outbuffer[:wr]
+
 }
 
 // Export -
@@ -86,7 +95,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if len(params) != 1 && len(params) != 2 {
 		return nil, errors.New("Wrong number of parameters")
 	}
-	start := time.Now()
 
 	var encoder string
 
@@ -111,19 +119,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	defer file.Close()
 
-	buf := make([]byte, filelen)
-
-	bnum, err = file.Read(buf)
-
-	outbuf := decode(encoder, buf)
-
-	elapsed := time.Since(start)
-	if elapsed.Seconds() > float64(agent.Options.Timeout) {
-		return nil, errors.New("Timeout while processing item")
+	buf := bytes.Buffer{}
+	if _, err = buf.ReadFrom(file); err != nil {
+		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
-	if err != nil {
-		return nil, errors.New("Cannot read from file")
-	}
+
+	outbuf := decode(encoder, buf.Bytes())
 
 	return string(bytes.TrimRight(outbuf, "\n\r")), nil
 
