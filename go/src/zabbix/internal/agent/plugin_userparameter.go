@@ -32,6 +32,8 @@ import (
 	"zabbix/pkg/itemutil"
 )
 
+const maxExecuteOutputLen = 512 * 1024
+
 type parameterInfo struct {
 	cmd      string
 	flexible bool
@@ -114,6 +116,10 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 
 		p.Debugf("Failed to execute command \"%s\": %s", s, string(stdoutStderr))
 		return nil, errors.New(string(stdoutStderr))
+	}
+
+	if maxExecuteOutputLen <= len(stdoutStderr) {
+		return nil, fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLen/1024)
 	}
 
 	cmdResult := strings.TrimRight(string(stdoutStderr), " \t\r\n")
