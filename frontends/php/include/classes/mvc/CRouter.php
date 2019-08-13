@@ -64,6 +64,7 @@ class CRouter {
 		'dashboard.delete'				=> ['CControllerDashboardDelete',			null,					null],
 		'dashboard.widget.edit'			=> ['CControllerDashboardWidgetEdit',		'layout.json',			'monitoring.dashboard.widget.edit'],
 		'dashboard.widget.check'		=> ['CControllerDashboardWidgetCheck',		'layout.json',			null],
+		'dashboard.widget.configure'	=> ['CControllerDashboardWidgetConfigure',	'layout.json',			null],
 		'dashboard.widget.rfrate'		=> ['CControllerDashboardWidgetRfRate',		'layout.json',			null],
 		'dashboard.properties.check'	=> ['CControllerDashboardPropertiesCheck',	'layout.json',			null],
 		'dashboard.properties.edit'		=> ['CControllerDashboardPropertiesEdit',	'layout.json',			'dashboard.properties.edit'],
