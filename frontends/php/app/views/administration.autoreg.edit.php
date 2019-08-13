@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/administration.general.autoregconfig.js.php';
+$this->includeJSfile('app/views/administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Auto registration'))
@@ -27,7 +27,10 @@ $widget = (new CWidget())
 		(new CForm())
 			->cleanItems()
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.autoregconfig.php'))
+				->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
+					->setArgument('action', 'autoreg.edit')
+					->getUrl()
+				))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -66,11 +69,11 @@ $autoreg_view = (new CTabView())
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $autoreg_form = (new CForm())
+	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'autoreg.update')->getUrl())
 	->setAttribute('id', 'autoregconfig_form')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem($autoreg_view);
 
-$widget->addItem($autoreg_form);
+$widget->addItem($autoreg_form)->show();
 
-return $widget;

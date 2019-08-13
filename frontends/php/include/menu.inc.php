@@ -240,7 +240,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'url' => 'adm.gui.php',
 					'label' => _('General'),
 					'sub_pages' => [
-						'adm.autoregconfig.php',
 						'adm.housekeeper.php',
 						'adm.images.php',
 						'adm.iconmapping.php',
@@ -251,7 +250,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 						'adm.triggerseverities.php',
 						'adm.triggerdisplayoptions.php',
 						'adm.other.php'
-					]
+					],
+					'active_if' => ['autoreg.edit']
 				],
 				[
 					'url' => 'zabbix.php',
