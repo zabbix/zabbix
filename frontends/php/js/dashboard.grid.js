@@ -1116,7 +1116,6 @@
 				;
 			},
 			resize: function(event, ui) {
-				console.log(data);
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
 				if (SF) {
 					$.each(data['widgets'], function() {
@@ -1339,8 +1338,7 @@
 
 		var $placeholders = iterator['content_body'].find('.dashbrd-grid-iterator-placeholder'),
 			num_columns = numIteratorColumns(iterator),
-			num_rows = numIteratorRows(iterator)
-		;
+			num_rows = numIteratorRows(iterator);
 
 		for (var index = 0, count = num_columns * num_rows; index < count; index++) {
 			var cell_column = index % num_columns,
@@ -1358,8 +1356,7 @@
 					top: (y * data['options']['widget-height']) + 'px',
 					width: (width / pos['width'] * 100) + '%',
 					height: (height * data['options']['widget-height']) + 'px'
-				}
-			;
+				};
 
 			if (index < iterator['children'].length) {
 				iterator['children'][index]['div'].css(css);
@@ -1387,7 +1384,8 @@
 			'initial_load': true,
 			'ready': false,
 			'fields': {},
-			'storage': {}
+			'storage': {},
+			'padding': true
 		}, child, {
 			'rf_rate': 0,
 			'iterator': false,
@@ -1404,6 +1402,20 @@
 		iterator['children'].push(child);
 
 		showPreloader(child);
+	}
+
+	function hasEqualProperties(object_1, object_2) {
+		if (Object.keys(object_1).length !== Object.keys(object_2).length) {
+			return false;
+		}
+
+		for (var key in object_1) {
+			if (object_1[key] !== object_2[key]) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1426,7 +1438,6 @@
 
 			if (typeof response.messages !== 'undefined') {
 				iterator['div'].addClass('iterator-messages');
-
 				iterator['content_body'].append(response.messages);
 			}
 			else {
@@ -1447,7 +1458,7 @@
 				current_children_by_widgetid[child['widgetid']] = child;
 			}
 			else {
-				// Child widgets without "uniqueid" are never persisted.
+				// Child widgets without 'uniqueid' are never persisted.
 				removeWidget($obj, data, child);
 			}
 		});
@@ -1455,12 +1466,14 @@
 		var reused_widgetids = [];
 		response.children.slice(0, numIteratorColumns(iterator) * numIteratorRows(iterator))
 			.forEach(function(child) {
-				if (typeof child['widgetid'] !== 'undefined' && current_children_by_widgetid[child['widgetid']]) {
+				if (typeof child['widgetid'] !== 'undefined' && current_children_by_widgetid[child['widgetid']]
+						&& hasEqualProperties(child['fields'], current_children_by_widgetid[child['widgetid']]['fields'])) {
+
+					// Reuse widget, if it has 'widgetid' supplied, has exactly the same fields and fields data.
 					// Please note, that the order of widgets inside of iterator['content_body'] is not important,
 					// since the absolute positioning is done based on widget order in the iterator['children'].
 
 					iterator['children'].push(current_children_by_widgetid[child['widgetid']]);
-
 					reused_widgetids.push(child['widgetid']);
 				}
 				else {
@@ -1484,15 +1497,46 @@
 		);
 
 		iterator['children'].forEach(function(child) {
-			// 1. New child widgets MUST be initialized regardless of options['prevent_update'].
-			// 2. Existing child widgets are updated if not prevented.
+			/* Possible update policies for the child widgets:
+				resize: execute 'onResizeEnd' action (widget won't update if trigger's not defined or size not changed).
+				refresh: either execute 'timer_refresh' action or updateWidgetContent.
+				resize_or_refresh: either execute 'onResizeEnd' or 'timer_refresh' action, or updateWidgetContent.
+			*/
 
-			if ($.inArray(child['widgetid'], reused_widgetids) === -1 || !options['prevent_timer_refresh']) {
-				if (!doAction('timer_refresh', $obj, data, child)) {
-					// No refresh triggers for widget => update the conventional way.
+			var update_policy = 'refresh';
 
-					updateWidgetContent($obj, data, child);
-				}
+			if ($.inArray(child['widgetid'], reused_widgetids) !== -1 && 'update_policy' in options) {
+				// Allow to override update_policy only for existing (not new) widgets.
+				update_policy = options['update_policy'];
+			}
+
+			var success = false;
+			switch (update_policy) {
+				case 'resize':
+				case 'resize_or_refresh':
+					var size_old = child['content_size'],
+						size_new = getWidgetContentSize(child);
+
+					if (!isEqualContentSize(size_old, size_new)) {
+						success = doAction('onResizeEnd', $obj, data, child);
+						child['content_size'] = size_new;
+					}
+					if (update_policy === 'resize') {
+						success = true;
+					}
+					if (success) {
+						break;
+					}
+					// No break here.
+
+				case 'refresh':
+					success = doAction('timer_refresh', $obj, data, child);
+					break;
+			}
+
+			if (!success) {
+				// No triggers executed for the widget, therefore update the conventional way.
+				updateWidgetContent($obj, data, child);
 			}
 		});
 	}
@@ -1599,28 +1643,13 @@
 		};
 	}
 
-	function saveWidgetContentSize(widget) {
-		console.log('saveWidgetContentSize');
-
-		widget['content_size'] = getWidgetContentSize(widget);
-	}
-
-	function hasWidgetContentSizeChanged(widget) {
-		if (typeof widget['content_size'] === 'undefined') {
-			console.log('hasWidgetContentSizeChanged:true');
-			return true;
+	function isEqualContentSize(size_1, size_2) {
+		if (typeof size_1 === 'undefined' || typeof size_2 === 'undefined') {
+			return false;
 		}
 
-		var content_size = getWidgetContentSize(widget);
-
-		var x = (widget['content_size']['content_width'] != content_size['content_width']
-			|| widget['content_size']['content_height'] != content_size['content_height']
-		);
-		console.log('hasWidgetContentSizeChanged:' + (x ? 'true' : 'false'));
-
-		return (widget['content_size']['content_width'] != content_size['content_width']
-			|| widget['content_size']['content_height'] != content_size['content_height']
-		);
+		return size_1['content_width'] === size_2['content_width']
+			&& size_1['content_height'] === size_2['content_height'];
 	}
 
 	function updateWidgetContent($obj, data, widget, options) {
@@ -1632,7 +1661,7 @@
 			return;
 		}
 
-		if (widget['update_paused'] == true) {
+		if (widget['update_paused']) {
 			setUpdateWidgetContentTimer($obj, data, widget);
 
 			return;
@@ -1675,8 +1704,10 @@
 			'view_mode': widget['view_mode']
 		};
 
+		widget['content_size'] = getWidgetContentSize(widget);
+
 		if (!widget['iterator']) {
-			$.extend(ajax_data, getWidgetContentSize(widget));
+			$.extend(ajax_data, widget['content_size']);
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1842,8 +1873,7 @@
 								'pos': pos,
 								'rf_rate': 0,
 								'fields': fields
-							}
-						;
+							};
 
 						if (pos['y'] + pos['height'] > data['options']['rows']) {
 							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
@@ -1869,8 +1899,7 @@
 
 								// Remove height attribute set for scroll animation.
 								$('body').css('height', '');
-							})
-						;
+							});
 					}
 					else if (widget['type'] === type) {
 						// In case of EDIT widget, if type has not changed, update the widget.
@@ -1881,7 +1910,15 @@
 
 						doAction('afterUpdateWidgetConfig', $obj, data, null);
 						updateWidgetDynamic($obj, data, widget);
-						updateWidgetContent($obj, data, widget);
+
+						if (widget['iterator']) {
+							updateWidgetContent($obj, data, widget, {
+								'update_policy': 'resize_or_refresh'
+							});
+						}
+						else {
+							updateWidgetContent($obj, data, widget);
+						}
 					} else {
 						// In case of EDIT widget, if type has changed, replace the widget.
 
@@ -1891,7 +1928,7 @@
 							'pos': widget['pos'],
 							'rf_rate': 0,
 							'fields': fields,
-							'new_widget': false,
+							'new_widget': false
 						};
 
 						removeWidget($obj, data, widget);
@@ -2097,7 +2134,7 @@
 			 * Unset if dimension width/height is equal to size of placeholder.
 			 * Widget default size will be used.
 			 */
-			if (dimension.width == 1 && dimension.height == 2) {
+			if (dimension.width == 2 && dimension.height == 2) {
 				delete dimension.width;
 				delete dimension.height;
 			}
@@ -2160,34 +2197,45 @@
 					return;
 				}
 
-				var o = data.options,
-					offset = $obj.offset(),
-					y = Math.min(o['max-rows'] - 1,
-							Math.max(0, Math.floor((event.pageY - offset.top) / o['widget-height']))
+				var offset = $obj.offset(),
+					y = Math.min(data.options['max-rows'] - 1,
+							Math.max(0, Math.floor((event.pageY - offset.top) / data.options['widget-height']))
 						),
-					x = Math.min(o['max-columns'] - 1,
+					x = Math.min(data.options['max-columns'] - 1,
 							Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
 						),
-					pos = {
-						y: y,
-						x: x,
-						height: o['widget-min-rows'],
-						width: 1
-					},
 					overlap = false;
+
+				if (isNaN(x) || isNaN(y)) {
+					return;
+				}
+
+				var	pos = {
+					x: x,
+					y: y,
+					width: (x < data.options['max-columns'] - 1) ? 1 : 2,
+					height: data.options['widget-min-rows']
+				};
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
-						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: Math.min(y, data.add_widget_dimension.y), left: x});
+						data.add_widget_dimension.left = x;
+						data.add_widget_dimension.top = Math.min(y, data.add_widget_dimension.y);
 					}
 
 					pos = {
-						x: Math.min(x, data.add_widget_dimension.left),
+						x: Math.min(x, (data.add_widget_dimension.left < x)
+							? data.add_widget_dimension.x
+							: data.add_widget_dimension.left
+						),
 						y: Math.min(y, (data.add_widget_dimension.top < y)
 							? data.add_widget_dimension.y
 							: data.add_widget_dimension.top
 						),
-						width: Math.abs(data.add_widget_dimension.left - x) + 1,
+						width: Math.max(1, (data.add_widget_dimension.left < x)
+							? x - data.add_widget_dimension.left + 1
+							: data.add_widget_dimension.left - x + 1
+						),
 						height: Math.max(2, (data.add_widget_dimension.top < y)
 							? y - data.add_widget_dimension.top + 1
 							: data.add_widget_dimension.top - y + 2
@@ -2205,37 +2253,63 @@
 					}
 				}
 				else {
-					if (rectOverlap(data.add_widget_dimension, {x: x, y: y, width: 1, height: 1})) {
-						return;
+
+					if ((pos.x + pos.width) > data.options['max-columns']) {
+						pos.x = data.options['max-columns'] - pos.width;
+					}
+					else if (data.add_widget_dimension.x < pos.x) {
+						--pos.x;
 					}
 
-					if ((pos.y + pos.height) > data['options']['max-rows']) {
-						pos.y = data['options']['max-rows'] - pos.height;
+					if ((pos.y + pos.height) > data.options['max-rows']) {
+						pos.y = data.options['max-rows'] - pos.height;
 					}
 					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 
-					$.each(data.widgets, function(_, box) {
-						overlap |= rectOverlap(box.pos, pos);
-
-						return !overlap;
-					});
-
 					/**
 					 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
 					 * slot.
 					 */
-					if (overlap && pos.y > 0) {
-						overlap = false;
-						--pos.y;
+					var delta_check = [
+						[0, 0, 2],
+						[-1, 0, 2],
+						[0, 0, 1],
+						[0, -1, 2],
+						[0, -1, 1]
+					];
 
-						$.each(data.widgets, function(_, box) {
-							overlap |= rectOverlap(box.pos, pos);
-
-							return !overlap;
+					$.each(delta_check, function(i, val) {
+						var c_pos = $.extend({}, {
+							x: Math.max(0, (val[2] < 2 ? x : pos.x) + val[0]),
+							y: Math.max(0, pos.y + val[1]),
+							width: val[2],
+							height: pos.height
 						});
-					}
+
+						if (x > c_pos.x + 1) {
+							++c_pos.x;
+						}
+
+						overlap = false;
+						if (rectOverlap({
+							x: 0,
+							y: 0,
+							width: data.options['max-columns'],
+							height: data.options['max-rows']
+						}, c_pos)) {
+							$.each(data.widgets, function(_, box) {
+								overlap |= rectOverlap(box.pos, c_pos);
+								return !overlap;
+							});
+						}
+
+						if (!overlap) {
+							pos = c_pos;
+							return false;
+						}
+					});
 
 					if (overlap) {
 						data.add_widget_dimension = {};
@@ -2244,7 +2318,7 @@
 					}
 				}
 
-				if ((pos.y + pos.height) > data['options']['rows']) {
+				if ((pos.y + pos.height) > data.options['rows']) {
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
 
@@ -2253,10 +2327,10 @@
 				data.new_widget_placeholder.container
 					.css({
 						position: 'absolute',
-						top: (data.add_widget_dimension.y * o['widget-height']) + 'px',
-						left: (data.add_widget_dimension.x * o['widget-width']) + '%',
-						height: (data.add_widget_dimension.height * o['widget-height']) + 'px',
-						width: (data.add_widget_dimension.width * o['widget-width']) + '%'
+						top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
+						left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
+						height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
+						width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
 					})
 					.show();
 
@@ -2421,29 +2495,13 @@
 	}
 
 	function onIteratorResizeEnd($obj, data, iterator) {
-		console.log(1);
 		if (getIteratorTooSmallState(iterator)) {
 			return;
 		}
 
-		// 1. Ensure that the child widgets are still current; replace if otherwise.
-		// 2. When complete, call the onResizeEnd trigger for the child widgets.
-
 		updateWidgetContent($obj, data, iterator, {
-			'prevent_timer_refresh': true
-		})
-			.done(function() {
-				// On successful request.
-
-				iterator['children'].forEach(function(child) {
-					// If not resizing OR if resizing and the size of the child has actually changed.
-					if (data['pos-action'] === '' || hasWidgetContentSizeChanged(child)) {
-						doAction('onResizeEnd', $obj, data, child);
-						saveWidgetContentSize(child);
-					}
-				});
-			})
-		;
+			'update_policy': 'resize'
+		});
 	}
 
 	/**
@@ -2545,8 +2603,6 @@
 			var default_options = {
 				'widget-height': 70,
 				'widget-min-rows': 2,
-				'max-rows': 64,
-				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
 				'editable': true,
@@ -2605,11 +2661,12 @@
 				var resize_delay,
 					resize_handler = function () {
 						data.widgets.each(function(widget) {
-							console.log('onResizeEnd?');
-							if (hasWidgetContentSizeChanged(widget)) {
+							var size_old = widget['content_size'],
+								size_new = getWidgetContentSize(widget);
+
+							if (!isEqualContentSize(size_old, size_new)) {
 								doAction('onResizeEnd', $this, data, widget);
-								console.log('tiešām?');
-								saveWidgetContentSize(widget);
+								widget['content_size'] = size_new;
 							}
 						});
 					};
@@ -2679,7 +2736,6 @@
 				'rf_rate': 0,
 				'scrollable': null,
 				'iterator': null,
-				'padding': null,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
 				'update_in_progress': false,
@@ -2688,9 +2744,9 @@
 				'ready': false,
 				'fields': {},
 				'storage': {},
-				'padding': true,
+				'padding': true
 			}, widget, {
-				'parent': false,
+				'parent': false
 			});
 
 			if (typeof widget['new_widget'] === 'undefined') {

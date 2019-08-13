@@ -72,6 +72,15 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 			$this->fields[$field_graph_prototype->getName()] = $field_graph_prototype;
 		}
 
+		// Show legend checkbox.
+		$field_legend = (new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1);
+
+		if (array_key_exists('show_legend', $this->data)) {
+			$field_legend->setValue($this->data['show_legend']);
+		}
+
+		$this->fields[$field_legend->getName()] = $field_legend;
+
 		// Dynamic item.
 		$field_dynamic = (new CWidgetFieldCheckBox('dynamic', _('Dynamic item')))->setDefault(WIDGET_SIMPLE_ITEM);
 

@@ -56,6 +56,9 @@ if (array_key_exists('itemid', $fields)) {
 	$scripts[] = $field_itemid->getPostJS();
 }
 
+// Show legend.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend']));
+
 // Dynamic item.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
 

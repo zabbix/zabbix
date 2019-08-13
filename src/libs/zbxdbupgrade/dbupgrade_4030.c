@@ -165,6 +165,13 @@ static int	DBpatch_4030014(void)
 	return DBadd_field("widget", &field);
 }
 
+static int	DBpatch_4030015(void)
+{
+	if (ZBX_DB_OK > DBexecute("update widget set x=x*2, width=width*2"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4030)
@@ -186,5 +193,6 @@ DBPATCH_ADD(4030011, 0, 1)
 DBPATCH_ADD(4030012, 0, 1)
 DBPATCH_ADD(4030013, 0, 1)
 DBPATCH_ADD(4030014, 0, 1)
+DBPATCH_ADD(4030015, 0, 1)
 
 DBPATCH_END()

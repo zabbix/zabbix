@@ -33,7 +33,7 @@ else {
 			->setId($data['graph']['containerid'])
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_GRAPH_LINK)
 		)
-		->addClass('flickerfreescreen ')
+		->addClass('flickerfreescreen')
 		->setAttribute('data-timestamp', $data['graph']['timestamp'])
 		->setId('flickerfreescreen_'.$data['graph']['dataid']);
 
@@ -43,47 +43,47 @@ else {
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
-if ($data['widget']['initial_load'] == 1) {
-	$script .=
-		'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
-			'function zbx_graph_widget_resize_end(img_id) {'.
-				'var img = jQuery("#"+img_id),'.
-					'content = img.closest(".dashbrd-grid-widget-content"),'.
-					'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
-					'src = img.attr("src");'.
-					'timeControl.objectList[img_id]["objDims"].width = Math.floor(content.width());'.
+	if ($data['widget']['initial_load'] == 1) {
+		$script .=
+			'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
+				'function zbx_graph_widget_resize_end(img_id) {'.
+					'var img = jQuery("#"+img_id),'.
+						'content = img.closest(".dashbrd-grid-widget-content"),'.
+						'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
+						'src = img.attr("src");'.
+						'timeControl.objectList[img_id]["objDims"].width = Math.floor(content.width());'.
 
-				'if (typeof src === "undefined") {'.
-					'return;'.
+					'if (typeof src === "undefined") {'.
+						'return;'.
+					'}'.
+
+					'var img_url = new Curl(src);'.
+					'content.css("overflow", "hidden");'.
+					'img_url.setArgument("width", Math.floor(content.width()));'.
+					'img_url.setArgument("height", Math.floor(content.height()));'.
+					'img_url.setArgument("_", (new Date).getTime().toString(34));'.
+					'content.css("overflow", "");'.
+					'img.attr("src", img_url.getUrl());'.
 				'}'.
-
-				'var img_url = new Curl(src);'.
-				'content.css("overflow", "hidden");'.
-				'img_url.setArgument("width", Math.floor(content.width()));'.
-				'img_url.setArgument("height", Math.floor(content.height()));'.
-				'img_url.setArgument("_", (new Date).getTime().toString(34));'.
-				'content.css("overflow", "");'.
-				'img.attr("src", img_url.getUrl());'.
 			'}'.
-		'}'.
 
-		'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
-			'function zbx_graph_widget_timer_refresh(img_id) {'.
-				'timeControl.refreshObject(img_id);'.
+			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
+				'function zbx_graph_widget_timer_refresh(img_id) {'.
+					'timeControl.refreshObject(img_id);'.
+				'}'.
 			'}'.
-		'}'.
 
-		'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd", '.
-			'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
-				'parameters: ["'.$data['graph']['dataid'].'"],'.
-				'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
-			'});'.
+			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onResizeEnd", '.
+				'"zbx_graph_widget_resize_end", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'"],'.
+					'trigger_name: "graph_widget_resize_end_'.$data['widget']['uniqueid'].'"'.
+				'});'.
 
-		'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "timer_refresh", '.
-			'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
-				'parameters: ["'.$data['graph']['dataid'].'"],'.
-				'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
-			'});';
+			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "timer_refresh", '.
+				'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'"],'.
+					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
+				'});';
 	}
 
 	$output = [

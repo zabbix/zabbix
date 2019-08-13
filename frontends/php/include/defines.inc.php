@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0alpha2');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',	4030015);
+define('ZABBIX_DB_VERSION',		4030015);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -776,7 +776,7 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 

@@ -38,7 +38,7 @@ body {
   color: #1f2c33;
   background-color: #ebeef0;
   margin-bottom: 60px;
-  min-width: 950px;
+  min-width: 1200px;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 75%; }
 
@@ -5106,6 +5106,11 @@ table.preprocessing-test-results .rel-container {
 .dashbrd-grid-iterator:hover .dashbrd-grid-widget-head.iterator,
 .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-widget-head.iterator {
 	display: block;
+}
+
+.dashbrd-grid-widget-content.iterator {
+	/* to catch vertical resize events correctly */
+	height: 100%;
 }
 
 .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-widget-content.iterator {

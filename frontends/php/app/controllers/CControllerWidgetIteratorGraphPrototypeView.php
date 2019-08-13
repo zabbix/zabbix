@@ -36,10 +36,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$fields = $this->getForm()->getFieldsData();
 
 		if ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-			$return = $this->doGraphPrototype();
-		} elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			$return = $this->doSimpleGraphPrototype();
-		} else {
+			$return = $this->doGraphPrototype($fields);
+		}
+		elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			$return = $this->doSimpleGraphPrototype($fields);
+		}
+		else {
 			error(_('Page received incorrect data'));
 		}
 
@@ -50,9 +52,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		echo (new CJson())->encode($return);
 	}
 
-	protected function doGraphPrototype() {
-		$fields = $this->getForm()->getFieldsData();
-
+	protected function doGraphPrototype($fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['name'],
@@ -105,14 +105,18 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$children = [];
 
 		foreach ($graphs_collected as $graphid => $name) {
+			$child_fields = [
+				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
+				'graphid' => $graphid,
+				'show_legend' => $fields['show_legend']
+			];
+
 			$children[] = [
 				'widgetid' => (string) $graphid,
 				'type' => 'graph',
 				'header' => $name,
-				'fields' => [
-					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
-					'graphid' => $graphid,
-				]
+				'padding' => true, // unless new CWidgetConfig::getConfiguration() is merged.
+				'fields' => $child_fields
 			];
 		}
 
@@ -124,9 +128,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		];
 	}
 
-	protected function doSimpleGraphPrototype() {
-		$fields = $this->getForm()->getFieldsData();
-
+	protected function doSimpleGraphPrototype($fields) {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
@@ -182,14 +184,18 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$children = [];
 
 		foreach ($items_collected as $itemid => $name) {
+			$child_fields = [
+				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
+				'itemid' => $itemid,
+				'show_legend' => $fields['show_legend']
+			];
+
 			$children[] = [
 				'widgetid' => (string) $itemid,
 				'type' => 'graph',
 				'header' => $name,
-				'fields' => [
-					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
-					'itemid' => $itemid,
-				]
+				'padding' => true, // unless new CWidgetConfig::getConfiguration() is merged.
+				'fields' => $child_fields
 			];
 		}
 
