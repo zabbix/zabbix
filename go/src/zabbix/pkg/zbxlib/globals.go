@@ -103,6 +103,11 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 {
 	return FAIL;
 }
+
+int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
+{
+	return SYSINFO_RET_FAIL;
+}
 */
 import "C"
 
