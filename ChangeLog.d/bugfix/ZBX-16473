@@ -1,0 +1,1 @@
+........S. [ZBX-16473] fixed server-proxy synchronization and pre-preprocessing issues with items that are monitored by server even when their hosts are monitored by proxies (wiper)
