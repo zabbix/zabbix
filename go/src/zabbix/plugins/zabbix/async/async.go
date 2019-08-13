@@ -38,4 +38,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.localtime", "Returns system local time")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.boottime", "Returns system boot time")
+	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.get", "Get content of web page")
+	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.perf", "Loading time of full web page (in seconds)")
+	plugin.RegisterMetric(&impl, "zabbixasync", "web.page.regexp", "Find string on a web page")
 }
