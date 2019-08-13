@@ -32,7 +32,7 @@ class CCheckboxListElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getCheckboxes() {
-		return $this->query('xpath://input[@type="checkbox"]')->asCheckbox()->all();
+		return $this->query('xpath:.//input[@type="checkbox"]')->asCheckbox()->all();
 	}
 
 	/**
@@ -134,5 +134,35 @@ class CCheckboxListElement extends CElement {
 		$this->set(array_diff($this->getLabels()->asText(), $labels), false);
 
 		return $this->set($labels, true);
+	}
+
+	/**
+	 * Get checkbox labels with checked state.
+	 *
+	 * @return array
+	 */
+	public function getValue() {
+		$values = [];
+		foreach ($this->getCheckboxes() as $checkbox) {
+			if (!$checkbox->isChecked()) {
+				continue;
+			}
+
+			$label = $checkbox->getText();
+			if ($label === null) {
+				throw new Exception('Failed to get checkbox label name');
+			}
+
+			$values[] = $label;
+		}
+
+		return $values;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return (($this->query('xpath:.//input[@type="checkbox"][not(@disabled)]')->count() > 0) === $enabled);
 	}
 }

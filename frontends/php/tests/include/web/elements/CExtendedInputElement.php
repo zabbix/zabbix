@@ -23,12 +23,12 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Range control element.
+ * Extended input element.
  */
-class CRangeControlElement extends CElement {
+class CExtendedInputElement extends CElement {
 
 	/**
-	 * Get range control input field.
+	 * Get extended input field.
 	 *
 	 * @return type
 	 */
@@ -37,7 +37,7 @@ class CRangeControlElement extends CElement {
 	}
 
 	/**
-	 * Select range control value.
+	 * Select extended input value.
 	 *
 	 * @inheritdoc
 	 */
@@ -48,7 +48,7 @@ class CRangeControlElement extends CElement {
 	}
 
 	/**
-	 * Overwrite range control value.
+	 * Overwrite extended input value.
 	 *
 	 * @inheritdoc
 	 */
@@ -56,5 +56,24 @@ class CRangeControlElement extends CElement {
 		$this->getInput()->overwrite($text);
 
 		return $this;
+	}
+
+	/**
+	 * Alias for getValue.
+	 * @see self::getValue
+	 *
+	 * @return string
+	 */
+	public function getText() {
+		return $this->getValue();
+	}
+
+	/**
+	 * Get value of ExtendedInput element.
+	 *
+	 * @return string
+	 */
+	public function getValue() {
+		return $this->query('xpath:./input')->one()->getValue();
 	}
 }

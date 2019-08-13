@@ -161,6 +161,9 @@ class CElement extends CBaseElement implements IWaitable {
 		if ($type !== null) {
 			$selector .= '::'.CXPathHelper::fromSelector($type, $locator);
 		}
+		else {
+			$selector .= '::*';
+		}
 
 		return $this->query($selector);
 	}
@@ -430,6 +433,41 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function isEnabled($enabled = true) {
+		if (parent::isEnabled() !== $enabled) {
+			return !$enabled;
+		}
+
+		$classes = explode(' ', parent::getAttribute('class'));
+		if ((!array_intersect(['disabled', 'readonly'], $classes)) !== $enabled) {
+			return !$enabled;
+		}
+
+		if ((parent::getAttribute('readonly') === null) !== $enabled) {
+			return !$enabled;
+		}
+
+		return $enabled;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function click($force = false) {
+		try {
+			return parent::click();
+		} catch (UnrecognizedExceptionException $exception) {
+			if (!$force) {
+				throw $exception;
+			}
+
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getReadyCondition() {
 		return $this->getClickableCondition();
 	}
@@ -514,8 +552,12 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asCheckboxList($options);
 		}
 
-		if (in_array('range-control', $class)) {
-			return $this->asRangeControl($options);
+		if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
+			return $this->asExtendedInput($options);
+		}
+
+		if (in_array('input-color-picker', $class)) {
+			return $this->asColorPicker($options);
 		}
 
 		if (in_array('multilineinput-control', $class)) {

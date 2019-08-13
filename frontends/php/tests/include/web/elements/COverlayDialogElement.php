@@ -106,6 +106,16 @@ class COverlayDialogElement extends CElement {
 	}
 
 	/**
+	 * Cancel overlay dialog submit.
+	 *
+	 * @return $this
+	 */
+	public function cancel() {
+		$this->query('button:Cancel')->one()->click();
+		return $this->waitUntilNotPresent();
+	}
+
+	/**
 	 * Close overlay dialog.
 	 *
 	 * @return $this

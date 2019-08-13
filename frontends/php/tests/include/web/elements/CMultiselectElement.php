@@ -140,7 +140,7 @@ class CMultiselectElement extends CElement {
 	 * @return COverlayDialogElement
 	 */
 	public function edit($context = null) {
-		$this->query('xpath:.//div[@class="multiselect-button"]/button')->one()->click();
+		$this->query('xpath:.//button')->one()->click();
 
 		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
 	}
@@ -180,5 +180,26 @@ class CMultiselectElement extends CElement {
 		}
 
 		return $this->selectMultiple($labels, $context);
+	}
+
+	/**
+	 * Alias for getSelected.
+	 * @see self::getSelected
+	 *
+	 * @return array
+	 */
+	public function getValue() {
+		return $this->getSelected();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		if (parent::isEnabled() !== $enabled) {
+			return false;
+		}
+
+		return $this->query('xpath:.//button')->one()->isEnabled($enabled);
 	}
 }

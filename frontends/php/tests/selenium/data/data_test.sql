@@ -2090,3 +2090,44 @@ INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES 
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
 
+-- Dashboard for graph widget
+INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (102, 'Dashboard for graph widgets', 1, 1);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (103, 102, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (104, 102, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+-- widget "Test cases for simple update and deletion"
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90000, 104, 0, 'ds.axisy.0', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90001, 104, 0, 'ds.fill.0', 3, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90002, 104, 0, 'ds.missingdatafunc.0', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90003, 104, 0, 'ds.transparency.0', 5, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90004, 104, 0, 'ds.type.0', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90005, 104, 0, 'ds.width.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 104, 0, 'righty', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90007, 104, 1, 'ds.color.0', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 104, 1, 'ds.hosts.0.0', 0, 'Host*');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90009, 104, 1, 'ds.items.0.0', 0, 'Available memory');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90010, 104, 1, 'ds.timeshift.0', 0, '');
+-- widget "Test cases for update"
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90011, 103, 0, 'ds.axisy.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90012, 103, 0, 'ds.pointsize.0', 4, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90013, 103, 0, 'ds.transparency.0', 6, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90014, 103, 0, 'ds.type.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90015, 103, 0, 'graph_time', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90016, 103, 0, 'lefty', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90017, 103, 0, 'legend_lines', 2, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90018, 103, 0, 'or.pointsize.0', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90019, 103, 0, 'righty_units', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90020, 103, 0, 'severities', 0, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90021, 103, 0, 'show_problems', 1, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90022, 103, 0, 'source', 2, '');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90023, 103, 1, 'ds.color.0', 0, 'FF465C');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90024, 103, 1, 'ds.hosts.0.0', 0, 'update host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90025, 103, 1, 'ds.items.0.0', 0, 'update item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90026, 103, 1, 'ds.timeshift.0', 0, '1m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90027, 103, 1, 'or.hosts.0.0', 0, 'override host');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90028, 103, 1, 'or.items.0.0', 0, 'override item');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90029, 103, 1, 'problemhosts.0', 0, 'ЗАББИКС Сервер');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90030, 103, 1, 'righty_max', 0, '5');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90031, 103, 1, 'righty_min', 0, '-2');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90032, 103, 1, 'righty_static_units', 0, 'KB');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90033, 103, 1, 'time_from', 0, 'now-10m');
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90034, 103, 1, 'time_to', 0, 'now-5m');

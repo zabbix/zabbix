@@ -70,17 +70,6 @@ class CMultilineElement extends CElement {
 	}
 
 	/**
-	 * Fill Multiline input element with data.
-	 *
-	 * @param $text    text to be written into the field
-	 *
-	 * @return $this
-	 */
-	public function fill($text) {
-		return $this->overwrite($text);
-	}
-
-	/**
 	 * Overwrite value in Multiline input.
 	 *
 	 * @param $text    text to be written into the field

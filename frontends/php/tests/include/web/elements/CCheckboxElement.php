@@ -101,4 +101,14 @@ class CCheckboxElement extends CElement {
 	public function fill($checked) {
 		return $this->set($checked);
 	}
+
+	/**
+	 * Alias for isChecked.
+	 * @see self::isChecked
+	 *
+	 * @return boolean
+	 */
+	public function getValue() {
+		return $this->isChecked();
+	}
 }

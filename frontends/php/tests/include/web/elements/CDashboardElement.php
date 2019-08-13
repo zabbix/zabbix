@@ -132,7 +132,7 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-cancel')->one()->click();
+			$controls->query('id:dashbrd-cancel')->one()->click(true);
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 
@@ -149,7 +149,7 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashbrd-save')->one()->click();
+			$controls->query('id:dashbrd-save')->one()->click(true);
 			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
 		}
 
