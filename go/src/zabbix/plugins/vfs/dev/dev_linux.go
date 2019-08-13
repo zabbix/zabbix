@@ -178,38 +178,45 @@ func (p *Plugin) scanDeviceStats(name string, buf *bytes.Buffer) (devstats *devS
 		if match, err = p.matchDiskstatFields(name, rdev, fields); err != nil {
 			return
 		}
-		var rxop, rxsec, txop, txsec int
-		if match != diskstatMatchNone {
-			if len(fields) >= 14 {
-				rxop, rxsec, txop, txsec = 3, 5, 7, 9
-			} else {
-				rxop, rxsec, txop, txsec = 3, 4, 5, 6
-			}
-			var n uint64
-			if n, err = strconv.ParseUint(fields[rxop], 10, 64); err != nil {
-				return
-			}
-			stats.rx.operations += n
-
-			if n, err = strconv.ParseUint(fields[rxsec], 10, 64); err != nil {
-				return
-			}
-			stats.rx.sectors += n
-
-			if n, err = strconv.ParseUint(fields[txop], 10, 64); err != nil {
-				return
-			}
-			stats.tx.operations += n
-
-			if n, err = strconv.ParseUint(fields[txsec], 10, 64); err != nil {
-				return
-			}
-			stats.tx.sectors += n
-
+		if match == diskstatMatchNone {
+			continue
+		}
+		if match == diskstatMatchSingle {
+			// 'reset' devstats, as it might contain some information from matching device numbers
+			var tmpstats devStats
+			devstats = &tmpstats
+		} else {
 			devstats = &stats
-			if match == diskstatMatchSingle {
-				return
-			}
+		}
+		var rxop, rxsec, txop, txsec int
+		if len(fields) >= 14 {
+			rxop, rxsec, txop, txsec = 3, 5, 7, 9
+		} else {
+			rxop, rxsec, txop, txsec = 3, 4, 5, 6
+		}
+		var n uint64
+		if n, err = strconv.ParseUint(fields[rxop], 10, 64); err != nil {
+			return
+		}
+		devstats.rx.operations += n
+
+		if n, err = strconv.ParseUint(fields[rxsec], 10, 64); err != nil {
+			return
+		}
+		devstats.rx.sectors += n
+
+		if n, err = strconv.ParseUint(fields[txop], 10, 64); err != nil {
+			return
+		}
+		devstats.tx.operations += n
+
+		if n, err = strconv.ParseUint(fields[txsec], 10, 64); err != nil {
+			return
+		}
+		devstats.tx.sectors += n
+
+		if match == diskstatMatchSingle {
+			return
 		}
 	}
 	return
