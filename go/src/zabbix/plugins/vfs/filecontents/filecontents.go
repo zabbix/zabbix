@@ -30,6 +30,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"syscall"
 	"unsafe"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/std"
@@ -68,15 +69,24 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	sz := inlen
 
 	for ret == -1 && int(inbytes) != 0 {
+		var errno syscall.Errno
+
 		inptr := &inbuf[inlen-int(inbytes)]
 		tmp := make([]byte, sz)
 		copy(tmp[:wr], outbuffer)
 		outptr := &tmp[wr]
 		outbytes = C.size_t(inlen)
 
-		ret = int(C.call_iconv(cd,
+		cret, err := C.call_iconv(cd,
 			(*C.char)(unsafe.Pointer(inptr)), &inbytes,
-			(*C.char)(unsafe.Pointer(outptr)), &outbytes))
+			(*C.char)(unsafe.Pointer(outptr)), &outbytes)
+		ret = int(cret)
+
+		if err != nil {
+			if errno = err.(syscall.Errno); errno != syscall.E2BIG {
+				break
+			}
+		}
 
 		wr += inlen - int(outbytes)
 		sz = wr + inlen
