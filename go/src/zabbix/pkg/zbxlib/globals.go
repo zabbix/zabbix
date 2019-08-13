@@ -37,6 +37,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxregexp/libzbxregexp.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/libzbxagentsysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/common/libcommonsysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/simple/libsimplesysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspecsysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxexec/libzbxexec.a
@@ -87,7 +88,6 @@ const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
-ZBX_METRIC	parameters_simple[] = {NULL};
 
 void zbx_on_exit(int ret)
 {

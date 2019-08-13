@@ -38,6 +38,10 @@ int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 
 
@@ -107,6 +111,14 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.WEB_PAGE_PERF)
 	case "web.page.regexp":
 		cfunc = unsafe.Pointer(C.WEB_PAGE_REGEXP)
+	case "net.tcp.listen":
+		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
+	case "net.tcp.port":
+		cfunc = unsafe.Pointer(C.NET_TCP_PORT)
+	case "net.tcp.service":
+		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
+	case "net.tcp.service.perf":
+		cfunc = unsafe.Pointer(C.CHECK_SERVICE_PERF)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
