@@ -51,4 +51,5 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "sensor", "Hardware sensor reading")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.load", "CPU load")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.num", "Number of CPUs")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.switches", "Count of context switches")
 }
