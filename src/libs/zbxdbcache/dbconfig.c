@@ -11785,8 +11785,12 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 			proxy_hostid = 0;
 		}
-		else if (0 == (proxy_hostid = dc_host->proxy_hostid))
+		else if (0 == (proxy_hostid = dc_host->proxy_hostid) ||
+				SUCCEED == is_item_processed_by_server(dc_item->type, dc_item->key))
+		{
 			dc_requeue_item_at(dc_item, dc_host, nextcheck);
+			proxy_hostid = 0;
+		}
 
 		if (NULL != proxy_hostids)
 			proxy_hostids[i] = proxy_hostid;
