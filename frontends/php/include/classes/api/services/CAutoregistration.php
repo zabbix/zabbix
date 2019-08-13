@@ -36,7 +36,7 @@ class CAutoregistration extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options) {
+	public function get(array $options) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'output' =>			['type' => API_OUTPUT, 'in' => implode(',',
 				['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND],
@@ -108,7 +108,7 @@ class CAutoregistration extends CApiService {
 	 *
 	 * @return true if no errors
 	 */
-	public function update($autoreg) {
+	public function update(array $autoreg) {
 		$db_autoreg = $this->get(['preservekeys' => true]);
 		reset($db_autoreg);
 		$autoreg['autoreg_tlsid'] = key($db_autoreg);
