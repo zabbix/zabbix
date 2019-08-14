@@ -62,6 +62,7 @@ int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -177,6 +178,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.VFS_FILE_MD5SUM)
 	case "vfs.file.regmatch":
 		cfunc = unsafe.Pointer(C.VFS_FILE_REGMATCH)
+	case "vfs.file.size":
+		cfunc = unsafe.Pointer(C.VFS_FILE_SIZE)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
