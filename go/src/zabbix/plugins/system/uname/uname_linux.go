@@ -47,3 +47,14 @@ func getUname() (uname string, err error) {
 
 	return uname, nil
 }
+
+func getHostname() (hostname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
+		return
+	}
+	hostname = fmt.Sprintf("%s", arrayToString(&utsname.Nodename))
+
+	return hostname, nil
+}

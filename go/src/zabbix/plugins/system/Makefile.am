@@ -2,5 +2,4 @@
 
 SUBDIRS = \
 	uptime \
-	uname \
-	hostname
+	uname
