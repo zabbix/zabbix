@@ -49,9 +49,7 @@ class CWidgetFormGraph extends CWidgetForm {
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
 				->setFilterParameter('numeric', true) // For filtering items.
-				->setFilterParameter('with_simple_graph_items', true) // For groups and hosts selection.
-			;
-
+				->setFilterParameter('with_simple_graph_items', true); // For groups and hosts selection.
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
 			}
@@ -62,8 +60,7 @@ class CWidgetFormGraph extends CWidgetForm {
 			// Select graph field.
 			$field_graph = (new CWidgetFieldMultiselectGraph('graphid', _('Graph')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false)
-			;
+				->setMultiple(false);
 
 			if (array_key_exists('graphid', $this->data)) {
 				$field_graph->setValue($this->data['graphid']);

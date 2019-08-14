@@ -125,7 +125,9 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'Widget is too small for the specified number of columns and rows.' =>
+			_('Widget is too small for the specified number of columns and rows.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

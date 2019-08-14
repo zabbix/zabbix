@@ -307,21 +307,18 @@ class CHost extends CHostGeneral {
 
 			if ($options['with_items'] !== null) {
 				$where_and =
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
-				;
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]);
 			}
 			elseif ($options['with_monitored_items'] !== null) {
 				$where_and =
 					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
-					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE])
-				;
+					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]);
 			}
 			elseif ($options['with_simple_graph_items'] !== null) {
 				$where_and =
 					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]).
-					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-				;
+					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 
 			$sqlParts['where'][] = 'EXISTS ('.
@@ -329,23 +326,20 @@ class CHost extends CHostGeneral {
 				' FROM items i'.
 				' WHERE h.hostid=i.hostid'.
 					$where_and.
-				')'
-			;
+				')';
 		}
 
 		// with_item_prototypes, with_simple_graph_item_prototypes
 		if ($options['with_item_prototypes'] !== null || $options['with_simple_graph_item_prototypes'] !== null) {
 			if ($options['with_item_prototypes'] !== null) {
 				$where_and =
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
-				;
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]);
 			}
 			elseif ($options['with_simple_graph_item_prototypes'] !== null) {
 				$where_and =
 					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
 					' AND '.dbConditionInt('i.status', [ITEM_STATUS_ACTIVE]).
-					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-				;
+					' AND '.dbConditionInt('i.value_type', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 
 			$sqlParts['where'][] = 'EXISTS ('.
@@ -353,8 +347,7 @@ class CHost extends CHostGeneral {
 				' FROM items i'.
 				' WHERE h.hostid=i.hostid'.
 					$where_and.
-				')'
-			;
+				')';
 		}
 
 		// with_triggers, with_monitored_triggers
@@ -403,8 +396,7 @@ class CHost extends CHostGeneral {
 					' AND i.itemid=gi.itemid '.
 					' AND gi.graphid=g.graphid'.
 					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
-				')'
-			;
+				')';
 		}
 
 		// with_graph_prototypes
@@ -416,8 +408,7 @@ class CHost extends CHostGeneral {
 					' AND i.itemid=gi.itemid '.
 					' AND gi.graphid=g.graphid'.
 					' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-				')'
-			;
+				')';
 		}
 
 		// with applications

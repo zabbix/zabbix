@@ -49,8 +49,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
 				->setFilterParameter('numeric', true) // For filtering item prototypes.
-				->setFilterParameter('with_simple_graph_item_prototypes', true) // For groups and hosts selection.
-			;
+				->setFilterParameter('with_simple_graph_item_prototypes', true); // For groups and hosts selection.
 
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item_prototype->setValue($this->data['itemid']);
@@ -62,8 +61,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 			// Select graph prototype field.
 			$field_graph_prototype = (new CWidgetFieldMultiselectGraphPrototype('graphid', _('Graph prototype')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false)
-			;
+				->setMultiple(false);
 
 			if (array_key_exists('graphid', $this->data)) {
 				$field_graph_prototype->setValue($this->data['graphid']);

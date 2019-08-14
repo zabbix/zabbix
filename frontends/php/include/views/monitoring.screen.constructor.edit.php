@@ -107,7 +107,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 		$graphs = API::Graph()->get([
 			'output' => ['name'],
 			'selectHosts' => ['name'],
-			'graphids' => $resourceId,
+			'graphids' => $resourceId
 		]);
 
 		if ($graphs) {
@@ -139,7 +139,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'srcfld1' => 'graphid',
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
+					'dstfld1' => 'resourceid'
 				], $this->data['screen']['templateid'] ? [
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid']
@@ -164,7 +164,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		$graph_prototypes = API::GraphPrototype()->get([
 			'output' => ['name'],
 			'selectHosts' => ['name'],
-			'graphids' => $resourceId,
+			'graphids' => $resourceId
 		]);
 
 		if ($graph_prototypes) {
@@ -196,12 +196,12 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 					'srcfld1' => 'graphid',
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid',
+					'dstfld1' => 'resourceid'
 				], $this->data['screen']['templateid'] ? [
 					'templated_hosts' => '1',
 					'only_hostid' => $data['screen']['templateid']
 				] : [
-					'real_hosts' => '1',
+					'real_hosts' => '1'
 				]),
 			]
 		]))

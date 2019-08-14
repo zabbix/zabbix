@@ -41,6 +41,8 @@
 		;
 
 		if (!widget['parent']) {
+			// Do not add action buttons for child widgets of iterators.
+
 			widget['content_header'].append(
 				$('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
 					.append((data['options']['editable'] && !data['options']['kioskmode'])
@@ -126,8 +128,8 @@
 			$div
 				.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
 				.css({
-					'min-height': '' + data['options']['widget-height'] + 'px',
-					'min-width': '' + data['options']['widget-width'] + '%'
+					'min-height': data['options']['widget-height'] + 'px',
+					'min-width': data['options']['widget-width'] + '%'
 				});
 		}
 
@@ -254,6 +256,7 @@
 		;
 
 		if (widget['iterator'] && data['pos-action'] === 'resize') {
+			// 0.49 refers to pixels in the following calculations.
 			var place_w = Math.round($div.width() / cell_w - 0.49),
 				place_h = Math.round($div.height() / cell_h - 0.49),
 				place_x = $div.hasClass('resizing-left')
@@ -934,7 +937,6 @@
 
 			data.widgets.each(function(box) {
 				if (widget.uniqueid !== box.uniqueid) {
-					// Align children of Iterator if size changed.
 					if (box['iterator']) {
 						var box_pos = calcDivPosition($obj, data, box['div']);
 						if (box_pos['width'] !== box['current_pos']['width']
@@ -1151,8 +1153,10 @@
 
 				if (widget['iterator']) {
 					if (getIteratorTooSmallState(widget)) {
+						// Stop aligning size of iterator to the dashboard grid.
 						$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr('style');
 					} else {
+						// Align size of iterator to the dashboard grid.
 						$('.dashbrd-grid-widget-container.iterator', widget['div']).css({
 							'width': data['placeholder'].width(),
 							'height': data['placeholder'].height()
@@ -1260,6 +1264,9 @@
 		}
 
 		hidePreloader(widget);
+
+		// Stop animations and set to visible state.
+		// Do not use .show(), nor .fadeTo(0, 1) here, since these set display: block, which will break css rules.
 		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
@@ -1268,7 +1275,6 @@
 
 		if (widget['update_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
-
 			return;
 		}
 
@@ -1283,12 +1289,10 @@
 
 				if (!active.length && !doAction('timer_refresh', $obj, data, widget)) {
 					// No active popup or hintbox AND no triggers executed => update now.
-
 					updateWidgetContent($obj, data, widget);
 				}
 				else {
 					// Active popup or hintbox OR triggers executed => just setup the next cycle.
-
 					setUpdateWidgetContentTimer($obj, data, widget);
 				}
 			}, rf_rate * 1000);
@@ -1298,7 +1302,6 @@
 	function clearUpdateWidgetContentTimer(widget) {
 		if (typeof widget['rf_timeoutid'] !== 'undefined') {
 			clearTimeout(widget['rf_timeoutid']);
-
 			delete widget['rf_timeoutid'];
 		}
 	}
@@ -1319,8 +1322,9 @@
 		return iterator['fields']['rows'] ? iterator['fields']['rows'] : 1;
 	}
 
-	function isIteratorTooSmall(iterator, pos) {
-		return pos['width'] < numIteratorColumns(iterator) || pos['height'] < numIteratorRows(iterator) * 2;
+	function isIteratorTooSmall($obj, data, iterator, pos) {
+		return pos['width'] < numIteratorColumns(iterator)
+			|| pos['height'] < numIteratorRows(iterator) * data['options']['widget-min-rows'];
 	}
 
 	function addIteratorPlaceholders(iterator, count) {
@@ -1334,7 +1338,7 @@
 	}
 
 	function alignIteratorContents($obj, data, iterator, pos) {
-		if (isIteratorTooSmall(iterator, pos)) {
+		if (isIteratorTooSmall($obj, data, iterator, pos)) {
 			setIteratorTooSmallState(iterator, true);
 
 			return;
@@ -1463,8 +1467,7 @@
 		}
 
 		var current_children = iterator['children'],
-			current_children_by_widgetid = {}
-		;
+			current_children_by_widgetid = {};
 
 		iterator['children'] = [];
 
@@ -1624,8 +1627,7 @@
 			var children = widget['parent']['children'],
 				children_not_ready = children.filter(function(widget) {
 					return !widget['ready'];
-				})
-			;
+				});
 
 			if (!children_not_ready.length) {
 				// Set parent iterator to ready state.
@@ -1642,8 +1644,8 @@
 
 		if (check_dashboard_ready) {
 			var widgets_not_ready = data['widgets'].filter(function(widget) {
-				return !widget['ready'];
-			})
+					return !widget['ready'];
+				});
 
 			if (!widgets_not_ready.length) {
 				doAction('onDashboardReady', $obj, data, null);
@@ -1672,20 +1674,18 @@
 
 		if (widget['update_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
-
 			return;
 		}
 
 		if (widget['update_paused']) {
 			setUpdateWidgetContentTimer($obj, data, widget);
-
 			return;
 		}
 
 		if (widget['iterator']) {
 			var pos = (typeof widget['current_pos'] === 'object') ? widget['current_pos'] : widget['pos'];
 
-			if (isIteratorTooSmall(widget, pos)) {
+			if (isIteratorTooSmall($obj, data, widget, pos)) {
 				clearIterator($obj, data, widget);
 
 				stopPreloader(widget);
@@ -1705,19 +1705,17 @@
 			widget['content_body'].css('overflow', 'hidden');
 		}
 
-		var url = new Curl('zabbix.php'),
-			ajax_data;
-
+		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
-		ajax_data = {
-			'dashboardid': data['dashboard']['id'],
-			'uniqueid': widget['uniqueid'],
-			'initial_load': widget['initial_load'] ? 1 : 0,
-			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
-			'storage': widget['storage'],
-			'view_mode': widget['view_mode']
-		};
+		var ajax_data = {
+				'dashboardid': data['dashboard']['id'],
+				'uniqueid': widget['uniqueid'],
+				'initial_load': widget['initial_load'] ? 1 : 0,
+				'edit_mode': data['options']['edit_mode'] ? 1 : 0,
+				'storage': widget['storage'],
+				'view_mode': widget['view_mode']
+			};
 
 		widget['content_size'] = getWidgetContentSize(widget);
 
@@ -1779,7 +1777,6 @@
 
 				if (!widget['parent']) {
 					// Iterator child widgets are excluded here.
-
 					setUpdateWidgetContentTimer($obj, data, widget);
 				}
 
@@ -1791,7 +1788,6 @@
 				// TODO: gentle message about failed update of widget content
 
 				widget['update_in_progress'] = false;
-
 				setUpdateWidgetContentTimer($obj, data, widget, 3);
 			})
 		;
@@ -1813,10 +1809,10 @@
 		url.setArgument('action', 'dashboard.widget.check');
 
 		var ajax_data = {
-			type: type,
-			name: name,
-			view_mode: view_mode
-		};
+				type: type,
+				name: name,
+				view_mode: view_mode
+			};
 
 		if (Object.keys(fields).length != 0) {
 			ajax_data['fields'] = JSON.stringify(fields);
@@ -1849,9 +1845,9 @@
 				url.setArgument('action', 'dashboard.widget.configure');
 
 				var ajax_data = {
-					type: type,
-					view_mode: view_mode
-				};
+						type: type,
+						view_mode: view_mode
+					};
 
 				if (Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
@@ -1959,13 +1955,13 @@
 					removeWidget($obj, data, widget);
 
 					var widget_data = {
-						'type': type,
-						'header': name,
-						'pos': widget['pos'],
-						'fields': fields,
-						'configuration': configuration,
-						'new_widget': false
-					};
+							'type': type,
+							'header': name,
+							'pos': widget['pos'],
+							'fields': fields,
+							'configuration': configuration,
+							'new_widget': false
+						};
 
 					// Disable position/size checking during addWidget call.
 					data['pos-action'] = 'updateWidgetConfig';
@@ -1985,11 +1981,11 @@
 
 	function findEmptyPosition($obj, data, type) {
 		var pos = {
-			'x': 0,
-			'y': 0,
-			'width': data['widget_defaults'][type]['size']['width'],
-			'height': data['widget_defaults'][type]['size']['height']
-		}
+				'x': 0,
+				'y': 0,
+				'width': data['widget_defaults'][type]['size']['width'],
+				'height': data['widget_defaults'][type]['size']['height']
+			};
 
 		// Go y by row and try to position widget in each space.
 		var	max_col = data['options']['max-columns'] - pos['width'],
@@ -2784,8 +2780,7 @@
 				var	$this = $(this),
 					data = $this.data('dashboardGrid'),
 					widget_local = JSON.parse(JSON.stringify(widget)),
-					widget_type_defaults = data['widget_defaults'][widget_local['type']]
-				;
+					widget_type_defaults = data['widget_defaults'][widget_local['type']];
 
 				widget_local['iterator'] = widget_type_defaults['iterator'];
 

@@ -126,7 +126,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'header' =>
 				$this->getInput('name', $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name']),
 
-			'children' => array_slice($children, 2)
+			'children' => $children
 		];
 	}
 

@@ -74,8 +74,7 @@ class CWidgetHelper {
 	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
 		$form_list
 			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
-			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows))
-		;
+			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows));
 	}
 
 	/**
@@ -198,13 +197,13 @@ class CWidgetHelper {
 
 		if ($field instanceof CWidgetFieldMultiselect) {
 			$field_name .= ($field->isMultiple() ? '[]' : '');
-		} else {
+		}
+		else {
 			$field_name .= '[]';
 		}
 
 		return (new CLabel($field->getLabel(), $field_name.'_ms'))
-			->setAsteriskMark(self::isAriaRequired($field))
-		;
+			->setAsteriskMark(self::isAriaRequired($field));
 	}
 
 	/**
@@ -232,7 +231,6 @@ class CWidgetHelper {
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(self::isAriaRequired($field));
-		;
 	}
 
 	/**
