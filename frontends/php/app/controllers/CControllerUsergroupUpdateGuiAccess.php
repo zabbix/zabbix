@@ -23,7 +23,10 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usergroupids' => 'required|array_db usrgrp.usrgrpid'
+			'usrgrpids' => 'required|array_db usrgrp.usrgrpid',
+			'gui_access' => 'required| in ' . implode(',', [
+				GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED
+			])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,28 +44,35 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 		}
 
 		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usergroupids'),
+			'usrgrpids' => $this->getInput('usrgrpids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($usergroup_ctn == count($this->getInput('usergroupids')));
+		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
 	}
 
 	protected function doAction() {
 
-		$result = true;
+		$user_groups = [];
 
+		foreach ($this->getInput('usrgrpids', []) as $usrgrpid) {
+			$user_groups[] = [
+				'usrgrpid' => $usrgrpid,
+				'gui_access' => $this->getInput('gui_access')
+			];
+		}
+
+		$result = (bool) API::UserGroup()->update($user_groups);
 		$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
 
-		$disabled = count($this->getInput('usergroupids'));
-
 		if ($result) {
-			$response->setMessageOk(_n('.. disabled', '..s disabled', $disabled));
+			$response->setMessageOk(_('Frontend access updated'));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete ..', 'Cannot delete ..s', $disabled));
+			$response->setMessageError(_('Cannot update frontend access'));
 		}
+
 		$this->setResponse($response);
 	}
 

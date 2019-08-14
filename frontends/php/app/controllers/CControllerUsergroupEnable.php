@@ -23,7 +23,7 @@ class CControllerUsergroupEnable extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usergroupids' => 'required|array_db usrgrp.usrgrpid'
+			'usrgrpids' => 'required|array_db usrgrp.usrgrpid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,27 +41,37 @@ class CControllerUsergroupEnable extends CController {
 		}
 
 		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usergroupids'),
+			'usrgrpids' => $this->getInput('usrgrpids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($usergroup_ctn == count($this->getInput('usergroupids')));
+		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
 	}
 
 	protected function doAction() {
 
-		$result = true;
+		$user_groups = [];
+		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
+			$user_groups[] = [
+				'usrgrpid' => $usrgrpid,
+				'users_status' => GROUP_STATUS_ENABLED
+			];
+		}
+		$result = (bool) API::UserGroup()->update($user_groups);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 
-		$disabled = count($this->getInput('usergroupids'));
-
+		$number = count($user_groups);
 		if ($result) {
-			$response->setMessageOk(_n('.. disabled', '..s disabled', $disabled));
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_n('User group enabled', 'User groups enabled', $number));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete ..', 'Cannot delete ..s', $disabled));
+			$response->setMessageError(_n('Cannot enable user group', 'Cannot enable user groups', $number));
 		}
 		$this->setResponse($response);
 	}

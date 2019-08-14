@@ -23,7 +23,7 @@ class CControllerUsergroupDisableDebug extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usergroupids' => 'required|array_db usrgrp.usrgrpid'
+			'usrgrpids' => 'required|array_db usrgrp.usrgrpid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,27 +41,37 @@ class CControllerUsergroupDisableDebug extends CController {
 		}
 
 		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usergroupids'),
+			'usrgrpids' => $this->getInput('usrgrpids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($usergroup_ctn == count($this->getInput('usergroupids')));
+		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
 	}
 
 	protected function doAction() {
 
-		$result = true;
+		$user_groups = [];
+		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
+			$user_groups[] = [
+				'usrgrpid' => $usrgrpid,
+				'debug_mode' => GROUP_DEBUG_MODE_DISABLED
+			];
+		}
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
+		$result = (bool) API::UserGroup()->update($user_groups);
 
-		$disabled = count($this->getInput('usergroupids'));
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 
 		if ($result) {
-			$response->setMessageOk(_n('.. disabled', '..s disabled', $disabled));
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_('Debug mode updated'));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete ..', 'Cannot delete ..s', $disabled));
+			$response->setMessageError(_('Cannot update debug mode'));
 		}
 		$this->setResponse($response);
 	}

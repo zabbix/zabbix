@@ -23,7 +23,7 @@ class CControllerUsergroupDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usergroupids' => 'required|array_db usrgrp.usrgrpid'
+			'usrgrpids' => 'required|array_db usrgrp.usrgrpid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,27 +41,31 @@ class CControllerUsergroupDelete extends CController {
 		}
 
 		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usergroupids'),
+			'usrgrpids' => $this->getInput('usrgrpids'),
 			'countOutput' => true,
 			'editable' => true
 		]);
 
-		return ($usergroup_ctn == count($this->getInput('usergroupids')));
+		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
 	}
 
 	protected function doAction() {
+		$result = API::UserGroup()->delete($this->getInput('usrgrpids'));
 
-		$result = true;
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 
-		$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
+		$deleted = count($this->getInput('usrgrpids'));
 
-		$deleted = count($this->getInput('usergroupids'));
-
+		$number = count($result['usrgrpids']);
 		if ($result) {
-			$response->setMessageOk(_n('.. deleted', '..s deleted', $deleted));
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_n('Group deleted', 'Groups deleted', $number));
 		}
 		else {
-			$response->setMessageError(_n('Cannot delete ..', 'Cannot delete ..s', $deleted));
+			$response->setMessageError(_n('Cannot delete group', 'Cannot delete groups', $number));
 		}
 		$this->setResponse($response);
 	}
