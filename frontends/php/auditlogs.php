@@ -162,7 +162,6 @@ while ($audit = DBfetch($dbAudit)) {
 	$data['actions'][$audit['auditid']] = $audit;
 }
 if (!empty($data['actions'])) {
-	order_result($data['actions'], 'auditid', ZBX_SORT_DOWN);
 	order_result($data['actions'], 'clock', ZBX_SORT_DOWN);
 }
 
