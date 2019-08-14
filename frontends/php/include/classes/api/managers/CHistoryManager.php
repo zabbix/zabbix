@@ -236,8 +236,8 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Returns the history value of the item at the given time. If no value exists at the given time, the function
-	 * will return the previous value.
+	 * Returns the history data of the item at the given time. If no data exists at the given time, the function will
+	 * return the previous data.
 	 *
 	 * The $item parameter must have the value_type and itemid properties set.
 	 *
@@ -247,7 +247,7 @@ class CHistoryManager {
 	 * @param int    $clock
 	 * @param int    $ns
 	 *
-	 * @return string|null  Value at specified time of first value before specified time. null if value is not found.
+	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	public function getValueAt(array $item, $clock, $ns) {
 		switch (self::getDataSourceType($item['value_type'])) {
@@ -320,7 +320,7 @@ class CHistoryManager {
 			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
 
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
-				return $result[0]['value'];
+				return $result[0];
 			}
 		}
 
@@ -333,21 +333,21 @@ class CHistoryManager {
 	 * @see CHistoryManager::getValueAt
 	 */
 	private function getValueAtFromSql(array $item, $clock, $ns) {
-		$value = null;
+		$result = null;
 		$table = self::getTableName($item['value_type']);
 
-		$sql = 'SELECT value'.
+		$sql = 'SELECT *'.
 				' FROM '.$table.
 				' WHERE itemid='.zbx_dbstr($item['itemid']).
 					' AND clock='.zbx_dbstr($clock).
 					' AND ns='.zbx_dbstr($ns);
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
-			$value = $row['value'];
+			$result = $row;
 		}
 
-		if ($value !== null) {
-			return $value;
+		if ($result !== null) {
+			return $result;
 		}
 
 		$max_clock = 0;
@@ -374,18 +374,18 @@ class CHistoryManager {
 		}
 
 		if ($max_clock == 0) {
-			return $value;
+			return $result;
 		}
 
 		if ($clock == $max_clock) {
-			$sql = 'SELECT value'.
+			$sql = 'SELECT *'.
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock='.zbx_dbstr($clock).
 						' AND ns<'.zbx_dbstr($ns);
 		}
 		else {
-			$sql = 'SELECT value'.
+			$sql = 'SELECT *'.
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock='.zbx_dbstr($max_clock).
@@ -393,10 +393,10 @@ class CHistoryManager {
 		}
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
-			$value = $row['value'];
+			$result = $row;
 		}
 
-		return $value;
+		return $result;
 	}
 
 	/**

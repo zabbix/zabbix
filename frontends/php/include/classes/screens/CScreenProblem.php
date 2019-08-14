@@ -1086,7 +1086,7 @@ class CScreenProblem extends CScreenBase {
 				$opdata = null;
 				if ($show_opdata) {
 					$opdata = ($trigger['opdata'] !== '')
-						? CMacrosResolverHelper::resolveTriggerOpdata(
+						? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
 							[
 								'triggerid' => $trigger['triggerid'],
 								'expression' => $trigger['expression'],
@@ -1094,9 +1094,12 @@ class CScreenProblem extends CScreenBase {
 								'clock' => $problem['clock'],
 								'ns' => $problem['ns']
 							],
-							['events' => true]
-						)
-						: self::getLatestValues($trigger['items']);
+							[
+								'events' => true,
+								'html' => true
+							]
+						)))->addClass('opdata')
+						: (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
 				}
 
 				// Add table row.
@@ -1231,7 +1234,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $items  An array of trigger items.
 	 * @param bool  $html
 	 *
-	 * @return CCol|string
+	 * @return array|string
 	 */
 	public static function getLatestValues(array $items, $html = true) {
 		$latest_values = [];
@@ -1262,7 +1265,11 @@ class CScreenProblem extends CScreenBase {
 			if ($html) {
 				$hint_table->addRow([
 					new CCol($item['name_expanded']),
-					new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])),
+					new CCol(
+						($last_value['clock'] !== null)
+							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
+							: UNRESOLVED_MACRO_STRING
+					),
 					new CCol($last_value['value']),
 					new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
@@ -1296,7 +1303,7 @@ class CScreenProblem extends CScreenBase {
 				->setHint($hint_table)
 			);
 
-			return (new CCol($latest_values))->addClass('latest-value');
+			return $latest_values;
 		}
 
 		return implode(', ', $latest_values);

@@ -706,9 +706,6 @@ output {
     border-bottom: 1px solid #888;
     line-height: 18px;
     vertical-align: top; }
-    .list-table tbody th.latest-value,
-    .list-table td.latest-value {
-      max-width: 300px; }
   .list-table tbody th {
     text-align: left; }
   .list-table .vertical_rotation_inner {
@@ -721,6 +718,9 @@ output {
     border-bottom: none;
     color: #333;
     text-align: right; }
+  .list-table .latest-values,
+  .list-table .opdata {
+    max-width: 300px; }
 
 .table-paging {
   text-align: center;

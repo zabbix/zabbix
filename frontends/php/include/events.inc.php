@@ -146,8 +146,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['userid']         User ID who generated the OK event.
  * @param string $event['name']           Event name.
  * @param string $event['acknowledged']   State of acknowledgement.
- * @param string $event['opdata']         Operational data with expanded macros.
- * @param array  $event['items']          (optional) Event trigger items.
+ * @param CCOl   $event['opdata']         Operational data with expanded macros.
  * @param string $backurl                 A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
@@ -168,7 +167,7 @@ function make_event_details($event, $backurl) {
 		])
 		->addRow([
 			_('Operational data'),
-			($event['opdata'] !== '') ? $event['opdata'] : CScreenProblem::getLatestValues($event['items'])
+			$event['opdata']
 		])
 		->addRow([
 			_('Severity'),

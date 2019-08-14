@@ -1112,9 +1112,6 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		&.latest-value {
-			max-width: 300px;
-		}
 	}
 
 	tbody th {
@@ -1130,6 +1127,11 @@ output {
 		border-bottom: none;
 		color: $font-alt-color;
 		text-align: right;
+	}
+
+	.latest-values,
+	.opdata {
+		max-width: 300px;
 	}
 }
 

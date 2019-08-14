@@ -465,6 +465,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param int    $triggers[$triggerid]['ns']          (optional)
 	 * @param array  $options
 	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool   $options['html']
 	 * @param array  $options['sources']                  An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
@@ -545,7 +546,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options['events']);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -580,9 +581,30 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach ($options['sources'] as $source) {
 				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
 
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$trigger[$source] =
-						substr_replace($trigger[$source], $macro_values[$triggerid][$macro], $pos, strlen($macro));
+				if ($options['html']) {
+					$macro_string = [];
+					$pos_left = 0;
+
+					foreach ($matched_macros as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$triggerid])) {
+							if ($pos_left != $pos) {
+								$macro_string[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+							}
+
+							$macro_string[] = $macro_values[$triggerid][$macro];
+							$pos_left = $pos + strlen($macro);
+						}
+					}
+					$macro_string[] = substr($trigger[$source], $pos_left);
+
+					$trigger[$source] = $macro_string;
+				}
+				else {
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						$trigger[$source] = substr_replace($trigger[$source], $macro_values[$triggerid][$macro], $pos,
+							strlen($macro)
+						);
+					}
 				}
 			}
 		}

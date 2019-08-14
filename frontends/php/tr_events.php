@@ -72,7 +72,7 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 $events = API::Event()->get([
-	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity', 'opdata'],
+	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity'],
 	'selectTags' => ['tag', 'value'],
 	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity'],
 	'source' => EVENT_SOURCE_TRIGGERS,
@@ -104,12 +104,28 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
-if ($event['opdata'] === '') {
+if ($trigger['opdata'] !== '') {
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'opdata' => $trigger['opdata'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		[
+			'events' => true,
+			'html' => true
+		]
+	)))->addClass('opdata');
+}
+else {
 	$db_items = API::Item()->get([
 		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 		'triggerids' => $event['objectid']
 	]);
-	$event['items'] = CMacrosResolverHelper::resolveItemNames($db_items);
+	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
 $config = select_config();

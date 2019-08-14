@@ -805,7 +805,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 		$opdata = null;
 		if ($show_opdata) {
 			$opdata = ($trigger['opdata'] !== '')
-				? CMacrosResolverHelper::resolveTriggerOpdata(
+				? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
 					[
 						'triggerid' => $trigger['triggerid'],
 						'expression' => $trigger['expression'],
@@ -813,9 +813,12 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 						'clock' => $problem['clock'],
 						'ns' => $problem['ns']
 					],
-					['events' => true]
-				)
-				: CScreenProblem::getLatestValues($trigger['items']);
+					[
+						'events' => true,
+						'html' => true
+					]
+				)))->addClass('opdata')
+				: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
 		}
 
 		// ack

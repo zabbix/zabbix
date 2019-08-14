@@ -224,6 +224,7 @@ class CMacrosResolverHelper {
 	 * @param array  $options
 	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
 	 *                                       Default: false.
+	 * @param bool   $options['html']        (optional) Default: false.
 	 *
 	 * @return string
 	 */
@@ -248,6 +249,7 @@ class CMacrosResolverHelper {
 	 * @param array  $options
 	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
 	 *                                       Default: false.
+	 * @param bool   $options['html']        (optional) Default: false.
 	 *
 	 * @return string
 	 */
@@ -272,6 +274,7 @@ class CMacrosResolverHelper {
 	 * @param array  $options
 	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
 	 *                                                    fields. Default: false.
+	 * @param bool   $options['html']                     (optional) Default: false.
 	 * @param array  $options['sources']                  An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
@@ -280,7 +283,8 @@ class CMacrosResolverHelper {
 		self::init();
 
 		$options += [
-			'events' => false
+			'events' => false,
+			'html' => false
 		];
 
 		return self::$macrosResolver->resolveTriggerDescriptions($triggers, $options);
