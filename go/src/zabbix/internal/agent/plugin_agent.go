@@ -49,6 +49,6 @@ func (p *Plugin) Export(key string, params []string) (result interface{}, err er
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
-	plugin.RegisterMetric(&impl, "ping", "agent.ping", "Returns agent availability check result")
+	plugin.RegisterMetric(&impl, "agent", "agent.hostname", "Returns Hostname from agent configuration")
+	plugin.RegisterMetric(&impl, "agent", "agent.ping", "Returns agent availability check result")
 }
