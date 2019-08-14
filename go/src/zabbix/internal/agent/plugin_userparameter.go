@@ -128,19 +128,23 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 	return cmdResult, nil
 }
 
-func InitUserParameterPlugin() error {
+func InitUserParameterPlugin(userParameterConfig []string) error {
 	userParameter.parameters = make(map[string]parameterInfo)
 
-	for i := 0; i < len(Options.UserParameter); i++ {
-		s := strings.SplitN(Options.UserParameter[i], ",", 2)
+	for i := 0; i < len(userParameterConfig); i++ {
+		s := strings.SplitN(userParameterConfig[i], ",", 2)
 
 		if len(s) != 2 {
-			return fmt.Errorf("cannot add user parameter \"%s\": not comma-separated", Options.UserParameter[i])
+			return fmt.Errorf("cannot add user parameter \"%s\": not comma-separated", userParameterConfig[i])
 		}
 
 		key, p, err := itemutil.ParseKey(s[0])
 		if err != nil {
-			return fmt.Errorf("cannot add user parameter \"%s\": %s", Options.UserParameter[i], err)
+			return fmt.Errorf("cannot add user parameter \"%s\": %s", userParameterConfig[i], err)
+		}
+
+		if len(strings.TrimSpace(s[1])) == 0 {
+			return fmt.Errorf("cannot add user parameter \"%s\": command is missing", userParameterConfig[i])
 		}
 
 		parameter := parameterInfo{cmd: s[1]}
@@ -148,7 +152,7 @@ func InitUserParameterPlugin() error {
 		if len(p) == 1 && p[0] == "*" {
 			parameter.flexible = true
 		} else if len(p) != 0 {
-			return fmt.Errorf("cannot add user parameter \"%s\": syntax error", Options.UserParameter[i])
+			return fmt.Errorf("cannot add user parameter \"%s\": syntax error", userParameterConfig[i])
 		}
 
 		userParameter.parameters[key] = parameter
