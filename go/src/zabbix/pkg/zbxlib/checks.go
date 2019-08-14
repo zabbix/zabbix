@@ -54,6 +54,9 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -153,6 +156,12 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
 	case "system.sw.packages":
 		cfunc = unsafe.Pointer(C.SYSTEM_SW_PACKAGES)
+	case "system.swap.in":
+		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
+	case "system.swap.out":
+		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
+	case "system.swap.size":
+		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_SIZE)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)

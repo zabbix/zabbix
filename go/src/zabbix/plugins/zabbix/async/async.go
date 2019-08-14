@@ -48,4 +48,7 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.cpu", "CPU information")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.macaddr", "Listing of MAC addresses")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.sw.os", "Operating system information")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.swap.in", "Swap in (from device into memory) statistics")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.swap.out", "Swap out (from memory onto device) statistics")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.swap.size", "Swap space size in bytes or in percentage from total")
 }
