@@ -74,6 +74,7 @@ class CHostNameParser extends CParser {
 		$this->macros = [];
 
 		$p = $pos;
+
 		if (isset($source[$p]) && $source[$p] === ' ') {
 			return self::PARSE_FAIL;
 		}
@@ -94,10 +95,8 @@ class CHostNameParser extends CParser {
 			return self::PARSE_FAIL;
 		}
 
-		if ($source[$p - 1] === ' ') {
-			while (isset($source[$p - 1]) && $source[$p - 1] === ' ') {
-				$p--;
-			}
+		while ($source[$p - 1] === ' ') {
+			$p--;
 		}
 
 		$this->length = $p - $pos;
