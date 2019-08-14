@@ -808,7 +808,7 @@ class CScreenProblem extends CScreenBase {
 		if ($this->data['action'] === 'problem.view') {
 			$url_form = clone $url;
 
-			$form = (new CForm('get', 'zabbix.php'))
+			$form = (new CForm('post', 'zabbix.php'))
 				->setName('problem')
 				->cleanItems()
 				->addVar('backurl',

@@ -20,16 +20,19 @@
 
 
 function getSounds() {
-	$fileList = [];
+	$file_list = [];
 	$dir = scandir('./audio');
+
 	foreach ($dir as $file) {
-		if (!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) {
+		if ('audio/' !== substr(mime_content_type('./audio/'.$file), 0, 6)) {
 			continue;
 		}
-		list($filename, $type) = explode('.', $file);
-		$fileList[$filename] = $file;
+
+		$filename = explode('.', $file)[0];
+		$file_list[$filename] = $file;
 	}
-	return $fileList;
+
+	return $file_list;
 }
 
 function getMessageSettings() {
@@ -50,13 +53,13 @@ function getMessageSettings() {
 		'triggers.severities' => null,
 		'sounds.mute' => 0,
 		'sounds.repeat' => 1,
-		'sounds.recovery' => 'alarm_ok.wav',
-		'sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED => 'no_sound.wav',
-		'sounds.'.TRIGGER_SEVERITY_INFORMATION => 'alarm_information.wav',
-		'sounds.'.TRIGGER_SEVERITY_WARNING => 'alarm_warning.wav',
-		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.wav',
-		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.wav',
-		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav',
+		'sounds.recovery' => 'alarm_ok.mp3',
+		'sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED => 'no_sound.mp3',
+		'sounds.'.TRIGGER_SEVERITY_INFORMATION => 'alarm_information.mp3',
+		'sounds.'.TRIGGER_SEVERITY_WARNING => 'alarm_warning.mp3',
+		'sounds.'.TRIGGER_SEVERITY_AVERAGE => 'alarm_average.mp3',
+		'sounds.'.TRIGGER_SEVERITY_HIGH => 'alarm_high.mp3',
+		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.mp3',
 		'show_suppressed' => 0
 	];
 
@@ -70,12 +73,13 @@ function getMessageSettings() {
 		$messages[$profile['source']] = $profile['value_str'];
 	}
 
-	if (is_null($messages['triggers.severities'])) {
+	if ($messages['triggers.severities'] === null) {
 		$messages['triggers.severities'] = $defSeverities;
 	}
 	else {
 		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
 	}
+
 	return $messages;
 }
 
