@@ -53,4 +53,5 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.swap.size", "Swap space size in bytes or in percentage from total")
 	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.file.md5sum", "MD5 checksum of file")
 	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.file.regmatch", "Find string in a file")
+	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery")
 }
