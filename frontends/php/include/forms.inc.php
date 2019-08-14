@@ -1376,9 +1376,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:

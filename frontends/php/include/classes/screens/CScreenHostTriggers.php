@@ -246,7 +246,7 @@ class CScreenHostTriggers extends CScreenBase {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['userid'], $data['users'])
 							? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
-							: _('Resolved by user.')
+							: _('Resolved by inaccessible user.')
 					);
 				}
 			}
