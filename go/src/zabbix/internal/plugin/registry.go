@@ -92,4 +92,5 @@ func Get(key string) (acc Accessor, err error) {
 
 func ClearRegistry() {
 	Metrics = make(map[string]*Metric)
+	Plugins = make(map[string]Accessor)
 }
