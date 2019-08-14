@@ -778,6 +778,7 @@ define('ZBX_MAX_WIDGET_LINES', 100);
 // dashboards
 define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MIN_ROWS',	2);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments

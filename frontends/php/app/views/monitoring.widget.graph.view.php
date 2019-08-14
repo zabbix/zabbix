@@ -45,7 +45,7 @@ else {
 
 	if ($data['widget']['initial_load'] == 1) {
 		$script .=
-			'if (typeof(zbx_graph_widget_resize_end) !== typeof(Function)) {'.
+			'if (typeof zbx_graph_widget_resize_end !== typeof(Function)) {'.
 				'function zbx_graph_widget_resize_end(img_id) {'.
 					'var img = jQuery("#"+img_id),'.
 						'content = img.closest(".dashbrd-grid-widget-content"),'.
@@ -67,9 +67,16 @@ else {
 				'}'.
 			'}'.
 
-			'if (typeof(zbx_graph_widget_timer_refresh) !== typeof(Function)) {'.
+			'if (typeof zbx_graph_widget_timer_refresh !== typeof(Function)) {'.
 				'function zbx_graph_widget_timer_refresh(img_id) {'.
 					'timeControl.refreshObject(img_id);'.
+				'}'.
+			'}'.
+
+			'if (typeof zbx_graph_widget_delete !== typeof(Function)) {'.
+				'function zbx_graph_widget_delete(timeControl_dataid, fs_data) {'.
+					'timeControl.removeObject(timeControl_dataid);'.
+					'window.flickerfreeScreen.remove(fs_data);'.
 				'}'.
 			'}'.
 
@@ -83,6 +90,12 @@ else {
 				'"zbx_graph_widget_timer_refresh", "'.$data['widget']['uniqueid'].'", {'.
 					'parameters: ["'.$data['graph']['dataid'].'"],'.
 					'trigger_name: "graph_widget_timer_refresh_'.$data['widget']['uniqueid'].'"'.
+				'});'.
+
+			'jQuery(".dashbrd-grid-container").dashboardGrid("addAction", "onWidgetDelete", '.
+				'"zbx_graph_widget_delete", "'.$data['widget']['uniqueid'].'", {'.
+					'parameters: ["'.$data['graph']['dataid'].'",'.zbx_jsvalue($data['fs_data']).'],'.
+					'trigger_name: "graph_widget_delete_'.$data['widget']['uniqueid'].'"'.
 				'});';
 	}
 

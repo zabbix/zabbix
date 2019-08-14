@@ -2383,16 +2383,19 @@
 	function removeWidget($obj, data, widget) {
 		if (widget['iterator']) {
 			widget['children'].forEach(function(child) {
+				doAction('onWidgetDelete', $obj, data, child);
 				child['div'].remove();
 			});
 		}
 
 		if (widget['parent']) {
+			doAction('onWidgetDelete', $obj, data, widget);
 			widget['div'].remove();
 		}
 		else {
 			var index = widget['div'].data('widget-index');
 
+			doAction('onWidgetDelete', $obj, data, widget);
 			widget['div'].remove();
 
 			data['widgets'].splice(index, 1);
@@ -2627,15 +2630,12 @@
 
 	var	methods = {
 		init: function(options) {
-			var default_options = {
+			options = $.extend({
 				'widget-height': 70,
-				'widget-min-rows': 2,
 				'rows': 0,
-				'updated': false,
-				'editable': true,
-				'edit_mode': false
-			};
-			options = $.extend(default_options, options);
+				'updated': false
+			}, options);
+
 			options['widget-width'] = 100 / options['max-columns'];
 
 			return this.each(function() {

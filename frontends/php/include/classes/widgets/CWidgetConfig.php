@@ -103,7 +103,6 @@ class CWidgetConfig {
 				'header' => $name,
 				'size' => $dimensions[$type],
 				'iterator' => self::isIterator($type),
-				'scrollable' => self::isScrollable($type),
 			];
 		}
 
