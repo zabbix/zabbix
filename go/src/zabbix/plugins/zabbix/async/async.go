@@ -55,4 +55,5 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.intr", "Device interrupts")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.cpu", "CPU information")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.macaddr", "Listing of MAC addresses")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.sw.os", "Operating system information")
 }

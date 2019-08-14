@@ -52,6 +52,7 @@ int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -147,6 +148,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_DEVICES)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
+	case "system.sw.os":
+		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
