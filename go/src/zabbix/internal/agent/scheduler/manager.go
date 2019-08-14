@@ -21,7 +21,6 @@ package scheduler
 
 import (
 	"container/heap"
-	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -51,57 +50,20 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
+type statusRequest struct {
+	sink chan string
+}
+
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (s string, err error)
+	PerformTask(key string, timeout time.Duration) (result string, err error)
+	GetStatus() (status string)
 }
 
-func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("processing update request (%d requests)", len(update.requests))
-
-	// TODO: client expiry - remove unused owners after timeout (day+?)
-	var requestClient *client
-	var ok bool
-	if requestClient, ok = m.clients[update.clientID]; !ok {
-		requestClient = newClient(update.clientID, update.sink)
-		m.clients[update.clientID] = requestClient
-	}
-
-	requestClient.refreshUnsupported = update.refreshUnsupported
-	requestClient.updateExpressions(update.expressions)
-
-	for _, r := range update.requests {
-		var key string
-		var err error
-		var p *pluginAgent
-		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
-			if p, ok = m.plugins[key]; !ok {
-				err = errors.New("Unknown metric")
-			}
-		}
-		if err == nil {
-			err = requestClient.addRequest(p, r, update.sink, now)
-		}
-		if err != nil {
-			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
-				tacc.task().deactivate()
-			}
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
-			continue
-		}
-
-		if !p.queued() {
-			heap.Push(&m.queue, p)
-		} else {
-			m.queue.Update(p)
-		}
-	}
-
-	released := requestClient.cleanup(m.plugins, now)
+func (m *Manager) cleanupClient(c *client, now time.Time) {
+	released := c.cleanup(m.plugins, now)
 	for _, p := range released {
 		if p.refcount != 0 {
 			continue
@@ -145,6 +107,52 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			}
 		}
 	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
+	log.Debugf("processing update request (%d requests)", len(update.requests))
+
+	// TODO: client expiry - remove unused owners after timeout (day+?)
+	var requestClient *client
+	var ok bool
+	if requestClient, ok = m.clients[update.clientID]; !ok {
+		requestClient = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = requestClient
+	}
+
+	requestClient.refreshUnsupported = update.refreshUnsupported
+	requestClient.updateExpressions(update.expressions)
+
+	for _, r := range update.requests {
+		var key string
+		var err error
+		var p *pluginAgent
+		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
+			if p, ok = m.plugins[key]; !ok {
+				err = fmt.Errorf("Unknown metric %s", key)
+			}
+		}
+		if err == nil {
+			err = requestClient.addRequest(p, r, update.sink, now)
+		}
+		if err != nil {
+			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+				tacc.task().deactivate()
+			}
+			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
+			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			continue
+		}
+
+		if !p.queued() {
+			heap.Push(&m.queue, p)
+		} else {
+			m.queue.Update(p)
+		}
+	}
+
+	m.cleanupClient(requestClient, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
@@ -203,6 +211,47 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 	m.queue = queue
 }
 
+type pluginMetrics struct {
+	ref     *pluginAgent
+	metrics []*plugin.Metric
+}
+
+func (m *Manager) getStatus(r *statusRequest) {
+	var status strings.Builder
+	agents := make(map[plugin.Accessor]*pluginMetrics)
+	infos := make([]*pluginMetrics, 0, len(m.plugins))
+	for _, p := range m.plugins {
+		if _, ok := agents[p.impl]; !ok {
+			info := &pluginMetrics{ref: p, metrics: make([]*plugin.Metric, 0)}
+			infos = append(infos, info)
+			agents[p.impl] = info
+		}
+	}
+
+	for _, metric := range plugin.Metrics {
+		if info, ok := agents[metric.Plugin]; ok {
+			info.metrics = append(info.metrics, metric)
+		}
+	}
+	sort.Slice(infos, func(i, j int) bool {
+		return infos[i].ref.name() < infos[j].ref.name()
+	})
+
+	for _, info := range infos {
+		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\ncapacity: %d/%d\ntasks: %d\n",
+			info.ref.name(), info.ref.active(), info.ref.usedCapacity, info.ref.capacity, len(info.ref.tasks)))
+		for _, metric := range info.metrics {
+			status.WriteString(metric.Key)
+			status.WriteString(": ")
+			status.WriteString(metric.Description)
+			status.WriteString("\n")
+		}
+		status.WriteString("\n")
+	}
+	r.sink <- status.String()
+	close(r.sink)
+}
+
 func (m *Manager) run() {
 	defer log.PanicHook()
 	log.Debugf("starting manager")
@@ -210,6 +259,7 @@ func (m *Manager) run() {
 	// some microseconds, which will be enough to include all scheduled tasks at this second
 	// even with nanosecond priority adjustment.
 	lastTick := time.Now()
+	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
@@ -226,6 +276,13 @@ run:
 			}
 			lastTick = now
 			m.processQueue(now)
+			// cleanup plugins used by passive checks
+			if now.Sub(cleaned) >= time.Hour {
+				if passive, ok := m.clients[0]; ok {
+					m.cleanupClient(passive, now)
+				}
+				cleaned = now
+			}
 		case v := <-m.input:
 			if v == nil {
 				break run
@@ -237,6 +294,8 @@ run:
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
+			case *statusRequest:
+				m.getStatus(v.(*statusRequest))
 			}
 		}
 	}
@@ -249,62 +308,68 @@ func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
-
-	metrics := make([]plugin.Accessor, 0, len(plugin.Metrics))
 	m.plugins = make(map[string]*pluginAgent)
-	for key, acc := range plugin.Metrics {
-		capacity := plugin.DefaultCapacity
-		section := strings.Title(acc.Name())
-		if options, ok := agent.Options.Plugins[section]; ok {
-			if cap, ok := options["Capacity"]; ok {
-				var err error
-				if capacity, err = strconv.Atoi(cap); err != nil {
-					log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-						section, cap, plugin.DefaultCapacity)
+
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
+
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
+	}
+	sort.Slice(metrics, func(i, j int) bool {
+		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
+	})
+
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl {
+			capacity := metric.Plugin.Capacity()
+			section := strings.Title(metric.Plugin.Name())
+			if options, ok := agent.Options.Plugins[section]; ok {
+				if cap, ok := options["Capacity"]; ok {
+					var err error
+					if capacity, err = strconv.Atoi(cap); err != nil {
+						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
+							section, cap, plugin.DefaultCapacity)
+					}
 				}
 			}
-		}
-		m.plugins[key] = &pluginAgent{
-			impl:         acc,
-			tasks:        make(performerHeap, 0),
-			capacity:     capacity,
-			usedCapacity: 0,
-			index:        -1,
-			refcount:     0,
-		}
-		metrics = append(metrics, acc)
-	}
+			if capacity > metric.Plugin.Capacity() {
+				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
+				capacity = metric.Plugin.Capacity()
+			}
 
-	// log available plugins
-	sort.Slice(metrics, func(i, j int) bool {
-		return metrics[i].Name() < metrics[j].Name()
-	})
-	lastPlugin := ""
-	for _, acc := range metrics {
-		if acc.Name() != lastPlugin {
+			pagent = &pluginAgent{
+				impl:         metric.Plugin,
+				tasks:        make(performerHeap, 0),
+				capacity:     capacity,
+				usedCapacity: 0,
+				index:        -1,
+				refcount:     0,
+			}
+
 			interfaces := ""
-			if _, ok := acc.(plugin.Exporter); ok {
+			if _, ok := metric.Plugin.(plugin.Exporter); ok {
 				interfaces += "exporter, "
 			}
-			if _, ok := acc.(plugin.Collector); ok {
+			if _, ok := metric.Plugin.(plugin.Collector); ok {
 				interfaces += "collector, "
 			}
-			if _, ok := acc.(plugin.Runner); ok {
+			if _, ok := metric.Plugin.(plugin.Runner); ok {
 				interfaces += "runner, "
 			}
-			if _, ok := acc.(plugin.Watcher); ok {
+			if _, ok := metric.Plugin.(plugin.Watcher); ok {
 				interfaces += "watcher, "
 			}
-			if _, ok := acc.(plugin.Configurator); ok {
+			if _, ok := metric.Plugin.(plugin.Configurator); ok {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", acc.Name(), interfaces)
-			lastPlugin = acc.Name()
+			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
 		}
+		m.plugins[metric.Key] = pagent
 	}
 }
-
 func (m *Manager) Start() {
 	monitor.Register()
 	go m.run()
@@ -331,15 +396,18 @@ func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
 }
 
-func (r resultWriter) SlotsAvailable() bool {
-	return true
+func (r resultWriter) Flush() {
 }
 
-func (r resultWriter) PersistSlotsAvailable() bool {
-	return true
+func (r resultWriter) SlotsAvailable() int {
+	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
+func (r resultWriter) PersistSlotsAvailable() int {
+	return 1
+}
+
+func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -350,10 +418,9 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case r := <-w:
 		if r.Error == nil {
 			if r.Value != nil {
-				s = *r.Value
+				result = *r.Value
 			} else {
 				// TODO: check what must be returned on empty result
-				s = "(null)"
 			}
 		} else {
 			err = r.Error
@@ -361,14 +428,17 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
 	}
-
-	close(w)
-
-	return s, err
+	return
 }
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func (m *Manager) GetStatus() (status string) {
+	request := &statusRequest{sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
 }
 
 func NewManager() *Manager {

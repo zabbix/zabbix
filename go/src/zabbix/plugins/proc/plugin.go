@@ -17,28 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixagent
+package proc
 
-import (
-	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
-	"zabbix/pkg/zbxlib"
+type procQuery struct {
+	name    string
+	user    string
+	cmdline string
+}
+
+const (
+	procInfoPid = 1 << iota
+	procInfoName
+	procInfoUser
+	procInfoCmdline
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
+type procInfo struct {
+	pid     int64
+	name    string
+	userid  int64
+	cmdline string
+	arg0    string
 }
 
-var impl Plugin
-var stdOs std.Os
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
-}
-
-func init() {
-	plugin.RegisterMetric(&impl, "zabbixagent", "system.localtime", "Returns system local time")
-	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns", "Checks if DNS service is up")
-	plugin.RegisterMetric(&impl, "zabbixagent", "net.dns.record", "Performs DNS query")
+type cpuUtil struct {
+	utime   uint64
+	stime   uint64
+	started uint64
+	err     error
 }

@@ -22,12 +22,18 @@ package plugins
 import (
 	_ "zabbix/plugins/debug/collector"
 	_ "zabbix/plugins/debug/empty"
+
+	//	_ "zabbix/plugins/debug/filewatcher"
 	_ "zabbix/plugins/debug/log"
+	_ "zabbix/plugins/debug/trapper"
 	_ "zabbix/plugins/log"
+	_ "zabbix/plugins/proc"
 	_ "zabbix/plugins/system/uname"
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
+	_ "zabbix/plugins/vfs/dev"
 	_ "zabbix/plugins/vfs/filecksum"
 	_ "zabbix/plugins/vfs/fileexists"
-	_ "zabbix/plugins/zabbixagent"
+	_ "zabbix/plugins/zabbix/async"
+	_ "zabbix/plugins/zabbix/sync"
 )

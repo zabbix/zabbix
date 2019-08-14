@@ -124,6 +124,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
 				client:   c,
+				output:   sink,
 			}
 			// cache scheduled (non direct) request tasks
 			if r.Itemid != 0 {

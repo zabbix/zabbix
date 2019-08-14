@@ -182,12 +182,15 @@ func (c *resultCacheMock) Write(r *plugin.Result) {
 	c.results = append(c.results, r)
 }
 
-func (pc *resultCacheMock) SlotsAvailable() bool {
-	return true
+func (c *resultCacheMock) Flush() {
 }
 
-func (pc *resultCacheMock) PersistSlotsAvailable() bool {
-	return true
+func (pc *resultCacheMock) SlotsAvailable() int {
+	return 1
+}
+
+func (pc *resultCacheMock) PersistSlotsAvailable() int {
+	return 1
 }
 
 type mockManager struct {

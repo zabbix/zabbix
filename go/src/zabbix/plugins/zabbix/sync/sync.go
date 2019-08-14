@@ -17,41 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zbxlib
-
-/*
-#cgo CFLAGS: -I${SRCDIR}/../../../../../include
-#include "common.h"
-*/
-import "C"
+package zabbixsync
 
 import (
-	"errors"
-	"time"
-	"unsafe"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/zbxlib"
 )
 
-//export processValue
-func processValue(citem unsafe.Pointer, cvalue *C.char, cstate C.int, clastLogsize C.ulong, cmtime C.int) C.int {
-	item := (*LogItem)(citem)
-	if !item.Output.PersistSlotsAvailable() {
-		return C.FAIL
-	}
-	var value string
-	var err error
-	if cstate == ItemStateNormal {
-		value = C.GoString(cvalue)
-	} else {
-		err = errors.New(C.GoString(cvalue))
-	}
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-	result := &LogResult{
-		Value:       &value,
-		Ts:          time.Now(),
-		Error:       err,
-		LastLogsize: uint64(clastLogsize),
-		Mtime:       int(cmtime),
-	}
-	item.Results = append(item.Results, result)
-	return C.SUCCEED
+var impl Plugin
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return zbxlib.ExecuteCheck(key, params)
+}
+
+func init() {
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns", "Checks if DNS service is up")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
+	impl.SetCapacity(1)
 }

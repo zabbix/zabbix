@@ -55,24 +55,17 @@ import (
 	"zabbix/pkg/version"
 )
 
-const (
-	cacheStateNormal  = 0
-	cacheStateLimited = 1 << (iota - 1)
-	cacheStateFull
-)
-
 type ResultCache struct {
-	input              chan interface{}
-	output             Uploader
-	results            []*AgentData
-	token              string
-	lastDataID         uint64
-	clientID           uint64
-	lastError          error
-	maxBufferSize      int
-	totalValueNum      int
-	persistentValueNum int
-	state              uint32
+	input           chan interface{}
+	output          Uploader
+	results         []*AgentData
+	token           string
+	lastDataID      uint64
+	clientID        uint64
+	lastError       error
+	maxBufferSize   int32
+	totalValueNum   int32
+	persistValueNum int32
 }
 
 type AgentData struct {
@@ -147,31 +140,23 @@ func (c *ResultCache) flushOutput(u Uploader) {
 	c.results = c.results[:0]
 
 	c.totalValueNum = 0
-	c.persistentValueNum = 0
-	atomic.StoreUint32(&c.state, cacheStateNormal)
+	c.persistValueNum = 0
 }
 
 // addResult appends received result at the end of results slice
 func (c *ResultCache) addResult(result *AgentData) {
+	full := c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize
 	c.results = append(c.results, result)
 	c.totalValueNum++
 	if result.persistent {
-		c.persistentValueNum++
+		c.persistValueNum++
 	}
 
-	state := uint32(cacheStateNormal)
-	if c.persistentValueNum >= c.maxBufferSize/2 {
-		state |= cacheStateLimited
-	}
-	if c.totalValueNum >= c.maxBufferSize {
-		state |= cacheStateFull
-	}
-	if state != cacheStateNormal && atomic.LoadUint32(&c.state) == cacheStateNormal {
-		if c.output != nil {
+	if c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize {
+		if !full && c.output != nil {
 			c.flushOutput(c.output)
 		}
 	}
-	atomic.StoreUint32(&c.state, state)
 }
 
 // insertResult attempts to insert the received result into results slice by replacing existing value.
@@ -186,7 +171,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 			}
 		}
 	}
-	if index == -1 && (!result.persistent || c.persistentValueNum < c.maxBufferSize/2) {
+	if index == -1 && (!result.persistent || c.persistValueNum < c.maxBufferSize/2) {
 		for i, r := range c.results {
 			if !r.persistent {
 				index = i
@@ -201,10 +186,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	}
 
 	if result.persistent {
-		c.persistentValueNum++
-		if c.persistentValueNum >= c.maxBufferSize/2 {
-			atomic.StoreUint32(&c.state, atomic.LoadUint32(&c.state)|cacheStateLimited)
-		}
+		c.persistValueNum++
 	}
 
 	copy(c.results[index:], c.results[index+1:])
@@ -242,10 +224,10 @@ func (c *ResultCache) write(r *plugin.Result) {
 		persistent:  r.Persistent,
 	}
 
-	if atomic.LoadUint32(&c.state) == cacheStateNormal {
-		c.addResult(data)
-	} else {
+	if c.totalValueNum >= c.maxBufferSize {
 		c.insertResult(data)
+	} else {
+		c.addResult(data)
 	}
 }
 
@@ -280,7 +262,7 @@ func newToken() string {
 }
 
 func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
-	c.maxBufferSize = options.BufferSize
+	c.maxBufferSize = int32(options.BufferSize)
 }
 
 func (c *ResultCache) init() {
@@ -299,13 +281,13 @@ func (c *ResultCache) Stop() {
 }
 
 func NewActive(clientid uint64, output Uploader) *ResultCache {
-	cache := &ResultCache{clientID: clientid, output: output, token: newToken(), state: cacheStateNormal}
+	cache := &ResultCache{clientID: clientid, output: output, token: newToken()}
 	cache.init()
 	return cache
 }
 
 func NewPassive(clientid uint64) *ResultCache {
-	cache := &ResultCache{clientID: clientid, token: newToken(), state: cacheStateNormal}
+	cache := &ResultCache{clientID: clientid, token: newToken()}
 	cache.init()
 	return cache
 }
@@ -329,10 +311,18 @@ func (c *ResultCache) UpdateOptions(options *agent.AgentOptions) {
 	c.input <- options
 }
 
-func (c *ResultCache) SlotsAvailable() bool {
-	return atomic.LoadUint32(&c.state)&cacheStateFull == 0
+func (c *ResultCache) SlotsAvailable() int {
+	slots := atomic.LoadInt32(&c.maxBufferSize) - atomic.LoadInt32(&c.totalValueNum)
+	if slots < 0 {
+		slots = 0
+	}
+	return int(slots)
 }
 
-func (c *ResultCache) PersistSlotsAvailable() bool {
-	return atomic.LoadUint32(&c.state)&cacheStateLimited == 0
+func (c *ResultCache) PersistSlotsAvailable() int {
+	slots := atomic.LoadInt32(&c.maxBufferSize)/2 - atomic.LoadInt32(&c.persistValueNum)
+	if slots < 0 {
+		slots = 0
+	}
+	return int(slots)
 }
