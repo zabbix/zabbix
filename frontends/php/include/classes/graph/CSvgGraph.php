@@ -971,13 +971,66 @@ class CSvgGraph extends CSvg {
 	 * Add metric of type bar to graph.
 	 */
 	protected function drawMetricsBar() {
-		$this->paths = (new CBarGraphDataFormatter)->format($this->paths, $this->metrics);
+		$bar_min_width = [GRAPH_YAXIS_SIDE_LEFT => $this->canvas_width, GRAPH_YAXIS_SIDE_RIGHT => $this->canvas_width];
+		$bar_groups_indexes = [];
+		$bar_groups_position = [];
+
+		foreach ($this->paths as $index => $path) {
+			if ($this->metrics[$index]['options']['type'] == SVG_GRAPH_TYPE_BAR) {
+				// If one second in displayed over multiple pixels, this shows number of px in second.
+				$sec_per_px = ceil(max(
+					($this->time_till - $this->time_from) / $this->canvas_width,
+					$this->canvas_width / ($this->time_till - $this->time_from)
+				)) * 3;
+
+				$y_axis_side = $this->metrics[$index]['options']['axisy'];
+				$time_points = array_keys($this->points[$index]);
+				$last_point = 0;
+				$path = reset($path);
+
+				foreach ($path as $point_index => $point) {
+					$time_point = floor($time_points[$point_index] / $sec_per_px) * $sec_per_px;
+					$bar_groups_indexes[$y_axis_side][$time_point][$index] = $point_index;
+					$bar_groups_position[$y_axis_side][$time_point][$point_index] = $point[0];
+
+					if ($last_point > 0) {
+						$bar_min_width[$y_axis_side] = min($point[0] - $last_point, $bar_min_width[$y_axis_side]);
+					}
+					$last_point = $point[0];
+				}
+			}
+		}
+
+		foreach ($bar_groups_indexes as $y_axis => $points) {
+			foreach ($points as $time_point => $paths) {
+				$group_count = count($paths);
+				$group_width = $bar_min_width[$y_axis];
+				$bar_width = ceil($group_width / $group_count * .75);
+				$group_index = 0;
+				foreach ($paths as $path_index => $point_index) {
+					$group_x = $bar_groups_position[$y_axis][$time_point][$point_index];
+					if ($group_count > 1) {
+						$this->paths[$path_index][0][$point_index][0] = $group_x
+							// Calculate the leftmost X-coordinate including gap size.
+							- $group_width * .375
+							// Calculate the X-offset for the each bar in the group.
+							+ ceil($bar_width * ($group_index + .5));
+						$group_index++;
+					}
+					$this->paths[$path_index][0][$point_index][3] = max(1, $bar_width);
+					// X position for bars group.
+					$this->paths[$path_index][0][$point_index][4] = $group_x - $group_width * .375;
+				}
+			}
+		}
 
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $this->paths)) {
-				$metric['options']['y_zero'] = $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT
+				$metric['options']['y_zero'] = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
 					? $this->right_y_zero
 					: $this->left_y_zero;
+				$metric['options']['bar_width'] = $bar_min_width[$metric['options']['axisy']];
+
 				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));
 			}
 		}
