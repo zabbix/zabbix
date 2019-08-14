@@ -1265,7 +1265,7 @@
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
 		clearUpdateWidgetContentTimer(widget);
 
-		if (widget['updateWidgetContent_in_progress']) {
+		if (widget['updating_content']) {
 			// Waiting for another AJAX request to either complete of fail.
 			return;
 		}
@@ -1660,7 +1660,7 @@
 	function updateWidgetContent($obj, data, widget, options) {
 		clearUpdateWidgetContentTimer(widget);
 
-		if (widget['updateWidgetContent_in_progress']) {
+		if (widget['updating_content']) {
 			// Waiting for another AJAX request to either complete of fail.
 			return;
 		}
@@ -1727,7 +1727,7 @@
 
 		startPreloader(widget);
 
-		widget['updateWidgetContent_in_progress'] = true;
+		widget['updating_content'] = true;
 
 		return jQuery.ajax({
 			url: url.getUrl(),
@@ -1736,7 +1736,7 @@
 			dataType: 'json'
 		})
 			.done(function(response) {
-				delete widget['updateWidgetContent_in_progress'];
+				delete widget['updating_content'];
 
 				stopPreloader(widget);
 
@@ -1775,18 +1775,18 @@
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
 
-				delete widget['updateWidgetContent_in_progress'];
+				delete widget['updating_content'];
 				setUpdateWidgetContentTimer($obj, data, widget, 3);
 			});
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
-		if (widget['updateWidgetConfig_in_progress']) {
+		if (widget['updating_config']) {
 			// Waiting for another AJAX request to either complete of fail.
 			return;
 		}
 
-		widget['updateWidgetConfig_in_progress'] = true;
+		widget['updating_config'] = true;
 
 		var	fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
@@ -1972,7 +1972,7 @@
 				data['options']['updated'] = true;
 			})
 			.always(function() {
-				delete widget['updateWidgetConfig_in_progress'];
+				delete widget['updating_config'];
 			});
 	}
 
