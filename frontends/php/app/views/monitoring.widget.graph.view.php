@@ -43,7 +43,7 @@ else {
 		'timeControl.processObjects();'.
 		'window.flickerfreeScreen.add('.zbx_jsvalue($data['fs_data']).');';
 
-	if ($data['widget']['initial_load'] == 1) {
+	if ($data['widget']['initial_load']) {
 		$script .=
 			'if (typeof zbx_graph_widget_resize_end !== typeof(Function)) {'.
 				'function zbx_graph_widget_resize_end(img_id) {'.

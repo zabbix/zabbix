@@ -50,6 +50,7 @@ class CWidgetFormGraph extends CWidgetForm {
 				->setMultiple(false)
 				->setFilterParameter('numeric', true) // For filtering items.
 				->setFilterParameter('with_simple_graph_items', true); // For groups and hosts selection.
+
 			if (array_key_exists('itemid', $this->data)) {
 				$field_item->setValue($this->data['itemid']);
 			}

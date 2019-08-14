@@ -38,7 +38,6 @@
 					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
 				}
 			});
-		;
 
 		if (!widget['parent']) {
 			// Do not add action buttons for child widgets of iterators.
@@ -108,9 +107,7 @@
 		if (widget['iterator']) {
 			widget['container']
 				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
-					.append($('<div>')
-						.html(t('Widget is too small for the specified number of columns and rows.'))
-					)
+					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
 				);
 		}
 		else {
@@ -119,10 +116,10 @@
 		}
 
 		var $div = $('<div>', {
-			'class': widget['iterator'] ? 'dashbrd-grid-iterator' : 'dashbrd-grid-widget'
-		})
-			.toggleClass('dashbrd-grid-widget-hidden-header', widget['view_mode'] == 1)
-			.toggleClass('new-widget', widget['new_widget']);
+				'class': widget['iterator'] ? 'dashbrd-grid-iterator' : 'dashbrd-grid-widget'
+			})
+				.toggleClass('dashbrd-grid-widget-hidden-header', widget['view_mode'] == 1)
+				.toggleClass('new-widget', widget['new_widget']);
 
 		if (!widget['parent']) {
 			$div
@@ -252,8 +249,7 @@
 		var	widget = getWidgetByTarget(data['widgets'], $div),
 			pos = $div.position(),
 			cell_w = data['cell-width'],
-			cell_h = data['options']['widget-height']
-		;
+			cell_h = data['options']['widget-height'];
 
 		if (widget['iterator'] && data['pos-action'] === 'resize') {
 			// 0.49 refers to pixels in the following calculations.
@@ -264,8 +260,7 @@
 					: Math.round(pos.left / cell_w),
 				place_y = $div.hasClass('resizing-top')
 					? (Math.round((pos.top + $div.height()) / cell_h) - place_h)
-					: Math.round(pos.top / cell_h)
-			;
+					: Math.round(pos.top / cell_h);
 		}
 		else {
 			var place_x = Math.round(pos.left / cell_w),
@@ -296,10 +291,10 @@
 
 	function setDivPosition($div, data, pos) {
 		$div.css({
-			'left': (data['options']['widget-width'] * pos['x']) + '%',
-			'top': (data['options']['widget-height'] * pos['y']) + 'px',
-			'width': (data['options']['widget-width'] * pos['width']) + '%',
-			'height': (data['options']['widget-height'] * pos['height']) + 'px'
+			left: (data['options']['widget-width'] * pos['x']) + '%',
+			top: (data['options']['widget-height'] * pos['y']) + 'px',
+			width: (data['options']['widget-width'] * pos['width']) + '%',
+			height: (data['options']['widget-height'] * pos['height']) + 'px'
 		});
 	}
 
@@ -315,8 +310,7 @@
 
 		data['placeholder']
 			.toggleClass('iterator', widget['iterator'])
-			.show()
-		;
+			.show();
 
 		$('.dashbrd-grid-widget-mask', widget['div']).show();
 		widget['div'].addClass('dashbrd-grid-widget-draggable');
@@ -406,8 +400,7 @@
 			})
 			.each(function(box, index) {
 				box.div.data('widget-index', index);
-			})
-		;
+			});
 
 		return widgets;
 	}
@@ -421,22 +414,22 @@
 	 */
 	function dragPrepare(widgets, widget, max_rows) {
 		var markAffected = function(widgets, affected_by, affected_by_draggable) {
-			var w_pos = $.extend({}, affected_by.pos);
-			w_pos.height++;
+				var w_pos = $.extend({}, affected_by.pos);
+				w_pos.height++;
 
-			$.map(widgets, function(w) {
-				return (!('affected' in w) && rectOverlap(w_pos, w.pos)) ? w : null;
-			}).each(function(w) {
-				if (w.uniqueid !== widget.uniqueid) {
-					w.affected = true;
-					w.affected_by_id = affected_by.uniqueid;
-					if (affected_by_draggable) {
-						w.affected_by_draggable = affected_by.uniqueid;
+				$.map(widgets, function(w) {
+					return (!('affected' in w) && rectOverlap(w_pos, w.pos)) ? w : null;
+				}).each(function(w) {
+					if (w.uniqueid !== widget.uniqueid) {
+						w.affected = true;
+						w.affected_by_id = affected_by.uniqueid;
+						if (affected_by_draggable) {
+							w.affected_by_draggable = affected_by.uniqueid;
+						}
+						markAffected(widgets, w, affected_by_draggable);
 					}
-					markAffected(widgets, w, affected_by_draggable);
-				}
-			});
-		};
+				});
+			};
 
 		markAffected(widgets, widget, true);
 
@@ -815,11 +808,11 @@
 				|| widget.prev_pos.height != widget.current_pos.height)) {
 			// Mark affected_axis as y if affected box is affected by only changing y position or height.
 			var pos = {
-				x: widget.prev_pos.x,
-				y: widget.current_pos.y,
-				width: widget.prev_pos.width,
-				height: widget.current_pos.height
-			}
+					x: widget.prev_pos.x,
+					y: widget.current_pos.y,
+					width: widget.prev_pos.width,
+					height: widget.current_pos.height
+				};
 
 			if ('width' in widget.prev_pos.axis_correction) {
 				// Use 'corrected' size if it is less than current size.
@@ -1128,8 +1121,7 @@
 				var _class = event.currentTarget.className;
 				widget['div']
 					.toggleClass('resizing-top', _class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null)
-					.toggleClass('resizing-left', _class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null)
-				;
+					.toggleClass('resizing-left', _class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null);
 			},
 			resize: function(event, ui) {
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
@@ -1153,9 +1145,10 @@
 
 				if (widget['iterator']) {
 					if (getIteratorTooSmallState(widget)) {
-						// Stop aligning size of iterator to the dashboard grid.
+						// Do not align size of iterator to the dashboard grid while in too small state.
 						$('.dashbrd-grid-widget-container.iterator', widget['div']).removeAttr('style');
-					} else {
+					}
+					else {
 						// Align size of iterator to the dashboard grid.
 						$('.dashbrd-grid-widget-container.iterator', widget['div']).css({
 							'width': data['placeholder'].width(),
@@ -1198,8 +1191,7 @@
 					.css({
 						'max-width': '',
 						'max-height': ''
-					})
-				;
+					});
 
 				// Invoke onResizeEnd on every affected widget.
 				data.widgets.each(function(box) {
@@ -1497,8 +1489,7 @@
 				else {
 					addWidgetOfIterator($obj, data, iterator, child);
 				}
-			})
-		;
+			});
 
 		$.each(current_children_by_widgetid, function(index, child) {
 			if ($.inArray(child['widgetid'], reused_widgetids) === -1) {
@@ -1581,9 +1572,7 @@
 		widget['content_script'].empty();
 		if (typeof response.script_inline !== 'undefined') {
 			// NOTE: to execute script with current widget context, add unique ID for required div, and use it in script.
-			var new_script = $('<script>')
-				.text(response.script_inline);
-			widget['content_script'].append(new_script);
+			widget['content_script'].append($('<script>').text(response.script_inline));
 		}
 	}
 
@@ -1600,8 +1589,8 @@
 		}
 
 		var widgets_found = search_widgets.filter(function(w) {
-			return (w['uniqueid'] === widget['uniqueid']);
-		});
+				return (w['uniqueid'] === widget['uniqueid']);
+			});
 
 		return !widgets_found.length;
 	}
@@ -1789,8 +1778,7 @@
 
 				widget['update_in_progress'] = false;
 				setUpdateWidgetContentTimer($obj, data, widget, 3);
-			})
-		;
+			});
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
@@ -2234,11 +2222,11 @@
 				}
 
 				var	pos = {
-					x: x,
-					y: y,
-					width: (x < data.options['max-columns'] - 1) ? 1 : 2,
-					height: data.options['widget-min-rows']
-				};
+						x: x,
+						y: y,
+						width: (x < data.options['max-columns'] - 1) ? 1 : 2,
+						height: data.options['widget-min-rows']
+					};
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
@@ -2296,20 +2284,20 @@
 					 * slot.
 					 */
 					var delta_check = [
-						[0, 0, 2],
-						[-1, 0, 2],
-						[0, 0, 1],
-						[0, -1, 2],
-						[0, -1, 1]
-					];
+							[0, 0, 2],
+							[-1, 0, 2],
+							[0, 0, 1],
+							[0, -1, 2],
+							[0, -1, 1]
+						];
 
 					$.each(delta_check, function(i, val) {
 						var c_pos = $.extend({}, {
-							x: Math.max(0, (val[2] < 2 ? x : pos.x) + val[0]),
-							y: Math.max(0, pos.y + val[1]),
-							width: val[2],
-							height: pos.height
-						});
+								x: Math.max(0, (val[2] < 2 ? x : pos.x) + val[0]),
+								y: Math.max(0, pos.y + val[1]),
+								width: val[2],
+								height: pos.height
+							});
 
 						if (x > c_pos.x + 1) {
 							++c_pos.x;
@@ -2442,12 +2430,12 @@
 		});
 
 		var ajax_data = {
-			// Can be undefined if dashboard is new.
-			dashboardid: data['dashboard']['id'],
-			name: data['dashboard']['name'],
-			userid: data['dashboard']['userid'],
-			widgets: ajax_widgets
-		};
+				// Can be undefined if dashboard is new.
+				dashboardid: data['dashboard']['id'],
+				name: data['dashboard']['name'],
+				userid: data['dashboard']['userid'],
+				widgets: ajax_widgets
+			};
 
 		if (isset('sharing', data['dashboard'])) {
 			ajax_data['sharing'] = data['dashboard']['sharing'];
@@ -2478,8 +2466,7 @@
 			.always(function() {
 				var ul = $('#dashbrd-config').closest('ul');
 				$('#dashbrd-save', ul).prop('disabled', false);
-			})
-		;
+			});
 	}
 
 	function confirmExit($obj, data) {
@@ -2558,8 +2545,8 @@
 		}
 
 		triggers.sort(function(a,b) {
-			var priority_a = (typeof a['options']['priority'] !== 'undefined') ? a['options']['priority'] : 10;
-			var priority_b = (typeof b['options']['priority'] !== 'undefined') ? b['options']['priority'] : 10;
+			var priority_a = (typeof a['options']['priority'] !== 'undefined') ? a['options']['priority'] : 10,
+				priority_b = (typeof b['options']['priority'] !== 'undefined') ? b['options']['priority'] : 10;
 
 			if (priority_a < priority_b) {
 				return -1;
@@ -3082,8 +3069,7 @@
 						}
 
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
-					})
-				;
+					});
 			});
 		},
 
@@ -3364,7 +3350,7 @@
 				}
 			});
 		}
-	}
+	};
 
 	$.fn.dashboardGrid = function(method) {
 		if (methods[method]) {
