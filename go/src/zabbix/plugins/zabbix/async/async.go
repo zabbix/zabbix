@@ -54,4 +54,5 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.switches", "Count of context switches")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.intr", "Device interrupts")
 	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.cpu", "CPU information")
+	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.macaddr", "Listing of MAC addresses")
 }
