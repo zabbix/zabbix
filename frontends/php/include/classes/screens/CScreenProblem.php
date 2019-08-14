@@ -1200,7 +1200,6 @@ class CScreenProblem extends CScreenBase {
 	 * @return CCol
 	 */
 	public static function getLatestValues(array $trigger_items) {
-		ksort($trigger_items);
 		$trigger_items = zbx_toHash($trigger_items, 'itemid');
 		$history_values = Manager::History()->getLastValues($trigger_items, 1, ZBX_HISTORY_PERIOD);
 		$tooltip = [];
