@@ -43,5 +43,9 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.hw.chassis", "Chassis information")
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.hw.devices", "Listing of PCI or USB devices")
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.sw.packages", "Listing of installed packages")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.tcp.service", "Checks if service is running and accepting TCP connections")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.tcp.service.perf", "Checks performance of TCP service")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.udp.service", "Checks if service is running and responding to UDP requests")
+	plugin.RegisterMetric(&impl, "zabbixsync", "net.udp.service.perf", "Checks performance of UDP service")
 	impl.SetCapacity(1)
 }
