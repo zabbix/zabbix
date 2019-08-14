@@ -60,43 +60,25 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 		return inbuf
 	}
 
-	inlen := len(inbuf)
-	outbuffer := []byte{}
-	inbytes := C.size_t(inlen)
-	outbytes := C.size_t(inlen)
-	ret := -1
-	wr := 0
-	sz := inlen
+	outbuf = make([]byte, len(inbuf))
+	inbytes := C.size_t(len(inbuf))
+	outbytes := C.size_t(len(inbuf))
 
-	for ret == -1 && int(inbytes) != 0 {
-		var errno syscall.Errno
-
-		inptr := &inbuf[inlen-int(inbytes)]
-		tmp := make([]byte, sz)
-		copy(tmp[:wr], outbuffer)
-		outptr := &tmp[wr]
-		outbytes = C.size_t(inlen)
-
-		cret, err := C.call_iconv(cd,
-			(*C.char)(unsafe.Pointer(inptr)), &inbytes,
-			(*C.char)(unsafe.Pointer(outptr)), &outbytes)
-		ret = int(cret)
-
-		if err != nil {
-			if errno = err.(syscall.Errno); errno != syscall.E2BIG {
-				break
-			}
+	for {
+		inptr := (*C.char)(unsafe.Pointer(&inbuf[len(inbuf)-int(inbytes)]))
+		outptr := (*C.char)(unsafe.Pointer(&outbuf[len(outbuf)-int(outbytes)]))
+		_, err := C.call_iconv(cd, inptr, &inbytes, outptr, &outbytes)
+		if err == nil || err.(syscall.Errno) != syscall.E2BIG {
+			break
 		}
-
-		wr += inlen - int(outbytes)
-		sz = wr + inlen
-
-		outbuffer = tmp
+		outbytes += C.size_t(len(inbuf))
+		tmp := make([]byte, len(outbuf)+len(inbuf))
+		copy(tmp, outbuf)
+		outbuf = tmp
 	}
-
+	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 	C.iconv_close(cd)
-	return outbuffer[:wr]
-
+	return
 }
 
 // Export -
