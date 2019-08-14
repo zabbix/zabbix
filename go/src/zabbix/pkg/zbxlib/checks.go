@@ -57,6 +57,7 @@ int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -162,6 +163,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
 	case "system.swap.size":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_SIZE)
+	case "system.users.num":
+		cfunc = unsafe.Pointer(C.SYSTEM_USERS_NUM)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
