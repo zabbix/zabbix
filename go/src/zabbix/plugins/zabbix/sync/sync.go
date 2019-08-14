@@ -54,5 +54,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.users.num", "Number of users logged in")
 	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.dir.count", "Directory entry count")
 	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.dir.size", "Directory size (in bytes)")
+	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.file.size", "File size (in bytes)")
 	impl.SetCapacity(1)
 }
