@@ -1265,7 +1265,7 @@
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
 		clearUpdateWidgetContentTimer(widget);
 
-		if (widget['update_in_progress']) {
+		if (widget['updateWidgetContent_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
 			return;
 		}
@@ -1393,7 +1393,6 @@
 			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
 			'preloader_fadespeed': 500,
-			'update_in_progress': false,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -1661,7 +1660,7 @@
 	function updateWidgetContent($obj, data, widget, options) {
 		clearUpdateWidgetContentTimer(widget);
 
-		if (widget['update_in_progress']) {
+		if (widget['updateWidgetContent_in_progress']) {
 			// Waiting for another AJAX request to either complete of fail.
 			return;
 		}
@@ -1728,7 +1727,7 @@
 
 		startPreloader(widget);
 
-		widget['update_in_progress'] = true;
+		widget['updateWidgetContent_in_progress'] = true;
 
 		return jQuery.ajax({
 			url: url.getUrl(),
@@ -1737,7 +1736,7 @@
 			dataType: 'json'
 		})
 			.done(function(response) {
-				widget['update_in_progress'] = false;
+				delete widget['updateWidgetContent_in_progress'];
 
 				stopPreloader(widget);
 
@@ -1776,12 +1775,19 @@
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
 
-				widget['update_in_progress'] = false;
+				delete widget['updateWidgetContent_in_progress'];
 				setUpdateWidgetContentTimer($obj, data, widget, 3);
 			});
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
+		if (widget['updateWidgetConfig_in_progress']) {
+			// Waiting for another AJAX request to either complete of fail.
+			return;
+		}
+
+		widget['updateWidgetConfig_in_progress'] = true;
+
 		var	fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
@@ -1964,6 +1970,9 @@
 
 				// Mark dashboard as updated.
 				data['options']['updated'] = true;
+			})
+			.always(function() {
+				delete widget['updateWidgetConfig_in_progress'];
 			});
 	}
 
@@ -2750,7 +2759,6 @@
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
 				'preloader_fadespeed': 500,
-				'update_in_progress': false,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
