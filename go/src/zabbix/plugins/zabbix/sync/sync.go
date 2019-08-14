@@ -56,5 +56,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.dir.size", "Directory size (in bytes)")
 	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.file.size", "File size (in bytes)")
 	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.file.time", "File time information")
+	plugin.RegisterMetric(&impl, "zabbixsync", "vfs.fs.inode", "Number or percentage of inodes")
 	impl.SetCapacity(1)
 }
