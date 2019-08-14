@@ -24,7 +24,7 @@ import (
 	"syscall"
 )
 
-func arrayToString(unameArray *[65]int8) string {
+func arrayToString(unameArray [65]int8) string {
 	var byteString [65]byte
 	var indexLength int
 	for ; indexLength < len(unameArray); indexLength++ {
@@ -42,8 +42,18 @@ func getUname() (uname string, err error) {
 		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
 		return
 	}
-	uname = fmt.Sprintf("%s %s %s %s %s", arrayToString(&utsname.Sysname), arrayToString(&utsname.Nodename),
-		arrayToString(&utsname.Release), arrayToString(&utsname.Version), arrayToString(&utsname.Machine))
+	uname = fmt.Sprintf("%s %s %s %s %s", arrayToString(utsname.Sysname), arrayToString(utsname.Nodename),
+		arrayToString(utsname.Release), arrayToString(utsname.Version), arrayToString(utsname.Machine))
 
 	return uname, nil
+}
+
+func getSwArch() (uname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
+		return
+	}
+
+	return arrayToString(utsname.Machine), nil
 }
