@@ -42,5 +42,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "proc.num", "The number of processes")
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.hw.chassis", "Chassis information")
 	plugin.RegisterMetric(&impl, "zabbixsync", "system.hw.devices", "Listing of PCI or USB devices")
+	plugin.RegisterMetric(&impl, "zabbixsync", "system.sw.packages", "Listing of installed packages")
 	impl.SetCapacity(1)
 }
