@@ -221,7 +221,7 @@ function make_event_details($event, $backurl) {
 					$table->addRow([_('Resolved by'), getUserFullname($user[0])]);
 				}
 				else {
-					$table->addRow([_('Resolved by'), _('User')]);
+					$table->addRow([_('Resolved by'), _('Inaccessible user')]);
 				}
 			}
 		}
