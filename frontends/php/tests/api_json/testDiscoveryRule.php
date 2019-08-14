@@ -922,19 +922,6 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
 			],
-			'Test unallowed preprocessing error handler for type ZBX_PREPROC_ERROR_FIELD_JSON' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
-			],
 			'Test filled preprocessing error handler params (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DEFAULT)' => [
 				'discoveryrule' => [
 					'preprocessing' => [
@@ -947,19 +934,6 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "error_handler_params": should be empty.'
-			],
-			'Test unallowed preprocessing error handler for type ZBX_PREPROC_ERROR_FIELD_JSON' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => 'Error param'
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
 			],
 			'Test incorrect preprocessing params for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
@@ -1012,19 +986,6 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_SET_ERROR.'".'
-			],
-			'Test unallowed preprocessing error handler (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
-				'discoveryrule' => [
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
-							'params' => 'abc',
-							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "'.ZBX_PREPROC_FAIL_DISCARD_VALUE.'".'
 			],
 			'Test two preprocessing steps for type ZBX_PREPROC_THROTTLE_TIMED_VALUE' => [
 				'discoveryrule' => [
@@ -1206,6 +1167,45 @@ class testDiscoveryRule extends CAPITest {
 							'params' => 'abc',
 							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_DISCARD_VALUE)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_DISCARD_VALUE,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_SET_VALUE)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_VALUE,
+							'error_handler_params' => 'abc'
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing (ZBX_PREPROC_ERROR_FIELD_JSON + ZBX_PREPROC_FAIL_SET_ERROR)' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_ERROR_FIELD_JSON,
+							'params' => 'abc',
+							'error_handler' => ZBX_PREPROC_FAIL_SET_ERROR,
+							'error_handler_params' => 'abc'
 						]
 					]
 				],
