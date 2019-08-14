@@ -66,6 +66,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
 {
@@ -189,6 +190,8 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":
 		cfunc = unsafe.Pointer(C.VFS_FS_INODE)
+	case "vfs.fs.size":
+		cfunc = unsafe.Pointer(C.VFS_FS_SIZE)
 
 	default:
 		return nil, fmt.Errorf("Unsupported metric %s", key)
