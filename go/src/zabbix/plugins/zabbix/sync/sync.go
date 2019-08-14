@@ -51,5 +51,6 @@ func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.tcp.service.perf", "Checks performance of TCP service")
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.udp.service", "Checks if service is running and responding to UDP requests")
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.udp.service.perf", "Checks performance of UDP service")
+	plugin.RegisterMetric(&impl, "zabbixsync", "system.users.num", "Number of users logged in")
 	impl.SetCapacity(1)
 }
