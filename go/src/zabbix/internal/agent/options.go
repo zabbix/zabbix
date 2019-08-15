@@ -40,6 +40,7 @@ type AgentOptions struct {
 	ListenIP            string `conf:",optional"`
 	ListenPort          int    `conf:",,1024:32767,10050"`
 	MaxLinesPerSecond   int    `conf:",,1:1000,20"`
+	ControlSocket       string `conf:",optional"`
 	Plugins             map[string]map[string]string
 }
 

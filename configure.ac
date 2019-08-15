@@ -2001,9 +2001,10 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/zbxlib/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/agent/remotecontrol/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
 	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
