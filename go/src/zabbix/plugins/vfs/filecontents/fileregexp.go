@@ -29,6 +29,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 )
 
@@ -80,6 +81,8 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 	var encoder, output string
 	var line, outline string
 
+	start := time.Now()
+
 	if len(params) > 6 {
 		return nil, errors.New("Too many parameters")
 	}
@@ -116,7 +119,6 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 		output = params[5]
 	}
 
-	start := time.Now()
 	file, err := stdOs.Open(params[0])
 	if err != nil {
 		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
@@ -130,7 +132,7 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 
 	for {
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > /*float64(agent.Options.Timeout)*/ 3000 {
+		if elapsed.Seconds() > float64(agent.Options.Timeout) {
 			return nil, errors.New("Timeout while processing item")
 		}
 
