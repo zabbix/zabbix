@@ -94,7 +94,7 @@ type devUnit struct {
 	name       string
 	head, tail historyIndex
 	accessed   time.Time
-	history    []devStats
+	history    [maxHistory]devStats
 }
 
 var typeParams map[string]int = map[string]int{
@@ -157,6 +157,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if devParam == "all" {
 			devParam = ""
 		}
+	case 0:
 	default:
 		return nil, errors.New("Too many parameters.")
 	}
@@ -238,7 +239,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		return float64(tailio.operations-headio.operations) * float64(time.Second) / float64(tail.clock-head.clock), nil
 	} else {
-		p.devices[devName] = &devUnit{name: devName, accessed: now, history: make([]devStats, maxHistory)}
+		p.devices[devName] = &devUnit{name: devName, accessed: now}
 		return
 	}
 }
