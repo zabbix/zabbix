@@ -21,18 +21,14 @@ package agent
 
 import (
 	"bytes"
-	"context"
-	"errors"
 	"fmt"
-	"os/exec"
 	"strings"
 	"time"
 	"unicode"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/zbxcmd"
 )
-
-const maxExecuteOutputLen = 512 * 1024
 
 type parameterInfo struct {
 	cmd      string
@@ -99,44 +95,21 @@ func (p UserParameterPlugin) cmd(key string, params []string) (string, error) {
 
 // Export -
 func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-
 	s, err := p.cmd(key, params)
 	if err != nil {
 		return nil, err
 	}
 
-	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), s)
+	p.Debugf("executing command:'%s'", s)
 
-	cmdCtx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(Options.Timeout))
-	defer cancel()
-
-	cmd := exec.CommandContext(cmdCtx, "sh", "-c", s)
-
-	stdoutStderr, err := cmd.CombinedOutput()
-
+	stdoutStderr, err := zbxcmd.Run(s, time.Second*time.Duration(Options.Timeout))
 	if err != nil {
-		if cmdCtx.Err() == context.DeadlineExceeded {
-			p.Debugf("Failed to execute command \"%s\": timeout", s)
-			return nil, fmt.Errorf("Timeout while executing a shell script.")
-		}
-
-		if len(stdoutStderr) == 0 {
-			p.Debugf("Failed to execute command \"%s\": %s", s, err)
-			return nil, err
-		}
-
-		p.Debugf("Failed to execute command \"%s\": %s", s, string(stdoutStderr))
-		return nil, errors.New(string(stdoutStderr))
+		return nil, err
 	}
 
-	if maxExecuteOutputLen <= len(stdoutStderr) {
-		return nil, fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLen/1024)
-	}
+	p.Debugf("command:'%s' length:%d output:'%.20s'", s, len(stdoutStderr), stdoutStderr)
 
-	cmdResult := strings.TrimRight(string(stdoutStderr), " \t\r\n")
-	p.Debugf("[%d] command:'%s' len:%d cmd_result:'%.20s'", ctx.ClientID(), s, len(cmdResult), cmdResult)
-
-	return cmdResult, nil
+	return stdoutStderr, nil
 }
 
 func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int) error {

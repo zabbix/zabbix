@@ -42,6 +42,8 @@ type AgentOptions struct {
 	MaxLinesPerSecond    int      `conf:",,1:1000,20"`
 	UserParameter        []string `conf:",optional"`
 	UnsafeUserParameters int      `conf:",,0:1,0"`
+	LogRemoteCommands    int      `conf:",,0:1,0"`
+	EnableRemoteCommands int      `conf:",,0:1,0"`
 	Plugins              map[string]map[string]string
 }
 
