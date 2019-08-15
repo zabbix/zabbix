@@ -45,7 +45,6 @@ int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -149,8 +148,6 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.GET_SENSOR)
 	case "system.cpu.load":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_LOAD)
-	case "system.cpu.num":
-		cfunc = unsafe.Pointer(C.SYSTEM_CPU_NUM)
 	case "system.cpu.switches":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
 	case "system.cpu.intr":
