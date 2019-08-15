@@ -18,6 +18,9 @@
 			if ($('#tls_in_psk').is(':checked')) {
 				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
 			}
+			else {
+				$('.tls_psk').find('input').val('');
+			}
 
 			$('#tls_accept').val(tls_accept);
 		});
@@ -29,7 +32,7 @@
 				$('.tls_psk').show();
 			}
 			else {
-				$('.tls_psk').hide().find('input').val('');
+				$('.tls_psk').hide();
 			}
 		});
 		if (!$('#tls_in_psk').is(':checked')) {
