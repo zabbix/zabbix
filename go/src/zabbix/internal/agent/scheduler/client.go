@@ -181,6 +181,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					return
 				}
 				tasks = append(tasks, info.watcher)
+
 				log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 			}
 			info.watcher.requests = append(info.watcher.requests, r)
@@ -190,16 +191,14 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	// handle configurator interface for inactive plugins
 	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
 		if p.refcount == 0 {
-			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
-				task := &configuratorTask{
-					taskBase: taskBase{plugin: p, active: true},
-					options:  options}
-				if err = task.reschedule(now); err != nil {
-					return
-				}
-				tasks = append(tasks, task)
-				log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
+			task := &configuratorTask{
+				taskBase: taskBase{plugin: p, active: true},
+				options:  agent.Options.Plugins[strings.Title(p.impl.Name())]}
+			if err = task.reschedule(now); err != nil {
+				return
 			}
+			tasks = append(tasks, task)
+			log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 		}
 	}
 	for _, t := range tasks {

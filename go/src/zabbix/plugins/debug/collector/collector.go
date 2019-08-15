@@ -52,10 +52,11 @@ func (p *Plugin) Period() int {
 
 func (p *Plugin) Configure(options map[string]string) {
 	p.Debugf("configure")
-	if val, ok := options["Interval"]; ok {
-		p.interval, _ = strconv.Atoi(val)
-	} else {
-		p.interval = 10
+	p.interval = 10
+	if options != nil {
+		if val, ok := options["Interval"]; ok {
+			p.interval, _ = strconv.Atoi(val)
+		}
 	}
 }
 

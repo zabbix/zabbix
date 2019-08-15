@@ -32,6 +32,7 @@ type Metric struct {
 }
 
 var Metrics map[string]*Metric = make(map[string]*Metric)
+var Plugins map[string]Accessor = make(map[string]Accessor)
 
 func RegisterMetric(plugin Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
@@ -70,16 +71,15 @@ func RegisterMetric(plugin Accessor, name string, key string, description string
 		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
 	}
 
-	var found bool
-	for _, m := range Metrics {
-		if m.Plugin == plugin {
-			found = true
-			break
+	if p, ok := Plugins[name]; ok {
+		if p != plugin {
+			panic(fmt.Sprintf(`plugin name "%s" has been already registred by other plugin`, name))
 		}
-	}
-	if !found {
+	} else {
+		Plugins[name] = plugin
 		plugin.Init(name)
 	}
+
 	Metrics[key] = &Metric{Plugin: plugin, Key: key, Description: description}
 }
 
@@ -92,4 +92,5 @@ func Get(key string) (acc Accessor, err error) {
 
 func ClearRegistry() {
 	Metrics = make(map[string]*Metric)
+	Plugins = make(map[string]Accessor)
 }

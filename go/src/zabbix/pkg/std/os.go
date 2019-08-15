@@ -85,30 +85,6 @@ type fileStat struct {
 	sys     syscall.Stat_t
 }
 
-// The defined file mode bits
-const (
-	// The single letters are the abbreviations
-	// used by the String method's formatting.
-	ModeDir        FileMode = 1 << (32 - 1 - iota) // d: is a directory
-	ModeAppend                                     // a: append-only
-	ModeExclusive                                  // l: exclusive use
-	ModeTemporary                                  // T: temporary file; Plan 9 only
-	ModeSymlink                                    // L: symbolic link
-	ModeDevice                                     // D: device file
-	ModeNamedPipe                                  // p: named pipe (FIFO)
-	ModeSocket                                     // S: Unix domain socket
-	ModeSetuid                                     // u: setuid
-	ModeSetgid                                     // g: setgid
-	ModeCharDevice                                 // c: Unix character device, when ModeDevice is set
-	ModeSticky                                     // t: sticky
-	ModeIrregular                                  // ?: non-regular file; nothing else is known about this file
-
-	// Mask for the type bits. For regular files, none will be set.
-	ModeType = ModeDir | ModeSymlink | ModeNamedPipe | ModeSocket | ModeDevice | ModeCharDevice | ModeIrregular
-
-	ModePerm FileMode = 0777 // Unix permission bits
-)
-
 func (o *mockOs) Open(name string) (File, error) {
 	if data, ok := o.files[name]; !ok {
 		return nil, errors.New("file does not exist")
@@ -139,11 +115,6 @@ func (o *fileStat) Size() int64 {
 
 func (o *fileStat) Sys() interface{} {
 	return nil
-}
-
-// IsRegular reports whether m describes a regular file.
-func (m FileMode) IsRegular() bool {
-	return m&ModeType == 0
 }
 
 func (o *mockOs) Stat(name string) (os.FileInfo, error) {
