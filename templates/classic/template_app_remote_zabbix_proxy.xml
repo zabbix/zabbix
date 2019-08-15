@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-02-06T11:30:20Z</date>
+    <date>2019-05-23T13:19:03Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -1485,7 +1485,7 @@
                     <history>1w</history>
                     <trends>365d</trends>
                     <status>0</status>
-                    <value_type>3</value_type>
+                    <value_type>0</value_type>
                     <allowed_hosts/>
                     <units/>
                     <snmpv3_contextname/>
@@ -1516,6 +1516,10 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.all</params>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                         </step>
                     </preprocessing>
                     <jmx_endpoint/>
@@ -1583,6 +1587,10 @@
                             <type>12</type>
                             <params>$.data.wcache.values.float</params>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1648,6 +1656,10 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.log</params>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                         </step>
                     </preprocessing>
                     <jmx_endpoint/>
@@ -1715,6 +1727,10 @@
                             <type>12</type>
                             <params>$.data.wcache.values['not supported']</params>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1780,6 +1796,10 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.str</params>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                         </step>
                     </preprocessing>
                     <jmx_endpoint/>
@@ -1847,6 +1867,10 @@
                             <type>12</type>
                             <params>$.data.wcache.values.text</params>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1912,6 +1936,10 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.uint</params>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                         </step>
                     </preprocessing>
                     <jmx_endpoint/>

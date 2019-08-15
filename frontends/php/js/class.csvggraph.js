@@ -92,6 +92,7 @@ jQuery(function ($) {
 			hbox = graph.data('hintbox') || null;
 
 		if (hbox !== null && data.isHintBoxFrozen === false) {
+			removeFromOverlaysStack(graph.hintboxid);
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
 			hbox.remove();
@@ -119,6 +120,7 @@ jQuery(function ($) {
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, false, graph.parent());
 			data.isHintBoxFrozen = true;
 			$('.dashbrd-grid-container').dashboardGrid('pauseWidgetRefresh', graph.data('widget')['uniqueid']);
+			overlayDialogueOnLoad(true, graph.hintBoxItem);
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				$('.dashbrd-grid-container')

@@ -320,6 +320,26 @@ class CDBHelper {
 	}
 
 	/**
+	 * Escapes value to be used in SQL query.
+	 *
+	 * @param mixed $value    value to be escaped
+	 *
+	 * @return string
+	 */
+	public static function escape($value) {
+		if (!is_array($value)) {
+			return zbx_dbstr($value);
+		}
+
+		$result = [];
+		foreach ($value as $part) {
+			$result[] = zbx_dbstr($part);
+		}
+
+		return implode(',', $result);
+	}
+
+	/**
 	 * Add host groups to user group with these rights.
 	 *
 	 * @param string $usergroup_name

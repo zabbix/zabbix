@@ -12,6 +12,7 @@ SERVER_tests = \
 	is_double \
 	zbx_trim_float \
 	zbx_trim_integer \
+	zbx_variant_compare \
 	zbx_user_macro_parse
 endif
 
@@ -64,11 +65,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
@@ -254,6 +255,20 @@ zbx_trim_integer_LDADD += @SERVER_LIBS@
 zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_variant_compare_SOURCES = \
+	zbx_variant_compare.c \
+	$(COMMON_SRC_FILES)
+
+zbx_variant_compare_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_variant_compare_LDADD += @SERVER_LIBS@
+
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 
 zbx_user_macro_parse_SOURCES = \

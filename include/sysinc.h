@@ -420,4 +420,8 @@
 #	include <utmpx.h>
 #endif
 
+#ifdef HAVE_STDDEF_H
+#	include <stddef.h>
+#endif
+
 #endif

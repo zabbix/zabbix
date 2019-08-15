@@ -26,6 +26,7 @@
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
 #include "mutexs.h"
+#include "daemon.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -121,7 +122,17 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_send_proxy_data_response(&proxy, sock, error);
+	if (!ZBX_IS_RUNNING())
+	{
+		error = zbx_strdup(error, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from active proxy at \"%s\": %s",
+				sock->peer, error);
+		ret = status = FAIL;
+		goto out;
+	}
+	else
+		zbx_send_proxy_data_response(&proxy, sock, error);
+
 out:
 	if (FAIL == ret)
 	{

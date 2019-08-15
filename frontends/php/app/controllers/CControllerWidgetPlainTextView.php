@@ -86,13 +86,13 @@ class CControllerWidgetPlainTextView extends CControllerWidget {
 			if ($histories) {
 				$histories = call_user_func_array('array_merge', $histories);
 
-				if (!$fields['show_as_html']) {
-					foreach ($histories as &$history) {
-						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-						$history['value'] = new CPre($history['value']);
-					}
-					unset($history);
+				foreach ($histories as &$history) {
+					$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
+					$history['value'] = $fields['show_as_html']
+						? new CJsScript($history['value'])
+						: new CPre($history['value']);
 				}
+				unset($history);
 			}
 
 			CArrayHelper::sort($histories, [

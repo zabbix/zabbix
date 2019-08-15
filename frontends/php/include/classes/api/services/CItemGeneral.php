@@ -1397,10 +1397,11 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$step = 1;
+
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
@@ -1426,11 +1427,11 @@ abstract class CItemGeneral extends CApiService {
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$item_preprocids[] = $item['itemid'];
+				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
@@ -1976,11 +1977,13 @@ abstract class CItemGeneral extends CApiService {
 				libxml_clear_errors();
 
 				if (!$errors) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.', _('XML is empty')));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('XML is expected'))
+					);
 				}
 				else {
 					$error = reset($errors);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
 						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
 						$error->line, $error->column
 					)));
@@ -1989,7 +1992,9 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
 				if (trim($posts, " \r\n") === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 
 				$types = [
@@ -2016,7 +2021,9 @@ abstract class CItemGeneral extends CApiService {
 				$json->decode($posts);
 
 				if ($json->hasError()) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 			}
 		}

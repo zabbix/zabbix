@@ -149,7 +149,7 @@ foreach (getLocales() as $localeId => $locale) {
 	if ($locale['display']) {
 		// checking if this locale exists in the system. The only way of doing it is to try and set one
 		// trying to set only the LC_MONETARY locale to avoid changing LC_NUMERIC
-		$localeExists = (setlocale(LC_MONETARY , zbx_locale_variants($localeId)) || $localeId == 'en_GB');
+		$localeExists = ($localeId === 'en_GB' || setlocale(LC_MONETARY , zbx_locale_variants($localeId)));
 
 		$languageComboBox->addItem(
 			$localeId,

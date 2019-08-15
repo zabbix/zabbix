@@ -1020,7 +1020,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 		$applicationids = array_keys(API::Application()->get([
 			'output' => [],
 			'groupids' => $groupids ? $groupids : null,
-			'filter' => ['name' => $application],
+			'search' => ['name' => $application],
 			'preservekeys' => true
 		]));
 		$groupids = [];

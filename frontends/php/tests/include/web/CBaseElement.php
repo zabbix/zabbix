@@ -212,13 +212,13 @@ abstract class CBaseElement extends RemoteWebElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return ($this->executeStaleSafe(__FUNCTION__) === $enabled);
+		return (parent::isEnabled() === $enabled);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public function isSelected($selected = true) {
-		return ($this->executeStaleSafe(__FUNCTION__) === $selected);
+		return (parent::isSelected() === $selected);
 	}
 }

@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
@@ -725,7 +724,7 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::HostGroup()->get($options);
 				if (array_key_exists('enrich_parent_groups', $page_options)) {
-					$records = CPageFilter::enrichParentGroups($records, [
+					$records = enrichParentGroups($records, [
 						'real_hosts' => null
 					] + $options);
 				}

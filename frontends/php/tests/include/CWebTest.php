@@ -83,7 +83,7 @@ class CWebTest extends CTest {
 	 */
 	protected function tearDown() {
 		// Check for JS errors.
-		if (!$this->hasFailed()) {
+		if (!$this->hasFailed() && $this->getStatus() !== null) {
 			if (self::$shared_page !== null) {
 				$errors = [];
 
@@ -214,5 +214,20 @@ class CWebTest extends CTest {
 	 */
 	public function query($type, $locator = null) {
 		return $this->page->query($type, $locator);
+	}
+
+	/**
+	 * Check page title text.
+	 *
+	 * @param string $title		page title
+	 */
+	public function assertPageTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+		}
+
+		$this->assertEquals($title, $this->page->getTitle());
 	}
 }

@@ -90,7 +90,7 @@ $str = _s('%1$s (year %2$s)', $service['name'], $d);
 $x = imagesx($im) / 2 - imagefontwidth(4) * mb_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $textcolor, $str);
 
-$now = time(null);
+$now = time();
 $to_time = $now;
 
 $count_now = [];

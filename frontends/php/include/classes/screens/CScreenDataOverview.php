@@ -40,7 +40,9 @@ class CScreenDataOverview extends CScreenBase {
 				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
-		$table = getItemsDataOverview((array) $groupid, $this->screenitem['application'], $this->screenitem['style']);
+		$table = getItemsDataOverview((array) $groupid, $this->screenitem['application'], $this->screenitem['style'],
+			ZBX_PROBLEM_SUPPRESSED_FALSE
+		);
 
 		$footer = (new CList())
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))

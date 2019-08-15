@@ -1812,6 +1812,8 @@ static const char	*check_escalation_result_string(int result)
 			return "skip";
 		case ZBX_ESCALATION_PROCESS:
 			return "process";
+		case ZBX_ESCALATION_SUPPRESS:
+			return "suppress";
 		default:
 			return "unknown";
 	}
@@ -1828,14 +1830,16 @@ static const char	*check_escalation_result_string(int result)
  *             action     - [IN]  action responsible for the escalation       *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Return value: ZBX_ESCALATION_CANCEL  - the relevant event, item, trigger   *
- *                                        or host is disabled or deleted      *
- *               ZBX_ESCALATION_DELETE  - escalations was created and         *
- *                                        recovered during maintenance        *
- *               ZBX_ESCALATION_SKIP    - escalation is paused during         *
- *                                        maintenance or dependable trigger   *
- *                                        in problem state                    *
- *               ZBX_ESCALATION_PROCESS - otherwise                           *
+ * Return value: ZBX_ESCALATION_CANCEL   - the relevant event, item, trigger  *
+ *                                         or host is disabled or deleted     *
+ *               ZBX_ESCALATION_DELETE   - escalations was created and        *
+ *                                         recovered during maintenance       *
+ *               ZBX_ESCALATION_SKIP     - escalation is paused during        *
+ *                                         maintenance or dependable trigger  *
+ *                                         in problem state                   *
+ *               ZBX_ESCALATION_SUPPRESS - escalation was created before      *
+ *                                         maintenance period                 *
+ *               ZBX_ESCALATION_PROCESS  - otherwise                          *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
@@ -1900,7 +1904,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		}
 
 		/* suppress paused escalations created before maintenance period */
-		/* until maintenance ends or the escalations are recovered   */
+		/* until maintenance ends or the escalations are recovered       */
 		if (0 == escalation->r_eventid)
 		{
 			ret = ZBX_ESCALATION_SUPPRESS;
@@ -2547,7 +2551,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		int	esc_nextcheck;
 
@@ -2645,7 +2649,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -2692,4 +2696,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

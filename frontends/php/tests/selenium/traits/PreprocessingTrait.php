@@ -35,23 +35,19 @@ trait PreprocessingTrait {
 			[
 				'name'		=> 'type',
 				'selector'	=> 'xpath:.//select[contains(@id, "_type")]',
-				'class'		=> 'CDropdownElement',
-				'value'		=> ['getText']
-			],
-			[
-				'name'		=> 'type',
-				'selector'	=> 'xpath:.//input[contains(@id, "_type_name")]',
-				'value'		=> ['getAttribute', 'params' => ['value']]
+				'detect'	=> true,
+				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_1',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]',
-				'value'		=> ['getAttribute', 'params' => ['value']]
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]',
+				'detect'	=> true,
+				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_2',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]',
-				'value'		=> ['getAttribute', 'params' => ['value']]
+				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'on_fail',
@@ -68,7 +64,7 @@ trait PreprocessingTrait {
 			[
 				'name'		=> 'error_handler_params',
 				'selector'	=> 'xpath:.//input[contains(@id, "_error_handler_params")]',
-				'value'		=> ['getAttribute', 'params' => ['value']]
+				'value'		=> ['getValue']
 			]
 		];
 	}
@@ -88,7 +84,12 @@ trait PreprocessingTrait {
 			$query->cast($field['class']);
 		}
 
-		return $query->one(false);
+		$element = $query->one(false);
+		if ($element !== null && array_key_exists('detect', $field) && $field['detect']) {
+			$element = $element->detect();
+		}
+
+		return $element;
 	}
 
 	/**
@@ -100,9 +101,6 @@ trait PreprocessingTrait {
 		$rows = $this->query('class:preprocessing-list-item')->count() + 1;
 		$add = $this->query('id:param_add')->one();
 		$fields = self::getPreprocessingFieldDescriptors();
-
-		// Forcing removing of input field descriptor used in items inherited from templates.
-		unset($fields[1]);
 
 		foreach ($steps as $options) {
 			$add->click();
@@ -191,5 +189,34 @@ trait PreprocessingTrait {
 		unset($step);
 
 		return $steps;
+	}
+
+	/**
+	 * Get preprocessing steps and convert them to data.
+	 *
+	 * @return array
+	 */
+	private function listPreprocessingSteps() {
+		$data = [];
+		foreach ($this->getPreprocessingSteps(true) as $i => $step) {
+			$values = [];
+			foreach ($step as $control) {
+				$field = $control['field'];
+
+				if ($control['element'] === null) {
+					continue;
+				}
+
+				$value = call_user_func_array([$control['element'], $field['value'][0]],
+						array_key_exists('params', $field['value']) ? $field['value']['params'] : []
+				);
+
+				$values[$field['name']] = $value;
+			}
+
+			$data[] = $values;
+		}
+
+		return $data;
 	}
 }

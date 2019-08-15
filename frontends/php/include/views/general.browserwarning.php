@@ -29,15 +29,15 @@
 		<meta name="Author" content="Zabbix SIA" />
 		<title>You are using an outdated browser.</title>
 		<link rel="icon" href="favicon.ico">
-		<link rel="apple-touch-icon-precomposed" sizes="76x76" href="<?= $data['assets_path'] ?>img/apple-touch-icon-76x76-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="120x120" href="<?= $data['assets_path'] ?>img/apple-touch-icon-120x120-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="<?= $data['assets_path'] ?>img/apple-touch-icon-152x152-precomposed.png">
-		<link rel="apple-touch-icon-precomposed" sizes="180x180" href="<?= $data['assets_path'] ?>img/apple-touch-icon-180x180-precomposed.png">
-		<link rel="icon" sizes="192x192" href="<?= $data['assets_path'] ?>img/touch-icon-192x192.png">
-		<meta name="msapplication-TileImage" content="<?= $data['assets_path'] ?>img/ms-tile-144x144.png">
+		<link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/img/apple-touch-icon-76x76-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="120x120" href="assets/img/apple-touch-icon-120x120-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="assets/img/apple-touch-icon-152x152-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="180x180" href="assets/img/apple-touch-icon-180x180-precomposed.png">
+		<link rel="icon" sizes="192x192" href="assets/img/touch-icon-192x192.png">
+		<meta name="msapplication-TileImage" content="assets/img/ms-tile-144x144.png">
 		<meta name="msapplication-TileColor" content="#d40000">
 		<meta name="msapplication-config" content="none"/>
-		<link rel="stylesheet" type="text/css" href="<?= $data['assets_path'] ?>styles/<?= ZBX_DEFAULT_THEME ?>.css" />
+		<link rel="stylesheet" type="text/css" href="assets/styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
 	<body lang="en">
 		<main>

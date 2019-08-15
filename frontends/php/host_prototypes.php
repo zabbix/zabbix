@@ -338,12 +338,24 @@ if (hasRequest('form')) {
 				$data['host_prototype']['inventory']['inventory_mode'] = HOST_INVENTORY_DISABLED;
 			}
 
+			$groupids = zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid');
 			$data['groups'] = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid'),
-				'editable' => true,
+				'groupids' => $groupids,
 				'preservekeys' => true
 			]);
+
+			$n = 0;
+			foreach ($groupids as $groupid) {
+				if (!array_key_exists($groupid, $data['groups'])) {
+					$postfix = (++$n > 1) ? ' ('.$n.')' : '';
+					$data['groups'][$groupid] = [
+						'groupid' => $groupid,
+						'name' => _('Inaccessible group').$postfix,
+						'inaccessible' => true
+					];
+				}
+			}
 		}
 		else {
 			// Set default values for new host prototype.

@@ -202,7 +202,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		zbx_ipc_message_t	*message = NULL;
 
@@ -221,21 +221,27 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-		while (NULL == message)
+		while (ZBX_IS_RUNNING())
 		{
+			const int ipc_timeout = 2;
 			const int ipmi_timeout = 1;
-			const int ipc_timeout = 1;
-
-			zbx_perform_all_openipmi_ops(ipmi_timeout);
 
 			if (SUCCEED != zbx_ipc_async_socket_recv(&ipmi_socket, ipc_timeout, &message))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read IPMI service request");
 				exit(EXIT_FAILURE);
 			}
+
+			if (NULL != message)
+				break;
+
+			zbx_perform_all_openipmi_ops(ipmi_timeout);
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+		if (NULL == message)
+			break;
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;
@@ -259,10 +265,14 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 		message = NULL;
 	}
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
+
 	zbx_ipc_async_socket_close(&ipmi_socket);
 
 	zbx_free_ipmi_handler();
-
 #undef STAT_INTERVAL
 }
 

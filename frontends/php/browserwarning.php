@@ -29,8 +29,5 @@ require_once dirname(__FILE__).'/include/classes/html/CTag.php';
 require_once dirname(__FILE__).'/include/classes/html/CLink.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CBrandHelper.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
-require_once dirname(__FILE__).'/include/classes/core/CAssetsFileCache.php';
 
-(new CView('general.browserwarning', [
-	'assets_path' => (new CAssetsFileCache(__DIR__))->getAssetsUrl()
-]))->render();
+(new CView('general.browserwarning'))->render();

@@ -27,6 +27,10 @@ $alt-blue-grey: #97aab3;
 $white: #fff !default;
 $transparent: transparent;
 
+$disabled-bg-color: #ebebeb !default;
+$disabled-item-color: #768d99 !default;
+$disabled-item-bg-color: #ccd5d9 !default;
+
 $teal: #0f998b;
 
 // MAIN
@@ -53,6 +57,7 @@ $ui-sortable-helper-border-color: $ui-border-color !default;
 
 $action-hover-color: #e8f5ff !default;
 $action-border-color: #ccd5d9 !default;
+$action-preloader-bg-color: $body-bg-color !default;
 $action-shadow-color: rgba(#768d99, 0.5) !default;
 
 $table-border-color: #ebeef0 !default;
@@ -129,3 +134,8 @@ $problem-unack-fg-color: #cc0000 !default;
 $problem-ack-fg-color: #cc0000 !default;
 $ok-unack-fg-color: #009900 !default;
 $ok-ack-fg-color: #009900 !default;
+
+// MULTISELECT
+$multiselect-disabled-bg-color: $disabled-bg-color;
+$multiselect-item-disabled-color: $disabled-item-color;
+$multiselect-item-disabled-bg-color: $disabled-item-bg-color;

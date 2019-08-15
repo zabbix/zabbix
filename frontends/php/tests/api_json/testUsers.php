@@ -679,7 +679,7 @@ class testUsers extends CAPITest {
 					],
 					'autologin' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/autologin": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/autologin": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -781,7 +781,9 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value is too long.'
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of en_GB, en_US, bg_BG, ca_ES, zh_CN, '
+				. 'zh_TW, cs_CZ, nl_NL, fi_FI, fr_FR, ka_GE, de_DE, el_GR, he_IL, hu_HU, id_ID, it_IT, ko_KR, ja_JP, lv_LV, '
+				. 'lt_LT, nb_NO, fa_IR, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sk_SK, es_ES, sv_SE, tr_TR, uk_UA, vi_VN.'
 			],
 			// Check user properties, theme.
 			[
@@ -827,7 +829,7 @@ class testUsers extends CAPITest {
 					],
 					'type' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -849,7 +851,7 @@ class testUsers extends CAPITest {
 					],
 					'type' => '1.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			// Check user properties, refresh.
 			[
@@ -895,7 +897,7 @@ class testUsers extends CAPITest {
 					],
 					'rows_per_page' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/rows_per_page": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/rows_per_page": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1201,7 +1203,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1218,7 +1220,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/active": an integer is expected.'
 			],
 			[
 				'user' => [
@@ -1253,7 +1255,7 @@ class testUsers extends CAPITest {
 						]
 					],
 				],
-				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/user_medias/1/severity": an integer is expected.'
 			],
 			[
 				'user' => [

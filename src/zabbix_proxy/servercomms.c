@@ -26,6 +26,7 @@
 
 #include "comms.h"
 #include "servercomms.h"
+#include "daemon.h"
 
 extern unsigned int	configured_tls_connect_mode;
 
@@ -80,8 +81,9 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 
 			lastlogtime = (int)time(NULL);
 
-			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
-					timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP,
+					CONFIG_SERVER, CONFIG_SERVER_PORT, timeout, configured_tls_connect_mode,
+					tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
 
@@ -94,7 +96,8 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 				sleep(retry_interval);
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+			if (FAIL != res)
+				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
 		}
 	}
 

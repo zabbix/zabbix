@@ -14,31 +14,31 @@
 		jQuery('#user_medias_' + index + '_description').remove();
 	}
 
-	jQuery(document).ready(function() {
-		jQuery('#autologout_visible').bind('click', function() {
+	jQuery(function($) {
+		var $autologin_cbx = $('#autologin'),
+			$autologout_cbx = $('#autologout_visible'),
+			$autologout_txt = $('#autologout');
+
+		$autologin_cbx.on('click', function() {
 			if (this.checked) {
-				jQuery('#autologout').prop('disabled', false);
-				jQuery('#autologin').attr('checked', false);
+				$autologout_cbx.prop('checked', false);
 			}
-			else {
-				jQuery('#autologout').prop('disabled', true);
-			}
+			$autologout_txt.prop('disabled', this.checked || !$autologin_cbx.prop('checked'));
 		});
-		jQuery('#autologin').bind('click', function() {
+
+		$autologout_cbx.on('click', function() {
 			if (this.checked) {
-				jQuery('#autologout').prop('disabled', true);
-				jQuery('#autologout_visible').attr('checked', false);
+				$autologin_cbx.prop('checked', false);
 			}
+			$autologout_txt.prop('disabled', !this.checked);
 		});
 
 		<?php if ($this->data['is_profile']): ?>
-			jQuery('#messages_enabled').on('change', function() {
-				jQuery('#messagingTab input, #messagingTab button, #messagingTab select')
-					.not('[name="messages[enabled]"]')
-					.prop('disabled', !this.checked);
-			});
-
-			jQuery('#messages_enabled').trigger('change');
+		$('#messages_enabled').on('change', function() {
+			$('input, button, select', $('#messagingTab'))
+				.not('[name="messages[enabled]"]')
+				.prop('disabled', !this.checked);
+		}).trigger('change');
 		<?php endif ?>
 	});
 </script>
