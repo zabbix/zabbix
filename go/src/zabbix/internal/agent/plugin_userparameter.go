@@ -101,6 +101,10 @@ func (p UserParameterPlugin) cmd(key string, params []string) (string, error) {
 func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 
 	s, err := p.cmd(key, params)
+	if err != nil {
+		return nil, err
+	}
+
 	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), s)
 
 	cmdCtx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(Options.Timeout))
