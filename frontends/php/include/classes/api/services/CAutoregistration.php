@@ -32,14 +32,25 @@ class CAutoregistration extends CApiService {
 	 *
 	 * @param array    $options
 	 * @param array    $options['output']
-	 * @param boolean  $options['preservekeys']
 	 *
 	 * @return array
 	 */
 	public function get(array $options) {
+		return $this->getAutoreg($options);
+	}
+
+	/**
+	 * Internal get auto registration configuration.
+	 *
+	 * @param array    $options
+	 * @param array    $options['output']
+	 * @param boolean  $update_mode
+	 *
+	 * @return array
+	 */
+	protected function getAutoreg(array $options, $update_mode = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>			['type' => API_OUTPUT, 'in' => implode(',',	['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND],
-			'preservekeys' =>	['type' => API_BOOLEAN, 'default' => false]
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',',	['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -57,7 +68,7 @@ class CAutoregistration extends CApiService {
 		$def_options = [
 			// output
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => false
+			'preservekeys' => $update_mode
 		];
 		$options = zbx_array_merge($def_options, $options);
 
@@ -81,11 +92,7 @@ class CAutoregistration extends CApiService {
 			$result[$autoreg['autoreg_tlsid']] = $autoreg;
 		}
 
-		if (!$result) {
-			return $result;
-		}
-
-		if ($options['preservekeys']) {
+		if (!$result || $update_mode) {
 			return $result;
 		}
 
@@ -108,7 +115,7 @@ class CAutoregistration extends CApiService {
 	 * @return true if no errors
 	 */
 	public function update(array $autoreg) {
-		$db_autoreg = $this->get(['preservekeys' => true]);
+		$db_autoreg = $this->getAutoreg(['output' => API_OUTPUT_EXTEND], true);
 		reset($db_autoreg);
 		$autoreg['autoreg_tlsid'] = key($db_autoreg);
 
