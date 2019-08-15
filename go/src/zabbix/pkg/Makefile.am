@@ -1,6 +1,10 @@
 SUBDIRS = \
-	log \
 	conf \
-	std \
+	glexpr \
 	itemutil \
-	comms
+	log \
+	std \
+	version \
+	watch \
+	zbxcomms \
+	zbxlib

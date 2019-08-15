@@ -95,6 +95,7 @@ func TestParseKey(t *testing.T) {
 		Result{input: `key[ `, failed: true},
 		Result{input: `key[,`, failed: true},
 		Result{input: `key[, `, failed: true},
+		Result{input: `key["\1"]`, key: `key`, params: []string{`\1`}},
 	}
 
 	for _, result := range results {
@@ -117,6 +118,32 @@ func TestParseKey(t *testing.T) {
 				if !result.failed {
 					t.Errorf("Unexpected error: %s", err.Error())
 				}
+			}
+		})
+	}
+}
+
+func TestMakeKey(t *testing.T) {
+	type Result struct {
+		key    string
+		params []string
+		output string
+	}
+
+	results := []*Result{
+		&Result{key: "key", params: []string{}, output: `key`},
+		&Result{key: "key", params: []string{`1`}, output: `key[1]`},
+		&Result{key: "key", params: []string{`1`, `2`}, output: `key[1,2]`},
+		&Result{key: "key", params: []string{`1,2`, `3`}, output: `key["1,2",3]`},
+		&Result{key: "key", params: []string{`1,2,"3"`}, output: `key["1,2,\"3\""]`},
+		&Result{key: "key", params: []string{`]`}, output: `key["]"]`},
+	}
+
+	for _, r := range results {
+		t.Run(r.output, func(t *testing.T) {
+			text := MakeKey(r.key, r.params)
+			if text != r.output {
+				t.Errorf("Expected %s while got %s", r.output, text)
 			}
 		})
 	}

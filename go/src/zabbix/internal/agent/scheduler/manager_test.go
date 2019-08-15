@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"testing"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
@@ -67,7 +68,7 @@ type mockExporterPlugin struct {
 	mockPlugin
 }
 
-func (p *mockExporterPlugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -93,7 +94,7 @@ type mockCollectorExporterPlugin struct {
 	period int
 }
 
-func (p *mockCollectorExporterPlugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.call(key)
 	return
 }
@@ -130,8 +131,9 @@ type mockWatcherPlugin struct {
 	requests []*plugin.Request
 }
 
-func (p *mockWatcherPlugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockWatcherPlugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.call("$watch")
+	log.Debugf("WATCH %s %v", p.Name(), requests)
 	p.requests = requests
 }
 
@@ -153,7 +155,7 @@ func (p *mockRunnerWatcherPlugin) Stop() {
 	p.call("$stop")
 }
 
-func (p *mockRunnerWatcherPlugin) Watch(requests []*plugin.Request, sink plugin.ResultWriter) {
+func (p *mockRunnerWatcherPlugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.call("$watch")
 	p.requests = requests
 }
@@ -162,12 +164,33 @@ func (p *mockRunnerWatcherPlugin) watched() []*plugin.Request {
 	return p.requests
 }
 
+type mockConfiguratorPlugin struct {
+	plugin.Base
+	mockPlugin
+	options map[string]string
+}
+
+func (p *mockConfiguratorPlugin) Configure(options map[string]string) {
+	p.call("$configure")
+}
+
 type resultCacheMock struct {
 	results []*plugin.Result
 }
 
 func (c *resultCacheMock) Write(r *plugin.Result) {
 	c.results = append(c.results, r)
+}
+
+func (c *resultCacheMock) Flush() {
+}
+
+func (pc *resultCacheMock) SlotsAvailable() int {
+	return 1
+}
+
+func (pc *resultCacheMock) PersistSlotsAvailable() int {
+	return 1
 }
 
 type mockManager struct {
@@ -199,12 +222,23 @@ func (m *mockManager) iterate(t *testing.T, iters int) {
 func (m *mockManager) mockInit(t *testing.T) {
 	m.init()
 	clock := time.Now().Unix()
-	m.startTime = time.Unix(clock-clock%10, 0)
+	m.startTime = time.Unix(clock-clock%10, 100)
 	t.Logf("starting time %s", m.startTime.Format(time.Stamp))
 	m.now = m.startTime
 }
 
+func (m *mockManager) update(update *updateRequest) {
+	m.processUpdateRequest(update, m.now)
+}
+
 func (m *mockManager) mockTasks() {
+	index := make(map[exporterTaskAccessor]uint64)
+	for clientid, client := range m.clients {
+		for _, task := range client.exporters {
+			index[task] = clientid
+		}
+		client.exporters = make(map[uint64]exporterTaskAccessor)
+	}
 	for _, p := range m.plugins {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
@@ -218,24 +252,30 @@ func (m *mockManager) mockTasks() {
 						scheduled: getNextcheck(fmt.Sprintf("%d", collector.Period()), m.now).Add(priorityCollectorTaskNs),
 						index:     -1,
 						active:    task.isActive(),
+						recurring: true,
 					},
 					sink: m.sink,
 				}
 				p.enqueueTask(mockTask)
 			case *exporterTask:
-				e := tasks[j].(*exporterTask)
+				e := task.(*exporterTask)
 				mockTask := &mockExporterTask{
-					taskBase: taskBase{
-						plugin:    task.getPlugin(),
-						scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
-						index:     -1,
-						active:    task.isActive(),
+					exporterTask: exporterTask{
+						taskBase: taskBase{
+							plugin:    task.getPlugin(),
+							scheduled: getNextcheck(e.item.delay, m.now).Add(priorityExporterTaskNs),
+							index:     -1,
+							active:    task.isActive(),
+							recurring: true,
+						},
+						item:   e.item,
+						client: e.client,
+						meta:   e.meta,
 					},
 					sink: m.sink,
-					item: e.item,
 				}
-				e.item.task = mockTask
 				p.enqueueTask(mockTask)
+				m.clients[index[e]].exporters[e.item.itemid] = mockTask
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -259,7 +299,7 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 			case *watcherTask:
-				w := tasks[j].(*watcherTask)
+				w := task.(*watcherTask)
 				mockTask := &mockWatcherTask{
 					taskBase: taskBase{
 						plugin:    task.getPlugin(),
@@ -267,9 +307,22 @@ func (m *mockManager) mockTasks() {
 						index:     -1,
 						active:    task.isActive(),
 					},
-					sink:       m.sink,
-					resultSink: w.sink,
-					requests:   w.requests,
+					sink:     m.sink,
+					requests: w.requests,
+					client:   w.client,
+				}
+				p.enqueueTask(mockTask)
+			case *configuratorTask:
+				c := task.(*configuratorTask)
+				mockTask := &mockConfigerTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
+						scheduled: m.now.Add(priorityWatcherTaskNs),
+						index:     -1,
+						active:    task.isActive(),
+					},
+					options: c.options,
+					sink:    m.sink,
 				}
 				p.enqueueTask(mockTask)
 			default:
@@ -298,7 +351,7 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 		}
 	}
 
-	// find the range start in offsetse
+	// find the range start in offsets
 	if len(offsets) != 0 {
 		for offsets[right] < from {
 			right++
@@ -311,18 +364,18 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 	for left < len(times) && right < len(offsets) {
 		if times[left].After(m.now) {
 			if offsets[right] <= to {
-				t.Errorf("plugin %s: no matching timestamp for offset %d", name, offsets[right])
+				t.Errorf("Plugin %s: no matching timestamp for offset %d", name, offsets[right])
 			}
 			return
 		}
 		if offsets[right] > to {
-			t.Errorf("plugin %s: no matching offset for timestamp %s", name, times[left].Format(time.Stamp))
+			t.Errorf("Plugin %s: no matching offset for timestamp %s", name, times[left].Format(time.Stamp))
 			return
 		}
 
 		offsetTime := m.startTime.Add(time.Second * time.Duration(offsets[right]))
 		if !offsetTime.Equal(times[left]) {
-			t.Errorf("plugin %s: offset %d time %s does not match timestamp %s", name, offsets[right],
+			t.Errorf("Plugin %s: offset %d time %s does not match timestamp %s", name, offsets[right],
 				offsetTime.Format(time.Stamp), times[left].Format(time.Stamp))
 			return
 		}
@@ -330,12 +383,12 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 		right++
 	}
 	if left != len(times) && !times[left].After(m.now) {
-		t.Errorf("plugin %s: no matching offset for timestamp %s", name, times[left].Format(time.Stamp))
+		t.Errorf("Plugin %s: no matching offset for timestamp %s", name, times[left].Format(time.Stamp))
 		return
 	}
 
 	if right != len(offsets) && offsets[right] <= to {
-		t.Errorf("plugin %s: no matching timestamp for offset %d", name, offsets[right])
+		t.Errorf("Plugin %s: no matching timestamp for offset %d", name, offsets[right])
 		return
 	}
 }
@@ -351,20 +404,37 @@ func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accesso
 }
 
 type mockExporterTask struct {
-	taskBase
-	item *batchItem
+	exporterTask
 	sink chan performer
 }
 
 func (t *mockExporterTask) perform(s Scheduler) {
 	key, params, _ := itemutil.ParseKey(t.item.key)
-	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params)
+	_, _ = t.plugin.impl.(plugin.Exporter).Export(key, params, t)
 	t.sink <- t
 }
 
-func (t *mockExporterTask) reschedule() bool {
+func (t *mockExporterTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(t.item.delay, t.scheduled)
-	return true
+	return
+}
+
+func (t *mockExporterTask) task() (task *exporterTask) {
+	return &t.exporterTask
+}
+
+// plugin.ContextProvider interface
+
+func (t *mockExporterTask) Output() (output plugin.ResultWriter) {
+	return nil
+}
+
+func (t *mockExporterTask) Meta() (meta *plugin.Meta) {
+	return &t.meta
+}
+
+func (t *mockExporterTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type mockCollectorTask struct {
@@ -377,9 +447,9 @@ func (t *mockCollectorTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockCollectorTask) reschedule() bool {
+func (t *mockCollectorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = getNextcheck(fmt.Sprintf("%d", t.plugin.impl.(plugin.Collector).Period()), t.scheduled)
-	return true
+	return
 }
 
 func (t *mockCollectorTask) getWeight() int {
@@ -396,8 +466,8 @@ func (t *mockStarterTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStarterTask) reschedule() bool {
-	return false
+func (t *mockStarterTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStarterTask) getWeight() int {
@@ -414,8 +484,8 @@ func (t *mockStopperTask) perform(s Scheduler) {
 	t.sink <- t
 }
 
-func (t *mockStopperTask) reschedule() bool {
-	return false
+func (t *mockStopperTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockStopperTask) getWeight() int {
@@ -427,28 +497,71 @@ type mockWatcherTask struct {
 	sink       chan performer
 	resultSink plugin.ResultWriter
 	requests   []*plugin.Request
+	client     ClientAccessor
 }
 
 func (t *mockWatcherTask) perform(s Scheduler) {
-	t.plugin.impl.(plugin.Watcher).Watch(t.requests, t.resultSink)
+	log.Debugf("%s %v", t.plugin.impl.Name(), t.requests)
+	t.plugin.impl.(plugin.Watcher).Watch(t.requests, t)
 	t.sink <- t
 }
 
-func (t *mockWatcherTask) reschedule() bool {
-	return false
+func (t *mockWatcherTask) reschedule(now time.Time) (err error) {
+	return
 }
 
 func (t *mockWatcherTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-func checkExporterTasks(t *testing.T, m *Manager, sink plugin.ResultWriter, items []*batchItem) {
+// plugin.ContextProvider interface
+
+func (t *mockWatcherTask) ClientID() (clientid uint64) {
+	return t.client.ID()
+}
+
+func (t *mockWatcherTask) ItemID() (itemid uint64) {
+	return 0
+}
+
+func (t *mockWatcherTask) Output() (output plugin.ResultWriter) {
+	return t.resultSink
+}
+
+func (t *mockWatcherTask) Meta() (meta *plugin.Meta) {
+	return nil
+}
+
+func (t *mockWatcherTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
+}
+
+type mockConfigerTask struct {
+	taskBase
+	sink    chan performer
+	options map[string]string
+}
+
+func (t *mockConfigerTask) perform(s Scheduler) {
+	t.plugin.impl.(plugin.Configurator).Configure(t.options)
+	t.sink <- t
+}
+
+func (t *mockConfigerTask) reschedule(now time.Time) (err error) {
+	return
+}
+
+func (t *mockConfigerTask) getWeight() int {
+	return t.plugin.capacity
+}
+
+func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clientItem) {
 	lastCheck := time.Time{}
 	n := 0
 	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
 		if task := p.peekTask(); task != nil {
 			if task.getScheduled().Before(lastCheck) {
-				t.Errorf("out of order tasks detected")
+				t.Errorf("Out of order tasks detected")
 			}
 			heap.Pop(&m.queue)
 			p.popTask()
@@ -456,34 +569,37 @@ func checkExporterTasks(t *testing.T, m *Manager, sink plugin.ResultWriter, item
 			if p.peekTask() != nil {
 				heap.Push(&m.queue, p)
 			}
+		} else {
+			heap.Pop(&m.queue)
 		}
 	}
 	if len(items) != n {
 		t.Errorf("Expected %d tasks while got %d", len(items), n)
 	}
 
-	var owner *batch
+	var requestClient *client
 	var ok bool
-	if owner, ok = m.owners[sink]; !ok {
-		t.Errorf("Cannot find owner of the specified result writer sink")
+	if requestClient, ok = m.clients[clientID]; !ok {
+		t.Errorf("Cannot find owner of the default client")
 		return
 	}
 
 	for _, item := range items {
-		if it, ok := owner.items[item.itemid]; ok {
-			if it.delay != item.delay {
-				t.Errorf("Expected item %d delay %s while got %s", item.itemid, item.delay, it.delay)
+		if tacc, ok := requestClient.exporters[item.itemid]; ok {
+			ti := tacc.task().item
+			if ti.delay != item.delay {
+				t.Errorf("Expected item %d delay %s while got %s", item.itemid, item.delay, ti.delay)
 			}
-			if it.key != item.key {
-				t.Errorf("Expected item %d key %s while got %s", item.itemid, item.key, it.key)
+			if ti.key != item.key {
+				t.Errorf("Expected item %d key %s while got %s", item.itemid, item.key, ti.key)
 			}
 		} else {
 			t.Errorf("Item %d was not queued", item.itemid)
 		}
 	}
 
-	if len(items) != len(owner.items) {
-		t.Errorf("Expected %d queued items while got %d", len(items), len(owner.items))
+	if len(items) != len(requestClient.exporters) {
+		t.Errorf("Expected %d queued items while got %d", len(items), len(requestClient.exporters))
 	}
 }
 
@@ -498,38 +614,46 @@ func TestTaskCreate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "151", key: "debug1"},
-		&batchItem{itemid: 2, delay: "103", key: "debug2"},
-		&batchItem{itemid: 3, delay: "79", key: "debug3"},
-		&batchItem{itemid: 4, delay: "17", key: "debug1"},
-		&batchItem{itemid: 5, delay: "7", key: "debug2"},
-		&batchItem{itemid: 6, delay: "1", key: "debug3"},
-		&batchItem{itemid: 7, delay: "63", key: "debug1"},
-		&batchItem{itemid: 8, delay: "47", key: "debug2"},
-		&batchItem{itemid: 9, delay: "31", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "151", key: "debug1"},
+		&clientItem{itemid: 2, delay: "103", key: "debug2"},
+		&clientItem{itemid: 3, delay: "79", key: "debug3"},
+		&clientItem{itemid: 4, delay: "17", key: "debug1"},
+		&clientItem{itemid: 5, delay: "7", key: "debug2"},
+		&clientItem{itemid: 6, delay: "1", key: "debug3"},
+		&clientItem{itemid: 7, delay: "63", key: "debug1"},
+		&clientItem{itemid: 8, delay: "47", key: "debug2"},
+		&clientItem{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
 
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdate(t *testing.T) {
@@ -543,31 +667,39 @@ func TestTaskUpdate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "151", key: "debug1"},
-		&batchItem{itemid: 2, delay: "103", key: "debug2"},
-		&batchItem{itemid: 3, delay: "79", key: "debug3"},
-		&batchItem{itemid: 4, delay: "17", key: "debug1"},
-		&batchItem{itemid: 5, delay: "7", key: "debug2"},
-		&batchItem{itemid: 6, delay: "1", key: "debug3"},
-		&batchItem{itemid: 7, delay: "63", key: "debug1"},
-		&batchItem{itemid: 8, delay: "47", key: "debug2"},
-		&batchItem{itemid: 9, delay: "31", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "151", key: "debug1"},
+		&clientItem{itemid: 2, delay: "103", key: "debug2"},
+		&clientItem{itemid: 3, delay: "79", key: "debug3"},
+		&clientItem{itemid: 4, delay: "17", key: "debug1"},
+		&clientItem{itemid: 5, delay: "7", key: "debug2"},
+		&clientItem{itemid: 6, delay: "1", key: "debug3"},
+		&clientItem{itemid: 7, delay: "63", key: "debug1"},
+		&clientItem{itemid: 8, delay: "47", key: "debug2"},
+		&clientItem{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	for _, item := range items {
 		item.delay = "10" + item.delay
@@ -575,15 +707,21 @@ func TestTaskUpdate(t *testing.T) {
 	}
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	if len(manager.queue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
@@ -597,34 +735,48 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "151", key: "debug1"},
-		&batchItem{itemid: 2, delay: "103", key: "debug2"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "151", key: "debug1"},
+		&clientItem{itemid: 2, delay: "103", key: "debug2"},
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	items[0].delay = "xyz"
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 1 {
-		t.Errorf("Expected %d plugins queued while got %d", 1, len(manager.queue))
+	if len(manager.plugins["debug1"].tasks) != 0 {
+		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug1"].tasks))
 	}
 }
 
@@ -639,45 +791,59 @@ func TestTaskDelete(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "")
 	}
 
-	var manager Manager
-	manager.init()
+	manager := NewManager()
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "151", key: "debug1"},
-		&batchItem{itemid: 2, delay: "103", key: "debug2"},
-		&batchItem{itemid: 3, delay: "79", key: "debug3"}, // remove
-		&batchItem{itemid: 4, delay: "17", key: "debug1"},
-		&batchItem{itemid: 5, delay: "7", key: "debug2"},
-		&batchItem{itemid: 6, delay: "1", key: "debug3"}, // remove
-		&batchItem{itemid: 7, delay: "63", key: "debug1"},
-		&batchItem{itemid: 8, delay: "47", key: "debug2"}, // remove
-		&batchItem{itemid: 9, delay: "31", key: "debug3"}, // remove
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "151", key: "debug1"},
+		&clientItem{itemid: 2, delay: "103", key: "debug2"},
+		&clientItem{itemid: 3, delay: "79", key: "debug3"}, // remove
+		&clientItem{itemid: 4, delay: "17", key: "debug1"},
+		&clientItem{itemid: 5, delay: "7", key: "debug2"},
+		&clientItem{itemid: 6, delay: "1", key: "debug3"}, // remove
+		&clientItem{itemid: 7, delay: "63", key: "debug1"},
+		&clientItem{itemid: 8, delay: "47", key: "debug2"}, // remove
+		&clientItem{itemid: 9, delay: "31", key: "debug3"}, // remove
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
 	items[2] = items[6]
 	items = items[:cap(items)-4]
 	update.requests = update.requests[:0]
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 2 {
-		t.Errorf("Expected %d plugins queued while got %d", 2, len(manager.queue))
+	if len(manager.plugins["debug3"].tasks) != 0 {
+		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug3"].tasks))
 	}
 
-	checkExporterTasks(t, &manager, &cache, items)
+	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestSchedule(t *testing.T) {
@@ -693,10 +859,10 @@ func TestSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "1", key: "debug1"},
-		&batchItem{itemid: 2, delay: "2", key: "debug2"},
-		&batchItem{itemid: 3, delay: "5", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "1", key: "debug1"},
+		&clientItem{itemid: 2, delay: "2", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -707,14 +873,23 @@ func TestSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 
 	manager.iterate(t, 20)
@@ -737,11 +912,11 @@ func TestScheduleCapacity(t *testing.T) {
 	p := manager.plugins["debug2"]
 	p.capacity = 2
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "1", key: "debug1"},
-		&batchItem{itemid: 2, delay: "2", key: "debug2"},
-		&batchItem{itemid: 3, delay: "2", key: "debug2"},
-		&batchItem{itemid: 4, delay: "2", key: "debug2"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "1", key: "debug1"},
+		&clientItem{itemid: 2, delay: "2", key: "debug2"},
+		&clientItem{itemid: 3, delay: "2", key: "debug2"},
+		&clientItem{itemid: 4, delay: "2", key: "debug2"},
 	}
 
 	calls := []map[string][]int{
@@ -751,14 +926,23 @@ func TestScheduleCapacity(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 
 	manager.iterate(t, 10)
@@ -778,10 +962,10 @@ func TestScheduleUpdate(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "1", key: "debug1"},
-		&batchItem{itemid: 2, delay: "1", key: "debug2"},
-		&batchItem{itemid: 3, delay: "1", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "1", key: "debug1"},
+		&clientItem{itemid: 2, delay: "1", key: "debug2"},
+		&clientItem{itemid: 3, delay: "1", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -792,32 +976,41 @@ func TestScheduleUpdate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -836,8 +1029,8 @@ func TestCollectorSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "1", key: "debug1"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "1", key: "debug1"},
 	}
 
 	calls := []map[string][]int{
@@ -846,14 +1039,23 @@ func TestCollectorSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 20)
 	manager.checkPluginTimeline(t, plugins, calls, 20)
@@ -872,10 +1074,10 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "5", key: "debug1"},
-		&batchItem{itemid: 2, delay: "5", key: "debug2"},
-		&batchItem{itemid: 3, delay: "5", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -886,38 +1088,47 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[1:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -936,10 +1147,10 @@ func TestRunner(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "5", key: "debug1"},
-		&batchItem{itemid: 2, delay: "5", key: "debug2"},
-		&batchItem{itemid: 3, delay: "5", key: "debug3"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
@@ -950,56 +1161,65 @@ func TestRunner(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[1:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
 
 	update.requests = update.requests[1:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1017,7 +1237,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*plugin.Requ
 		for _, r := range tracker.watched() {
 			returned += fmt.Sprintf("%+v,", *r)
 		}
-		t.Errorf("expected watch requests %s while got %s", expected, returned)
+		t.Errorf("Expected watch requests %s while got %s", expected, returned)
 	}
 }
 
@@ -1034,31 +1254,40 @@ func TestWatcher(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "5", key: "debug1"},
-		&batchItem{itemid: 2, delay: "5", key: "debug2[1]"},
-		&batchItem{itemid: 3, delay: "5", key: "debug2[2]"},
-		&batchItem{itemid: 4, delay: "5", key: "debug3[1]"},
-		&batchItem{itemid: 5, delay: "5", key: "debug3[2]"},
-		&batchItem{itemid: 6, delay: "5", key: "debug3[3]"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2[1]"},
+		&clientItem{itemid: 3, delay: "5", key: "debug2[2]"},
+		&clientItem{itemid: 4, delay: "5", key: "debug3[1]"},
+		&clientItem{itemid: 5, delay: "5", key: "debug3[2]"},
+		&clientItem{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
 		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
 		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
-		map[string][]int{"$watch": []int{1, 2, 5}},
+		map[string][]int{"$watch": []int{1, 2, 3, 5}},
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1068,7 +1297,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:6])
 
 	update.requests = update.requests[:5]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1078,7 +1307,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:5])
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1087,7 +1316,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:3])
 
 	update.requests = update.requests[:2]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1096,7 +1325,7 @@ func TestWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:2])
 
 	update.requests = update.requests[:6]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 1)
 	manager.checkPluginTimeline(t, plugins, calls, 1)
@@ -1118,10 +1347,10 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "2", key: "debug[1]"},
-		&batchItem{itemid: 2, delay: "2", key: "debug[2]"},
-		&batchItem{itemid: 3, delay: "2", key: "debug[3]"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "2", key: "debug[1]"},
+		&clientItem{itemid: 2, delay: "2", key: "debug[2]"},
+		&clientItem{itemid: 3, delay: "2", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
@@ -1130,14 +1359,23 @@ func TestCollectorExporterSchedule(t *testing.T) {
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 10)
 
@@ -1157,31 +1395,40 @@ func TestRunnerWatcher(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "5", key: "debug1"},
-		&batchItem{itemid: 2, delay: "5", key: "debug2[1]"},
-		&batchItem{itemid: 3, delay: "5", key: "debug2[2]"},
-		&batchItem{itemid: 4, delay: "5", key: "debug3[1]"},
-		&batchItem{itemid: 5, delay: "5", key: "debug3[2]"},
-		&batchItem{itemid: 6, delay: "5", key: "debug3[3]"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2[1]"},
+		&clientItem{itemid: 3, delay: "5", key: "debug2[2]"},
+		&clientItem{itemid: 4, delay: "5", key: "debug3[1]"},
+		&clientItem{itemid: 5, delay: "5", key: "debug3[2]"},
+		&clientItem{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 6, 11}, "$start": []int{1}, "$stop": []int{16}},
-		map[string][]int{"$watch": []int{2, 6, 22}, "$start": []int{1, 21}, "$stop": []int{11, 26}},
-		map[string][]int{"$watch": []int{2, 27}, "$start": []int{1, 26}, "$stop": []int{6}},
+		map[string][]int{"$watch": []int{2, 6, 11, 16}, "$start": []int{1}, "$stop": []int{17}},
+		map[string][]int{"$watch": []int{2, 6, 11, 22, 26}, "$start": []int{1, 21}, "$stop": []int{12, 27}},
+		map[string][]int{"$watch": []int{2, 6, 27}, "$start": []int{1, 26}, "$stop": []int{7}},
 	}
 
 	var cache resultCacheMock
 	update := updateRequest{
+		clientID: 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1191,7 +1438,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[2], update.requests[3:6])
 
 	update.requests = update.requests[:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1200,7 +1447,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[1:3])
 
 	update.requests = update.requests[:1]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1208,13 +1455,13 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[0], update.requests[0:1])
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[1:3]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1222,7 +1469,7 @@ func TestRunnerWatcher(t *testing.T) {
 	checkWatchRequests(t, plugins[1], update.requests[:2])
 
 	update.requests = update.requests[2:5]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1242,38 +1489,47 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "2", key: "debug[1]"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "2", key: "debug[1]"},
 	}
 
 	calls := []map[string][]int{
 		map[string][]int{"debug": []int{3, 3, 5, 5, 7, 9}, "$collect": []int{2, 4, 6, 8, 10}},
 	}
 
-	var cache1, cache2 resultCacheMock
+	var cache resultCacheMock
 	update := updateRequest{
-		sink:     &cache1,
+		clientID: 1,
+		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
-	update.sink = &cache2
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
+	update.clientID = 2
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.sink = &cache1
-	manager.processUpdateRequest(&update)
+	update.clientID = 1
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
@@ -1291,58 +1547,211 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	}
 	manager.mockInit(t)
 
-	items := []*batchItem{
-		&batchItem{itemid: 1, delay: "5", key: "debug[1]"},
-		&batchItem{itemid: 2, delay: "5", key: "debug[2]"},
-		&batchItem{itemid: 3, delay: "5", key: "debug[3]"},
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug[1]"},
+		&clientItem{itemid: 2, delay: "5", key: "debug[2]"},
+		&clientItem{itemid: 3, delay: "5", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 3, 6, 17, 21}, "$start": []int{1, 16}, "$stop": []int{11}},
+		map[string][]int{"$watch": []int{2, 3, 6, 7, 11, 17, 21}, "$start": []int{1, 16}, "$stop": []int{12}},
 	}
 
-	var cache1, cache2 resultCacheMock
+	var cache resultCacheMock
 	update := updateRequest{
-		sink:     &cache1,
+		clientID: 1,
+		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
 	}
 
+	var lastLogsize uint64
+	var mtime int
 	for _, item := range items {
-		update.requests = append(update.requests, &plugin.Request{Itemid: item.itemid, Key: item.key, Delay: item.delay})
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
 	}
-	manager.processUpdateRequest(&update)
-	update.sink = &cache2
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
+	update.clientID = 2
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.sink = &cache1
-	manager.processUpdateRequest(&update)
-	update.sink = &cache2
+	update.clientID = 1
+	manager.update(&update)
+	update.clientID = 2
 	update.requests = update.requests[:0]
-	manager.processUpdateRequest(&update)
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.sink = &cache1
-	manager.processUpdateRequest(&update)
+	update.clientID = 1
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
 	update.requests = update.requests[:1]
-	update.sink = &cache2
-	manager.processUpdateRequest(&update)
+	update.clientID = 2
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
-	update.sink = &cache1
-	manager.processUpdateRequest(&update)
+	update.clientID = 1
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
+}
+
+func TestPassiveRunner(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	manager := mockManager{sink: make(chan performer, 10)}
+	plugin.ClearRegistry()
+	plugins := make([]plugin.Accessor, 3)
+	for i := range plugins {
+		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
+		name := fmt.Sprintf("debug%d", i+1)
+		plugin.RegisterMetric(plugins[i], name, name, "")
+	}
+	manager.mockInit(t)
+
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
+	}
+
+	calls := []map[string][]int{
+		map[string][]int{"$start": []int{1}, "$stop": []int{}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*51 + 1}},
+		map[string][]int{"$start": []int{1}, "$stop": []int{3600*26 + 1}},
+	}
+
+	var cache resultCacheMock
+	update := updateRequest{
+		clientID: 0,
+		sink:     &cache,
+		requests: make([]*plugin.Request, 0),
+	}
+
+	var lastLogsize uint64
+	var mtime int
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
+	}
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600)
+	manager.checkPluginTimeline(t, plugins, calls, 3600)
+
+	update.requests = update.requests[:0]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600)
+	manager.checkPluginTimeline(t, plugins, calls, 3600)
+
+	update.requests = update.requests[:2]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600*24)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*24)
+
+	update.requests = update.requests[:1]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 3600*25)
+	manager.checkPluginTimeline(t, plugins, calls, 3600*25)
+
+	update.requests = update.requests[:1]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 1)
+	manager.checkPluginTimeline(t, plugins, calls, 1)
+}
+
+func TestConfigurator(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "")
+
+	options := map[string]map[string]string{
+		"Debug1": map[string]string{"delay": "5"},
+		"Debug2": map[string]string{"delay": "30"},
+		"Debug3": map[string]string{"delay": "60"},
+	}
+	agent.Options.Plugins = options
+
+	manager := mockManager{sink: make(chan performer, 10)}
+	plugin.ClearRegistry()
+	plugins := make([]plugin.Accessor, 3)
+	for i := range plugins {
+		name := fmt.Sprintf("debug%d", i+1)
+		plugins[i] = &mockConfiguratorPlugin{
+			Base:       plugin.Base{},
+			mockPlugin: mockPlugin{now: &manager.now},
+			options:    options[name]}
+		plugin.RegisterMetric(plugins[i], name, name, "")
+	}
+	manager.mockInit(t)
+
+	items := []*clientItem{
+		&clientItem{itemid: 1, delay: "5", key: "debug1"},
+		&clientItem{itemid: 2, delay: "5", key: "debug2"},
+		&clientItem{itemid: 3, delay: "5", key: "debug3"},
+	}
+
+	calls := []map[string][]int{
+		map[string][]int{"$configure": []int{1}},
+		map[string][]int{"$configure": []int{6}},
+		map[string][]int{"$configure": []int{11}},
+	}
+
+	var cache resultCacheMock
+	update := updateRequest{
+		clientID: 1,
+		sink:     &cache,
+		requests: make([]*plugin.Request, 0),
+	}
+
+	var lastLogsize uint64
+	var mtime int
+	for _, item := range items {
+		update.requests = append(update.requests, &plugin.Request{
+			Itemid:      item.itemid,
+			Key:         item.key,
+			Delay:       item.delay,
+			LastLogsize: &lastLogsize,
+			Mtime:       &mtime,
+		})
+	}
+	update.requests = update.requests[:1]
+	manager.update(&update)
 	manager.mockTasks()
 	manager.iterate(t, 5)
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 
+	update.requests = update.requests[:2]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
+
+	update.requests = update.requests[:3]
+	manager.update(&update)
+	manager.mockTasks()
+	manager.iterate(t, 5)
+	manager.checkPluginTimeline(t, plugins, calls, 5)
 }

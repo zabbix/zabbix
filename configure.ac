@@ -1761,7 +1761,7 @@ AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 dnl Check for libpcre, used by Zabbix for regular expressions
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$go" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1812,6 +1812,27 @@ AC_SUBST(PROXY_LIBS)
 
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
+
+CGO_LDFLAGS="-Wl,--start-group \
+	\${abs_top_builddir}/src/zabbix_agent/logs/libzbxlogs.a \
+	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
+	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
+	\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
+	\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
+	\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
+	\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+	\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
+	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+	$LIBS $AGENT_LIBS \
+	-Wl,--end-group"
+AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
 AC_SUBST(ZBXGET_LIBS)
@@ -1929,6 +1950,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
+	src/zabbix_agent/logs/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
@@ -1969,19 +1991,41 @@ AC_OUTPUT([
 	go/src/zabbix/cmd/mock_server/Makefile
 	go/src/zabbix/pkg/Makefile
 	go/src/zabbix/pkg/conf/Makefile
+	go/src/zabbix/pkg/glexpr/Makefile
+	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/log/Makefile
 	go/src/zabbix/pkg/std/Makefile
-	go/src/zabbix/pkg/itemutil/Makefile
-	go/src/zabbix/pkg/comms/Makefile
+	go/src/zabbix/pkg/version/Makefile
+	go/src/zabbix/pkg/watch/Makefile
+	go/src/zabbix/pkg/zbxcomms/Makefile
+	go/src/zabbix/pkg/zbxlib/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
+	go/src/zabbix/internal/agent/serverconnector/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
+	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
+	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
+	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
+	go/src/zabbix/plugins/debug/Makefile
+	go/src/zabbix/plugins/debug/empty/Makefile
+	go/src/zabbix/plugins/debug/filewatcher/Makefile
+	go/src/zabbix/plugins/debug/log/Makefile
+	go/src/zabbix/plugins/debug/collector/Makefile
+	go/src/zabbix/plugins/proc/Makefile
+	go/src/zabbix/plugins/vfs/Makefile
+	go/src/zabbix/plugins/vfs/dev/Makefile
+	go/src/zabbix/plugins/vfs/filecksum/Makefile
+	go/src/zabbix/plugins/vfs/fileexists/Makefile
+	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/sync/Makefile
+	go/src/zabbix/plugins/zabbix/async/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

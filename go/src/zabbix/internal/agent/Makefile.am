@@ -1,7 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	scheduler
+	scheduler \
+	resultcache \
+	serverlistener \
+	serverconnector
 
 all: build
 

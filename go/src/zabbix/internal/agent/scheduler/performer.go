@@ -31,10 +31,7 @@ type performer interface {
 	// performs the task, this function is called in a separate goroutine
 	perform(s Scheduler)
 	// reschedules the task, returns false if the task has been expired
-	reschedule() bool
-	// finishes performed task, this function is called in sheduler goroutine and can
-	// be used to update scheduler data without synchronization
-	finish()
+	reschedule(now time.Time) error
 	// returns time the task has been scheduled to perform
 	getScheduled() time.Time
 	// returns task weight
@@ -47,6 +44,8 @@ type performer interface {
 	isActive() bool
 	// deactivates task, removing from plugin task queue if necessary
 	deactivate()
+	// true if the task has to be rescheduled after performing
+	isRecurring() bool
 }
 
 // performerHeap -
@@ -80,6 +79,8 @@ func (h *performerHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	p := old[n-1]
+	// clear slice slot, so the performer can be garbage collected later
+	old[n-1] = nil
 	*h = old[0 : n-1]
 	p.setIndex(-1)
 	return p

@@ -1,6 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	debug \
+	log \
+	proc \
 	system \
-	systemd
+	systemd \
+	vfs \
+	zabbix
 

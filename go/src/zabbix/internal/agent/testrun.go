@@ -52,7 +52,7 @@ func CheckMetric(metric string) (err error) {
 	}
 
 	var v interface{}
-	if v, err = exporter.Export(key, params); err != nil {
+	if v, err = exporter.Export(key, params, nil); err != nil {
 		return
 	}
 
@@ -78,6 +78,10 @@ func CheckMetrics() {
 		"agent.hostname",
 		"agent.ping",
 		"system.uptime",
+		"system.uname",
+		"system.hostname",
+		"vfs.file.cksum",
+		"vfs.file.exists",
 	}
 
 	for _, metric := range metrics {

@@ -96,7 +96,7 @@ OBJS = \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
 	..\..\..\src\zabbix_agent\listener.o \
-	..\..\..\src\zabbix_agent\logfiles.o \
+	..\..\..\src\zabbix_agent\logs\logfiles.o \
 	..\..\..\src\zabbix_agent\perfstat.o \
 	..\..\..\src\zabbix_agent\stats.o \
 	..\..\..\src\zabbix_agent\zabbix_agentd.o \

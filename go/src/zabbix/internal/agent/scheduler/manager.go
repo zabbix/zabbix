@@ -10,7 +10,7 @@
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more detailm.
+** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
@@ -21,10 +21,16 @@ package scheduler
 
 import (
 	"container/heap"
-	"errors"
+	"fmt"
+	"math"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
+	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
 )
@@ -33,47 +39,109 @@ type Manager struct {
 	input   chan interface{}
 	plugins map[string]*pluginAgent
 	queue   pluginHeap
-	owners  map[plugin.ResultWriter]*batch
+	clients map[uint64]*client
 }
 
 type updateRequest struct {
-	sink     plugin.ResultWriter
-	requests []*plugin.Request
+	clientID           uint64
+	sink               plugin.ResultWriter
+	requests           []*plugin.Request
+	refreshUnsupported int
+	expressions        []*glexpr.Expression
+}
+
+type statusRequest struct {
+	sink chan string
 }
 
 type Scheduler interface {
-	UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
+		requests []*plugin.Request)
 	FinishTask(task performer)
+	PerformTask(key string, timeout time.Duration) (result string, err error)
+	GetStatus() (status string)
 }
 
-func (m *Manager) processUpdateRequest(update *updateRequest) {
+func (m *Manager) cleanupClient(c *client, now time.Time) {
+	released := c.cleanup(m.plugins, now)
+	for _, p := range released {
+		if p.refcount != 0 {
+			continue
+		}
+		log.Debugf("deactivate unused plugin %s", p.name())
+
+		// deactivate recurring tasks
+		for deactivate := true; deactivate; {
+			deactivate = false
+			for _, t := range p.tasks {
+				if t.isRecurring() {
+					t.deactivate()
+					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
+					deactivate = true
+					break
+				}
+			}
+		}
+
+		// queue stopper task if plugin has Runner interface
+		if _, ok := p.impl.(plugin.Runner); ok {
+			task := &stopperTask{
+				taskBase: taskBase{plugin: p, active: true},
+			}
+			if err := task.reschedule(now); err != nil {
+				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				continue
+			}
+			p.enqueueTask(task)
+			log.Debugf("created stopper task for plugin %s", p.name())
+
+			if p.queued() {
+				m.queue.Update(p)
+			}
+		}
+
+		// queue plugin if there are still some tasks left to be finished before deactivating
+		if len(p.tasks) != 0 {
+			if !p.queued() {
+				heap.Push(&m.queue, p)
+			}
+		}
+	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: owner expiry - remove unused owners after tiemout (day+?)
-	var owner *batch
+	// TODO: client expiry - remove unused owners after timeout (day+?)
+	var requestClient *client
 	var ok bool
-	if owner, ok = m.owners[update.sink]; !ok {
-		owner = newBatch()
-		m.owners[update.sink] = owner
+	if requestClient, ok = m.clients[update.clientID]; !ok {
+		requestClient = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = requestClient
 	}
 
-	now := time.Now()
+	requestClient.refreshUnsupported = update.refreshUnsupported
+	requestClient.updateExpressions(update.expressions)
+
 	for _, r := range update.requests {
 		var key string
 		var err error
 		var p *pluginAgent
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
-				err = errors.New("unknown metric")
+				err = fmt.Errorf("Unknown metric %s", key)
 			}
 		}
+		if err == nil {
+			err = requestClient.addRequest(p, r, update.sink, now)
+		}
 		if err != nil {
+			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+				tacc.task().deactivate()
+			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
-			continue
-		}
-		if err = owner.addRequest(p, r, update.sink, now); err != nil {
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			continue
 		}
 
@@ -84,31 +152,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 		}
 	}
 
-	released := owner.cleanup(m.plugins, now)
-	for _, p := range released {
-		if p.refcount != 0 {
-			continue
-		}
-		p.tasks = p.tasks[:0]
-		if _, ok := p.impl.(plugin.Runner); ok {
-			log.Debugf("start stopper task for plugin %s", p.impl.Name())
-			task := &stopperTask{
-				taskBase: taskBase{
-					plugin:    p,
-					scheduled: now.Add(priorityStopperTaskNs),
-					active:    true,
-				}}
-			p.enqueueTask(task)
-
-			if !p.queued() {
-				heap.Push(&m.queue, p)
-			} else {
-				m.queue.Update(p)
-			}
-		} else {
-			m.queue.Remove(p)
-		}
-	}
+	m.cleanupClient(requestClient, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
@@ -135,65 +179,198 @@ func (m *Manager) processQueue(now time.Time) {
 }
 
 func (m *Manager) processFinishRequest(task performer) {
-	task.finish()
 	p := task.getPlugin()
 	p.releaseCapacity(task)
-	if p.active() && task.isActive() && task.reschedule() {
-		p.enqueueTask(task)
+	if p.active() && task.isActive() && task.isRecurring() {
+		if err := task.reschedule(time.Now()); err != nil {
+			log.Warningf("cannot reschedule plugin %s: %s", p.impl.Name(), err)
+		} else {
+			p.enqueueTask(task)
+		}
 	}
 	if !p.queued() && p.hasCapacity() {
 		heap.Push(&m.queue, p)
 	}
 }
 
+// rescheduleQueue reschedules all queued tasks. This is done whenever time
+// difference between ticks exceeds limits (for example during daylight saving changes).
+func (m *Manager) rescheduleQueue(now time.Time) {
+	// easier to rebuild queues than update each element
+	queue := make(pluginHeap, 0, len(m.queue))
+	for _, p := range m.queue {
+		tasks := p.tasks
+		p.tasks = make(performerHeap, 0, len(tasks))
+		for _, t := range tasks {
+			if err := t.reschedule(now); err == nil {
+				p.enqueueTask(t)
+			}
+		}
+		heap.Push(&queue, p)
+	}
+	m.queue = queue
+}
+
+type pluginMetrics struct {
+	ref     *pluginAgent
+	metrics []*plugin.Metric
+}
+
+func (m *Manager) getStatus(r *statusRequest) {
+	var status strings.Builder
+	agents := make(map[plugin.Accessor]*pluginMetrics)
+	infos := make([]*pluginMetrics, 0, len(m.plugins))
+	for _, p := range m.plugins {
+		if _, ok := agents[p.impl]; !ok {
+			info := &pluginMetrics{ref: p, metrics: make([]*plugin.Metric, 0)}
+			infos = append(infos, info)
+			agents[p.impl] = info
+		}
+	}
+
+	for _, metric := range plugin.Metrics {
+		if info, ok := agents[metric.Plugin]; ok {
+			info.metrics = append(info.metrics, metric)
+		}
+	}
+	sort.Slice(infos, func(i, j int) bool {
+		return infos[i].ref.name() < infos[j].ref.name()
+	})
+
+	for _, info := range infos {
+		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\ncapacity: %d/%d\ntasks: %d\n",
+			info.ref.name(), info.ref.active(), info.ref.usedCapacity, info.ref.capacity, len(info.ref.tasks)))
+		for _, metric := range info.metrics {
+			status.WriteString(metric.Key)
+			status.WriteString(": ")
+			status.WriteString(metric.Description)
+			status.WriteString("\n")
+		}
+		status.WriteString("\n")
+	}
+	r.sink <- status.String()
+	close(r.sink)
+}
+
 func (m *Manager) run() {
 	defer log.PanicHook()
-	log.Debugf("starting Manager")
+	log.Debugf("starting manager")
+	// Adjust ticker creation at the 0 nanosecond timestamp. In reality it will have at least
+	// some microseconds, which will be enough to include all scheduled tasks at this second
+	// even with nanosecond priority adjustment.
+	lastTick := time.Now()
+	cleaned := lastTick
+	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			m.processQueue(time.Now())
+			now := time.Now()
+			diff := now.Sub(lastTick)
+			interval := time.Second * 10
+			if diff <= -interval || diff >= interval {
+				log.Warningf("detected %d time difference between queue checks, rescheduling tasks",
+					int(math.Abs(float64(diff))/1e9))
+				m.rescheduleQueue(now)
+			}
+			lastTick = now
+			m.processQueue(now)
+			// cleanup plugins used by passive checks
+			if now.Sub(cleaned) >= time.Hour {
+				if passive, ok := m.clients[0]; ok {
+					m.cleanupClient(passive, now)
+				}
+				cleaned = now
+			}
 		case v := <-m.input:
 			if v == nil {
 				break run
 			}
 			switch v.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v.(*updateRequest))
+				m.processUpdateRequest(v.(*updateRequest), time.Now())
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
+			case *statusRequest:
+				m.getStatus(v.(*statusRequest))
 			}
 		}
 	}
 	close(m.input)
-	log.Debugf("Manager has been stopped")
+	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
 
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
-	m.owners = make(map[plugin.ResultWriter]*batch)
-
+	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
-	for key, acc := range plugin.Metrics {
-		m.plugins[key] = &pluginAgent{
-			impl:         acc,
-			tasks:        make(performerHeap, 0),
-			capacity:     10,
-			usedCapacity: 0,
-			index:        -1,
-			refcount:     0,
+
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
+
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
+	}
+	sort.Slice(metrics, func(i, j int) bool {
+		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
+	})
+
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl {
+			capacity := metric.Plugin.Capacity()
+			section := strings.Title(metric.Plugin.Name())
+			if options, ok := agent.Options.Plugins[section]; ok {
+				if cap, ok := options["Capacity"]; ok {
+					var err error
+					if capacity, err = strconv.Atoi(cap); err != nil {
+						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
+							section, cap, plugin.DefaultCapacity)
+					}
+				}
+			}
+			if capacity > metric.Plugin.Capacity() {
+				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
+				capacity = metric.Plugin.Capacity()
+			}
+
+			pagent = &pluginAgent{
+				impl:         metric.Plugin,
+				tasks:        make(performerHeap, 0),
+				capacity:     capacity,
+				usedCapacity: 0,
+				index:        -1,
+				refcount:     0,
+			}
+
+			interfaces := ""
+			if _, ok := metric.Plugin.(plugin.Exporter); ok {
+				interfaces += "exporter, "
+			}
+			if _, ok := metric.Plugin.(plugin.Collector); ok {
+				interfaces += "collector, "
+			}
+			if _, ok := metric.Plugin.(plugin.Runner); ok {
+				interfaces += "runner, "
+			}
+			if _, ok := metric.Plugin.(plugin.Watcher); ok {
+				interfaces += "watcher, "
+			}
+			if _, ok := metric.Plugin.(plugin.Configurator); ok {
+				interfaces += "configurator, "
+			}
+			interfaces = interfaces[:len(interfaces)-2]
+			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
 		}
+		m.plugins[metric.Key] = pagent
 	}
 }
-
 func (m *Manager) Start() {
-	m.init()
 	monitor.Register()
 	go m.run()
 }
@@ -202,11 +379,70 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(writer plugin.ResultWriter, requests []*plugin.Request) {
-	r := updateRequest{sink: writer, requests: requests}
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
+	expressions []*glexpr.Expression, requests []*plugin.Request) {
+	r := updateRequest{clientID: clientID,
+		sink:               writer,
+		requests:           requests,
+		refreshUnsupported: refreshUnsupported,
+		expressions:        expressions,
+	}
 	m.input <- &r
+}
+
+type resultWriter chan *plugin.Result
+
+func (r resultWriter) Write(result *plugin.Result) {
+	r <- result
+}
+
+func (r resultWriter) Flush() {
+}
+
+func (r resultWriter) SlotsAvailable() int {
+	return 1
+}
+
+func (r resultWriter) PersistSlotsAvailable() int {
+	return 1
+}
+
+func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
+	var lastLogsize uint64
+	var mtime int
+
+	w := make(resultWriter)
+	m.UpdateTasks(0, w, 0, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+
+	select {
+	case r := <-w:
+		if r.Error == nil {
+			if r.Value != nil {
+				result = *r.Value
+			} else {
+				// TODO: check what must be returned on empty result
+			}
+		} else {
+			err = r.Error
+		}
+	case <-time.After(timeout):
+		err = fmt.Errorf("timeout occurred")
+	}
+	return
 }
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func (m *Manager) GetStatus() (status string) {
+	request := &statusRequest{sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
+}
+
+func NewManager() *Manager {
+	var m Manager
+	m.init()
+	return &m
 }
