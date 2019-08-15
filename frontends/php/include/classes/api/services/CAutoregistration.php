@@ -36,7 +36,7 @@ class CAutoregistration extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options) {
-		return $this->getAutoreg($options);
+		return (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) :[];
 	}
 
 	/**
@@ -71,10 +71,6 @@ class CAutoregistration extends CApiService {
 			'preservekeys' => $update_mode
 		];
 		$options = zbx_array_merge($def_options, $options);
-
-		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			return [];
-		}
 
 		$ini_autoreg = [];
 
@@ -161,7 +157,7 @@ class CAutoregistration extends CApiService {
 	 */
 	protected function validateUpdate(array $autoreg, array $db_autoreg = []) {
 		// Check permissions.
-		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
