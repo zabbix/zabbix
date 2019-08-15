@@ -20,33 +20,50 @@
 package zbxcmd
 
 import (
-	"context"
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
+	"syscall"
 	"time"
+	"zabbix/pkg/log"
 )
 
 const maxExecuteOutputLenB = 512 * 1024
 
 func Run(s string, timeout time.Duration) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	cmd := exec.Command("sh", "-c", s)
 
-	cmd := exec.CommandContext(ctx, "sh", "-c", s)
+	var b bytes.Buffer
+	cmd.Stdout = &b
+	cmd.Stderr = &b
 
-	stdoutStderr, err := cmd.CombinedOutput()
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+
+	err := cmd.Start()
+
 	if err != nil {
-		if ctx.Err() == context.DeadlineExceeded {
-			return "", fmt.Errorf("Timeout while executing a shell script.")
-		}
+		return "", fmt.Errorf("Cannot execute command: %s", err)
 	}
 
-	if maxExecuteOutputLenB <= len(stdoutStderr) {
+	t := time.AfterFunc(timeout, func() {
+		errKill := syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
+		if errKill != nil {
+			log.Errf("failed to kill [%s]: %s", s, errKill)
+		}
+	})
+
+	cmd.Wait()
+
+	if !t.Stop() {
+		return "", fmt.Errorf("Timeout while executing a shell script.")
+	}
+
+	if maxExecuteOutputLenB <= len(b.String()) {
 		return "", fmt.Errorf("Command output exceeded limit of %d KB", maxExecuteOutputLenB/1024)
 	}
 
-	return strings.TrimRight(string(stdoutStderr), " \t\r\n"), nil
+	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
 func Start(s string) error {
