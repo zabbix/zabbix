@@ -3,5 +3,6 @@
 SUBDIRS = \
 	dev \
 	filecksum \
-	fileexists
+	fileexists \
+	filecontents
 
