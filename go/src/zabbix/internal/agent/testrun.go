@@ -81,6 +81,7 @@ func CheckMetrics() {
 		"system.uname",
 		"system.hostname",
 		"vfs.file.cksum",
+		"vfs.file.contents",
 		"vfs.file.exists",
 	}
 
