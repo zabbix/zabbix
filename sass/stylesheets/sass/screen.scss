@@ -3492,11 +3492,13 @@ $form-icon-btn: (
 
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				z-index: 5;
 			}
 
 			.dashbrd-grid-widget-content {
 				padding-top: 4px;
 				margin-top: 2.25em;
+				z-index: 6;
 			}
 		}
 	}
