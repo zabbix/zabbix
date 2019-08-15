@@ -41,14 +41,16 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	switch key {
 	case "system.uname":
 		return getUname()
+	case "system.hostname":
+		return getHostname()
 	case "system.sw.arch":
 		return getSwArch()
 	}
-
 	return nil, fmt.Errorf("Not implemented: %s", key)
 }
 
 func init() {
 	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
+	plugin.RegisterMetric(&impl, "hostname", "system.hostname", "Returns system host name")
 	plugin.RegisterMetric(&impl, "uname", "system.sw.arch", "Software architecture information")
 }

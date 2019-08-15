@@ -78,6 +78,7 @@ func CheckMetrics() {
 		"agent.hostname",
 		"system.uptime",
 		"system.uname",
+		"system.hostname",
 		"vfs.file.cksum",
 		"vfs.file.exists",
 	}
