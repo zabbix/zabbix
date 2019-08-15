@@ -2324,7 +2324,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #888; }
-  .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad, .dashbrd-grid-widget-content .msg-warning {
+  .dashbrd-grid-widget-content .msg-bad,
+  .dashbrd-grid-widget-content .msg-good,
+  .dashbrd-grid-widget-content .msg-warning {
     margin: 0 10px; }
 
 .dashbrd-grid-widget {
@@ -2558,7 +2560,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #888; }
-  .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad, .dashbrd-widget .msg-warning {
+  .dashbrd-widget .msg-bad,
+  .dashbrd-widget .msg-good,
+  .dashbrd-widget .msg-warning {
     margin: 0 10px; }
   .dashbrd-widget.dashbrd-widget-fluid {
     margin-right: 0; }
@@ -2742,8 +2746,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     max-width: 1024px;
     min-width: 650px; }
   .overlay-dialogue .msg-bad,
-  .overlay-dialogue .msg-warning,
-  .overlay-dialogue .msg-good {
+  .overlay-dialogue .msg-good,
+  .overlay-dialogue .msg-warning {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
@@ -3446,133 +3450,118 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
 .list-table tbody tr.row-selected, .drag-drop-area, .navtree .tree .tree-item.selected > .tree-row, .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #f4f4f4; }
 
-.msg-good {
-  color: #000;
-  border: 2px solid #009900;
-  background-color: #fff;
-  text-align: left; }
-  .msg-good .link-action {
-    color: #033003;
-    margin-right: 10px;
-    font-size: 0.85em; }
-    .msg-good .link-action .arrow-up {
-      border-bottom-color: #033003; }
-    .msg-good .link-action .arrow-down {
-      border-top-color: #033003; }
-  .msg-good .overlay-close-btn {
-    color: #333; }
-  .msg-good ul {
-    border-top-color: #009900; }
-  .msg-good button {
-    background-color: #fff;
-    color: #033003;
-    border-color: #009900; }
-
-.msg-good:before {
-  content: "";
-  background-color: #009900;
-  float: left;
-  width: 61px;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  position: absolute; }
-
-.msg-good:after {
-  content: "";
-  background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
-  width: 27px;
-  height: 25px;
-  top: 0;
-  left: 0;
-  position: absolute;
-  margin-left: 16px;
-  margin-top: 2px; }
-
+.msg-bad,
+.msg-good,
 .msg-warning {
+  background-color: #fff;
   color: #000;
-  border: 2px solid #ffc859;
-  background-color: #fff; }
+  border: 2px solid;
+  font-size: 1.167em;
+  margin-bottom: 10px;
+  padding: 6px 10px 6px 75px;
+  text-align: left;
+  vertical-align: middle;
+  position: relative;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px; }
+  .msg-bad .overlay-close-btn,
+  .msg-good .overlay-close-btn,
+  .msg-warning .overlay-close-btn {
+    color: #333;
+    font-size: 1.167em; }
+  .msg-bad .link-action,
+  .msg-good .link-action,
   .msg-warning .link-action {
-    color: #4d4014;
     margin-right: 10px;
     font-size: 0.85em; }
+    .msg-bad .link-action .arrow-up,
+    .msg-good .link-action .arrow-up,
     .msg-warning .link-action .arrow-up {
-      border-bottom-color: #4d4014; }
+      border-bottom-color: #033003; }
+    .msg-bad .link-action .arrow-down,
+    .msg-good .link-action .arrow-down,
     .msg-warning .link-action .arrow-down {
-      border-top-color: #4d4014; }
-  .msg-warning .overlay-close-btn {
-    color: #333; }
-  .msg-warning ul {
-    border-top-color: #ffc859; }
+      border-top-color: #033003; }
+  .msg-bad button,
+  .msg-good button,
   .msg-warning button {
-    background-color: #fff;
-    color: #033003;
-    border-color: #ffc859; }
-
-.msg-warning:before {
-  content: "";
-  background-color: #ffc859;
-  float: left;
-  width: 61px;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  position: absolute; }
-
-.msg-warning:after {
-  content: "";
-  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-  width: 27px;
-  height: 25px;
-  top: 0;
-  left: 0;
-  position: absolute;
-  margin-left: 16px;
-  margin-top: 2px; }
+    background-color: #fff; }
+  .msg-bad:before,
+  .msg-good:before,
+  .msg-warning:before {
+    content: "";
+    width: 61px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0; }
+  .msg-bad:after,
+  .msg-good:after,
+  .msg-warning:after {
+    content: "";
+    background: url(../img/icon-sprite.svg) no-repeat;
+    margin-top: 2px;
+    margin-left: 16px;
+    width: 27px;
+    height: 25px;
+    position: absolute;
+    left: 0;
+    top: 0; }
 
 .msg-bad {
-  color: #000;
-  border: 2px solid #cc0000;
-  background-color: #fff;
-  text-align: left; }
+  border-color: #cc0000; }
   .msg-bad .link-action {
-    color: #300303;
-    margin-right: 10px;
-    font-size: 0.85em; }
+    color: #990000; }
     .msg-bad .link-action .arrow-up {
-      border-bottom-color: #300303; }
+      border-bottom-color: #990000; }
     .msg-bad .link-action .arrow-down {
-      border-top-color: #300303; }
-  .msg-bad .overlay-close-btn {
-    color: #333; }
+      border-top-color: #990000; }
   .msg-bad ul {
     border-top-color: #cc0000; }
   .msg-bad button {
-    background-color: #fff;
-    color: #300303;
+    color: #990000;
     border-color: #cc0000; }
+  .msg-bad:before {
+    background-color: #cc0000; }
+  .msg-bad:after {
+    background-position: -122px -325px; }
 
-.msg-bad:before {
-  content: "";
-  background-color: #cc0000;
-  float: left;
-  width: 61px;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  position: absolute; }
+.msg-good {
+  border-color: #009900; }
+  .msg-good .link-action {
+    color: #009900; }
+    .msg-good .link-action .arrow-up {
+      border-bottom-color: #009900; }
+    .msg-good .link-action .arrow-down {
+      border-top-color: #009900; }
+  .msg-good ul {
+    border-top-color: #009900; }
+  .msg-good button {
+    color: #009900;
+    border-color: #009900; }
+  .msg-good:before {
+    background-color: #009900; }
+  .msg-good:after {
+    background-position: -122px -244px; }
 
-.msg-bad:after {
-  content: "";
-  background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-  width: 27px;
-  height: 25px;
-  top: 0;
-  left: 0;
-  position: absolute;
-  margin-left: 16px;
-  margin-top: 2px; }
+.msg-warning {
+  border-color: #ffb319; }
+  .msg-warning .link-action {
+    color: #b37e12; }
+    .msg-warning .link-action .arrow-up {
+      border-bottom-color: #b37e12; }
+    .msg-warning .link-action .arrow-down {
+      border-top-color: #b37e12; }
+  .msg-warning ul {
+    border-top-color: #ffb319; }
+  .msg-warning button {
+    color: #b37e12;
+    border-color: #ffb319; }
+  .msg-warning:before {
+    background-color: #ffb319; }
+  .msg-warning:after {
+    background-position: -122px -325px; }
 
 .msg-details {
   font-size: 1em;
@@ -3607,19 +3596,6 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   margin: 10px 0 0 0; }
   .msg-buttons button {
     margin: 0 0 0 10px; }
-
-.msg-good, .msg-warning, .msg-bad {
-  font-size: 1.167em;
-  padding: 6px 10px 6px 75px;
-  text-align: left;
-  vertical-align: middle;
-  position: relative;
-  margin-bottom: 10px;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px; }
-  .msg-good .overlay-close-btn, .msg-warning .overlay-close-btn, .msg-bad .overlay-close-btn {
-    font-size: 1.167em; }
 
 .msg-global-footer {
   display: none;
@@ -5277,23 +5253,10 @@ td.inactive-bg {
   left: 6px;
   position: absolute; }
 
-.msg-bad .link-action {
-  color: #990000; }
-  .msg-bad .link-action .arrow-up {
-    border-bottom-color: #990000; }
-  .msg-bad .link-action .arrow-down {
-    border-top-color: #990000; }
-  .msg-bad .link-action:hover {
-    color: #000; }
-
-.msg-good .link-action {
-  color: #009900; }
-  .msg-good .link-action .arrow-up {
-    border-bottom-color: #009900; }
-  .msg-good .link-action .arrow-down {
-    border-top-color: #009900; }
-  .msg-good .link-action:hover {
-    color: #000; }
+.msg-bad .link-action:hover,
+.msg-good .link-action:hover,
+.msg-warning .link-action:hover {
+  color: #000; }
 
 .graph-selection {
   background-color: rgba(0, 0, 0, 0.1);
