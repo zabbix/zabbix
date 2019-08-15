@@ -25,7 +25,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/std"
@@ -38,15 +40,59 @@ type Plugin struct {
 
 var impl Plugin
 
+const maxNumberOfGroups int = 10
+
 func decode(encoder string, inbuf []byte) (outbuf []byte) {
 
 	return inbuf
 }
 
+func executeRegex(line string, pattern string, output string) (result string, err error) {
+	retline := ""
+
+	regx, err := regexp.Compile(pattern)
+	if err != nil {
+		return retline, err
+	}
+
+	Idxs := regx.FindAllSubmatchIndex([]byte(line), maxNumberOfGroups)
+
+	if len(Idxs) != 0 {
+		if output != "" {
+			var i int
+			var toreplace, replaceby string
+
+			retline = output
+
+			if len(Idxs) > 1 {
+				replaceby = fmt.Sprintf("%s", line[Idxs[1][0]:Idxs[1][1]])
+				toreplace = "\\@"
+				retline = strings.Replace(retline, toreplace, replaceby, -1)
+			}
+
+			for i < maxNumberOfGroups {
+				toreplace = fmt.Sprintf("\\%d", i)
+				replaceby = ""
+				if i < len(Idxs) {
+					replaceby = fmt.Sprintf("%s", line[Idxs[i][0]:Idxs[i][1]])
+				}
+				retline = strings.Replace(retline, toreplace, replaceby, -1)
+				i++
+			}
+
+		} else {
+			retline = line
+		}
+	}
+
+	return retline, nil
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var startline, endline, curline uint64
-	var encoder string
+	var encoder, output string
+	var line, outline string
 
 	if len(params) > 6 {
 		return nil, errors.New("Too many parameters")
@@ -80,6 +126,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if startline > endline {
 		return nil, errors.New("Start line parameter must not exceed end line")
 	}
+	if len(params) == 6 {
+		output = params[5]
+	}
+
 	start := time.Now()
 	file, err := stdOs.Open(params[0])
 	if err != nil {
@@ -90,7 +140,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// Start reading from the file with a reader.
 	reader := bufio.NewReader(file)
 
-	var line string
 	curline = 0
 
 	for {
@@ -110,8 +159,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		curline++
 		if curline >= startline {
-			outline := string(bytes.TrimRight(decode(encoder, []byte(line)), "\n\r"))
-			fmt.Printf("AKDBG %s\n", outline)
+			line := string(bytes.TrimRight(decode(encoder, []byte(line)), "\n\r"))
+			outline, err = executeRegex(line, params[1], output)
+			if err != nil {
+				return nil, fmt.Errorf("Cannot execute regex %s: %s", params[1], err)
+			}
+			if outline != "" {
+				break
+			}
 		}
 
 		if curline >= endline {
@@ -120,7 +175,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	}
 
-	return 1, nil
+	return outline, nil
 
 }
 
