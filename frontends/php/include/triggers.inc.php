@@ -729,8 +729,6 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-		'time_from' => null,
-		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
@@ -747,16 +745,27 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	unset($trigger);
 
 	if ($problem_triggerids) {
-		$problems = API::Problem()->get([
+		$problem_query = [
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
-			'objectids' => $problem_triggerids,
-			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
-			'acknowledged' => (array_key_exists('acknowledged', $problem_options))
-				? $problem_options['acknowledged']
-				: null,
-			'time_from' => $problem_options['time_from']
-		]);
+			'objectids' => $problem_triggerids
+		];
+
+		$filters = [
+			'show_recent' => 'recent',
+			'show_suppressed' => 'suppressed',
+			'acknowledged' => 'acknowledged',
+			'time_from' => 'time_from',
+		];
+
+		foreach ($filters as $key => $filter) {
+			$problem_query[$filter] = array_key_exists($key, $problem_options)
+				? (($key === 'show_suppressed')
+					? (($problem_options[$key] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null)
+					: $problem_options[$key])
+				: null;
+		}
+
+		$problems = API::Problem()->get($problem_query);
 
 		$objectids = [];
 
