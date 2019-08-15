@@ -79,6 +79,11 @@ func CheckMetrics() {
 		"system.uptime",
 		"system.uname",
 		"vfs.file.cksum",
+		"net.if.discovery",
+		"net.if.in",
+		"net.if.out",
+		"net.if.total",
+		"net.if.collisions",
 	}
 
 	for _, metric := range metrics {
