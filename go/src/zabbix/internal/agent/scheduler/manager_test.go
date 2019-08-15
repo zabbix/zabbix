@@ -182,6 +182,9 @@ func (c *resultCacheMock) Write(r *plugin.Result) {
 	c.results = append(c.results, r)
 }
 
+func (c *resultCacheMock) Flush() {
+}
+
 func (pc *resultCacheMock) SlotsAvailable() int {
 	return 1
 }

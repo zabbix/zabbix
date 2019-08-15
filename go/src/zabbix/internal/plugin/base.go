@@ -25,43 +25,32 @@ import (
 )
 
 type Accessor interface {
-	Init(name string, key string, description string)
+	Init(name string)
 	Name() string
-	Key() string
-	Description() string
 	Capacity() int
+	SetCapacity(capactity int)
 }
 
 type Base struct {
-	name        string
-	key         string
-	description string
-	MaxCapacity int
+	name     string
+	capacity int
 }
 
-func (b *Base) Init(name string, key string, description string) {
-	if b.MaxCapacity == 0 {
-		b.MaxCapacity = DefaultCapacity
-	}
+func (b *Base) Init(name string) {
 	b.name = name
-	b.key = key
-	b.description = description
+	b.capacity = DefaultCapacity
 }
 
 func (b *Base) Name() string {
 	return b.name
 }
 
-func (b *Base) Description() string {
-	return b.description
-}
-
-func (b *Base) Key() string {
-	return b.key
-}
-
 func (b *Base) Capacity() int {
-	return b.MaxCapacity
+	return b.capacity
+}
+
+func (b *Base) SetCapacity(capacity int) {
+	b.capacity = capacity
 }
 
 func (b *Base) Debugf(format string, args ...interface{}) {

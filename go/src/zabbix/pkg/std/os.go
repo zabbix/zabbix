@@ -40,6 +40,7 @@ type File interface {
 type Os interface {
 	Open(name string) (File, error)
 	Stat(name string) (os.FileInfo, error)
+	IsExist(err error) bool
 }
 
 // A FileMode represents a file's mode and permission bits.
@@ -56,6 +57,10 @@ func (o *sysOs) Open(name string) (File, error) {
 
 func (o *sysOs) Stat(name string) (os.FileInfo, error) {
 	return os.Stat(name)
+}
+
+func (o *sysOs) IsExist(err error) bool {
+	return os.IsExist(err)
 }
 
 // mocked os functionality
@@ -118,13 +123,24 @@ func (o *mockOs) Stat(name string) (os.FileInfo, error) {
 	} else {
 		var fs fileStat
 
-		fs.mode = 0
+		fs.mode = 436
 		fs.modTime = time.Now()
 		fs.name = name
 		fs.size = int64(len(data))
 
 		return &fs, nil
 	}
+}
+
+func (o *mockOs) IsExist(err error) bool {
+
+	if err == nil {
+		return false
+	}
+	if err.Error() == "exists" {
+		return true
+	}
+	return false
 }
 
 func (f *mockFile) Close() error {

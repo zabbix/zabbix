@@ -76,10 +76,13 @@ func CheckMetric(metric string) (err error) {
 func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
+		"agent.ping",
 		"system.uptime",
 		"system.uname",
+		"system.hostname",
 		"vfs.file.cksum",
 		"vfs.file.contents",
+		"vfs.file.exists",
 	}
 
 	for _, metric := range metrics {

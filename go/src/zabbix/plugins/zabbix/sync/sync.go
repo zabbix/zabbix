@@ -29,7 +29,7 @@ type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin = Plugin{plugin.Base{MaxCapacity: 1}}
+var impl Plugin
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	return zbxlib.ExecuteCheck(key, params)
@@ -38,4 +38,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns", "Checks if DNS service is up")
 	plugin.RegisterMetric(&impl, "zabbixsync", "net.dns.record", "Performs DNS query")
+	impl.SetCapacity(1)
 }

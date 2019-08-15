@@ -57,6 +57,7 @@ type Configurator interface {
 
 type ResultWriter interface {
 	Write(result *Result)
+	Flush()
 	SlotsAvailable() int
 	PersistSlotsAvailable() int
 }

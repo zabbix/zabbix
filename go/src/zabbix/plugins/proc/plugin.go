@@ -17,28 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package proc
 
-import (
-	"errors"
-	"zabbix/internal/plugin"
+type procQuery struct {
+	name    string
+	user    string
+	cmdline string
+}
+
+const (
+	procInfoPid = 1 << iota
+	procInfoName
+	procInfoUser
+	procInfoCmdline
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
+type procInfo struct {
+	pid     int64
+	name    string
+	userid  int64
+	cmdline string
+	arg0    string
 }
 
-var impl Plugin
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
-	}
-	return Options.Hostname, nil
-}
-
-func init() {
-	plugin.RegisterMetric(&impl, "hostname", "agent.hostname", "Returns Hostname from agent configuration")
+type cpuUtil struct {
+	utime   uint64
+	stime   uint64
+	started uint64
+	err     error
 }

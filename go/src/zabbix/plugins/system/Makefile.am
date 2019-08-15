@@ -3,4 +3,3 @@
 SUBDIRS = \
 	uptime \
 	uname
-
