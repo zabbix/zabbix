@@ -28,6 +28,7 @@ import (
 	_ "zabbix/plugins/debug/trapper"
 	_ "zabbix/plugins/log"
 	_ "zabbix/plugins/proc"
+	_ "zabbix/plugins/system/cpucollector"
 	_ "zabbix/plugins/system/uname"
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"

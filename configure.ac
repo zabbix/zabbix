@@ -2010,6 +2010,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
+	go/src/zabbix/plugins/system/cpucollector/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
