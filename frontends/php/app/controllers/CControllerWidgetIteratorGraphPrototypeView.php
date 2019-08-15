@@ -35,13 +35,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
-		$view_mode = $this->getInput('view_mode');
 
 		if ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-			$return = $this->doGraphPrototype($fields, $view_mode);
+			$return = $this->doGraphPrototype($fields);
 		}
 		elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			$return = $this->doSimpleGraphPrototype($fields, $view_mode);
+			$return = $this->doSimpleGraphPrototype($fields);
 		}
 		else {
 			error(_('Page received incorrect data'));
@@ -54,7 +53,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		echo (new CJson())->encode($return);
 	}
 
-	protected function doGraphPrototype($fields, $view_mode) {
+	protected function doGraphPrototype($fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['name'],
@@ -104,6 +103,13 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			natsort($graphs_collected);
 		}
 
+		$page = $this->getIteratorPage(count($graphs_collected));
+		$page_count = $this->getIteratorPageCount(count($graphs_collected));
+
+		$graphs_collected = array_slice(
+			$graphs_collected, $this->getIteratorPageSize() * ($page - 1), $this->getIteratorPageSize(), true
+		);
+
 		$children = [];
 
 		foreach ($graphs_collected as $graphid => $name) {
@@ -118,7 +124,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'type' => 'graph',
 				'header' => $name,
 				'fields' => $child_fields,
-				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $view_mode)
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode'))
 			];
 		}
 
@@ -126,11 +132,13 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'header' =>
 				$this->getInput('name', $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name']),
 
-			'children' => $children
+			'children' => $children,
+			'page' => $page,
+			'page_count' => $page_count
 		];
 	}
 
-	protected function doSimpleGraphPrototype($fields, $view_mode) {
+	protected function doSimpleGraphPrototype($fields) {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
@@ -183,6 +191,13 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			natsort($items_collected);
 		}
 
+		$page = $this->getIteratorPage(count($items_collected));
+		$page_count = $this->getIteratorPageCount(count($items_collected));
+
+		$items_collected = array_slice(
+			$items_collected, $this->getIteratorPageSize() * ($page - 1), $this->getIteratorPageSize(), true
+		);
+
 		$children = [];
 
 		foreach ($items_collected as $itemid => $name) {
@@ -197,7 +212,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'type' => 'graph',
 				'header' => $name,
 				'fields' => $child_fields,
-				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $view_mode)
+				'configuration' => CWidgetConfig::getConfiguration(WIDGET_GRAPH, $fields, $this->getInput('view_mode'))
 			];
 		}
 
@@ -205,7 +220,9 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'header' =>
 				$this->getInput('name', $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name']),
 
-			'children' => $children
+			'children' => $children,
+			'page' => $page,
+			'page_count' => $page_count
 		];
 	}
 }

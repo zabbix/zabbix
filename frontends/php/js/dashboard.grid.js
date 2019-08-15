@@ -42,8 +42,32 @@
 		if (!widget['parent']) {
 			// Do not add action buttons for child widgets of iterators.
 
-			widget['content_header'].append(
-				$('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
+			widget['content_header']
+				.append(widget['iterator']
+					? $('<div>', {'class': 'dashbrd-grid-iterator-pager'}).append(
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-iterator-page-previous',
+							'title': t('Previous page')
+						}).on('click', function() {
+							if (widget['page'] > 1) {
+								widget['page'] = Math.max(1, widget['page'] - 1);
+								updateWidgetContent($obj, data, widget);
+							}
+						}),
+						$('<span>'),
+						$('<button>', {
+							'type': 'button',
+							'class': 'btn-iterator-page-next',
+							'title': t('Next page')
+						}).on('click', function() {
+							widget['page']++;
+							updateWidgetContent($obj, data, widget);
+						})
+					)
+					: ''
+				)
+				.append($('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
 					.append((data['options']['editable'] && !data['options']['kioskmode'])
 						? $('<li>').append(
 							$('<button>', {
@@ -92,7 +116,7 @@
 						)
 						: ''
 					)
-			);
+				);
 		}
 
 		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + _add_class});
@@ -141,6 +165,16 @@
 		return $div;
 	}
 
+	function updateIteratorPager(iterator, page, page_count) {
+		iterator['page'] = page;
+
+		// Not changing the text if about to slowly hide the pager.
+		if (page_count > 1) {
+			$('.dashbrd-grid-iterator-pager span', iterator['content_header']).text(page + ' / ' + page_count);
+		}
+		iterator['content_header'].toggleClass('pager-visible', page_count > 1);
+	}
+
 	function addWidgetInfoButtons($content_header, buttons) {
 		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
@@ -153,8 +187,8 @@
 							'class': button.icon,
 							'data-hintbox': 1,
 							'data-hintbox-static': 1
-							})
-						)
+						})
+					)
 					.append(
 						$('<div>', {
 							'class': 'hint-box',
@@ -1457,6 +1491,8 @@
 			return;
 		}
 
+		updateIteratorPager(iterator, response.page, response.page_count);
+
 		var current_children = iterator['children'],
 			current_children_by_widgetid = {};
 
@@ -1506,9 +1542,14 @@
 
 		iterator['children'].forEach(function(child) {
 			/* Possible update policies for the child widgets:
-				resize: execute 'onResizeEnd' action (widget won't update if trigger's not defined or size not changed).
-				refresh: either execute 'timer_refresh' action or updateWidgetContent.
+				resize: execute 'onResizeEnd' action (widget won't update if there's no trigger or size hasn't changed).
+					- Is used to propagate iterator's resize event.
+
+				refresh: either execute 'timer_refresh' action (if trigger exists) or updateWidgetContent.
+					- Is used when widget surely hasn't been resized, but needs to be refreshed.
+
 				resize_or_refresh: either execute 'onResizeEnd' or 'timer_refresh' action, or updateWidgetContent.
+					- Is used when widget might have been resized, and needs to be refreshed anyway.
 			*/
 
 			var update_policy = 'refresh';
@@ -1707,7 +1748,10 @@
 
 		widget['content_size'] = getWidgetContentSize(widget);
 
-		if (!widget['iterator']) {
+		if (widget['iterator']) {
+			ajax_data['page'] = widget['page'];
+		}
+		else {
 			$.extend(ajax_data, widget['content_size']);
 		};
 
@@ -2781,6 +2825,7 @@
 
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
+						'page': 1,
 						'children': [],
 						'update_pending': false
 					});

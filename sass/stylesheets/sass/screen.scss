@@ -2512,6 +2512,8 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -85px -657px,
+	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -83px -623px,
 	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
@@ -3459,11 +3461,12 @@ $form-icon-btn: (
 }
 
 .layout-kioskmode {
-	transition: padding-top .3s 2s;
+	transition: padding-top .2s 2s, margin-bottom .2s 2s; // same speed as floating headers of the widgets.
 
 	&.widget-mouseenter {
 		padding-top: 40px;
-		transition: padding-top .3s;
+		margin-bottom: -30px;
+		transition: padding-top .2s, margin-bottom .2s; // same speed as floating headers of the widgets.
 	}
 }
 
@@ -3483,14 +3486,17 @@ $form-icon-btn: (
 
 		&.dashbrd-grid-widget-hidden-header {
 
+			.dashbrd-grid-widget-container {
+				margin-top: -2.25em;
+			}
+
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				transform: translate3d(0, -94%, 0);
-				z-index: 5;
 			}
 
 			.dashbrd-grid-widget-content {
-				z-index: 6;
+				padding-top: 4px;
+				margin-top: 2.25em;
 			}
 		}
 	}
@@ -3505,29 +3511,30 @@ $form-icon-btn: (
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 	padding-bottom: 8px;
+	z-index: 3;
 }
 
 .dashbrd-grid-widget-head {
-	border: 1px solid $ui-border-color;
-	border-bottom: none;
-	margin: -1px -1px 0 -1px;
 	position: relative;
-	padding: 8px 65px 8px 10px;
-	min-height: 17px;
+	display: flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	overflow: hidden;
+	height: 2.75em;
+	padding: 0 0 0 10px;
 
 	h4 {
+		flex-grow: 1;
 		color: h4-widget-color($font-color);
 		font-weight: bold;
 		@extend %overflow-ellipsis;
 	}
 
 	ul {
-		position: absolute;
-		top: 0;
-		right: 0;
+		align-self: flex-start;
+		flex-shrink: 0;
 
 		li {
-			display: block;
 			float: left;
 			padding: 0;
 
@@ -3545,23 +3552,22 @@ $form-icon-btn: (
 		.dashbrd-grid-widget-container {
 			padding: 8px 0;
 			position: relative;
+			transition: margin-top .2s;
 		}
 
 		.dashbrd-grid-widget-head {
 			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
-			background-color: $ui-bg-color;
 			position: absolute;
 			left: 0;
 			right: 0;
 			top: 0;
-			transform: translate3d(0, 0, 0);
-			transition: transform .3s, box-shadow .3s, z-index .3s;
+			transition: box-shadow .2s;
 			z-index: 2;
 		}
 
 		.dashbrd-grid-widget-content {
 			background-color: $ui-bg-color;
-			transition: z-index .3s;
+			transition: margin-top .2s, padding-top .2s;
 			z-index: 3;
 		}
 	}
