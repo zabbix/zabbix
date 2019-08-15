@@ -22,7 +22,6 @@
 class CControllerUsergroupEnableDebug extends CController {
 
 	protected function checkInput() {
-
 		$fields = [
 			'usrgrpids' => 'required|array_db usrgrp.usrgrpid'
 		];
@@ -37,42 +36,29 @@ class CControllerUsergroupEnableDebug extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usrgrpids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
-
 		$user_groups = [];
 		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
-			$user_groups[] = [
-				'usrgrpid' => $usrgrpid,
-				'debug_mode' => GROUP_DEBUG_MODE_ENABLED
-			];
+			$user_groups[] = ['usrgrpid' => $usrgrpid, 'debug_mode' => GROUP_DEBUG_MODE_ENABLED];
 		}
 
 		$result = (bool) API::UserGroup()->update($user_groups);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.list')->getUrl()
-		);
+		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
+		$response->setFormData(['uncheck' => '1']);
 
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Debug mode updated'));
 		}
 		else {
 			$response->setMessageError(_('Cannot update debug mode'));
 		}
+
 		$this->setResponse($response);
 	}
 }

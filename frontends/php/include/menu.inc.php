@@ -265,7 +265,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'label' => _('Authentication')
 				],
 				[
-					'url' => 'usergrps.php',
+					'url' => 'zabbix.php',
+					'action' => 'usergroup.list',
+					'active_if' => ['usergroup.list', 'usergroup.edit', 'usergrp.create'],
 					'label' => _('User groups')
 				],
 				[
@@ -273,12 +275,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'action' => 'user.list',
 					'active_if' => ['user.edit', 'user.list'],
 					'label' => _('Users')
-				],
-				[
-					'url' => 'zabbix.php',
-					'action' => 'usergroup.list',
-					'active_if' => ['usergroup.list', 'usergroup.edit', 'usergrp.create'],
-					'label' => _('User groups NEW')
 				],
 				[
 					'url' => 'zabbix.php',

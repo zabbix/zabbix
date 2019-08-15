@@ -23,8 +23,8 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpids' => 'required|array_db usrgrp.usrgrpid',
-			'gui_access' => 'required| in ' . implode(',', [
+			'usrgrpids' => 'required | array_db usrgrp.usrgrpid',
+			'gui_access' => 'required | in ' . implode(',', [
 				GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED
 			])
 		];
@@ -39,32 +39,23 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usrgrpids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
-
 		$user_groups = [];
+		$gui_access = $this->getInput('gui_access');
 
-		foreach ($this->getInput('usrgrpids', []) as $usrgrpid) {
-			$user_groups[] = [
-				'usrgrpid' => $usrgrpid,
-				'gui_access' => $this->getInput('gui_access')
-			];
+		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
+			$user_groups[] = compact('usrgrpid', 'gui_access');
 		}
 
 		$result = (bool) API::UserGroup()->update($user_groups);
-		$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
+
+		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
+		$response->setFormData(['uncheck' => '1']);
 
 		if ($result) {
 			$response->setMessageOk(_('Frontend access updated'));
@@ -75,5 +66,4 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 
 		$this->setResponse($response);
 	}
-
 }

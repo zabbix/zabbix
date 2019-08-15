@@ -36,42 +36,31 @@ class CControllerUsergroupDisable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usrgrpids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
 		$user_groups = [];
 		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
-			$user_groups[] = [
-				'usrgrpid' => $usrgrpid,
-				'users_status' => GROUP_STATUS_DISABLED
-			];
+			$user_groups[] = ['usrgrpid' => $usrgrpid, 'users_status' => GROUP_STATUS_DISABLED];
 		}
 
-		$result = API::UserGroup()->update($user_groups);
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.list')
-			->getUrl()
-		);
+		$disabled = count($user_groups);
 
-		$number = count($user_groups);
+		$result = (bool) API::UserGroup()->update($user_groups);
+
+		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
+		$response->setFormData(['uncheck' => '1']);
+
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_n('User group disabled', 'User groups disabled', $number));
+			$response->setMessageOk(_n('User group disabled', 'User groups disabled', $disabled));
 		}
 		else {
-			$response->setMessageError(_n('Cannot disable user group', 'Cannot disable user groups', $number));
+			$response->setMessageError(_n('Cannot disable user group', 'Cannot disable user groups', $disabled));
 		}
+
 		$this->setResponse($response);
 	}
 }

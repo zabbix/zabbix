@@ -22,19 +22,35 @@
 class CControllerUsergroupCreate extends CController {
 
 	protected function checkInput() {
+
+		$gui_access = [
+			GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED
+		];
+
 		$fields = [
-			'name' => 'db usrgrp.name|not_empty'
+			'name'         => 'required|not_empty|string',
+			'userids'      => 'array_db users.userid',
+			'gui_access'   => 'required|db usrgrp.gui_access|in '.implode(',', $gui_access),
+			'users_status' => 'required|db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode'   => 'required|db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+
+			'group_rights' => 'array',
+			'tag_filters'  => 'array',
+
+			'form_refresh' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.edit');
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'usergroup.edit')
+						->getUrl()
+					);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot ...'));
+					$response->setMessageError(_('Cannot add group'));
 					$this->setResponse($response);
 					break;
 
@@ -52,17 +68,48 @@ class CControllerUsergroupCreate extends CController {
 	}
 
 	protected function doAction() {
-		$result = true;
+		$user_group = [
+			'name'         => $this->getInput('name'),
+			'users_status' => $this->getInput('users_status'),
+			'gui_access'   => $this->getInput('gui_access'),
+			'debug_mode'   => $this->getInput('debug_mode'),
+			'userids'      => $this->getInput('userids', []),
+			'tag_filters'  => $this->getInput('tag_filters', []),
+			'rights'       => []
+		];
+
+		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
+
+		foreach ($group_rights as $groupid => $group_right) {
+			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
+				$user_group['rights'][] = [
+					'id' => (string) $groupid,
+					'permission' => $group_right['permission']
+				];
+			}
+		}
+
+		$result = (bool) API::UserGroup()->create($user_group);
+
+		$form_data = $this->getInputAll();
 
 		if ($result) {
-			$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.list');
-			$response->setMessageOk(_('.. added'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.list')
+				->getUrl()
+			);
+			$response->setMessageOk(_('Group added'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=usergroup.edit');
-			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot ...'));
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
+				->setArgument('action', 'usergroup.edit')
+				->getUrl()
+			);
+			$response->setMessageError(_('Cannot add group'));
+			$response->setFormData($form_data);
 		}
+
 		$this->setResponse($response);
 	}
 }

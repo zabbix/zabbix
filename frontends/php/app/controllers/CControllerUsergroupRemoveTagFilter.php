@@ -19,11 +19,25 @@
 **/
 
 
-class CControllerUsergroupDelete extends CController {
+class CControllerUsergroupRemoveTagFilter extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpids' => 'required|array_db usrgrp.usrgrpid'
+			'usrgrpid'        => 'db usrgrp.usrgrpid',
+			'name'            => 'db usrgrp.name',
+			'userids'         => 'array_db users.userid',
+			'gui_access'      => 'db usrgrp.gui_access',
+			'users_status'    => 'db usrgrp.users_status',
+			'debug_mode'      => 'db usrgrp.debug_mode',
+
+			'permissions'     => 'array',
+			'tag_filters'     => 'array',
+
+			'new_tag_filter'  => 'array',
+			'new_group_right' => 'array',
+
+			'index'           => 'int32',
+			'form_refresh'    => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,24 +54,16 @@ class CControllerUsergroupDelete extends CController {
 	}
 
 	protected function doAction() {
-		$usrgrpids = $this->getInput('usrgrpids');
+		$old_input = $this->getInputAll();
 
-		$result = (bool) API::UserGroup()->delete($usrgrpids);
+		unset($old_input['tag_filters'][$this->getInput('index')]);
 
-		$deleted = count($usrgrpids);
-
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
+			->setArgument('action', 'usergroup.edit');
 
 		$response = new CControllerResponseRedirect($url->getUrl());
-		$response->setFormData(['uncheck' => '1']);
-
-		if ($result) {
-			$response->setMessageOk(_n('Group deleted', 'Groups deleted', $deleted));
-		}
-		else {
-			$response->setMessageError(_n('Cannot delete group', 'Cannot delete groups', $deleted));
-		}
-
+		$response->setFormData($old_input);
 		$this->setResponse($response);
 	}
 }

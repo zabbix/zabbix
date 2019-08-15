@@ -28,11 +28,11 @@ class CControllerUsergroupList extends CController {
 	protected function checkInput() {
 		$fields = [
 			'sort' => 'in name',
-			'sortorder' => 'in ' . ZBX_SORT_DOWN . ',' . ZBX_SORT_UP,
+			'sortorder' => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'filter_set' => 'in 1',
 			'filter_rst' => 'in 1',
-			'filter_user_status' => 'in -1,' . GROUP_STATUS_ENABLED . ',' . GROUP_STATUS_DISABLED,
-			/* 'page' => 'ge 1' */
+			'filter_user_status' => 'in -1,'.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'page' => 'ge 1',
 			'uncheck' => 'in 1',
 			'filter_name' => 'string'
 		];
@@ -55,7 +55,9 @@ class CControllerUsergroupList extends CController {
 	 */
 	protected function updateUserProfile() {
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1),
+				PROFILE_TYPE_INT
+			);
 			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_rst')) {

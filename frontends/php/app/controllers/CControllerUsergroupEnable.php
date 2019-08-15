@@ -36,43 +36,30 @@ class CControllerUsergroupEnable extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$usergroup_ctn = API::UserGroup()->get([
-			'usrgrpids' => $this->getInput('usrgrpids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($usergroup_ctn == count($this->getInput('usrgrpids')));
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
-
 		$user_groups = [];
 		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
-			$user_groups[] = [
-				'usrgrpid' => $usrgrpid,
-				'users_status' => GROUP_STATUS_ENABLED
-			];
+			$user_groups[] = ['usrgrpid' => $usrgrpid, 'users_status' => GROUP_STATUS_ENABLED];
 		}
+
 		$result = (bool) API::UserGroup()->update($user_groups);
-
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.list')
-			->getUrl()
-		);
-
 		$number = count($user_groups);
+
+		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
+		$response->setFormData(['uncheck' => '1']);
+
 		if ($result) {
-			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('User group enabled', 'User groups enabled', $number));
 		}
 		else {
 			$response->setMessageError(_n('Cannot enable user group', 'Cannot enable user groups', $number));
 		}
+
 		$this->setResponse($response);
 	}
 }

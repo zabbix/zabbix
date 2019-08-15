@@ -19,5 +19,288 @@
 **/
 
 
-// require_once 'include/views/administration.usergroups.list.php';
-echo '<pre>' . var_export($data, true);
+$this->includeJSfile('app/views/administration.usergroup.edit.js.php');
+$widget = (new CWidget())->setTitle(_('User groups'));
+
+$form = (new CForm())
+	->setName('user_group_form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+
+if ($data['usrgrpid'] == 0) {
+	$form->addVar('action', 'usergroup.create');
+}
+else {
+	$form->addVar('action', 'usergroup.update')->addVar('usrgrpid', $data['usrgrpid']);
+}
+
+$form_list = (new CFormList())
+	->addRow(
+		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+			->setAttribute('maxlength', DB::getFieldLength('usrgrp', 'name'))
+	)
+	->addRow(
+		new CLabel(_('Users'), 'userids__ms'),
+		(new CMultiSelect([
+			'name' => 'userids[]',
+			'object_name' => 'users',
+			'data' => $data['users_ms'],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'users',
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'userids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+
+if ($data['can_update_group']) {
+	$form_list->addRow(
+		(new CLabel(_('Frontend access'), 'gui_access')),
+		(new CComboBox('gui_access', $data['gui_access'], null, [
+			GROUP_GUI_ACCESS_SYSTEM => user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM),
+			GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
+			GROUP_GUI_ACCESS_LDAP => user_auth_type2str(GROUP_GUI_ACCESS_LDAP),
+			GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
+		]))
+	);
+	$form_list->addRow(_('Enabled'),
+		(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
+			->setUncheckedValue(GROUP_STATUS_DISABLED)
+			->setChecked($data['users_status'] == GROUP_STATUS_ENABLED)
+	);
+}
+else {
+	$form
+		->addVar('gui_access', $data['gui_access'])
+		->addVar('users_status', GROUP_STATUS_ENABLED);
+	$form_list
+		->addRow(_('Frontend access'),
+			(new CSpan(user_auth_type2str($data['gui_access'])))
+				->addClass('text-field')
+				->addClass('green')
+		)
+		->addRow(_('Enabled'),
+			(new CSpan(_('Enabled')))
+				->addClass('text-field')
+				->addClass('green')
+		);
+}
+
+$form_list->addRow(_('Debug mode'),
+	(new CCheckBox('debug_mode', GROUP_DEBUG_MODE_ENABLED))
+		->setUncheckedValue(GROUP_DEBUG_MODE_DISABLED)
+		->setChecked($data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
+);
+
+$permissions_form_list = new CFormList('permissions_form_list');
+$permissions_table = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host group'), _('Permissions')]);
+
+foreach ($data['group_rights'] as $groupid => $group_right) {
+	$form->addVar('group_rights['.$groupid.'][name]', $group_right['name']);
+
+	if ($groupid == 0) {
+		$permissions_table->addRow([italic(_('All groups')), permissionText($group_right['permission'])]);
+		$form->addVar('group_rights['.$groupid.'][grouped]', $group_right['grouped']);
+		$form->addVar('group_rights['.$groupid.'][permission]', $group_right['permission']);
+	}
+	else {
+		if (array_key_exists('grouped', $group_right) && $group_right['grouped']) {
+			$form->addVar('group_rights['.$groupid.'][grouped]', $group_right['grouped']);
+			$group_name = [$group_right['name'], SPACE, italic('('._('including subgroups').')')];
+		}
+		else {
+			$group_name = $group_right['name'];
+		}
+
+		$permissions_table->addRow([$group_name,
+			(new CRadioButtonList('group_rights['.$groupid.'][permission]', (int) $group_right['permission']))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true)
+		]);
+	}
+}
+
+$permissions_form_list->addRow(_('Permissions'),
+	(new CDiv($permissions_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$new_group_right_table = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'new_group_right[groupids][]',
+			'object_name' => 'hostGroup',
+			'data' => zbx_array_mintersect($data['new_group_right']['groupids'], $data['host_groups_ms']),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_group_right_groupids_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CCol(
+			(new CRadioButtonList('new_group_right[permission]', (int) $data['new_group_right']['permission']))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->addValue(_('None'), PERM_NONE)
+				->setModern(true)
+		))->setAttribute('style', 'vertical-align: top')
+	])
+	->addRow((new CCheckBox('new_group_right[include_subgroups]'))
+		->setChecked($data['new_group_right']['include_subgroups'])
+		->setLabel(_('Include subgroups'))
+	)
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$form->getName().'", "action", "usergroup.add.group_right");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
+$permissions_form_list->addRow(null,
+	(new CDiv($new_group_right_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$tag_filter_form_list = new CFormList('tagFilterFormList');
+
+$tag_filter_table = (new CTable())
+	->setId('tag_filter_table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host group'), _('Tags'), _('Action')]);
+
+$previous_name = '';
+foreach ($data['tag_filters'] as $key => $tag_filter) {
+	if ($previous_name === $tag_filter['name']) {
+		$tag_filter['name'] = '';
+	}
+	else {
+		$previous_name = $tag_filter['name'];
+	}
+
+	if ($tag_filter['tag'] !== '' && $tag_filter['value'] !== '') {
+		$tag_value = $tag_filter['tag'] . NAME_DELIMITER . $tag_filter['value'];
+	}
+	elseif ($tag_filter['tag'] !== '') {
+		$tag_value = $tag_filter['tag'];
+	}
+	else {
+		$tag_value = italic(_('All tags'));
+	}
+
+	$action = (new CSimpleButton(_('Remove')))
+		->onClick(sprintf('javascript: create_var("%s", "action", "usergroup.remove.tag_filter");'.
+			'submitFormWithParam("%s", "index", "%s")', $form->getName(), $form->getName(), $key))
+		->addClass(ZBX_STYLE_BTN_LINK);
+
+	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
+	$form->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
+	$form->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
+	$form->addVar('tag_filters['.$key.'][value]', $tag_filter['value']);
+}
+
+$tag_filter_form_list->addRow(_('Permissions'),
+	(new CDiv($tag_filter_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$new_tag_filter_table = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'new_tag_filter[groupids][]',
+			'object_name' => 'hostGroup',
+			'data' => zbx_array_mintersect($data['new_tag_filter']['groupids'], $data['host_groups_ms']),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'new_tag_filter_groupids_'
+				]
+			],
+			'styles' => ['margin-top' => '-.3em']
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		new CCol(
+			(new CTextBox('new_tag_filter[tag]', $data['new_tag_filter']['tag']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+		),
+		new CCol(
+			(new CTextBox('new_tag_filter[value]', $data['new_tag_filter']['value']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('value'))
+		)
+	])
+	->addRow((new CCheckBox('new_tag_filter[include_subgroups]'))
+		->setChecked($data['new_tag_filter']['include_subgroups'])
+		->setLabel(_('Include subgroups'))
+	)
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('javascript: submitFormWithParam("'.$form->getName().'", "action", "usergroup.add.tag_filter");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
+$tag_filter_form_list->addRow(null,
+	(new CDiv($new_tag_filter_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$tabs = (new CTabView())
+	->addTab('user_group_tab', _('User group'), $form_list)
+	->addTab('permissions_tab', _('Permissions'), $permissions_form_list)
+	->addTab('tag_filter_tab', _('Tag filter'), $tag_filter_form_list);
+if (!$data['form_refresh']) {
+	$tabs->setSelected(0);
+}
+
+if ($data['usrgrpid'] != 0) {
+	$tabs->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[
+			(new CRedirectButton(_('Delete'),
+				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.delete')
+					->setArgument('usrgrpids', [$data['usrgrpid']])->setArgumentSID(),
+				_('Delete selected group?')
+			))->setId('delete'),
+			(new CRedirectButton(_('Cancel'),
+				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
+			))->setId('cancel')
+		]
+	));
+}
+else {
+	$tabs->setFooter(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		[
+			(new CRedirectButton(_('Cancel'),
+				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
+			))->setId('cancel')
+		]
+	));
+}
+
+// append tab to form
+$form->addItem($tabs);
+$widget->addItem($form);
+$widget->show();
+
+$this->addJsFile('multiselect.js');
