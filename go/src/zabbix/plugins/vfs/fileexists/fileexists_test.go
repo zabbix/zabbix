@@ -36,10 +36,10 @@ func TestFileExists(t *testing.T) {
 		t.Errorf("vfs.file.exists returned error %s", err.Error())
 	} else {
 		if exists, ok := result.(int); !ok {
-			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+			t.Errorf("vfs.file.exists returned unexpected value type %s", reflect.TypeOf(result).Kind())
 		} else {
 			if exists != 1 {
-				t.Errorf("vfs.file.cksum returned invalid result")
+				t.Errorf("vfs.file.exists returned invalid result")
 			}
 		}
 	}
@@ -55,10 +55,10 @@ func TestFileNotExists(t *testing.T) {
 		t.Errorf("vfs.file.exists returned error %s", err.Error())
 	} else {
 		if exists, ok := result.(int); !ok {
-			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+			t.Errorf("vfs.file.exists returned unexpected value type %s", reflect.TypeOf(result).Kind())
 		} else {
 			if exists != 0 {
-				t.Errorf("vfs.file.cksum returned invalid result")
+				t.Errorf("vfs.file.exists returned invalid result")
 			}
 		}
 	}
