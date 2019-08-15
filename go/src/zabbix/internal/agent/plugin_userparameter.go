@@ -42,7 +42,8 @@ type parameterInfo struct {
 // Plugin -
 type UserParameterPlugin struct {
 	plugin.Base
-	parameters map[string]parameterInfo
+	parameters           map[string]parameterInfo
+	unsafeUserParameters int
 }
 
 var userParameter UserParameterPlugin
@@ -64,19 +65,19 @@ func (p UserParameterPlugin) cmd(key string, params []string) (string, error) {
 
 		for i := strings.IndexByte(s, '$'); i != -1; i = strings.IndexByte(s, '$') {
 			if len(s) > i+1 && s[i+1] >= '1' && s[i+1] <= '9' && int(s[i+1]-'0') <= len(params) {
-				p := params[s[i+1]-'0'-1]
-				if Options.UnsafeUserParameters == 0 {
-					if j := strings.IndexAny(p, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
-						if unicode.IsPrint(rune(p[j])) {
-							return "", fmt.Errorf("Character \"%c\" is not allowed", p[j])
+				param := params[s[i+1]-'0'-1]
+				if p.unsafeUserParameters == 0 {
+					if j := strings.IndexAny(param, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
+						if unicode.IsPrint(rune(param[j])) {
+							return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
 						}
 
-						return "", fmt.Errorf("Character 0x%02x is not allowed", p[j])
+						return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
 					}
 				}
 
 				b.WriteString(s[:i])
-				b.WriteString(p)
+				b.WriteString(param)
 				s = s[i+2:]
 			} else {
 				b.WriteString(s[:i+1])
@@ -134,8 +135,9 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 	return cmdResult, nil
 }
 
-func InitUserParameterPlugin(userParameterConfig []string) error {
+func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int) error {
 	userParameter.parameters = make(map[string]parameterInfo)
+	userParameter.unsafeUserParameters = unsafeUserParameters
 
 	for i := 0; i < len(userParameterConfig); i++ {
 		s := strings.SplitN(userParameterConfig[i], ",", 2)

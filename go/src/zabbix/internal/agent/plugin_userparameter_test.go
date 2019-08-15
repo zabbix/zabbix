@@ -13,9 +13,10 @@ type Input struct {
 }
 
 type Result struct {
-	data   []string
-	failed bool
-	input  []Input
+	data                 []string
+	failed               bool
+	input                []Input
+	unsafeUserParameters int
 }
 
 var results = []Result{
@@ -48,7 +49,7 @@ func TestUserParameterPlugin(t *testing.T) {
 		t.Run(results[i].data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			if err := InitUserParameterPlugin(results[i].data); err != nil {
+			if err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters); err != nil {
 				if !results[i].failed {
 					t.Errorf("Expected success while got error %s", err)
 				}
@@ -190,6 +191,11 @@ var resultsCmd = []Result{
 			Input{failed: true, key: "a", params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"}, cmd: ""},
 		},
 	},
+	Result{data: []string{"a[*],echo $1"}, unsafeUserParameters: 1,
+		input: []Input{
+			Input{key: "a", params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"}, cmd: "echo \\'\"`*?[]{}~$!&;()<>|#@\n"},
+		},
+	},
 }
 
 func TestCmd(t *testing.T) {
@@ -197,7 +203,7 @@ func TestCmd(t *testing.T) {
 		t.Run(resultsCmd[i].data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			if err := InitUserParameterPlugin(resultsCmd[i].data); err != nil {
+			if err := InitUserParameterPlugin(resultsCmd[i].data, resultsCmd[i].unsafeUserParameters); err != nil {
 				t.Errorf("Plugin init failed: %s", err)
 			}
 
