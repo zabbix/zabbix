@@ -111,7 +111,7 @@ func (p *Plugin) Period() int {
 
 func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error) {
 	if len(params) > 0 {
-		return "", errors.New("Too many parameters.")
+		return nil, errors.New("Too many parameters.")
 	}
 	cpus := make([]*cpuDiscovery, 0, len(p.cpus))
 	for _, cpu := range p.cpus {
@@ -139,11 +139,11 @@ func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
 		case "max":
 			mask = cpuStatusOnline | cpuStatusOffline
 		default:
-			return 0, errors.New("Invalid first parameter.")
+			return nil, errors.New("Invalid first parameter.")
 		}
 	case 0:
 	default:
-		return 0, errors.New("Too many parameters.")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	var num int
@@ -203,14 +203,14 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	case 1: // cpu number or all;
 		if params[0] != "" && params[0] != "all" {
 			if i, err := strconv.ParseInt(params[0], 10, 32); err != nil {
-				return 0, errors.New("Invalid first parameter.")
+				return nil, errors.New("Invalid first parameter.")
 			} else {
 				index = int(i) + 1
 			}
 		}
 	case 0:
 	default:
-		return 0, errors.New("Too many parameters.")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	var ok bool

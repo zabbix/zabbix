@@ -97,21 +97,6 @@ type devUnit struct {
 	history    [maxHistory]devStats
 }
 
-var typeParams map[string]int = map[string]int{
-	"":           statTypeSPS,
-	"sps":        statTypeSPS,
-	"ops":        statTypeOPS,
-	"sectors":    statTypeSectors,
-	"operations": statTypeOperations,
-}
-
-var rangeParams map[string]historyIndex = map[string]historyIndex{
-	"":      60,
-	"avg1":  60,
-	"avg5":  60 * 5,
-	"avg15": 60 * 15,
-}
-
 func (p *Plugin) Collect() (err error) {
 	now := time.Now()
 	p.mutex.Lock()
@@ -144,13 +129,36 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Unsupported metric")
 	}
 
-	var devParam, typeParam, rangeParam string
+	statType := statTypeSPS
+	statRange := historyIndex(60)
+	var devParam string
+
 	switch len(params) {
 	case 3:
-		rangeParam = params[2]
+		switch params[2] {
+		case "", "avg1":
+			statRange = 60
+		case "avg5":
+			statRange = 60 * 5
+		case "avg15":
+			statRange = 60 * 15
+		default:
+			return nil, errors.New("Invalid third parameter.")
+		}
 		fallthrough
-	case 2:
-		typeParam = params[1]
+	case 2: // type parameter
+		switch params[1] {
+		case "", "sps":
+			statType = statTypeSPS
+		case "ops":
+			statType = statTypeOPS
+		case "sectors":
+			statType = statTypeSectors
+		case "operations":
+			statType = statTypeOperations
+		default:
+			return nil, errors.New("Invalid second parameter.")
+		}
 		fallthrough
 	case 1:
 		devParam = params[0]
@@ -160,12 +168,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case 0:
 	default:
 		return nil, errors.New("Too many parameters.")
-	}
-
-	var ok bool
-	var statType int
-	if statType, ok = typeParams[typeParam]; !ok {
-		return nil, errors.New("Invalid second parameter.")
 	}
 
 	if statType == statTypeSectors || statType == statTypeOperations {
@@ -194,11 +196,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	if ctx == nil {
 		return nil, errors.New("This item is available only in daemon mode.")
-	}
-
-	var statRange historyIndex
-	if statRange, ok = rangeParams[rangeParam]; !ok {
-		return nil, errors.New("Invalid third parameter.")
 	}
 
 	var devName string
