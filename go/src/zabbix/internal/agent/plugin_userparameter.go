@@ -47,8 +47,7 @@ type UserParameterPlugin struct {
 
 var userParameter UserParameterPlugin
 
-// Export -
-func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p UserParameterPlugin) cmd(key string, params []string) (string, error) {
 	var b bytes.Buffer
 
 	parameter := p.parameters[key]
@@ -69,10 +68,10 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 				if Options.UnsafeUserParameters == 0 {
 					if j := strings.IndexAny(p, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
 						if unicode.IsPrint(rune(p[j])) {
-							return nil, fmt.Errorf("Character \"%c\" is not allowed", p[j])
-						} else {
-							return nil, fmt.Errorf("Character 0x%02x is not allowed", p[j])
+							return "", fmt.Errorf("Character \"%c\" is not allowed", p[j])
 						}
+
+						return "", fmt.Errorf("Character 0x%02x is not allowed", p[j])
 					}
 				}
 
@@ -91,9 +90,16 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 
 		s = b.String()
 	} else if len(params) > 0 {
-		return nil, fmt.Errorf("Parameters are not allowed.")
+		return "", fmt.Errorf("Parameters are not allowed.")
 	}
 
+	return s, nil
+}
+
+// Export -
+func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+
+	s, err := p.cmd(key, params)
 	p.Debugf("[%d] executing command:'%s'", ctx.ClientID(), s)
 
 	cmdCtx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(Options.Timeout))
