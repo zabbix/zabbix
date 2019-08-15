@@ -1973,7 +1973,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		while ($row = DBfetch($result)) {
 			$key = $functionids[$row['functionid']]['key'];
 			$num = $functionids[$row['functionid']]['num'];
-			if (!isset($item_order[$key][$row['itemid']])) {
+			if (!array_key_exists($key, $item_order) || !array_key_exists($row['itemid'], $item_order[$key])) {
 				$item_order[$key][$row['itemid']] = $num;
 			}
 		}
