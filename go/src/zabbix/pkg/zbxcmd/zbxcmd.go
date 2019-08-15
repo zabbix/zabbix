@@ -21,12 +21,10 @@ package zbxcmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
 	"time"
-	"zabbix/pkg/log"
 )
 
 const maxExecuteOutputLenB = 512 * 1024
@@ -38,17 +36,10 @@ func Run(s string, timeout time.Duration) (string, error) {
 	cmd := exec.CommandContext(ctx, "sh", "-c", s)
 
 	stdoutStderr, err := cmd.CombinedOutput()
-
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			return "", fmt.Errorf("Timeout while executing a shell script.")
 		}
-
-		if len(stdoutStderr) == 0 {
-			return "", err
-		}
-
-		return "", errors.New(string(stdoutStderr))
 	}
 
 	if maxExecuteOutputLenB <= len(stdoutStderr) {
@@ -56,14 +47,6 @@ func Run(s string, timeout time.Duration) (string, error) {
 	}
 
 	return strings.TrimRight(string(stdoutStderr), " \t\r\n"), nil
-}
-
-func wait(cmd *exec.Cmd) {
-	err := cmd.Wait()
-
-	if err != nil {
-		log.Debugf("Command %s finished with error: %s", cmd.Args, err)
-	}
 }
 
 func Start(s string) error {
@@ -74,7 +57,7 @@ func Start(s string) error {
 		return fmt.Errorf("Cannot execute command: %s", err)
 	}
 
-	go wait(cmd)
+	go cmd.Wait()
 
 	return nil
 }
