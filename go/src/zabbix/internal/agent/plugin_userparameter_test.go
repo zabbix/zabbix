@@ -226,3 +226,34 @@ func TestCmd(t *testing.T) {
 		})
 	}
 }
+
+func TestUnsafeCmd(t *testing.T) {
+
+	t.Run("", func(t *testing.T) {
+		plugin.Metrics = make(map[string]*plugin.Metric)
+
+		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 0); err != nil {
+			t.Errorf("Plugin init failed: %s", err)
+		}
+
+		for _, c := range notAllowedCharacters {
+			_, err := userParameter.cmd("a", []string{string(c)})
+			if err == nil {
+				t.Errorf("Not allowed character is present")
+			}
+		}
+
+		plugin.Metrics = make(map[string]*plugin.Metric)
+
+		if err := InitUserParameterPlugin([]string{"a[*],echo $1"}, 1); err != nil {
+			t.Errorf("Plugin init failed: %s", err)
+		}
+
+		for _, c := range notAllowedCharacters {
+			_, err := userParameter.cmd("a", []string{string(c)})
+			if err != nil {
+				t.Errorf("Not allowed character is present")
+			}
+		}
+	})
+}
