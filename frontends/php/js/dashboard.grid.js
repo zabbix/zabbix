@@ -165,14 +165,18 @@
 		return $div;
 	}
 
-	function updateIteratorPager(iterator, page, page_count) {
-		iterator['page'] = page;
+	function updateIteratorPager(iterator) {
+		var too_narrow = iterator['content_header'].width() <
+				$('.dashbrd-grid-iterator-pager', iterator['content_header']).outerWidth(true)
+					+ $('.dashbrd-grid-widget-actions', iterator['content_header']).outerWidth(true),
+			pager_visible = iterator['page_count'] > 1 && !too_narrow;
 
-		// Not changing the text if about to slowly hide the pager.
-		if (page_count > 1) {
-			$('.dashbrd-grid-iterator-pager span', iterator['content_header']).text(page + ' / ' + page_count);
+		// Not changing the text if about to hide the pager.
+		if (pager_visible) {
+			$('.dashbrd-grid-iterator-pager span', iterator['content_header'])
+				.text(iterator['page'] + ' / ' + iterator['page_count']);
 		}
-		iterator['content_header'].toggleClass('pager-visible', page_count > 1);
+		iterator['content_header'].toggleClass('pager-visible', pager_visible);
 	}
 
 	function addWidgetInfoButtons($content_header, buttons) {
@@ -1491,7 +1495,9 @@
 			return;
 		}
 
-		updateIteratorPager(iterator, response.page, response.page_count);
+		iterator['page'] = response.page;
+		iterator['page_count'] = response.page_count;
+		updateIteratorPager(iterator);
 
 		var current_children = iterator['children'],
 			current_children_by_widgetid = {};
@@ -2561,6 +2567,8 @@
 	}
 
 	function onIteratorResizeEnd($obj, data, iterator) {
+		updateIteratorPager(iterator);
+
 		if (getIteratorTooSmallState(iterator)) {
 			return;
 		}
@@ -2826,6 +2834,7 @@
 				if (widget_local['iterator']) {
 					$.extend(widget_local, {
 						'page': 1,
+						'page_count': 1,
 						'children': [],
 						'update_pending': false
 					});

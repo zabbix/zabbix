@@ -3461,12 +3461,14 @@ $form-icon-btn: (
 }
 
 .layout-kioskmode {
-	transition: padding-top .2s 2s, margin-bottom .2s 2s; // same speed as floating headers of the widgets.
+	// set the same speed as for the floating headers of the widgets.
+	transition: padding-top .3s 2s, margin-bottom .3s 2s;
 
 	&.widget-mouseenter {
 		padding-top: 40px;
 		margin-bottom: -30px;
-		transition: padding-top .2s, margin-bottom .2s; // same speed as floating headers of the widgets.
+		// set the same speed as for the floating headers of the widgets.
+		transition: padding-top .3s, margin-bottom .3s;
 	}
 }
 
@@ -3554,7 +3556,7 @@ $form-icon-btn: (
 		.dashbrd-grid-widget-container {
 			padding: 8px 0;
 			position: relative;
-			transition: margin-top .2s;
+			transition: margin-top .3s;
 		}
 
 		.dashbrd-grid-widget-head {
@@ -3563,13 +3565,13 @@ $form-icon-btn: (
 			left: 0;
 			right: 0;
 			top: 0;
-			transition: box-shadow .2s;
+			transition: box-shadow .3s;
 			z-index: 2;
 		}
 
 		.dashbrd-grid-widget-content {
 			background-color: $ui-bg-color;
-			transition: margin-top .2s, padding-top .2s;
+			transition: margin-top .3s, padding-top .3s;
 			z-index: 3;
 		}
 	}
