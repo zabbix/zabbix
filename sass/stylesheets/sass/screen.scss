@@ -4256,6 +4256,15 @@ $form-icon-btn: (
 	float: left;
 	margin: 2px 0 0 -19px;
 	@include border-radius(2px);
+
+	.notif-indic-snooze {
+		width: 14px;
+		height: 14px;
+		float: left;
+		margin-top: 20px;
+		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+	}
+
 }
 
 .notif-indic-container {
