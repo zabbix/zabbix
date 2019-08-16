@@ -54,7 +54,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.Debugf("Executing command:'%s'", params[0])
 	}
 
-	if len(params) == 1 || len(params[1]) == 0 || params[1] == "wait" {
+	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
 		stdoutStderr, err := zbxcmd.Run(params[0], time.Second*time.Duration(agent.Options.Timeout))
 		if err != nil {
 			return nil, err
