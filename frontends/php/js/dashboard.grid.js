@@ -22,9 +22,9 @@
 	"use strict"
 
 	function makeWidgetDiv($obj, data, widget) {
-		var _add_class = widget['iterator'] ? ' iterator' : '';
+		var add_class = widget['iterator'] ? ' iterator' : '';
 
-		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head' + _add_class})
+		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head' + add_class})
 			.append($('<h4>').text((widget['header'] !== '')
 				? widget['header']
 				: data['widget_defaults'][widget['type']]['header']
@@ -67,7 +67,7 @@
 					)
 					: ''
 				)
-				.append($('<ul>', {'class': 'dashbrd-grid-widget-actions' + _add_class})
+				.append($('<ul>', {'class': 'dashbrd-grid-widget-actions' + add_class})
 					.append((data['options']['editable'] && !data['options']['kioskmode'])
 						? $('<li>').append(
 							$('<button>', {
@@ -119,9 +119,9 @@
 				);
 		}
 
-		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + _add_class});
+		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content' + add_class});
 
-		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container' + _add_class})
+		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container' + add_class})
 			.toggleClass('no-padding', !widget['configuration']['padding']);
 
 		widget['container']
@@ -1156,10 +1156,10 @@
 				widget.prev_pos.axis_correction = {};
 				doWidgetResize($obj, data, widget);
 
-				var _class = event.currentTarget.className;
+				var handle_class = event.currentTarget.className;
 				widget['div']
-					.toggleClass('resizing-top', _class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null)
-					.toggleClass('resizing-left', _class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null);
+					.toggleClass('resizing-top', handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null)
+					.toggleClass('resizing-left', handle_class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null);
 			},
 			resize: function(event, ui) {
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
