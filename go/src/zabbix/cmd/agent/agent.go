@@ -124,6 +124,19 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 	return
 }
 
+func processMetricsCommand(c *remotecontrol.Client, params []string) (err error) {
+	data := manager.Query("metrics")
+	return c.Reply(data)
+}
+
+func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
+	help := `Remote control interface, available commands:
+	loglevel <increase|decrease> - increases/decreases logging level
+	metrics - lists available metrics
+	help - this message`
+	return c.Reply(help)
+}
+
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
 	if len(params) == 0 {
@@ -132,6 +145,10 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	switch params[0] {
 	case "loglevel":
 		err = processLoglevelCommand(c, params)
+	case "help":
+		err = processHelpCommand(c, params)
+	case "metrics":
+		err = processMetricsCommand(c, params)
 	default:
 		return errors.New("Unknown command")
 	}

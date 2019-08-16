@@ -21,6 +21,7 @@ package remotecontrol
 
 import (
 	"bufio"
+	"io/ioutil"
 	"net"
 	"os"
 	"syscall"
@@ -49,6 +50,7 @@ func (c *Client) Request() (cmmand string) {
 
 func (c *Client) Reply(response string) (err error) {
 	_, err = c.conn.Write([]byte(response + "\n"))
+	c.conn.Close()
 	return
 }
 
@@ -64,7 +66,8 @@ func (c *Conn) run() {
 			break
 		} else {
 			scanner := bufio.NewScanner(conn)
-			for scanner.Scan() {
+			if scanner.Scan() {
+				// accept single command line, the connection will be closed after sending reply
 				c.sink <- &Client{request: scanner.Text(), conn: conn}
 			}
 		}
@@ -112,9 +115,9 @@ func SendCommand(path string, command string) (reply string, err error) {
 	if _, err = conn.Write([]byte(command + "\n")); err != nil {
 		return
 	}
-	scanner := bufio.NewScanner(conn)
-	if scanner.Scan() {
-		reply = scanner.Text()
+	var b []byte
+	if b, err = ioutil.ReadAll(conn); err != nil {
+		return
 	}
-	return
+	return string(b), nil
 }

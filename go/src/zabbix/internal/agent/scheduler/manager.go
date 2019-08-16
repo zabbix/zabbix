@@ -50,8 +50,9 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
-type statusRequest struct {
-	sink chan string
+type queryRequest struct {
+	command string
+	sink    chan string
 }
 
 type Scheduler interface {
@@ -59,7 +60,7 @@ type Scheduler interface {
 		requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration) (result string, err error)
-	GetStatus() (status string)
+	Query(command string) (status string)
 }
 
 func (m *Manager) cleanupClient(c *client, now time.Time) {
@@ -211,47 +212,6 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 	m.queue = queue
 }
 
-type pluginMetrics struct {
-	ref     *pluginAgent
-	metrics []*plugin.Metric
-}
-
-func (m *Manager) getStatus(r *statusRequest) {
-	var status strings.Builder
-	agents := make(map[plugin.Accessor]*pluginMetrics)
-	infos := make([]*pluginMetrics, 0, len(m.plugins))
-	for _, p := range m.plugins {
-		if _, ok := agents[p.impl]; !ok {
-			info := &pluginMetrics{ref: p, metrics: make([]*plugin.Metric, 0)}
-			infos = append(infos, info)
-			agents[p.impl] = info
-		}
-	}
-
-	for _, metric := range plugin.Metrics {
-		if info, ok := agents[metric.Plugin]; ok {
-			info.metrics = append(info.metrics, metric)
-		}
-	}
-	sort.Slice(infos, func(i, j int) bool {
-		return infos[i].ref.name() < infos[j].ref.name()
-	})
-
-	for _, info := range infos {
-		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\ncapacity: %d/%d\ntasks: %d\n",
-			info.ref.name(), info.ref.active(), info.ref.usedCapacity, info.ref.capacity, len(info.ref.tasks)))
-		for _, metric := range info.metrics {
-			status.WriteString(metric.Key)
-			status.WriteString(": ")
-			status.WriteString(metric.Description)
-			status.WriteString("\n")
-		}
-		status.WriteString("\n")
-	}
-	r.sink <- status.String()
-	close(r.sink)
-}
-
 func (m *Manager) run() {
 	defer log.PanicHook()
 	log.Debugf("starting manager")
@@ -294,8 +254,13 @@ run:
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
-			case *statusRequest:
-				m.getStatus(v.(*statusRequest))
+			case *queryRequest:
+				r := v.(*queryRequest)
+				if response, err := m.processQuery(r); err != nil {
+					r.sink <- "cannot process request: " + err.Error()
+				} else {
+					r.sink <- response
+				}
 			}
 		}
 	}
@@ -435,8 +400,8 @@ func (m *Manager) FinishTask(task performer) {
 	m.input <- task
 }
 
-func (m *Manager) GetStatus() (status string) {
-	request := &statusRequest{sink: make(chan string)}
+func (m *Manager) Query(command string) (status string) {
+	request := &queryRequest{command: command, sink: make(chan string)}
 	m.input <- request
 	return <-request.sink
 }
