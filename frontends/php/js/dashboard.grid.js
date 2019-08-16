@@ -51,7 +51,7 @@
 							'title': t('Previous page')
 						}).on('click', function() {
 							if (widget['page'] > 1) {
-								widget['page'] = Math.max(1, widget['page'] - 1);
+								widget['page']--;
 								updateWidgetContent($obj, data, widget);
 							}
 						}),
@@ -61,8 +61,10 @@
 							'class': 'btn-iterator-page-next',
 							'title': t('Next page')
 						}).on('click', function() {
-							widget['page']++;
-							updateWidgetContent($obj, data, widget);
+							if (widget['page'] < widget['page_count']) {
+								widget['page']++;
+								updateWidgetContent($obj, data, widget);
+							}
 						})
 					)
 					: ''
