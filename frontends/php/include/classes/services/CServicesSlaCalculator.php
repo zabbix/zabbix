@@ -153,17 +153,25 @@ class CServicesSlaCalculator {
 		];
 		$prevTime = $period_start;
 
-		if (isset($data[$period_start]['ut_s'])) {
-			$utCnt += $data[$period_start]['ut_s'];
-		}
-		if (isset($data[$period_start]['ut_e'])) {
-			$utCnt -= $data[$period_start]['ut_e'];
-		}
-		if (isset($data[$period_start]['dt_s'])) {
-			$dtCnt += $data[$period_start]['dt_s'];
-		}
-		if (isset($data[$period_start]['dt_e'])) {
-			$dtCnt -= $data[$period_start]['dt_e'];
+		foreach ($data as $val) {
+			if ($period_start != $val['clock']) {
+				continue;
+			}
+
+			if (array_key_exists('ut_s', $val)) {
+				$utCnt += $val['ut_s'];
+			}
+			if (array_key_exists('ut_e', $val)) {
+				$utCnt -= $val['ut_e'];
+			}
+			if (array_key_exists('dt_s', $val)) {
+				$dtCnt += $val['dt_s'];
+			}
+			if (array_key_exists('dt_e', $val)) {
+				$dtCnt -= $val['dt_e'];
+			}
+
+			break;
 		}
 
 		foreach ($data as $val) {
