@@ -38,13 +38,13 @@ type parameterInfo struct {
 // Plugin -
 type UserParameterPlugin struct {
 	plugin.Base
-	parameters           map[string]parameterInfo
+	parameters           map[string]*parameterInfo
 	unsafeUserParameters int
 }
 
 var userParameter UserParameterPlugin
 
-func (p UserParameterPlugin) cmd(key string, params []string) (string, error) {
+func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 	var b bytes.Buffer
 
 	parameter := p.parameters[key]
@@ -113,7 +113,7 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 }
 
 func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int) error {
-	userParameter.parameters = make(map[string]parameterInfo)
+	userParameter.parameters = make(map[string]*parameterInfo)
 	userParameter.unsafeUserParameters = unsafeUserParameters
 
 	for i := 0; i < len(userParameterConfig); i++ {
@@ -132,7 +132,7 @@ func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters 
 			return fmt.Errorf("cannot add user parameter \"%s\": command is missing", userParameterConfig[i])
 		}
 
-		parameter := parameterInfo{cmd: s[1]}
+		parameter := &parameterInfo{cmd: s[1]}
 
 		if len(p) == 1 && p[0] == "*" {
 			parameter.flexible = true
