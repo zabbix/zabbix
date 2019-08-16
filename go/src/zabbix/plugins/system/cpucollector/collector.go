@@ -1,0 +1,278 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+package cpucollector
+
+import (
+	"encoding/json"
+	"errors"
+	"strconv"
+	"zabbix/internal/plugin"
+	"zabbix/pkg/log"
+)
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	cpus map[int]*cpuUnit
+}
+
+var impl Plugin
+
+const (
+	maxHistory = 60*15 + 1
+)
+
+const (
+	cpuStatusOffline = 1 << iota
+	cpuStatusOnline
+	cpuStatusSummary
+)
+const (
+	stateUser = iota
+	stateNice
+	stateSystem
+	stateIdle
+	stateIowait
+	stateIrq
+	stateSoftirq
+	stateSteal
+	stateGcpu
+	stateGnice
+)
+
+var cpuStatuses [3]string = [3]string{"", "offline", "online"}
+
+type historyIndex int
+
+func (h historyIndex) inc() historyIndex {
+	h++
+	if h == maxHistory {
+		h = 0
+	}
+	return h
+}
+
+func (h historyIndex) dec() historyIndex {
+	h--
+	if h < 0 {
+		h = maxHistory - 1
+	}
+	return h
+}
+
+func (h historyIndex) sub(value historyIndex) historyIndex {
+	h -= value
+	for h < 0 {
+		h += maxHistory
+	}
+	return h
+}
+
+type cpuStats struct {
+	counters [10]uint64
+}
+
+type cpuUnit struct {
+	index      int
+	head, tail historyIndex
+	history    [maxHistory]cpuStats
+	status     int
+}
+
+type cpuDiscovery struct {
+	Number int    `json:"{#CPU.NUMBER}"`
+	Status string `json:"{#CPU.STATUS}"`
+}
+
+func (p *Plugin) Collect() (err error) {
+	return p.collect()
+}
+
+func (p *Plugin) Period() int {
+	return 1
+}
+
+func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error) {
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters.")
+	}
+	cpus := make([]*cpuDiscovery, 0, len(p.cpus))
+	for _, cpu := range p.cpus {
+		// 0 index is for the overall stats, skip for discovery
+		if cpu.status&cpuStatusSummary == 0 {
+			cpus = append(cpus, &cpuDiscovery{Number: cpu.index, Status: cpuStatuses[cpu.status]})
+		}
+	}
+	var b []byte
+	if b, err = json.Marshal(&cpus); err != nil {
+		return
+	}
+	return string(b), nil
+}
+
+func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
+	mask := cpuStatusOnline
+	switch len(params) {
+	case 1:
+		switch params[0] {
+		case "":
+			mask = cpuStatusOnline
+		case "online":
+			mask = cpuStatusOnline
+		case "max":
+			mask = cpuStatusOnline | cpuStatusOffline
+		default:
+			return nil, errors.New("Invalid first parameter.")
+		}
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	var num int
+	for _, cpu := range p.cpus {
+		if cpu.status&mask != 0 {
+			num++
+		}
+	}
+	return num, nil
+}
+
+func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
+	index := 0
+	state := stateUser
+	statRange := historyIndex(60)
+
+	switch len(params) {
+	case 3: // mode parameter
+		switch params[2] {
+		case "", "avg1":
+			statRange = 60
+		case "avg5":
+			statRange = 60 * 5
+		case "avg15":
+			statRange = 60 * 15
+		default:
+			return nil, errors.New("Invalid third parameter.")
+		}
+
+		fallthrough
+	case 2: // type parameter
+		switch params[1] {
+		case "", "user":
+			state = stateUser
+		case "idle":
+			state = stateIdle
+		case "nice":
+			state = stateNice
+		case "system":
+			state = stateSystem
+		case "iowait":
+			state = stateIowait
+		case "interrupt":
+			state = stateIrq
+		case "softirq":
+			state = stateSoftirq
+		case "steal":
+			state = stateSteal
+		case "guest":
+			state = stateGcpu
+		case "guest_nice":
+			state = stateGnice
+		default:
+			return nil, errors.New("Invalid second parameter.")
+		}
+		fallthrough
+	case 1: // cpu number or all;
+		if params[0] != "" && params[0] != "all" {
+			if i, err := strconv.ParseInt(params[0], 10, 32); err != nil {
+				return nil, errors.New("Invalid first parameter.")
+			} else {
+				index = int(i) + 1
+			}
+		}
+	case 0:
+	default:
+		return nil, errors.New("Too many parameters.")
+	}
+
+	var ok bool
+	var cpu *cpuUnit
+	if cpu, ok = p.cpus[index]; !ok || cpu.head == cpu.tail {
+		log.Debugf("no collected data for CPU %d", index-1)
+		return nil, nil
+	}
+
+	var tail, head *cpuStats
+	totalnum := cpu.tail - cpu.head
+	if totalnum < 0 {
+		totalnum += maxHistory
+	}
+	if totalnum < statRange {
+		statRange = totalnum
+	}
+	tail = &cpu.history[cpu.tail.dec()]
+	if totalnum > 1 {
+		head = &cpu.history[cpu.tail.sub(statRange)]
+	} else {
+		head = &cpuStats{}
+	}
+
+	var counter, total uint64
+	for i := 0; i < len(tail.counters); i++ {
+		if tail.counters[i] > head.counters[i] {
+			total += tail.counters[i] - head.counters[i]
+		}
+	}
+	if total == 0 {
+		return 0, nil
+	}
+
+	if tail.counters[state] > head.counters[state] {
+		counter = tail.counters[state] - head.counters[state]
+	}
+
+	return float64(counter) * 100 / float64(total), nil
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	// collector has not yet been initialized
+	if len(p.cpus) == 0 {
+		return
+	}
+	switch key {
+	case "system.cpu.discovery":
+		return p.getCpuDiscovery(params)
+	case "system.cpu.num":
+		return p.getCpuNum(params)
+	case "system.cpu.util":
+		return p.getCpuUtil(params)
+	default:
+		return nil, errors.New("Unsupported metric")
+	}
+}
+
+func init() {
+	impl.cpus = make(map[int]*cpuUnit)
+	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.discovery",
+		"List of detected CPUs/CPU cores. Used for low-level discovery.")
+	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.num", "Number of CPUs.")
+	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.util", "CPU utilisation percentage.")
+}

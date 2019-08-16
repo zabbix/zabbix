@@ -26,6 +26,8 @@ import (
 	"errors"
 	"io"
 	"os"
+	"syscall"
+	"time"
 )
 
 // File interface is used to mock os.File structure
@@ -37,7 +39,12 @@ type File interface {
 // Os interface is used to mock os package
 type Os interface {
 	Open(name string) (File, error)
+	Stat(name string) (os.FileInfo, error)
+	IsExist(err error) bool
 }
+
+// A FileMode represents a file's mode and permission bits.
+type FileMode uint32
 
 // wrappers for standard os functionality
 
@@ -46,6 +53,14 @@ type sysOs struct {
 
 func (o *sysOs) Open(name string) (File, error) {
 	return os.Open(name)
+}
+
+func (o *sysOs) Stat(name string) (os.FileInfo, error) {
+	return os.Stat(name)
+}
+
+func (o *sysOs) IsExist(err error) bool {
+	return os.IsExist(err)
 }
 
 // mocked os functionality
@@ -62,12 +77,70 @@ type mockFile struct {
 	buffer *bytes.Buffer
 }
 
+type fileStat struct {
+	name    string
+	size    int64
+	mode    FileMode
+	modTime time.Time
+	sys     syscall.Stat_t
+}
+
 func (o *mockOs) Open(name string) (File, error) {
 	if data, ok := o.files[name]; !ok {
 		return nil, errors.New("file does not exist")
 	} else {
 		return &mockFile{bytes.NewBuffer(data)}, nil
 	}
+}
+
+func (o *fileStat) IsDir() bool {
+	return false
+}
+
+func (o *fileStat) Mode() os.FileMode {
+	return os.FileMode(o.mode)
+}
+
+func (o *fileStat) ModTime() time.Time {
+	return o.modTime
+}
+
+func (o *fileStat) Name() string {
+	return o.name
+}
+
+func (o *fileStat) Size() int64 {
+	return o.size
+}
+
+func (o *fileStat) Sys() interface{} {
+	return nil
+}
+
+func (o *mockOs) Stat(name string) (os.FileInfo, error) {
+	if data, ok := o.files[name]; !ok {
+		return nil, errors.New("file does not exist")
+	} else {
+		var fs fileStat
+
+		fs.mode = 436
+		fs.modTime = time.Now()
+		fs.name = name
+		fs.size = int64(len(data))
+
+		return &fs, nil
+	}
+}
+
+func (o *mockOs) IsExist(err error) bool {
+
+	if err == nil {
+		return false
+	}
+	if err.Error() == "exists" {
+		return true
+	}
+	return false
 }
 
 func (f *mockFile) Close() error {

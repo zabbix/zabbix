@@ -20,6 +20,7 @@
 package log
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 	"unsafe"
@@ -47,6 +48,9 @@ type metadata struct {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if ctx == nil || ctx.ClientID() == 0 {
+		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
+	}
 	meta := ctx.Meta()
 	var data *metadata
 	if meta.Data == nil {
@@ -79,7 +83,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
 	}
-	logitem := zbxlib.LogItem{Itemid: ctx.ItemID(), Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
+	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
 	data.lastcheck = now
@@ -94,8 +98,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			results[i].LastLogsize = &r.LastLogsize
 			results[i].Mtime = &r.Mtime
 			results[i].Persistent = true
-			return results, nil
 		}
+		return results, nil
 	}
 	return nil, nil
 }
