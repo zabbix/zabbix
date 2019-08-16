@@ -73,7 +73,20 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'error_details' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
-			// Validation. JSONPath.
+			// Structured data.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item XML XPath',
+						'Key' => 'item-empty-xpath'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath', 'parameter_1' => '']
+					],
+					'error_details' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -115,7 +128,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
-			// Validation. Error in JSON.
+			// Validation. Error in JSON and XML.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -125,6 +138,19 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in JSON']
+					],
+					'error_details' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item error XML empty',
+						'Key' => 'item-error-xml-empty'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML', 'parameter_1' => '']
 					],
 					'error_details' => 'Incorrect value for field "params": cannot be empty.'
 				]
@@ -304,12 +330,16 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						['type' => 'Regular expression', 'parameter_1' => 'expression2', 'parameter_2' => '\2'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test1'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test2'],
+						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
+						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern1'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern2'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path1'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path2']
+						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path2'],
+						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml'],
+						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml']
 					]
 				]
 			],
@@ -322,10 +352,12 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-='],
+						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
 						['type' => 'Does not match regular expression', 'parameter_1' => '4d!@#$%^&*()-='],
 						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
-						['type' => 'Check for error in JSON', 'parameter_1' => '5e!@#$%^&*()-=']
+						['type' => 'Check for error in JSON', 'parameter_1' => '5e!@#$%^&*()-='],
+						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
 					]
 				]
 			],
@@ -339,9 +371,11 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '{$PATTERN}', 'parameter_2' => '{$OUTPUT}'],
 						['type' => 'JSONPath', 'parameter_1' => '{$PATH}'],
+						['type' => 'XML XPath', 'parameter_1' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
 						['type' => 'Does not match regular expression', 'parameter_1' => '{$PATTERN2}'],
 						['type' => 'JavaScript', 'parameter_1' => '{$JAVASCRIPT}'],
 						['type' => 'Check for error in JSON', 'parameter_1' => '{$PATH2}'],
+						['type' => 'Check for error in XML', 'parameter_1' => '/tmp/{$PATH}'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '{$HEARTBEAT}']
 					]
 				]
@@ -886,13 +920,24 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 						'on_fail' => true
 					],
 					[
+						'type' => 'XML XPath',
+						'parameter_1' => '/path/new',
+						'on_fail' => true
+					],
+					[
 						'type' => 'Does not match regular expression',
 						'parameter_1' => 'Pattern',
 						'on_fail' => true
 					],
 					[
 						'type' => 'Check for error in JSON',
-						'parameter_1' => '$.new.path'
+						'parameter_1' => '$.new.path',
+						'on_fail' => true
+					],
+					[
+						'type' => 'Check for error in XML',
+						'parameter_1' => '/new/path',
+						'on_fail' => true
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
@@ -937,9 +982,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
-			if ($options['type'] === 'Check for error in JSON'
-					|| $options['type'] === 'Discard unchanged with heartbeat') {
-
+			if ($options['type'] === 'Discard unchanged with heartbeat') {
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 			}
 		}
@@ -979,12 +1022,14 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 			switch ($options['type']) {
 				case 'Regular expression':
 				case 'JSONPath':
+				case 'XML XPath':
+				case 'Check for error in JSON':
 				case 'Does not match regular expression':
+				case 'Check for error in XML':
 					// Check preprocessing in frontend.
 					$this->assertTrue($steps[$i]['on_fail']->isSelected());
 					$this->assertTrue($steps[$i]['on_fail']->isEnabled());
 					break;
-				case 'Check for error in JSON':
 				case 'Discard unchanged with heartbeat':
 					// Check pre-processing error handler type in DB.
 					$this->assertFalse($steps[$i]['on_fail']->isEnabled());

@@ -1,8 +1,37 @@
 Changes for 4.4.0alpha2
 
 New features:
+A.F.....S. [ZBXNEXT-5343] extended custom error handling to support more preprocessing rules (akozlovs, miks)
+A.F....... [ZBXNEXT-5344] extended LLD preprocessing to support XML related preprocessing operations (miks)
+.........T [ZBXNEXT-5257] added "Template DB PostgreSQL" (afayantsev)
+.........T [ZBXNEXT-5258] added "Template DB MySQL" (mchudinov)
+..F....... [ZBXNEXT-5281] added visibility option for the widget header (ashubin)
+..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
+...G...PS. [ZBXNEXT-1740] added way to specify "connect to dns" for auto registered agents and discovered hosts (akozlovs)
+..F....... [ZBXNEXT-5236] updated dashboard for 24 columns grid supporting (ashubin)
+..F....... [ZBX-11280] implemented auto-resizing of macro and tag fields on user input (agriscenko)
+..F....... [ZBXNEXT-5251] extended widget "Problems by severity" with aggregated view (ashubin, vasilijs)
+..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
+..F....... [ZBX-16157] moved Adminitration->Users pages to MVC framework (Ivo, Sasha)
 
 Bug fixes:
+..F....... [ZBX-16128] Audit log show incorrect action ID (rlataria)
+..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
+..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
+..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
+..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
+..F....... [ZBX-16474] fixed 'Request-URI too long' error in problems mass update page (miks)
+........S. [ZBX-16473] fixed server-proxy synchronization and pre-preprocessing issues with items that are monitored by server even when their hosts are monitored by proxies (wiper)
+.D........ [ZBX-16184] updated Zabbix sender man page (viktors)
+A......... [ZBX-16462] fixed syntax error in SQL query used to calculate SLA in Monitoring->Services (agriscenko)
+..F....... [ZBX-16031] reworked event update controller, making partly closed set of events closable (miks)
+..F....... [ZBX-16283] fixed read-only shared dashboard without widgets missing placeholder label (gcalenko)
+..F....... [ZBX-16316] fixed dashboard widget and slideshow menu popup not updating current refresh rate and fixed a JS error in slideshows (Ivo)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+.........T [ZBX-16146] added missing mandatory tag "<tags/>" into templates/classic/template_app_zabbix_server.xml (Sasha)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.0alpha1
@@ -30,8 +59,27 @@ Bug fixes:
 Changes for 4.2.6rc1
 
 New features:
+..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
+..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
 
 Bug fixes:
+..F....... [ZBX-16128] Audit log show incorrect action ID (rlataria)
+..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
+..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
+..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
+..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
+..F....... [ZBX-16474] fixed 'Request-URI too long' error in problems mass update page (miks)
+........S. [ZBX-16473] fixed server-proxy synchronization and pre-preprocessing issues with items that are monitored by server even when their hosts are monitored by proxies (wiper)
+.D........ [ZBX-16184] updated Zabbix sender man page (viktors)
+A......... [ZBX-16462] fixed syntax error in SQL query used to calculate SLA in Monitoring->Services (agriscenko)
+..F....... [ZBX-16031] reworked event update controller, making partly closed set of events closable (miks)
+..F....... [ZBX-16283] fixed read-only shared dashboard without widgets missing placeholder label (gcalenko)
+..F....... [ZBX-16316] fixed dashboard widget and slideshow menu popup not updating current refresh rate and fixed a JS error in slideshows (Ivo)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+.........T [ZBX-16146] added missing mandatory tag "<tags/>" into templates/classic/template_app_zabbix_server.xml (Sasha)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.5
@@ -533,8 +581,24 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.12rc1
 
 New features:
+..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
 
 Bug fixes:
+..F....... [ZBX-16128] Audit log show incorrect action ID (rlataria)
+..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
+..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
+..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
+..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
+..F....... [ZBX-16474] fixed 'Request-URI too long' error in problems mass update page (miks)
+.D........ [ZBX-16184] updated Zabbix sender man page (viktors)
+A......... [ZBX-16462] fixed syntax error in SQL query used to calculate SLA in Monitoring->Services (agriscenko)
+..F....... [ZBX-16031] reworked event update controller, making partly closed set of events closable (miks)
+..F....... [ZBX-16283] fixed read-only shared dashboard without widgets missing placeholder label (gcalenko)
+..F....... [ZBX-16316] fixed dashboard widget and slideshow menu popup not updating current refresh rate and fixed a JS error in slideshows (Ivo)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.11

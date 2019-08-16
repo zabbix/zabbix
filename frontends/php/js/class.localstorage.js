@@ -366,7 +366,17 @@ ZBX_LocalStorage.prototype.writeKey = function(key, value) {
  * @return {object}
  */
 ZBX_LocalStorage.prototype.fetchKeyWrites = function() {
-	return JSON.parse(localStorage.getItem(ZBX_LocalStorage.defines.KEY_LAST_WRITE) || '{}');
+	var key_writes = JSON.parse(localStorage.getItem(ZBX_LocalStorage.defines.KEY_LAST_WRITE) || '{}'),
+		session_regex = '^' + ZBX_LocalStorage.prefix,
+		session_key_writes = {};
+
+	for (var abs_key in key_writes) {
+		if (abs_key.match(session_regex)) {
+			session_key_writes[abs_key] = key_writes[abs_key];
+		}
+	}
+
+	return session_key_writes;
 };
 
 /**
