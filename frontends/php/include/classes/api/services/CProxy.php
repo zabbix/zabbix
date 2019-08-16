@@ -612,13 +612,14 @@ class CProxy extends CApiService {
 		$names = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$host_name_parser = new CHostNameParser();
 
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
-			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
+			if ($host_name_parser->parse($proxy['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect characters used for proxy name "%1$s".', $proxy['host'])
 				);
@@ -719,6 +720,7 @@ class CProxy extends CApiService {
 		$names = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'ranges' => false]);
+		$host_name_parser = new CHostNameParser();
 
 		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
@@ -731,7 +733,7 @@ class CProxy extends CApiService {
 
 			// host
 			if (array_key_exists('host', $proxy)) {
-				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
+				if ($host_name_parser->parse($proxy['host']) != CParser::PARSE_SUCCESS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host'])
 					);
