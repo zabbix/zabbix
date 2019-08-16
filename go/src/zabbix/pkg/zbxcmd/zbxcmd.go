@@ -49,7 +49,7 @@ func Run(s string, timeout time.Duration) (string, error) {
 	t := time.AfterFunc(timeout, func() {
 		errKill := syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
 		if errKill != nil {
-			log.Errf("failed to kill [%s]: %s", s, errKill)
+			log.Warningf("failed to kill [%s]: %s", s, errKill)
 		}
 	})
 
