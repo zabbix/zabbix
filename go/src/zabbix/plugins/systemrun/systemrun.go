@@ -60,7 +60,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Run(params[0], time.Second*time.Duration(agent.Options.Timeout))
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(agent.Options.Timeout))
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return stdoutStderr, nil
 	} else if params[1] == "nowait" {
-		err := zbxcmd.Start(params[0])
+		err := zbxcmd.ExecuteBackground(params[0])
 
 		if err != nil {
 			return nil, err

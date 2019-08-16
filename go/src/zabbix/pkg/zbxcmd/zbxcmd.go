@@ -31,7 +31,7 @@ import (
 
 const maxExecuteOutputLenB = 512 * 1024
 
-func Run(s string, timeout time.Duration) (string, error) {
+func Execute(s string, timeout time.Duration) (string, error) {
 	cmd := exec.Command("sh", "-c", s)
 
 	var b bytes.Buffer
@@ -66,7 +66,7 @@ func Run(s string, timeout time.Duration) (string, error) {
 	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
-func Start(s string) error {
+func ExecuteBackground(s string) error {
 	cmd := exec.Command("sh", "-c", s)
 	err := cmd.Start()
 
