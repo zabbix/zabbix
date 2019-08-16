@@ -123,6 +123,32 @@ class CServicesSlaCalculator {
 		if ($service_time_data) {
 			ksort($service_time_data);
 
+			/*
+			 * If 'downtime' service time is active at moment of $period_start, move $start_value to moment when service
+			 * time ends.
+			 */
+			$first_service_time_start_time = key($service_time_data);
+			$first_service_time = $service_time_data[$first_service_time_start_time];
+			if ($period_start == $first_service_time_start_time && array_key_exists('dt_s', $first_service_time)) {
+				foreach (array_keys($service_time_data) as $service_time_ts) {
+					if (array_key_exists('dt_e', $service_time_data[$service_time_ts])) {
+						$data[] = [
+							'alarm' => $start_value,
+							'clock' => $service_time_ts
+						];
+						$start_value = 0;
+						break;
+					}
+				}
+			}
+
+			/*
+			 * For next foreach we need incrementally increasing keys (starting with n > 0) but entries still need to
+			 * be sorted by 'clock'.
+			 */
+			CArrayHelper::sort($data, [['field' => 'clock', 'order' => ZBX_SORT_UP]]);
+			$data = array_combine(range(1, count($data)), array_values($data));
+
 			// Put service times between alarms at right positions.
 			$prev_time = $period_start;
 			$prev_alarmid = 0;
