@@ -83,6 +83,8 @@ func CheckMetrics() {
 		"vfs.file.cksum",
 		"vfs.file.contents",
 		"vfs.file.exists",
+		"kernel.maxfiles",
+		"kernel.maxproc",
 	}
 
 	for _, metric := range metrics {
