@@ -127,11 +127,11 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				output:   sink,
 			}
 			// cache scheduled (non direct) request tasks
+			if err = task.reschedule(now); err != nil {
+				return
+			}
 			if r.Itemid != 0 {
 				c.exporters[r.Itemid] = task
-				if err = task.reschedule(now); err != nil {
-					return
-				}
 			}
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
