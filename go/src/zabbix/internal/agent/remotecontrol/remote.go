@@ -75,8 +75,9 @@ func (c *Conn) run() {
 }
 
 func (c *Conn) Start() {
-	go c.run()
-
+	if c.listener != nil {
+		go c.run()
+	}
 }
 
 func (c *Conn) Client() (client chan *Client) {
