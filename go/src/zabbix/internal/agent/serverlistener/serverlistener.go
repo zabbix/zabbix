@@ -107,5 +107,7 @@ func (sl *ServerListener) Start() (err error) {
 }
 
 func (sl *ServerListener) Stop() {
-	sl.listener.Close()
+	if sl.listener != nil {
+		sl.listener.Close()
+	}
 }

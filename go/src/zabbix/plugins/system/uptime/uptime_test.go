@@ -51,7 +51,7 @@ func TestUptime(t *testing.T) {
 	stdOs.(std.MockOs).MockFile("/proc/stat", []byte(procStat))
 
 	time1 := time.Now()
-	if result, err := impl.Export("system.uptime", []string{}); err != nil {
+	if result, err := impl.Export("system.uptime", []string{}, nil); err != nil {
 		t.Errorf("sytem.uptime returned error %s", err.Error())
 	} else {
 		if uptime, ok := result.(int); !ok {

@@ -3,9 +3,10 @@ package systemd
 import (
 	"encoding/json"
 	"fmt"
-	"zabbix/internal/plugin"
 	"path/filepath"
+	"reflect"
 	"sync"
+	"zabbix/internal/plugin"
 
 	"github.com/godbus/dbus"
 )
@@ -78,7 +79,7 @@ func zbxNum2hex(c byte) byte {
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (interface{}, error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
 	conn, err := p.getConnection()
 
 	if nil != err {
@@ -182,6 +183,19 @@ func (p *Plugin) Export(key string, params []string) (interface{}, error) {
 
 		if nil != err {
 			return nil, fmt.Errorf("Cannot get unit property: %s", err)
+		}
+
+		switch reflect.TypeOf(value).Kind() {
+		case reflect.Slice:
+			fallthrough
+		case reflect.Array:
+			ret, err := json.Marshal(value)
+
+			if nil != err {
+				return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+			}
+
+			return string(ret), nil
 		}
 
 		return value, nil

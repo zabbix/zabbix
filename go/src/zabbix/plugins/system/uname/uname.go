@@ -21,6 +21,7 @@ package uname
 
 import (
 	"errors"
+	"fmt"
 	"zabbix/internal/plugin"
 )
 
@@ -32,13 +33,24 @@ type Plugin struct {
 var impl Plugin
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters")
 	}
-	return getUname()
+
+	switch key {
+	case "system.uname":
+		return getUname()
+	case "system.hostname":
+		return getHostname()
+	case "system.sw.arch":
+		return getSwArch()
+	}
+	return nil, fmt.Errorf("Not implemented: %s", key)
 }
 
 func init() {
 	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
+	plugin.RegisterMetric(&impl, "uname", "system.hostname", "Returns system host name")
+	plugin.RegisterMetric(&impl, "uname", "system.sw.arch", "Software architecture information")
 }

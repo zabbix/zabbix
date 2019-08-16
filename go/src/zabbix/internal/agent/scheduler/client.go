@@ -22,11 +22,14 @@ package scheduler
 import (
 	"hash/fnv"
 	"strings"
+	"sync/atomic"
 	"time"
+	"unsafe"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/itemutil"
+	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxlib"
 )
 
 type clientItem struct {
@@ -41,9 +44,44 @@ type pluginInfo struct {
 }
 
 type client struct {
-	id        uint64
-	exporters map[uint64]exporterTaskAccessor
-	plugins   map[*pluginAgent]*pluginInfo
+	id                 uint64
+	exporters          map[uint64]exporterTaskAccessor
+	plugins            map[*pluginAgent]*pluginInfo
+	refreshUnsupported int
+	globalRegexp       unsafe.Pointer
+	output             plugin.ResultWriter
+}
+
+type ClientAccessor interface {
+	RefreshUnsupported() int
+	Output() plugin.ResultWriter
+	GlobalRegexp() *glexpr.Bundle
+	ID() uint64
+}
+
+// RefreshUnsupported is used only by scheduler, no synchronization is required
+func (c *client) RefreshUnsupported() int {
+	return c.refreshUnsupported
+}
+
+// GlobalRegexp() is used by tasks to implement ContextProvider interface.
+// In theory it can be accessed by plugins and replaced by scheduler at the same time,
+// so pointer access must be synchronized. The global regexp contents are never changed,
+// only replaced, so pointer synchronization is enough.
+func (c *client) GlobalRegexp() *glexpr.Bundle {
+	return (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))
+}
+
+// While ID() is used by tasks to implement ContextProvider interface, client ID cannot
+// change, so no synchronization is required.
+func (c *client) ID() uint64 {
+	return c.id
+}
+
+// While Output() is used by tasks to implement ContextProvider interface, client output cannot
+// change, so no synchronization is required.
+func (c *client) Output() plugin.ResultWriter {
+	return c.output
 }
 
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
@@ -61,7 +99,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			h := fnv.New32a()
 			_, _ = h.Write([]byte(p.impl.Name()))
 			task := &collectorTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: false},
+				taskBase: taskBase{plugin: p, active: true, recurring: true},
 				seed:     uint64(h.Sum32())}
 			if err = task.reschedule(now); err != nil {
 				return
@@ -75,48 +113,51 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		if r.Itemid != 0 {
-			if _, err = itemutil.GetNextcheck(r.Itemid, r.Delay, false, now); err != nil {
+			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
 		}
+		var task *exporterTask
 		if tacc, ok := c.exporters[r.Itemid]; !ok {
-			task := &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: r.Itemid == 0},
-				writer:   sink,
+			task = &exporterTask{
+				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
+				client:   c,
+				output:   sink,
 			}
-
-			// cache scheduled (non direct) requests
+			// cache scheduled (non direct) request tasks
+			if err = task.reschedule(now); err != nil {
+				return
+			}
 			if r.Itemid != 0 {
 				c.exporters[r.Itemid] = task
-				if err = task.reschedule(now); err != nil {
-					return
-				}
 			}
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {
-			tacc.setUpdated(now)
-			item := tacc.getItem()
-			item.key = r.Key
-			if item.delay != r.Delay {
-				item.delay = r.Delay
-				if err = tacc.reschedule(now); err != nil {
-					tacc.deactivate()
+			task = tacc.task()
+			task.updated = now
+			task.item.key = r.Key
+			if task.item.delay != r.Delay {
+				task.item.delay = r.Delay
+				if err = task.reschedule(now); err != nil {
+					task.deactivate()
 					return
 				}
-				p.tasks.Update(tacc)
-				log.Debugf("[%d] updated exporter task for item %d %s", c.id, item.itemid, item.key)
+				p.tasks.Update(task)
+				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
 			}
 		}
+		task.meta.SetLastLogsize(*r.LastLogsize)
+		task.meta.SetMtime(int32(*r.Mtime))
 	}
 
 	// handle runner interface for inactive plugins
 	if _, ok := p.impl.(plugin.Runner); ok {
 		if p.refcount == 0 {
 			task := &starterTask{
-				taskBase: taskBase{plugin: p, active: true, onetime: true},
+				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err = task.reschedule(now); err != nil {
 				return
@@ -132,14 +173,15 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if _, ok := p.impl.(plugin.Watcher); ok {
 			if info.watcher == nil {
 				info.watcher = &watcherTask{
-					taskBase: taskBase{plugin: p, active: true, onetime: true},
-					sink:     sink,
+					taskBase: taskBase{plugin: p, active: true},
 					requests: make([]*plugin.Request, 0, 1),
+					client:   c,
 				}
 				if err = info.watcher.reschedule(now); err != nil {
 					return
 				}
 				tasks = append(tasks, info.watcher)
+
 				log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 			}
 			info.watcher.requests = append(info.watcher.requests, r)
@@ -149,16 +191,14 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	// handle configurator interface for inactive plugins
 	if _, ok := p.impl.(plugin.Configurator); ok && agent.Options.Plugins != nil {
 		if p.refcount == 0 {
-			if options, ok := agent.Options.Plugins[strings.Title(p.impl.Name())]; ok {
-				task := &configerTask{
-					taskBase: taskBase{plugin: p, active: true, onetime: true},
-					options:  options}
-				if err = task.reschedule(now); err != nil {
-					return
-				}
-				tasks = append(tasks, task)
-				log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
+			task := &configuratorTask{
+				taskBase: taskBase{plugin: p, active: true},
+				options:  agent.Options.Plugins[strings.Title(p.impl.Name())]}
+			if err = task.reschedule(now); err != nil {
+				return
 			}
+			tasks = append(tasks, task)
+			log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 		}
 	}
 	for _, t := range tasks {
@@ -182,9 +222,10 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	}
 
 	// remove unused items
-	for _, task := range c.exporters {
-		if task.getUpdated().Before(now) {
-			delete(c.exporters, task.getItem().itemid)
+	for _, tacc := range c.exporters {
+		task := tacc.task()
+		if task.updated.Before(now) {
+			delete(c.exporters, task.item.itemid)
 			task.deactivate()
 		}
 	}
@@ -203,6 +244,25 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	for _, p := range plugins {
 		if info, ok := c.plugins[p]; ok {
 			if info.used.Before(expiry) {
+				// perform empty watch task before closing
+				if c.id != 0 {
+					if _, ok := p.impl.(plugin.Watcher); ok {
+						task := &watcherTask{
+							taskBase: taskBase{plugin: p, active: true},
+							requests: make([]*plugin.Request, 0),
+							client:   c,
+						}
+						if err := task.reschedule(now); err == nil {
+							p.enqueueTask(task)
+							log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
+						} else {
+							// currently watcher rescheduling cannot fail, but log a warning for future
+							log.Warningf("[%d] cannot reschedule plugin '%s' closing watcher task: %s",
+								c.id, p.impl.Name(), err)
+						}
+					}
+				}
+
 				released = append(released, p)
 				delete(c.plugins, p)
 				p.refcount--
@@ -219,11 +279,29 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 	return
 }
 
-func newClient(id uint64) (b *client) {
+func (c *client) updateExpressions(expressions []*glexpr.Expression) {
+	// reset expressions if changed
+	var grxp *glexpr.Bundle
+	if c.globalRegexp != nil {
+		grxp = (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))
+		if !grxp.CompareExpressions(expressions) {
+			grxp = nil
+		}
+	}
+
+	if grxp == nil {
+		grxp = glexpr.NewBundle(expressions)
+		atomic.StorePointer(&c.globalRegexp, unsafe.Pointer(grxp))
+	}
+}
+
+func newClient(id uint64, output plugin.ResultWriter) (b *client) {
 	b = &client{
 		id:        id,
 		exporters: make(map[uint64]exporterTaskAccessor),
 		plugins:   make(map[*pluginAgent]*pluginInfo),
+		output:    output,
 	}
+
 	return
 }

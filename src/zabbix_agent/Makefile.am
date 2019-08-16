@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = \
+	logs
+	
 EXTRA_DIST = \
 	eventlog.c eventlog.h \
 	perfstat.c perfstat.h
@@ -14,10 +17,10 @@ libzbxagent_a_SOURCES = \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
 	vmstats.c vmstats.h \
-	logfiles.c logfiles.h \
 	zbxconf.c zbxconf.h \
 	listener.c listener.h \
-	procstat.c procstat.h
+	procstat.c procstat.h \
+	metrics.h
 
 libzbxagent_a_CFLAGS = \
 	-DZABBIX_DAEMON
@@ -26,6 +29,7 @@ zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
 	libzbxagent.a \
+	logs/libzbxlogs.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \

@@ -23,26 +23,12 @@ import (
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/log"
 )
 
 type passiveCheck struct {
 	conn      *passiveConnection
 	scheduler scheduler.Scheduler
-	results   chan *plugin.Result
-}
-
-func (pc *passiveCheck) Write(r *plugin.Result) {
-	pc.results <- r
-}
-
-func (pc *passiveCheck) SlotsAvailable() bool {
-	return true
-}
-
-func (pc *passiveCheck) PersistSlotsAvailable() bool {
-	return true
 }
 
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
@@ -55,26 +41,16 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 }
 
 func (pc *passiveCheck) handleCheck(data []byte) {
-	pc.results = make(chan *plugin.Result)
-	pc.scheduler.UpdateTasks(0, pc, []*plugin.Request{&plugin.Request{Key: string(data)}})
-	var response []byte
-	select {
-	case r := <-pc.results:
-		if r.Error == nil {
-			if r.Value != nil {
-				response = []byte(*r.Value)
-			} else {
-				// TODO: check what must be returned on empty result
-				response = []byte("(null)")
-			}
-		} else {
-			response = pc.formatError(r.Error.Error())
-		}
-	case <-time.After(time.Second * time.Duration(agent.Options.Timeout)):
-		response = pc.formatError("timeout occurred")
+	s, err := pc.scheduler.PerformTask(string(data), time.Second*time.Duration(agent.Options.Timeout))
+
+	if err != nil {
+		_, err = pc.conn.Write(pc.formatError(err.Error()))
+	} else {
+		_, err = pc.conn.Write([]byte(s))
 	}
-	if _, err := pc.conn.Write(response); err != nil {
+
+	if err != nil {
 		log.Warningf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
 	}
-	close(pc.results)
+
 }

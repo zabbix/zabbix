@@ -2,6 +2,7 @@
 
 SUBDIRS = \
 	scheduler \
+	remotecontrol \
 	resultcache \
 	serverlistener \
 	serverconnector

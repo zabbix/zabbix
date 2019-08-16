@@ -91,7 +91,7 @@ var crctable []uint32 = []uint32{
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) != 1 {
 		return nil, errors.New("Wrong number of parameters")
 	}

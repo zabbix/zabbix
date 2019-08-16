@@ -20,12 +20,14 @@
 package scheduler
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/zbxlib"
 )
 
 // task priority within the same second is done by setting nanosecond component
@@ -43,14 +45,11 @@ type taskBase struct {
 	scheduled time.Time
 	index     int
 	active    bool
-	onetime   bool
+	recurring bool
 }
 
 type exporterTaskAccessor interface {
-	performer
-	setUpdated(now time.Time)
-	getUpdated() time.Time
-	getItem() *clientItem
+	task() *exporterTask
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -84,8 +83,8 @@ func (t *taskBase) isActive() bool {
 	return t.active
 }
 
-func (t *taskBase) isOneTime() bool {
-	return t.onetime
+func (t *taskBase) isRecurring() bool {
+	return t.recurring
 }
 
 type collectorTask struct {
@@ -94,10 +93,11 @@ type collectorTask struct {
 }
 
 func (t *collectorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
-			log.Warningf("Plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
+			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
 		s.FinishTask(t)
 	}()
@@ -119,14 +119,20 @@ func (t *collectorTask) getWeight() int {
 
 type exporterTask struct {
 	taskBase
-	writer  plugin.ResultWriter
 	item    clientItem
 	failed  bool
 	updated time.Time
+	client  ClientAccessor
+	meta    plugin.Meta
+	output  plugin.ResultWriter
 }
 
 func (t *exporterTask) perform(s Scheduler) {
+	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
+	// from performer goroutine
+	log.Tracef("plugin %s: executing exporter task for item %d: %s", t.plugin.name(), t.item.itemid, t.item.key)
 	go func(itemkey string) {
+		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
 		now := time.Now()
 		var key string
@@ -134,59 +140,88 @@ func (t *exporterTask) perform(s Scheduler) {
 		var err error
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			if ret, err = exporter.Export(key, params); err == nil {
+			if ret, err = exporter.Export(key, params, t); err == nil {
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
 					case reflect.Slice:
 						fallthrough
 					case reflect.Array:
-						s := reflect.ValueOf(ret)
-						for i := 0; i < s.Len(); i++ {
-							value := itemutil.ValueToString(s.Index(i))
-							t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+						if t.client.ID() == 0 {
+							err = errors.New("Multiple return values are not supported for single passive checks")
+						} else {
+							s := reflect.ValueOf(ret)
+							for i := 0; i < s.Len(); i++ {
+								result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+								t.output.Write(result)
+							}
 						}
 					default:
-						value := itemutil.ValueToString(ret)
-						t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Value: &value, Ts: now})
+						result = itemutil.ValueToResult(t.item.itemid, now, ret)
+						t.output.Write(result)
 					}
 				} else {
-					t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Ts: now})
+					if t.client.ID() == 0 {
+						// for direct requests (internal/old passive checks) return empty result
+						// on nil value
+						t.output.Write(&plugin.Result{})
+					}
 				}
 			}
 		}
 		if err != nil {
-			t.writer.Write(&plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now})
+			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
+			t.output.Write(result)
+		}
+		// set failed state based on last result
+		if result != nil && result.Error != nil {
 			t.failed = true
 		} else {
 			t.failed = false
 		}
+
 		s.FinishTask(t)
 	}(t.item.key)
 }
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
 	if t.item.itemid != 0 {
-		if nextcheck, err := itemutil.GetNextcheck(t.item.itemid, t.item.delay, t.failed, now); err != nil {
-			return err
-		} else {
-			t.scheduled = nextcheck.Add(priorityExporterTaskNs)
+		var nextcheck time.Time
+		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
+		if err != nil {
+			return
 		}
+		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	} else {
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
 	return
 }
 
-func (t *exporterTask) setUpdated(now time.Time) {
-	t.updated = now
-}
-func (t *exporterTask) getUpdated() (updated time.Time) {
-	return t.updated
+func (t *exporterTask) task() (task *exporterTask) {
+	return t
 }
 
-func (t *exporterTask) getItem() (item *clientItem) {
-	return &t.item
+// plugin.ContextProvider interface
+
+func (t *exporterTask) ClientID() (clientid uint64) {
+	return t.client.ID()
+}
+
+func (t *exporterTask) Output() (output plugin.ResultWriter) {
+	return t.output
+}
+
+func (t *exporterTask) ItemID() (itemid uint64) {
+	return t.item.itemid
+}
+
+func (t *exporterTask) Meta() (meta *plugin.Meta) {
+	return &t.meta
+}
+
+func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
 }
 
 type starterTask struct {
@@ -194,6 +229,7 @@ type starterTask struct {
 }
 
 func (t *starterTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing starter task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Start()
@@ -215,6 +251,7 @@ type stopperTask struct {
 }
 
 func (t *stopperTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing stopper task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Stop()
@@ -234,13 +271,14 @@ func (t *stopperTask) getWeight() int {
 type watcherTask struct {
 	taskBase
 	requests []*plugin.Request
-	sink     plugin.ResultWriter
+	client   ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t.sink)
+		watcher.Watch(t.requests, t)
 		s.FinishTask(t)
 	}()
 }
@@ -254,12 +292,35 @@ func (t *watcherTask) getWeight() int {
 	return t.plugin.capacity
 }
 
-type configerTask struct {
+// plugin.ContextProvider interface
+
+func (t *watcherTask) ClientID() (clientid uint64) {
+	return t.client.ID()
+}
+
+func (t *watcherTask) Output() (output plugin.ResultWriter) {
+	return t.client.Output()
+}
+
+func (t *watcherTask) ItemID() (itemid uint64) {
+	return 0
+}
+
+func (t *watcherTask) Meta() (meta *plugin.Meta) {
+	return nil
+}
+
+func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
+}
+
+type configuratorTask struct {
 	taskBase
 	options map[string]string
 }
 
-func (t *configerTask) perform(s Scheduler) {
+func (t *configuratorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing configurator task", t.plugin.name())
 	go func() {
 		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)
@@ -267,11 +328,11 @@ func (t *configerTask) perform(s Scheduler) {
 	}()
 }
 
-func (t *configerTask) reschedule(now time.Time) (err error) {
+func (t *configuratorTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityConfiguratorTaskNs)
 	return
 }
 
-func (t *configerTask) getWeight() int {
+func (t *configuratorTask) getWeight() int {
 	return t.plugin.capacity
 }

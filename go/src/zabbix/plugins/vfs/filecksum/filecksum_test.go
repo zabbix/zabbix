@@ -28,13 +28,13 @@ import (
 
 var CrcFile = "1234"
 
-func TestUptime(t *testing.T) {
+func TestFileCksum(t *testing.T) {
 	stdOs = std.NewMockOs()
 
 	agent.Options.Timeout = 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}); err != nil {
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {
 		t.Errorf("vfs.file.cksum returned error %s", err.Error())
 	} else {
 		if crc, ok := result.(uint32); !ok {
