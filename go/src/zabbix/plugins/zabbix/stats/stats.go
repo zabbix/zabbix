@@ -33,12 +33,13 @@ type response struct {
 
 const defaultServerPort = 10051
 
+var timeoutConnection time.Duration
 var impl Plugin
 
 func getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, err := zbxcomms.Exchange(addr, time.Second*time.Duration(agent.Options.Timeout), req)
+	resp, err := zbxcomms.Exchange(addr, timeoutConnection, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
@@ -75,11 +76,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Too many parameters.")
 	}
 
-	if len(params) == 0 {
+	if len(params) < 1 || params[0] == "" {
 		addr = fmt.Sprintf("127.0.0.1:%d", defaultServerPort)
 	} else {
 		addr = params[0]
-		if len(params) > 1 {
+		if len(params) > 1 && params[1] != "" {
 			port, err := strconv.ParseUint(params[1], 10, 16)
 
 			if err != nil {
@@ -127,7 +128,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return str, nil
 }
 
+// Configure -
+func (p *Plugin) Configure(options map[string]string) {
+	timeoutConnection = time.Second * time.Duration(agent.Options.Timeout)
+}
+
 func init() {
-	plugin.RegisterMetric(&impl, "stats", "zabbix.stats", `Return a set of Zabbix server or proxy internal
-			metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.`)
+	plugin.RegisterMetric(&impl, "zabbixstats", "zabbix.stats", "Return a set of Zabbix server or proxy internal "+
+		"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.")
 }
