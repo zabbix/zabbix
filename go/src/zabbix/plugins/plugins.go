@@ -27,6 +27,5 @@ import (
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
 	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/kernel/maxfiles"
-	_ "zabbix/plugins/kernel/maxproc"
+	_ "zabbix/plugins/kernel"
 )

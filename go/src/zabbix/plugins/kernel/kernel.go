@@ -17,35 +17,46 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package maxfiles
+package kernel
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
-	"strconv"
+	"zabbix/internal/plugin"
 	"zabbix/pkg/std"
 )
 
-func getMaxfiles() (maxfiles uint64, err error) {
-	var file std.File
-	var line string
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
 
-	file, err = stdOs.Open("/proc/sys/fs/file-max")
-	if err != nil {
-		return 0, fmt.Errorf("Cannot read /proc/sys/fs/file-max: %s", err.Error())
-	}
-	defer file.Close()
+var impl Plugin
+var stdOs std.Os
 
-	reader := bufio.NewReader(file)
-	line, err = reader.ReadString('\n')
-	if err != nil {
-		return 0, fmt.Errorf("Cannot read number of files: %s", err.Error())
-	}
+// Export -
+func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+	var proc bool
 
-	maxfiles, err = strconv.ParseUint(line[:len(line)-1], 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("Cannot read number of files: %s", err.Error())
+	if len(params) > 0 {
+		return nil, errors.New("Too many parameters.")
 	}
 
-	return maxfiles, nil
+	switch key {
+	case "kernel.maxproc":
+		proc = true
+	case "kernel.maxfiles":
+		proc = false
+	default:
+		/* SHOULD_NEVER_HAPPEN */
+		return 0, fmt.Errorf("Invalid key.")
+	}
+
+	return getMax(proc)
+}
+
+func init() {
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "kernel", "kernel.maxproc", "Returns maximum number of processes supported by OS")
+	plugin.RegisterMetric(&impl, "kernel", "kernel.maxfiles", "Returns maximum number of opened files supported by OS")
 }

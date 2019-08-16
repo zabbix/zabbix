@@ -17,31 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package maxfiles
+package kernel
 
 import (
-	"errors"
-	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
+	"bufio"
+	"fmt"
+	"strconv"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+func getMax(proc bool) (max uint64, err error) {
+	var fileName string
 
-var impl Plugin
-var stdOs std.Os
-
-// Export -
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+	if proc == true {
+		fileName = "/proc/sys/kernel/pid_max"
+	} else {
+		fileName = "/proc/sys/fs/file-max"
 	}
-	return getMaxfiles()
-}
 
-func init() {
-	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "maxfiles", "kernel.maxfiles", "Returns maximum number of opened files supported by OS")
+	file, err := stdOs.Open(fileName)
+	if err == nil {
+		var line []byte
+		var long bool
+
+		reader := bufio.NewReader(file)
+
+		if line, long, err = reader.ReadLine(); err == nil && long == false {
+			max, err = strconv.ParseUint(string(line), 10, 64)
+		}
+
+		file.Close()
+	}
+
+	if err != nil {
+		err = fmt.Errorf("Cannot obtain data from %s.", fileName)
+	}
+
+	return
 }
