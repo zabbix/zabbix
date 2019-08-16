@@ -345,12 +345,15 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
+	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
 	manager = scheduler.NewManager()
 	listener = serverlistener.New(manager)
 
 	manager.Start()
 
-	err = configDefault(manager, &agent.Options)
+	if err == nil {
+		err = configDefault(manager, &agent.Options)
+	}
 
 	if err == nil {
 		serverConnectors = make([]*serverconnector.Connector, len(addresses))

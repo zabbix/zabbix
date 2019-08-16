@@ -32,10 +32,11 @@ import (
 	_ "zabbix/plugins/system/uname"
 	_ "zabbix/plugins/system/uptime"
 	_ "zabbix/plugins/systemd"
+	_ "zabbix/plugins/systemrun"
 	_ "zabbix/plugins/vfs/dev"
 	_ "zabbix/plugins/vfs/filecksum"
+	_ "zabbix/plugins/vfs/filecontents"
 	_ "zabbix/plugins/vfs/fileexists"
 	_ "zabbix/plugins/zabbix/async"
 	_ "zabbix/plugins/zabbix/sync"
-	_ "zabbix/plugins/vfs/filecontents"
 )
