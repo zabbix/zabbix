@@ -172,6 +172,39 @@ static int	DBpatch_4030015(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030016(void)
+{
+	int		i;
+	const char      *values[] = {
+			"alarm_ok",
+			"no_sound",
+			"alarm_information",
+			"alarm_warning",
+			"alarm_average",
+			"alarm_high",
+			"alarm_disaster",
+			NULL
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set value_str='%s.mp3'"
+				" where value_str='%s.wav'"
+					" and idx='web.messages'", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -194,5 +227,6 @@ DBPATCH_ADD(4030012, 0, 1)
 DBPATCH_ADD(4030013, 0, 1)
 DBPATCH_ADD(4030014, 0, 1)
 DBPATCH_ADD(4030015, 0, 1)
+DBPATCH_ADD(4030016, 0, 1)
 
 DBPATCH_END()
