@@ -20,7 +20,7 @@
 
 
 /**
- * Class containing methods for operations with auto registration.
+ * Class containing methods for operations with autoregistration.
  */
 class CAutoregistration extends CApiService {
 
@@ -28,29 +28,29 @@ class CAutoregistration extends CApiService {
 	protected $tableAlias = 'ca';
 
 	/**
-	 * Get auto registration configuration.
+	 * Get autoregistration configuration.
 	 *
-	 * @param array    $options
-	 * @param array    $options['output']
+	 * @param array $options
+	 * @param array $options['output']
 	 *
 	 * @return array
 	 */
 	public function get(array $options) {
-		return (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) :[];
+		return (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) : [];
 	}
 
 	/**
-	 * Internal get auto registration configuration.
+	 * Internal get autoregistration configuration.
 	 *
-	 * @param array    $options
-	 * @param array    $options['output']
-	 * @param boolean  $update_mode
+	 * @param array $options
+	 * @param array $options['output']
+	 * @param bool  $update_mode
 	 *
 	 * @return array
 	 */
 	protected function getAutoreg(array $options, $update_mode = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',',	['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND]
+			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', ['tls_accept', 'tls_psk_identity', 'tls_psk']), 'default' => API_OUTPUT_EXTEND]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -66,11 +66,10 @@ class CAutoregistration extends CApiService {
 		];
 
 		$def_options = [
-			// output
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => $update_mode
 		];
-		$options = zbx_array_merge($def_options, $options);
+		$options = array_merge($def_options, $options);
 
 		$ini_autoreg = [];
 
@@ -99,12 +98,12 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
-	 * Update auto registration configuration.
+	 * Update autoregistration configuration.
 	 *
-	 * @param array   $autoreg
-	 * @param int     $autoreg['tls_accept']
-	 * @param string  $autoreg['tls_psk_identity']
-	 * @param string  $autoreg['tls_psk']
+	 * @param array  $autoreg
+	 * @param int    $autoreg['tls_accept']
+	 * @param string $autoreg['tls_psk_identity']
+	 * @param string $autoreg['tls_psk']
 	 *
 	 * @throws APIException if incorrect encryption options.
 	 *
@@ -140,18 +139,18 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
-	 * Validate auto registration connections and PSK fields.
+	 * Validate autoregistration connections and PSK fields.
 	 *
-	 * @param array   $autoreg
-	 * @param int     $autoreg['tls_accept']
-	 * @param string  $autoreg['tls_psk_identity']
-	 * @param string  $autoreg['tls_psk']
-	 * @param array   $db_autoreg                 (optional)
-	 * @param int     $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
-	 * @param int     $db_autoreg[<autoreg_tlsid>]['tls_accept']
-	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
-	 * @param string  $db_autoreg[<autoreg_tlsid>]['tls_psk']
-	 * @param int     $autoreg_tlsid
+	 * @param array  $autoreg
+	 * @param int    $autoreg['tls_accept']
+	 * @param string $autoreg['tls_psk_identity']
+	 * @param string $autoreg['tls_psk']
+	 * @param array  $db_autoreg                                       (optional)
+	 * @param int    $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
+	 * @param int    $db_autoreg[<autoreg_tlsid>]['tls_accept']
+	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
+	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk']
+	 * @param int    $autoreg_tlsid
 	 *
 	 * @throws APIException if incorrect encryption options.
 	 */
@@ -183,10 +182,10 @@ class CAutoregistration extends CApiService {
 		$autoreg['tls_accept'] = $tls_accept;
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['autoreg_tlsid']], 'fields' => [
-				'autoreg_tlsid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'tls_accept' =>			['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK])],
-				'tls_psk_identity' =>	['type' => API_STRING_UTF8],
-				'tls_psk' =>			['type' => API_STRING_UTF8]
+			'autoreg_tlsid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'tls_accept' =>			['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK])],
+			'tls_psk_identity' =>	['type' => API_STRING_UTF8],
+			'tls_psk' =>			['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $autoreg, '/', $error)) {

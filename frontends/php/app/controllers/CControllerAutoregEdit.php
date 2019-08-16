@@ -43,23 +43,21 @@ class CControllerAutoregEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
-		// get values from the dabatase
-		$autoreg = API::Autoregistration()->get(['output' => API_OUTPUT_EXTEND]);
+		// get values from the database
+		$autoreg = API::Autoregistration()->get([
+			'output' => ['tls_accept', 'tls_psk_identity', 'tls_psk']
+		]);
 
 		$data['tls_accept'] = $autoreg['tls_accept'];
 		$data['tls_psk_identity'] = $autoreg['tls_psk_identity'];
 		$data['tls_psk'] = $autoreg['tls_psk'];
 
 		// overwrite with input variables
-		$this->getInputs($data, [
-			'tls_accept',
-			'tls_psk_identity',
-			'tls_psk'
-		]);
+		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Auto registration'));

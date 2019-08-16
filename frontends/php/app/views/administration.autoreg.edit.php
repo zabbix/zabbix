@@ -69,11 +69,15 @@ $autoreg_view = (new CTabView())
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $autoreg_form = (new CForm())
-	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'autoreg.update')->getUrl())
-	->setAttribute('id', 'autoregconfig_form')
-	->addVar('tls_accept', $data['tls_accept'])
+	->setId('autoreg-form')
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'autoreg.update')
+		->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('tls_accept', $data['tls_accept'])
 	->addItem($autoreg_view);
 
-$widget->addItem($autoreg_form)->show();
-
+$widget
+	->addItem($autoreg_form)
+	->show();

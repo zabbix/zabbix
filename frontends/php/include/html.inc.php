@@ -759,7 +759,9 @@ function makePageFooter($with_version = true) {
  * @return CComboBox
  */
 function makeAdministrationGeneralMenu($selected) {
-	$autoreg_url = (new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')->getUrl();
+	$autoreg_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'autoreg.edit')
+		->getUrl();
 
 	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
 		'adm.gui.php' => _('GUI'),

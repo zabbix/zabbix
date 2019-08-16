@@ -20,6 +20,7 @@
 
 
 class CControllerAutoregUpdate extends CController {
+
 	/**
 	 * @var CControllerResponseRedirect
 	 */
@@ -61,7 +62,7 @@ class CControllerAutoregUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
 	protected function doAction() {
@@ -80,6 +81,7 @@ class CControllerAutoregUpdate extends CController {
 			$this->response->setFormData($this->getInputAll());
 			$this->response->setMessageError(_('Cannot update configuration'));
 		}
+
 		$this->setResponse($this->response);
 	}
 }
