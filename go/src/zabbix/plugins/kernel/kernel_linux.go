@@ -28,7 +28,7 @@ import (
 func getMax(proc bool) (max uint64, err error) {
 	var fileName string
 
-	if proc == true {
+	if proc {
 		fileName = "/proc/sys/kernel/pid_max"
 	} else {
 		fileName = "/proc/sys/fs/file-max"
@@ -41,7 +41,7 @@ func getMax(proc bool) (max uint64, err error) {
 
 		reader := bufio.NewReader(file)
 
-		if line, long, err = reader.ReadLine(); err == nil && long == false {
+		if line, long, err = reader.ReadLine(); err == nil && !long {
 			max, err = strconv.ParseUint(string(line), 10, 64)
 		}
 
