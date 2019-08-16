@@ -153,8 +153,8 @@ int	init_collector_data(char **error)
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter	= (zbx_perf_counter_data_t **)((char *)collector + sz);
-	collector->cpus.count		= cpu_count;
+	collector->cpus.cpu_counter = (zbx_perf_counter_data_t **)((char *)collector + sz);
+	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
 

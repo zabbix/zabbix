@@ -28,9 +28,9 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	AGENT_REQUEST	request_tmp;
 	int		ret;
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d",
-			get_builtin_counter_index(PCI_SYSTEM),
-			get_builtin_counter_index(PCI_SYSTEM_UP_TIME));
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%u\\%u",
+			(unsigned int)get_builtin_counter_index(PCI_SYSTEM),
+			(unsigned int)get_builtin_counter_index(PCI_SYSTEM_UP_TIME));
 
 	request_tmp.nparam = 1;
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));

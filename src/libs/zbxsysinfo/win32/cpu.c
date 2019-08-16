@@ -28,15 +28,15 @@ typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
 
 /* pointer to GetLogicalProcessorInformationEx(), it's not guaranteed to be available */
 typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
-static GETLPIEX		get_lpiex;
+ZBX_THREAD_LOCAL static GETLPIEX		get_lpiex;
 
 /******************************************************************************
  *                                                                            *
  * Function: get_cpu_num_win32                                                *
  *                                                                            *
- * Purpose: returns the number of active logical CPUs (threads)               *
+ * Purpose: find number of active logical CPUs                                *
  *                                                                            *
- * Return value: number of logical CPUs                                       *
+ * Return value: number of CPUs or 0 on failure                               *
  *                                                                            *
  ******************************************************************************/
 int	get_cpu_num_win32(void)
@@ -44,23 +44,21 @@ int	get_cpu_num_win32(void)
 	/* pointer to GetActiveProcessorCount() */
 	typedef DWORD (WINAPI *GETACTIVEPC)(WORD);
 
-	static GETACTIVEPC	get_act;
-	SYSTEM_INFO		sysInfo;
-	DWORD			buffer_length;
-	PSYS_LPI_EX		buffer = NULL;
-	int			cpu_count = 0;
-	unsigned		i;
+	ZBX_THREAD_LOCAL static GETACTIVEPC	get_act;
+	SYSTEM_INFO				sysInfo;
+	PSYS_LPI_EX				buffer = NULL;
+	int					cpu_count = 0;
 
 	/* The rationale for checking dynamically if specific functions are implemented */
-	/* in kernel32.lib because these may not be available in certain Windows versions. */
-	/* E.g. GetActiveProcessorCount() available from Windows 7 onward (and not in Windows Vista or XP) */
+	/* in kernel32.lib is because these may not be available in certain Windows versions. */
+	/* E.g. GetActiveProcessorCount() is available from Windows 7 onward (and not in Windows Vista or XP) */
 	/* We can't resolve this using conditional compilation unless we release multiple agents */
 	/* targeting different sets of Windows APIs. */
 
-	/* First, lets try GetLogicalProcessorInformationEx() method. It's the most reliable way */
+	/* First, let's try GetLogicalProcessorInformationEx() method. It's the most reliable way */
 	/* because it counts logical CPUs (aka threads) regardless of whether the application is */
 	/* 32 or 64-bit. GetActiveProcessorCount() may return incorrect value (e.g. 64 CPUs for systems */
-	/* with 128 CPUs) if executed under under WoW64. */
+	/* with 128 CPUs) if executed under WoW64. */
 
 	if (NULL == get_lpiex)
 	{
@@ -70,7 +68,7 @@ int	get_cpu_num_win32(void)
 
 	if (NULL != get_lpiex)
 	{
-		buffer_length = 0;
+		DWORD buffer_length = 0;
 
 		/* first run with empty arguments to figure the buffer length */
 		if (get_lpiex(RelationProcessorCore, NULL, &buffer_length) ||
@@ -83,15 +81,21 @@ int	get_cpu_num_win32(void)
 
 		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
-			for (i = 0; i < buffer_length;)
+			unsigned int	i;
+			PSYS_LPI_EX	ptr;
+
+			for (i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
 			{
-				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+				ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
 				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
-					for (KAFFINITY mask = ptr->Processor.GroupMask[group].Mask; mask != 0; mask >>= 1)
+				{
+					for (KAFFINITY mask = ptr->Processor.GroupMask[group].Mask; mask != 0;
+							mask >>= 1)
+					{
 						cpu_count += mask & 1;
-
-				i += (unsigned)ptr->Size;
+					}
+				}
 			}
 
 			goto finish;
@@ -104,6 +108,7 @@ fallback:
 
 	if (NULL != get_act)
 	{
+		/* cpu_count set to 0 if GetActiveProcessorCount() fails */
 		cpu_count = (int)get_act(ALL_PROCESSOR_GROUPS);
 		goto finish;
 	}
@@ -133,9 +138,9 @@ int	get_cpu_group_num_win32(void)
 {
 	/* pointer type for the GetActiveProcessorGroupCount() */
 	typedef WORD (WINAPI *GETACTIVEPGC)();
-	static GETACTIVEPGC	get_act;
+	ZBX_THREAD_LOCAL static GETACTIVEPGC	get_act;
 
-	/* please see comments in get_cpu_num_win32() */
+	/* Check if GetActiveProcessorGroupCount() is available. See comments in get_cpu_num_win32() for details. */
 
 	if (NULL == get_act)
 	{
@@ -144,9 +149,18 @@ int	get_cpu_group_num_win32(void)
 	}
 
 	if (NULL != get_act)
-		return (int)get_act();
+	{
+		int groups = (int)get_act();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() not supported, assuming 1");
+		if (0 >= groups)
+			zabbix_log(LOG_LEVEL_WARNING, "GetActiveProcessorGroupCount() failed");
+		else
+			return groups;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "GetActiveProcessorGroupCount() not supported, assuming 1");
+	}
 
 	return 1;
 }
@@ -162,10 +176,7 @@ int	get_cpu_group_num_win32(void)
  ******************************************************************************/
 int	get_numa_node_num_win32(void)
 {
-	DWORD		buffer_length;
-	PSYS_LPI_EX	buffer = NULL;
-	int		numa_node_count = 1;
-	unsigned	i;
+	int	numa_node_count = 1;
 
 	if (NULL == get_lpiex)
 	{
@@ -175,7 +186,8 @@ int	get_numa_node_num_win32(void)
 
 	if (NULL != get_lpiex)
 	{
-		buffer_length = 0;
+		DWORD 		buffer_length = 0;
+		PSYS_LPI_EX	buffer = NULL;
 
 		/* first run with empty arguments to figure the buffer length */
 		if (get_lpiex(RelationNumaNode, NULL, &buffer_length) || ERROR_INSUFFICIENT_BUFFER != GetLastError())
@@ -185,16 +197,18 @@ int	get_numa_node_num_win32(void)
 
 		if (get_lpiex(RelationNumaNode, buffer, &buffer_length))
 		{
+			unsigned int	i;
+
 			for (i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 				i += (unsigned)ptr->Size;
 			}
 		}
+
+		zbx_free(buffer);
 	}
 finish:
-	zbx_free(buffer);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "NUMA node count %d", numa_node_count);
 
 	return numa_node_count;

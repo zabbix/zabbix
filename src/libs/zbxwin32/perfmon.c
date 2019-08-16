@@ -24,8 +24,8 @@
 
 ZBX_THREAD_LOCAL static zbx_perf_counter_id_t	*PerfCounterList = NULL;
 
-/* This struct contains mapping between built-in english counter names and PDH indexes. */
-/* If you change it then you also need to add enum values to zbx_builtin_counter_ref_t  */
+/* This struct contains mapping between built-in English counter names and PDH indexes. */
+/* If you change it then you also need to add enum values to zbx_builtin_counter_ref_t.  */
 static struct builtin_counter_ref
 {
 	unsigned long	pdhIndex;
@@ -233,7 +233,7 @@ close_query:
  * Purpose: get performance counter index by reference value described by     *
  *          zbx_builtin_counter_ref_t enum                                    *
  *                                                                            *
- * Parameters: counter_ref    - [IN] built-inperformance counter              *
+ * Parameters: counter_ref    - [IN] built-in performance counter             *
  *                                                                            *
  * Return value: PDH performance counter index or 0 on failure                *
  *                                                                            *
@@ -247,7 +247,7 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 	{
 		static int first_error = 1;
 
-		if (first_error)
+		if (0 != first_error)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			first_error = 0;
@@ -271,7 +271,7 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
  *               NULL on failure                                              *
  *                                                                            *
  * Comments: This function should be normally called with L"Counter"          *
- *           parameter. It returns list of null-terminated string pairs.      *
+ *           parameter. It returns a list of null-terminated string pairs.    *
  *           Last string is followed by an additional null-terminator.        *
  *           The return buffer must be freed by the caller.                   *
  *                                                                            *
@@ -281,25 +281,26 @@ static wchar_t	*get_all_counter_eng_names(wchar_t *reg_value_name)
 	const char	*__function_name = "get_all_counter_eng_names";
 	wchar_t		*buffer = NULL;
 	DWORD		buffer_size = 0;
-	long		status = ERROR_SUCCESS;
+	LSTATUS		status = ERROR_SUCCESS;
 	/* this registry key guaranteed to hold english counter texts even in localized Win versions */
 	static HKEY reg_key = HKEY_PERFORMANCE_TEXT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* query the size of the text data for further buffer allocation */
-	status = RegQueryValueEx(reg_key, reg_value_name, NULL, NULL, NULL, &buffer_size);
-	if (ERROR_SUCCESS != status)
+	if (ERROR_SUCCESS != (status = RegQueryValueEx(reg_key, reg_value_name, NULL, NULL, NULL, &buffer_size)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed at getting buffer size, 0x%x", status);
+		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed at getting buffer size, 0x%lx",
+				(unsigned long)status);
 		goto finish;
 	}
 
 	buffer = (wchar_t*)zbx_malloc(buffer, (size_t)buffer_size);
-	status = RegQueryValueEx(reg_key, reg_value_name, NULL, NULL, (LPBYTE)buffer, &buffer_size);
-	if (ERROR_SUCCESS != status)
+
+	if (ERROR_SUCCESS != (status = RegQueryValueEx(reg_key, reg_value_name, NULL, NULL, (LPBYTE)buffer,
+			&buffer_size)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed with 0x%x", status);
+		zabbix_log(LOG_LEVEL_ERR, "RegQueryValueEx() failed with 0x%lx", (unsigned long)status);
 		zbx_free(buffer);
 		goto finish;
 	}
@@ -313,7 +314,7 @@ finish:
  *                                                                            *
  * Function: init_builtin_counter_indexes                                     *
  *                                                                            *
- * Purpose: scans registry key with all performance counter english names     *
+ * Purpose: scans registry key with all performance counter English names     *
  *          and obtains system-dependent PDH counter indexes for further      *
  *          use by corresponding items                                        *
  *                                                                            *
@@ -328,14 +329,13 @@ int	init_builtin_counter_indexes(void)
 	const char	*__function_name = "init_builtin_counter_indexes";
 	int 		ret = FAIL, i;
 	wchar_t 	*counter_text, *saved_ptr;
-	DWORD 		counter_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* get buffer holding a text list of perf. counter indexes and english counter names */
+	/* get buffer holding a text list of perf. counter indexes and English counter names */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used) */
 	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
-		goto cleanup;
+		goto out;
 
 	/* bypass first pair of counter data elements - these contain number of records */
 	counter_text += wcslen(counter_text) + 1;
@@ -343,21 +343,22 @@ int	init_builtin_counter_indexes(void)
 
 	for (; 0 != *counter_text; counter_text += wcslen(counter_text) + 1)
 	{
-		counter_index	= (DWORD)_wtoi(counter_text);
-		counter_text	+= wcslen(counter_text) + 1;
+		DWORD counter_index = (DWORD)_wtoi(counter_text);
+		counter_text += wcslen(counter_text) + 1;
 
 		for (i = 0; i < ARRSIZE(builtin_counter_map); i++)
+		{
 			if (0 == wcscmp(builtin_counter_map[i].eng_name, counter_text))
 			{
 				builtin_counter_map[i].pdhIndex = counter_index;
 				break;
 			}
+		}
 	}
 
 	ret = SUCCEED;
-cleanup:
 	zbx_free(saved_ptr);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

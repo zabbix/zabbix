@@ -24,7 +24,7 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-/* this struct must be only modified along with mapping builtin_counter_refs[] in perfmon.c */
+/* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum
 {
 	PCI_SYSTEM = 0,
@@ -85,6 +85,5 @@ wchar_t		*get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath);
 int		init_builtin_counter_indexes(void);
 DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);
-
 
 #endif /* ZABBIX_PERFMON_H */
