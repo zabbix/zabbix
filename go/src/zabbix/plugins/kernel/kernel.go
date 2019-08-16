@@ -35,7 +35,7 @@ var impl Plugin
 var stdOs std.Os
 
 // Export -
-func (p *Plugin) Export(key string, params []string) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var proc bool
 
 	if len(params) > 0 {
