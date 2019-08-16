@@ -231,14 +231,13 @@ static int	DBpatch_4000004(void)
 			"alarm_warning",
 			"alarm_average",
 			"alarm_high",
-			"alarm_disaster",
-			NULL
+			"alarm_disaster"
 		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; NULL != values[i]; i++)
+	for (i = 0; i < ARRSIZE(values); i++)
 	{
 		if (ZBX_DB_OK > DBexecute(
 				"update profiles"
