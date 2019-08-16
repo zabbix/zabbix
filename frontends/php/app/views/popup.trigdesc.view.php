@@ -97,9 +97,9 @@ if ($data['isCommentExist'] && $data['isTriggerEditable']) {
 			'var forms = jQuery("form[name='.$form->getName().']");'.
 			'jQuery("[name=comments]", forms)'.
 				'.text(jQuery("[name=comments_unresolved]", forms).val())'.
-				'.removeProp("readonly")'.
+				'.prop("readonly", false)'.
 				'.focus();'.
-			'jQuery(".trigger-descr-update-btn").removeProp("disabled");'.
+			'jQuery(".trigger-descr-update-btn").prop("disabled", false);'.
 			'jQuery(".trigger-descr-edit-btn").attr("disabled", "disabled");'.
 		'}';
 }
