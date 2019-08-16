@@ -44,6 +44,7 @@ type AgentOptions struct {
 	UnsafeUserParameters int      `conf:",,0:1,0"`
 	LogRemoteCommands    int      `conf:",,0:1,0"`
 	EnableRemoteCommands int      `conf:",,0:1,0"`
+	ControlSocket        string   `conf:",optional"`
 	Plugins              map[string]map[string]string
 }
 

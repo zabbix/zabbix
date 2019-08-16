@@ -41,17 +41,17 @@ func ValueToResult(itemid uint64, ts time.Time, v interface{}) (result *plugin.R
 	case *string:
 		value = *v.(*string)
 	case int:
-		value = strconv.Itoa(v.(int))
+		value = strconv.FormatInt(int64(v.(int)), 10)
 	case int64:
-		value = strconv.Itoa(v.(int))
+		value = strconv.FormatInt(v.(int64), 10)
 	case uint:
-		value = strconv.Itoa(v.(int))
+		value = strconv.FormatUint(uint64(v.(uint)), 10)
 	case uint64:
-		value = strconv.Itoa(v.(int))
+		value = strconv.FormatUint(v.(uint64), 10)
 	case float32:
-		value = strconv.FormatFloat(float64(v.(float32)), 'g', -1, 64)
+		value = strconv.FormatFloat(float64(v.(float32)), 'f', 6, 64)
 	case float64:
-		value = strconv.FormatFloat(v.(float64), 'g', -1, 64)
+		value = strconv.FormatFloat(v.(float64), 'f', 6, 64)
 	default:
 		// note that this conversion is slow and it's better to return known value type
 		value = fmt.Sprintf("%v", v)

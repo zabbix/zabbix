@@ -51,16 +51,39 @@ func CheckLogLevel(level int) bool {
 	return true
 }
 
-func IncreaseLogLevel() {
-	if logLevel != Trace {
-		logLevel++
+func Level() string {
+	switch logLevel {
+	case Empty:
+		return "empty"
+	case Crit:
+		return "critical"
+	case Err:
+		return "error"
+	case Warning:
+		return "warning"
+	case Debug:
+		return "debug"
+	case Trace:
+		return "trace"
+	default:
+		return "unknown"
 	}
 }
 
-func DecreaseLogLevel() {
+func IncreaseLogLevel() (success bool) {
+	if logLevel != Trace {
+		logLevel++
+		return true
+	}
+	return false
+}
+
+func DecreaseLogLevel() (success bool) {
 	if logLevel != Empty {
 		logLevel--
+		return true
 	}
+	return false
 }
 
 func Open(logType int, level int, filename string) error {

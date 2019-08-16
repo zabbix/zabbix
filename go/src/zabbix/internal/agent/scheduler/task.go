@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -146,10 +147,14 @@ func (t *exporterTask) perform(s Scheduler) {
 					case reflect.Slice:
 						fallthrough
 					case reflect.Array:
-						s := reflect.ValueOf(ret)
-						for i := 0; i < s.Len(); i++ {
-							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-							t.output.Write(result)
+						if t.client.ID() == 0 {
+							err = errors.New("Multiple return values are not supported for single passive checks")
+						} else {
+							s := reflect.ValueOf(ret)
+							for i := 0; i < s.Len(); i++ {
+								result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+								t.output.Write(result)
+							}
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)

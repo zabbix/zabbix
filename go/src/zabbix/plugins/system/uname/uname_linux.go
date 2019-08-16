@@ -47,3 +47,23 @@ func getUname() (uname string, err error) {
 
 	return uname, nil
 }
+
+func getHostname() (hostname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
+		return
+	}
+
+	return arrayToString(&utsname.Nodename), nil
+}
+
+func getSwArch() (uname string, err error) {
+	var utsname syscall.Utsname
+	if err = syscall.Uname(&utsname); err != nil {
+		err = fmt.Errorf("Cannot obtain system information: %s", err.Error())
+		return
+	}
+
+	return arrayToString(&utsname.Machine), nil
+}

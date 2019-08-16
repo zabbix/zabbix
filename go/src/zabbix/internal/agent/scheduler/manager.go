@@ -50,11 +50,17 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
+type queryRequest struct {
+	command string
+	sink    chan string
+}
+
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (s string, err error)
+	PerformTask(key string, timeout time.Duration) (result string, err error)
+	Query(command string) (status string)
 }
 
 func (m *Manager) cleanupClient(c *client, now time.Time) {
@@ -248,6 +254,13 @@ run:
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
+			case *queryRequest:
+				r := v.(*queryRequest)
+				if response, err := m.processQuery(r); err != nil {
+					r.sink <- "cannot process request: " + err.Error()
+				} else {
+					r.sink <- response
+				}
 			}
 		}
 	}
@@ -322,7 +335,6 @@ func (m *Manager) init() {
 		m.plugins[metric.Key] = pagent
 	}
 }
-
 func (m *Manager) Start() {
 	monitor.Register()
 	go m.run()
@@ -360,7 +372,7 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
+func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -371,7 +383,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case r := <-w:
 		if r.Error == nil {
 			if r.Value != nil {
-				s = *r.Value
+				result = *r.Value
 			} else {
 				// TODO: check what must be returned on empty result
 			}
@@ -381,12 +393,17 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
 	}
-
-	return s, err
+	return
 }
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func (m *Manager) Query(command string) (status string) {
+	request := &queryRequest{command: command, sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
 }
 
 func NewManager() *Manager {

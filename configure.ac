@@ -2002,15 +2002,17 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/zbxcmd/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/agent/remotecontrol/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
 	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
+	go/src/zabbix/plugins/system/cpucollector/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
@@ -2022,7 +2024,10 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/debug/collector/Makefile
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
+	go/src/zabbix/plugins/vfs/dev/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
+	go/src/zabbix/plugins/vfs/filecontents/Makefile
+	go/src/zabbix/plugins/vfs/fileexists/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile
