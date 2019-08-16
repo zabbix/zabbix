@@ -2024,7 +2024,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/vfs/dev/Makefile
 	go/src/zabbix/plugins/vfs/filecksum/Makefile
 	go/src/zabbix/plugins/vfs/filecontents/Makefile
-	go/src/zabbix/plugins/vfs/fileexists/Makefile
+	go/src/zabbix/plugins/vfs/filestats/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile

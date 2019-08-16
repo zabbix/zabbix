@@ -69,8 +69,15 @@ type MockOs interface {
 	MockFile(path string, data []byte)
 }
 
+type fileTime struct {
+	ModTime time.Time
+	acTime  int64
+	chTime  int64
+}
+
 type mockOs struct {
-	files map[string][]byte
+	files  map[string][]byte
+	ftimes map[string]fileTime
 }
 
 type mockFile struct {
@@ -114,7 +121,7 @@ func (o *fileStat) Size() int64 {
 }
 
 func (o *fileStat) Sys() interface{} {
-	return nil
+	return &o.sys
 }
 
 func (o *mockOs) Stat(name string) (os.FileInfo, error) {
@@ -124,9 +131,11 @@ func (o *mockOs) Stat(name string) (os.FileInfo, error) {
 		var fs fileStat
 
 		fs.mode = 436
-		fs.modTime = time.Now()
+		fs.modTime = o.ftimes[name].ModTime
 		fs.name = name
 		fs.size = int64(len(data))
+		fs.sys.Atim.Sec = o.ftimes[name].acTime
+		fs.sys.Ctim.Sec = o.ftimes[name].chTime
 
 		return &fs, nil
 	}
@@ -154,6 +163,11 @@ func (f *mockFile) Read(p []byte) (n int, err error) {
 // MockFile creates new mock file with the specified path and contents.
 func (o *mockOs) MockFile(path string, data []byte) {
 	o.files[path] = data
+	var ft fileTime
+	ft.ModTime = time.Now()
+	ft.acTime = ft.ModTime.Unix()
+	ft.chTime = ft.ModTime.Unix()
+	o.ftimes[path] = ft
 }
 
 // NewOs returns Os interface that forwards supported methods to os package.
@@ -164,6 +178,7 @@ func NewOs() Os {
 // NewMockOs returns Os interface that replaces supported os package functionality with mock functions.
 func NewMockOs() Os {
 	return &mockOs{
-		files: make(map[string][]byte),
+		files:  make(map[string][]byte),
+		ftimes: make(map[string]fileTime),
 	}
 }
