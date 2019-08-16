@@ -30,13 +30,18 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	enableRemoteCommands int
 }
 
 var impl Plugin
 
+func (p *Plugin) Configure(options map[string]string) {
+	p.enableRemoteCommands = agent.Options.EnableRemoteCommands
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if agent.Options.EnableRemoteCommands != 1 {
+	if p.enableRemoteCommands != 1 {
 		return nil, fmt.Errorf("Remote commands are not enabled.")
 	}
 
