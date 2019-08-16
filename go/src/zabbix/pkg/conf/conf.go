@@ -418,26 +418,20 @@ func assignValues(v interface{}, root *Node) (err error) {
 }
 
 func parseConfig(root *Node, data []byte) (err error) {
-	var tail int
+	var line []byte
 	for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
-		end = bytes.IndexByte(data[offset:], '\n')
-		if end != -1 {
-			tail = offset + end
+		if end = bytes.IndexByte(data[offset:], '\n'); end != -1 {
+			line = bytes.TrimSpace(data[offset : offset+end])
 		} else {
-			tail = len(data)
+			line = bytes.TrimSpace(data[offset:])
 		}
-		start := offset
-		for start < tail && isWhitespace(data[start]) {
-			start++
-		}
-		if start == tail || data[start] == '#' {
+
+		if len(line) == 0 || line[0] == '#' {
 			continue
 		}
-		for start < tail && isWhitespace(data[tail-1]) {
-			tail--
-		}
+
 		var key, value []byte
-		if key, value, err = parseLine(data[start:tail]); err != nil {
+		if key, value, err = parseLine(line); err != nil {
 			return fmt.Errorf("Cannot parse configuration at line %d: %s", num, err.Error())
 		}
 		if string(key) == "Include" {
