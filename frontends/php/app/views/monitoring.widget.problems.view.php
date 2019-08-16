@@ -140,7 +140,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			$info_icons[] = makeInformationIcon(
 				array_key_exists($problem['userid'], $data['data']['users'])
 					? _s('Resolved by user "%1$s".', getUserFullname($data['data']['users'][$problem['userid']]))
-					: _('Resolved by user.')
+					: _('Resolved by inaccessible user.')
 			);
 		}
 	}
