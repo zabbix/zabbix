@@ -195,7 +195,7 @@ func main() {
 		confDescription = "Path to the configuration file"
 	)
 	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorhand)")
+	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
 
 	var foregroundFlag bool
 	const (
@@ -203,7 +203,7 @@ func main() {
 		foregroundDescription = "Run Zabbix agent in foreground"
 	)
 	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
-	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorhand)")
+	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorthand)")
 
 	var testFlag string
 	const (
@@ -211,7 +211,7 @@ func main() {
 		testDescription = "Test specified item and exit"
 	)
 	flag.StringVar(&testFlag, "test", testDefault, testDescription)
-	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorhand)")
+	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorthand)")
 
 	var printFlag bool
 	const (
@@ -219,15 +219,15 @@ func main() {
 		printDescription = "Print known items and exit"
 	)
 	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
-	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorhand)")
+	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
 
 	var versionFlag bool
 	const (
 		versionDefault     = false
-		versionDescription = "Print programm version and exit"
+		versionDescription = "Print program version and exit"
 	)
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorhand)")
+	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorthand)")
 
 	var remoteCommand string
 	const (
