@@ -21,8 +21,6 @@ package tls
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
-// TODO: remove
-#cgo LDFLAGS: -lssl -lcrypto
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -61,11 +59,6 @@ static int tls_init()
 	return 0;
 }
 
-static int tls_cert_cb(SSL *ssl, void *arg)
-{
-	return -1;
-}
-
 static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity,
 	unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len)
 {
@@ -100,17 +93,19 @@ static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity
 	memcpy(identity, psk_identity, sz);
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-    if (key == NULL) {
-        BIO_printf(err, "invalid PSK key");
-        return 0;
+	if (key == NULL) {
+		BIO_printf(err, "invalid PSK key");
+		return 0;
 	}
 
-    if (key_len > (long)max_psk_len) {
-        BIO_printf(err, "PSK key is too large");
-        OPENSSL_free(key);
-        return 0;
-    }
+	if (key_len > (long)max_psk_len) {
+		BIO_printf(err, "PSK key is too large");
+		OPENSSL_free(key);
+		return 0;
+	}
+
 	memcpy(psk, key, key_len);
+	OPENSSL_free(key);
 	return key_len;
 }
 
@@ -143,20 +138,25 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	}
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-    if (key == NULL) {
-        BIO_printf(err, "invalid PSK key");
-        return 0;
+	if (key == NULL) {
+		BIO_printf(err, "invalid PSK key");
+		return 0;
 	}
 
-    if (key_len > (long)max_psk_len) {
-        BIO_printf(err, "PSK key is too large");
-        OPENSSL_free(key);
-        return 0;
-    }
+	if (key_len > (long)max_psk_len) {
+		BIO_printf(err, "PSK key is too large");
+		return 0;
+	}
+
 	memcpy(psk, key, key_len);
+	OPENSSL_free(key);
 	return key_len;
 }
-static void *tls_new_context(const char *ciphers, char **error)
+
+#define TLS_1_3_CIPHERSUITES "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+#define TLS_CIPHERS "RSA+aRSA+AES128:kPSK+AES128"
+
+static void *tls_new_context(const char *ca_file, const char *cert_file, const char *key_file, char **error)
 {
 	SSL_CTX	*ctx;
 	int		ret = -1;
@@ -164,13 +164,33 @@ static void *tls_new_context(const char *ciphers, char **error)
 	if (NULL == (ctx = SSL_CTX_new(TLS_method())))
 		goto out;
 
-	SSL_CTX_set_psk_client_callback(ctx, tls_psk_client_cb);
-	SSL_CTX_set_psk_server_callback(ctx, tls_psk_server_cb);
-
-	if (0 == SSL_CTX_set_cipher_list(ctx, ciphers))
+	if (1 != SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION))
 		goto out;
 
-	// TODO: set options and certificate support?
+	if (NULL != ca_file)
+	{
+		if (1 != SSL_CTX_load_verify_locations(ctx, ca_file, NULL))
+			goto out;
+		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+	}
+
+	if (NULL != cert_file && 1 != SSL_CTX_use_certificate_chain_file(ctx, cert_file))
+		goto out;
+
+	if (NULL != key_file && 1 != SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM))
+		goto out;
+
+	SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+	SSL_CTX_set_options(ctx, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
+	SSL_CTX_clear_options(ctx, SSL_OP_LEGACY_SERVER_CONNECT);
+	SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_OFF);
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1
+	if (1 != SSL_CTX_set_ciphersuites(ctx, TLS_1_3_CIPHERSUITES))
+		goto out;
+#endif
+	if (0 == SSL_CTX_set_cipher_list(ctx, TLS_CIPHERS))
+		goto out;
 
 	ret = 0;
 out:
@@ -235,8 +255,6 @@ static int tls_new(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key
 	if (1 != SSL_set_ex_data(tls->ssl, TLS_EX_DATA_KEY, (void *)tls->psk_key))
 		return -1;
 
-	SSL_set_cert_cb(tls->ssl, tls_cert_cb, NULL);
-
 	tls->in = BIO_new(BIO_s_mem());
 	tls->out = BIO_new(BIO_s_mem());
 	BIO_set_nbio(tls->in, 1);
@@ -253,6 +271,9 @@ static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const cha
 
 	if (0 == tls_new(ctx, psk_identity, psk_key, &tls))
 	{
+		if (psk_identity != NULL && psk_key != NULL)
+			SSL_set_psk_client_callback(tls->ssl, tls_psk_client_cb);
+
 		SSL_set_connect_state(tls->ssl);
 		if (1 == (ret = SSL_connect(tls->ssl)) || SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 			tls->ready = 1;
@@ -267,8 +288,14 @@ static tls_t *tls_new_server(SSL_CTX_LP ctx, const char *psk_identity, const cha
 
 	if (0 == tls_new(ctx, psk_identity, psk_key, &tls))
 	{
-		SSL_set_accept_state(tls->ssl);
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1 or newer, or LibreSSL
+		if (1 != SSL_set_session_id_context(tls->ssl, "Zbx", sizeof("Zbx") - 1))
+			return tls;
+#endif
+		if (psk_identity != NULL && psk_key != NULL)
+			SSL_set_psk_server_callback(tls->ssl, tls_psk_server_cb);
 
+		SSL_set_accept_state(tls->ssl);
 		if (1 == (ret = SSL_accept(tls->ssl)) || SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 			tls->ready = 1;
 	}
@@ -335,7 +362,6 @@ static int tls_accept(tls_t *tls)
 static size_t tls_error(tls_t *tls, char **buf)
 {
 	size_t	sz;
-
 	sz = BIO_ctrl_pending(tls->err);
 	if (sz == 0)
 	{
@@ -348,6 +374,9 @@ static size_t tls_error(tls_t *tls, char **buf)
 		BIO_read(tls->err, *buf, sz);
 		(*buf)[sz] = '\0';
 	}
+	else
+		*buf = strdup("unknown error");
+
 	BIO_reset(tls->err);
 	return sz;
 }
@@ -376,7 +405,6 @@ static void tls_free(tls_t *tls)
 	if (NULL != tls->psk_key)
 		free(tls->psk_key);
 	free(tls);
-	fprintf(stderr, "FREE TLS\n");
 }
 
 #else // HAVE_OPENSSL 0
@@ -479,17 +507,18 @@ import (
 )
 
 type tlsConn struct {
-	conn net.Conn
-	tls  unsafe.Pointer
-	buf  []byte
+	conn    net.Conn
+	tls     unsafe.Pointer
+	buf     []byte
+	timeout time.Duration
 }
 
 func (c *tlsConn) Error() (err error) {
-	var cbuf *C.char
+	var cBuf *C.char
 	var errmsg string
-	if 0 != C.tls_error(C.tls_lp_t(c.tls), &cbuf) {
-		errmsg = C.GoString(cbuf)
-		C.free(unsafe.Pointer(cbuf))
+	if c.tls != nil && 0 != C.tls_error(C.tls_lp_t(c.tls), &cBuf) {
+		errmsg = C.GoString(cBuf)
+		C.free(unsafe.Pointer(cBuf))
 	} else {
 		errmsg = "unknown openssl error"
 	}
@@ -505,7 +534,7 @@ func (c *tlsConn) flushTLS() (err error) {
 	for {
 		if cn := C.tls_recv(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
 			// TODO: remove
-			// fmt.Println("->server", cn, c.buf[:cn])
+			fmt.Println("->server", cn, c.buf[:5])
 			if _, err = c.conn.Write(c.buf[:cn]); err != nil {
 				return
 			}
@@ -519,15 +548,14 @@ func (c *tlsConn) flushTLS() (err error) {
 func (c *tlsConn) recvTLS() (err error) {
 
 	var n int
-	// TODO: proper timeout?
-	if err = c.conn.SetDeadline(time.Now().Add(time.Second * 10)); err != nil {
+	if err = c.conn.SetDeadline(time.Now().Add(c.timeout)); err != nil {
 		return
 	}
 	if n, err = c.conn.Read(c.buf); err != nil {
 		return
 	}
 	// TODO: remove
-	// fmt.Println("->openssl", n, c.buf[:n])
+	fmt.Println("->openssl", n, c.buf[:5])
 	C.tls_send(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(n))
 	return
 }
@@ -553,23 +581,12 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 }
 
 func (c *tlsConn) Close() (err error) {
-	for {
-		cr := C.tls_close(C.tls_lp_t(c.tls))
-		if cr < 0 {
-			return c.Error()
-		}
-		if cr == 1 {
-			break
-		}
-		if err = c.flushTLS(); err != nil {
-			break
-		}
-		if err = c.recvTLS(); err != nil {
-			break
-		}
-	}
+	cr := C.tls_close(C.tls_lp_t(c.tls))
 	c.conn.Close()
 	c.tls = nil
+	if cr < 0 {
+		return c.Error()
+	}
 	return
 }
 
@@ -583,11 +600,11 @@ func (c *Client) checkConnection() (err error) {
 		return
 	}
 	for C.tls_connected(C.tls_lp_t(c.tls)) != C.int(1) {
-		cr := C.tls_handshake(C.tls_lp_t(c.tls))
-		if cr == 0 {
+		cRet := C.tls_handshake(C.tls_lp_t(c.tls))
+		if cRet == 0 {
 			break
 		}
-		if cr < 0 {
+		if cRet < 0 {
 			return c.Error()
 		}
 		if err = c.flushTLS(); err != nil {
@@ -605,8 +622,8 @@ func (c *Client) Write(b []byte) (n int, err error) {
 	if err = c.checkConnection(); err != nil {
 		return
 	}
-	cret := C.tls_write(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-	if cret <= 0 {
+	cRet := C.tls_write(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+	if cRet <= 0 {
 		return 0, c.Error()
 	}
 	if err = c.flushTLS(); err != nil {
@@ -620,11 +637,11 @@ func (c *Client) Read(b []byte) (n int, err error) {
 		if err = c.checkConnection(); err != nil {
 			return
 		}
-		cret := C.tls_read(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-		if cret > 0 {
-			return int(cret), nil
+		cRet := C.tls_read(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+		if cRet > 0 {
+			return int(cRet), nil
 		}
-		if cret < 0 {
+		if cRet < 0 {
 			return 0, c.Error()
 		}
 		if err = c.recvTLS(); err != nil {
@@ -633,40 +650,51 @@ func (c *Client) Read(b []byte) (n int, err error) {
 	}
 }
 
+// NewClient(connection, tlsConfig, timeoutDuration)
 func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if args == nil || args[0] == nil {
+	if len(args) == 0 || args[0] == nil {
 		return nc, nil
 	}
 	if !supported {
 		return nil, errors.New("built without TLS support")
 	}
 	var cfg *Config
-	var cuser, csecret *C.char
-	if len(args) > 0 {
-		var ok bool
-		if cfg, ok = args[0].(*Config); !ok {
-			return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
-		}
-		if cfg.Connect == ConnUnencrypted {
-			return nc, nil
-		}
+	var ok bool
+	if cfg, ok = args[0].(*Config); !ok {
+		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
+	}
+	if cfg.Connect == ConnUnencrypted {
+		return nc, nil
+	}
 
-		if cfg.Connect == ConnPSK {
-			cuser = C.CString(*cfg.PskIdentity)
-			csecret = C.CString(*cfg.PskKey)
+	var cUser, cSecret *C.char
+	context := defaultContext
+	if cfg.Connect == ConnPSK {
+		cUser = C.CString(cfg.PSKIdentity)
+		cSecret = C.CString(cfg.PSKKey)
 
-			defer func() {
-				C.free(unsafe.Pointer(cuser))
-				C.free(unsafe.Pointer(csecret))
-			}()
+		defer func() {
+			C.free(unsafe.Pointer(cUser))
+			C.free(unsafe.Pointer(cSecret))
+		}()
+		context = pskContext
+	}
+
+	var timeout time.Duration
+	if len(args) > 1 {
+		if timeout, ok = args[1].(time.Duration); !ok {
+			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
 		}
+	} else {
+		timeout = 3 * time.Second
 	}
 
 	c := &Client{
 		tlsConn: tlsConn{
-			conn: nc,
-			buf:  make([]byte, 4096),
-			tls:  unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cuser, csecret)),
+			conn:    nc,
+			buf:     make([]byte, 4096),
+			tls:     unsafe.Pointer(C.tls_new_client(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout: timeout,
 		},
 	}
 	runtime.SetFinalizer(c, func(c *Client) { C.tls_free(C.tls_lp_t(c.tls)) })
@@ -675,6 +703,7 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nil, c.Error()
 	}
 	if err = c.checkConnection(); err != nil {
+		c.conn.Close()
 		return
 	}
 	return c, nil
@@ -690,11 +719,11 @@ func (s *Server) checkConnection() (err error) {
 		return
 	}
 	for {
-		cr := C.tls_accept(C.tls_lp_t(s.tls))
-		if cr == 0 {
+		cRet := C.tls_accept(C.tls_lp_t(s.tls))
+		if cRet == 0 {
 			return
 		}
-		if cr < 0 {
+		if cRet < 0 {
 			return s.Error()
 		}
 		if err = s.flushTLS(); err != nil {
@@ -710,8 +739,8 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if err = s.checkConnection(); err != nil {
 		return
 	}
-	cret := C.tls_write(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-	if cret <= 0 {
+	cRet := C.tls_write(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+	if cRet <= 0 {
 		return 0, s.Error()
 	}
 	return len(b), s.flushTLS()
@@ -722,11 +751,11 @@ func (s *Server) Read(b []byte) (n int, err error) {
 		if err = s.checkConnection(); err != nil {
 			return
 		}
-		cret := C.tls_read(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
-		if cret > 0 {
-			return int(cret), nil
+		cRet := C.tls_read(C.tls_lp_t(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
+		if cRet > 0 {
+			return int(cRet), nil
 		}
-		if cret < 0 {
+		if cRet < 0 {
 			return 0, s.Error()
 		}
 		if err = s.recvTLS(); err != nil {
@@ -735,39 +764,55 @@ func (s *Server) Read(b []byte) (n int, err error) {
 	}
 }
 
+// NewServer(connection, tlsConfig, pendingbufer, timeoutSeconds)
 func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
-	if args == nil || args[0] == nil {
+	if len(args) == 0 || args[0] == nil {
 		return nc, nil
 	}
 	if !supported {
 		return nil, errors.New("built without TLS support")
 	}
 	var cfg *Config
-	var cuser, csecret *C.char
-	if len(args) > 0 {
-		var ok bool
-		if cfg, ok = args[0].(*Config); !ok {
-			return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
-		}
-		if cfg.Accept == ConnUnencrypted {
-			return nc, nil
-		}
-		if cfg.Accept&ConnPSK != 0 {
-			cuser = C.CString(*cfg.PskIdentity)
-			csecret = C.CString(*cfg.PskKey)
+	var ok bool
+	if cfg, ok = args[0].(*Config); !ok {
+		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
+	}
 
-			defer func() {
-				C.free(unsafe.Pointer(cuser))
-				C.free(unsafe.Pointer(csecret))
-			}()
+	if cfg.Accept == ConnUnencrypted {
+		return nc, nil
+	}
+
+	var cUser, cSecret *C.char
+	if cfg.Accept&ConnPSK != 0 {
+		cUser = C.CString(cfg.PSKIdentity)
+		cSecret = C.CString(cfg.PSKKey)
+
+		defer func() {
+			C.free(unsafe.Pointer(cUser))
+			C.free(unsafe.Pointer(cSecret))
+		}()
+	}
+
+	context := pskContext
+	if cfg.Accept&ConnCert != 0 {
+		context = defaultContext
+	}
+
+	var timeout time.Duration
+	if len(args) > 2 {
+		if timeout, ok = args[2].(time.Duration); !ok {
+			return nil, fmt.Errorf("invalid timeout parameter of type %T", args)
 		}
+	} else {
+		timeout = 3 * time.Second
 	}
 
 	s := &Server{
 		tlsConn: tlsConn{
-			conn: nc,
-			buf:  make([]byte, 4096),
-			tls:  unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cuser, csecret)),
+			conn:    nc,
+			buf:     make([]byte, 4096),
+			tls:     unsafe.Pointer(C.tls_new_server(C.SSL_CTX_LP(context), cUser, cSecret)),
+			timeout: timeout,
 		},
 	}
 	runtime.SetFinalizer(s, func(s *Server) { C.tls_free(C.tls_lp_t(s.tls)) })
@@ -785,6 +830,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 	}
 
 	if err = s.checkConnection(); err != nil {
+		s.conn.Close()
 		return
 	}
 
@@ -792,7 +838,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 }
 
 var supported bool
-var context unsafe.Pointer
+var pskContext, defaultContext unsafe.Pointer
 
 const (
 	ConnUnencrypted = 1 << iota
@@ -803,28 +849,48 @@ const (
 type Config struct {
 	Accept      int
 	Connect     int
-	PskIdentity *string
-	PskKey      *string
+	PSKIdentity string
+	PSKKey      string
+	CAFile      string
+	CertFile    string
+	KeyFile     string
 }
 
 func Supported() bool {
 	return supported
 }
-func Configure(ciphers string) (err error) {
+func Init(config *Config) (err error) {
 	if !supported {
 		return errors.New("built without TLS support")
 	}
-	if context != nil {
-		C.tls_free_context(C.SSL_CTX_LP(context))
+	if pskContext != nil {
+		C.tls_free_context(C.SSL_CTX_LP(pskContext))
+	}
+	if defaultContext != nil {
+		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
-	var cerr *C.char
-	cciphers := C.CString(ciphers)
-	if context = unsafe.Pointer(C.tls_new_context(cciphers, &cerr)); context == nil {
-		err = fmt.Errorf("cannot initialize TLS: %s", C.GoString(cerr))
-		C.free(unsafe.Pointer(cerr))
+	var cErr, cCaFile, cCertFile, cKeyFile, cNULL *C.char
+	if (config.Accept|config.Connect)&ConnCert != 0 {
+		cCaFile = C.CString(config.CAFile)
+		cCertFile = C.CString(config.CertFile)
+		cKeyFile = C.CString(config.KeyFile)
+
+		defer func() {
+			C.free(unsafe.Pointer(cCaFile))
+			C.free(unsafe.Pointer(cCertFile))
+			C.free(unsafe.Pointer(cKeyFile))
+		}()
 	}
-	C.free(unsafe.Pointer(cciphers))
+
+	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
+		err = fmt.Errorf("cannot initialize global TLS context: %s", C.GoString(cErr))
+		C.free(unsafe.Pointer(cErr))
+	}
+	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
+		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
+		C.free(unsafe.Pointer(cErr))
+	}
 	return err
 }
 

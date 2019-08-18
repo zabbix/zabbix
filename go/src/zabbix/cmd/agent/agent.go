@@ -334,16 +334,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	if tls.Supported() {
-		if err := tls.Configure("RSA+aRSA+AES128:kPSK+AES128"); err != nil {
-			log.Critf("cannot configure encryption: %s", err)
-			os.Exit(1)
-		}
-	}
-
-	if _, err := agent.GetTLSConfig(&agent.Options); err != nil {
+	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
 		log.Critf("cannot use encryption configuration: %s", err)
 		os.Exit(1)
+	} else {
+		if tlsConfig != nil {
+			if err := tls.Init(tlsConfig); err != nil {
+				log.Critf("cannot configure encryption: %s", err)
+				os.Exit(1)
+			}
+		}
 	}
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())

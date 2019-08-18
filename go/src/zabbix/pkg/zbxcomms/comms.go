@@ -63,18 +63,10 @@ func Open(address string, timeout time.Duration, args ...interface{}) (c *Connec
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
-		if c.conn, err = tls.NewClient(c.conn, tlsconfig); err != nil {
+		if c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout); err != nil {
 			return
 		}
 	}
-
-	err = c.conn.SetReadDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return
-	}
-
-	err = c.conn.SetWriteDeadline(time.Now().Add(timeout))
-
 	return
 }
 
@@ -218,7 +210,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 			return nil, errors.New("cannot accept encrypted connection")
 		}
 		var tlsConn net.Conn
-		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b); err != nil {
+		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, timeout); err != nil {
 			return
 		}
 		c.conn = tlsConn
@@ -306,8 +298,11 @@ func Exchange(address string, timeout time.Duration, data []byte, args ...interf
 		log.Tracef("cannot receive data from [%s]: %s", address, err)
 		return nil, err
 	}
-
 	log.Tracef("received [%s] from [%s]", string(b), address)
+
+	if len(b) == 0 {
+		return nil, errors.New("connection closed")
+	}
 
 	return b, nil
 }

@@ -55,7 +55,11 @@ type AgentOptions struct {
 	TLSAccept            string   `conf:",optional"`
 	TLSPSKIdentity       string   `conf:",optional"`
 	TLSPSKFile           string   `conf:",optional"`
-	Plugins              map[string]map[string]string
+	TLSCAFile            string   `conf:",optional"`
+	TLSCertFile          string   `conf:",optional"`
+	TLSKeyFile           string   `conf:",optional"`
+
+	Plugins map[string]map[string]string
 }
 
 var Options AgentOptions
@@ -99,10 +103,11 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			options.TLSPSKIdentity != "" {
 			return nil, errors.New("cannot user TLS configuration: encryption support was not compiled in")
 		}
+		return
 	}
 	c := &tls.Config{}
 	switch options.TLSConnect {
-	case "":
+	case "", "unencrypted":
 		c.Connect = tls.ConnUnencrypted
 	case "psk":
 		c.Connect = tls.ConnPSK
@@ -132,7 +137,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 
 	if (c.Accept|c.Connect)&tls.ConnPSK != 0 {
 		if options.TLSPSKIdentity != "" {
-			c.PskIdentity = &options.TLSPSKIdentity
+			c.PSKIdentity = options.TLSPSKIdentity
 		} else {
 			return nil, errors.New("missing TLSPSKIdentity configuration parameter")
 		}
@@ -146,8 +151,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			if b, err = ioutil.ReadAll(file); err != nil {
 				return nil, fmt.Errorf("invalid TLSPSKFile configuration parameter: %s", err)
 			}
-			key := string(bytes.TrimRight(b, "\r\n \t"))
-			c.PskKey = &key
+			c.PSKKey = string(bytes.TrimRight(b, "\r\n \t"))
 		} else {
 			return nil, errors.New("missing TLSPSKFile configuration parameter")
 		}
@@ -160,7 +164,34 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		}
 	}
 
-	// TODO: check certificate parameters
+	if (c.Accept|c.Connect)&tls.ConnCert != 0 {
+		if options.TLSCAFile != "" {
+			c.CAFile = options.TLSCAFile
+		} else {
+			return nil, errors.New("missing TLSCAFile configuration parameter")
+		}
+		if options.TLSCertFile != "" {
+			c.CertFile = options.TLSCertFile
+		} else {
+			return nil, errors.New("missing TLSCertFile configuration parameter")
+		}
+		if options.TLSKeyFile != "" {
+			c.KeyFile = options.TLSKeyFile
+		} else {
+			return nil, errors.New("missing TLSKeyFile configuration parameter")
+		}
+
+	} else {
+		if options.TLSCAFile != "" {
+			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
+		}
+		if options.TLSCertFile != "" {
+			return nil, errors.New("TLSCertFile configuration parameter set without certificates being used")
+		}
+		if options.TLSKeyFile != "" {
+			return nil, errors.New("TLSKeyFile configuration parameter set without certificates being used")
+		}
+	}
 
 	return c, nil
 }
