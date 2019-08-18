@@ -36,6 +36,7 @@ import (
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/tls"
 	"zabbix/pkg/version"
 	"zabbix/pkg/zbxlib"
 	_ "zabbix/plugins"
@@ -333,6 +334,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	if tls.Supported() {
+		if err := tls.Configure("RSA+aRSA+AES128:kPSK+AES128"); err != nil {
+			log.Critf("cannot configure encryption: %s", err)
+			os.Exit(1)
+		}
+	}
+
+	if _, err := agent.GetTLSConfig(&agent.Options); err != nil {
+		log.Critf("cannot use encryption configuration: %s", err)
+		os.Exit(1)
+	}
+
 	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
 	log.Infof(greeting)
 
@@ -347,7 +360,7 @@ func main() {
 
 	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
 	manager = scheduler.NewManager()
-	listener = serverlistener.New(manager)
+	listener = serverlistener.New(manager, &agent.Options)
 
 	manager.Start()
 
@@ -359,7 +372,10 @@ func main() {
 		serverConnectors = make([]*serverconnector.Connector, len(addresses))
 
 		for i := 0; i < len(serverConnectors); i++ {
-			serverConnectors[i] = serverconnector.New(manager, addresses[i])
+			if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
+				log.Critf("cannot create server connector: %s", err)
+				os.Exit(1)
+			}
 			serverConnectors[i].Start()
 		}
 

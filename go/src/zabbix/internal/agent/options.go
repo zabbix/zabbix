@@ -20,8 +20,14 @@
 package agent
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 	"unicode"
+	"zabbix/pkg/tls"
 )
 
 type AgentOptions struct {
@@ -45,6 +51,10 @@ type AgentOptions struct {
 	LogRemoteCommands    int      `conf:",,0:1,0"`
 	EnableRemoteCommands int      `conf:",,0:1,0"`
 	ControlSocket        string   `conf:",optional"`
+	TLSConnect           string   `conf:",optional"`
+	TLSAccept            string   `conf:",optional"`
+	TLSPSKIdentity       string   `conf:",optional"`
+	TLSPSKFile           string   `conf:",optional"`
 	Plugins              map[string]map[string]string
 }
 
@@ -79,4 +89,78 @@ func CheckHostname(s string) error {
 	}
 
 	return nil
+}
+
+func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
+	if !tls.Supported() {
+		if options.TLSAccept != "" ||
+			options.TLSConnect != "" ||
+			options.TLSPSKFile != "" ||
+			options.TLSPSKIdentity != "" {
+			return nil, errors.New("cannot user TLS configuration: encryption support was not compiled in")
+		}
+	}
+	c := &tls.Config{}
+	switch options.TLSConnect {
+	case "":
+		c.Connect = tls.ConnUnencrypted
+	case "psk":
+		c.Connect = tls.ConnPSK
+	case "cert":
+		c.Connect = tls.ConnCert
+	default:
+		return nil, errors.New("invalid TLSConnect configuration parameter")
+	}
+
+	if options.TLSAccept != "" {
+		opts := strings.Split(options.TLSAccept, ",")
+		for _, o := range opts {
+			switch strings.Trim(o, " \t") {
+			case "unencrypted":
+				c.Accept |= tls.ConnUnencrypted
+			case "psk":
+				c.Accept |= tls.ConnPSK
+			case "cert":
+				c.Accept |= tls.ConnCert
+			default:
+				return nil, errors.New("invalid TLSAccept configuration parameter")
+			}
+		}
+	} else {
+		c.Accept = tls.ConnUnencrypted
+	}
+
+	if (c.Accept|c.Connect)&tls.ConnPSK != 0 {
+		if options.TLSPSKIdentity != "" {
+			c.PskIdentity = &options.TLSPSKIdentity
+		} else {
+			return nil, errors.New("missing TLSPSKIdentity configuration parameter")
+		}
+		if options.TLSPSKFile != "" {
+			var file *os.File
+			if file, err = os.Open(options.TLSPSKFile); err != nil {
+				return nil, fmt.Errorf("invalid TLSPSKFile configuration parameter: %s", err)
+			}
+			defer file.Close()
+			var b []byte
+			if b, err = ioutil.ReadAll(file); err != nil {
+				return nil, fmt.Errorf("invalid TLSPSKFile configuration parameter: %s", err)
+			}
+			key := string(bytes.TrimRight(b, "\r\n \t"))
+			c.PskKey = &key
+		} else {
+			return nil, errors.New("missing TLSPSKFile configuration parameter")
+		}
+	} else {
+		if options.TLSPSKIdentity != "" {
+			return nil, errors.New("TLSPSKIdentity configuration parameter set without PSK being used")
+		}
+		if options.TLSPSKFile != "" {
+			return nil, errors.New("TLSPSKFile configuration parameter set without PSK being used")
+		}
+	}
+
+	// TODO: check certificate parameters
+
+	return c, nil
 }

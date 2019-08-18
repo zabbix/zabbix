@@ -4,6 +4,7 @@ SUBDIRS = \
 	itemutil \
 	log \
 	std \
+	tls \
 	version \
 	watch \
 	zbxcomms \
