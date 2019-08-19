@@ -57,6 +57,14 @@ func Open(address string, timeout time.Duration, args ...interface{}) (c *Connec
 		return
 	}
 
+	if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
+		return
+	}
+
+	if ferr = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
+		return
+	}
+
 	var tlsconfig *tls.Config
 	if len(args) > 0 {
 		var ok bool
