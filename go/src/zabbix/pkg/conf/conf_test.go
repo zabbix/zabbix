@@ -34,7 +34,7 @@ func TestParserErrors(t *testing.T) {
 		"abc",
 		"abc =",
 		" = abc",
-		"Te$t = value"}
+		"Test = value"}
 
 	for _, data := range input {
 		var options Options
@@ -59,6 +59,7 @@ func TestParserSuccess(t *testing.T) {
 		" # comments\nText=6",
 		"    \nText=7",
 		"Text=8=9",
+		"Text=",
 	}
 
 	var output = []Options{
@@ -69,6 +70,7 @@ func TestParserSuccess(t *testing.T) {
 		{Text: "6"},
 		{Text: "7"},
 		{Text: "8=9"},
+		{Text: ""},
 	}
 
 	for i, data := range input {

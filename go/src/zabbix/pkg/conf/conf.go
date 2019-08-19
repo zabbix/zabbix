@@ -136,28 +136,11 @@ func parseLine(line []byte) (key []byte, value []byte, err error) {
 		return nil, nil, errors.New("missing assignment operator")
 	}
 
-	keyTail := valueStart
-	for keyTail > 0 && isWhitespace(line[keyTail-1]) {
-		keyTail--
-	}
-	if keyTail == 0 {
+	if key = bytes.TrimSpace(line[:valueStart]); len(key) == 0 {
 		return nil, nil, errors.New("missing variable name")
 	}
 
-	valueStart++
-	valueTail := len(line)
-	for valueStart < valueTail && isWhitespace(line[valueStart]) {
-		valueStart++
-	}
-	if valueStart == valueTail {
-		return nil, nil, errors.New("missing variable value")
-	}
-
-	if err = validateParameterName(line[:keyTail]); err != nil {
-		return
-	}
-
-	return line[:keyTail], line[valueStart:], nil
+	return key, bytes.TrimSpace(line[valueStart+1:]), nil
 }
 
 // getMeta returns 'conf' tag metadata.
