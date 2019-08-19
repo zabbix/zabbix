@@ -19,5 +19,15 @@
 **/
 
 
-class CXmlSchemaBuilderException extends Exception {
+class CGroupsSchemaCreator implements CSchemaCreator {
+
+	public function create() {
+		return (new CIndexedArrayXmlTag('groups'))
+			->setSchema(
+				(new CArrayXmlTag('group'))
+					->setSchema(
+						(new CStringXmlTag('name'))->setRequired()
+					)
+			);
+	}
 }

@@ -26,26 +26,24 @@ class CXmlSchemaBuilder {
 		$sub_tags = $class->getSubTags();
 
 		if (count($sub_tags) === 0) {
-			throw new CXmlSchemaBuilderException(_s('Tag "%1$s" schema is empty.', $class->getTag()));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $class->getTag(), _('empty schema')));
 		}
 
 		foreach ($sub_tags as $tag) {
 			$result[$tag->getTag()] = $tag;
 		}
 
-		return $class instanceof CIndexedArrayXmlTagInterface
-			? $result
-			: [$class->getTag() => $result];
+		return $class instanceof CIndexedArrayXmlTagInterface ? $result : [$class->getTag() => $result];
 	}
 
 	public function getFullSchema() {
 		return [
-			(new CGraphsSchemaCreater)->create(),
-			(new CGroupsSchemaCreater)->create(),
-			(new CHostsSchemaCreater)->create(),
-			(new CValueMapsSchemaCreater)->create(),
-			(new CTemplatesSchemaCreater)->create(),
-			(new CTriggersSchemaCreater)->create()
+			(new CGraphsSchemaCreator)->create(),
+			(new CGroupsSchemaCreator)->create(),
+			(new CHostsSchemaCreator)->create(),
+			(new CValueMapsSchemaCreator)->create(),
+			(new CTemplatesSchemaCreator)->create(),
+			(new CTriggersSchemaCreator)->create()
 		];
 	}
 }

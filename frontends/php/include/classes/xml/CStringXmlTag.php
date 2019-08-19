@@ -74,6 +74,19 @@ class CStringXmlTag extends CXmlTag implements CStringXmlTagInterface {
 		return $this;
 	}
 
+	public function addConstants(array $const, $index = 0) {
+		$this->has_constants = true;
+
+		foreach ($const as $key => $val) {
+			$this->constant_names[$index][$val] = $key;
+			if (is_string($key)) {
+				$this->constant_values[$index][$key] = $val;
+			}
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Get constant name by constant value.
 	 *
@@ -84,7 +97,7 @@ class CStringXmlTag extends CXmlTag implements CStringXmlTagInterface {
 	 */
 	public function getConstantByValue($value, $index = 0) {
 		if (!array_key_exists($value, $this->constant_names[$index])) {
-			throw new InvalidArgumentException(_s('Constant with value "%1$s" for tag "%2$s" does not exist.', $value, $this->tag));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $this->getTag(), _s('unexpected constant value "%1$s"', $value)));
 		}
 
 		return $this->constant_names[$index][$value];
@@ -100,7 +113,7 @@ class CStringXmlTag extends CXmlTag implements CStringXmlTagInterface {
 	 */
 	public function getConstantValueByName($const, $index = 0) {
 		if (!array_key_exists($const, $this->constant_values[$index])) {
-			throw new InvalidArgumentException(_s('Constant "%1$s" for tag "%2$s" does not exist.', $const, $this->tag));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $this->getTag(), _s('unexpected constant "%1$s"', $const)));
 		}
 
 		return $this->constant_values[$index][$const];

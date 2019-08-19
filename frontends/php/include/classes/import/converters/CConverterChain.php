@@ -22,7 +22,7 @@
 /**
  * An object that can perform a sequential conversion using an array of conversions.
  */
-class CConverterChain  {
+class CConverterChain {
 
 	/**
 	 * Converters to use.
@@ -50,6 +50,8 @@ class CConverterChain  {
 				$data = $converter->convert($data);
 			}
 		}
+
+		$data = (new CXmlValidator)->validate($data, 'xml');
 
 		return $data;
 	}

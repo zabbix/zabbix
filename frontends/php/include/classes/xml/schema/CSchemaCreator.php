@@ -19,15 +19,7 @@
 **/
 
 
-class CGroupsSchemaCreater implements CSchemaCreater {
+interface CSchemaCreator {
 
-	public function create() {
-		return (new CIndexedArrayXmlTag('groups'))
-			->setSchema(
-				(new CArrayXmlTag('group'))
-					->setSchema(
-						(new CStringXmlTag('name'))->setRequired()
-					)
-			);
-	}
+	public function create();
 }

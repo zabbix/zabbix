@@ -87,12 +87,12 @@ class C30ImportConverter extends CConverter {
 	 */
 	protected function convertTriggers(array $triggers) {
 		foreach ($triggers as &$trigger) {
-			$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
+			$trigger['recovery_mode'] = (string) ZBX_RECOVERY_MODE_EXPRESSION;
 			$trigger['recovery_expression'] = '';
-			$trigger['correlation_mode'] = ZBX_TRIGGER_CORRELATION_NONE;
+			$trigger['correlation_mode'] = (string) ZBX_TRIGGER_CORRELATION_NONE;
 			$trigger['correlation_tag'] = '';
 			$trigger['tags'] = [];
-			$trigger['manual_close'] = ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED;
+			$trigger['manual_close'] = (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED;
 
 			if (array_key_exists('dependencies', $trigger)) {
 				$trigger['dependencies'] =

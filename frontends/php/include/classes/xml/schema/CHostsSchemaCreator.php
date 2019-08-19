@@ -19,13 +19,22 @@
 **/
 
 
-class CHostsSchemaCreater implements CSchemaCreater {
+class CHostsSchemaCreator implements CSchemaCreator {
 
 	public function create() {
 		return (new CIndexedArrayXmlTag('hosts'))
 			->setSchema(
 				(new CArrayXmlTag('host'))
 					->setSchema(
+						(new CIndexedArrayXmlTag('groups'))
+							->setRequired()
+							->setSchema(
+								(new CArrayXmlTag('group'))
+									->setRequired()
+									->setSchema(
+										(new CStringXmlTag('name'))->setRequired()
+									)
+							),
 						(new CStringXmlTag('host'))->setRequired(),
 						(new CIndexedArrayXmlTag('applications'))
 							->setSchema(
@@ -57,6 +66,11 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
+												if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
+													&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+													return CXmlConstantName::NONE;
+												}
+
 												return $class->getConstantByValue($data['authtype'], $data['type']);
 											})
 											->setImportHandler(function(array $data, CXmlTagInterface $class) {
@@ -281,6 +295,11 @@ class CHostsSchemaCreater implements CSchemaCreater {
 															->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 															->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 															->setExportHandler(function(array $data, CXmlTagInterface $class) {
+																if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
+																	&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+																	return CXmlConstantName::NONE;
+																}
+
 																return $class->getConstantByValue($data['authtype'], $data['type']);
 															})
 															->setImportHandler(function(array $data, CXmlTagInterface $class) {
@@ -406,6 +425,7 @@ class CHostsSchemaCreater implements CSchemaCreater {
 														(new CIndexedArrayXmlTag('preprocessing'))
 															->setSchema(
 																(new CArrayXmlTag('step'))
+																	->setRequired()
 																	->setSchema(
 																		(new CStringXmlTag('params'))->setRequired(),
 																		(new CStringXmlTag('type'))
@@ -542,69 +562,6 @@ class CHostsSchemaCreater implements CSchemaCreater {
 																	->setSchema(
 																		(new CStringXmlTag('name'))->setRequired()
 																	)
-															),
-														(new CIndexedArrayXmlTag('trigger_prototypes'))
-															->setKey('triggerPrototypes')
-															->setSchema(
-																(new CArrayXmlTag('trigger_prototype'))
-																	->setSchema(
-																		(new CStringXmlTag('expression'))->setRequired(),
-																		(new CStringXmlTag('name'))
-																			->setRequired()
-																			->setKey('description'),
-																		(new CStringXmlTag('correlation_mode'))
-																			->setDefaultValue(CXmlConstantValue::TRIGGER_DISABLED)
-																			->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
-																			->addConstant(CXmlConstantName::TAG_VALUE, CXmlConstantValue::TRIGGER_TAG_VALUE),
-																		new CStringXmlTag('correlation_tag'),
-																		(new CIndexedArrayXmlTag('dependencies'))
-																			->setSchema(
-																				(new CArrayXmlTag('dependency'))
-																					->setSchema(
-																						(new CStringXmlTag('expression'))->setRequired(),
-																						(new CStringXmlTag('name'))
-																							->setRequired()
-																							->setKey('description'),
-																						new CStringXmlTag('recovery_expression')
-																					)
-																			),
-																		(new CStringXmlTag('description'))->setKey('comments'),
-																		(new CStringXmlTag('manual_close'))
-																			->setDefaultValue(CXmlConstantValue::NO)
-																			->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
-																			->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-																		(new CStringXmlTag('priority'))
-																			->setDefaultValue(CXmlConstantValue::NOT_CLASSIFIED)
-																			->addConstant(CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::NOT_CLASSIFIED)
-																			->addConstant(CXmlConstantName::INFO, CXmlConstantValue::INFO)
-																			->addConstant(CXmlConstantName::WARNING, CXmlConstantValue::WARNING)
-																			->addConstant(CXmlConstantName::AVERAGE, CXmlConstantValue::AVERAGE)
-																			->addConstant(CXmlConstantName::HIGH, CXmlConstantValue::HIGH)
-																			->addConstant(CXmlConstantName::DISASTER, CXmlConstantValue::DISASTER),
-																		new CStringXmlTag('recovery_expression'),
-																		(new CStringXmlTag('recovery_mode'))
-																			->setDefaultValue(CXmlConstantValue::TRIGGER_EXPRESSION)
-																			->addConstant(CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_EXPRESSION)
-																			->addConstant(CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION)
-																			->addConstant(CXmlConstantName::NONE, CXmlConstantValue::TRIGGER_NONE),
-																		(new CStringXmlTag('status'))
-																			->setDefaultValue(CXmlConstantValue::ENABLED)
-																			->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
-																			->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
-																		(new CIndexedArrayXmlTag('tags'))
-																			->setSchema(
-																				(new CArrayXmlTag('tag'))
-																					->setSchema(
-																						(new CStringXmlTag('tag'))->setRequired(),
-																						new CStringXmlTag('value')
-																					)
-																			),
-																		(new CStringXmlTag('type'))
-																			->setDefaultValue(CXmlConstantValue::SINGLE)
-																			->addConstant(CXmlConstantName::SINGLE, CXmlConstantValue::SINGLE)
-																			->addConstant(CXmlConstantName::MULTIPLE, CXmlConstantValue::MULTIPLE),
-																		new CStringXmlTag('url')
-																	)
 															)
 													)
 											),
@@ -634,32 +591,17 @@ class CHostsSchemaCreater implements CSchemaCreater {
 										(new CIndexedArrayXmlTag('preprocessing'))
 											->setSchema(
 												(new CArrayXmlTag('step'))
+													->setRequired()
 													->setSchema(
 														(new CStringXmlTag('params'))->setRequired(),
 														(new CStringXmlTag('type'))
 															->setRequired()
-															->addConstant(CXmlConstantName::MULTIPLIER, CXmlConstantValue::MULTIPLIER)
-															->addConstant(CXmlConstantName::RTRIM, CXmlConstantValue::RTRIM)
-															->addConstant(CXmlConstantName::LTRIM, CXmlConstantValue::LTRIM)
-															->addConstant(CXmlConstantName::TRIM, CXmlConstantValue::TRIM)
 															->addConstant(CXmlConstantName::REGEX, CXmlConstantValue::REGEX)
-															->addConstant(CXmlConstantName::BOOL_TO_DECIMAL, CXmlConstantValue::BOOL_TO_DECIMAL)
-															->addConstant(CXmlConstantName::OCTAL_TO_DECIMAL, CXmlConstantValue::OCTAL_TO_DECIMAL)
-															->addConstant(CXmlConstantName::HEX_TO_DECIMAL, CXmlConstantValue::HEX_TO_DECIMAL)
-															->addConstant(CXmlConstantName::SIMPLE_CHANGE, CXmlConstantValue::SIMPLE_CHANGE)
-															->addConstant(CXmlConstantName::CHANGE_PER_SECOND, CXmlConstantValue::CHANGE_PER_SECOND)
-															->addConstant(CXmlConstantName::XMLPATH, CXmlConstantValue::XMLPATH)
 															->addConstant(CXmlConstantName::JSONPATH, CXmlConstantValue::JSONPATH)
-															->addConstant(CXmlConstantName::IN_RANGE, CXmlConstantValue::IN_RANGE)
-															->addConstant(CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::MATCHES_REGEX)
 															->addConstant(CXmlConstantName::NOT_MATCHES_REGEX, CXmlConstantValue::NOT_MATCHES_REGEX)
 															->addConstant(CXmlConstantName::CHECK_JSON_ERROR, CXmlConstantValue::CHECK_JSON_ERROR)
-															->addConstant(CXmlConstantName::CHECK_XML_ERROR, CXmlConstantValue::CHECK_XML_ERROR)
-															->addConstant(CXmlConstantName::CHECK_REGEX_ERROR, CXmlConstantValue::CHECK_REGEX_ERROR)
-															->addConstant(CXmlConstantName::DISCARD_UNCHANGED, CXmlConstantValue::DISCARD_UNCHANGED)
 															->addConstant(CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT, CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT)
 															->addConstant(CXmlConstantName::JAVASCRIPT, CXmlConstantValue::JAVASCRIPT)
-															->addConstant(CXmlConstantName::PROMETHEUS_PATTERN, CXmlConstantValue::PROMETHEUS_PATTERN)
 															->addConstant(CXmlConstantName::PROMETHEUS_TO_JSON, CXmlConstantValue::PROMETHEUS_TO_JSON),
 														(new CStringXmlTag('error_handler'))
 															->setDefaultValue(CXmlConstantValue::ORIGINAL_ERROR)
@@ -792,15 +734,12 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::INTERNAL, CXmlConstantValue::ITEM_TYPE_INTERNAL)
 											->addConstant(CXmlConstantName::SNMPV3, CXmlConstantValue::ITEM_TYPE_SNMPV3)
 											->addConstant(CXmlConstantName::ZABBIX_ACTIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE)
-											->addConstant(CXmlConstantName::AGGREGATE, CXmlConstantValue::ITEM_TYPE_AGGREGATE)
 											->addConstant(CXmlConstantName::EXTERNAL, CXmlConstantValue::ITEM_TYPE_EXTERNAL)
 											->addConstant(CXmlConstantName::ODBC, CXmlConstantValue::ITEM_TYPE_ODBC)
 											->addConstant(CXmlConstantName::IPMI, CXmlConstantValue::ITEM_TYPE_IPMI)
 											->addConstant(CXmlConstantName::SSH, CXmlConstantValue::ITEM_TYPE_SSH)
 											->addConstant(CXmlConstantName::TELNET, CXmlConstantValue::ITEM_TYPE_TELNET)
-											->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::ITEM_TYPE_CALCULATED)
 											->addConstant(CXmlConstantName::JMX, CXmlConstantValue::ITEM_TYPE_JMX)
-											->addConstant(CXmlConstantName::SNMP_TRAP, CXmlConstantValue::ITEM_TYPE_SNMP_TRAP)
 											->addConstant(CXmlConstantName::DEPENDENT, CXmlConstantValue::ITEM_TYPE_DEPENDENT)
 											->addConstant(CXmlConstantName::HTTP_AGENT, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT),
 										new CStringXmlTag('url'),
@@ -815,13 +754,6 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES)
 									)
 							),
-						(new CIndexedArrayXmlTag('groups'))
-							->setSchema(
-								(new CArrayXmlTag('group'))
-									->setSchema(
-										(new CStringXmlTag('name'))->setRequired()
-									)
-							),
 						(new CIndexedArrayXmlTag('httptests'))
 							->setSchema(
 								(new CArrayXmlTag('httptest'))
@@ -831,16 +763,38 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->setRequired()
 											->setSchema(
 												(new CArrayXmlTag('step'))
+													->setRequired()
 													->setSchema(
 														(new CStringXmlTag('name'))->setRequired(),
 														(new CStringXmlTag('url'))->setRequired(),
 														(new CStringXmlTag('follow_redirects'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(CXmlConstantValue::YES)
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-														new CStringXmlTag('headers'),
-														new CStringXmlTag('posts'),
-														new CStringXmlTag('query_fields'),
+														(new CIndexedArrayXmlTag('headers'))
+															->setSchema(
+																(new CArrayXmlTag('header'))
+																	->setSchema(
+																		(new CStringXmlTag('name'))->setRequired(),
+																		(new CStringXmlTag('value'))->setRequired()
+																	)
+															),
+														(new CIndexedArrayXmlTag('posts'))
+															->setSchema(
+																(new CArrayXmlTag('post_field'))
+																	->setSchema(
+																		(new CStringXmlTag('name'))->setRequired(),
+																		(new CStringXmlTag('value'))->setRequired()
+																	)
+															),
+														(new CIndexedArrayXmlTag('query_fields'))
+															->setSchema(
+																(new CArrayXmlTag('query_field'))
+																	->setSchema(
+																		(new CStringXmlTag('name'))->setRequired(),
+																		new CStringXmlTag('value')
+																	)
+															),
 														new CStringXmlTag('required'),
 														(new CStringXmlTag('retrieve_mode'))
 															->setDefaultValue(CXmlConstantValue::BODY)
@@ -849,7 +803,14 @@ class CHostsSchemaCreater implements CSchemaCreater {
 															->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
 														new CStringXmlTag('status_codes'),
 														(new CStringXmlTag('timeout'))->setDefaultValue('15s'),
-														(new CStringXmlTag('variables'))
+														(new CIndexedArrayXmlTag('variables'))
+															->setSchema(
+																(new CArrayXmlTag('variable'))
+																	->setSchema(
+																		(new CStringXmlTag('name'))->setRequired(),
+																		(new CStringXmlTag('value'))->setRequired()
+																	)
+															)
 													)
 											),
 										(new CStringXmlTag('agent'))->setDefaultValue('Zabbix'),
@@ -866,7 +827,14 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM),
 										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
-										new CStringXmlTag('headers'),
+										(new CIndexedArrayXmlTag('headers'))
+											->setSchema(
+												(new CArrayXmlTag('header'))
+													->setSchema(
+														(new CStringXmlTag('name'))->setRequired(),
+														(new CStringXmlTag('value'))->setRequired()
+													)
+											),
 										new CStringXmlTag('http_password'),
 										new CStringXmlTag('http_proxy'),
 										new CStringXmlTag('http_user'),
@@ -877,7 +845,14 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->setDefaultValue(CXmlConstantValue::ENABLED)
 											->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 											->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
-										new CStringXmlTag('variables'),
+										(new CIndexedArrayXmlTag('variables'))
+											->setSchema(
+												(new CArrayXmlTag('variable'))
+													->setSchema(
+														(new CStringXmlTag('name'))->setRequired(),
+														(new CStringXmlTag('value'))->setRequired()
+													)
+											),
 										(new CStringXmlTag('verify_host'))
 											->setDefaultValue(CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
@@ -1041,6 +1016,11 @@ class CHostsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
+												if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
+													&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+													return CXmlConstantName::NONE;
+												}
+
 												return $class->getConstantByValue($data['authtype'], $data['type']);
 											})
 											->setImportHandler(function(array $data, CXmlTagInterface $class) {
@@ -1166,6 +1146,7 @@ class CHostsSchemaCreater implements CSchemaCreater {
 										(new CIndexedArrayXmlTag('preprocessing'))
 											->setSchema(
 												(new CArrayXmlTag('step'))
+													->setRequired()
 													->setSchema(
 														(new CStringXmlTag('params'))->setRequired(),
 														(new CStringXmlTag('type'))
@@ -1252,68 +1233,6 @@ class CHostsSchemaCreater implements CSchemaCreater {
 										new CStringXmlTag('status_codes'),
 										new CStringXmlTag('timeout'),
 										(new CStringXmlTag('trends'))->setDefaultValue('365d'),
-										(new CIndexedArrayXmlTag('triggers'))
-											->setSchema(
-												(new CArrayXmlTag('trigger'))
-													->setSchema(
-														(new CStringXmlTag('expression'))->setRequired(),
-														(new CStringXmlTag('name'))
-															->setRequired()
-															->setKey('description'),
-														(new CStringXmlTag('correlation_mode'))
-															->setDefaultValue(CXmlConstantValue::TRIGGER_DISABLED)
-															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
-															->addConstant(CXmlConstantName::TAG_VALUE, CXmlConstantValue::TRIGGER_TAG_VALUE),
-														new CStringXmlTag('correlation_tag'),
-														(new CIndexedArrayXmlTag('dependencies'))
-															->setSchema(
-																(new CArrayXmlTag('dependency'))
-																	->setSchema(
-																		(new CStringXmlTag('expression'))->setRequired(),
-																		(new CStringXmlTag('name'))
-																			->setRequired()
-																			->setKey('description'),
-																		new CStringXmlTag('recovery_expression')
-																	)
-															),
-														(new CStringXmlTag('description'))->setKey('comments'),
-														(new CStringXmlTag('manual_close'))
-															->setDefaultValue(CXmlConstantValue::NO)
-															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
-															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-														(new CStringXmlTag('priority'))
-															->setDefaultValue(CXmlConstantValue::NOT_CLASSIFIED)
-															->addConstant(CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::NOT_CLASSIFIED)
-															->addConstant(CXmlConstantName::INFO, CXmlConstantValue::INFO)
-															->addConstant(CXmlConstantName::WARNING, CXmlConstantValue::WARNING)
-															->addConstant(CXmlConstantName::AVERAGE, CXmlConstantValue::AVERAGE)
-															->addConstant(CXmlConstantName::HIGH, CXmlConstantValue::HIGH)
-															->addConstant(CXmlConstantName::DISASTER, CXmlConstantValue::DISASTER),
-														new CStringXmlTag('recovery_expression'),
-														(new CStringXmlTag('recovery_mode'))
-															->setDefaultValue(CXmlConstantValue::TRIGGER_EXPRESSION)
-															->addConstant(CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_EXPRESSION)
-															->addConstant(CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION)
-															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::TRIGGER_NONE),
-														(new CStringXmlTag('status'))
-															->setDefaultValue(CXmlConstantValue::ENABLED)
-															->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
-															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
-														(new CIndexedArrayXmlTag('tags'))
-															->setSchema(
-																(new CArrayXmlTag('tag'))
-																	->setSchema(
-																		(new CStringXmlTag('tag'))->setRequired(),
-																		new CStringXmlTag('value')
-																	)
-															),
-														(new CStringXmlTag('type'))
-															->setDefaultValue(CXmlConstantValue::SINGLE)
-															->addConstant(CXmlConstantName::SINGLE, CXmlConstantValue::SINGLE)
-															->addConstant(CXmlConstantName::MULTIPLE, CXmlConstantValue::MULTIPLE),
-														new CStringXmlTag('url')
-													)
-											),
 										(new CStringXmlTag('type'))
 											->setDefaultValue(CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
 											->addConstant(CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)

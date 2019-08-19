@@ -19,7 +19,7 @@
 **/
 
 
-class CTriggersSchemaCreater implements CSchemaCreater {
+class CTriggersSchemaCreator implements CSchemaCreator {
 
 	public function create() {
 		return (new CIndexedArrayXmlTag('triggers'))
@@ -31,7 +31,7 @@ class CTriggersSchemaCreater implements CSchemaCreater {
 							->setRequired()
 							->setKey('description'),
 						(new CStringXmlTag('correlation_mode'))
-							->setDefaultValue(CXmlConstantValue::TRIGGER_DISABLED)
+							->setDefaultValue(DB::getDefault('triggers', 'correlation_mode'))
 							->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
 							->addConstant(CXmlConstantName::TAG_VALUE, CXmlConstantValue::TRIGGER_TAG_VALUE),
 						new CStringXmlTag('correlation_tag'),
@@ -48,11 +48,11 @@ class CTriggersSchemaCreater implements CSchemaCreater {
 							),
 						(new CStringXmlTag('description'))->setKey('comments'),
 						(new CStringXmlTag('manual_close'))
-							->setDefaultValue(CXmlConstantValue::NO)
+							->setDefaultValue(DB::getDefault('triggers', 'manual_close'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('priority'))
-							->setDefaultValue(CXmlConstantValue::NOT_CLASSIFIED)
+							->setDefaultValue(DB::getDefault('triggers', 'priority'))
 							->addConstant(CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::NOT_CLASSIFIED)
 							->addConstant(CXmlConstantName::INFO, CXmlConstantValue::INFO)
 							->addConstant(CXmlConstantName::WARNING, CXmlConstantValue::WARNING)
@@ -61,12 +61,12 @@ class CTriggersSchemaCreater implements CSchemaCreater {
 							->addConstant(CXmlConstantName::DISASTER, CXmlConstantValue::DISASTER),
 						new CStringXmlTag('recovery_expression'),
 						(new CStringXmlTag('recovery_mode'))
-							->setDefaultValue(CXmlConstantValue::TRIGGER_EXPRESSION)
+							->setDefaultValue(DB::getDefault('triggers', 'recovery_mode'))
 							->addConstant(CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_EXPRESSION)
 							->addConstant(CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION)
 							->addConstant(CXmlConstantName::NONE, CXmlConstantValue::TRIGGER_NONE),
 						(new CStringXmlTag('status'))
-							->setDefaultValue(CXmlConstantValue::ENABLED)
+							->setDefaultValue(DB::getDefault('triggers', 'status'))
 							->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 							->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 						(new CIndexedArrayXmlTag('tags'))
@@ -78,7 +78,7 @@ class CTriggersSchemaCreater implements CSchemaCreater {
 									)
 							),
 						(new CStringXmlTag('type'))
-							->setDefaultValue(CXmlConstantValue::SINGLE)
+							->setDefaultValue(DB::getDefault('triggers', 'type'))
 							->addConstant(CXmlConstantName::SINGLE, CXmlConstantValue::SINGLE)
 							->addConstant(CXmlConstantName::MULTIPLE, CXmlConstantValue::MULTIPLE),
 						new CStringXmlTag('url')

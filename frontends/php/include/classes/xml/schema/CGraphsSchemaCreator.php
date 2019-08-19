@@ -19,7 +19,7 @@
 **/
 
 
-class CGraphsSchemaCreater implements CSchemaCreater {
+class CGraphsSchemaCreator implements CSchemaCreator {
 
 	public function create() {
 		return (new CIndexedArrayXmlTag('graphs'))
@@ -41,7 +41,7 @@ class CGraphsSchemaCreater implements CSchemaCreater {
 												(new CStringXmlTag('key'))->setRequired()
 											),
 										(new CStringXmlTag('calc_fnc'))
-											->setDefaultValue(CXmlConstantValue::AVG)
+											->setDefaultValue(DB::getDefault('graphs_items', 'calc_fnc'))
 											->addConstant(CXmlConstantName::MIN, CXmlConstantValue::MIN)
 											->addConstant(CXmlConstantName::AVG, CXmlConstantValue::AVG)
 											->addConstant(CXmlConstantName::MAX, CXmlConstantValue::MAX)
@@ -49,7 +49,7 @@ class CGraphsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::LAST, CXmlConstantValue::LAST),
 										new CStringXmlTag('color'),
 										(new CStringXmlTag('drawtype'))
-											->setDefaultValue(CXmlConstantValue::SINGLE_LINE)
+											->setDefaultValue(DB::getDefault('graphs_items', 'drawtype'))
 											->addConstant(CXmlConstantName::SINGLE_LINE, CXmlConstantValue::SINGLE_LINE)
 											->addConstant(CXmlConstantName::FILLED_REGION, CXmlConstantValue::FILLED_REGION)
 											->addConstant(CXmlConstantName::BOLD_LINE, CXmlConstantValue::BOLD_LINE)
@@ -57,60 +57,97 @@ class CGraphsSchemaCreater implements CSchemaCreater {
 											->addConstant(CXmlConstantName::DASHED_LINE, CXmlConstantValue::DASHED_LINE)
 											->addConstant(CXmlConstantName::GRADIENT_LINE, CXmlConstantValue::GRADIENT_LINE),
 										(new CStringXmlTag('sortorder'))
-											->setDefaultValue('0'),
+											->setDefaultValue(DB::getDefault('graphs_items', 'sortorder')),
 										(new CStringXmlTag('type'))
-											->setDefaultValue(CXmlConstantValue::SIMPLE)
+											->setDefaultValue(DB::getDefault('graphs_items', 'type'))
 											->addConstant(CXmlConstantName::SIMPLE, CXmlConstantValue::SIMPLE)
 											->addConstant(CXmlConstantName::GRAPH_SUM, CXmlConstantValue::GRAPH_SUM),
 										(new CStringXmlTag('yaxisside'))
-											->setDefaultValue(CXmlConstantValue::LEFT)
+											->setDefaultValue(DB::getDefault('graphs_items', 'yaxisside'))
 											->addConstant(CXmlConstantName::LEFT, CXmlConstantValue::LEFT)
 											->addConstant(CXmlConstantName::RIGHT, CXmlConstantValue::RIGHT)
 									)
 							),
-						(new CStringXmlTag('height'))->setDefaultValue('200'),
-						(new CStringXmlTag('percent_left'))->setDefaultValue('0'),
-						(new CStringXmlTag('percent_right'))->setDefaultValue('0'),
+						(new CStringXmlTag('height'))->setDefaultValue(DB::getDefault('graphs', 'height')),
+						(new CStringXmlTag('percent_left'))->setDefaultValue(DB::getDefault('graphs', 'percent_left')),
+						(new CStringXmlTag('percent_right'))->setDefaultValue(DB::getDefault('graphs', 'percent_right')),
 						(new CStringXmlTag('show_3d'))
-							->setDefaultValue(CXmlConstantValue::NO)
+							->setDefaultValue(DB::getDefault('graphs', 'show_3d'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('show_legend'))
-							->setDefaultValue(CXmlConstantValue::YES)
+							->setDefaultValue(DB::getDefault('graphs', 'show_legend'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('show_triggers'))
-							->setDefaultValue(CXmlConstantValue::YES)
+							->setDefaultValue(DB::getDefault('graphs', 'show_triggers'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('show_work_period'))
-							->setDefaultValue(CXmlConstantValue::YES)
+							->setDefaultValue(DB::getDefault('graphs', 'show_work_period'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('type'))
 							->setKey('graphtype')
-							->setDefaultValue(CXmlConstantValue::NORMAL)
+							->setDefaultValue(DB::getDefault('graphs', 'graphtype'))
 							->addConstant(CXmlConstantName::NORMAL, CXmlConstantValue::NORMAL)
 							->addConstant(CXmlConstantName::STACKED, CXmlConstantValue::STACKED)
 							->addConstant(CXmlConstantName::PIE, CXmlConstantValue::PIE)
 							->addConstant(CXmlConstantName::EXPLODED, CXmlConstantValue::EXPLODED),
-						(new CStringXmlTag('width'))->setDefaultValue('900'),
-						(new CStringXmlTag('yaxismax'))->setDefaultValue('100'),
-						(new CStringXmlTag('yaxismin'))->setDefaultValue('0'),
-						(new CStringXmlTag('ymax_item_1'))->setKey('ymax_itemid'),
+						(new CStringXmlTag('width'))->setDefaultValue(DB::getDefault('graphs', 'width')),
+						(new CStringXmlTag('yaxismax'))->setDefaultValue(DB::getDefault('graphs', 'yaxismax')),
+						(new CStringXmlTag('yaxismin'))->setDefaultValue(DB::getDefault('graphs', 'yaxismin')),
+						(new CStringXmlTag('ymax_item_1'))
+							->setKey('ymax_itemid')
+							->setDefaultValue('0')
+							->setExportHandler(function(array $data, CXmlTagInterface $class) {
+								if ($data['ymax_type_1'] == 2) {
+									if (array_key_exists('ymax_item_1', $data)) {
+										if (!array_key_exists('host', $data['ymax_item_1']) &&
+											!array_key_exists('key', $data['ymax_item_1'])) {
+											throw new Exception(
+												_s('Invalid tag "%1$s": %2$s.',
+													'/zabbix_export/graphs/graph/ymax_item_1',
+													_('an array is expected'))
+											);
+										}
+									}
+								}
+
+								return $data['ymax_item_1'];
+							}),
 						(new CStringXmlTag('ymax_type_1'))
 							->setKey('ymax_type')
-							->setDefaultValue(CXmlConstantValue::CALCULATED)
+							->setDefaultValue(DB::getDefault('graphs', 'ymax_type'))
 							->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 							->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)
 							->addConstant(CXmlConstantName::ITEM, CXmlConstantValue::ITEM),
-						(new CStringXmlTag('ymin_item_1'))->setKey('ymin_itemid'),
+						(new CStringXmlTag('ymin_item_1'))
+							->setKey('ymin_itemid')
+							->setDefaultValue('0')
+							->setExportHandler(function(array $data, CXmlTagInterface $class) {
+								if ($data['ymin_type_1'] == 2) {
+									if (array_key_exists('ymin_item_1', $data)) {
+										if (!array_key_exists('host', $data['ymin_item_1']) &&
+											!array_key_exists('key', $data['ymin_item_1'])) {
+											throw new Exception(
+												_s('Invalid tag "%1$s": %2$s.',
+													'/zabbix_export/graphs/graph/ymin_item_1',
+													_('an array is expected'))
+											);
+										}
+									}
+								}
+
+								return $data['ymax_item_1'];
+							}),
 						(new CStringXmlTag('ymin_type_1'))
 							->setKey('ymin_type')
-							->setDefaultValue(CXmlConstantValue::CALCULATED)
+							->setDefaultValue(DB::getDefault('graphs', 'ymin_type'))
 							->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 							->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)
 							->addConstant(CXmlConstantName::ITEM, CXmlConstantValue::ITEM)
+
 					)
 			);
 	}

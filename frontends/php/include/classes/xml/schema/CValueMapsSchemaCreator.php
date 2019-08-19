@@ -19,7 +19,7 @@
 **/
 
 
-class CValueMapsSchemaCreater implements CSchemaCreater {
+class CValueMapsSchemaCreator implements CSchemaCreator {
 
 	public function create() {
 		return (new CIndexedArrayXmlTag('value_maps'))

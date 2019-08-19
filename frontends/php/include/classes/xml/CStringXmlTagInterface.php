@@ -29,6 +29,8 @@ interface CStringXmlTagInterface extends CXmlTagInterface {
 
 	public function addConstant($const, $value, $index = 0);
 
+	public function addConstants(array $const, $index = 0);
+
 	public function getConstantByValue($value, $index = 0);
 
 	public function getConstantValueByName($const, $index = 0);

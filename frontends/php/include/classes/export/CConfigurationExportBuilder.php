@@ -100,9 +100,9 @@ class CConfigurationExportBuilder {
 
 				if (!$default_value && !$has_data) {
 					if ($is_require) {
-						throw new CConfigurationExportException(
-							_s('Required tag "%1$s" -> "%2$s" cannot be empty.', $schema_class->getTag(), $tag)
-						);
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $schema_class->getTag(),
+							_s('the tag "%1$s" is missing', $tag)
+						));
 					}
 					continue;
 				}

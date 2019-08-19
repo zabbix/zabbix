@@ -81,6 +81,8 @@ class CXmlValidatorGeneral {
 
 		if ($rules['type'] & XML_STRING) {
 			$this->validateString($data, $path);
+
+			$this->validateConstant($data, $rules, $path);
 		}
 		elseif ($rules['type'] & XML_ARRAY) {
 			if ($data === '') {
@@ -142,7 +144,7 @@ class CXmlValidatorGeneral {
 
 				switch ($this->format) {
 					case 'xml':
-						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index));
+						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index)) || $tag === $index;
 						break;
 
 					case 'json':
@@ -173,8 +175,6 @@ class CXmlValidatorGeneral {
 					unset($data[$rules['extra']]);
 				}
 			}
-
-			$data = array_values($data);
 
 			if ($extra !== null) {
 				$data[$rules['extra']] = $extra;
@@ -211,6 +211,14 @@ class CXmlValidatorGeneral {
 	private function validateArray($value, $path) {
 		if (!is_array($value)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _('an array is expected')));
+		}
+	}
+
+	private function validateConstant($value, $rules, $path) {
+		if (array_key_exists('in', $rules)) {
+			if (!in_array($value, array_values($rules['in']))) {
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
+			}
 		}
 	}
 }
