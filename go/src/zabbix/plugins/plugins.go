@@ -40,4 +40,5 @@ import (
 	_ "zabbix/plugins/vfs/fileexists"
 	_ "zabbix/plugins/zabbix/async"
 	_ "zabbix/plugins/zabbix/sync"
+	_ "zabbix/plugins/zabbix/stats"
 )

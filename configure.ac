@@ -2022,6 +2022,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/debug/filewatcher/Makefile
 	go/src/zabbix/plugins/debug/log/Makefile
 	go/src/zabbix/plugins/debug/collector/Makefile
+	go/src/zabbix/plugins/kernel/Makefile
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/dev/Makefile
@@ -2029,9 +2030,9 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/vfs/filecontents/Makefile
 	go/src/zabbix/plugins/vfs/fileexists/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/stats/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile
-	go/src/zabbix/plugins/kernel/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

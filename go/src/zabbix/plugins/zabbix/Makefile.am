@@ -2,5 +2,6 @@
 
 SUBDIRS = \
 	async \
-	sync
+	sync \
+	stats
 

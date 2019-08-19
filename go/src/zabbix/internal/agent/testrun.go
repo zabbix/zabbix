@@ -22,6 +22,7 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 )
@@ -49,6 +50,11 @@ func CheckMetric(metric string) (err error) {
 	var ok bool
 	if exporter, ok = acc.(plugin.Exporter); !ok {
 		return errors.New("not an exporter plugin")
+	}
+
+	var conf plugin.Configurator
+	if conf, ok = acc.(plugin.Configurator); ok {
+		conf.Configure(Options.Plugins[strings.Title(acc.Name())])
 	}
 
 	var v interface{}
