@@ -407,6 +407,7 @@ func assignValues(v interface{}, root *Node) (err error) {
 }
 
 func parseConfig(root *Node, data []byte) (err error) {
+	const maxStringLen = 2048
 	var line []byte
 
 	root.level++
@@ -419,6 +420,10 @@ func parseConfig(root *Node, data []byte) (err error) {
 			line = bytes.TrimSpace(data[offset : offset+end])
 		} else {
 			line = bytes.TrimSpace(data[offset:])
+		}
+
+		if len(line) > maxStringLen {
+			return fmt.Errorf("Cannot parse configuration at line %d: limit of %d bytes is exceeded", num, maxStringLen)
 		}
 
 		if len(line) == 0 || line[0] == '#' {
