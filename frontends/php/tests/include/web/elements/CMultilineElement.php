@@ -53,7 +53,7 @@ class CMultilineElement extends CElement {
 	public function edit() {
 		$this->query('xpath:.//button[@type="button"]')->one()->click();
 
-		return $this->query('xpath://div[@id="overlay_dialogue"]')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+		return $this->query('xpath://div[contains(@class, "multilineinput-modal")]')->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
 	}
 
 	/**
@@ -115,5 +115,12 @@ class CMultilineElement extends CElement {
 	 */
 	public function selectValue() {
 		self::onNotSupportedMethod(__FUNCTION__);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return in_array('multilineinput-disabled', explode(' ', $this->getAttribute('class'))) !== $enabled;
 	}
 }
