@@ -53,7 +53,10 @@ type Listener struct {
 
 func Open(address string, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect}
-	if c.conn, err = net.DialTimeout("tcp", address, timeout); nil != err {
+	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
+	c.conn, err = d.Dial("tcp", address)
+
+	if nil != err {
 		return
 	}
 
@@ -283,7 +286,7 @@ func Exchange(address string, timeout time.Duration, data []byte, args ...interf
 		}
 	}
 
-	c, err := Open(address, time.Second*time.Duration(timeout), tlsconfig)
+	c, err := Open(address, localAddr, time.Second*time.Duration(timeout), tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err

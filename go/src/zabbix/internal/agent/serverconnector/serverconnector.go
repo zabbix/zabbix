@@ -46,6 +46,7 @@ type Connector struct {
 	clientID    uint64
 	input       chan interface{}
 	address     string
+	localAddr   net.Addr
 	lastError   error
 	resultCache *resultcache.ResultCache
 	taskManager scheduler.Scheduler
@@ -158,7 +159,7 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, err := zbxcomms.Exchange(c.address, &c.localAddr, time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
@@ -282,7 +283,7 @@ func (c *Connector) refreshActiveChecks() {
 func (c *Connector) Write(data []byte) (n int, err error) {
 	// While runtime configuration changes are not supported, directly accessing connector configuration
 	// is okay. However in future the history uploading logic must be moved into separate structure.
-	b, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(c.options.Timeout), data, c.tlsConfig)
+	b, err := zbxcomms.Exchange(c.address, &c.localAddr, time.Second*time.Duration(c.options.Timeout), data, c.tlsConfig)
 	if err != nil {
 		return 0, err
 	}
@@ -342,6 +343,7 @@ run:
 
 func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.options = options
+	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
 func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOptions) (connector *Connector, err error) {

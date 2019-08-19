@@ -45,6 +45,7 @@ type AgentOptions struct {
 	BufferSize           int      `conf:",,2:65535,100"`
 	ListenIP             string   `conf:",optional"`
 	ListenPort           int      `conf:",,1024:32767,10050"`
+	SourceIP             string   `conf:",optional"`
 	MaxLinesPerSecond    int      `conf:",,1:1000,20"`
 	UserParameter        []string `conf:",optional"`
 	UnsafeUserParameters int      `conf:",,0:1,0"`
