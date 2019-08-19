@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package kernel
 
 import (
 	"errors"
 	"fmt"
 	"zabbix/internal/plugin"
-	"zabbix/pkg/version"
+	"zabbix/pkg/std"
 )
 
 // Plugin -
@@ -32,27 +32,31 @@ type Plugin struct {
 }
 
 var impl Plugin
+var stdOs std.Os
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	var proc bool
+
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
+	case "kernel.maxproc":
+		proc = true
+	case "kernel.maxfiles":
+		proc = false
+	default:
+		/* SHOULD_NEVER_HAPPEN */
+		return 0, fmt.Errorf("Invalid key.")
 	}
 
-	return nil, fmt.Errorf("Not implemented: %s", key)
+	return getMax(proc)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "agent", "agent.hostname", "Returns Hostname from agent configuration")
-	plugin.RegisterMetric(&impl, "agent", "agent.ping", "Returns agent availability check result")
-	plugin.RegisterMetric(&impl, "agent", "agent.version", "Version of Zabbix agent")
+	stdOs = std.NewOs()
+	plugin.RegisterMetric(&impl, "kernel", "kernel.maxproc", "Returns maximum number of processes supported by OS")
+	plugin.RegisterMetric(&impl, "kernel", "kernel.maxfiles", "Returns maximum number of opened files supported by OS")
 }

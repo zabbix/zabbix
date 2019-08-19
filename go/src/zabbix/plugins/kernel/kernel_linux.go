@@ -17,27 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package kernel
 
 import (
-	_ "zabbix/plugins/debug/collector"
-	_ "zabbix/plugins/debug/empty"
-
-	//	_ "zabbix/plugins/debug/filewatcher"
-	_ "zabbix/plugins/debug/log"
-	_ "zabbix/plugins/debug/trapper"
-	_ "zabbix/plugins/kernel"
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/system/cpucollector"
-	_ "zabbix/plugins/system/uname"
-	_ "zabbix/plugins/system/uptime"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/systemrun"
-	_ "zabbix/plugins/vfs/dev"
-	_ "zabbix/plugins/vfs/filecksum"
-	_ "zabbix/plugins/vfs/filecontents"
-	_ "zabbix/plugins/vfs/filestats"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/sync"
+	"bufio"
+	"fmt"
+	"strconv"
 )
+
+func getMax(proc bool) (max uint64, err error) {
+	var fileName string
+
+	if proc {
+		fileName = "/proc/sys/kernel/pid_max"
+	} else {
+		fileName = "/proc/sys/fs/file-max"
+	}
+
+	file, err := stdOs.Open(fileName)
+	if err == nil {
+		var line []byte
+		var long bool
+
+		reader := bufio.NewReader(file)
+
+		if line, long, err = reader.ReadLine(); err == nil && !long {
+			max, err = strconv.ParseUint(string(line), 10, 64)
+		}
+
+		file.Close()
+	}
+
+	if err != nil {
+		err = fmt.Errorf("Cannot obtain data from %s.", fileName)
+	}
+
+	return
+}

@@ -1999,11 +1999,13 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/watch/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/pkg/zbxlib/Makefile
+	go/src/zabbix/pkg/zbxcmd/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/agent/remotecontrol/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
 	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/internal/plugin/Makefile
@@ -2014,6 +2016,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
+	go/src/zabbix/plugins/systemrun/Makefile
 	go/src/zabbix/plugins/debug/Makefile
 	go/src/zabbix/plugins/debug/empty/Makefile
 	go/src/zabbix/plugins/debug/filewatcher/Makefile
@@ -2028,6 +2031,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile
+	go/src/zabbix/plugins/kernel/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

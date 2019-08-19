@@ -93,6 +93,7 @@ type collectorTask struct {
 }
 
 func (t *collectorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
@@ -129,6 +130,7 @@ type exporterTask struct {
 func (t *exporterTask) perform(s Scheduler) {
 	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
 	// from performer goroutine
+	log.Tracef("plugin %s: executing exporter task for item %d: %s", t.plugin.name(), t.item.itemid, t.item.key)
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -227,6 +229,7 @@ type starterTask struct {
 }
 
 func (t *starterTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing starter task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Start()
@@ -248,6 +251,7 @@ type stopperTask struct {
 }
 
 func (t *stopperTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing stopper task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Stop()
@@ -271,6 +275,7 @@ type watcherTask struct {
 }
 
 func (t *watcherTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
 		watcher.Watch(t.requests, t)
@@ -315,6 +320,7 @@ type configuratorTask struct {
 }
 
 func (t *configuratorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing configurator task", t.plugin.name())
 	go func() {
 		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)
