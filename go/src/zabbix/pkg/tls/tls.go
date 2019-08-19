@@ -419,7 +419,7 @@ static int tls_init()
 	return -1;
 }
 
-static void *tls_new_context(const char *ciphers, char **error)
+static void *tls_new_context(const char *ca_file, const char *cert_file, const char *key_file, char **error)
 {
 	*error = strdup("built without OpenSSL");
 	return NULL;
