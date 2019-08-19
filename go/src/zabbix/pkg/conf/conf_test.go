@@ -83,6 +83,24 @@ func TestParserSuccess(t *testing.T) {
 	}
 }
 
+func TestUtf8(t *testing.T) {
+	type Options struct {
+		Text string `conf:",optional"`
+	}
+
+	var input = []string{
+		"Text=\xFE",
+		"Text\xFE=2",
+	}
+
+	for i, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err == nil {
+			t.Errorf("[%d] expected error while got success\n", i)
+		}
+	}
+}
+
 func TestParserRangeErrors(t *testing.T) {
 	type Options struct {
 		Value int `conf:",,-10:10"`

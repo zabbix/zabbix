@@ -430,8 +430,9 @@ func parseConfig(root *Node, data []byte) (err error) {
 		if len(line) == 0 || line[0] == '#' {
 			continue
 		}
+
 		if !utf8.ValidString(string(line)) {
-			return fmt.Errorf("Cannot parse configuration at line %d: not a valid UTF-8 string", num)
+			return fmt.Errorf("Cannot parse configuration at line %d: not a valid UTF-8 character found", num)
 		}
 
 		var key, value []byte
