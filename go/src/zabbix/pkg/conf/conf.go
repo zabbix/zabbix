@@ -39,6 +39,7 @@ type Node struct {
 	nodes  []*Node
 	parent *Node
 	line   int
+	level  int
 }
 
 // Meta structure is used to stroe the 'conf' tag metadata.
@@ -407,6 +408,12 @@ func assignValues(v interface{}, root *Node) (err error) {
 
 func parseConfig(root *Node, data []byte) (err error) {
 	var line []byte
+
+	root.level++
+	if root.level > 10 {
+		return fmt.Errorf("Recursion detected! Skipped processing of configuration file")
+	}
+
 	for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
 		if end = bytes.IndexByte(data[offset:], '\n'); end != -1 {
 			line = bytes.TrimSpace(data[offset : offset+end])
@@ -438,8 +445,9 @@ func parseConfig(root *Node, data []byte) (err error) {
 			if _, err = buf.ReadFrom(file); err != nil {
 				return fmt.Errorf("Cannot read include file: %s", err.Error())
 			}
+
 			if err = parseConfig(root, buf.Bytes()); err != nil {
-				return fmt.Errorf("Cannot parse include file %s: %s", filename, err.Error())
+				return err
 			}
 		} else {
 			root.add(key, value, num)
