@@ -61,7 +61,7 @@ func Open(address string, timeout time.Duration, args ...interface{}) (c *Connec
 		return
 	}
 
-	if ferr = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
+	if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
 		return
 	}
 
