@@ -140,6 +140,10 @@ func parseLine(line []byte) (key []byte, value []byte, err error) {
 		return nil, nil, errors.New("missing variable name")
 	}
 
+	if err = validateParameterName(key); err != nil {
+		return
+	}
+
 	return key, bytes.TrimSpace(line[valueStart+1:]), nil
 }
 
