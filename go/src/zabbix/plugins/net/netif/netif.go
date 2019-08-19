@@ -33,6 +33,13 @@ type Plugin struct {
 var impl Plugin
 var stdOs std.Os
 
+type dirFlag uint8
+
+const (
+	dirIn dirFlag = 1 << iota
+	dirOut
+)
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var direction dirFlag
@@ -43,7 +50,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) > 0 {
 			return nil, fmt.Errorf("Too many parameters.")
 		}
-
 		return getDevList()
 	case "net.if.collisions":
 		if len(params) > 1 {
@@ -53,7 +59,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) < 1 || params[0] == "" {
 			return nil, fmt.Errorf("Network interface name cannot be empty.")
 		}
-
 		return getNetStats(params[0], "collisions", dirOut)
 	case "net.if.in":
 		direction = dirIn
@@ -85,9 +90,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "netif", "net.if.collisions", "Returns number of out-of-window collisions")
-	plugin.RegisterMetric(&impl, "netif", "net.if.in", "Returns incoming traffic statistics on network interface")
-	plugin.RegisterMetric(&impl, "netif", "net.if.out", "Returns outgoing traffic statistics on network interface")
-	plugin.RegisterMetric(&impl, "netif", "net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface")
-	plugin.RegisterMetric(&impl, "netif", "net.if.discovery", "Returns list of network interfaces. Used for low-level discovery")
+
+	plugin.RegisterMetrics(&impl, "netif",
+		"net.if.collisions", "Returns number of out-of-window collisions",
+		"net.if.in", "Returns incoming traffic statistics on network interface",
+		"net.if.out", "Returns outgoing traffic statistics on network interface",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery")
+
 }

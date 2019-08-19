@@ -31,13 +31,6 @@ type msgIfDiscovery struct {
 	Ifname string `json:"{#IFNAME}"`
 }
 
-type dirFlag uint8
-
-const (
-	dirIn dirFlag = 1 << iota
-	dirOut
-)
-
 var mapNetStatIn = map[string]uint{
 	"bytes":      0,
 	"packets":    1,
@@ -63,7 +56,7 @@ var mapNetStatOut = map[string]uint{
 func addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
 	statNum, ok := mapNetStat[statName]
 
-	if ok != true {
+	if !ok {
 		return fmt.Errorf("Invalid second parameter.")
 	}
 
@@ -74,7 +67,6 @@ func addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) e
 
 func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
 	var statNums []uint
-	var statNum uint
 
 	if dir&dirIn != 0 {
 		if err = addStatNum(statName, mapNetStatIn, &statNums); err != nil {
@@ -96,29 +88,26 @@ func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64,
 
 	defer file.Close()
 
+	var total uint64
+loop:
 	for sLines := bufio.NewScanner(file); sLines.Scan(); {
 		dev := strings.Split(sLines.Text(), ":")
 
 		if len(dev) > 1 && networkIf == strings.TrimSpace(dev[0]) {
 			stats := strings.Fields(dev[1])
 
-			if len(stats) == 16 {
-				for _, statNum = range statNums {
+			if len(stats) >= 16 {
+				for _, statNum := range statNums {
 					var res uint64
 
-					if res, err = strconv.ParseUint(stats[statNum], 10, 64); err == nil {
-						result += res
-					} else {
-						break
+					if res, err = strconv.ParseUint(stats[statNum], 10, 64); err != nil {
+						break loop
 					}
+					total += res
 				}
-
-				if err == nil {
-					return
-				}
-
-				result = 0
+				return total, nil
 			}
+			break
 		}
 	}
 
