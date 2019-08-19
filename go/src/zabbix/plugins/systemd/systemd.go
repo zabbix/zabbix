@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"sync"
 	"zabbix/internal/plugin"
 
@@ -182,6 +183,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		if nil != err {
 			return nil, fmt.Errorf("Cannot get unit property: %s", err)
+		}
+
+		switch reflect.TypeOf(value).Kind() {
+		case reflect.Slice:
+			fallthrough
+		case reflect.Array:
+			ret, err := json.Marshal(value)
+
+			if nil != err {
+				return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+			}
+
+			return string(ret), nil
 		}
 
 		return value, nil

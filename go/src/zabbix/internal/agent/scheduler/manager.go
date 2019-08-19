@@ -50,11 +50,64 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
+type queryRequest struct {
+	command string
+	sink    chan string
+}
+
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int, expressions []*glexpr.Expression,
 		requests []*plugin.Request)
 	FinishTask(task performer)
-	PerformTask(key string, timeout time.Duration) (s string, err error)
+	PerformTask(key string, timeout time.Duration) (result string, err error)
+	Query(command string) (status string)
+}
+
+func (m *Manager) cleanupClient(c *client, now time.Time) {
+	released := c.cleanup(m.plugins, now)
+	for _, p := range released {
+		if p.refcount != 0 {
+			continue
+		}
+		log.Debugf("deactivate unused plugin %s", p.name())
+
+		// deactivate recurring tasks
+		for deactivate := true; deactivate; {
+			deactivate = false
+			for _, t := range p.tasks {
+				if t.isRecurring() {
+					t.deactivate()
+					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
+					deactivate = true
+					break
+				}
+			}
+		}
+
+		// queue stopper task if plugin has Runner interface
+		if _, ok := p.impl.(plugin.Runner); ok {
+			task := &stopperTask{
+				taskBase: taskBase{plugin: p, active: true},
+			}
+			if err := task.reschedule(now); err != nil {
+				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				continue
+			}
+			p.enqueueTask(task)
+			log.Debugf("created stopper task for plugin %s", p.name())
+
+			if p.queued() {
+				m.queue.Update(p)
+			}
+		}
+
+		// queue plugin if there are still some tasks left to be finished before deactivating
+		if len(p.tasks) != 0 {
+			if !p.queued() {
+				heap.Push(&m.queue, p)
+			}
+		}
+	}
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
@@ -100,50 +153,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 	}
 
-	released := requestClient.cleanup(m.plugins, now)
-	for _, p := range released {
-		if p.refcount != 0 {
-			continue
-		}
-		log.Debugf("deactivate unused plugin %s", p.name())
-
-		// deactivate recurring tasks
-		for deactivate := true; deactivate; {
-			deactivate = false
-			for _, t := range p.tasks {
-				if t.isRecurring() {
-					t.deactivate()
-					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
-					deactivate = true
-					break
-				}
-			}
-		}
-
-		// queue stopper task if plugin has Runner interface
-		if _, ok := p.impl.(plugin.Runner); ok {
-			task := &stopperTask{
-				taskBase: taskBase{plugin: p, active: true},
-			}
-			if err := task.reschedule(now); err != nil {
-				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
-				continue
-			}
-			p.enqueueTask(task)
-			log.Debugf("created stopper task for plugin %s", p.name())
-
-			if p.queued() {
-				m.queue.Update(p)
-			}
-		}
-
-		// queue plugin if there are still some tasks left to be finished before deactivating
-		if len(p.tasks) != 0 {
-			if !p.queued() {
-				heap.Push(&m.queue, p)
-			}
-		}
-	}
+	m.cleanupClient(requestClient, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
@@ -209,6 +219,7 @@ func (m *Manager) run() {
 	// some microseconds, which will be enough to include all scheduled tasks at this second
 	// even with nanosecond priority adjustment.
 	lastTick := time.Now()
+	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
@@ -225,6 +236,13 @@ run:
 			}
 			lastTick = now
 			m.processQueue(now)
+			// cleanup plugins used by passive checks
+			if now.Sub(cleaned) >= time.Hour {
+				if passive, ok := m.clients[0]; ok {
+					m.cleanupClient(passive, now)
+				}
+				cleaned = now
+			}
 		case v := <-m.input:
 			if v == nil {
 				break run
@@ -236,6 +254,13 @@ run:
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
+			case *queryRequest:
+				r := v.(*queryRequest)
+				if response, err := m.processQuery(r); err != nil {
+					r.sink <- "cannot process request: " + err.Error()
+				} else {
+					r.sink <- response
+				}
 			}
 		}
 	}
@@ -250,25 +275,20 @@ func (m *Manager) init() {
 	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
 
-	type metric struct {
-		acc plugin.Accessor
-		key string
-	}
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
 
-	metrics := make([]*metric, 0, len(plugin.Metrics))
-
-	for key, acc := range plugin.Metrics {
-		metrics = append(metrics, &metric{acc: acc, key: key})
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
 	}
 	sort.Slice(metrics, func(i, j int) bool {
-		return metrics[i].acc.Name() < metrics[j].acc.Name()
+		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
 	})
 
-	plug := &pluginAgent{}
-	for _, mt := range metrics {
-		if mt.acc != plug.impl {
-			capacity := mt.acc.Capacity()
-			section := strings.Title(mt.acc.Name())
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl {
+			capacity := metric.Plugin.Capacity()
+			section := strings.Title(metric.Plugin.Name())
 			if options, ok := agent.Options.Plugins[section]; ok {
 				if cap, ok := options["Capacity"]; ok {
 					var err error
@@ -278,14 +298,14 @@ func (m *Manager) init() {
 					}
 				}
 			}
-			if capacity > mt.acc.Capacity() {
+			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
-					mt.acc.Name(), mt.acc.Capacity(), capacity)
-				capacity = mt.acc.Capacity()
+					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
+				capacity = metric.Plugin.Capacity()
 			}
 
-			plug = &pluginAgent{
-				impl:         mt.acc,
+			pagent = &pluginAgent{
+				impl:         metric.Plugin,
 				tasks:        make(performerHeap, 0),
 				capacity:     capacity,
 				usedCapacity: 0,
@@ -294,28 +314,27 @@ func (m *Manager) init() {
 			}
 
 			interfaces := ""
-			if _, ok := mt.acc.(plugin.Exporter); ok {
+			if _, ok := metric.Plugin.(plugin.Exporter); ok {
 				interfaces += "exporter, "
 			}
-			if _, ok := mt.acc.(plugin.Collector); ok {
+			if _, ok := metric.Plugin.(plugin.Collector); ok {
 				interfaces += "collector, "
 			}
-			if _, ok := mt.acc.(plugin.Runner); ok {
+			if _, ok := metric.Plugin.(plugin.Runner); ok {
 				interfaces += "runner, "
 			}
-			if _, ok := mt.acc.(plugin.Watcher); ok {
+			if _, ok := metric.Plugin.(plugin.Watcher); ok {
 				interfaces += "watcher, "
 			}
-			if _, ok := mt.acc.(plugin.Configurator); ok {
+			if _, ok := metric.Plugin.(plugin.Configurator); ok {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", mt.acc.Name(), interfaces)
+			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
 		}
-		m.plugins[mt.key] = plug
+		m.plugins[metric.Key] = pagent
 	}
 }
-
 func (m *Manager) Start() {
 	monitor.Register()
 	go m.run()
@@ -342,6 +361,9 @@ func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
 }
 
+func (r resultWriter) Flush() {
+}
+
 func (r resultWriter) SlotsAvailable() int {
 	return 1
 }
@@ -350,7 +372,7 @@ func (r resultWriter) PersistSlotsAvailable() int {
 	return 1
 }
 
-func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err error) {
+func (m *Manager) PerformTask(key string, timeout time.Duration) (result string, err error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -361,10 +383,9 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case r := <-w:
 		if r.Error == nil {
 			if r.Value != nil {
-				s = *r.Value
+				result = *r.Value
 			} else {
 				// TODO: check what must be returned on empty result
-				s = "(null)"
 			}
 		} else {
 			err = r.Error
@@ -372,14 +393,17 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (s string, err 
 	case <-time.After(timeout):
 		err = fmt.Errorf("timeout occurred")
 	}
-
-	close(w)
-
-	return s, err
+	return
 }
 
 func (m *Manager) FinishTask(task performer) {
 	m.input <- task
+}
+
+func (m *Manager) Query(command string) (status string) {
+	request := &queryRequest{command: command, sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
 }
 
 func NewManager() *Manager {

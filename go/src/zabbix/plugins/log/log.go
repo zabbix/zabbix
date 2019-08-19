@@ -20,6 +20,7 @@
 package log
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 	"unsafe"
@@ -47,6 +48,9 @@ type metadata struct {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if ctx == nil || ctx.ClientID() == 0 {
+		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
+	}
 	meta := ctx.Meta()
 	var data *metadata
 	if meta.Data == nil {

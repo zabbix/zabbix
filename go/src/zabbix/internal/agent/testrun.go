@@ -22,6 +22,7 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 )
@@ -51,6 +52,11 @@ func CheckMetric(metric string) (err error) {
 		return errors.New("not an exporter plugin")
 	}
 
+	var conf plugin.Configurator
+	if conf, ok = acc.(plugin.Configurator); ok {
+		conf.Configure(Options.Plugins[strings.Title(acc.Name())])
+	}
+
 	var v interface{}
 	if v, err = exporter.Export(key, params, nil); err != nil {
 		return
@@ -76,14 +82,20 @@ func CheckMetric(metric string) (err error) {
 func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
+		"agent.ping",
 		"system.uptime",
 		"system.uname",
+		"system.hostname",
 		"vfs.file.cksum",
 		"net.if.discovery",
 		"net.if.in",
 		"net.if.out",
 		"net.if.total",
 		"net.if.collisions",
+		"vfs.file.contents",
+		"vfs.file.exists",
+		"kernel.maxfiles",
+		"kernel.maxproc",
 	}
 
 	for _, metric := range metrics {

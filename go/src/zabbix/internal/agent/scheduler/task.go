@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -92,10 +93,11 @@ type collectorTask struct {
 }
 
 func (t *collectorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
-			log.Warningf("Plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
+			log.Warningf("plugin '%s' collector failed: %s", t.plugin.impl.Name(), err.Error())
 		}
 		s.FinishTask(t)
 	}()
@@ -122,11 +124,13 @@ type exporterTask struct {
 	updated time.Time
 	client  ClientAccessor
 	meta    plugin.Meta
+	output  plugin.ResultWriter
 }
 
 func (t *exporterTask) perform(s Scheduler) {
 	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
 	// from performer goroutine
+	log.Tracef("plugin %s: executing exporter task for item %d: %s", t.plugin.name(), t.item.itemid, t.item.key)
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -143,21 +147,31 @@ func (t *exporterTask) perform(s Scheduler) {
 					case reflect.Slice:
 						fallthrough
 					case reflect.Array:
-						s := reflect.ValueOf(ret)
-						for i := 0; i < s.Len(); i++ {
-							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-							t.client.Output().Write(result)
+						if t.client.ID() == 0 {
+							err = errors.New("Multiple return values are not supported for single passive checks")
+						} else {
+							s := reflect.ValueOf(ret)
+							for i := 0; i < s.Len(); i++ {
+								result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+								t.output.Write(result)
+							}
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
-						t.client.Output().Write(result)
+						t.output.Write(result)
+					}
+				} else {
+					if t.client.ID() == 0 {
+						// for direct requests (internal/old passive checks) return empty result
+						// on nil value
+						t.output.Write(&plugin.Result{})
 					}
 				}
 			}
 		}
 		if err != nil {
 			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
-			t.client.Output().Write(result)
+			t.output.Write(result)
 		}
 		// set failed state based on last result
 		if result != nil && result.Error != nil {
@@ -195,7 +209,7 @@ func (t *exporterTask) ClientID() (clientid uint64) {
 }
 
 func (t *exporterTask) Output() (output plugin.ResultWriter) {
-	return t.client.Output()
+	return t.output
 }
 
 func (t *exporterTask) ItemID() (itemid uint64) {
@@ -215,6 +229,7 @@ type starterTask struct {
 }
 
 func (t *starterTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing starter task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Start()
@@ -236,6 +251,7 @@ type stopperTask struct {
 }
 
 func (t *stopperTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing stopper task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Stop()
@@ -259,6 +275,7 @@ type watcherTask struct {
 }
 
 func (t *watcherTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
 		watcher.Watch(t.requests, t)
@@ -303,6 +320,7 @@ type configuratorTask struct {
 }
 
 func (t *configuratorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing configurator task", t.plugin.name())
 	go func() {
 		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)

@@ -2,7 +2,9 @@
 
 SUBDIRS = \
 	debug \
+	kernel \
 	log \
+	proc \
 	system \
 	systemd \
 	vfs \

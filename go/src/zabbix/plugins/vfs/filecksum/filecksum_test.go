@@ -28,7 +28,7 @@ import (
 
 var CrcFile = "1234"
 
-func TestUptime(t *testing.T) {
+func TestFileCksum(t *testing.T) {
 	stdOs = std.NewMockOs()
 
 	agent.Options.Timeout = 3

@@ -22,23 +22,65 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
-var Metrics map[string]Accessor = make(map[string]Accessor)
+type Metric struct {
+	Plugin      Accessor
+	Key         string
+	Description string
+}
 
-func RegisterMetric(impl Accessor, name string, key string, description string) {
+var Metrics map[string]*Metric = make(map[string]*Metric)
+var Plugins map[string]Accessor = make(map[string]Accessor)
+
+func RegisterMetric(plugin Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
 		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
 	}
 
-	switch impl.(type) {
+	t := reflect.TypeOf(plugin)
+	for i := 0; i < t.NumMethod(); i++ {
+		method := t.Method(i)
+		switch method.Name {
+		case "Export":
+			if _, ok := plugin.(Exporter); !ok {
+				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Exporter interface`, name, method.Name))
+			}
+		case "Collect", "Period":
+			if _, ok := plugin.(Collector); !ok {
+				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Collector interface`, name, method.Name))
+			}
+		case "Watch":
+			if _, ok := plugin.(Watcher); !ok {
+				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Watcher interface`, name, method.Name))
+			}
+		case "Configure":
+			if _, ok := plugin.(Configurator); !ok {
+				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Configurator interface`, name, method.Name))
+			}
+		case "Start", "Stop":
+			if _, ok := plugin.(Runner); !ok {
+				panic(fmt.Sprintf(`the "%s" plugin %s method does not match Runner interface`, name, method.Name))
+			}
+		}
+	}
+	switch plugin.(type) {
 	case Exporter, Collector, Runner, Watcher, Configurator:
 	default:
 		panic(fmt.Sprintf(`plugin "%s" does not implement any plugin interfaces`, name))
 	}
 
-	impl.Init(name, key, description)
-	Metrics[key] = impl
+	if p, ok := Plugins[name]; ok {
+		if p != plugin {
+			panic(fmt.Sprintf(`plugin name "%s" has been already registred by other plugin`, name))
+		}
+	} else {
+		Plugins[name] = plugin
+		plugin.Init(name)
+	}
+
+	Metrics[key] = &Metric{Plugin: plugin, Key: key, Description: description}
 }
 
 func RegisterMetrics(impl Accessor, name string, params ...string) {
@@ -54,13 +96,13 @@ func RegisterMetrics(impl Accessor, name string, params ...string) {
 }
 
 func Get(key string) (acc Accessor, err error) {
-	var ok bool
-	if acc, ok = Metrics[key]; ok {
-		return
+	if m, ok := Metrics[key]; ok {
+		return m.Plugin, nil
 	}
 	return nil, errors.New("no plugin found")
 }
 
 func ClearRegistry() {
-	Metrics = make(map[string]Accessor)
+	Metrics = make(map[string]*Metric)
+	Plugins = make(map[string]Accessor)
 }
