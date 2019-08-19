@@ -83,6 +83,18 @@ func RegisterMetric(plugin Accessor, name string, key string, description string
 	Metrics[key] = &Metric{Plugin: plugin, Key: key, Description: description}
 }
 
+func RegisterMetrics(impl Accessor, name string, params ...string) {
+	if len(params) < 2 {
+		panic("expected at least one metric and its description")
+	}
+	if len(params)&1 != 0 {
+		panic("expected even number of metric and description parameters")
+	}
+	for i := 0; i < len(params); i += 2 {
+		RegisterMetric(impl, name, params[i], params[i+1])
+	}
+}
+
 func Get(key string) (acc Accessor, err error) {
 	if m, ok := Metrics[key]; ok {
 		return m.Plugin, nil
