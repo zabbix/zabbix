@@ -172,6 +172,26 @@ static int	DBpatch_4030015(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_4030016(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.usergroup.filter_user_status'"
+				" where idx='web.usergroup.filter_users_status'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.usergroup.sort'"
+				" where idx='web.usergrps.php.sort'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.usergroup.sortorder'"
+				" where idx='web.usergrps.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(4030)
@@ -194,5 +214,6 @@ DBPATCH_ADD(4030012, 0, 1)
 DBPATCH_ADD(4030013, 0, 1)
 DBPATCH_ADD(4030014, 0, 1)
 DBPATCH_ADD(4030015, 0, 1)
+DBPATCH_ADD(4030016, 0, 1)
 
 DBPATCH_END()
