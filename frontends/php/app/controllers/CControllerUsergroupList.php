@@ -50,6 +50,26 @@ class CControllerUsergroupList extends CController {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
+	protected function doAction() {
+		$this->updateUserProfile();
+
+		$data = [
+			'uncheck' => $this->hasInput('uncheck'),
+			'is_filter_visible' => CProfile::get('web.usergroup.filter.active', 1),
+			'sort' => CProfile::get('web.usergroup.sort', 'name', PROFILE_TYPE_STR),
+			'sortorder' => CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP),
+			'profileIdx' => 'web.usergroup.filter',
+			'usergroups' => $this->selectUserGroups($paging, $filter),
+			'paging' => $paging,
+			'filter' => $filter,
+		];
+
+		$response = new CControllerResponseData($data);
+
+		$response->setTitle(_('Configuration of user groups'));
+		$this->setResponse($response);
+	}
+
 	/**
 	 * Updates use profile key values based on current input.
 	 */
@@ -123,25 +143,5 @@ class CControllerUsergroupList extends CController {
 		unset($usergroup);
 
 		return $usergroups;
-	}
-
-	protected function doAction() {
-		$this->updateUserProfile();
-
-		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
-			'is_filter_visible' => CProfile::get('web.usergroup.filter.active', 1),
-			'sort' => CProfile::get('web.usergroup.sort', 'name', PROFILE_TYPE_STR),
-			'sortorder' => CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP),
-			'profileIdx' => 'web.usergroup.filter',
-			'usergroups' => $this->selectUserGroups($paging, $filter),
-			'paging' => $paging,
-			'filter' => $filter,
-		];
-
-		$response = new CControllerResponseData($data);
-
-		$response->setTitle(_('Configuration of user groups'));
-		$this->setResponse($response);
 	}
 }

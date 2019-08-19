@@ -113,6 +113,61 @@ class CControllerUsergroupEdit extends CController {
 		return true;
 	}
 
+	protected function doAction() {
+		$data = [
+			'usrgrpid'         => $this->getInput('usrgrpid',     $this->user_group['usrgrpid']),
+			'name'             => $this->getInput('name',         $this->user_group['name']),
+			'gui_access'       => $this->getInput('gui_access',   $this->user_group['gui_access']),
+			'users_status'     => $this->getInput('users_status', $this->user_group['users_status']),
+			'debug_mode'       => $this->getInput('debug_mode',   $this->user_group['debug_mode']),
+
+			'group_rights'     => $this->getGroupRights(),
+			'new_group_right'  => $this->new_group_right,
+
+			'tag_filters'      => $this->getTagFilters(),
+			'new_tag_filter'   => $this->new_tag_filter,
+
+			'host_groups_ms'   => $this->getHostGroupsMs(),
+			'users_ms'         => $this->getUsersMs(),
+
+			'form_refresh'     => $this->getInput('form_refresh', 0),
+			'can_update_group' => (
+				$this->getInput('usrgrpid', 0) == 0) || granted2update_group($this->getInput('usrgrpid', 0)
+			)
+		];
+
+		$response = new CControllerResponseData($data);
+
+		$response->setTitle(_('Configuration of user groups'));
+		$this->setResponse($response);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getGroupRights() {
+		if ($this->user_group['usrgrpid'] == 0) {
+			return [];
+		}
+
+		if ($this->hasInput('group_rights')) {
+			return $this->getInput('group_rights');
+		}
+
+		return collapseHostGroupRights(getHostGroupsRights((array) $this->user_group['usrgrpid']));
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getTagFilters() {
+		if ($this->hasInput('tag_filters')) {
+			return collapseTagFilters($this->getInput('tag_filters'));
+		}
+
+		return collapseTagFilters($this->user_group['tag_filters']);
+	}
+
 	/**
 	 * Returs all needed host groups formatted for multiselector.
 	 *
@@ -133,32 +188,6 @@ class CControllerUsergroupEdit extends CController {
 		CArrayHelper::sort($host_groups, ['name']);
 
 		return CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function getTagFilters() {
-		if ($this->hasInput('tag_filters')) {
-			return collapseTagFilters($this->getInput('tag_filters'));
-		}
-
-		return collapseTagFilters($this->user_group['tag_filters']);
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function getGroupRights() {
-		if ($this->user_group['usrgrpid'] == 0) {
-			return [];
-		}
-
-		if ($this->hasInput('group_rights')) {
-			return $this->getInput('group_rights');
-		}
-
-		return collapseHostGroupRights(getHostGroupsRights((array) $this->user_group['usrgrpid']));
 	}
 
 	/**
@@ -190,34 +219,5 @@ class CControllerUsergroupEdit extends CController {
 		CArrayHelper::sort($users_ms, ['name']);
 
 		return $users_ms;
-	}
-
-	protected function doAction() {
-		$data = [
-			'usrgrpid'         => $this->getInput('usrgrpid',     $this->user_group['usrgrpid']),
-			'name'             => $this->getInput('name',         $this->user_group['name']),
-			'gui_access'       => $this->getInput('gui_access',   $this->user_group['gui_access']),
-			'users_status'     => $this->getInput('users_status', $this->user_group['users_status']),
-			'debug_mode'       => $this->getInput('debug_mode',   $this->user_group['debug_mode']),
-
-			'group_rights'     => $this->getGroupRights(),
-			'new_group_right'  => $this->new_group_right,
-
-			'tag_filters'      => $this->getTagFilters(),
-			'new_tag_filter'   => $this->new_tag_filter,
-
-			'host_groups_ms'   => $this->getHostGroupsMs(),
-			'users_ms'         => $this->getUsersMs(),
-
-			'form_refresh'     => $this->getInput('form_refresh', 0),
-			'can_update_group' => (
-				$this->getInput('usrgrpid', 0) == 0) || granted2update_group($this->getInput('usrgrpid', 0)
-			)
-		];
-
-		$response = new CControllerResponseData($data);
-
-		$response->setTitle(_('Configuration of user groups'));
-		$this->setResponse($response);
 	}
 }

@@ -24,9 +24,7 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 	protected function checkInput() {
 		$fields = [
 			'usrgrpids' => 'required | array_db usrgrp.usrgrpid',
-			'gui_access' => 'required | in ' . implode(',', [
-				GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED
-			])
+			'gui_access' => 'required | in ' . implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);

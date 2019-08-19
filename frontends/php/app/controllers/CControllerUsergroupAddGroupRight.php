@@ -60,37 +60,6 @@ class CControllerUsergroupAddGroupRight extends CController {
 		return $ret;
 	}
 
-	/**
-	 * @param string $error
-	 *
-	 * @retun bool
-	 */
-	protected function validateNewGroupRight(&$error) {
-		if (!$this->new_group_right['groupids']) {
-			$error = _s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty'));
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param array $form_data
-	 */
-	protected function updateFormData(&$form_data) {
-		list($groupids, $subgroupids) = $this->new_group_right['include_subgroups']
-			? [$this->new_group_right['groupids'], []]
-			: [[], $this->new_group_right['groupids']];
-
-		$form_data['group_rights'] = collapseHostGroupRights(applyHostGroupRights(
-			$form_data['group_rights'],
-			$groupids,
-			$subgroupids,
-			$this->new_group_right['permission']
-		));
-	}
-
 	protected function checkPermissions() {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
@@ -106,7 +75,7 @@ class CControllerUsergroupAddGroupRight extends CController {
 
 		if ($this->validateNewGroupRight($error)) {
 			unset($form_data['new_group_right']);
-			$this->updateFormData($form_data);
+			$form_data = $this->updateFormData($form_data);
 		}
 		else {
 			$form_data['new_group_right'] = $this->new_group_right;
@@ -117,4 +86,38 @@ class CControllerUsergroupAddGroupRight extends CController {
 		$this->setResponse($response);
 	}
 
+	/**
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	protected function validateNewGroupRight(&$error) {
+		if (!$this->new_group_right['groupids']) {
+			$error = _s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty'));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array $form_data
+	 *
+	 * @return array
+	 */
+	protected function updateFormData(array $form_data) {
+		list($groupids, $subgroupids) = $this->new_group_right['include_subgroups']
+			? [[], $this->new_group_right['groupids']]
+			: [$this->new_group_right['groupids'], []];
+
+		$form_data['group_rights'] = collapseHostGroupRights(applyHostGroupRights(
+			$form_data['group_rights'],
+			$groupids,
+			$subgroupids,
+			$this->new_group_right['permission']
+		));
+
+		return $form_data;
+	}
 }

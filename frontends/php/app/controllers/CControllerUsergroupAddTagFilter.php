@@ -61,10 +61,36 @@ class CControllerUsergroupAddTagFilter extends CController {
 		return $ret;
 	}
 
+	protected function checkPermissions() {
+		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+	}
+
+	protected function doAction() {
+		$form_data = $this->getInputAll();
+
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
+			->setArgument('action', 'usergroup.edit');
+
+		$response = new CControllerResponseRedirect($url->getUrl());
+
+		if ($this->validateNewTagFilter($error)) {
+			unset($form_data['new_tag_filter']);
+			$form_data = $this->updateFormData($form_data);
+		}
+		else {
+			$form_data['new_tag_filter'] = $this->new_tag_filter;
+			$response->setMessageError($error);
+		}
+
+		$response->setFormData($form_data);
+		$this->setResponse($response);
+	}
+
 	/**
 	 * @param string $error
 	 *
-	 * @retun bool
+	 * @return bool
 	 */
 	protected function validateNewTagFilter(&$error) {
 		if (!$this->new_tag_filter['groupids']) {
@@ -83,8 +109,10 @@ class CControllerUsergroupAddTagFilter extends CController {
 
 	/**
 	 * @param array $form_data
+	 *
+	 * @return array
 	 */
-	protected function updateFormData(&$form_data) {
+	protected function updateFormData(array $form_data) {
 		$groupids = $this->new_tag_filter['include_subgroups']
 			? getSubGroups($this->new_tag_filter['groupids'])
 			: $this->new_tag_filter['groupids'];
@@ -96,32 +124,7 @@ class CControllerUsergroupAddTagFilter extends CController {
 				'value' => $this->new_tag_filter['value'],
 			];
 		}
+
+		return $form_data;
 	}
-
-	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
-	}
-
-	protected function doAction() {
-		$form_data = $this->getInputAll();
-
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
-			->setArgument('action', 'usergroup.edit');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
-
-		if ($this->validateNewTagFilter($error)) {
-			unset($form_data['new_tag_filter']);
-			$this->updateFormData($form_data);
-		}
-		else {
-			$form_data['new_tag_filter'] = $this->new_tag_filter;
-			$response->setMessageError($error);
-		}
-
-		$response->setFormData($form_data);
-		$this->setResponse($response);
-	}
-
 }
