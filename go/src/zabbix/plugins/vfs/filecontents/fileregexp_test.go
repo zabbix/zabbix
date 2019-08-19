@@ -21,10 +21,49 @@ package filecontents
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 	"zabbix/internal/agent"
 	"zabbix/pkg/std"
 )
+
+func TestExecuteRegex(t *testing.T) {
+	type testCase struct {
+		input   string
+		pattern string
+		output  string
+		result  string
+		match   bool
+	}
+
+	tests := []*testCase{
+		&testCase{input: `1`, pattern: `1`, output: ``, result: `1`, match: true},
+		&testCase{input: `1`, pattern: `2`, output: ``, result: `1`, match: false},
+		&testCase{input: `123 456 789"`, pattern: `([0-9]+)`, output: `\1`, result: `123`, match: true},
+		&testCase{input: `value ""`, pattern: `value "([^"]*)"`, output: `\1`, result: ``, match: true},
+		&testCase{input: `b:xyz"`, pattern: `b:([^ ]+)`, output: `\\1`, result: `\1`, match: true},
+		&testCase{input: `a:1 b:2`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `1,2`, match: true},
+		&testCase{input: `a:\2 b:xyz`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `\2,xyz`, match: true},
+		&testCase{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\@`, result: `value: 10`, match: true},
+		&testCase{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\0`, result: `value: 10`, match: true},
+	}
+
+	for _, c := range tests {
+		t.Run(c.input, func(t *testing.T) {
+			rx, _ := regexp.Compile(c.pattern)
+			r, m := executeRegex([]byte(c.input), rx, []byte(c.output))
+			if !m && c.match {
+				t.Errorf("expected match while returned false")
+			}
+			if m && !c.match {
+				t.Errorf("expected not match while returned true")
+			}
+			if m && r != c.result {
+				t.Errorf("expected match output '%s' while got '%s'", c.result, r)
+			}
+		})
+	}
+}
 
 func TestFileRegexpOutput(t *testing.T) {
 	stdOs = std.NewMockOs()

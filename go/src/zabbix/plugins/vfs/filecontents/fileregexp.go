@@ -24,74 +24,68 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
+	"math"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/plugin"
 )
 
-const maxNumberOfGroups int = 10
-
-func executeRegex(line string, pattern string, output string) (result string, err error) {
-	retline := ""
-
-	regx, err := regexp.Compile(pattern)
-	if err != nil {
-		return retline, err
+func executeRegex(line []byte, rx *regexp.Regexp, output []byte) (result string, match bool) {
+	matches := rx.FindSubmatchIndex(line)
+	if len(matches) == 0 {
+		return "", false
+	}
+	if len(output) == 0 {
+		return string(line), true
 	}
 
-	Idxs := regx.FindAllSubmatchIndex([]byte(line), maxNumberOfGroups)
-
-	if len(Idxs) != 0 {
-		if output != "" {
-			var i int
-			var toreplace, replaceby string
-
-			retline = output
-
-			if len(Idxs) > 1 {
-				replaceby = fmt.Sprintf("%s", line[Idxs[1][0]:Idxs[1][1]])
-				toreplace = "\\@"
-				retline = strings.Replace(retline, toreplace, replaceby, -1)
-			}
-
-			for i < maxNumberOfGroups {
-				toreplace = fmt.Sprintf("\\%d", i)
-				replaceby = ""
-				if i < len(Idxs) {
-					replaceby = fmt.Sprintf("%s", line[Idxs[i][0]:Idxs[i][1]])
-				}
-				retline = strings.Replace(retline, toreplace, replaceby, -1)
-				i++
-			}
-
-		} else {
-			retline = line
+	buf := &bytes.Buffer{}
+	for len(output) > 0 {
+		pos := bytes.Index(output, []byte{'\\'})
+		if pos == -1 || pos == len(output)-1 {
+			break
 		}
+		_, _ = buf.Write(output[:pos])
+		switch output[pos+1] {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			i := output[pos+1] - '0'
+			if len(matches) >= int(i)*2+2 {
+				_, _ = buf.Write(line[matches[i*2]:matches[i*2+1]])
+			}
+			pos++
+		case '@':
+			_, _ = buf.Write(line[matches[0]:matches[1]])
+			pos++
+		case '\\':
+			_ = buf.WriteByte('\\')
+			pos++
+		default:
+			_ = buf.WriteByte('\\')
+		}
+		output = output[pos+1:]
 	}
-
-	return retline, nil
+	_, _ = buf.Write(output)
+	return buf.String(), true
 }
 
 func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var startline, endline, curline uint64
-	var encoder, output string
-	var line, outline string
 
 	start := time.Now()
 
 	if len(params) > 6 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 	if len(params) < 1 || "" == params[0] {
-		return nil, errors.New("Invalid first parameter")
+		return nil, errors.New("Invalid first parameter.")
 	}
 	if len(params) < 2 || "" == params[1] {
-		return nil, errors.New("Invalid second parameter")
+		return nil, errors.New("Invalid second parameter.")
 	}
+
+	var encoder string
 	if len(params) > 2 {
 		encoder = params[2]
 	}
@@ -101,22 +95,28 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 	} else {
 		startline, err = strconv.ParseUint(params[3], 10, 32)
 		if err != nil {
-			return nil, errors.New("Invalid fourth parameter")
+			return nil, errors.New("Invalid fourth parameter.")
 		}
 	}
 	if len(params) < 5 || "" == params[4] {
-		endline = 0xffffffff
+		endline = math.MaxUint64
 	} else {
 		endline, err = strconv.ParseUint(params[4], 10, 32)
 		if err != nil {
-			return nil, errors.New("Invalid fifth parameter")
+			return nil, errors.New("Invalid fifth parameter.")
 		}
 	}
 	if startline > endline {
-		return nil, errors.New("Start line parameter must not exceed end line")
+		return nil, errors.New("Start line parameter must not exceed end line.")
 	}
+	var output string
 	if len(params) == 6 {
 		output = params[5]
+	}
+
+	var rx *regexp.Regexp
+	if rx, err = regexp.Compile(params[1]); err != nil {
+		return nil, errors.New("Invalid first parameter.")
 	}
 
 	file, err := stdOs.Open(params[0])
@@ -126,43 +126,23 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 	defer file.Close()
 
 	// Start reading from the file with a reader.
-	reader := bufio.NewReader(file)
-
+	scanner := bufio.NewScanner(file)
 	curline = 0
-
-	for {
+	for scanner.Scan() {
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(agent.Options.Timeout) {
 			return nil, errors.New("Timeout while processing item")
 		}
 
-		line, err = reader.ReadString('\n')
-
-		if err != nil {
-			if err != io.EOF {
-				return nil, errors.New("Cannot read from file")
-			}
-			break
-		}
-
 		curline++
 		if curline >= startline {
-			line := string(bytes.TrimRight(decode(encoder, []byte(line)), "\n\r"))
-			outline, err = executeRegex(line, params[1], output)
-			if err != nil {
-				return nil, fmt.Errorf("Cannot execute regex %s: %s", params[1], err)
-			}
-			if outline != "" {
-				break
+			if out, ok := executeRegex(decode(encoder, scanner.Bytes()), rx, []byte(output)); ok {
+				return out, nil
 			}
 		}
-
 		if curline >= endline {
 			break
 		}
-
 	}
-
-	return outline, nil
-
+	return "", nil
 }
