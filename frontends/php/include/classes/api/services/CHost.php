@@ -894,9 +894,13 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if (isset($data['host'])) {
-			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host name "%s".', $data['host']));
+		if (array_key_exists('host', $data)) {
+			$host_name_parser = new CHostNameParser();
+
+			if ($host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect characters used for host name "%s".', $data['host'])
+				);
 			}
 
 			if (count($hosts) > 1) {
@@ -1702,6 +1706,8 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $hosts) {
+		$host_name_parser = new CHostNameParser();
+
 		$host_db_fields = ['host' => null];
 
 		$groupids = [];
@@ -1720,7 +1726,7 @@ class CHost extends CHostGeneral {
 			}
 
 			// Validate "host" field.
-			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
+			if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect characters used for host name "%s".', $host['host'])
 				);
@@ -1941,6 +1947,8 @@ class CHost extends CHostGeneral {
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
 		]);
 
+		$host_name_parser = new CHostNameParser();
+
 		$host_names = [];
 
 		foreach ($hosts as &$host) {
@@ -1981,7 +1989,7 @@ class CHost extends CHostGeneral {
 			}
 
 			if (array_key_exists('host', $host)) {
-				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
+				if ($host_name_parser->parse($host['host']) != CParser::PARSE_SUCCESS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect characters used for host name "%s".', $host['host'])
 					);

@@ -1824,7 +1824,8 @@ class testFormItemPrototypePreprocessing extends CWebTest {
 					],
 					[
 						'type' => 'Check for error in JSON',
-						'parameter_1' => '$.new.path'
+						'parameter_1' => '$.new.path',
+						'on_fail' => true
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
@@ -1857,7 +1858,7 @@ class testFormItemPrototypePreprocessing extends CWebTest {
 	 *
 	 * @dataProvider getCustomOnFailData
 	 */
-	public function testFormItemPrototypePreprocessing_CustomOnFail1($data) {
+	public function testFormItemPrototypePreprocessing_CustomOnFail($data) {
 		$this->page->login()->open('disc_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID);
 		$this->query('button:Create item prototype')->one()->click();
 
@@ -1869,8 +1870,7 @@ class testFormItemPrototypePreprocessing extends CWebTest {
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
-			if ($options['type'] === 'Check for error in JSON'
-					|| $options['type'] === 'Discard unchanged with heartbeat') {
+			if ($options['type'] === 'Discard unchanged with heartbeat') {
 
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 			}
@@ -1908,7 +1908,7 @@ class testFormItemPrototypePreprocessing extends CWebTest {
 
 			$this->assertEquals($expected, $rows[$i + 1]);
 
-			if (in_array($options['type'], ['Check for error in JSON', 'Discard unchanged with heartbeat'])){
+			if (in_array($options['type'], ['Discard unchanged with heartbeat'])){
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 				$this->assertFalse($steps[$i]['on_fail']->isSelected());
 				$this->assertTrue($steps[$i]['error_handler'] === null || !$steps[$i]['error_handler']->isVisible());
