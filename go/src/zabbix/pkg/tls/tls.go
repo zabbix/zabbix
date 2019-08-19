@@ -52,6 +52,7 @@ typedef struct {
 
 static int tls_init()
 {
+	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
 	ERR_load_crypto_strings();
 	ERR_load_SSL_strings();
 	OpenSSL_add_all_algorithms();
@@ -154,12 +155,14 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 }
 
 #define TLS_1_3_CIPHERSUITES "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
-#define TLS_CIPHERS "RSA+aRSA+AES128:kPSK+AES128"
+#define TLS_CIPHER_CERT	"RSA+aRSA+AES128"
+#define TLS_CIPHER_PSK	"kPSK+AES128"
 
 static void *tls_new_context(const char *ca_file, const char *cert_file, const char *key_file, char **error)
 {
 	SSL_CTX	*ctx;
 	int		ret = -1;
+	const char	*ciphers;
 
 	if (NULL == (ctx = SSL_CTX_new(TLS_method())))
 		goto out;
@@ -172,7 +175,10 @@ static void *tls_new_context(const char *ca_file, const char *cert_file, const c
 		if (1 != SSL_CTX_load_verify_locations(ctx, ca_file, NULL))
 			goto out;
 		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+		ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
 	}
+	else
+		ciphers = TLS_CIPHER_PSK;
 
 	if (NULL != cert_file && 1 != SSL_CTX_use_certificate_chain_file(ctx, cert_file))
 		goto out;
@@ -189,7 +195,8 @@ static void *tls_new_context(const char *ca_file, const char *cert_file, const c
 	if (1 != SSL_CTX_set_ciphersuites(ctx, TLS_1_3_CIPHERSUITES))
 		goto out;
 #endif
-	if (0 == SSL_CTX_set_cipher_list(ctx, TLS_CIPHERS))
+
+	if (0 == SSL_CTX_set_cipher_list(ctx, ciphers))
 		goto out;
 
 	ret = 0;
@@ -534,7 +541,7 @@ func (c *tlsConn) flushTLS() (err error) {
 	for {
 		if cn := C.tls_recv(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
 			// TODO: remove
-			fmt.Println("->server", cn, c.buf[:5])
+			//fmt.Println("->server", cn, c.buf[:5])
 			if _, err = c.conn.Write(c.buf[:cn]); err != nil {
 				return
 			}
@@ -555,7 +562,7 @@ func (c *tlsConn) recvTLS() (err error) {
 		return
 	}
 	// TODO: remove
-	fmt.Println("->openssl", n, c.buf[:5])
+	//fmt.Println("->openssl", n, c.buf[:5])
 	C.tls_send(C.tls_lp_t(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(n))
 	return
 }
@@ -721,7 +728,7 @@ func (s *Server) checkConnection() (err error) {
 	for {
 		cRet := C.tls_accept(C.tls_lp_t(s.tls))
 		if cRet == 0 {
-			return
+			break
 		}
 		if cRet < 0 {
 			return s.Error()
@@ -733,6 +740,8 @@ func (s *Server) checkConnection() (err error) {
 			return
 		}
 	}
+	err = s.flushTLS()
+	return
 }
 
 func (s *Server) Write(b []byte) (n int, err error) {
