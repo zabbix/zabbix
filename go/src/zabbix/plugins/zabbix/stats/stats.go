@@ -13,6 +13,7 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	timeout time.Duration
 }
 
 type queue struct {
@@ -33,13 +34,12 @@ type response struct {
 
 const defaultServerPort = 10051
 
-var timeoutConnection time.Duration
 var impl Plugin
 
-func getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
+func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, err := zbxcomms.Exchange(addr, timeoutConnection, req)
+	resp, err := zbxcomms.Exchange(addr, p.timeout, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
@@ -117,7 +117,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
 	}
 
-	resp, err := getRemoteZabbixStats(addr, req)
+	resp, err := p.getRemoteZabbixStats(addr, req)
 
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 // Configure -
 func (p *Plugin) Configure(options map[string]string) {
-	timeoutConnection = time.Second * time.Duration(agent.Options.Timeout)
+	p.timeout = time.Second * time.Duration(agent.Options.Timeout)
 }
 
 func init() {
