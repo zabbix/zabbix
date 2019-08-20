@@ -726,7 +726,7 @@ class CMacrosResolverGeneral {
 							$trigger = $triggers[$function['triggerid']];
 							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 
-							if ($history !== null) {
+							if (is_array($history)) {
 								if (array_key_exists('clock', $history)) {
 									$clock = $history['clock'];
 								}
