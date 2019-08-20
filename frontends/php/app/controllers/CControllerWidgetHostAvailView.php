@@ -31,11 +31,6 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		]);
 	}
 
-	// 1 - agent;
-	// 2 - SNMP;
-	// 3 - IPMI;
-	// 4 - JMX.
-
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
@@ -50,17 +45,12 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$hosts_types = count($fields['interface_type']) === 0 ? array_keys($type_fields) : $fields['interface_type'];
 
-		// $hosts_total = array_fill(0, count($type_fields), 0);
-		$hosts_total = array_map(function() {
-			return 0;
-		}, $type_fields);
-		$hosts_count = array_map(function() {
-			return [
-				HOST_AVAILABLE_UNKNOWN => 0,
-				HOST_AVAILABLE_TRUE => 0,
-				HOST_AVAILABLE_FALSE => 0,
-			];
-		}, $type_fields);
+		$hosts_total = array_fill_keys(array_keys($type_fields), 0);
+		$hosts_count = array_fill_keys(array_keys($type_fields), [
+			HOST_AVAILABLE_UNKNOWN => 0,
+			HOST_AVAILABLE_TRUE => 0,
+			HOST_AVAILABLE_FALSE => 0
+		]);
 
 		$db_hosts = API::Host()->get([
 			'output' => ['available', 'snmp_available', 'jmx_available', 'ipmi_available'],
