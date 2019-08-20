@@ -331,3 +331,26 @@ func TestInclude(t *testing.T) {
 	var expected Options = Options{[]int{1, 10, 20, 2, 100, 200, 3}}
 	checkUnmarshal(t, []byte(input), &expected, &options)
 }
+
+func TestRecursiveInclude(t *testing.T) {
+	stdOs = std.NewMockOs()
+	stdOs.(std.MockOs).MockFile("/tmp/array10.conf", []byte("Value=10\nValue=20\nInclude = /tmp/array10.conf"))
+
+	type Options struct {
+		Values []int `conf:"Value"`
+	}
+	input := `
+			Value = 1
+			Include = /tmp/array10.conf
+			Value = 2
+		`
+
+	var options Options
+	if err := Unmarshal([]byte(input), &options); err != nil {
+		if err.Error() != "Recursion detected! Skipped processing of configuration file" {
+			t.Errorf("Expected recursion error message: %s", err.Error())
+		}
+	} else {
+		t.Errorf("Expected error while got success")
+	}
+}
