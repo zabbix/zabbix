@@ -34,7 +34,8 @@ func TestParserErrors(t *testing.T) {
 		"abc",
 		"abc =",
 		" = abc",
-		"Test = value"}
+		"Test = value",
+		"Te$t = value"}
 
 	for _, data := range input {
 		var options Options
