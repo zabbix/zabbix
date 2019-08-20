@@ -108,6 +108,7 @@ class CXmlConstantName {
 	// const NONE = 'NONE'; // Duplicate.
 	const BASIC = 'BASIC';
 	const NTLM = 'NTLM';
+	const KERBEROS = 'KERBEROS';
 
 	const ALIAS = 'ALIAS';
 	const ASSET_TAG = 'ASSET_TAG';

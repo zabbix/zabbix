@@ -109,7 +109,7 @@ class CXmlConstantValue {
 	// const NONE = HTTPTEST_AUTH_NONE; // Duplicate.
 	const BASIC = HTTPTEST_AUTH_BASIC;
 	const NTLM = HTTPTEST_AUTH_NTLM;
-	const KERBEROS = HTTPTEST_AUTH_KERBEROS; // Not used.
+	const KERBEROS = HTTPTEST_AUTH_KERBEROS;
 
 	const ALIAS = 4;
 	const ASSET_TAG = 11;

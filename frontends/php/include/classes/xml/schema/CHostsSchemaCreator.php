@@ -60,6 +60,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
+											->addConstant(CXmlConstantName::KERBEROS, CXmlConstantValue::KERBEROS, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
@@ -310,6 +311,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 															->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 															->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
+															->addConstant(CXmlConstantName::KERBEROS, CXmlConstantValue::KERBEROS, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 															->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 															->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 															->setExportHandler(function(array $data, CXmlTagInterface $class) {
@@ -1024,6 +1026,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
+											->addConstant(CXmlConstantName::KERBEROS, CXmlConstantValue::KERBEROS, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::PASSWORD, CXmlConstantValue::PASSWORD, CXmlConstantValue::ITEM_TYPE_SSH)
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
