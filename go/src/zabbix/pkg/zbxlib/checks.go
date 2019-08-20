@@ -93,7 +93,7 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_STR_RESULT(&result)))
+	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
 		*value = zbx_strdup(NULL, *pvalue);
 
 	ret = SUCCEED;

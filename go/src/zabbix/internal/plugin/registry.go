@@ -112,7 +112,7 @@ func Get(key string) (acc Accessor, err error) {
 	if m, ok := Metrics[key]; ok {
 		return m.Plugin, nil
 	}
-	return nil, errors.New("no plugin found")
+	return nil, errors.New("Unsupported item key.")
 }
 
 func ClearRegistry() {
