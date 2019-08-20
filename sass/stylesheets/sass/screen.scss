@@ -15,7 +15,7 @@ body {
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 60px;
-	min-width: 950px;
+	min-width: 1200px;
 
 	font: {
 		family: $font-stack;
@@ -221,6 +221,10 @@ pre {
 	[disabled] {
 		opacity: 1 !important;
 	}
+}
+
+.monospace-font {
+	font-family: $font-stack-mono;
 }
 
 %space-pre-wrap {
@@ -2260,7 +2264,8 @@ select {
 	}
 
 	+ label.label-pos-left span {
-		margin-left: 4px;
+		margin-left: 6px;
+		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -3465,6 +3470,15 @@ $form-icon-btn: (
 	}
 }
 
+.layout-kioskmode {
+	transition: padding-top .3s 2s;
+
+	&.widget-mouseenter {
+		padding-top: 40px;
+		transition: padding-top .3s;
+	}
+}
+
 .dashbrd-grid-container {
 
 	&.dashbrd-mode-edit .dashbrd-grid-widget,
@@ -3473,6 +3487,23 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
+		}
+	}
+
+	.dashbrd-grid-widget-focus,
+	.dashbrd-grid-widget:hover {
+
+		&.dashbrd-grid-widget-hidden-header {
+
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				transform: translate3d(0, -94%, 0);
+				z-index: 5;
+			}
+
+			.dashbrd-grid-widget-content {
+				z-index: 6;
+			}
 		}
 	}
 }
@@ -3489,6 +3520,9 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-head {
+	border: 1px solid $ui-border-color;
+	border-bottom: none;
+	margin: -1px -1px 0 -1px;
 	position: relative;
 	padding: 8px 65px 8px 10px;
 	min-height: 17px;
@@ -3512,6 +3546,35 @@ $form-icon-btn: (
 			select {
 				margin: 4px 0;
 			}
+		}
+	}
+}
+
+.dashbrd-grid-widget {
+
+	&.dashbrd-grid-widget-hidden-header {
+
+		.dashbrd-grid-widget-container {
+			padding: 8px 0;
+			position: relative;
+		}
+
+		.dashbrd-grid-widget-head {
+			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
+			background-color: $ui-bg-color;
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			transform: translate3d(0, 0, 0);
+			transition: transform .3s, box-shadow .3s, z-index .3s;
+			z-index: 2;
+		}
+
+		.dashbrd-grid-widget-content {
+			background-color: $ui-bg-color;
+			transition: z-index .3s;
+			z-index: 3;
 		}
 	}
 }
@@ -4075,6 +4138,11 @@ $form-icon-btn: (
 		margin-left: -10px;
 		@extend %webkit-scrollbar;
 	}
+
+	.table-forms-second-column {
+		float: right;
+		line-height: 24px;
+	}
 }
 
 // Multiline input control.
@@ -4097,7 +4165,6 @@ $form-icon-btn: (
 		}
 
 		&.monospace-font {
-			font-family: $font-stack-mono;
 			padding-top: 1px;
 		}
 	}
@@ -4178,7 +4245,6 @@ $form-icon-btn: (
 
 		li {
 			color: $font-alt-color;
-			font-family: $font-stack-mono;
 			line-height: $line-height;
 			text-align: right;
 			min-width: 24px;
@@ -4214,14 +4280,31 @@ $form-icon-btn: (
 		float: left;
 		line-height: 24px;
 	}
+}
 
-	&.monospace-font {
+// Flexible textarea.
+.textarea-flexible-container {
 
-		.multilineinput-textarea,
-		.multilineinput-label {
-			font-family: $font-stack-mono;
+	td {
+		line-height: 22px;
+
+		&.textarea-flexible-parent {
+			vertical-align: top;
+		}
+
+		button {
+			line-height: normal;
 		}
 	}
+}
+
+.textarea-flexible {
+	display: block;
+	min-height: 24px;
+	overflow: hidden;
+	resize: none;
+	word-break: break-all;
+	white-space: normal;
 }
 
 // Map widget back to parent button.
@@ -4471,6 +4554,15 @@ $form-icon-btn: (
 	float: left;
 	margin: 2px 0 0 -19px;
 	@include border-radius(2px);
+
+	.notif-indic-snooze {
+		width: 14px;
+		height: 14px;
+		float: left;
+		margin-top: 20px;
+		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+	}
+
 }
 
 .notif-indic-container {
@@ -4571,7 +4663,7 @@ $form-icon-btn: (
 }
 
 .no-padding {
-	padding: 0;
+	padding: 0 !important;
 }
 
 .graph-selection {
@@ -5116,6 +5208,7 @@ a.link-action {
 ) {
 	.#{$severity-type} {
 		color: darken($color, 45%);
+		position: relative;
 
 		@if $severity-type == normal-bg {
 			background-color: $color;
@@ -6842,7 +6935,7 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET HOST AVAILABILITY
+// WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 	width: 100%;
@@ -6850,6 +6943,8 @@ table.preprocessing-test-results {
 	table-layout: fixed;
 
 	td {
+		line-height: 18px;
+		overflow: hidden;
 		padding: 0 10px;
 		vertical-align: middle;
 	}
@@ -6862,6 +6957,7 @@ table.preprocessing-test-results {
 		min-width: 305px;
 
 		td {
+			height: 100%;
 			text-align: center;
 		}
 
@@ -6895,6 +6991,61 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+	height: 100%;
+	display: flex;
+
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
+		line-height: 18px;
+		overflow: hidden;
+		padding: 0 10px;
+		position: relative;
+	}
+
+	.by-severity-count {
+		font-size: 16px;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
+		}
+	}
+
+	&.by-severity-layout-vertical {
+		flex-direction: column;
+
+		> div {
+			min-height: 26px;
+			padding-top: 3px;
+		}
+
+		.by-severity-count {
+			margin-right: 5px;
+		}
+	}
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+	/* for IE11 only. Fixed cell height if table has 100% height */
+	.host-avail-widget {
+
+		td {
+			height: 100%;
+		}
 	}
 }
 

@@ -1291,7 +1291,7 @@ in:
     type: ZBX_PREPROC_ERROR_FIELD_JSON
     params: $.error
 out:
-  return: SUCCEED
+  return: FAIL
   error: error message
 ---
 test case: xmlerror(x, //error)
@@ -1329,7 +1329,7 @@ in:
     type: ZBX_PREPROC_ERROR_FIELD_XML
     params: //error/text()
 out:
-  return: SUCCEED
+  return: FAIL
   error: custom error
 ---
 test case: xmlerror(<a><value>1</value></a>, "//error/text()")
@@ -1369,7 +1369,7 @@ in:
       error:([0-9]+)
       \1
 out:
-  return: SUCCEED
+  return: FAIL
   error: 123
 ---
 test case: regexerror("value:123, "error:([0-9]+)")

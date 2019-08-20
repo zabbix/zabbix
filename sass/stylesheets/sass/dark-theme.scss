@@ -248,12 +248,25 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
-// WIDGET HOST AVAILABILITY
+// WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 	color: darken($font-color, 85%);
 
 	.host-avail-total {
+		color: $font-color;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+
+	> div {
+		color: darken($font-color, 85%);
+	}
+
+	.by-severity-count {
 		color: $font-color;
 	}
 }

@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0alpha2');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',	4030011);
+define('ZABBIX_DB_VERSION',		4030016);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -63,8 +63,6 @@ define('ELASTICSEARCH_RESPONSE_PLAIN',			0);
 define('ELASTICSEARCH_RESPONSE_AGGREGATION',	1);
 define('ELASTICSEARCH_RESPONSE_DOCUMENTS',		2);
 
-define('ZBX_WIDGET_ROWS', 20);
-
 define('ZBX_FONTPATH',				realpath('assets/fonts')); // where to search for font (GD > 2.0.18)
 define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
@@ -102,6 +100,9 @@ define('ZBX_FLAG_DISCOVERY_CREATED',	0x4);
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
+
+define('WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS',	0);
+define('WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS',	1);
 
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
@@ -775,7 +776,7 @@ define('ZBX_MIN_WIDGET_LINES', 1);
 define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
-define('DASHBOARD_MAX_COLUMNS',		12);
+define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
@@ -1304,14 +1305,17 @@ define('ZBX_LAYOUT_KIOSKMODE',  2);
 define('ZBX_LAYOUT_MODE', 'layout-mode');
 
 // input fields
-define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
-define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
+define('ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH',		218);
+define('ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH',	218);
+define('ZBX_TEXTAREA_MACRO_WIDTH',				250);
+define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		300);
+define('ZBX_TEXTAREA_TAG_WIDTH',				250);
+define('ZBX_TEXTAREA_TAG_VALUE_WIDTH',			300);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
 define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
 define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
 define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
-define('ZBX_TEXTAREA_TAG_WIDTH',				218);
 define('ZBX_TEXTAREA_MEDIUM_WIDTH',				270);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',			453);
 define('ZBX_TEXTAREA_BIG_WIDTH',				540);
@@ -1385,9 +1389,12 @@ define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
 // slideshow
 define('WIDGET_SLIDESHOW',				'hat_slides');
 
-// Dashboard widget dynamic state
+// dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
+
+// widget defaults
+define('ZBX_WIDGET_ROWS', 20);
 
 // widget field types
 define('ZBX_WIDGET_FIELD_TYPE_INT32',			0);
@@ -1402,6 +1409,10 @@ define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 
 define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
 define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
+
+// widget view modes
+define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
+define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1604,6 +1615,7 @@ define('ZBX_STYLE_ACTIONS_NUM_RED', 'icon-actions-number-red');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
+define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
@@ -1626,6 +1638,7 @@ define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
 define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
+define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
@@ -1703,6 +1716,9 @@ define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
+define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
+define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TIME_ZONE', 'time-zone');
@@ -1758,6 +1774,12 @@ define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
 define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
 define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
 define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
+
+// Widget "Problems by severity" styles.
+define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL', 'by-severity-layout-horizontal');
+define('ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL', 'by-severity-layout-vertical');
+define('ZBX_STYLE_BY_SEVERITY_COUNT', 'by-severity-count');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

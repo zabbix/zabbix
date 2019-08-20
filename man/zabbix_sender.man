@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_SENDER 1 "2019\-01\-29" Zabbix
+.TH ZABBIX_SENDER 1 "2019\-07\-10" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -327,15 +327,16 @@ By default
 does not read any configuration file.
 Only parameters \fBHostname\fR, \fBServerActive\fR, \fBSourceIP\fR, \fBTLSConnect\fR, \fBTLSCAFile\fR, \fBTLSCRLFile\fR,
 \fBTLSServerCertIssuer\fR, \fBTLSServerCertSubject\fR, \fBTLSCertFile\fR, \fBTLSKeyFile\fR, \fBTLSPSKIdentity\fR and \fBTLSPSKFile\fR are supported.
-First entry from the \fBServerActive\fR parameter is used.
+All addresses defined in the agent \fBServerActive\fR configuration parameter are used for sending data.
+If sending of batch data fails to one address, the following batches are not sent to this address.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server.
 If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
-When used together with \fB\-\-config\fR, overrides the first entry of \fBServerActive\fR parameter specified in agentd configuration file.
+When used together with \fB\-\-config\fR, overrides the entries of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-p\fR, \fB\-\-port\fR \fIport\fR"
 Specify port number of Zabbix server trapper running on the server.
 Default is 10051.
-When used together with \fB\-\-config\fR, overrides the port of first entry of \fBServerActive\fR parameter specified in agentd configuration file.
+When used together with \fB\-\-config\fR, overrides the port entries of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
 Specify source IP address.
 When used together with \fB\-\-config\fR, overrides \fBSourceIP\fR parameter specified in agentd configuration file.
@@ -397,6 +398,8 @@ An example of a line of the input file:
 \fB "Linux DB3" db.connections 1429533600 43\fR
 
 For more details please see option \fB\-\-input\-file\fR.
+
+If a timestamped value is sent for a host that is in a “no data” maintenance type then this value will be dropped; however, it is possible to send a timestamped value in for an expired maintenance period and it will be accepted. 
 
 .IP "\fB\-r\fR, \fB\-\-real\-time\fR"
 Send values one by one as soon as they are received.
