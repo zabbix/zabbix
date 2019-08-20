@@ -1162,7 +1162,7 @@ class CWidgetHelper {
 
 			// Expand dataset when click in pattern fields.
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .multiselect-control',
+				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
 			]).'", function() {'.
 				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
