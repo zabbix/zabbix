@@ -174,19 +174,25 @@ foreach ($data['hosts'] as $host) {
 		'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid')
 	);
 
+	$maintenance_icon = false;
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
 
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$statusCaption = _('In maintenance');
-			$statusClass = ZBX_STYLE_ORANGE;
-		}
-		else {
-			$statusCaption = _('Enabled');
-			$statusClass = ZBX_STYLE_GREEN;
+			if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+				$maintenance = $data['maintenances'][$host['maintenanceid']];
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+					$maintenance['description']
+				);
+			}
+			else {
+				$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
+			}
 		}
 
+		$statusCaption = _('Enabled');
+		$statusClass = ZBX_STYLE_GREEN;
 		$confirm_message = _('Disable host?');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
 	}
@@ -202,6 +208,13 @@ foreach ($data['hosts'] as $host) {
 		->addClass($statusClass)
 		->addConfirmation($confirm_message)
 		->addSID();
+
+	if ($maintenance_icon) {
+		$status = [$maintenance_icon, $status];
+	}
+	elseif (count($data['maintenances'])) {
+		$status->addClass(ZBX_STYLE_ICON_NONE);
+	}
 
 	order_result($host['parentTemplates'], 'name');
 
@@ -356,7 +369,15 @@ $form->addItem([
 		[
 			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
 			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
-			'host.export' => ['name' => _('Export')],
+			'host.export' => ['name' => _('Export'), 'redirect' =>
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'export.hosts.xml')
+					->setArgument('backurl', (new CUrl('hosts.php'))
+						->setArgument('groupid', $data['pageFilter']->groupid)
+						->setArgument('page', getPageNumber())
+						->getUrl())
+					->getUrl()
+			],
 			'host.massupdateform' => ['name' => _('Mass update')],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
 		]

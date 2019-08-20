@@ -153,6 +153,41 @@ class CTableElement extends CElement {
 	}
 
 	/**
+	 * Find row by column value.
+	 *
+	 * @param array $content    column data
+	 *
+	 * @return CTableRow|null
+	 */
+	public function findRows($content) {
+		$rows = [];
+
+		if (CTestArrayHelper::isAssociative($content)) {
+			$content = [$content];
+		}
+
+		foreach ($this->getRows() as $row) {
+			foreach ($content as $columns) {
+				$found = true;
+
+				foreach ($columns as $name => $value) {
+					if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
+						$found = false;
+						break;
+					}
+				}
+
+				if ($found) {
+					$rows[] = $row;
+					break;
+				}
+			}
+		}
+
+		return new CElementCollection($rows, CTableRowElement::class);
+	}
+
+	/**
 	 * Index table row text by values of table column.
 	 *
 	 * @param string $column	column name

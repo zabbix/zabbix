@@ -755,7 +755,7 @@ class CService extends CApiService {
 					' FROM service_alarms sa2'.
 					' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
 						' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
-					'GROUP BY sa2.serviceid) ss2 '.
+					' GROUP BY sa2.serviceid) ss2'.
 			' JOIN service_alarms sa ON sa.servicealarmid = ss2.servicealarmid'
 		);
 		$rs = [];

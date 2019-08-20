@@ -80,7 +80,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'result' => ['Script']
+					'result' => ['Test script']
 				]
 			],
 			// Filter by name and status.
@@ -209,7 +209,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'select_all' => true,
-					'used_by_action' => 'Trigger action 3'
+					// Selected different action names in MySQL and PostgreSQL.
+					'used_by_action' => ''
 				]
 			]
 		];

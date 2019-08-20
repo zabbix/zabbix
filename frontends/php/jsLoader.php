@@ -74,7 +74,13 @@ $availableJScripts = [
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
 	'class.cmap.js' => '',
-	'class.cmessages.js' => '',
+	'class.promise.js' => '',
+	'class.localstorage.js' => '',
+	'class.notifications.js' => '',
+	'class.notification.js' => '',
+	'class.notification.collection.js' => '',
+	'class.notifications.audio.js' => '',
+	'class.browsertab.js' => '',
 	'class.cnavtree.js' => '',
 	'class.cookie.js' => '',
 	'class.coverride.js' => '',
@@ -113,6 +119,7 @@ $tranStrings = [
 		'You have unsaved changes.' => _('You have unsaved changes.'),
 		'Are you sure, you want to leave this page?' => _('Are you sure, you want to leave this page?'),
 		'Cannot add widgets in kiosk mode' => _('Cannot add widgets in kiosk mode'),
+		'You do not have permissions to edit dashboard' => _('You do not have permissions to edit dashboard'),
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
@@ -190,7 +197,9 @@ $tranStrings = [
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 		'S_COLOR_IS_NOT_CORRECT' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
 	],
-	'class.cmessages.js' => [
+	'class.notifications.js' => [
+		'S_PROBLEM_ON' => _('Problem on'),
+		'S_RESOLVED' => _('Resolved'),
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLEAR' => _('Clear'),
@@ -300,6 +309,10 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
+	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
+	}
+
 	$files = [
 		'prototype.js',
 		'jquery.js',
@@ -321,18 +334,24 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
-		$files[] = 'class.cmessages.js';
+		$files[] = 'class.promise.js';
+		$files[] = 'class.localstorage.js';
+		$files[] = 'class.browsertab.js';
+		$files[] = 'class.notification.collection.js';
+		$files[] = 'class.notifications.audio.js';
+		$files[] = 'class.notification.js';
+		$files[] = 'class.notifications.js';
 	}
 }
 else {
 	$files = $_GET['files'];
 }
 
-$js = 'if (typeof(locale) == "undefined") { var locale = {}; }'."\n";
+$js = 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {
-			$js .= "locale['".$origStr."'] = ".zbx_jsvalue($str).";";
+			$js .= 'locale[\'' . $origStr . '\'] = ' . zbx_jsvalue($str) . ';';
 		}
 	}
 }

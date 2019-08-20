@@ -67,7 +67,7 @@ static void worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			if (FAIL != zbx_item_preproc_convert_value_to_numeric(&value_num, &value, value_type, &error))
 			{
 				history_value_local.timestamp = *ts;
-				zbx_variant_set_variant(&history_value_local.value, &value_num);
+				zbx_variant_copy(&history_value_local.value, &value_num);
 				history_value = &history_value_local;
 			}
 
@@ -140,7 +140,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
@@ -163,5 +163,8 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 		zbx_ipc_message_clean(&message);
 	}
 
-	return 0;
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

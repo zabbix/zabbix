@@ -24,20 +24,10 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'map.export' && hasRequest('maps')) {
-	$page['file'] = 'zbx_export_maps.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	$isExportData = true;
-}
-else {
-	$page['title'] = _('Configuration of network maps');
-	$page['file'] = 'sysmaps.php';
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['scripts'] = ['multiselect.js'];
-
-	$isExportData = false;
-}
+$page['title'] = _('Configuration of network maps');
+$page['file'] = 'sysmaps.php';
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -118,22 +108,6 @@ if (hasRequest('sysmapid')) {
 }
 else {
 	$sysmap = [];
-}
-
-if ($isExportData) {
-	$export = new CConfigurationExport(['maps' => getRequest('maps', [])]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
-
-	if (hasErrorMesssages()) {
-		show_messages();
-	}
-	else {
-		echo $exportData;
-	}
-
-	exit;
 }
 
 /*

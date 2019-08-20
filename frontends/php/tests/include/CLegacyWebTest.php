@@ -127,15 +127,7 @@ class CLegacyWebTest extends CWebTest {
 		}
 
 		foreach ($strings as $string) {
-			$quote = '"';
-			if (strpos($string, $quote) !== false) {
-				$quote = '\'';
-				if (strpos($string, $quote) !== false) {
-					$this->fail('Cannot assert message detail text containig both single and double quotes.');
-				}
-			}
-
-			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.$quote.$string.$quote.')]');
+			$this->zbxTestAssertElementPresentXpath('//div[@class="msg-details"]//li[contains(text(), '.CXPathHelper::escapeQuotes($string).')]');
 		}
 	}
 

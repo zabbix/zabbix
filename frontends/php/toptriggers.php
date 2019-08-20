@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';

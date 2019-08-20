@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -208,6 +207,7 @@ if ($type == SHOW_TRIGGERS) {
 		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
 			$host_options, $trigger_options, $problem_options
 		);
+		CArrayHelper::sort($triggers, ['description']);
 	}
 	else {
 		$hosts = [];

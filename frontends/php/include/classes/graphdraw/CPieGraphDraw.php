@@ -23,6 +23,9 @@ class CPieGraphDraw extends CGraphDraw {
 
 	const DEFAULT_HEADER_PADDING_TOP = 30;
 
+	const GRAPH_WIDTH_MIN = 20;
+	const GRAPH_HEIGHT_MIN = 20;
+
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 		$this->background = false;
@@ -139,7 +142,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 	protected function selectData() {
 		$this->data = [];
-		$now = time(null);
+		$now = time();
 
 		if (isset($this->stime)) {
 			$this->from_time = $this->stime;

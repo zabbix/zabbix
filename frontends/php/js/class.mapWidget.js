@@ -92,7 +92,7 @@ if (typeof(navigateToSubmap) !== typeof(Function)) {
 			jQuery('.dashbrd-grid-container').dashboardGrid('refreshWidget', uniqueid);
 			jQuery('.dashbrd-grid-container').dashboardGrid('widgetDataShare', widget[0], 'current_sysmapid',
 				{submapid: submapid, previous_maps: previous_maps, moving_upward: reset_previous ? 1 : 0});
-			jQuery('.action-menu').menuPopup('close', null);
+			jQuery('.menu-popup').menuPopup('close', null);
 		}
 	}
 }
@@ -119,7 +119,6 @@ jQuery(function($) {
 							var url = new Curl(widget_data['map_instance'].options.refresh);
 							url.setArgument('curtime', new CDate().getTime());
 							url.setArgument('uniqueid', widget['uniqueid']);
-							url.setArgument('used_in_widget', 1);
 
 							$.ajax({
 								'url': url.getUrl()

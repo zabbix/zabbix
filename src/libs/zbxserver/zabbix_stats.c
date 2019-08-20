@@ -115,7 +115,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_json_addobject(json, "values");
 	zbx_json_adduint64(json, "all", wcache_info.stats.history_counter);
 	zbx_json_adduint64(json, "float", wcache_info.stats.history_float_counter);
-	zbx_json_adduint64(json, "uint", wcache_info.stats.history_float_counter);
+	zbx_json_adduint64(json, "uint", wcache_info.stats.history_uint_counter);
 	zbx_json_adduint64(json, "str", wcache_info.stats.history_str_counter);
 	zbx_json_adduint64(json, "log", wcache_info.stats.history_log_counter);
 	zbx_json_adduint64(json, "text", wcache_info.stats.history_text_counter);

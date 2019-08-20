@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'4.0.9rc1');
-define('ZABBIX_API_VERSION',	'4.0.9');
+define('ZABBIX_VERSION',		'4.0.12rc1');
+define('ZABBIX_API_VERSION',	'4.0.12');
 define('ZABBIX_EXPORT_VERSION',	'4.0');
 define('ZABBIX_DB_VERSION',		4000000);
 
@@ -42,6 +42,7 @@ define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
 define('ZBX_MIN_INT64',			'-9223372036854775808');
 define('ZBX_MAX_INT64',			'9223372036854775807');
+define('ZBX_MAX_UINT64',		'18446744073709551615');
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT_FROM',	'now-1h'); // Default time interval.
 define('ZBX_PERIOD_DEFAULT_TO',		'now');
@@ -1192,27 +1193,31 @@ define('API_INT32',				2);
 define('API_ID',				3);
 define('API_BOOLEAN',			4);
 define('API_FLAG',				5);
+define('API_FLOAT',				6);
+define('API_UINT64',			7);
 // arrays
-define('API_OBJECT',			6);
-define('API_IDS',				7);
-define('API_OBJECTS',			8);
-define('API_STRINGS_UTF8',		9);
-define('API_INTS32',			10);
+define('API_OBJECT',			8);
+define('API_IDS',				9);
+define('API_OBJECTS',			10);
+define('API_STRINGS_UTF8',		11);
+define('API_INTS32',			12);
+define('API_FLOATS',			13);
+define('API_UINTS64',			14);
 // specific types
-define('API_HG_NAME',			11);
-define('API_SCRIPT_NAME',		12);
-define('API_USER_MACRO',		13);
-define('API_TIME_PERIOD',		14);
-define('API_REGEX',				15);
-define('API_HTTP_POST',			16);
-define('API_VARIABLE_NAME',		17);
-define('API_OUTPUT',			18);
-define('API_TIME_UNIT',			19);
-define('API_URL',				20);
-define('API_H_NAME',			21);
-define('API_RANGE_TIME',		22);
-define('API_COLOR',				23);
-define('API_NUMERIC',			24);
+define('API_HG_NAME',			15);
+define('API_SCRIPT_NAME',		16);
+define('API_USER_MACRO',		17);
+define('API_TIME_PERIOD',		18);
+define('API_REGEX',				19);
+define('API_HTTP_POST',			20);
+define('API_VARIABLE_NAME',		21);
+define('API_OUTPUT',			22);
+define('API_TIME_UNIT',			23);
+define('API_URL',				24);
+define('API_H_NAME',			25);
+define('API_RANGE_TIME',		26);
+define('API_COLOR',				27);
+define('API_NUMERIC',			28);
 
 // flags
 define('API_REQUIRED',				0x0001);
@@ -1404,6 +1409,13 @@ define('HISTORY_BATCH_GRAPH', 'batchgraph');
 define('HISTORY_VALUES', 'showvalues');
 define('HISTORY_LATEST', 'showlatest');
 
+// Item history and trends storage modes.
+define('ITEM_STORAGE_OFF',		0);
+define('ITEM_STORAGE_CUSTOM',	1);
+
+// Item history and trends storage value to define 0 storage period.
+define('ITEM_NO_STORAGE_VALUE',	0);
+
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
@@ -1532,6 +1544,7 @@ define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
+define('ZBX_STYLE_ICON_NONE', 'icon-none');
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "preproc.h"
+#include "daemon.h"
 
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -715,7 +716,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep.httptest = httptest;
 	httpstep.httpstep = &db_httpstep;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		struct curl_slist	*headers_slist = NULL;
 		char			*header_cookie = NULL;
@@ -1089,7 +1090,7 @@ int	process_httptests(int httppoller_num, int now)
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		strscpy(host.host, row[1]);

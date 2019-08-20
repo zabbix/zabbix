@@ -221,7 +221,7 @@ function make_event_details($event, $backurl) {
 					$table->addRow([_('Resolved by'), getUserFullname($user[0])]);
 				}
 				else {
-					$table->addRow([_('Resolved by'), _('User')]);
+					$table->addRow([_('Resolved by'), _('Inaccessible user')]);
 				}
 			}
 		}
@@ -807,72 +807,4 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 		default:
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
 	}
-}
-
-/**
- * Selects recent problems.
- *
- * @param array  $options  Variate selection set using options. All fields are mandatory.
- * @param string $options['time_from']
- * @param bool   $options['show_recovered']
- * @param bool   $options['show_suppressed']
- * @param array  $options['severities']
- * @param int    $options['limit']
- *
- * @return array
- */
-function getLastProblems(array $options) {
-	$problem_options = [
-		'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'severities' => $options['severities'],
-		'sortorder' => ZBX_SORT_DOWN,
-		'sortfield' => ['eventid'],
-		'limit' => $options['limit']
-	];
-
-	if ($options['show_recovered']) {
-		$problem_options['recent'] = true;
-	}
-	else {
-		$problem_options['time_from'] = $options['time_from'];
-	}
-
-	if (!$options['show_suppressed']) {
-		$problem_options['suppressed'] = false;
-	}
-
-	$db_problems = API::Problem()->get($problem_options);
-	$triggers = $db_problems
-		? API::Trigger()->get([
-			'output' => [],
-			'selectHosts' => ['hostid', 'name'],
-			'triggerid' => zbx_objectValues($db_problems, 'objectid'),
-			'lastChangeSince' => $options['time_from'],
-			'preservekeys' => true
-		])
-		: [];
-
-	$problems = [];
-
-	foreach ($db_problems as $problem) {
-		$resolved = ($problem['r_eventid'] != 0);
-		if (!array_key_exists($problem['objectid'], $triggers)) {
-			continue;
-		}
-		$trigger = $triggers[$problem['objectid']];
-		$problems[] = [
-			'resolved' => $resolved,
-			'triggerid' => $problem['objectid'],
-			'objectid' => $problem['objectid'],
-			'eventid' => $resolved ? $problem['r_eventid'] : $problem['eventid'],
-			'description' => $problem['name'],
-			'host' => reset($trigger['hosts']),
-			'severity' => $problem['severity'],
-			'clock' => $resolved ? $problem['r_clock'] : $problem['clock']
-		];
-	}
-
-	return $problems;
 }

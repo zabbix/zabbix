@@ -289,7 +289,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Condition operator must be of type integer.
 			[
@@ -302,7 +302,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Possible values for "operator" are 0 (Equals) and 2 (Contains).
 			[
@@ -328,7 +328,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				] + $def_options,
-				'expected_error' => 'Invalid parameter "/tags/1/operator": a number is expected.'
+				'expected_error' => 'Invalid parameter "/tags/1/operator": an integer is expected.'
 			],
 			// Fail. Tag value must be of type string.
 			[

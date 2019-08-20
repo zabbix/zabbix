@@ -663,7 +663,7 @@ class testPageOverview extends CLegacyWebTest {
 		$this->assertEquals(count($tbody), count($columns));
 	}
 
-	public function getContextMenu() {
+	public function getMenuPopup() {
 		return [
 			[
 				[
@@ -693,9 +693,9 @@ class testPageOverview extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getContextMenu
+	 * @dataProvider getMenuPopup
 	 */
-	public function testPageOverview_ContextMenuLinks($data) {
+	public function testPageOverview_MenuPopupLinks($data) {
 		$this->zbxTestLogin('overview.php');
 		$this->zbxTestCheckHeader('Overview');
 		$this->zbxTestClickButtonText('Reset');
@@ -705,23 +705,23 @@ class testPageOverview extends CLegacyWebTest {
 		$this->zbxTestDropdownSelectWait('type', $data['type']);
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestClickXpathWait('//tbody//td[contains(@class, "cursor-pointer")]');
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//ul[contains(@class, "menu-popup")]//a'));
 
 		// Check context menu links text and url.
-		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="History"]');
+		$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//h3[text()="History"]');
 		if ($data['type'] === 'Triggers') {
-			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//h3[text()="Trigger"]');
+			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//h3[text()="Trigger"]');
 		}
 
 		$get_links_text = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//ul[contains(@class, "action-menu")]//a'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//ul[contains(@class, "menu-popup")]//a'));
 		foreach ($elements as $element) {
 			$get_links_text[] = $element->getText();
 		}
 		$this->assertEquals($data['links_text'], $get_links_text);
 
 		foreach ($data['links'] as $link) {
-			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "action-menu")]//a[contains(@href, "'.$link.'")]');
+			$this->zbxTestAssertElementPresentXpath('//ul[contains(@class, "menu-popup")]//a[contains(@href, "'.$link.'")]');
 		}
 	}
 

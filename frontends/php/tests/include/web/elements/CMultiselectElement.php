@@ -83,7 +83,12 @@ class CMultiselectElement extends CElement {
 			$table = $overlay->getContent()->asTable();
 
 			foreach ($labels as $label) {
-				$table->findRow('Name', $label)->select();
+				$row = $table->findRow('Name', $label);
+				if ($row === null) {
+					throw new Exception('Cannot select row with label "'.$label.'" in multiselect element.');
+				}
+
+				$row->select();
 			}
 			$overlay->getFooter()->query('button:Select')->one()->click();
 			$overlay->waitUntilNotPresent();

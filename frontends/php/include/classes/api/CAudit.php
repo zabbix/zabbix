@@ -184,6 +184,17 @@ class CAudit {
 			if ($action == AUDIT_ACTION_UPDATE) {
 				$object_old = $objects_old[$resourceid];
 
+				/**
+				 * Convert two dimension array to one dimension array,
+				 * because array_diff and array_intersect work only with one dimension array.
+				 */
+				$object_old = array_filter($object_old, function ($val) {
+					return !is_array($val);
+				});
+				$object = array_filter($object, function ($val) {
+					return !is_array($val);
+				});
+
 				$object_diff = array_diff_assoc(array_intersect_key($object_old, $object), $object);
 
 				if (!$object_diff) {
@@ -201,6 +212,7 @@ class CAudit {
 						'old' => $object_old[$field_name],
 						'new' => $object[$field_name]
 					];
+
 				}
 				unset($values);
 
