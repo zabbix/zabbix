@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @backup widget
+ * @backup profiles
  */
 class testHostAvailabilityWidget extends CWebTest {
 
