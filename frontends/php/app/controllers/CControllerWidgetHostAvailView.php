@@ -31,21 +31,29 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		]);
 	}
 
+	// 1 - agent;
+	// 2 - SNMP;
+	// 3 - IPMI;
+	// 4 - JMX.
+
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
 		$type_fields = [
-			HOST_AVAILABLE_TYPE_AGENT => 'available',
-			HOST_AVAILABLE_TYPE_SNMP => 'snmp_available',
-			HOST_AVAILABLE_TYPE_JMX => 'jmx_available',
-			HOST_AVAILABLE_TYPE_IPMI => 'ipmi_available'
+			INTERFACE_TYPE_AGENT => 'available',
+			INTERFACE_TYPE_SNMP => 'snmp_available',
+			INTERFACE_TYPE_JMX => 'jmx_available',
+			INTERFACE_TYPE_IPMI => 'ipmi_available'
 		];
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 
 		$hosts_types = count($fields['interface_type']) === 0 ? array_keys($type_fields) : $fields['interface_type'];
 
-		$hosts_total = array_fill(0, count($type_fields), 0);
+		// $hosts_total = array_fill(0, count($type_fields), 0);
+		$hosts_total = array_map(function() {
+			return 0;
+		}, $type_fields);
 		$hosts_count = array_map(function() {
 			return [
 				HOST_AVAILABLE_UNKNOWN => 0,
@@ -64,7 +72,12 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		]);
 
 		foreach ($db_hosts as $host) {
-			foreach ($hosts_types as $type) {
+			$interface = [];
+			foreach ($host['interfaces'] as $val) {
+				$interface[] = $val['type'];
+			}
+
+			foreach ($interface as $type) {
 				$hosts_count[$type][$host[$type_fields[$type]]]++;
 				$hosts_total[$type]++;
 			}
