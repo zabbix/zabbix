@@ -454,11 +454,12 @@ switch ($data['method']) {
 					'preservekeys' => true
 				];
 
-				if (strstr($search, '*')) {
-					$result = API::Host()->get($options + ['searchWildcardsEnabled' => true]);
-				}
+				$result = API::Host()->get($options);
 
-				$result += API::Host()->get($options);
+				if (strstr($search, '*')) {
+					$wildcard_search_results = API::Host()->get($options + ['searchWildcardsEnabled' => true]);
+					$result = array_merge($result, $wildcard_search_results);
+				}
 				break;
 
 			case 'items':
@@ -472,15 +473,15 @@ switch ($data['method']) {
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
 					],
 					'webitems' => true,
-					'searchWildcardsEnabled' => true,
 					'limit' => $config['search_limit']
 				];
 
-				if (strstr($search, '*')) {
-					$result = API::Item()->get($options + ['searchWildcardsEnabled' => true]);
-				}
+				$result = API::Item()->get($options);
 
-				$result += API::Item()->get($options);
+				if (strstr($search, '*')) {
+					$wildcard_search_results = API::Item()->get($options + ['searchWildcardsEnabled' => true]);
+					$result = array_merge($result, $wildcard_search_results);
+				}
 				break;
 		}
 
