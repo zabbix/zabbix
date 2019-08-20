@@ -97,7 +97,7 @@ var serverConnectors []*serverconnector.Connector
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
-		return errors.New("No loglevel parameter specified")
+		return errors.New("No 'loglevel' parameter specified")
 	}
 	switch params[1] {
 	case "increase":
@@ -115,11 +115,11 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			log.Infof(message)
 			err = c.Reply(message)
 		} else {
-			err = fmt.Errorf("Cannot descrease log level below %s", log.Level())
+			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
 			log.Infof(err.Error())
 		}
 	default:
-		return errors.New("Invalid loglevel parameter")
+		return errors.New("Invalid 'loglevel' parameter")
 	}
 	return
 }
@@ -131,9 +131,9 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel <increase|decrease> - increases/decreases logging level
-	metrics - lists available metrics
-	help - this message`
+	loglevel <increase|decrease> - increase/decrease logging level
+	metrics - List available metrics
+	help - Display this help message`
 	return c.Reply(help)
 }
 
