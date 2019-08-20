@@ -145,26 +145,24 @@ class CWidgetHelper {
 	 * @return CDiv
 	 */
 	public static function getHostPatternSelect($field, $form_name) {
-		return (new CDiv(
-			(new CPatternSelect([
-				'name' => $field->getName().'[]',
-				'object_name' => 'hosts',
-				'data' => $field->getValue(),
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'hosts',
-						'srcfld1' => 'hostid',
-						'dstfrm' => $form_name,
-						'dstfld1' => zbx_formatDomId($field->getName().'[]')
-					]
-				],
-				'add_post_js' => false
-			]))
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->setAttribute('placeholder', $field->getPlaceholder())
-				->setAriaRequired(self::isAriaRequired($field))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(CMultiSelect::ZBX_STYLE_CLASS);
+		return (new CPatternSelect([
+			'name' => $field->getName().'[]',
+			'object_name' => 'hosts',
+			'data' => $field->getValue(),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
+					'dstfrm' => $form_name,
+					'dstfld1' => zbx_formatDomId($field->getName().'[]')
+				]
+			],
+			'add_post_js' => false
+		]))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('placeholder', $field->getPlaceholder())
+			->setAriaRequired(self::isAriaRequired($field))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**
@@ -539,9 +537,7 @@ class CWidgetHelper {
 							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50),
+					))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv(
 						(new CPatternSelect([
 							'name' => $field->getName().'['.$row_num.'][items][]',
@@ -565,9 +561,7 @@ class CWidgetHelper {
 							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50)
+					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
 					->addClass(ZBX_STYLE_COLUMN_95)
 					->addClass(ZBX_STYLE_COLUMNS),
@@ -878,44 +872,40 @@ class CWidgetHelper {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),
-						(new CDiv(
-							(new CPatternSelect([
-								'name' => $field_name.'['.$row_num.'][hosts][]',
-								'object_name' => 'hosts',
-								'data' => $value['hosts'],
-								'popup' => [
-									'parameters' => [
-										'srctbl' => 'hosts',
-										'srcfld1' => 'host',
-										'dstfrm' => $form_name,
-										'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-									]
-								],
-								'add_post_js' => false
-							]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						))->addClass(CMultiSelect::ZBX_STYLE_CLASS)
+						(new CPatternSelect([
+							'name' => $field_name.'['.$row_num.'][hosts][]',
+							'object_name' => 'hosts',
+							'data' => $value['hosts'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'hosts',
+									'srcfld1' => 'host',
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+								]
+							],
+							'add_post_js' => false
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
 					(new CDiv(
-							(new CPatternSelect([
-								'name' => $field_name.'['.$row_num.'][items][]',
-								'object_name' => 'items',
-								'data' => $value['items'],
-								'popup' => [
-									'parameters' => [
-										'srctbl' => 'items',
-										'srcfld1' => 'name',
-										'real_hosts' => 1,
-										'numeric' => 1,
-										'webitems' => 1,
-										'dstfrm' => $form_name,
-										'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-									]
-								],
-								'add_post_js' => false
-							]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50),
+						(new CPatternSelect([
+							'name' => $field_name.'['.$row_num.'][items][]',
+							'object_name' => 'items',
+							'data' => $value['items'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'items',
+									'srcfld1' => 'name',
+									'real_hosts' => 1,
+									'numeric' => 1,
+									'webitems' => 1,
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+								]
+							],
+							'add_post_js' => false
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
 					->addClass(ZBX_STYLE_COLUMN_95)
 					->addClass(ZBX_STYLE_COLUMNS),
