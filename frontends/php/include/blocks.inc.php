@@ -817,7 +817,9 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 						'events' => true,
 						'html' => true
 					]
-				)))->addClass('opdata')
+				)))
+					->addClass('opdata')
+					->addClass(ZBX_STYLE_WORDWRAP)
 				: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
 		}
 

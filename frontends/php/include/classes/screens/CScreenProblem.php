@@ -1098,7 +1098,9 @@ class CScreenProblem extends CScreenBase {
 								'events' => true,
 								'html' => true
 							]
-						)))->addClass('opdata')
+						)))
+							->addClass('opdata')
+							->addClass(ZBX_STYLE_WORDWRAP)
 						: (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
 				}
 

@@ -218,7 +218,9 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 					'events' => true,
 					'html' => true
 				]
-			)))->addClass('opdata')
+			)))
+				->addClass('opdata')
+				->addClass(ZBX_STYLE_WORDWRAP)
 			: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
 	}
 
