@@ -20,9 +20,13 @@
 
 
 class CPatternSelect extends CMultiSelect {
+	/**
+	 * Search method used for auto-suggestions.
+	 */
+	const SEARCH_METHOD = 'patternselect.get';
 
 	public function __construct(array $options = []) {
-		parent::__construct($options + ['search_method' => 'patternselect.get']);
+		parent::__construct($options);
 
 		// Reset numeric IDs and use names as unique identifiers.
 		if (array_key_exists('data', $this->params) && $this->params['data']) {
