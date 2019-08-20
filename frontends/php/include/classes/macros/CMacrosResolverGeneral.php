@@ -716,8 +716,6 @@ class CMacrosResolverGeneral {
 
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
-			$trigger = $triggers[$function['triggerid']];
-
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$clock = null;
 				$value = null;
@@ -725,6 +723,7 @@ class CMacrosResolverGeneral {
 				switch ($m) {
 					case 'ITEM.VALUE':
 						if ($options['events']) {
+							$trigger = $triggers[$function['triggerid']];
 							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 
 							if ($history !== null) {
