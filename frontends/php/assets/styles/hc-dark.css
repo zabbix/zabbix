@@ -4990,7 +4990,7 @@ table.preprocessing-test-results .rel-container {
 .totals-list.totals-list-vertical {
   flex-direction: column; }
   .totals-list.totals-list-vertical > div {
-    min-height: 26px;
+    min-height: 21px;
     padding-top: 3px; }
   .totals-list.totals-list-vertical .count {
     margin-right: 5px; }
