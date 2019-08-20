@@ -51,20 +51,6 @@ type Meta struct {
 	max          int64
 }
 
-func isWhitespace(b byte) bool {
-	switch b {
-	case ' ':
-		return true
-	case '\n':
-		return true
-	case '\r':
-		return true
-	case '\t':
-		return true
-	}
-	return false
-}
-
 // get returns child node by name
 func (n *Node) get(name string) (node *Node) {
 	for _, child := range n.nodes {
