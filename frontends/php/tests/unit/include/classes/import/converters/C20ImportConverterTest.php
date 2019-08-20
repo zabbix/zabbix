@@ -121,19 +121,41 @@ class C20ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'hosts' => [
-						[],
+						[
+							'description' => '',
+							'tls_connect' => '1',
+							'tls_accept' => '1',
+							'tls_issuer' => '',
+							'tls_subject' => '',
+							'tls_psk_identity' => '',
+							'tls_psk' => ''
+						],
 						[
 							'interfaces' => [
-								['type' => INTERFACE_TYPE_AGENT],
+								['type' => INTERFACE_TYPE_AGENT, 'bulk' => SNMP_BULK_DISABLED],
 								['type' => INTERFACE_TYPE_SNMP, 'bulk' => SNMP_BULK_ENABLED]
-							]
+							],
+							'description' => '',
+							'tls_connect' => '1',
+							'tls_accept' => '1',
+							'tls_issuer' => '',
+							'tls_subject' => '',
+							'tls_psk_identity' => '',
+							'tls_psk' => ''
 						],
 						[
 							'items' => [
 								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
 								['key' => 'net.udp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
 								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_ACTIVE]
-							]
+							],
+							'description' => '',
+							'tls_connect' => '1',
+							'tls_accept' => '1',
+							'tls_issuer' => '',
+							'tls_subject' => '',
+							'tls_psk_identity' => '',
+							'tls_psk' => ''
 						],
 						[
 							'discovery_rules' => [
@@ -144,10 +166,12 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'filter' => [],
 									'item_prototypes' => [
 										[
-											'key' => 'net.if.in[{#IFNAME}]'
+											'key' => 'net.if.in[{#IFNAME}]',
+											'application_prototypes' => ''
 										],
 										[
-											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]',
+											'application_prototypes' => ''
 										]
 									],
 									'graph_prototypes' => [
@@ -228,7 +252,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
 								]
-							]
+							],
+							'description' => '',
+							'tls_connect' => '1',
+							'tls_accept' => '1',
+							'tls_issuer' => '',
+							'tls_subject' => '',
+							'tls_psk_identity' => '',
+							'tls_psk' => ''
 						]
 					]
 				]
@@ -422,13 +453,16 @@ class C20ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'templates' => [
-						[],
+						[
+							'description' => ''
+						],
 						[
 							'items' => [
 								['key' => 'agent.ping', 'status' => ITEM_STATUS_ACTIVE],
 								['key' => 'net.udp.service[ntp]', 'status' => ITEM_STATUS_DISABLED],
 								['key' => 'net.tcp.service[tcp,,5432]', 'status' => ITEM_STATUS_ACTIVE]
-							]
+							],
+							'description' => ''
 						],
 						[
 							'screens' => [
@@ -436,12 +470,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 								[
 									'screen_items' => [
 										[
-											'rowspan' => 1,
-											'colspan' => 1,
+											'rowspan' => '1',
+											'colspan' => '1',
 											'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
 											'resource' => [
 												'key' => 'net.udp.service[ntp]'
-											]
+											],
+											'application' => '',
+											'max_columns' => ''
 										],
 										[
 											'rowspan' => 1,
@@ -449,7 +485,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
 											'resource' => [
 												'key' => 'net.udp.service[ntp]'
-											]
+											],
+											'application' => '',
+											'max_columns' => ''
 										],
 										[
 											'rowspan' => 3,
@@ -457,11 +495,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
 											'resource' => [
 												'key' => 'net.tcp.service[tcp,,5432]'
-											]
+											],
+											'application' => '',
+											'max_columns' => ''
 										]
 									]
 								]
-							]
+							],
+							'description' => ''
 						],
 						[
 							'discovery_rules' => [
@@ -472,10 +513,12 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'filter' => [],
 									'item_prototypes' => [
 										[
-											'key' => 'net.if.in[{#IFNAME}]'
+											'key' => 'net.if.in[{#IFNAME}]',
+											'application_prototypes' => ''
 										],
 										[
-											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]'
+											'key' => 'net.udp.service[ntp, {#HOST}, {#PORT}]',
+											'application_prototypes' => ''
 										]
 									],
 									'graph_prototypes' => [
@@ -507,7 +550,7 @@ class C20ImportConverterTest extends CImportConverterTest {
 											'expression' => '{host:item.last(0)}<>0 or {host:item.last(0)}<>1'
 										]
 									],
-									'host_prototypes' => []
+									'host_prototypes' => [],
 								],
 								[
 									'type' => ITEM_TYPE_ZABBIX,
@@ -553,8 +596,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'graph_prototypes' => [],
 									'trigger_prototypes' => [],
 									'host_prototypes' => []
-								]
-							]
+								],
+							],
+							'description' => ''
 						]
 					]
 				]
@@ -599,12 +643,14 @@ class C20ImportConverterTest extends CImportConverterTest {
 						[
 							'screen_items' => [
 								[
-									'rowspan' => 1,
-									'colspan' => 1,
+									'rowspan' => '1',
+									'colspan' => '1',
 									'resourcetype' => SCREEN_RESOURCE_SIMPLE_GRAPH,
 									'resource' => [
 										'key' => 'net.udp.service[ntp]'
-									]
+									],
+									'application' => '',
+									'max_columns' => ''
 								],
 								[
 									'rowspan' => 1,
@@ -612,7 +658,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
 									'resource' => [
 										'key' => 'net.udp.service[ntp]'
-									]
+									],
+									'application' => '',
+									'max_columns' => ''
 								],
 								[
 									'rowspan' => 3,
@@ -620,7 +668,9 @@ class C20ImportConverterTest extends CImportConverterTest {
 									'resourcetype' => SCREEN_RESOURCE_PLAIN_TEXT,
 									'resource' => [
 										'key' => 'net.tcp.service[tcp,,5432]'
-									]
+									],
+									'application' => '',
+									'max_columns' => ''
 								]
 							]
 						]
