@@ -29,13 +29,11 @@ class CGraphsSchemaCreator implements CSchemaCreator {
 						(new CStringXmlTag('name'))->setRequired(),
 						(new CIndexedArrayXmlTag('graph_items'))
 							->setRequired()
-							->setKey('gitems')
 							->setSchema(
 								(new CArrayXmlTag('graph_item'))
 									->setSchema(
 										(new CArrayXmlTag('item'))
 											->setRequired()
-											->setKey('itemid')
 											->setSchema(
 												(new CStringXmlTag('host'))->setRequired(),
 												(new CStringXmlTag('key'))->setRequired()
@@ -88,7 +86,6 @@ class CGraphsSchemaCreator implements CSchemaCreator {
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 							->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 						(new CStringXmlTag('type'))
-							->setKey('graphtype')
 							->setDefaultValue(DB::getDefault('graphs', 'graphtype'))
 							->addConstant(CXmlConstantName::NORMAL, CXmlConstantValue::NORMAL)
 							->addConstant(CXmlConstantName::STACKED, CXmlConstantValue::STACKED)
@@ -98,7 +95,6 @@ class CGraphsSchemaCreator implements CSchemaCreator {
 						(new CStringXmlTag('yaxismax'))->setDefaultValue(DB::getDefault('graphs', 'yaxismax')),
 						(new CStringXmlTag('yaxismin'))->setDefaultValue(DB::getDefault('graphs', 'yaxismin')),
 						(new CStringXmlTag('ymax_item_1'))
-							->setKey('ymax_itemid')
 							->setDefaultValue('0')
 							->setExportHandler(function(array $data, CXmlTagInterface $class) {
 								if ($data['ymax_type_1'] == 2) {
@@ -117,13 +113,11 @@ class CGraphsSchemaCreator implements CSchemaCreator {
 								return $data['ymax_item_1'];
 							}),
 						(new CStringXmlTag('ymax_type_1'))
-							->setKey('ymax_type')
 							->setDefaultValue(DB::getDefault('graphs', 'ymax_type'))
 							->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 							->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)
 							->addConstant(CXmlConstantName::ITEM, CXmlConstantValue::ITEM),
 						(new CStringXmlTag('ymin_item_1'))
-							->setKey('ymin_itemid')
 							->setDefaultValue('0')
 							->setExportHandler(function(array $data, CXmlTagInterface $class) {
 								if ($data['ymin_type_1'] == 2) {
@@ -142,7 +136,6 @@ class CGraphsSchemaCreator implements CSchemaCreator {
 								return $data['ymax_item_1'];
 							}),
 						(new CStringXmlTag('ymin_type_1'))
-							->setKey('ymin_type')
 							->setDefaultValue(DB::getDefault('graphs', 'ymin_type'))
 							->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 							->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)

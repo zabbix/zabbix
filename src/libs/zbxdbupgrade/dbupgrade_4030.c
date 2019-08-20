@@ -29,6 +29,8 @@ extern unsigned char	program_type;
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char	program_type;
+
 static int	DBpatch_4030000(void)
 {
 	const ZBX_FIELD	field = {"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -124,6 +126,86 @@ static int	DBpatch_4030010(void)
 
 static int	DBpatch_4030011(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter.usrgrpid'"
+				" where idx='web.users.filter.usrgrpid'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sort'"
+				" where idx='web.users.php.sort'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sortorder'"
+				" where idx='web.users.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030012(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_4030013(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
+static int	DBpatch_4030014(void)
+{
+	const ZBX_FIELD	field = {"view_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("widget", &field);
+}
+
+static int	DBpatch_4030015(void)
+{
+	if (ZBX_DB_OK > DBexecute("update widget set x=x*2, width=width*2"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030016(void)
+{
+	int		i;
+	const char      *values[] = {
+			"alarm_ok",
+			"no_sound",
+			"alarm_information",
+			"alarm_warning",
+			"alarm_average",
+			"alarm_high",
+			"alarm_disaster"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set value_str='%s.mp3'"
+				" where value_str='%s.wav'"
+					" and idx='web.messages'", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030017(void)
+{
 
 	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -148,5 +230,11 @@ DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
 DBPATCH_ADD(4030011, 0, 1)
+DBPATCH_ADD(4030012, 0, 1)
+DBPATCH_ADD(4030013, 0, 1)
+DBPATCH_ADD(4030014, 0, 1)
+DBPATCH_ADD(4030015, 0, 1)
+DBPATCH_ADD(4030016, 0, 1)
+DBPATCH_ADD(4030017, 0, 1)
 
 DBPATCH_END()

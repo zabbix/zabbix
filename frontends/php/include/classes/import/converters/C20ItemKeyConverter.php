@@ -38,9 +38,9 @@ class C20ItemKeyConverter extends CConverter {
 	/**
 	 * Convert item key
 	 *
-	 * @param string	$value	item key
+	 * @param string $value item key
 	 *
-	 * @return string			converted item key
+	 * @return string       converted item key
 	 */
 	public function convert($value) {
 		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {

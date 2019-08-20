@@ -27,9 +27,7 @@ class CTriggersSchemaCreator implements CSchemaCreator {
 				(new CArrayXmlTag('trigger'))
 					->setSchema(
 						(new CStringXmlTag('expression'))->setRequired(),
-						(new CStringXmlTag('name'))
-							->setRequired()
-							->setKey('description'),
+						(new CStringXmlTag('name'))->setRequired(),
 						(new CStringXmlTag('correlation_mode'))
 							->setDefaultValue(DB::getDefault('triggers', 'correlation_mode'))
 							->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
@@ -40,13 +38,11 @@ class CTriggersSchemaCreator implements CSchemaCreator {
 								(new CArrayXmlTag('dependency'))
 									->setSchema(
 										(new CStringXmlTag('expression'))->setRequired(),
-										(new CStringXmlTag('name'))
-											->setRequired()
-											->setKey('description'),
+										(new CStringXmlTag('name'))->setRequired(),
 										new CStringXmlTag('recovery_expression')
 									)
 							),
-						(new CStringXmlTag('description'))->setKey('comments'),
+						new CStringXmlTag('description'),
 						(new CStringXmlTag('manual_close'))
 							->setDefaultValue(DB::getDefault('triggers', 'manual_close'))
 							->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)

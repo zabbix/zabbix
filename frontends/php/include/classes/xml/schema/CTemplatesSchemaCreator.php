@@ -35,9 +35,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										(new CStringXmlTag('name'))->setRequired()
 									)
 							),
-						(new CStringXmlTag('template'))
-							->setRequired()
-							->setKey('host'),
+						(new CStringXmlTag('template'))->setRequired(),
 						new CStringXmlTag('description'),
 						new CStringXmlTag('name'),
 						(new CIndexedArrayXmlTag('applications'))
@@ -48,21 +46,18 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 									)
 							),
 						(new CIndexedArrayXmlTag('discovery_rules'))
-							->setKey('discoveryRules')
 							->setSchema(
 								(new CArrayXmlTag('discovery_rule'))
 									->setSchema(
-										(new CStringXmlTag('key'))
-											->setRequired()
-											->setKey('key_'),
+										(new CStringXmlTag('key'))->setRequired(),
 										(new CStringXmlTag('name'))->setRequired(),
 										(new CStringXmlTag('allow_traps'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'allow_traps'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-										(new CStringXmlTag('allowed_hosts'))->setKey('trapper_hosts'),
+										new CStringXmlTag('allowed_hosts'),
 										(new CStringXmlTag('authtype'))
-											->setDefaultValue(CXmlConstantValue::NONE)
+											->setDefaultValue(DB::getDefault('items', 'authtype'))
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
@@ -86,6 +81,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													: CXmlConstantValue::ITEM_TYPE_SSH);
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
+										// Default value is different from DB default value.
 										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
 										new CStringXmlTag('description'),
 										(new CArrayXmlTag('filter'))
@@ -97,14 +93,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																(new CStringXmlTag('formulaid'))->setRequired(),
 																(new CStringXmlTag('macro'))->setRequired(),
 																(new CStringXmlTag('operator'))
-																	->setDefaultValue(CXmlConstantValue::CONDITION_MATCHES_REGEX)
+																	->setDefaultValue(DB::getDefault('item_condition', 'operator'))
 																	->addConstant(CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_MATCHES_REGEX)
 																	->addConstant(CXmlConstantName::NOT_MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX),
 																new CStringXmlTag('value')
 															)
 													),
 												(new CStringXmlTag('evaltype'))
-													->setDefaultValue(CXmlConstantValue::AND_OR)
+													->setDefaultValue(DB::getDefault('items', 'evaltype'))
 													->addConstant(CXmlConstantName::AND_OR, CXmlConstantValue::AND_OR)
 													->addConstant(CXmlConstantName::XML_AND, CXmlConstantValue::XML_AND)
 													->addConstant(CXmlConstantName::XML_OR, CXmlConstantValue::XML_OR)
@@ -112,36 +108,37 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 												new CStringXmlTag('formula')
 											)->setImportHandler(function(array $data, CXmlTagInterface $class) {
 												if (!array_key_exists('filter', $data)) {
-													return [];
+													return [
+														'conditions' => '',
+														'evaltype' => DB::getDefault('items', 'evaltype'),
+														'formula' => ''
+													];
 												}
 
 												return $data['filter'];
 											}),
 										(new CStringXmlTag('follow_redirects'))
-											->setDefaultValue(CXmlConstantValue::YES)
+											->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 										(new CIndexedArrayXmlTag('graph_prototypes'))
-											->setKey('graphPrototypes')
 											->setSchema(
 												(new CArrayXmlTag('graph_prototype'))
 													->setSchema(
 														(new CStringXmlTag('name'))->setRequired(),
 														(new CIndexedArrayXmlTag('graph_items'))
 															->setRequired()
-															->setKey('gitems')
 															->setSchema(
 																(new CArrayXmlTag('graph_item'))
 																	->setSchema(
 																		(new CArrayXmlTag('item'))
 																			->setRequired()
-																			->setKey('itemid')
 																			->setSchema(
 																				(new CStringXmlTag('host'))->setRequired(),
 																				(new CStringXmlTag('key'))->setRequired()
 																			),
 																		(new CStringXmlTag('calc_fnc'))
-																			->setDefaultValue(CXmlConstantValue::AVG)
+																			->setDefaultValue(DB::getDefault('graphs_items', 'calc_fnc'))
 																			->addConstant(CXmlConstantName::MIN, CXmlConstantValue::MIN)
 																			->addConstant(CXmlConstantName::AVG, CXmlConstantValue::AVG)
 																			->addConstant(CXmlConstantName::MAX, CXmlConstantValue::MAX)
@@ -149,64 +146,96 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																			->addConstant(CXmlConstantName::LAST, CXmlConstantValue::LAST),
 																		new CStringXmlTag('color'),
 																		(new CStringXmlTag('drawtype'))
-																			->setDefaultValue(CXmlConstantValue::SINGLE_LINE)
+																			->setDefaultValue(DB::getDefault('graphs_items', 'drawtype'))
 																			->addConstant(CXmlConstantName::SINGLE_LINE, CXmlConstantValue::SINGLE_LINE)
 																			->addConstant(CXmlConstantName::FILLED_REGION, CXmlConstantValue::FILLED_REGION)
 																			->addConstant(CXmlConstantName::BOLD_LINE, CXmlConstantValue::BOLD_LINE)
 																			->addConstant(CXmlConstantName::DOTTED_LINE, CXmlConstantValue::DOTTED_LINE)
 																			->addConstant(CXmlConstantName::DASHED_LINE, CXmlConstantValue::DASHED_LINE)
 																			->addConstant(CXmlConstantName::GRADIENT_LINE, CXmlConstantValue::GRADIENT_LINE),
-																		(new CStringXmlTag('sortorder'))->setDefaultValue('0'),
+																		(new CStringXmlTag('sortorder'))
+																			->setDefaultValue(DB::getDefault('graphs_items', 'sortorder')),
 																		(new CStringXmlTag('type'))
-																			->setDefaultValue(CXmlConstantValue::SIMPLE)
+																			->setDefaultValue(DB::getDefault('graphs_items', 'type'))
 																			->addConstant(CXmlConstantName::SIMPLE, CXmlConstantValue::SIMPLE)
 																			->addConstant(CXmlConstantName::GRAPH_SUM, CXmlConstantValue::GRAPH_SUM),
 																		(new CStringXmlTag('yaxisside'))
-																			->setDefaultValue(CXmlConstantValue::LEFT)
+																			->setDefaultValue(DB::getDefault('graphs_items', 'yaxisside'))
 																			->addConstant(CXmlConstantName::LEFT, CXmlConstantValue::LEFT)
 																			->addConstant(CXmlConstantName::RIGHT, CXmlConstantValue::RIGHT)
 																	)
 															),
-														(new CStringXmlTag('height'))->setDefaultValue('200'),
-														(new CStringXmlTag('percent_left'))->setDefaultValue('0'),
-														(new CStringXmlTag('percent_right'))->setDefaultValue('0'),
+														(new CStringXmlTag('height'))->setDefaultValue(DB::getDefault('graphs', 'height')),
+														(new CStringXmlTag('percent_left'))->setDefaultValue(DB::getDefault('graphs', 'percent_left')),
+														(new CStringXmlTag('percent_right'))->setDefaultValue(DB::getDefault('graphs', 'percent_right')),
 														(new CStringXmlTag('show_3d'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(DB::getDefault('graphs', 'show_3d'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('show_legend'))
-															->setDefaultValue(CXmlConstantValue::YES)
+															->setDefaultValue(DB::getDefault('graphs', 'show_legend'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('show_triggers'))
-															->setDefaultValue(CXmlConstantValue::YES)
+															->setDefaultValue(DB::getDefault('graphs', 'show_triggers'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('show_work_period'))
-															->setDefaultValue(CXmlConstantValue::YES)
+															->setDefaultValue(DB::getDefault('graphs', 'show_work_period'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('type'))
-															->setKey('graphtype')
-															->setDefaultValue(CXmlConstantValue::NORMAL)
+															->setDefaultValue(DB::getDefault('graphs', 'graphtype'))
 															->addConstant(CXmlConstantName::NORMAL, CXmlConstantValue::NORMAL)
 															->addConstant(CXmlConstantName::STACKED, CXmlConstantValue::STACKED)
 															->addConstant(CXmlConstantName::PIE, CXmlConstantValue::PIE)
 															->addConstant(CXmlConstantName::EXPLODED, CXmlConstantValue::EXPLODED),
-														(new CStringXmlTag('width'))->setDefaultValue('900'),
-														(new CStringXmlTag('yaxismax'))->setDefaultValue('100'),
-														(new CStringXmlTag('yaxismin'))->setDefaultValue('0'),
-														(new CStringXmlTag('ymax_item_1'))->setKey('ymax_itemid'),
+														(new CStringXmlTag('width'))->setDefaultValue(DB::getDefault('graphs', 'width')),
+														(new CStringXmlTag('yaxismax'))->setDefaultValue(DB::getDefault('graphs', 'yaxismax')),
+														(new CStringXmlTag('yaxismin'))->setDefaultValue(DB::getDefault('graphs', 'yaxismin')),
+														(new CStringXmlTag('ymax_item_1'))
+															->setDefaultValue('0')
+															->setExportHandler(function(array $data, CXmlTagInterface $class) {
+																if ($data['ymax_type_1'] == 2) {
+																	if (array_key_exists('ymax_item_1', $data)) {
+																		if (!array_key_exists('host', $data['ymax_item_1']) &&
+																			!array_key_exists('key', $data['ymax_item_1'])) {
+																			throw new Exception(
+																				_s('Invalid tag "%1$s": %2$s.',
+																					'/zabbix_export/templates/template/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymax_item_1',
+																					_('an array is expected'))
+																			);
+																		}
+																	}
+																}
+
+																return $data['ymax_item_1'];
+															}),
 														(new CStringXmlTag('ymax_type_1'))
-															->setKey('ymax_type')
-															->setDefaultValue(CXmlConstantValue::CALCULATED)
+															->setDefaultValue(DB::getDefault('graphs', 'ymax_type'))
 															->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 															->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)
 															->addConstant(CXmlConstantName::ITEM, CXmlConstantValue::ITEM),
-														(new CStringXmlTag('ymin_item_1'))->setKey('ymin_itemid'),
+														(new CStringXmlTag('ymin_item_1'))
+															->setDefaultValue('0')
+															->setExportHandler(function(array $data, CXmlTagInterface $class) {
+																if ($data['ymin_type_1'] == 2) {
+																	if (array_key_exists('ymin_item_1', $data)) {
+																		if (!array_key_exists('host', $data['ymin_item_1']) &&
+																			!array_key_exists('key', $data['ymin_item_1'])) {
+																			throw new Exception(
+																				_s('Invalid tag "%1$s": %2$s.',
+																					'/zabbix_export/templates/template/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymin_item_1',
+																					_('an array is expected'))
+																			);
+																		}
+																	}
+																}
+
+																return $data['ymax_item_1'];
+															}),
 														(new CStringXmlTag('ymin_type_1'))
-															->setKey('ymin_type')
-															->setDefaultValue(CXmlConstantValue::CALCULATED)
+															->setDefaultValue(DB::getDefault('graphs', 'ymin_type'))
 															->addConstant(CXmlConstantName::CALCULATED, CXmlConstantValue::CALCULATED)
 															->addConstant(CXmlConstantName::FIXED, CXmlConstantValue::FIXED)
 															->addConstant(CXmlConstantName::ITEM, CXmlConstantValue::ITEM)
@@ -221,24 +250,20 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										(new CIndexedArrayXmlTag('host_prototypes'))
-											->setKey('hostPrototypes')
 											->setSchema(
 												(new CArrayXmlTag('host_prototype'))
 													->setSchema(
 														(new CIndexedArrayXmlTag('group_links'))
-															->setKey('groupLinks')
 															->setSchema(
 																(new CArrayXmlTag('group_link'))
 																	->setSchema(
 																		(new CArrayXmlTag('group'))
-																			->setKey('groupid')
 																			->setSchema(
 																				(new CStringXmlTag('name'))->setRequired()
 																			)
 																	)
 															),
 														(new CIndexedArrayXmlTag('group_prototypes'))
-															->setKey('groupPrototypes')
 															->setSchema(
 																(new CArrayXmlTag('group_prototype'))
 																	->setSchema(
@@ -248,16 +273,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('host'))->setRequired(),
 														new CStringXmlTag('name'),
 														(new CStringXmlTag('status'))
-															->setDefaultValue(CXmlConstantValue::ENABLED)
+															->setDefaultValue(DB::getDefault('hosts', 'status'))
 															->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 														(new CIndexedArrayXmlTag('templates'))
 															->setSchema(
 																(new CArrayXmlTag('template'))
 																	->setSchema(
-																		(new CStringXmlTag('name'))
-																			->setRequired()
-																			->setKey('host')
+																		(new CStringXmlTag('name'))->setRequired()
 																	)
 															)
 													)
@@ -265,19 +288,16 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('http_proxy'),
 										new CStringXmlTag('ipmi_sensor'),
 										(new CIndexedArrayXmlTag('item_prototypes'))
-											->setKey('itemPrototypes')
 											->setSchema(
 												(new CArrayXmlTag('item_prototype'))
 													->setSchema(
-														(new CStringXmlTag('key'))
-															->setRequired()
-															->setKey('key_'),
+														(new CStringXmlTag('key'))->setRequired(),
 														(new CStringXmlTag('name'))->setRequired(),
 														(new CStringXmlTag('allow_traps'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(DB::getDefault('items', 'allow_traps'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-														(new CStringXmlTag('allowed_hosts'))->setKey('trapper_hosts'),
+														new CStringXmlTag('allowed_hosts'),
 														(new CIndexedArrayXmlTag('applications'))
 															->setSchema(
 																(new CArrayXmlTag('application'))
@@ -286,7 +306,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																	)
 															),
 														(new CStringXmlTag('authtype'))
-															->setDefaultValue(CXmlConstantValue::NONE)
+															->setDefaultValue(DB::getDefault('items', 'authtype'))
 															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 															->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 															->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
@@ -310,10 +330,11 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																	: CXmlConstantValue::ITEM_TYPE_SSH);
 																return (string) $class->getConstantValueByName($data['authtype'], $type);
 															}),
+														// Default value is different from DB default value.
 														(new CStringXmlTag('delay'))->setDefaultValue('1m'),
 														new CStringXmlTag('description'),
 														(new CStringXmlTag('follow_redirects'))
-															->setDefaultValue(CXmlConstantValue::YES)
+															->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CIndexedArrayXmlTag('headers'))
@@ -324,10 +345,10 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																		(new CStringXmlTag('value'))->setRequired()
 																	)
 															),
-														(new CStringXmlTag('history'))->setDefaultValue('90d'),
+														(new CStringXmlTag('history'))->setDefaultValue(DB::getDefault('items', 'history')),
 														new CStringXmlTag('http_proxy'),
 														(new CStringXmlTag('inventory_link'))
-															->setDefaultValue(CXmlConstantValue::NONE)
+															->setDefaultValue(DB::getDefault('items', 'inventory_link'))
 															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE)
 															->addConstant(CXmlConstantName::ALIAS, CXmlConstantValue::ALIAS)
 															->addConstant(CXmlConstantName::ASSET_TAG, CXmlConstantValue::ASSET_TAG)
@@ -407,14 +428,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																(new CStringXmlTag('key'))->setRequired()
 															),
 														(new CStringXmlTag('output_format'))
-															->setDefaultValue(CXmlConstantValue::RAW)
+															->setDefaultValue(DB::getDefault('items', 'output_format'))
 															->addConstant(CXmlConstantName::RAW, CXmlConstantValue::RAW)
 															->addConstant(CXmlConstantName::JSON, CXmlConstantValue::JSON),
 														new CStringXmlTag('params'),
 														new CStringXmlTag('password'),
 														new CStringXmlTag('port'),
 														(new CStringXmlTag('post_type'))
-															->setDefaultValue(CXmlConstantValue::RAW)
+															->setDefaultValue(DB::getDefault('items', 'post_type'))
 															->addConstant(CXmlConstantName::RAW, CXmlConstantValue::RAW)
 															->addConstant(CXmlConstantName::JSON, CXmlConstantValue::JSON)
 															->addConstant(CXmlConstantName::XML, CXmlConstantValue::XML),
@@ -451,7 +472,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																			->addConstant(CXmlConstantName::PROMETHEUS_PATTERN, CXmlConstantValue::PROMETHEUS_PATTERN)
 																			->addConstant(CXmlConstantName::PROMETHEUS_TO_JSON, CXmlConstantValue::PROMETHEUS_TO_JSON),
 																		(new CStringXmlTag('error_handler'))
-																			->setDefaultValue(CXmlConstantValue::ORIGINAL_ERROR)
+																			->setDefaultValue(DB::getDefault('item_preproc', 'error_handler'))
 																			->addConstant(CXmlConstantName::ORIGINAL_ERROR, CXmlConstantValue::ORIGINAL_ERROR)
 																			->addConstant(CXmlConstantName::DISCARD_VALUE, CXmlConstantValue::DISCARD_VALUE)
 																			->addConstant(CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_VALUE)
@@ -470,13 +491,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																	)
 															),
 														(new CStringXmlTag('request_method'))
-															->setDefaultValue(CXmlConstantValue::GET)
+															->setDefaultValue(DB::getDefault('items', 'request_method'))
 															->addConstant(CXmlConstantName::GET, CXmlConstantValue::GET)
 															->addConstant(CXmlConstantName::POST, CXmlConstantValue::POST)
 															->addConstant(CXmlConstantName::PUT, CXmlConstantValue::PUT)
 															->addConstant(CXmlConstantName::HEAD, CXmlConstantValue::HEAD),
 														(new CStringXmlTag('retrieve_mode'))
-															->setDefaultValue(CXmlConstantValue::BODY)
+															->setDefaultValue(DB::getDefault('items', 'retrieve_mode'))
 															->addConstant(CXmlConstantName::BODY, CXmlConstantValue::BODY)
 															->addConstant(CXmlConstantName::HEADERS, CXmlConstantValue::HEADERS)
 															->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
@@ -484,17 +505,17 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														new CStringXmlTag('snmp_oid'),
 														new CStringXmlTag('snmpv3_authpassphrase'),
 														(new CStringXmlTag('snmpv3_authprotocol'))
-															->setDefaultValue(CXmlConstantValue::SNMPV3_MD5)
+															->setDefaultValue(DB::getDefault('items', 'snmpv3_authprotocol'))
 															->addConstant(CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_MD5)
 															->addConstant(CXmlConstantName::SHA, CXmlConstantValue::SNMPV3_SHA),
 														new CStringXmlTag('snmpv3_contextname'),
 														new CStringXmlTag('snmpv3_privpassphrase'),
 														(new CStringXmlTag('snmpv3_privprotocol'))
-															->setDefaultValue(CXmlConstantValue::DES)
+															->setDefaultValue(DB::getDefault('items', 'snmpv3_privprotocol'))
 															->addConstant(CXmlConstantName::DES, CXmlConstantValue::DES)
 															->addConstant(CXmlConstantName::AES, CXmlConstantValue::AES),
 														(new CStringXmlTag('snmpv3_securitylevel'))
-															->setDefaultValue(CXmlConstantValue::NOAUTHNOPRIV)
+															->setDefaultValue(DB::getDefault('items', 'snmpv3_securitylevel'))
 															->addConstant(CXmlConstantName::NOAUTHNOPRIV, CXmlConstantValue::NOAUTHNOPRIV)
 															->addConstant(CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHNOPRIV)
 															->addConstant(CXmlConstantName::AUTHPRIV, CXmlConstantValue::AUTHPRIV),
@@ -503,14 +524,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														new CStringXmlTag('ssl_key_file'),
 														new CStringXmlTag('ssl_key_password'),
 														(new CStringXmlTag('status'))
-															->setDefaultValue(CXmlConstantValue::ENABLED)
+															->setDefaultValue(DB::getDefault('items', 'status'))
 															->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 														new CStringXmlTag('status_codes'),
 														new CStringXmlTag('timeout'),
-														(new CStringXmlTag('trends'))->setDefaultValue('365d'),
+														(new CStringXmlTag('trends'))->setDefaultValue(DB::getDefault('items', 'trends')),
 														(new CStringXmlTag('type'))
-															->setDefaultValue(CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
+															->setDefaultValue(DB::getDefault('items', 'type'))
 															->addConstant(CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
 															->addConstant(CXmlConstantName::SNMPV1, CXmlConstantValue::ITEM_TYPE_SNMPV1)
 															->addConstant(CXmlConstantName::TRAP, CXmlConstantValue::ITEM_TYPE_TRAP)
@@ -534,6 +555,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														new CStringXmlTag('url'),
 														new CStringXmlTag('username'),
 														(new CStringXmlTag('value_type'))
+															// Default value is different from DB default value.
 															->setDefaultValue(CXmlConstantValue::UNSIGNED)
 															->addConstant(CXmlConstantName::FLOAT, CXmlConstantValue::FLOAT)
 															->addConstant(CXmlConstantName::CHAR, CXmlConstantValue::CHAR)
@@ -545,15 +567,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																new CStringXmlTag('name')
 															),
 														(new CStringXmlTag('verify_host'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(DB::getDefault('items', 'verify_host'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('verify_peer'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(DB::getDefault('items', 'verify_peer'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CIndexedArrayXmlTag('application_prototypes'))
-															->setKey('applicationPrototypes')
 															->setSchema(
 																(new CArrayXmlTag('application_prototype'))
 																	->setSchema(
@@ -563,13 +584,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										new CStringXmlTag('jmx_endpoint'),
-										(new CStringXmlTag('lifetime'))->setDefaultValue('30d'),
+										(new CStringXmlTag('lifetime'))->setDefaultValue(DB::getDefault('items', 'lifetime')),
 										(new CIndexedArrayXmlTag('lld_macro_paths'))
 											->setSchema(
 												(new CArrayXmlTag('lld_macro_path'))
 													->setSchema(
-														new CStringXmlTag('lld_macro'),
-														new CStringXmlTag('path')
+														(new CStringXmlTag('lld_macro'))->setRequired(),
+														(new CStringXmlTag('path'))->setRequired()
 													)
 											),
 										(new CArrayXmlTag('master_item'))
@@ -580,7 +601,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('password'),
 										new CStringXmlTag('port'),
 										(new CStringXmlTag('post_type'))
-											->setDefaultValue(CXmlConstantValue::RAW)
+											->setDefaultValue(DB::getDefault('items', 'post_type'))
 											->addConstant(CXmlConstantName::RAW, CXmlConstantValue::RAW)
 											->addConstant(CXmlConstantName::JSON, CXmlConstantValue::JSON)
 											->addConstant(CXmlConstantName::XML, CXmlConstantValue::XML),
@@ -601,7 +622,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::JAVASCRIPT, CXmlConstantValue::JAVASCRIPT)
 															->addConstant(CXmlConstantName::PROMETHEUS_TO_JSON, CXmlConstantValue::PROMETHEUS_TO_JSON),
 														(new CStringXmlTag('error_handler'))
-															->setDefaultValue(CXmlConstantValue::ORIGINAL_ERROR)
+															->setDefaultValue(DB::getDefault('item_preproc', 'error_handler'))
 															->addConstant(CXmlConstantName::ORIGINAL_ERROR, CXmlConstantValue::ORIGINAL_ERROR)
 															->addConstant(CXmlConstantName::DISCARD_VALUE, CXmlConstantValue::DISCARD_VALUE)
 															->addConstant(CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_VALUE)
@@ -620,13 +641,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										(new CStringXmlTag('request_method'))
-											->setDefaultValue(CXmlConstantValue::GET)
+											->setDefaultValue(DB::getDefault('items', 'request_method'))
 											->addConstant(CXmlConstantName::GET, CXmlConstantValue::GET)
 											->addConstant(CXmlConstantName::POST, CXmlConstantValue::POST)
 											->addConstant(CXmlConstantName::PUT, CXmlConstantValue::PUT)
 											->addConstant(CXmlConstantName::HEAD, CXmlConstantValue::HEAD),
 										(new CStringXmlTag('retrieve_mode'))
-											->setDefaultValue(CXmlConstantValue::BODY)
+											->setDefaultValue(DB::getDefault('items', 'retrieve_mode'))
 											->addConstant(CXmlConstantName::BODY, CXmlConstantValue::BODY)
 											->addConstant(CXmlConstantName::HEADERS, CXmlConstantValue::HEADERS)
 											->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
@@ -634,17 +655,17 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('snmp_oid'),
 										new CStringXmlTag('snmpv3_authpassphrase'),
 										(new CStringXmlTag('snmpv3_authprotocol'))
-											->setDefaultValue(CXmlConstantValue::SNMPV3_MD5)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_authprotocol'))
 											->addConstant(CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_MD5)
 											->addConstant(CXmlConstantName::SHA, CXmlConstantValue::SNMPV3_SHA),
 										new CStringXmlTag('snmpv3_contextname'),
 										new CStringXmlTag('snmpv3_privpassphrase'),
 										(new CStringXmlTag('snmpv3_privprotocol'))
-											->setDefaultValue(CXmlConstantValue::DES)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_privprotocol'))
 											->addConstant(CXmlConstantName::DES, CXmlConstantValue::DES)
 											->addConstant(CXmlConstantName::AES, CXmlConstantValue::AES),
 										(new CStringXmlTag('snmpv3_securitylevel'))
-											->setDefaultValue(CXmlConstantValue::NOAUTHNOPRIV)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_securitylevel'))
 											->addConstant(CXmlConstantName::NOAUTHNOPRIV, CXmlConstantValue::NOAUTHNOPRIV)
 											->addConstant(CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHNOPRIV)
 											->addConstant(CXmlConstantName::AUTHPRIV, CXmlConstantValue::AUTHPRIV),
@@ -653,22 +674,19 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('ssl_key_file'),
 										new CStringXmlTag('ssl_key_password'),
 										(new CStringXmlTag('status'))
-											->setDefaultValue(CXmlConstantValue::ENABLED)
+											->setDefaultValue(DB::getDefault('items', 'status'))
 											->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 											->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 										new CStringXmlTag('status_codes'),
 										new CStringXmlTag('timeout'),
 										(new CIndexedArrayXmlTag('trigger_prototypes'))
-											->setKey('triggerPrototypes')
 											->setSchema(
 												(new CArrayXmlTag('trigger_prototype'))
 													->setSchema(
 														(new CStringXmlTag('expression'))->setRequired(),
-														(new CStringXmlTag('name'))
-															->setRequired()
-															->setKey('description'),
+														(new CStringXmlTag('name'))->setRequired(),
 														(new CStringXmlTag('correlation_mode'))
-															->setDefaultValue(CXmlConstantValue::TRIGGER_DISABLED)
+															->setDefaultValue(DB::getDefault('triggers', 'correlation_mode'))
 															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
 															->addConstant(CXmlConstantName::TAG_VALUE, CXmlConstantValue::TRIGGER_TAG_VALUE),
 														new CStringXmlTag('correlation_tag'),
@@ -677,19 +695,17 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																(new CArrayXmlTag('dependency'))
 																	->setSchema(
 																		(new CStringXmlTag('expression'))->setRequired(),
-																		(new CStringXmlTag('name'))
-																			->setRequired()
-																			->setKey('description'),
+																		(new CStringXmlTag('name'))->setRequired(),
 																		new CStringXmlTag('recovery_expression')
 																	)
 															),
-														(new CStringXmlTag('description'))->setKey('comments'),
+														new CStringXmlTag('description'),
 														(new CStringXmlTag('manual_close'))
-															->setDefaultValue(CXmlConstantValue::NO)
+															->setDefaultValue(DB::getDefault('triggers', 'manual_close'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CStringXmlTag('priority'))
-															->setDefaultValue(CXmlConstantValue::NOT_CLASSIFIED)
+															->setDefaultValue(DB::getDefault('triggers', 'priority'))
 															->addConstant(CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::NOT_CLASSIFIED)
 															->addConstant(CXmlConstantName::INFO, CXmlConstantValue::INFO)
 															->addConstant(CXmlConstantName::WARNING, CXmlConstantValue::WARNING)
@@ -698,12 +714,12 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::DISASTER, CXmlConstantValue::DISASTER),
 														new CStringXmlTag('recovery_expression'),
 														(new CStringXmlTag('recovery_mode'))
-															->setDefaultValue(CXmlConstantValue::TRIGGER_EXPRESSION)
+															->setDefaultValue(DB::getDefault('triggers', 'recovery_mode'))
 															->addConstant(CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_EXPRESSION)
 															->addConstant(CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION)
 															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::TRIGGER_NONE),
 														(new CStringXmlTag('status'))
-															->setDefaultValue(CXmlConstantValue::ENABLED)
+															->setDefaultValue(DB::getDefault('triggers', 'status'))
 															->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 														(new CIndexedArrayXmlTag('tags'))
@@ -715,14 +731,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																	)
 															),
 														(new CStringXmlTag('type'))
-															->setDefaultValue(CXmlConstantValue::SINGLE)
+															->setDefaultValue(DB::getDefault('triggers', 'type'))
 															->addConstant(CXmlConstantName::SINGLE, CXmlConstantValue::SINGLE)
 															->addConstant(CXmlConstantName::MULTIPLE, CXmlConstantValue::MULTIPLE),
 														new CStringXmlTag('url')
 													)
 											),
 										(new CStringXmlTag('type'))
-											->setDefaultValue(CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
+											->setDefaultValue(DB::getDefault('items', 'type'))
 											->addConstant(CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
 											->addConstant(CXmlConstantName::SNMPV1, CXmlConstantValue::ITEM_TYPE_SNMPV1)
 											->addConstant(CXmlConstantName::TRAP, CXmlConstantValue::ITEM_TYPE_TRAP)
@@ -742,11 +758,11 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('url'),
 										new CStringXmlTag('username'),
 										(new CStringXmlTag('verify_host'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'verify_host'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 										(new CStringXmlTag('verify_peer'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'verify_peer'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES)
 									)
@@ -765,7 +781,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('name'))->setRequired(),
 														(new CStringXmlTag('url'))->setRequired(),
 														(new CStringXmlTag('follow_redirects'))
-															->setDefaultValue(CXmlConstantValue::YES)
+															->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CIndexedArrayXmlTag('headers'))
@@ -794,11 +810,12 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															),
 														new CStringXmlTag('required'),
 														(new CStringXmlTag('retrieve_mode'))
-															->setDefaultValue(CXmlConstantValue::BODY)
+															->setDefaultValue(DB::getDefault('items', 'retrieve_mode'))
 															->addConstant(CXmlConstantName::BODY, CXmlConstantValue::BODY)
 															->addConstant(CXmlConstantName::HEADERS, CXmlConstantValue::HEADERS)
 															->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
 														new CStringXmlTag('status_codes'),
+														// Default value is different from DB default value.
 														(new CStringXmlTag('timeout'))->setDefaultValue('15s'),
 														(new CIndexedArrayXmlTag('variables'))
 															->setSchema(
@@ -810,20 +827,18 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															)
 													)
 											),
-										(new CStringXmlTag('agent'))->setDefaultValue('Zabbix'),
+										(new CStringXmlTag('agent'))->setDefaultValue(DB::getDefault('httptest', 'agent')),
 										(new CArrayXmlTag('application'))
 											->setSchema(
 												(new CStringXmlTag('name'))->setRequired()
 											),
-										(new CStringXmlTag('attempts'))
-											->setKey('retries')
-											->setDefaultValue('1'),
+										(new CStringXmlTag('attempts'))->setDefaultValue(DB::getDefault('httptest', 'retries')),
 										(new CStringXmlTag('authentication'))
-											->setDefaultValue(CXmlConstantValue::NONE)
+											->setDefaultValue(DB::getDefault('httptest', 'authentication'))
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE)
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM),
-										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
+										(new CStringXmlTag('delay'))->setDefaultValue(DB::getDefault('httptest', 'delay')),
 										(new CIndexedArrayXmlTag('headers'))
 											->setSchema(
 												(new CArrayXmlTag('header'))
@@ -839,7 +854,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('ssl_key_file'),
 										new CStringXmlTag('ssl_key_password'),
 										(new CStringXmlTag('status'))
-											->setDefaultValue(CXmlConstantValue::ENABLED)
+											->setDefaultValue(DB::getDefault('httptest', 'status'))
 											->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
 											->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 										(new CIndexedArrayXmlTag('variables'))
@@ -851,11 +866,11 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										(new CStringXmlTag('verify_host'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('httptest', 'verify_host'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 										(new CStringXmlTag('verify_peer'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('httptest', 'verify_peer'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES)
 									)
@@ -864,15 +879,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 							->setSchema(
 								(new CArrayXmlTag('item'))
 									->setSchema(
-										(new CStringXmlTag('key'))
-											->setRequired()
-											->setKey('key_'),
+										(new CStringXmlTag('key'))->setRequired(),
 										(new CStringXmlTag('name'))->setRequired(),
 										(new CStringXmlTag('allow_traps'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'allow_traps'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-										(new CStringXmlTag('allowed_hosts'))->setKey('trapper_hosts'),
+										new CStringXmlTag('allowed_hosts'),
 										(new CIndexedArrayXmlTag('applications'))
 											->setSchema(
 												(new CArrayXmlTag('application'))
@@ -881,7 +894,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										(new CStringXmlTag('authtype'))
-											->setDefaultValue(CXmlConstantName::NONE)
+											->setDefaultValue(DB::getDefault('items', 'authtype'))
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::BASIC, CXmlConstantValue::BASIC, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
 											->addConstant(CXmlConstantName::NTLM, CXmlConstantValue::NTLM, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
@@ -905,10 +918,11 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													: CXmlConstantValue::ITEM_TYPE_SSH);
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
+										// Default value is different from DB default value.
 										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
 										new CStringXmlTag('description'),
 										(new CStringXmlTag('follow_redirects'))
-											->setDefaultValue(CXmlConstantValue::YES)
+											->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 										(new CIndexedArrayXmlTag('headers'))
@@ -919,10 +933,10 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('value'))->setRequired()
 													)
 											),
-										(new CStringXmlTag('history'))->setDefaultValue('90d'),
+										(new CStringXmlTag('history'))->setDefaultValue(DB::getDefault('items', 'history')),
 										new CStringXmlTag('http_proxy'),
 										(new CStringXmlTag('inventory_link'))
-											->setDefaultValue(CXmlConstantValue::NONE)
+											->setDefaultValue(DB::getDefault('items', 'inventory_link'))
 											->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE)
 											->addConstant(CXmlConstantName::ALIAS, CXmlConstantValue::ALIAS)
 											->addConstant(CXmlConstantName::ASSET_TAG, CXmlConstantValue::ASSET_TAG)
@@ -1002,14 +1016,14 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 												(new CStringXmlTag('key'))->setRequired()
 											),
 										(new CStringXmlTag('output_format'))
-											->setDefaultValue(CXmlConstantValue::RAW)
+											->setDefaultValue(DB::getDefault('items', 'output_format'))
 											->addConstant(CXmlConstantName::RAW, CXmlConstantValue::RAW)
 											->addConstant(CXmlConstantName::JSON, CXmlConstantValue::JSON),
 										new CStringXmlTag('params'),
 										new CStringXmlTag('password'),
 										new CStringXmlTag('port'),
 										(new CStringXmlTag('post_type'))
-											->setDefaultValue(CXmlConstantValue::RAW)
+											->setDefaultValue(DB::getDefault('items', 'post_type'))
 											->addConstant(CXmlConstantName::RAW, CXmlConstantValue::RAW)
 											->addConstant(CXmlConstantName::JSON, CXmlConstantValue::JSON)
 											->addConstant(CXmlConstantName::XML, CXmlConstantValue::XML),
@@ -1046,7 +1060,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::PROMETHEUS_PATTERN, CXmlConstantValue::PROMETHEUS_PATTERN)
 															->addConstant(CXmlConstantName::PROMETHEUS_TO_JSON, CXmlConstantValue::PROMETHEUS_TO_JSON),
 														(new CStringXmlTag('error_handler'))
-															->setDefaultValue(CXmlConstantValue::ORIGINAL_ERROR)
+															->setDefaultValue(DB::getDefault('item_preproc', 'error_handler'))
 															->addConstant(CXmlConstantName::ORIGINAL_ERROR, CXmlConstantValue::ORIGINAL_ERROR)
 															->addConstant(CXmlConstantName::DISCARD_VALUE, CXmlConstantValue::DISCARD_VALUE)
 															->addConstant(CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_VALUE)
@@ -1065,13 +1079,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 													)
 											),
 										(new CStringXmlTag('request_method'))
-											->setDefaultValue(CXmlConstantValue::GET)
+											->setDefaultValue(DB::getDefault('items', 'request_method'))
 											->addConstant(CXmlConstantName::GET, CXmlConstantValue::GET)
 											->addConstant(CXmlConstantName::POST, CXmlConstantValue::POST)
 											->addConstant(CXmlConstantName::PUT, CXmlConstantValue::PUT)
 											->addConstant(CXmlConstantName::HEAD, CXmlConstantValue::HEAD),
 										(new CStringXmlTag('retrieve_mode'))
-											->setDefaultValue(CXmlConstantValue::BODY)
+											->setDefaultValue(DB::getDefault('items', 'retrieve_mode'))
 											->addConstant(CXmlConstantName::BODY, CXmlConstantValue::BODY)
 											->addConstant(CXmlConstantName::HEADERS, CXmlConstantValue::HEADERS)
 											->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
@@ -1079,17 +1093,17 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('snmp_oid'),
 										new CStringXmlTag('snmpv3_authpassphrase'),
 										(new CStringXmlTag('snmpv3_authprotocol'))
-											->setDefaultValue(CXmlConstantValue::SNMPV3_MD5)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_authprotocol'))
 											->addConstant(CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_MD5)
 											->addConstant(CXmlConstantName::SHA, CXmlConstantValue::SNMPV3_SHA),
 										new CStringXmlTag('snmpv3_contextname'),
 										new CStringXmlTag('snmpv3_privpassphrase'),
 										(new CStringXmlTag('snmpv3_privprotocol'))
-											->setDefaultValue(CXmlConstantValue::DES)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_privprotocol'))
 											->addConstant(CXmlConstantName::DES, CXmlConstantValue::DES)
 											->addConstant(CXmlConstantName::AES, CXmlConstantValue::AES),
 										(new CStringXmlTag('snmpv3_securitylevel'))
-											->setDefaultValue(CXmlConstantValue::NOAUTHNOPRIV)
+											->setDefaultValue(DB::getDefault('items', 'snmpv3_securitylevel'))
 											->addConstant(CXmlConstantName::NOAUTHNOPRIV, CXmlConstantValue::NOAUTHNOPRIV)
 											->addConstant(CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHNOPRIV)
 											->addConstant(CXmlConstantName::AUTHPRIV, CXmlConstantValue::AUTHPRIV),
@@ -1103,9 +1117,9 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
 										new CStringXmlTag('status_codes'),
 										new CStringXmlTag('timeout'),
-										(new CStringXmlTag('trends'))->setDefaultValue('365d'),
+										(new CStringXmlTag('trends'))->setDefaultValue(DB::getDefault('items', 'trends')),
 										(new CStringXmlTag('type'))
-											->setDefaultValue(CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
+											->setDefaultValue(DB::getDefault('items', 'type'))
 											->addConstant(CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
 											->addConstant(CXmlConstantName::SNMPV1, CXmlConstantValue::ITEM_TYPE_SNMPV1)
 											->addConstant(CXmlConstantName::TRAP, CXmlConstantValue::ITEM_TYPE_TRAP)
@@ -1129,6 +1143,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('url'),
 										new CStringXmlTag('username'),
 										(new CStringXmlTag('value_type'))
+											// Default value is different from DB default value.
 											->setDefaultValue(CXmlConstantValue::UNSIGNED)
 											->addConstant(CXmlConstantName::FLOAT, CXmlConstantValue::FLOAT)
 											->addConstant(CXmlConstantName::CHAR, CXmlConstantValue::CHAR)
@@ -1140,11 +1155,11 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 												(new CStringXmlTag('name'))
 											),
 										(new CStringXmlTag('verify_host'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'verify_host'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 										(new CStringXmlTag('verify_peer'))
-											->setDefaultValue(CXmlConstantValue::NO)
+											->setDefaultValue(DB::getDefault('items', 'verify_peer'))
 											->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 											->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES)
 									)
@@ -1164,7 +1179,6 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('name'),
 										new CStringXmlTag('hsize'),
 										(new CIndexedArrayXmlTag('screen_items'))
-											->setKey('screenitems')
 											->setSchema(
 												(new CArrayXmlTag('screen_item'))
 													->setSchema(
@@ -1177,7 +1191,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														new CStringXmlTag('halign'),
 														new CStringXmlTag('height'),
 														new CStringXmlTag('max_columns'),
-														(new CStringXmlTag('resource'))->setKey('resourceid'),
+														new CStringXmlTag('resource'),
 														new CStringXmlTag('resourcetype'),
 														new CStringXmlTag('rowspan'),
 														new CStringXmlTag('sort_triggers'),
@@ -1199,13 +1213,10 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 									)
 							),
 						(new CIndexedArrayXmlTag('templates'))
-							->setKey('parentTemplates')
 							->setSchema(
 								(new CArrayXmlTag('template'))
 									->setSchema(
-										(new CStringXmlTag('name'))
-											->setRequired()
-											->setKey('host')
+										(new CStringXmlTag('name'))->setRequired()
 									)
 							)
 					)
