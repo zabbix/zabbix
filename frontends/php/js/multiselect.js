@@ -247,6 +247,22 @@ jQuery(function($) {
 					}
 				}
 			});
+		},
+
+		/**
+		 * Return option value.
+		 *
+		 * @return string
+		 */
+		getOption: function(key) {
+			var ret = null;
+			this.each(function() {
+				if (typeof $(this).data('multiSelect') !== 'undefined') {
+					ret = $(this).data('multiSelect').options[key];
+				}
+			});
+
+			return ret;
 		}
 	};
 

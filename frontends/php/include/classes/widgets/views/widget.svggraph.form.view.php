@@ -152,6 +152,15 @@ $scripts[] =
 	'function updateVariableOrder(obj, row_selector, var_prefix) {'.
 		'jQuery.each([10000, 0], function(index, value) {'.
 			'jQuery(row_selector, obj).each(function(i) {'.
+				'jQuery(".multiselect[data-params]", this).each(function() {'.
+					'var name = jQuery(this).multiSelect("getOption", "name");'.
+					'if (name !== null) {'.
+						'jQuery(this).multiSelect("modify", {'.
+							'name: name.replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
+						'});'.
+					'}'.
+				'});'.
+
 				'jQuery(\'[name^="\' + var_prefix + \'["]\', this).filter(function() {'.
 					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z]+\]/);'.
 				'}).each(function() {'.
