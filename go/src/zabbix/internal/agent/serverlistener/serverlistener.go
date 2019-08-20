@@ -78,7 +78,9 @@ func (sl *ServerListener) run() {
 	for {
 		conn, err := sl.listener.Accept()
 		if err == nil {
-			if err := sl.processConnection(conn); err != nil {
+			if err := tcpCheckAllowedPeers(); err != nil {
+				log.Errf("cannot accept incoming connection: %s", err.Error())
+			} else if err := sl.processConnection(conn); err != nil {
 				log.Warningf("cannot process incoming connection: %s", err.Error())
 			}
 		} else {
@@ -116,4 +118,8 @@ func (sl *ServerListener) Stop() {
 	if sl.listener != nil {
 		sl.listener.Close()
 	}
+}
+
+func (sl *ServerListener) tcpCheckAllowedPeers() (err error) {
+	return nil
 }
