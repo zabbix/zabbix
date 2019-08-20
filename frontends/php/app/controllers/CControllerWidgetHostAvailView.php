@@ -43,7 +43,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 
-		$hosts_types = count($fields['availtype']) === 0 ? array_keys($type_fields) : $fields['availtype'];
+		$hosts_types = count($fields['interface_type']) === 0 ? array_keys($type_fields) : $fields['interface_type'];
 
 		$hosts_total = array_fill(0, count($type_fields), 0);
 		$hosts_count = array_map(function() {
@@ -56,6 +56,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$db_hosts = API::Host()->get([
 			'output' => ['available', 'snmp_available', 'jmx_available', 'ipmi_available'],
+			'selectInterfaces' => ['interfaceid', 'type'],
 			'groupids' => $groupids,
 			'filter' => ($fields['maintenance'] == HOST_MAINTENANCE_STATUS_OFF)
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]

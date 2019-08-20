@@ -37,10 +37,10 @@ $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts = [$field_groupids->getPostJS()];
 
-// Availability type.
+// Interface type.
 $form_list->addRow(
-	CWidgetHelper::getLabel($fields['availtype']),
-	CWidgetHelper::getCheckBoxList($fields['availtype'], [
+	CWidgetHelper::getLabel($fields['interface_type']),
+	CWidgetHelper::getCheckBoxList($fields['interface_type'], [
 		HOST_AVAILABLE_TYPE_AGENT => _('Zabbix agent'),
 		HOST_AVAILABLE_TYPE_SNMP => _('SNMP'),
 		HOST_AVAILABLE_TYPE_JMX => _('JMX'),

@@ -35,14 +35,14 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
-		// Availability type.
-		$field_availtype = new CWidgetFieldCheckBoxList('availtype', _('Availability type'));
+		// Interface type.
+		$field_interface_type = new CWidgetFieldCheckBoxList('interface_type', _('Interface type'));
 
-		if (array_key_exists('availtype', $this->data)) {
-			$field_availtype->setValue($this->data['availtype']);
+		if (array_key_exists('interface_type', $this->data)) {
+			$field_interface_type->setValue($this->data['interface_type']);
 		}
 
-		$this->fields[$field_availtype->getName()] = $field_availtype;
+		$this->fields[$field_interface_type->getName()] = $field_interface_type;
 
 		// Layout.
 		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
