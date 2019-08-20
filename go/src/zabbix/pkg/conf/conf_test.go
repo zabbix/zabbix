@@ -60,6 +60,10 @@ func TestParserSuccess(t *testing.T) {
 		"    \nText=7",
 		"Text=8=9",
 		"Text=",
+		"Text=9\n#",
+		"Text=10\n",
+		"\n Text = 11 \n",
+		"\n#####Text=x\nText=12",
 	}
 
 	var output = []Options{
@@ -71,6 +75,10 @@ func TestParserSuccess(t *testing.T) {
 		{Text: "7"},
 		{Text: "8=9"},
 		{Text: ""},
+		{Text: "9"},
+		{Text: "10"},
+		{Text: "11"},
+		{Text: "12"},
 	}
 
 	for i, data := range input {
@@ -348,7 +356,7 @@ func TestRecursiveInclude(t *testing.T) {
 	var options Options
 	if err := Unmarshal([]byte(input), &options); err != nil {
 		if err.Error() != "Recursion detected! Skipped processing of configuration file" {
-			t.Errorf("Expected recursion error message: %s", err.Error())
+			t.Errorf("Expected recursion error message while got: %s", err.Error())
 		}
 	} else {
 		t.Errorf("Expected error while got success")
