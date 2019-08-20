@@ -234,8 +234,8 @@ class CWidgetConfig {
 		else {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
-					return (!array_key_exists('availtype', $fields))
-						|| !is_string($fields['availtype']);
+					return (!array_key_exists('interface_type', $fields))
+						|| !is_string($fields['interface_type']);
 
 				case WIDGET_PROBLEMS_BY_SV:
 					return (!array_key_exists('show_type', $fields)
