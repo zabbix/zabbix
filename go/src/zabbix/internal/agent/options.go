@@ -58,6 +58,8 @@ type AgentOptions struct {
 	TLSCAFile            string   `conf:",optional"`
 	TLSCertFile          string   `conf:",optional"`
 	TLSKeyFile           string   `conf:",optional"`
+	TLSServerCertIssuer  string   `conf:",optional"`
+	TLSServerCertSubject string   `conf:",optional"`
 
 	Plugins map[string]map[string]string
 }
@@ -105,6 +107,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		}
 		return
 	}
+
 	c := &tls.Config{}
 	switch options.TLSConnect {
 	case "", "unencrypted":
@@ -180,6 +183,8 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		} else {
 			return nil, errors.New("missing TLSKeyFile configuration parameter")
 		}
+		c.ServerCertIssuer = options.TLSServerCertIssuer
+		c.ServerCertSubject = options.TLSServerCertSubject
 
 	} else {
 		if options.TLSCAFile != "" {
@@ -190,6 +195,12 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		}
 		if options.TLSKeyFile != "" {
 			return nil, errors.New("TLSKeyFile configuration parameter set without certificates being used")
+		}
+		if options.TLSServerCertIssuer != "" {
+			return nil, errors.New("TLSServerCertIssuer configuration parameter set without certificates being used")
+		}
+		if options.TLSServerCertSubject != "" {
+			return nil, errors.New("TLSServerCertSubject configuration parameter set without certificates being used")
 		}
 	}
 

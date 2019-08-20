@@ -219,7 +219,7 @@ out:
 		}
 		else
 			*error = strdup("unknown openssl error");
-		BIO_free(err);
+		BIO_vfree(err);
 		if (NULL != ctx)
 		{
 			SSL_CTX_free(ctx);
@@ -406,12 +406,83 @@ static void tls_free(tls_t *tls)
 	if (NULL != tls->ssl)
 		SSL_free(tls->ssl);
 	if (NULL != tls->err)
-		BIO_free(tls->err);
+		BIO_vfree(tls->err);
 	if (NULL != tls->psk_identity)
 		free(tls->psk_identity);
 	if (NULL != tls->psk_key)
 		free(tls->psk_key);
 	free(tls);
+}
+
+static int	tls_get_x509_name(tls_t *tls, X509_NAME *dn, char **name)
+{
+	BIO		*bio;
+	const char	*data;
+	size_t		len;
+	int		ret = -1;
+
+	if (NULL == (bio = BIO_new(BIO_s_mem())))
+	{
+		BIO_printf(tls->err, "cannot create OpenSSL BIO");
+		return -1;
+	}
+
+	if (0 > X509_NAME_print_ex(bio, dn, 0, XN_FLAG_RFC2253 & ~ASN1_STRFLGS_ESC_MSB))
+	{
+		BIO_printf(tls->err, "cannot print distinguished name");
+	}
+	else
+	{
+		len = (size_t)BIO_get_mem_data(bio, &data);
+		*name = malloc(len + 1);
+		memcpy(*name, data, len);
+		(*name)[len] = '\0';
+		ret = 0;
+	}
+	BIO_vfree(bio);
+
+	return ret;
+}
+
+static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+{
+	X509	*cert;
+	char *peer_issuer = NULL, *peer_subject = NULL;
+	int ret = -1;
+
+	if (NULL == (cert = SSL_get_peer_certificate(tls->ssl)))
+	{
+		BIO_printf(tls->err, "cannot obtain peer certificate");
+		goto out;
+	}
+
+	if (NULL != issuer)
+	{
+		if (0 != tls_get_x509_name(tls, X509_get_issuer_name(cert), &peer_issuer))
+			goto out;
+		if (0 != strcmp(issuer, peer_issuer))
+		{
+			BIO_printf(tls->err, "invalid certificate issuer %s", peer_issuer);
+			goto out;
+		}
+	}
+
+	if (NULL != subject)
+	{
+		if (0 != tls_get_x509_name(tls, X509_get_subject_name(cert), &peer_subject))
+			goto out;
+		if (0 != strcmp(subject, peer_subject))
+		{
+			BIO_printf(tls->err, "invalid certificate subject %s", peer_subject);
+			goto out;
+		}
+	}
+	ret = 0;
+out:
+	free(peer_issuer);
+	free(peer_subject);
+	X509_free(cert);
+	return ret;
 }
 
 #else // HAVE_OPENSSL 0
@@ -499,6 +570,12 @@ static int tls_close(tls_t *tls)
 static void tls_free(tls_t *tls)
 {
 }
+
+static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+{
+	return 0;
+}
+
 #endif
 
 */
@@ -593,6 +670,24 @@ func (c *tlsConn) Close() (err error) {
 	c.tls = nil
 	if cr < 0 {
 		return c.Error()
+	}
+	return
+}
+
+func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
+	if cfg.Connect == ConnCert && (cfg.ServerCertIssuer != "" || cfg.ServerCertSubject != "") {
+		var cSubject, cIssuer *C.char
+		if cfg.ServerCertIssuer != "" {
+			cIssuer = C.CString(cfg.ServerCertIssuer)
+			defer C.free(unsafe.Pointer(cSubject))
+		}
+		if cfg.ServerCertSubject != "" {
+			cSubject = C.CString(cfg.ServerCertSubject)
+			defer C.free(unsafe.Pointer(cSubject))
+		}
+		if 0 != C.tls_validate_issuer_and_subect(C.tls_lp_t(c.tls), cIssuer, cSubject) {
+			return c.Error()
+		}
 	}
 	return
 }
@@ -711,6 +806,10 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 	}
 	if err = c.checkConnection(); err != nil {
 		c.conn.Close()
+		return
+	}
+	if err = c.verifyIssuerSubject(cfg); err != nil {
+		c.Close()
 		return
 	}
 	return c, nil
@@ -842,6 +941,10 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		s.conn.Close()
 		return
 	}
+	if err = s.verifyIssuerSubject(cfg); err != nil {
+		s.Close()
+		return
+	}
 
 	return s, nil
 }
@@ -856,13 +959,15 @@ const (
 )
 
 type Config struct {
-	Accept      int
-	Connect     int
-	PSKIdentity string
-	PSKKey      string
-	CAFile      string
-	CertFile    string
-	KeyFile     string
+	Accept            int
+	Connect           int
+	PSKIdentity       string
+	PSKKey            string
+	CAFile            string
+	CertFile          string
+	KeyFile           string
+	ServerCertIssuer  string
+	ServerCertSubject string
 }
 
 func Supported() bool {
