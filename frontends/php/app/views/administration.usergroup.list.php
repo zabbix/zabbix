@@ -71,7 +71,8 @@ $table = (new CTableInfo())
 foreach ($this->data['usergroups'] as $usergroup) {
 	$debug_mode = ($usergroup['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.disabledebug')
+			->setArgument('action', 'usergroup.massupdate')
+			->setArgument('update[debug_mode]', GROUP_DEBUG_MODE_DISABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
@@ -79,7 +80,8 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			->addClass(ZBX_STYLE_ORANGE)
 			->addSID()
 		: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.enabledebug')
+			->setArgument('action', 'usergroup.massupdate')
+			->setArgument('update[debug_mode]', GROUP_DEBUG_MODE_ENABLED)
 			->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 			->getUrl()
 		))
@@ -107,7 +109,8 @@ foreach ($this->data['usergroups'] as $usergroup) {
 
 		$user_status = ($usergroup['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'usergroup.disable')
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[users_status]', GROUP_STATUS_DISABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
@@ -115,7 +118,8 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				->addClass(ZBX_STYLE_GREEN)
 				->addSID()
 			: (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'usergroup.enable')
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[users_status]', GROUP_STATUS_ENABLED)
 				->setArgument('usrgrpids', [$usergroup['usrgrpid']])
 				->getUrl()
 			))
@@ -189,13 +193,25 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'usrgrpids', [
-		'usergroup.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected groups?')],
-		'usergroup.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected groups?')],
-		'usergroup.enabledebug' => ['name' => _('Enable debug mode'),
-			'confirm' => _('Enable debug mode in selected groups?')
+		['name' => _('Enable'), 'confirm' => _('Enable selected groups?'),
+			'redirect' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[users_status]', GROUP_STATUS_ENABLED)->getUrl()
 		],
-		'usergroup.disabledebug' => ['name' => _('Disable debug mode'),
-			'confirm' => _('Disable debug mode in selected groups?')
+		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
+			'redirect' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[users_status]', GROUP_STATUS_DISABLED)->getUrl()
+		],
+		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
+			'redirect' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[debug_mode]', GROUP_DEBUG_MODE_ENABLED)->getUrl()
+		],
+		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
+			'redirect' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.massupdate')
+				->setArgument('update[debug_mode]', GROUP_DEBUG_MODE_DISABLED)->getUrl()
 		],
 		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?')]
 	], 'usergroup')
