@@ -41,13 +41,7 @@ class CPatternSelect extends CMultiSelect {
 
 	public function setEnabled($enabled) {
 		$this->params['disabled'] = !$enabled;
-
-		if ($enabled) {
-			$this->removeAttribute('aria-disabled');
-		}
-		else {
-			$this->setAttribute('aria-disabled', 'true');
-		}
+		$this->setAttribute('aria-disabled', $enabled ? null : 'true');
 
 		return $this;
 	}
