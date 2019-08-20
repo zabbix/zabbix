@@ -82,5 +82,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "systemrun", "system.run", "Run specified command")
+	plugin.RegisterMetric(&impl, "systemrun", "system.run", "Run specified command.")
 }

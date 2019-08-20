@@ -36,18 +36,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.localtime", "Returns system local time")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.boottime", "Returns system boot time")
-	plugin.RegisterMetric(&impl, "zabbixasync", "net.tcp.listen", "Checks if this TCP port is in LISTEN state")
-	plugin.RegisterMetric(&impl, "zabbixasync", "net.udp.listen", "Checks if this UDP port is in LISTEN state")
-	plugin.RegisterMetric(&impl, "zabbixasync", "sensor", "Hardware sensor reading")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.load", "CPU load")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.switches", "Count of context switches")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.cpu.intr", "Device interrupts")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.cpu", "CPU information")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.hw.macaddr", "Listing of MAC addresses")
-	plugin.RegisterMetric(&impl, "zabbixasync", "system.sw.os", "Operating system information")
-	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.file.md5sum", "MD5 checksum of file")
-	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.file.regmatch", "Find string in a file")
-	plugin.RegisterMetric(&impl, "zabbixasync", "vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery")
+	plugin.RegisterMetrics(&impl, "zabbixasync",
+		"system.localtime", "Returns system local time.",
+		"system.boottime", "Returns system boot time.",
+		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
+		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",
+		"sensor", "Hardware sensor reading.",
+		"system.cpu.load", "CPU load.",
+		"system.cpu.switches", "Count of context switches.",
+		"system.cpu.intr", "Device interrupts.",
+		"system.hw.cpu", "CPU information.",
+		"system.hw.macaddr", "Listing of MAC addresses.",
+		"system.sw.os", "Operating system information.",
+		"vfs.file.md5sum", "MD5 checksum of file.",
+		"vfs.file.regmatch", "Find string in a file.",
+		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.")
 }

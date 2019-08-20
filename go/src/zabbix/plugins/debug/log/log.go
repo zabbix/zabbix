@@ -93,5 +93,5 @@ func (p *Plugin) Configure(options map[string]string) {
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "debuglog", "debug.log", "Returns timestamp each second")
+	plugin.RegisterMetric(&impl, "debuglog", "debug.log", "Returns timestamp each second.")
 }

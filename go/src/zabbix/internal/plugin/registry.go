@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"unicode"
 )
 
 type Metric struct {
@@ -37,6 +38,18 @@ var Plugins map[string]Accessor = make(map[string]Accessor)
 func RegisterMetric(plugin Accessor, name string, key string, description string) {
 	if _, ok := Metrics[key]; ok {
 		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
+	}
+
+	if 0 == len(description) {
+		panic(fmt.Sprintf(`cannot register metric "%s" with empty description`, key))
+	}
+
+	if unicode.IsLower([]rune(description)[0]) {
+		panic(fmt.Sprintf(`cannot register metric "%s" with description without capital first letter: "%s"`, key, description))
+	}
+
+	if description[len(description)-1] != '.' {
+		panic(fmt.Sprintf(`cannot register metric "%s" with dot at the end of description: "%s"`, key, description))
 	}
 
 	t := reflect.TypeOf(plugin)
