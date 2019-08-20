@@ -32,7 +32,7 @@ func CheckMetric(metric string) (err error) {
 
 	defer func() {
 		if err != nil {
-			fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", key, err.Error())
+			fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 		}
 	}()
 
@@ -58,15 +58,15 @@ func CheckMetric(metric string) (err error) {
 
 	switch v.(type) {
 	case string:
-		fmt.Printf("%-46s[s|%s]\n", key, v.(string))
+		fmt.Printf("%-46s[s|%s]\n", metric, v.(string))
 	case *string:
-		fmt.Printf("%-46s[s|%s]\n", key, *v.(*string))
+		fmt.Printf("%-46s[s|%s]\n", metric, *v.(*string))
 	case int, int8, int16, int32, int64:
-		fmt.Printf("%-46s[i|%v]\n", key, v)
+		fmt.Printf("%-46s[i|%v]\n", metric, v)
 	case uint, uint8, uint16, uint32, uint64:
-		fmt.Printf("%-46s[u|%v]\n", key, v)
+		fmt.Printf("%-46s[u|%v]\n", metric, v)
 	case float32, float64:
-		fmt.Printf("%-46s[f|%v]\n", key, v)
+		fmt.Printf("%-46s[f|%v]\n", metric, v)
 	}
 
 	return nil
