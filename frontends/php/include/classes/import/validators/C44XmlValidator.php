@@ -290,7 +290,7 @@ class C44XmlValidator {
 									'username' => ['type' => XML_STRING],
 									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-										'name' => ['type' => XML_STRING],
+										'name' => ['type' => XML_STRING | XML_REQUIRED],
 									]],
 									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -614,7 +614,7 @@ class C44XmlValidator {
 							'username' => ['type' => XML_STRING],
 							'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING]
+								'name' => ['type' => XML_STRING | XML_REQUIRED]
 							]],
 							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
@@ -843,7 +843,7 @@ class C44XmlValidator {
 									'username' => ['type' => XML_STRING],
 									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-										'name' => ['type' => XML_STRING]
+										'name' => ['type' => XML_STRING | XML_REQUIRED]
 									]],
 									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1079,7 +1079,7 @@ class C44XmlValidator {
 							'username' => ['type' => XML_STRING],
 							'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING]
+								'name' => ['type' => XML_STRING | XML_REQUIRED]
 							]],
 							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]

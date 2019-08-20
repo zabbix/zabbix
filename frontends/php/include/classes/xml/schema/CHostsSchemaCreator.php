@@ -565,7 +565,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::TEXT, CXmlConstantValue::TEXT),
 														(new CArrayXmlTag('valuemap'))
 															->setSchema(
-																new CStringXmlTag('name')
+																(new CStringXmlTag('name'))->setRequired()
 															),
 														(new CStringXmlTag('verify_host'))
 															->setDefaultValue(DB::getDefault('items', 'verify_host'))
@@ -1279,7 +1279,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::TEXT, CXmlConstantValue::TEXT),
 										(new CArrayXmlTag('valuemap'))
 											->setSchema(
-												(new CStringXmlTag('name'))
+												(new CStringXmlTag('name'))->setRequired()
 											),
 										(new CStringXmlTag('verify_host'))
 											->setDefaultValue(DB::getDefault('items', 'verify_host'))
