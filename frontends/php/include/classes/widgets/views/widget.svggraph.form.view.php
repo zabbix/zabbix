@@ -267,6 +267,7 @@ $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
 $scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select", onGraphConfigChange);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change.multiselect", ".multiselect", onGraphConfigChange);';
 $scripts[] = 'onGraphConfigChange();';
 
 return [

@@ -112,11 +112,11 @@ jQuery(function($) {
 		/**
 		 * Insert outside data
 		 *
-		 * @param object    multiselect value object
+		 * @param array    array of multiselect value objects
 		 *
 		 * @return jQuery
 		 */
-		addData: function(item) {
+		addData: function(items) {
 			return this.each(function() {
 				var obj = $(this),
 					ms = $(this).data('multiSelect');
@@ -127,9 +127,14 @@ jQuery(function($) {
 						removeSelected(id, obj, ms.values, ms.options);
 					}
 
-					cleanAvailable(item, ms.values);
+					cleanAvailable(items[0], ms.values);
 				}
-				addSelected(item, obj, ms.values, ms.options);
+
+				for (var i = 0, l = items.length; i < l; i++) {
+					addSelected(items[i], obj, ms.values, ms.options);
+				}
+
+				obj.trigger('change.multiselect');
 			});
 		},
 
@@ -148,6 +153,7 @@ jQuery(function($) {
 				}
 
 				cleanAvailable(obj, ms.values);
+				obj.trigger('change.multiselect');
 			});
 		},
 
@@ -600,6 +606,7 @@ jQuery(function($) {
 										: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
 
 									removeSelected(id, $obj, values, options);
+									$obj.trigger('change.multiselect');
 
 									if ($selected.length) {
 										var $collection = $('.selected li', $obj);
@@ -845,6 +852,7 @@ jQuery(function($) {
 						.on('click', function() {
 							if (!options.disabled && !item_disabled) {
 								removeSelected(item.id, obj, values, options);
+								obj.trigger('change.multiselect');
 							}
 						}))
 			);
@@ -955,6 +963,8 @@ jQuery(function($) {
 			if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
 				$('input[type="text"]', obj).focus();
 			}
+
+			obj.trigger('change.multiselect');
 		}
 	}
 

@@ -246,6 +246,7 @@ jQuery(function($) {
 	$(document).on('add.popup', function(e, data) {
 		// multiselect check
 		if ($('#' + data.parentId).hasClass('multiselect')) {
+			var items = [];
 			for (var i = 0; i < data.values.length; i++) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
@@ -256,10 +257,11 @@ jQuery(function($) {
 					if (typeof data.values[i].prefix !== 'undefined') {
 						item.prefix = data.values[i].prefix;
 					}
-
-					$('#' + data.parentId).multiSelect('addData', item);
+					items.push(item);
 				}
 			}
+
+			$('#' + data.parentId).multiSelect('addData', items);
 		}
 		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
 				&& typeof addPopupValues !== 'undefined') {

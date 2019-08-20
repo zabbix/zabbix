@@ -2939,10 +2939,10 @@ ZABBIX.apps.map = (function($) {
 				switch (selement.elementtype) {
 					// host
 					case '0':
-						$('#elementNameHost').multiSelect('addData', {
+						$('#elementNameHost').multiSelect('addData', [{
 							'id': selement.elements[0].hostid,
 							'name': selement.elements[0].elementName
-						});
+						}]);
 						break;
 
 					// map
@@ -2964,10 +2964,10 @@ ZABBIX.apps.map = (function($) {
 
 					// host group
 					case '3':
-						$('#elementNameHostGroup').multiSelect('addData', {
+						$('#elementNameHostGroup').multiSelect('addData', [{
 							'id': selement.elements[0].groupid,
 							'name': selement.elements[0].elementName
-						});
+						}]);
 						break;
 				}
 			},
