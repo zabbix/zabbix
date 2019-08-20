@@ -188,10 +188,11 @@ loop:
 	return nil
 }
 
+var confDefault string
+
 func main() {
 	var confFlag string
 	const (
-		confDefault     = "agent.conf"
 		confDescription = "Path to the configuration file"
 	)
 	flag.StringVar(&confFlag, "config", confDefault, confDescription)
@@ -238,7 +239,7 @@ func main() {
 
 	flag.Parse()
 
-	var argConfig, argTest, argPrint, argVersion bool
+	var argTest, argPrint, argVersion bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -248,8 +249,6 @@ func main() {
 			argTest = true
 		case "p", "print":
 			argPrint = true
-		case "c", "config":
-			argConfig = true
 		case "v", "version":
 			argVersion = true
 		}
@@ -260,11 +259,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	if argConfig {
-		if err := conf.Load(confFlag, &agent.Options); err != nil {
-			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-			os.Exit(1)
-		}
+	if err := conf.Load(confFlag, &agent.Options); err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+		os.Exit(1)
 	}
 
 	if argTest || argPrint {

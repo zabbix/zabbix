@@ -5,16 +5,24 @@ GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
 PKG=zabbix/pkg/version
 
+GOLDFLAGS = -X ${PKG}.titleMessage=zabbix_agentd
+GOLDFLAGS += -X '${PKG}.compileDate=${BUILD_DATE}'
+GOLDFLAGS += -X ${PKG}.compileTime=${BUILD_TIME}
+GOLDFLAGS += -X ${PKG}.compileOs=${GOOS}
+GOLDFLAGS += -X ${PKG}.compileArch=${GOARCH}
+GOLDFLAGS += -X ${PKG}.compileMode=daemon
+GOLDFLAGS += -X main.confDefault=${XAGENT_CONFIG_FILE}
+
 all: build
 
-build:	
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="-X ${PKG}.titleMessage=zabbix_agentd -X '${PKG}.compileDate=${BUILD_DATE}' -X ${PKG}.compileTime=${BUILD_TIME} -X ${PKG}.compileOs=${GOOS} -X ${PKG}.compileArch=${GOARCH} -X ${PKG}.compileMode=daemon"
+build:
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}"
 
 clean:
 	go clean
 
 install:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go install -ldflags="-X ${PKG}.titleMessage=zabbix_agentd -X '${PKG}.compileDate=${BUILD_DATE}' -X ${PKG}.compileTime=${BUILD_TIME} -X ${PKG}.compileOs=${GOOS} -X ${PKG}.compileArch=${GOARCH} -X ${PKG}.compileMode=daemon"
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go install -ldflags="${GOLDFLAGS}"
 
 check:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
