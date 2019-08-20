@@ -52,7 +52,9 @@ func executeRegex(line []byte, rx *regexp.Regexp, output []byte) (result string,
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			i := output[pos+1] - '0'
 			if len(matches) >= int(i)*2+2 {
-				_, _ = buf.Write(line[matches[i*2]:matches[i*2+1]])
+				if matches[i*2] != -1 {
+					_, _ = buf.Write(line[matches[i*2]:matches[i*2+1]])
+				}
 			}
 			pos++
 		case '@':
