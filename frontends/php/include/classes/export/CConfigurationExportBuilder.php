@@ -92,9 +92,9 @@ class CConfigurationExportBuilder {
 			$store = [];
 			foreach ($schema as $tag => $class) {
 				$is_require = $class->isRequired();
-				$is_array = $class instanceof CArrayXmlTagInterface;
-				$is_indexed_array = $class instanceof CIndexedArrayXmlTagInterface;
-				$is_string = $class instanceof CStringXmlTagInterface;
+				$is_array = ($class instanceof CArrayXmlTagInterface);
+				$is_indexed_array = ($class instanceof CIndexedArrayXmlTagInterface);
+				$is_string = ($class instanceof CStringXmlTagInterface);
 				$has_data = array_key_exists($tag, $row);
 				$default_value = $is_string ? $class->getDefaultValue() : null;
 
