@@ -65,7 +65,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
 												if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-													&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+														&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
 													return CXmlConstantName::NONE;
 												}
 
@@ -76,9 +76,9 @@ class CHostsSchemaCreator implements CSchemaCreator {
 													return (string) CXmlConstantValue::NONE;
 												}
 
-												$type = ($data['type'] === CXmlConstantName::HTTP_AGENT
+												$type = ($data['type'] === CXmlConstantName::HTTP_AGENT)
 													? CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-													: CXmlConstantValue::ITEM_TYPE_SSH);
+													: CXmlConstantValue::ITEM_TYPE_SSH;
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
 										// Default value is different from DB default value.
@@ -106,7 +106,8 @@ class CHostsSchemaCreator implements CSchemaCreator {
 													->addConstant(CXmlConstantName::XML_OR, CXmlConstantValue::XML_OR)
 													->addConstant(CXmlConstantName::FORMULA, CXmlConstantValue::FORMULA),
 												new CStringXmlTag('formula')
-											)->setImportHandler(function(array $data, CXmlTagInterface $class) {
+											)
+											->setImportHandler(function(array $data, CXmlTagInterface $class) {
 												if (!array_key_exists('filter', $data)) {
 													return [
 														'conditions' => '',
@@ -196,17 +197,13 @@ class CHostsSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('ymax_item_1'))
 															->setDefaultValue('0')
 															->setExportHandler(function(array $data, CXmlTagInterface $class) {
-																if ($data['ymax_type_1'] == 2) {
-																	if (array_key_exists('ymax_item_1', $data)) {
-																		if (!array_key_exists('host', $data['ymax_item_1']) &&
-																			!array_key_exists('key', $data['ymax_item_1'])) {
-																			throw new Exception(
-																				_s('Invalid tag "%1$s": %2$s.',
-																					'/zabbix_export/hosts/host/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymax_item_1',
-																					_('an array is expected'))
-																			);
-																		}
-																	}
+																if ($data['ymax_type_1'] == CXmlConstantValue::ITEM
+																		&& array_key_exists('ymax_item_1', $data)
+																		&& (!array_key_exists('host', $data['ymax_item_1'])
+																				|| !array_key_exists('key', $data['ymax_item_1']))) {
+																	throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+																		'/zabbix_export/hosts/host/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymax_item_1',
+																		_('an array is expected')));
 																}
 
 																return $data['ymax_item_1'];
@@ -219,17 +216,13 @@ class CHostsSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('ymin_item_1'))
 															->setDefaultValue('0')
 															->setExportHandler(function(array $data, CXmlTagInterface $class) {
-																if ($data['ymin_type_1'] == 2) {
-																	if (array_key_exists('ymin_item_1', $data)) {
-																		if (!array_key_exists('host', $data['ymin_item_1']) &&
-																			!array_key_exists('key', $data['ymin_item_1'])) {
-																			throw new Exception(
-																				_s('Invalid tag "%1$s": %2$s.',
-																					'/zabbix_export/hosts/host/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymin_item_1',
-																					_('an array is expected'))
-																			);
-																		}
-																	}
+																if ($data['ymin_type_1'] == CXmlConstantValue::ITEM
+																		&& array_key_exists('ymin_item_1', $data)
+																		&& (!array_key_exists('host', $data['ymin_item_1'])
+																			|| !array_key_exists('key', $data['ymin_item_1']))) {
+																	throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+																		'/zabbix_export/hosts/host/discovery_rules/discovery_rule/graph_prototypes/graph_prototype/ymin_item_1',
+																		_('an array is expected')));
 																}
 
 																return $data['ymax_item_1'];
@@ -316,7 +309,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 															->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 															->setExportHandler(function(array $data, CXmlTagInterface $class) {
 																if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-																	&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+																		&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
 																	return CXmlConstantName::NONE;
 																}
 
@@ -327,9 +320,9 @@ class CHostsSchemaCreator implements CSchemaCreator {
 																	return (string) CXmlConstantValue::NONE;
 																}
 
-																$type = ($data['type'] === CXmlConstantName::HTTP_AGENT
+																$type = ($data['type'] === CXmlConstantName::HTTP_AGENT)
 																	? CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-																	: CXmlConstantValue::ITEM_TYPE_SSH);
+																	: CXmlConstantValue::ITEM_TYPE_SSH;
 																return (string) $class->getConstantValueByName($data['authtype'], $type);
 															}),
 														// Default value is different from DB default value.
@@ -1031,7 +1024,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->addConstant(CXmlConstantName::PUBLIC_KEY, CXmlConstantValue::PUBLIC_KEY, CXmlConstantValue::ITEM_TYPE_SSH)
 											->setExportHandler(function(array $data, CXmlTagInterface $class) {
 												if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-													&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+														&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
 													return CXmlConstantName::NONE;
 												}
 
@@ -1042,9 +1035,9 @@ class CHostsSchemaCreator implements CSchemaCreator {
 													return (string) CXmlConstantValue::NONE;
 												}
 
-												$type = ($data['type'] === CXmlConstantName::HTTP_AGENT
+												$type = ($data['type'] === CXmlConstantName::HTTP_AGENT)
 													? CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-													: CXmlConstantValue::ITEM_TYPE_SSH);
+													: CXmlConstantValue::ITEM_TYPE_SSH;
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
 										// Default value is different from DB default value.
