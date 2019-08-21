@@ -70,6 +70,8 @@ func (c *Conn) run() {
 			if scanner.Scan() {
 				// accept single command line, the connection will be closed after sending reply
 				c.sink <- &Client{request: scanner.Text(), conn: conn}
+			} else {
+				conn.Close()
 			}
 		}
 	}
