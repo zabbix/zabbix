@@ -50,7 +50,7 @@ func RegisterMetric(plugin Accessor, name string, key string, description string
 	}
 
 	if description[len(description)-1] != '.' {
-		panic(fmt.Sprintf(`cannot register metric "%s" with dot at the end of description: "%s"`, key, description))
+		panic(fmt.Sprintf(`cannot register metric "%s" without dot at the end of description: "%s"`, key, description))
 	}
 
 	if _, ok := Metrics[key]; ok {
