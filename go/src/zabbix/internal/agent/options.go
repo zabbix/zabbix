@@ -27,6 +27,7 @@ import (
 type AgentOptions struct {
 	LogType              string   `conf:",,,console"`
 	LogFile              string   `conf:",optional"`
+	LogFileSize          int      `conf:",optional,0:1024,1"`
 	DebugLevel           int      `conf:",,0:5,3"`
 	ServerActive         string   `conf:",optional"`
 	RefreshActiveChecks  int      `conf:",,30:3600,120"`

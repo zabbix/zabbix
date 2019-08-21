@@ -25,6 +25,7 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
+	"sync"
 )
 
 const Empty = 0
@@ -41,8 +42,20 @@ const System = 1
 const File = 2
 const Console = 3
 
+const MB = 1048576
+
 var logLevel int
 var logger *log.Logger
+
+type LogStat struct {
+	logType  int
+	filename string
+	filesize int64
+	f        *os.File
+}
+
+var logStat LogStat
+var logAccess sync.Mutex
 
 func CheckLogLevel(level int) bool {
 	if level != Info && (level > logLevel || Empty == level) {
@@ -86,16 +99,21 @@ func DecreaseLogLevel() (success bool) {
 	return false
 }
 
-func Open(logType int, level int, filename string) error {
+func Open(logType int, level int, filename string, filesize int) error {
+
+	logStat.logType = logType
+	logStat.filename = filename
+	logStat.filesize = int64(filesize) * MB
+	var err error
 
 	if logType == Console {
 		logger = log.New(os.Stdout, "", log.Lmicroseconds|log.Ldate)
 	} else if logType == File {
-		f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		logStat.f, err = os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
-		logger = log.New(f, "", log.Lmicroseconds|log.Ldate)
+		logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
 	} else {
 		return errors.New("invalid argument")
 	}
@@ -106,35 +124,75 @@ func Open(logType int, level int, filename string) error {
 
 func Critf(format string, args ...interface{}) {
 	if CheckLogLevel(Crit) {
-		logger.Printf(format, args...)
+		procLog(format, args...)
 	}
 }
 
 func Infof(format string, args ...interface{}) {
-	logger.Printf(format, args...)
+	procLog(format, args...)
 }
 
 func Warningf(format string, args ...interface{}) {
 	if CheckLogLevel(Warning) {
-		logger.Printf(format, args...)
+		procLog(format, args...)
 	}
 }
 
 func Tracef(format string, args ...interface{}) {
 	if CheckLogLevel(Trace) {
-		logger.Printf(format, args...)
+		procLog(format, args...)
 	}
 }
 
 func Debugf(format string, args ...interface{}) {
 	if CheckLogLevel(Debug) {
-		logger.Printf(format, args...)
+		procLog(format, args...)
 	}
 }
 
 func Errf(format string, args ...interface{}) {
 	if CheckLogLevel(Err) {
-		logger.Printf(format, args...)
+		procLog(format, args...)
+	}
+}
+func procLog(format string, args ...interface{}) {
+	logAccess.Lock()
+	rotateLog()
+	logger.Printf(format, args...)
+	logAccess.Unlock()
+}
+
+func rotateLog() {
+	if logStat.logType == File && logStat.filesize != 0 {
+		var printError string
+
+		fstat, err := os.Stat(logStat.filename)
+		if err != nil {
+			return
+		}
+
+		if fstat.Size() > logStat.filesize {
+			filenameOld := logStat.filename + ".old"
+			logStat.f.Close()
+			os.Remove(filenameOld)
+
+			err = os.Rename(logStat.filename, filenameOld)
+			if err != nil {
+				printError = err.Error()
+			}
+
+			logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
+			if err == nil {
+				logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+				if printError != "" {
+					logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
+						logStat.filename, filenameOld, printError)
+					logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
+						" moving it to \"%s\" failed. The logfile was truncated.",
+						logStat.filename, filenameOld)
+				}
+			}
+		}
 	}
 }
 

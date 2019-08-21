@@ -604,7 +604,7 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 }
 
 func TestTaskCreate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
@@ -657,7 +657,7 @@ func TestTaskCreate(t *testing.T) {
 }
 
 func TestTaskUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
@@ -725,7 +725,7 @@ func TestTaskUpdate(t *testing.T) {
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
@@ -781,7 +781,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 }
 
 func TestTaskDelete(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
@@ -847,7 +847,7 @@ func TestTaskDelete(t *testing.T) {
 }
 
 func TestSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -897,7 +897,7 @@ func TestSchedule(t *testing.T) {
 }
 
 func TestScheduleCapacity(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -950,7 +950,7 @@ func TestScheduleCapacity(t *testing.T) {
 }
 
 func TestScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1017,7 +1017,7 @@ func TestScheduleUpdate(t *testing.T) {
 }
 
 func TestCollectorSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1062,7 +1062,7 @@ func TestCollectorSchedule(t *testing.T) {
 }
 
 func TestCollectorScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1135,7 +1135,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 }
 
 func TestRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1242,7 +1242,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*plugin.Requ
 }
 
 func TestWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1336,7 +1336,7 @@ func TestWatcher(t *testing.T) {
 }
 
 func TestCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1383,7 +1383,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1478,7 +1478,7 @@ func TestRunnerWatcher(t *testing.T) {
 }
 
 func TestMultiCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1536,7 +1536,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestMultiRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1612,7 +1612,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 }
 
 func TestPassiveRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1685,7 +1685,7 @@ func TestPassiveRunner(t *testing.T) {
 }
 
 func TestConfigurator(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	options := map[string]map[string]string{
 		"Debug1": map[string]string{"delay": "5"},

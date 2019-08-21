@@ -268,7 +268,7 @@ func main() {
 	}
 
 	if argTest || argPrint {
-		if err := log.Open(log.Console, log.Warning, ""); err != nil {
+		if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 			os.Exit(1)
 		}
@@ -320,7 +320,7 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, agent.Options.LogFile); err != nil {
+	if err := log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
