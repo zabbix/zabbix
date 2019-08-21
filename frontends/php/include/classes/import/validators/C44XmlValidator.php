@@ -24,25 +24,251 @@
  */
 class C44XmlValidator {
 
-	private $PREPROCESSING_STEP_TYPE = [CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER, CXmlConstantValue::RTRIM => CXmlConstantName::RTRIM, CXmlConstantValue::LTRIM => CXmlConstantName::LTRIM, CXmlConstantValue::TRIM => CXmlConstantName::TRIM, CXmlConstantValue::REGEX => CXmlConstantName::REGEX, CXmlConstantValue::BOOL_TO_DECIMAL => CXmlConstantName::BOOL_TO_DECIMAL, CXmlConstantValue::OCTAL_TO_DECIMAL => CXmlConstantName::OCTAL_TO_DECIMAL, CXmlConstantValue::HEX_TO_DECIMAL => CXmlConstantName::HEX_TO_DECIMAL, CXmlConstantValue::SIMPLE_CHANGE => CXmlConstantName::SIMPLE_CHANGE, CXmlConstantValue::CHANGE_PER_SECOND => CXmlConstantName::CHANGE_PER_SECOND, CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH, CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH, CXmlConstantValue::IN_RANGE => CXmlConstantName::IN_RANGE, CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX, CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR, CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR, CXmlConstantValue::CHECK_REGEX_ERROR => CXmlConstantName::CHECK_REGEX_ERROR, CXmlConstantValue::DISCARD_UNCHANGED => CXmlConstantName::DISCARD_UNCHANGED, CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT, CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT, CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN, CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON];
-	private $PREPROCESSING_STEP_TYPE_DRULE = [CXmlConstantValue::REGEX => CXmlConstantName::REGEX, CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH, CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX, CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR, CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT, CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT, CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON];
-	private $GRAPH_GRAPH_ITEM_CALC_FNC = [CXmlConstantValue::MIN => CXmlConstantName::MIN, CXmlConstantValue::AVG => CXmlConstantName::AVG, CXmlConstantValue::MAX => CXmlConstantName::MAX, CXmlConstantValue::ALL => CXmlConstantName::ALL, CXmlConstantValue::LAST => CXmlConstantName::LAST];
-	private $GRAPH_GRAPH_ITEM_DRAWTYPE = [CXmlConstantValue::SINGLE_LINE => CXmlConstantName::SINGLE_LINE, CXmlConstantValue::FILLED_REGION => CXmlConstantName::FILLED_REGION, CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE, CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE, CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE, CXmlConstantValue::GRADIENT_LINE => CXmlConstantName::GRADIENT_LINE];
-	private $GRAPH_TYPE = [CXmlConstantValue::NORMAL => CXmlConstantName::NORMAL, CXmlConstantValue::STACKED => CXmlConstantName::STACKED, CXmlConstantValue::PIE => CXmlConstantName::PIE, CXmlConstantValue::EXPLODED => CXmlConstantName::EXPLODED];
-	private $GRAPH_Y_TYPE = [CXmlConstantValue::CALCULATED => CXmlConstantName::CALCULATED, CXmlConstantValue::FIXED => CXmlConstantName::FIXED, CXmlConstantValue::ITEM => CXmlConstantName::ITEM];
-	private $GRAPH_GRAPH_ITEM_YAXISSIDE = [CXmlConstantValue::LEFT => CXmlConstantName::LEFT, CXmlConstantValue::RIGHT => CXmlConstantName::RIGHT];
-	private $GRAPH_GRAPH_ITEM_TYPE = [CXmlConstantValue::SIMPLE => CXmlConstantName::SIMPLE, CXmlConstantValue::GRAPH_SUM => CXmlConstantName::GRAPH_SUM];
-	private $ITEM_INVENTORY_LINK = [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::ALIAS => CXmlConstantName::ALIAS, CXmlConstantValue::ASSET_TAG => CXmlConstantName::ASSET_TAG, CXmlConstantValue::CHASSIS => CXmlConstantName::CHASSIS, CXmlConstantValue::CONTACT => CXmlConstantName::CONTACT, CXmlConstantValue::CONTRACT_NUMBER => CXmlConstantName::CONTRACT_NUMBER, CXmlConstantValue::DATE_HW_DECOMM => CXmlConstantName::DATE_HW_DECOMM, CXmlConstantValue::DATE_HW_EXPIRY => CXmlConstantName::DATE_HW_EXPIRY, CXmlConstantValue::DATE_HW_INSTALL => CXmlConstantName::DATE_HW_INSTALL, CXmlConstantValue::DATE_HW_PURCHASE => CXmlConstantName::DATE_HW_PURCHASE, CXmlConstantValue::DEPLOYMENT_STATUS => CXmlConstantName::DEPLOYMENT_STATUS, CXmlConstantValue::HARDWARE => CXmlConstantName::HARDWARE, CXmlConstantValue::HARDWARE_FULL => CXmlConstantName::HARDWARE_FULL, CXmlConstantValue::HOST_NETMASK => CXmlConstantName::HOST_NETMASK, CXmlConstantValue::HOST_NETWORKS => CXmlConstantName::HOST_NETWORKS, CXmlConstantValue::HOST_ROUTER => CXmlConstantName::HOST_ROUTER, CXmlConstantValue::HW_ARCH => CXmlConstantName::HW_ARCH, CXmlConstantValue::INSTALLER_NAME => CXmlConstantName::INSTALLER_NAME, CXmlConstantValue::LOCATION => CXmlConstantName::LOCATION, CXmlConstantValue::LOCATION_LAT => CXmlConstantName::LOCATION_LAT, CXmlConstantValue::LOCATION_LON => CXmlConstantName::LOCATION_LON, CXmlConstantValue::MACADDRESS_A => CXmlConstantName::MACADDRESS_A, CXmlConstantValue::MACADDRESS_B => CXmlConstantName::MACADDRESS_B, CXmlConstantValue::MODEL => CXmlConstantName::MODEL, CXmlConstantValue::NAME => CXmlConstantName::NAME, CXmlConstantValue::NOTES => CXmlConstantName::NOTES, CXmlConstantValue::OOB_IP => CXmlConstantName::OOB_IP, CXmlConstantValue::OOB_NETMASK => CXmlConstantName::OOB_NETMASK, CXmlConstantValue::OOB_ROUTER => CXmlConstantName::OOB_ROUTER, CXmlConstantValue::OS => CXmlConstantName::OS, CXmlConstantValue::OS_FULL => CXmlConstantName::OS_FULL, CXmlConstantValue::OS_SHORT => CXmlConstantName::OS_SHORT, CXmlConstantValue::POC_1_CELL => CXmlConstantName::POC_1_CELL, CXmlConstantValue::POC_1_EMAIL => CXmlConstantName::POC_1_EMAIL, CXmlConstantValue::POC_1_NAME => CXmlConstantName::POC_1_NAME, CXmlConstantValue::POC_1_NOTES => CXmlConstantName::POC_1_NOTES, CXmlConstantValue::POC_1_PHONE_A => CXmlConstantName::POC_1_PHONE_A, CXmlConstantValue::POC_1_PHONE_B => CXmlConstantName::POC_1_PHONE_B, CXmlConstantValue::POC_1_SCREEN => CXmlConstantName::POC_1_SCREEN, CXmlConstantValue::POC_2_CELL => CXmlConstantName::POC_2_CELL, CXmlConstantValue::POC_2_EMAIL => CXmlConstantName::POC_2_EMAIL, CXmlConstantValue::POC_2_NAME => CXmlConstantName::POC_2_NAME, CXmlConstantValue::POC_2_NOTES => CXmlConstantName::POC_2_NOTES, CXmlConstantValue::POC_2_PHONE_A => CXmlConstantName::POC_2_PHONE_A, CXmlConstantValue::POC_2_PHONE_B => CXmlConstantName::POC_2_PHONE_B, CXmlConstantValue::POC_2_SCREEN => CXmlConstantName::POC_2_SCREEN, CXmlConstantValue::SERIALNO_A => CXmlConstantName::SERIALNO_A, CXmlConstantValue::SERIALNO_B => CXmlConstantName::SERIALNO_B, CXmlConstantValue::SITE_ADDRESS_A => CXmlConstantName::SITE_ADDRESS_A, CXmlConstantValue::SITE_ADDRESS_B => CXmlConstantName::SITE_ADDRESS_B, CXmlConstantValue::SITE_ADDRESS_C => CXmlConstantName::SITE_ADDRESS_C, CXmlConstantValue::SITE_CITY => CXmlConstantName::SITE_CITY, CXmlConstantValue::SITE_COUNTRY => CXmlConstantName::SITE_COUNTRY, CXmlConstantValue::SITE_NOTES => CXmlConstantName::SITE_NOTES, CXmlConstantValue::SITE_RACK => CXmlConstantName::SITE_RACK, CXmlConstantValue::SITE_STATE => CXmlConstantName::SITE_STATE, CXmlConstantValue::SITE_ZIP => CXmlConstantName::SITE_ZIP, CXmlConstantValue::SOFTWARE => CXmlConstantName::SOFTWARE, CXmlConstantValue::SOFTWARE_APP_A => CXmlConstantName::SOFTWARE_APP_A, CXmlConstantValue::SOFTWARE_APP_B => CXmlConstantName::SOFTWARE_APP_B, CXmlConstantValue::SOFTWARE_APP_C => CXmlConstantName::SOFTWARE_APP_C, CXmlConstantValue::SOFTWARE_APP_D => CXmlConstantName::SOFTWARE_APP_D, CXmlConstantValue::SOFTWARE_APP_E => CXmlConstantName::SOFTWARE_APP_E, CXmlConstantValue::SOFTWARE_FULL => CXmlConstantName::SOFTWARE_FULL, CXmlConstantValue::TAG => CXmlConstantName::TAG, CXmlConstantValue::TYPE => CXmlConstantName::TYPE, CXmlConstantValue::TYPE_FULL => CXmlConstantName::TYPE_FULL, CXmlConstantValue::URL_A => CXmlConstantName::URL_A, CXmlConstantValue::URL_B => CXmlConstantName::URL_B, CXmlConstantValue::URL_C => CXmlConstantName::URL_C, CXmlConstantValue::VENDOR => CXmlConstantName::VENDOR];
-	private $ITEM_POST_TYPE = [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON, CXmlConstantValue::XML => CXmlConstantName::XML];
-	private $ITEM_PREPROCESSING_ERROR_HANDLER = [CXmlConstantValue::ORIGINAL_ERROR => CXmlConstantName::ORIGINAL_ERROR, CXmlConstantValue::DISCARD_VALUE => CXmlConstantName::DISCARD_VALUE, CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR];
-	private $ITEM_REQUEST_METHOD = [CXmlConstantValue::GET => CXmlConstantName::GET, CXmlConstantValue::POST => CXmlConstantName::POST, CXmlConstantValue::PUT => CXmlConstantName::PUT, CXmlConstantValue::HEAD => CXmlConstantName::HEAD];
-	private $ITEM_RETRIEVE_MODE = [CXmlConstantValue::BODY => CXmlConstantName::BODY, CXmlConstantValue::HEADERS => CXmlConstantName::HEADERS, CXmlConstantValue::BOTH => CXmlConstantName::BOTH];
-	private $ITEM_SNMPV3_SECURITYLEVEL = [CXmlConstantValue::NOAUTHNOPRIV => CXmlConstantName::NOAUTHNOPRIV, CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV, CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV];
-	private $ITEM_TYPE = [CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1, CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP, CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE, CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2, CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL, CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3, CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE, CXmlConstantValue::ITEM_TYPE_AGGREGATE => CXmlConstantName::AGGREGATE, CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL, CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC, CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI, CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH, CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET, CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED, CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX, CXmlConstantValue::ITEM_TYPE_SNMP_TRAP => CXmlConstantName::SNMP_TRAP, CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT];
-	private $ITEM_TYPE_DRULE = [CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1, CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP, CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE, CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2, CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL, CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3, CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE, CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL, CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC, CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI, CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH, CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET, CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX, CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT];
-	private $ITEM_VALUE_TYPE = [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::CHAR => CXmlConstantName::CHAR, CXmlConstantValue::LOG => CXmlConstantName::LOG, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED, CXmlConstantValue::TEXT => CXmlConstantName::TEXT];
-	private $TRIGGER_PRIORITY = [CXmlConstantValue::NOT_CLASSIFIED => CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::INFO => CXmlConstantName::INFO, CXmlConstantValue::WARNING => CXmlConstantName::WARNING, CXmlConstantValue::AVERAGE => CXmlConstantName::AVERAGE, CXmlConstantValue::HIGH => CXmlConstantName::HIGH, CXmlConstantValue::DISASTER => CXmlConstantName::DISASTER];
-	private $TRIGGER_RECOVERY_MODE = [CXmlConstantValue::TRIGGER_EXPRESSION => CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION => CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE];
+	private $PREPROCESSING_STEP_TYPE = [
+		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
+		CXmlConstantValue::RTRIM => CXmlConstantName::RTRIM,
+		CXmlConstantValue::LTRIM => CXmlConstantName::LTRIM,
+		CXmlConstantValue::TRIM => CXmlConstantName::TRIM,
+		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
+		CXmlConstantValue::BOOL_TO_DECIMAL => CXmlConstantName::BOOL_TO_DECIMAL,
+		CXmlConstantValue::OCTAL_TO_DECIMAL => CXmlConstantName::OCTAL_TO_DECIMAL,
+		CXmlConstantValue::HEX_TO_DECIMAL => CXmlConstantName::HEX_TO_DECIMAL,
+		CXmlConstantValue::SIMPLE_CHANGE => CXmlConstantName::SIMPLE_CHANGE,
+		CXmlConstantValue::CHANGE_PER_SECOND => CXmlConstantName::CHANGE_PER_SECOND,
+		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
+		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
+		CXmlConstantValue::IN_RANGE => CXmlConstantName::IN_RANGE,
+		CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
+		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
+		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
+		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
+		CXmlConstantValue::CHECK_REGEX_ERROR => CXmlConstantName::CHECK_REGEX_ERROR,
+		CXmlConstantValue::DISCARD_UNCHANGED => CXmlConstantName::DISCARD_UNCHANGED,
+		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
+		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
+		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
+		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON
+	];
+
+	private $PREPROCESSING_STEP_TYPE_DRULE = [
+		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
+		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
+		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
+		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
+		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
+		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
+		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON
+	];
+
+	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
+		CXmlConstantValue::MIN => CXmlConstantName::MIN,
+		CXmlConstantValue::AVG => CXmlConstantName::AVG,
+		CXmlConstantValue::MAX => CXmlConstantName::MAX,
+		CXmlConstantValue::ALL => CXmlConstantName::ALL,
+		CXmlConstantValue::LAST => CXmlConstantName::LAST
+	];
+
+	private $GRAPH_GRAPH_ITEM_DRAWTYPE = [
+		CXmlConstantValue::SINGLE_LINE => CXmlConstantName::SINGLE_LINE,
+		CXmlConstantValue::FILLED_REGION => CXmlConstantName::FILLED_REGION,
+		CXmlConstantValue::BOLD_LINE => CXmlConstantName::BOLD_LINE,
+		CXmlConstantValue::DOTTED_LINE => CXmlConstantName::DOTTED_LINE,
+		CXmlConstantValue::DASHED_LINE => CXmlConstantName::DASHED_LINE,
+		CXmlConstantValue::GRADIENT_LINE => CXmlConstantName::GRADIENT_LINE
+	];
+
+	private $GRAPH_TYPE = [
+		CXmlConstantValue::NORMAL => CXmlConstantName::NORMAL,
+		CXmlConstantValue::STACKED => CXmlConstantName::STACKED,
+		CXmlConstantValue::PIE => CXmlConstantName::PIE,
+		CXmlConstantValue::EXPLODED => CXmlConstantName::EXPLODED
+	];
+
+	private $GRAPH_Y_TYPE = [
+		CXmlConstantValue::CALCULATED => CXmlConstantName::CALCULATED,
+		CXmlConstantValue::FIXED => CXmlConstantName::FIXED,
+		CXmlConstantValue::ITEM => CXmlConstantName::ITEM
+	];
+
+	private $GRAPH_GRAPH_ITEM_YAXISSIDE = [
+		CXmlConstantValue::LEFT => CXmlConstantName::LEFT,
+		CXmlConstantValue::RIGHT => CXmlConstantName::RIGHT
+	];
+
+	private $GRAPH_GRAPH_ITEM_TYPE = [
+		CXmlConstantValue::SIMPLE => CXmlConstantName::SIMPLE,
+		CXmlConstantValue::GRAPH_SUM => CXmlConstantName::GRAPH_SUM
+	];
+
+	private $ITEM_INVENTORY_LINK = [
+		CXmlConstantValue::NONE => CXmlConstantName::NONE,
+		CXmlConstantValue::ALIAS => CXmlConstantName::ALIAS,
+		CXmlConstantValue::ASSET_TAG => CXmlConstantName::ASSET_TAG,
+		CXmlConstantValue::CHASSIS => CXmlConstantName::CHASSIS,
+		CXmlConstantValue::CONTACT => CXmlConstantName::CONTACT,
+		CXmlConstantValue::CONTRACT_NUMBER => CXmlConstantName::CONTRACT_NUMBER,
+		CXmlConstantValue::DATE_HW_DECOMM => CXmlConstantName::DATE_HW_DECOMM,
+		CXmlConstantValue::DATE_HW_EXPIRY => CXmlConstantName::DATE_HW_EXPIRY,
+		CXmlConstantValue::DATE_HW_INSTALL => CXmlConstantName::DATE_HW_INSTALL,
+		CXmlConstantValue::DATE_HW_PURCHASE => CXmlConstantName::DATE_HW_PURCHASE,
+		CXmlConstantValue::DEPLOYMENT_STATUS => CXmlConstantName::DEPLOYMENT_STATUS,
+		CXmlConstantValue::HARDWARE => CXmlConstantName::HARDWARE,
+		CXmlConstantValue::HARDWARE_FULL => CXmlConstantName::HARDWARE_FULL,
+		CXmlConstantValue::HOST_NETMASK => CXmlConstantName::HOST_NETMASK,
+		CXmlConstantValue::HOST_NETWORKS => CXmlConstantName::HOST_NETWORKS,
+		CXmlConstantValue::HOST_ROUTER => CXmlConstantName::HOST_ROUTER,
+		CXmlConstantValue::HW_ARCH => CXmlConstantName::HW_ARCH,
+		CXmlConstantValue::INSTALLER_NAME => CXmlConstantName::INSTALLER_NAME,
+		CXmlConstantValue::LOCATION => CXmlConstantName::LOCATION,
+		CXmlConstantValue::LOCATION_LAT => CXmlConstantName::LOCATION_LAT,
+		CXmlConstantValue::LOCATION_LON => CXmlConstantName::LOCATION_LON,
+		CXmlConstantValue::MACADDRESS_A => CXmlConstantName::MACADDRESS_A,
+		CXmlConstantValue::MACADDRESS_B => CXmlConstantName::MACADDRESS_B,
+		CXmlConstantValue::MODEL => CXmlConstantName::MODEL,
+		CXmlConstantValue::NAME => CXmlConstantName::NAME,
+		CXmlConstantValue::NOTES => CXmlConstantName::NOTES,
+		CXmlConstantValue::OOB_IP => CXmlConstantName::OOB_IP,
+		CXmlConstantValue::OOB_NETMASK => CXmlConstantName::OOB_NETMASK,
+		CXmlConstantValue::OOB_ROUTER => CXmlConstantName::OOB_ROUTER,
+		CXmlConstantValue::OS => CXmlConstantName::OS,
+		CXmlConstantValue::OS_FULL => CXmlConstantName::OS_FULL,
+		CXmlConstantValue::OS_SHORT => CXmlConstantName::OS_SHORT,
+		CXmlConstantValue::POC_1_CELL => CXmlConstantName::POC_1_CELL,
+		CXmlConstantValue::POC_1_EMAIL => CXmlConstantName::POC_1_EMAIL,
+		CXmlConstantValue::POC_1_NAME => CXmlConstantName::POC_1_NAME,
+		CXmlConstantValue::POC_1_NOTES => CXmlConstantName::POC_1_NOTES,
+		CXmlConstantValue::POC_1_PHONE_A => CXmlConstantName::POC_1_PHONE_A,
+		CXmlConstantValue::POC_1_PHONE_B => CXmlConstantName::POC_1_PHONE_B,
+		CXmlConstantValue::POC_1_SCREEN => CXmlConstantName::POC_1_SCREEN,
+		CXmlConstantValue::POC_2_CELL => CXmlConstantName::POC_2_CELL,
+		CXmlConstantValue::POC_2_EMAIL => CXmlConstantName::POC_2_EMAIL,
+		CXmlConstantValue::POC_2_NAME => CXmlConstantName::POC_2_NAME,
+		CXmlConstantValue::POC_2_NOTES => CXmlConstantName::POC_2_NOTES,
+		CXmlConstantValue::POC_2_PHONE_A => CXmlConstantName::POC_2_PHONE_A,
+		CXmlConstantValue::POC_2_PHONE_B => CXmlConstantName::POC_2_PHONE_B,
+		CXmlConstantValue::POC_2_SCREEN => CXmlConstantName::POC_2_SCREEN,
+		CXmlConstantValue::SERIALNO_A => CXmlConstantName::SERIALNO_A,
+		CXmlConstantValue::SERIALNO_B => CXmlConstantName::SERIALNO_B,
+		CXmlConstantValue::SITE_ADDRESS_A => CXmlConstantName::SITE_ADDRESS_A,
+		CXmlConstantValue::SITE_ADDRESS_B => CXmlConstantName::SITE_ADDRESS_B,
+		CXmlConstantValue::SITE_ADDRESS_C => CXmlConstantName::SITE_ADDRESS_C,
+		CXmlConstantValue::SITE_CITY => CXmlConstantName::SITE_CITY,
+		CXmlConstantValue::SITE_COUNTRY => CXmlConstantName::SITE_COUNTRY,
+		CXmlConstantValue::SITE_NOTES => CXmlConstantName::SITE_NOTES,
+		CXmlConstantValue::SITE_RACK => CXmlConstantName::SITE_RACK,
+		CXmlConstantValue::SITE_STATE => CXmlConstantName::SITE_STATE,
+		CXmlConstantValue::SITE_ZIP => CXmlConstantName::SITE_ZIP,
+		CXmlConstantValue::SOFTWARE => CXmlConstantName::SOFTWARE,
+		CXmlConstantValue::SOFTWARE_APP_A => CXmlConstantName::SOFTWARE_APP_A,
+		CXmlConstantValue::SOFTWARE_APP_B => CXmlConstantName::SOFTWARE_APP_B,
+		CXmlConstantValue::SOFTWARE_APP_C => CXmlConstantName::SOFTWARE_APP_C,
+		CXmlConstantValue::SOFTWARE_APP_D => CXmlConstantName::SOFTWARE_APP_D,
+		CXmlConstantValue::SOFTWARE_APP_E => CXmlConstantName::SOFTWARE_APP_E,
+		CXmlConstantValue::SOFTWARE_FULL => CXmlConstantName::SOFTWARE_FULL,
+		CXmlConstantValue::TAG => CXmlConstantName::TAG,
+		CXmlConstantValue::TYPE => CXmlConstantName::TYPE,
+		CXmlConstantValue::TYPE_FULL => CXmlConstantName::TYPE_FULL,
+		CXmlConstantValue::URL_A => CXmlConstantName::URL_A,
+		CXmlConstantValue::URL_B => CXmlConstantName::URL_B,
+		CXmlConstantValue::URL_C => CXmlConstantName::URL_C,
+		CXmlConstantValue::VENDOR => CXmlConstantName::VENDOR
+	];
+
+	private $ITEM_POST_TYPE = [
+		CXmlConstantValue::RAW => CXmlConstantName::RAW,
+		CXmlConstantValue::JSON => CXmlConstantName::JSON,
+		CXmlConstantValue::XML => CXmlConstantName::XML
+	];
+
+	private $ITEM_PREPROCESSING_ERROR_HANDLER = [
+		CXmlConstantValue::ORIGINAL_ERROR => CXmlConstantName::ORIGINAL_ERROR,
+		CXmlConstantValue::DISCARD_VALUE => CXmlConstantName::DISCARD_VALUE,
+		CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE,
+		CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR
+	];
+
+	private $ITEM_REQUEST_METHOD = [
+		CXmlConstantValue::GET => CXmlConstantName::GET,
+		CXmlConstantValue::POST => CXmlConstantName::POST,
+		CXmlConstantValue::PUT => CXmlConstantName::PUT,
+		CXmlConstantValue::HEAD => CXmlConstantName::HEAD
+	];
+
+	private $ITEM_RETRIEVE_MODE = [
+		CXmlConstantValue::BODY => CXmlConstantName::BODY,
+		CXmlConstantValue::HEADERS => CXmlConstantName::HEADERS,
+		CXmlConstantValue::BOTH => CXmlConstantName::BOTH
+	];
+
+	private $ITEM_SNMPV3_SECURITYLEVEL = [
+		CXmlConstantValue::NOAUTHNOPRIV => CXmlConstantName::NOAUTHNOPRIV,
+		CXmlConstantValue::AUTHNOPRIV => CXmlConstantName::AUTHNOPRIV,
+		CXmlConstantValue::AUTHPRIV => CXmlConstantName::AUTHPRIV
+	];
+
+	private $ITEM_TYPE = [
+		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
+		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
+		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
+		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
+		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
+		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
+		CXmlConstantValue::ITEM_TYPE_AGGREGATE => CXmlConstantName::AGGREGATE,
+		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
+		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
+		CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI,
+		CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH,
+		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
+		CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED,
+		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
+		CXmlConstantValue::ITEM_TYPE_SNMP_TRAP => CXmlConstantName::SNMP_TRAP,
+		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
+	];
+
+	private $ITEM_TYPE_DRULE = [
+		CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE => CXmlConstantName::ZABBIX_PASSIVE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV1 => CXmlConstantName::SNMPV1,
+		CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP,
+		CXmlConstantValue::ITEM_TYPE_SIMPLE => CXmlConstantName::SIMPLE,
+		CXmlConstantValue::ITEM_TYPE_SNMPV2 => CXmlConstantName::SNMPV2,
+		CXmlConstantValue::ITEM_TYPE_INTERNAL => CXmlConstantName::INTERNAL,
+		CXmlConstantValue::ITEM_TYPE_SNMPV3 => CXmlConstantName::SNMPV3,
+		CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE,
+		CXmlConstantValue::ITEM_TYPE_EXTERNAL => CXmlConstantName::EXTERNAL,
+		CXmlConstantValue::ITEM_TYPE_ODBC => CXmlConstantName::ODBC,
+		CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI,
+		CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH,
+		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
+		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
+		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
+		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT
+	];
+
+	private $ITEM_VALUE_TYPE = [
+		CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT,
+		CXmlConstantValue::CHAR => CXmlConstantName::CHAR,
+		CXmlConstantValue::LOG => CXmlConstantName::LOG,
+		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
+		CXmlConstantValue::TEXT => CXmlConstantName::TEXT
+	];
+
+	private $TRIGGER_PRIORITY = [
+		CXmlConstantValue::NOT_CLASSIFIED => CXmlConstantName::NOT_CLASSIFIED,
+		CXmlConstantValue::INFO => CXmlConstantName::INFO,
+		CXmlConstantValue::WARNING => CXmlConstantName::WARNING,
+		CXmlConstantValue::AVERAGE => CXmlConstantName::AVERAGE,
+		CXmlConstantValue::HIGH => CXmlConstantName::HIGH,
+		CXmlConstantValue::DISASTER => CXmlConstantName::DISASTER
+	];
+
+	private $TRIGGER_RECOVERY_MODE = [
+		CXmlConstantValue::TRIGGER_EXPRESSION => CXmlConstantName::EXPRESSION,
+		CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION => CXmlConstantName::RECOVERY_EXPRESSION,
+		CXmlConstantValue::TRIGGER_NONE => CXmlConstantName::NONE
+	];
 
 	/**
 	 * Format of import source.
