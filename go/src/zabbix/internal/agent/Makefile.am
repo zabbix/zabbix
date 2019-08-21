@@ -4,7 +4,8 @@ SUBDIRS = \
 	scheduler \
 	resultcache \
 	serverlistener \
-	serverconnector
+	serverconnector \
+	statuslistener
 
 all: build
 

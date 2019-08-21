@@ -39,6 +39,7 @@ type AgentOptions struct {
 	BufferSize          int    `conf:",,2:65535,100"`
 	ListenIP            string `conf:",optional"`
 	ListenPort          int    `conf:",,1024:32767,10050"`
+	StatusPort          int    `conf:",optional,1024:32767"`
 	MaxLinesPerSecond   int    `conf:",,1:1000,20"`
 	Plugins             map[string]map[string]string
 }
