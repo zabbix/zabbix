@@ -1827,7 +1827,9 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \

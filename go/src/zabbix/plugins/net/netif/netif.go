@@ -92,10 +92,10 @@ func init() {
 	stdOs = std.NewOs()
 
 	plugin.RegisterMetrics(&impl, "netif",
-		"net.if.collisions", "Returns number of out-of-window collisions",
-		"net.if.in", "Returns incoming traffic statistics on network interface",
-		"net.if.out", "Returns outgoing traffic statistics on network interface",
-		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface",
-		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery")
+		"net.if.collisions", "Returns number of out-of-window collisions.",
+		"net.if.in", "Returns incoming traffic statistics on network interface.",
+		"net.if.out", "Returns outgoing traffic statistics on network interface.",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.")
 
 }

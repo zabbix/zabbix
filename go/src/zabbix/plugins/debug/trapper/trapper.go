@@ -149,5 +149,5 @@ func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.listeners = make(map[int]*trapListener)
 
-	plugin.RegisterMetric(&impl, "trapper", "debug.trap", "Listen on port for incoming TCP data")
+	plugin.RegisterMetric(&impl, "trapper", "debug.trap", "Listen on port for incoming TCP data.")
 }
