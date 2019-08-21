@@ -233,7 +233,7 @@ func main() {
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
-		remoteDescription = "Test specified item and exit"
+		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
