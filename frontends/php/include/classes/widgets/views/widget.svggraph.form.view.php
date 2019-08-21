@@ -275,8 +275,7 @@ $form_tabs = (new CTabView())
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select", onGraphConfigChange);';
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change.multiselect", ".multiselect", onGraphConfigChange);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
 $scripts[] = 'onGraphConfigChange();';
 
 return [
