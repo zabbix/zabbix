@@ -191,6 +191,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			client.Close()
 		}
 	}
 	control.Stop()

@@ -43,6 +43,7 @@ type Client struct {
 type Exchanger interface {
 	Request() string
 	Reply(response string) error
+	Close()
 }
 
 func (c *Client) Request() (cmmand string) {
@@ -51,8 +52,11 @@ func (c *Client) Request() (cmmand string) {
 
 func (c *Client) Reply(response string) (err error) {
 	_, err = c.conn.Write([]byte(response))
-	c.conn.Close()
 	return
+}
+
+func (c *Client) Close() {
+	c.conn.Close()
 }
 
 func (c *Conn) Stop() {
