@@ -718,8 +718,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len,
-		unsigned int *psk_usage);
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
 void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);

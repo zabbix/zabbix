@@ -6349,8 +6349,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *                                                                            *
  * Parameters:                                                                *
  *     psk_identity - [IN] PSK identity to search for ('\0' terminated)       *
- *     psk_buf      - [OUT] output buffer for PSK value                       *
- *     psk_buf_len  - [IN] output buffer size                                 *
+ *     psk_buf      - [OUT] output buffer for PSK value with size             *
+ *                    HOST_TLS_PSK_LEN_MAX                                    *
  *     psk_usage    - [OUT] 0 - PSK not found, 1 - found in host PSKs,        *
  *                          2 - found in autoregistration PSK, 3 - found in   *
  *                          both                                              *
@@ -6365,8 +6365,7 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *     the src/libs/zbxcrypto/tls.c.                                          *
  *                                                                            *
  ******************************************************************************/
-size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len,
-		unsigned int *psk_usage)
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage)
 {
 	const ZBX_DC_PSK	*psk_i;
 	ZBX_DC_PSK		psk_i_local;
@@ -6382,7 +6381,7 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 	{
-		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, psk_buf_len);
+		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, HOST_TLS_PSK_LEN_MAX);
 		*psk_usage |= ZBX_PSK_FOR_HOST;
 	}
 
@@ -6395,7 +6394,7 @@ size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *p
 
 	if (0 == *psk_usage)	/* only as autoregistration PSK */
 	{
-		psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+		psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, HOST_TLS_PSK_LEN_MAX);
 		UNLOCK_CACHE;
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 
