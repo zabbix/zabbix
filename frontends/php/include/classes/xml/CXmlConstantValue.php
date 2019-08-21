@@ -20,7 +20,7 @@
 
 
 /**
- * Constant values what we used in schema.
+ * Constant values used in schema.
  */
 class CXmlConstantValue {
 
@@ -72,8 +72,8 @@ class CXmlConstantValue {
 	const HIGH = TRIGGER_SEVERITY_HIGH;
 	const DISASTER = TRIGGER_SEVERITY_DISASTER;
 
-	const SINGLE = 0;
-	const MULTIPLE = 1;
+	const SINGLE = TRIGGER_MULT_EVENT_DISABLED;
+	const MULTIPLE = TRIGGER_MULT_EVENT_ENABLED;
 
 	const CALCULATED = GRAPH_YAXIS_TYPE_CALCULATED;
 	const FIXED = GRAPH_YAXIS_TYPE_FIXED;
@@ -231,10 +231,10 @@ class CXmlConstantValue {
 	const UNSIGNED = ITEM_VALUE_TYPE_UINT64;
 	const TEXT = ITEM_VALUE_TYPE_TEXT;
 
-	const ORIGINAL_ERROR = 0;
-	const DISCARD_VALUE = 1;
-	const CUSTOM_VALUE = 2;
-	const CUSTOM_ERROR = 3;
+	const ORIGINAL_ERROR = ZBX_PREPROC_FAIL_DEFAULT;
+	const DISCARD_VALUE = ZBX_PREPROC_FAIL_DISCARD_VALUE;
+	const CUSTOM_VALUE = ZBX_PREPROC_FAIL_SET_VALUE;
+	const CUSTOM_ERROR = ZBX_PREPROC_FAIL_SET_ERROR;
 
 	const MULTIPLIER = ZBX_PREPROC_MULTIPLIER;
 	const RTRIM = ZBX_PREPROC_RTRIM;
