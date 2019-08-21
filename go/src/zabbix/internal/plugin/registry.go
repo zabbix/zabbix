@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"unicode"
 )
 
@@ -36,8 +37,8 @@ var Metrics map[string]*Metric = make(map[string]*Metric)
 var Plugins map[string]Accessor = make(map[string]Accessor)
 
 func RegisterMetric(plugin Accessor, name string, key string, description string) {
-	if _, ok := Metrics[key]; ok {
-		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
+	if ok, _ := regexp.MatchString(`^[A-Za-z0-9\._-]+$`, key); !ok {
+		panic(fmt.Sprintf(`cannot register metric "%s" having invalid format`, key))
 	}
 
 	if 0 == len(description) {
@@ -50,6 +51,10 @@ func RegisterMetric(plugin Accessor, name string, key string, description string
 
 	if description[len(description)-1] != '.' {
 		panic(fmt.Sprintf(`cannot register metric "%s" with dot at the end of description: "%s"`, key, description))
+	}
+
+	if _, ok := Metrics[key]; ok {
+		panic(fmt.Sprintf(`cannot register duplicate metric "%s"`, key))
 	}
 
 	t := reflect.TypeOf(plugin)
