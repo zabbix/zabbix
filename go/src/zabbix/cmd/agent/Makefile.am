@@ -23,6 +23,7 @@ clean:
 
 install:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go install -ldflags="${GOLDFLAGS}"
+	test -f "$(DESTDIR)@XAGENT_CONFIG_FILE@" || cp "../../conf/agent.conf" "$(DESTDIR)@XAGENT_CONFIG_FILE@"
 
 check:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
