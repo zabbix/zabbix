@@ -27,7 +27,8 @@ import (
 
 func TestParserErrors(t *testing.T) {
 	type Options struct {
-		Test string `conf:"Te$t,optional"`
+		Test  string `conf:"Te$t,optional"`
+		Range string `conf:",optional,1"`
 	}
 
 	var input = []string{
@@ -35,7 +36,9 @@ func TestParserErrors(t *testing.T) {
 		"abc =",
 		" = abc",
 		"Test = value",
-		"Te$t = value"}
+		"Te$t = value",
+		"Range=1",
+	}
 
 	for _, data := range input {
 		var options Options

@@ -152,23 +152,29 @@ func getMeta(field reflect.StructField) (meta *Meta, err error) {
 			m.defaultValue = &tags[3]
 			fallthrough
 		case 3:
-			limits := strings.Split(tags[2], ":")
-			if len(limits) > 0 && limits[0] != "" {
-				m.min, _ = strconv.ParseInt(limits[0], 10, 64)
-			}
-			if len(limits) > 1 && limits[1] != "" {
-				m.max, _ = strconv.ParseInt(limits[1], 10, 64)
+			rangeTag := strings.Trim(tags[2], " \t")
+			if len(rangeTag) > 0 {
+				limits := strings.Split(rangeTag, ":")
+				if len(limits) != 2 {
+					return nil, errors.New("invalid range tag format")
+				}
+				if limits[0] != "" {
+					m.min, _ = strconv.ParseInt(limits[0], 10, 64)
+				}
+				if limits[1] != "" {
+					m.max, _ = strconv.ParseInt(limits[1], 10, 64)
+				}
 			}
 			fallthrough
 		case 2:
-			if tags[1] == "optional" {
+			if strings.Trim(tags[1], " \t") == "optional" {
 				m.optional = true
 			} else if tags[1] != "" {
 				return nil, fmt.Errorf("unknown 'conf' tag: %s", tags[1])
 			}
 			fallthrough
 		case 1:
-			m.name = tags[0]
+			m.name = strings.Trim(tags[0], " \t")
 		}
 	}
 	if m.name == "" {
