@@ -33,10 +33,11 @@ import (
 )
 
 type ServerListener struct {
-	listener  *zbxcomms.Listener
-	scheduler scheduler.Scheduler
-	options   *agent.AgentOptions
-	tlsConfig *tls.Config
+	listener     *zbxcomms.Listener
+	scheduler    scheduler.Scheduler
+	options      *agent.AgentOptions
+	tlsConfig    *tls.Config
+	allowedPeers *AllowedPeers
 }
 
 func (sl *ServerListener) processRequest(conn *zbxcomms.Connection, data []byte) (err error) {
@@ -78,8 +79,8 @@ func (sl *ServerListener) run() {
 	for {
 		conn, err := sl.listener.Accept()
 		if err == nil {
-			if err := tcpCheckAllowedPeers(); err != nil {
-				log.Errf("cannot accept incoming connection: %s", err.Error())
+			if false == sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
+				log.Warningf("cannot accept incoming connection for peer: %s", conn.RemoteIP())
 			} else if err := sl.processConnection(conn); err != nil {
 				log.Warningf("cannot process incoming connection: %s", err.Error())
 			}
@@ -106,6 +107,9 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
 		return
 	}
+	if sl.allowedPeers, err = GetAllowdPeers(sl.options); err != nil {
+		return
+	}
 	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf(":%d", sl.options.ListenPort), sl.tlsConfig); err != nil {
 		return
 	}
@@ -118,8 +122,4 @@ func (sl *ServerListener) Stop() {
 	if sl.listener != nil {
 		sl.listener.Close()
 	}
-}
-
-func (sl *ServerListener) tcpCheckAllowedPeers() (err error) {
-	return nil
 }
