@@ -30,7 +30,7 @@ type AgentOptions struct {
 	DebugLevel           int      `conf:",,0:5,3"`
 	ServerActive         string   `conf:",optional"`
 	RefreshActiveChecks  int      `conf:",,30:3600,120"`
-	Timeout              int      `conf:",,1-30,3"`
+	Timeout              int      `conf:",,1:30,3"`
 	Hostname             string   `conf:",optional"`
 	HostnameItem         string   `conf:",optional"`
 	HostMetadata         string   `conf:",optional"`
