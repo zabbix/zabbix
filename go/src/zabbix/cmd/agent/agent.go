@@ -239,12 +239,14 @@ func main() {
 
 	flag.Parse()
 
-	var argTest, argPrint, argVersion bool
+	var argConfig, argTest, argPrint, argVersion bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
 	flag.Visit(func(f *flag.Flag) {
 		switch f.Name {
+		case "c", "config":
+			argConfig = true
 		case "t", "test":
 			argTest = true
 		case "p", "print":
@@ -260,8 +262,14 @@ func main() {
 	}
 
 	if err := conf.Load(confFlag, &agent.Options); err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err.Error())
-		os.Exit(1)
+		if argConfig || !(argTest || argPrint) {
+			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			os.Exit(1)
+		}
+		// create default configuration for testing options
+		if argConfig == false {
+			conf.Unmarshal([]byte{}, &agent.Options)
+		}
 	}
 
 	if argTest || argPrint {
