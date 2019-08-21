@@ -21,41 +21,19 @@
 
 class CControllerUsergroupAddTagFilter extends CController {
 
-	/**
-	 * @var array  Form object for adding new tag filter.
-	 */
-	protected $new_tag_filter = [
-		'groupids' => [],
-		'tag' => '',
-		'value' => '',
-		'include_subgroups' => false,
-	];
-
 	protected function checkInput() {
+
 		$fields = [
-			'usrgrpid'        => 'db usrgrp.usrgrpid',
-			'name'            => 'db usrgrp.name',
-			'userids'         => 'array_db users.userid',
-			'gui_access'      => 'db usrgrp.gui_access',
-			'users_status'    => 'db usrgrp.users_status',
-			'debug_mode'      => 'db usrgrp.debug_mode',
-
-			'group_rights'    => 'array',
-			'tag_filters'     => 'array',
-
-			'new_tag_filter'  => 'array',
-			'new_group_right' => 'array',
-
-			'form_refresh'    => 'int32'
+			'new_tag_filter' => 'array',
+			'tag_filters'    => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-		else {
-			$this->new_tag_filter = $this->getInput('new_tag_filter') + $this->new_tag_filter;
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;
@@ -66,40 +44,39 @@ class CControllerUsergroupAddTagFilter extends CController {
 	}
 
 	protected function doAction() {
-		$form_data = $this->getInputAll();
+		$new_tag_filter = $this->getInput('new_tag_filter') + [
+			'groupids' => [],
+			'tag' => '',
+			'value' => '',
+			'include_subgroups' => false
+		];
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
-			->setArgument('action', 'usergroup.edit');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
-
-		if ($this->validateNewTagFilter($error)) {
-			unset($form_data['new_tag_filter']);
-			$form_data = $this->updateFormData($form_data);
+		if ($this->validateNewTagFilter($new_tag_filter)) {
+			$view = (new CView('administration.usergroup.table.tagfilter', $this->getViewData($new_tag_filter)));
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['body' => $view->render()->toString()])
+			])));
 		}
 		else {
-			$form_data['new_tag_filter'] = $this->new_tag_filter;
-			$response->setMessageError($error);
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+			])));
 		}
-
-		$response->setFormData($form_data);
-		$this->setResponse($response);
 	}
 
 	/**
-	 * @param string $error
+	 * @param array $new_tag_filter
 	 *
 	 * @return bool
 	 */
-	protected function validateNewTagFilter(&$error) {
-		if (!$this->new_tag_filter['groupids']) {
-			$error = _s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty'));
+	protected function validateNewTagFilter($new_tag_filter) {
+		if (!$new_tag_filter['groupids']) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
 
 			return false;
 		}
-		elseif ($this->new_tag_filter['tag'] === '' && $this->new_tag_filter['value'] !== '') {
-			$error = _s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty'));
+		elseif ($new_tag_filter['tag'] === '' && $new_tag_filter['value'] !== '') {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 
 			return false;
 		}
@@ -108,23 +85,26 @@ class CControllerUsergroupAddTagFilter extends CController {
 	}
 
 	/**
-	 * @param array $form_data
+	 * @param array $new_tag_filter
 	 *
 	 * @return array
 	 */
-	protected function updateFormData(array $form_data) {
-		$groupids = $this->new_tag_filter['include_subgroups']
-			? getSubGroups($this->new_tag_filter['groupids'])
-			: $this->new_tag_filter['groupids'];
+	protected function getViewData(array $new_tag_filter) {
+		$groupids = $new_tag_filter['include_subgroups']
+			? getSubGroups($new_tag_filter['groupids'])
+			: $new_tag_filter['groupids'];
 
+		$view_data = ['tag_filters' => $this->getInput('tag_filters', [])];
 		foreach ($groupids as $groupid) {
-			$form_data['tag_filters'][] = [
+			$view_data['tag_filters'][] = [
 				'groupid' => $groupid,
-				'tag' => $this->new_tag_filter['tag'],
-				'value' => $this->new_tag_filter['value'],
+				'tag' => $new_tag_filter['tag'],
+				'value' => $new_tag_filter['value'],
 			];
 		}
 
-		return $form_data;
+		$view_data['tag_filters'] = collapseTagFilters($view_data['tag_filters']);
+
+		return $view_data;
 	}
 }

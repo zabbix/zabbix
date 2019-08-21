@@ -21,40 +21,18 @@
 
 class CControllerUsergroupAddGroupRight extends CController {
 
-	/**
-	 * @var array  Form object for adding new group right.
-	 */
-	protected $new_group_right = [
-		'groupids' => [],
-		'permission' => PERM_NONE,
-		'include_subgroups' => false
-	];
-
 	protected function checkInput() {
 		$fields = [
-			'usrgrpid'        => 'db usrgrp.usrgrpid',
-			'name'            => 'db usrgrp.name',
-			'userids'         => 'array_db users.userid',
-			'gui_access'      => 'db usrgrp.gui_access',
-			'users_status'    => 'db usrgrp.users_status',
-			'debug_mode'      => 'db usrgrp.debug_mode',
-
 			'group_rights'    => 'array',
-			'tag_filters'     => 'array',
-
-			'new_tag_filter'  => 'array',
-			'new_group_right' => 'array',
-
-			'form_refresh'    => 'int32'
+			'new_group_right' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-		else {
-			$this->new_group_right = $this->getInput('new_group_right') + $this->new_group_right;
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;
@@ -65,35 +43,33 @@ class CControllerUsergroupAddGroupRight extends CController {
 	}
 
 	protected function doAction() {
-		$form_data = $this->getInputAll();
+		$new_group_right = $this->getInput('new_group_right') + [
+			'groupids' => [],
+			'permission' => PERM_NONE,
+			'include_subgroups' => false
+		];
 
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
-			->setArgument('action', 'usergroup.edit');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
-
-		if ($this->validateNewGroupRight($error)) {
-			unset($form_data['new_group_right']);
-			$form_data = $this->updateFormData($form_data);
+		if ($this->validateNewGroupRight($new_group_right)) {
+			$view = (new CView('administration.usergroup.table.groupright', $this->getViewData($new_group_right)));
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['body' => $view->render()->toString()])
+			])));
 		}
 		else {
-			$form_data['new_group_right'] = $this->new_group_right;
-			$response->setMessageError($error);
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+			])));
 		}
-
-		$response->setFormData($form_data);
-		$this->setResponse($response);
 	}
 
 	/**
-	 * @param string $error
+	 * @param array $new_group_right
 	 *
 	 * @return bool
 	 */
-	protected function validateNewGroupRight(&$error) {
-		if (!$this->new_group_right['groupids']) {
-			$error = _s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty'));
+	protected function validateNewGroupRight($new_group_right) {
+		if (!$new_group_right['groupids']) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
 
 			return false;
 		}
@@ -102,22 +78,23 @@ class CControllerUsergroupAddGroupRight extends CController {
 	}
 
 	/**
-	 * @param array $form_data
+	 * @param array $new_group_right
 	 *
 	 * @return array
 	 */
-	protected function updateFormData(array $form_data) {
-		list($groupids, $subgroupids) = $this->new_group_right['include_subgroups']
-			? [[], $this->new_group_right['groupids']]
-			: [$this->new_group_right['groupids'], []];
+	protected function getViewData(array $new_group_right) {
+		list($groupids, $subgroupids) = $new_group_right['include_subgroups']
+			? [[], $new_group_right['groupids']]
+			: [$new_group_right['groupids'], []];
 
-		$form_data['group_rights'] = collapseHostGroupRights(applyHostGroupRights(
-			$form_data['group_rights'],
+		$view_data = [];
+		$view_data['group_rights'] = collapseHostGroupRights(applyHostGroupRights(
+			$this->getInput('group_rights', []),
 			$groupids,
 			$subgroupids,
-			$this->new_group_right['permission']
+			$new_group_right['permission']
 		));
 
-		return $form_data;
+		return $view_data;
 	}
 }

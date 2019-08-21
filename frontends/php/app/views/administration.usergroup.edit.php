@@ -100,45 +100,14 @@ $form_list->addRow(_('Debug mode'),
 );
 
 $permissions_form_list = new CFormList('permissions_form_list');
-$permissions_table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host group'), _('Permissions')]);
-
-foreach ($data['group_rights'] as $groupid => $group_right) {
-	$form->addVar('group_rights['.$groupid.'][name]', $group_right['name']);
-
-	if ($groupid == 0) {
-		$permissions_table->addRow([italic(_('All groups')), permissionText($group_right['permission'])]);
-		$form->addVar('group_rights['.$groupid.'][grouped]', $group_right['grouped']);
-		$form->addVar('group_rights['.$groupid.'][permission]', $group_right['permission']);
-	}
-	else {
-		if (array_key_exists('grouped', $group_right) && $group_right['grouped']) {
-			$form->addVar('group_rights['.$groupid.'][grouped]', $group_right['grouped']);
-			$group_name = [$group_right['name'], SPACE, italic('('._('including subgroups').')')];
-		}
-		else {
-			$group_name = $group_right['name'];
-		}
-
-		$permissions_table->addRow([$group_name,
-			(new CRadioButtonList('group_rights['.$groupid.'][permission]', (int) $group_right['permission']))
-				->addValue(_('Read-write'), PERM_READ_WRITE)
-				->addValue(_('Read'), PERM_READ)
-				->addValue(_('Deny'), PERM_DENY)
-				->addValue(_('None'), PERM_NONE)
-				->setModern(true)
-		]);
-	}
-}
-
 $permissions_form_list->addRow(_('Permissions'),
-	(new CDiv($permissions_table))
+	(new CDiv((new CView('administration.usergroup.table.groupright', $data))->render()))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $new_group_right_table = (new CTable())
+	->setId('new-group-right-table')
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'new_group_right[groupids][]',
@@ -168,7 +137,7 @@ $new_group_right_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: submitFormWithParam("'.$form->getName().'", "action", "usergroup.add.group_right");')
+			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.add.group_right");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
@@ -180,48 +149,14 @@ $permissions_form_list->addRow(null,
 
 $tag_filter_form_list = new CFormList('tagFilterFormList');
 
-$tag_filter_table = (new CTable())
-	->setId('tag_filter_table')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host group'), _('Tags'), _('Action')]);
-
-$previous_name = '';
-foreach ($data['tag_filters'] as $key => $tag_filter) {
-	if ($previous_name === $tag_filter['name']) {
-		$tag_filter['name'] = '';
-	}
-	else {
-		$previous_name = $tag_filter['name'];
-	}
-
-	if ($tag_filter['tag'] !== '' && $tag_filter['value'] !== '') {
-		$tag_value = $tag_filter['tag'] . NAME_DELIMITER . $tag_filter['value'];
-	}
-	elseif ($tag_filter['tag'] !== '') {
-		$tag_value = $tag_filter['tag'];
-	}
-	else {
-		$tag_value = italic(_('All tags'));
-	}
-
-	$action = (new CSimpleButton(_('Remove')))
-		->onClick(sprintf('javascript: create_var("%s", "action", "usergroup.remove.tag_filter");'.
-			'submitFormWithParam("%s", "index", "%s")', $form->getName(), $form->getName(), $key))
-		->addClass(ZBX_STYLE_BTN_LINK);
-
-	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
-	$form->addVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']);
-	$form->addVar('tag_filters['.$key.'][tag]', $tag_filter['tag']);
-	$form->addVar('tag_filters['.$key.'][value]', $tag_filter['value']);
-}
-
 $tag_filter_form_list->addRow(_('Permissions'),
-	(new CDiv($tag_filter_table))
+	(new CDiv((new CView('administration.usergroup.table.tagfilter', $data))->render()))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $new_tag_filter_table = (new CTable())
+	->setId('new-tag-filter-table')
 	->addRow([
 		(new CMultiSelect([
 			'name' => 'new_tag_filter[groupids][]',
@@ -254,7 +189,7 @@ $new_tag_filter_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: submitFormWithParam("'.$form->getName().'", "action", "usergroup.add.tag_filter");')
+			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.add.tag_filter");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 

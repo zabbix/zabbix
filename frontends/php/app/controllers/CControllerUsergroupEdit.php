@@ -146,10 +146,6 @@ class CControllerUsergroupEdit extends CController {
 	 * @return array
 	 */
 	protected function getGroupRights() {
-		if ($this->user_group['usrgrpid'] == 0) {
-			return [];
-		}
-
 		if ($this->hasInput('group_rights')) {
 			return $this->getInput('group_rights');
 		}

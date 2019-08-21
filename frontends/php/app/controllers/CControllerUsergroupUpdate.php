@@ -26,7 +26,7 @@ class CControllerUsergroupUpdate extends CController {
 			'usrgrpid'     => 'required|db usrgrp.usrgrpid',
 			'name'         => 'required|not_empty|string',
 			'userids'      => 'array_db users.userid',
-			'gui_access'   => 'required|db usrgrp.gui_access|in '.implode(',', GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED),
+			'gui_access'   => 'required|db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
 			'users_status' => 'required|db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'debug_mode'   => 'required|db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 
@@ -75,6 +75,8 @@ class CControllerUsergroupUpdate extends CController {
 			'tag_filters'  => $this->getInput('tag_filters', []),
 			'rights'       => []
 		];
+
+		sdfile($this->getInput( 'group_rights' ));
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 
