@@ -1555,16 +1555,6 @@ class C44XmlValidator {
 						]]
 					]]
 				]]
-			]],
-			'tests' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'test', 'rules' => [
-				'test' => ['type' => XML_ARRAY, 'rules' => [
-					'test' => ['type' => XML_ARRAY, 'rules' => [
-						'abc' => ['type' => XML_STRING, 'default' => '2'],
-						'def' => ['type' => XML_STRING, 'default' => '1'],
-						'const' => ['type' => XML_STRING, 'default' => '4', 'in' => [4 => 'ABC']]
-					]],
-					'work' => ['type' => XML_STRING, 'default' => '3']
-				]]
 			]]
 		]];
 	}
