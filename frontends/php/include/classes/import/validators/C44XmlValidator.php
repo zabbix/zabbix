@@ -877,13 +877,13 @@ class C44XmlValidator {
 					'tls_subject' => ['type' => XML_STRING]
 				]]
 			]],
-			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
-				'value_map' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
-						'mapping' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'value' =>					['type' => XML_STRING],
-							'newvalue' =>				['type' => XML_STRING]
+			'value_maps' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
+				'value_map' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+					'name' => ['type' => XML_STRING | XML_REQUIRED],
+					'mappings' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
+						'mapping' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'value' => ['type' => XML_STRING],
+							'newvalue' => ['type' => XML_STRING]
 						]]
 					]]
 				]]
