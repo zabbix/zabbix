@@ -131,7 +131,8 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel <increase|decrease> - increase/decrease logging level
+	loglevel increase - Increase log level
+	loglevel decrease - Decrease log level
 	metrics - List available metrics
 	help - Display this help message`
 	return c.Reply(help)
