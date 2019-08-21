@@ -143,17 +143,16 @@ class CConfiguration extends CApiService {
 
 		$data = (new CXmlValidator)->validate($data, $params['format']);
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $ver) {
-			$version = $data['zabbix_export']['version'];
-			if ($version != $ver) {
+		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $version) {
+			if ($data['zabbix_export']['version'] !== $version) {
 				continue;
 			}
 
-			$data = $importConverterFactory->getObject($ver)->convert($data);
+			$data = $importConverterFactory->getObject($version)->convert($data);
 			$data = (new CXmlValidator)->validate($data, $params['format']);
 		}
 
-		// Convert constant to values.
+		// Convert constants to values.
 		$data = (new CConstantImportConverter($importValidatorFactory->getObject(ZABBIX_EXPORT_VERSION)->getSchema()))->convert($data);
 		// Add missed tags with default values.
 		$data = (new CDefaultValuesImportConverter($importValidatorFactory->getObject(ZABBIX_EXPORT_VERSION)->getSchema()))->convert($data);
