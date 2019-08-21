@@ -120,7 +120,7 @@ func TestKernel(t *testing.T) {
 func (tc *testCase) checkResult() error {
 	var resTextOutput string
 
-	if ret, err := impl.Export(tc.key, tc.params); err != nil {
+	if ret, err := impl.Export(tc.key, tc.params, nil); err != nil {
 		if tc.fail != true {
 			return fmt.Errorf("returned error: %s", err)
 		}

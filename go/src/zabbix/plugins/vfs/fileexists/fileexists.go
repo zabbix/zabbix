@@ -56,6 +56,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var stdOs std.Os
 
 func init() {
-	plugin.RegisterMetric(&impl, "existance", "vfs.file.exists", "Returns if file exists or not")
+	plugin.RegisterMetric(&impl, "existance", "vfs.file.exists", "Returns if file exists or not.")
 	stdOs = std.NewOs()
 }

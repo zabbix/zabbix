@@ -611,7 +611,7 @@ func TestTaskCreate(t *testing.T) {
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -664,7 +664,7 @@ func TestTaskUpdate(t *testing.T) {
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -732,7 +732,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -788,7 +788,7 @@ func TestTaskDelete(t *testing.T) {
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -855,7 +855,7 @@ func TestSchedule(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -905,7 +905,7 @@ func TestScheduleCapacity(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -958,7 +958,7 @@ func TestScheduleUpdate(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1025,7 +1025,7 @@ func TestCollectorSchedule(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockCollectorPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1070,7 +1070,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockCollectorPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1143,7 +1143,7 @@ func TestRunner(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1250,7 +1250,7 @@ func TestWatcher(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1343,7 +1343,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetric(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1391,7 +1391,7 @@ func TestRunnerWatcher(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1485,7 +1485,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetric(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1543,7 +1543,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockRunnerWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetric(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1620,7 +1620,7 @@ func TestPassiveRunner(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1703,7 +1703,7 @@ func TestConfigurator(t *testing.T) {
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
 			options:    options[name]}
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetric(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 

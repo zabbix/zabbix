@@ -39,5 +39,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "debugempty", "debug.empty", "Returns empty value")
+	plugin.RegisterMetric(&impl, "debugempty", "debug.empty", "Returns empty value.")
 }

@@ -1795,6 +1795,7 @@ AC_SUBST(RANLIB)
 SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
+XAGENT_CONFIG_FILE="${sysconfdir}/agent.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
 ALERT_SCRIPTS_PATH="${datadir}/zabbix/alertscripts"
@@ -1826,7 +1827,9 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
@@ -1843,6 +1846,7 @@ AC_SUBST(SENDER_LIBS)
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
+AC_SUBST(XAGENT_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
 AC_SUBST(ALERT_SCRIPTS_PATH)
@@ -2022,6 +2026,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/debug/filewatcher/Makefile
 	go/src/zabbix/plugins/debug/log/Makefile
 	go/src/zabbix/plugins/debug/collector/Makefile
+	go/src/zabbix/plugins/kernel/Makefile
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/dev/Makefile
@@ -2029,9 +2034,11 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/vfs/filecontents/Makefile
 	go/src/zabbix/plugins/vfs/fileexists/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/stats/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile
-	go/src/zabbix/plugins/kernel/Makefile
+	go/src/zabbix/plugins/net/Makefile
+	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
@@ -2049,6 +2056,9 @@ PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
 
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
+
+XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
+XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
 
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`

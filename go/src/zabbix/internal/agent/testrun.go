@@ -22,6 +22,7 @@ package agent
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 )
@@ -32,7 +33,7 @@ func CheckMetric(metric string) (err error) {
 
 	defer func() {
 		if err != nil {
-			fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", key, err.Error())
+			fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 		}
 	}()
 
@@ -51,6 +52,11 @@ func CheckMetric(metric string) (err error) {
 		return errors.New("not an exporter plugin")
 	}
 
+	var conf plugin.Configurator
+	if conf, ok = acc.(plugin.Configurator); ok {
+		conf.Configure(Options.Plugins[strings.Title(acc.Name())])
+	}
+
 	var v interface{}
 	if v, err = exporter.Export(key, params, nil); err != nil {
 		return
@@ -58,15 +64,15 @@ func CheckMetric(metric string) (err error) {
 
 	switch v.(type) {
 	case string:
-		fmt.Printf("%-46s[s|%s]\n", key, v.(string))
+		fmt.Printf("%-46s[s|%s]\n", metric, v.(string))
 	case *string:
-		fmt.Printf("%-46s[s|%s]\n", key, *v.(*string))
+		fmt.Printf("%-46s[s|%s]\n", metric, *v.(*string))
 	case int, int8, int16, int32, int64:
-		fmt.Printf("%-46s[i|%v]\n", key, v)
+		fmt.Printf("%-46s[i|%v]\n", metric, v)
 	case uint, uint8, uint16, uint32, uint64:
-		fmt.Printf("%-46s[u|%v]\n", key, v)
+		fmt.Printf("%-46s[u|%v]\n", metric, v)
 	case float32, float64:
-		fmt.Printf("%-46s[f|%v]\n", key, v)
+		fmt.Printf("%-46s[f|%v]\n", metric, v)
 	}
 
 	return nil
@@ -77,14 +83,76 @@ func CheckMetrics() {
 	metrics := []string{
 		"agent.hostname",
 		"agent.ping",
-		"system.uptime",
-		"system.uname",
-		"system.hostname",
-		"vfs.file.cksum",
-		"vfs.file.contents",
-		"vfs.file.exists",
+		"agent.version",
+		"system.localtime[utc]",
+		"system.run[echo test]",
+		"web.page.get[localhost,,80]",
+		"web.page.perf[localhost,,80]",
+		"web.page.regexp[localhost,,80,OK]",
+		"vfs.file.size[/etc/passwd]",
+		"vfs.file.time[/etc/passwd,modify]",
+		"vfs.file.exists[/etc/passwd]",
+		"vfs.file.contents[/etc/passwd]",
+		"vfs.file.regexp[/etc/passwd,root]",
+		"vfs.file.regmatch[/etc/passwd,root]",
+		"vfs.file.md5sum[/etc/passwd]",
+		"vfs.file.cksum[/etc/passwd]",
+		"vfs.dir.size[/var/log]",
+		"vfs.dir.count[/var/log]",
+		"net.dns[,zabbix.com]",
+		"net.dns.record[,zabbix.com]",
+		"net.tcp.dns[,zabbix.com]",
+		"net.tcp.dns.query[,zabbix.com]",
+		"net.tcp.port[,80]",
+		"system.users.num",
+		"log[logfile]",
+		"log.count[logfile]",
+		"logrt[logfile]",
+		"logrt.count[logfile]",
+		"eventlog[system]",
+		"zabbix.stats[127.0.0.1,10051]",
 		"kernel.maxfiles",
 		"kernel.maxproc",
+		"vfs.fs.size[/,free]",
+		"vfs.fs.inode[/,free]",
+		"vfs.fs.discovery",
+		"vfs.dev.write[sda,operations]",
+		"net.tcp.listen[80]",
+		"net.udp.listen[68]",
+		"net.if.in[lo,bytes]",
+		"net.if.out[lo,bytes]",
+		"net.if.total[lo,bytes]",
+		"net.if.collisions[lo]",
+		"net.if.discovery",
+		"vm.memory.size[total]",
+		"proc.cpu.util[inetd]",
+		"proc.num[inetd]",
+		"proc.mem[inetd]",
+		"system.cpu.switches",
+		"system.cpu.intr",
+		"system.cpu.util[all,user,avg1]",
+		"system.cpu.load[all,avg1]",
+		"system.cpu.num[online]",
+		"system.cpu.discovery",
+		"system.uname",
+		"system.hw.chassis",
+		"system.hw.cpu",
+		"system.hw.devices",
+		"system.hw.macaddr",
+		"system.sw.arch",
+		"system.sw.os",
+		"system.sw.packages",
+		"system.swap.size[all,free]",
+		"system.swap.in[all]",
+		"system.swap.out[all]",
+		"system.uptime",
+		"system.boottime",
+		"sensor[w83781d-i2c-0-2d,temp1]",
+		"net.tcp.service[ssh,127.0.0.1,22]",
+		"net.tcp.service.perf[ssh,127.0.0.1,22]",
+		"net.udp.service[ntp,127.0.0.1,123]",
+		"net.udp.service.perf[ntp,127.0.0.1,123]",
+		"system.hostname",
 	}
 
 	for _, metric := range metrics {
