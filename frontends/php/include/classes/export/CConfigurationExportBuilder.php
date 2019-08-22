@@ -136,7 +136,7 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Prepare schema array for building xml file.
+	 * Prepare schema array for building export file.
 	 *
 	 * @param CXmlTagInterface $class
 	 *
