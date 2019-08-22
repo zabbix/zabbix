@@ -320,17 +320,9 @@
 		}
 	}
 
-	function setWidgetScrollable(widget, scrollable) {
-		widget['configuration']['scrollable'] = scrollable;
-	}
-
 	function applyWidgetConfiguration($obj, data, widget, configuration) {
 		if ('padding' in configuration) {
 			setWidgetPadding($obj, data, widget, configuration['padding']);
-		}
-
-		if ('scrollable' in configuration) {
-			setWidgetScrollable(widget, configuration['scrollable']);
 		}
 	}
 
@@ -1849,11 +1841,6 @@
 			}
 		}
 
-		if (!widget['configuration']['scrollable']) {
-			// For Internet Explorer 11 to calculate content_body size properly.
-			widget['content_body'].css('overflow', 'hidden');
-		}
-
 		var url = new Curl('zabbix.php');
 		url.setArgument('action', 'widget.' + widget['type'] + '.view');
 
@@ -1924,8 +1911,6 @@
 				else {
 					updateWidgetCallback($obj, data, widget, response, options);
 				}
-
-				widget['content_body'].css('overflow', '');
 
 				setWidgetReady($obj, data, widget);
 
