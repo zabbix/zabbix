@@ -978,10 +978,8 @@ class CSvgGraph extends CSvg {
 		foreach ($this->paths as $index => $path) {
 			if ($this->metrics[$index]['options']['type'] == SVG_GRAPH_TYPE_BAR) {
 				// If one second in displayed over multiple pixels, this shows number of px in second.
-				$sec_per_px = ceil(max(
-					($this->time_till - $this->time_from) / $this->canvas_width,
-					$this->canvas_width / ($this->time_till - $this->time_from)
-				)) * 3;
+				$sec_per_px = ceil(($this->time_till - $this->time_from) / $this->canvas_width);
+				$px_per_sec = ceil($this->canvas_width / ($this->time_till - $this->time_from));
 
 				$y_axis_side = $this->metrics[$index]['options']['axisy'];
 				$time_points = array_keys($this->points[$index]);
@@ -989,7 +987,11 @@ class CSvgGraph extends CSvg {
 				$path = reset($path);
 
 				foreach ($path as $point_index => $point) {
-					$time_point = floor($time_points[$point_index] / $sec_per_px) * $sec_per_px;
+					// $time_point = floor($time_points[$point_index] / $sec_per_px) * $sec_per_px;
+					// $time_point = $time_points[$point_index];
+					$time_point = ($sec_per_px > $px_per_sec)
+						? floor($time_points[$point_index] / $sec_per_px) * $sec_per_px
+						: $time_points[$point_index];
 					$bar_groups_indexes[$y_axis_side][$time_point][$index] = $point_index;
 					$bar_groups_position[$y_axis_side][$time_point][$point_index] = $point[0];
 
