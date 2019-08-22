@@ -163,6 +163,7 @@
 
 		if (widget['iterator']) {
 			widget['container']
+				.append($('<div>', {'class': 'dashbrd-grid-iterator-loading'}))
 				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
 					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
 				);

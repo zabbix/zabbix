@@ -3684,6 +3684,18 @@ $form-icon-btn: (
 			}
 		}
 
+		.dashbrd-grid-iterator-loading {
+			position: absolute;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			bottom: .25rem;
+			border: 1px solid $ui-border-color;
+			background-color: rgba($ui-bg-color, .3);
+			transition: opacity .3s;
+			opacity: 0;
+		}
+
 		.dashbrd-grid-iterator-too-small {
 			position: absolute;
 			top: .25rem;
@@ -3701,6 +3713,13 @@ $form-icon-btn: (
 				padding: 0 10px;
 				text-align: center;
 				color: $font-alt-color;
+			}
+		}
+
+		&.iterator-loading {
+
+			.dashbrd-grid-iterator-loading {
+				opacity: 1;
 			}
 		}
 
@@ -3772,18 +3791,6 @@ $form-icon-btn: (
 				.msg-good, .msg-bad {
 					margin: 10px;
 				}
-			}
-		}
-
-		&.iterator-loading {
-
-			.dashbrd-grid-iterator-content {
-				top: .25rem;
-				left: .25rem;
-				right: .25rem;
-				bottom: .25rem;
-				border: 1px solid $ui-border-color;
-				background-color: rgba($ui-bg-color, .3);
 			}
 		}
 	}
