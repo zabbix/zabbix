@@ -161,7 +161,6 @@ func validateLocalIP(addr string, lips *[]net.IP) (err error) {
 }
 
 func getListLocalIP() *[]net.IP {
-
 	var ips []net.IP
 
 	ifaces, err := net.Interfaces()
