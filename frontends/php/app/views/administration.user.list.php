@@ -127,7 +127,7 @@ foreach ($data['users'] as $user) {
 	$users_groups = [];
 	$i = 0;
 
-	$url = (new CUrl('usergrps.php'))->setArgument('form', 'update');
+	$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.edit');
 
 	foreach ($user['usrgrps'] as $user_group) {
 		$i++;
