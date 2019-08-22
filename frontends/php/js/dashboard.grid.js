@@ -142,12 +142,12 @@
 
 				if ($div.position().top === 0) {
 					if (widget['iterator']) {
-						setKioskSlide($obj, data, event.type === 'focusin'
+						slideKiosk($obj, data, event.type === 'focusin'
 							? ($div.hasClass('iterator-first-row-mouseenter') ? 2 : 1) : 0
 						);
 					}
 					else if (widget['div'].hasClass(classes['hidden_header'])) {
-						setKioskSlide($obj, data, event.type === 'focusin' ? 1 : 0);
+						slideKiosk($obj, data, event.type === 'focusin' ? 1 : 0);
 					}
 				}
 			});
@@ -195,12 +195,12 @@
 						widget['parent']['div'].toggleClass('iterator-first-row-mouseenter', $div.position().top === 0);
 
 						if (widget['parent']['div'].position().top === 0) {
-							setKioskSlide($obj, data, $div.position().top === 0 ? 2 : 1);
+							slideKiosk($obj, data, $div.position().top === 0 ? 2 : 1);
 						}
 					}
 					else {
 						if (widget['parent']['div'].position().top === 0) {
-							setKioskSlide($obj, data, 1);
+							slideKiosk($obj, data, 1);
 						}
 					}
 				});
@@ -210,13 +210,13 @@
 			$div.on('mouseenter mouseleave', function(event) {
 				if ($div.position().top === 0) {
 					if (widget['iterator']) {
-						setKioskSlide($obj, data, event.type === 'mouseenter'
+						slideKiosk($obj, data, event.type === 'mouseenter'
 							? ($div.hasClass('iterator-first-row-mouseenter') ? 2 : 1)
 							: ($div.hasClass(classes['focus']) ? 1 : 0)
 						);
 					}
 					else if (widget['div'].hasClass(classes['hidden_header'])) {
-						setKioskSlide($obj, data, event.type === 'mouseenter'
+						slideKiosk($obj, data, event.type === 'mouseenter'
 							? 1
 							: ($div.hasClass(classes['focus']) ? 1 : 0)
 						);
@@ -234,7 +234,7 @@
 		return $div;
 	}
 
-	function setKioskSlide($obj, data, slide_lines) {
+	function slideKiosk($obj, data, slide_lines) {
 		var $main = $obj.closest('main.layout-kioskmode');
 		if (!$main.length) {
 			return;
@@ -1480,7 +1480,7 @@
 		// Set single-line header for the iterator.
 		$('.dashbrd-grid-iterator-placeholder', iterator['content_body']).on('mouseenter', function() {
 			iterator['div'].removeClass('iterator-first-row-mouseenter');
-			setKioskSlide($obj, data, 1);
+			slideKiosk($obj, data, 1);
 		});
 	}
 

@@ -2475,7 +2475,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   top: 0;
   padding-top: 8px;
-  background-color: #2b2b2b;
   transition: top .3s;
   z-index: 5; }
 
