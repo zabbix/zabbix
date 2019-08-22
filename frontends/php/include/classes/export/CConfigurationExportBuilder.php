@@ -125,13 +125,11 @@ class CConfigurationExportBuilder {
 			}
 
 			if ($schema_class instanceof CIndexedArrayXmlTagInterface) {
-				$result[$n] = $store;
+				$result[$n++] = $store;
 			}
 			else {
 				$result = $store;
 			}
-
-			$n++;
 		}
 
 		return $result;
