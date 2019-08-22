@@ -931,11 +931,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 					],
 					[
 						'type' => 'Check for error in JSON',
-						'parameter_1' => '$.new.path'
+						'parameter_1' => '$.new.path',
+						'on_fail' => true
 					],
 					[
 						'type' => 'Check for error in XML',
-						'parameter_1' => '/new/path'
+						'parameter_1' => '/new/path',
+						'on_fail' => true
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
@@ -980,10 +982,7 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
-			if ($options['type'] === 'Check for error in JSON'
-					|| $options['type'] === 'Discard unchanged with heartbeat'
-						|| $options['type'] === 'Check for error in XML' ) {
-
+			if ($options['type'] === 'Discard unchanged with heartbeat') {
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 			}
 		}
@@ -1024,13 +1023,13 @@ class testFormLowLevelDiscoveryPreprocessing extends CWebTest {
 				case 'Regular expression':
 				case 'JSONPath':
 				case 'XML XPath':
+				case 'Check for error in JSON':
 				case 'Does not match regular expression':
+				case 'Check for error in XML':
 					// Check preprocessing in frontend.
 					$this->assertTrue($steps[$i]['on_fail']->isSelected());
 					$this->assertTrue($steps[$i]['on_fail']->isEnabled());
 					break;
-				case 'Check for error in JSON':
-				case 'Check for error in XML':
 				case 'Discard unchanged with heartbeat':
 					// Check pre-processing error handler type in DB.
 					$this->assertFalse($steps[$i]['on_fail']->isEnabled());

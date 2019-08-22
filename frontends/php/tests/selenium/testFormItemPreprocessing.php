@@ -1859,7 +1859,8 @@ class testFormItemPreprocessing extends CWebTest {
 					],
 					[
 						'type' => 'Check for error in JSON',
-						'parameter_1' => '$.new.path'
+						'parameter_1' => '$.new.path',
+						'on_fail' => true
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
@@ -1904,9 +1905,7 @@ class testFormItemPreprocessing extends CWebTest {
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
-			if ($options['type'] === 'Check for error in JSON'
-					|| $options['type'] === 'Discard unchanged with heartbeat') {
-
+			if ($options['type'] === 'Discard unchanged with heartbeat') {
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 			}
 		}
@@ -1943,7 +1942,7 @@ class testFormItemPreprocessing extends CWebTest {
 
 			$this->assertEquals($expected, $rows[$i + 1]);
 
-			if (in_array($options['type'], ['Check for error in JSON', 'Discard unchanged with heartbeat'])){
+			if (in_array($options['type'], ['Discard unchanged with heartbeat'])){
 				$this->assertFalse($steps[$i]['on_fail']->isEnabled());
 				$this->assertFalse($steps[$i]['on_fail']->isSelected());
 				$this->assertTrue($steps[$i]['error_handler'] === null || !$steps[$i]['error_handler']->isVisible());
