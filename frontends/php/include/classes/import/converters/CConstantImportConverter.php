@@ -36,7 +36,7 @@ class CConstantImportConverter extends CConverter {
 		return $data;
 	}
 
-	public function replaceConstant($data, array $rules, $path = '') {
+	protected function replaceConstant($data, array $rules, $path = '') {
 		if ($rules['type'] & XML_STRING) {
 			if (!array_key_exists('in', $rules)) {
 				return $data;
