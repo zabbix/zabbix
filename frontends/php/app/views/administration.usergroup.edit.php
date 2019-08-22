@@ -112,7 +112,7 @@ $new_group_right_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'new_group_right[groupids][]',
 			'object_name' => 'hostGroup',
-			'data' => zbx_array_mintersect($data['new_group_right']['groupids'], $data['host_groups_ms']),
+			'data' => array_intersect_key($data['host_groups_ms'], array_flip($data['new_group_right']['groupids'])),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -161,7 +161,7 @@ $new_tag_filter_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'new_tag_filter[groupids][]',
 			'object_name' => 'hostGroup',
-			'data' => zbx_array_mintersect($data['new_tag_filter']['groupids'], $data['host_groups_ms']),
+			'data' => array_intersect_key($data['host_groups_ms'], array_flip($data['new_tag_filter']['groupids'])),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
