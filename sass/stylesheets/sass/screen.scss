@@ -3664,7 +3664,6 @@ $form-icon-btn: (
 			// To allow overflowing of the floating headers of child widgets.
 			overflow: visible;
 
-			flex-grow: 1;
 			transition: margin-top .3s;
 			z-index: 3;
 		}
@@ -3763,16 +3762,28 @@ $form-icon-btn: (
 
 			.dashbrd-grid-iterator-content {
 				position: absolute;
-				top: 0.25rem;
-				left: 0.25rem;
-				right: 0.25rem;
-				bottom: 0.25rem;
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
 				border: 1px solid $ui-border-color;
 				background-color: $ui-bg-color;
 
 				.msg-good, .msg-bad {
 					margin: 10px;
 				}
+			}
+		}
+
+		&.iterator-loading {
+
+			.dashbrd-grid-iterator-content {
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
+				border: 1px solid $ui-border-color;
+				background-color: rgba($ui-bg-color, .3);
 			}
 		}
 	}

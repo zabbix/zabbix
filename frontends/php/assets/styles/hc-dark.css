@@ -2497,7 +2497,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     right: 0;
     bottom: 0;
     overflow: visible;
-    flex-grow: 1;
     transition: margin-top .3s;
     z-index: 3; }
   .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-placeholder {
@@ -2553,14 +2552,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     right: 0; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content {
     position: absolute;
-    top: 0.25rem;
-    left: 0.25rem;
-    right: 0.25rem;
-    bottom: 0.25rem;
+    top: .25rem;
+    left: .25rem;
+    right: .25rem;
+    bottom: .25rem;
     border: 1px solid #444;
     background-color: #000; }
     .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-good, .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-bad {
       margin: 10px; }
+  .dashbrd-grid-container .dashbrd-grid-iterator.iterator-loading .dashbrd-grid-iterator-content {
+    top: .25rem;
+    left: .25rem;
+    right: .25rem;
+    bottom: .25rem;
+    border: 1px solid #444;
+    background-color: rgba(0, 0, 0, 0.3); }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-head {
   margin-top: 0;
   height: 2rem;

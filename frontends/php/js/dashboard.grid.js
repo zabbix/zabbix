@@ -26,7 +26,7 @@
 
 	function makeWidgetDiv($obj, data, widget) {
 		var iterator_classes = {
-				'element': 'dashbrd-grid-iterator',
+				'root': 'dashbrd-grid-iterator',
 				'container': 'dashbrd-grid-iterator-container',
 				'head': 'dashbrd-grid-iterator-head',
 				'content': 'dashbrd-grid-iterator-content',
@@ -37,7 +37,7 @@
 
 			},
 			widget_classes = {
-				'element': 'dashbrd-grid-widget',
+				'root': 'dashbrd-grid-widget',
 				'container': 'dashbrd-grid-widget-container',
 				'head': 'dashbrd-grid-widget-head',
 				'content': 'dashbrd-grid-widget-content',
@@ -172,7 +172,7 @@
 			widget['container'].append(widget['content_script']);
 		}
 
-		var $div = $('<div>', {'class': classes['element']})
+		var $div = $('<div>', {'class': classes['root']})
 				.toggleClass(classes['hidden_header'], widget['view_mode'] == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 				.toggleClass('new-widget', widget['new_widget']);
 
@@ -1362,6 +1362,10 @@
 
 	function showPreloader(widget) {
 		if (typeof widget['preloader_div'] === 'undefined') {
+			if (widget['iterator']) {
+				widget['div'].addClass('iterator-loading');
+			}
+
 			widget['preloader_div'] = $('<div>')
 				.addClass('preloader-container')
 				.append($('<div>').addClass('preloader'));
@@ -1372,6 +1376,10 @@
 
 	function hidePreloader(widget) {
 		if (typeof widget['preloader_div'] !== 'undefined') {
+			if (widget['iterator']) {
+				widget['div'].removeClass('iterator-loading');
+			}
+
 			widget['preloader_div'].remove();
 			delete widget['preloader_div'];
 		}
