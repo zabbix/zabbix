@@ -282,7 +282,9 @@ jQuery(function ($) {
 					var pp = 0;
 
 					for (var c = 0, cl = polygons_nodes.length; cl > c; c++) {
-						var coord = polygons_nodes[c].getAttribute('points').split(' ').map((val) => val.split(','));
+						var coord = polygons_nodes[c].getAttribute('points').split(' ').map(function (val) {
+							return val.split(',');
+						});
 						if (polygons_nodes[c].getAttribute('data-px') == coord[0][0]) {
 							if (x >= parseInt(coord[0][0])) {
 								points.push(polygons_nodes[c]);
@@ -300,7 +302,9 @@ jQuery(function ($) {
 
 					var point = points.slice(-1)[0];
 					if (typeof point !== 'undefined') {
-						var coord = point.getAttribute('points').split(' ').map((val) => val.split(','));
+						var coord = point.getAttribute('points').split(' ').map(function (val) {
+							return val.split(',');
+						});
 						px = coord[0][0];
 						py = coord[1][1];
 						pv = point.getAttribute('label');
