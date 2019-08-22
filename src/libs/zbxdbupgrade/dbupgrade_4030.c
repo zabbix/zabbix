@@ -175,12 +175,43 @@ static int	DBpatch_4030015(void)
 
 static int	DBpatch_4030016(void)
 {
+	int		i;
+	const char      *values[] = {
+			"alarm_ok",
+			"no_sound",
+			"alarm_information",
+			"alarm_warning",
+			"alarm_average",
+			"alarm_high",
+			"alarm_disaster"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set value_str='%s.mp3'"
+				" where value_str='%s.wav'"
+					" and idx='web.messages'", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030017(void)
+{
 	const ZBX_FIELD	field = {"opdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBrename_field("triggers", "details", &field);
 }
 
-static int	DBpatch_4030017(void)
+static int	DBpatch_4030018(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -192,7 +223,7 @@ static int	DBpatch_4030017(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4030018(void)
+static int	DBpatch_4030019(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -234,5 +265,6 @@ DBPATCH_ADD(4030015, 0, 1)
 DBPATCH_ADD(4030016, 0, 1)
 DBPATCH_ADD(4030017, 0, 1)
 DBPATCH_ADD(4030018, 0, 1)
+DBPATCH_ADD(4030019, 0, 1)
 
 DBPATCH_END()
