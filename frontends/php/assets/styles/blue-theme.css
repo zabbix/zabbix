@@ -2539,7 +2539,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     background-color: #fff; }
     .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-too-small div {
       padding: 0 10px;
-      text-align: center; }
+      text-align: center;
+      color: #768d99; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-too-small {
     display: flex; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-content {
