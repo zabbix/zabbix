@@ -183,8 +183,15 @@
 			data['options']['rows'] = min_rows;
 		}
 
+		var height = data['options']['widget-height'] * data['options']['rows'];
+
+		if (data['options']['edit_mode']) {
+			// Occupy whole screen only if in edit mode, not to cause scrollbar in kiosk mode.
+			height = Math.max(height, data.minimalHeight);
+		}
+
 		$obj.css({
-			height: Math.max(data['options']['widget-height'] * data['options']['rows'], data.minimalHeight) + 'px'
+			height: height + 'px'
 		});
 	}
 
