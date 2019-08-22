@@ -39,13 +39,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	switch key {
 	case "vfs.file.time":
 		if len(params) > 2 || len(params) == 0 {
-			return nil, errors.New("Wrong number of parameters")
+			return nil, errors.New("Invalid number of parameters.")
 		}
 		if "" == params[0] {
-			return nil, errors.New("Invalid first parameter")
+			return nil, errors.New("Invalid first parameter.")
 		}
 		if f, err := stdOs.Stat(params[0]); err != nil {
-			return nil, fmt.Errorf("Cannot obtain file %s information: %s", params[0], err)
+			return nil, fmt.Errorf("Cannot obtain file information: %s", err)
 		} else {
 			if len(params) == 1 || params[1] == "" || params[1] == "modify" {
 				return f.ModTime().Unix(), nil
@@ -54,31 +54,31 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			} else if params[1] == "change" {
 				return f.Sys().(*syscall.Stat_t).Ctim.Sec, nil
 			} else {
-				return nil, errors.New("Invalid second parameter")
+				return nil, errors.New("Invalid second parameter.")
 			}
 		}
 
 	case "vfs.file.size":
 		if len(params) != 1 {
-			return nil, errors.New("Wrong number of parameters")
+			return nil, errors.New("Invalid number of parameters.")
 		}
 		if "" == params[0] {
-			return nil, errors.New("Invalid first parameter")
+			return nil, errors.New("Invalid first parameter.")
 		}
 
 		if f, err := stdOs.Stat(params[0]); err == nil {
 			return f.Size(), nil
 		} else {
-			return nil, fmt.Errorf("Cannot obtain file %s information: %s", params[0], err)
+			return nil, fmt.Errorf("Cannot obtain file information: %s", err)
 		}
 
 	case "vfs.file.exists":
 
 		if len(params) != 1 {
-			return nil, errors.New("Wrong number of parameters")
+			return nil, errors.New("Invalid number of parameters.")
 		}
 		if "" == params[0] {
-			return nil, errors.New("Invalid first parameter")
+			return nil, errors.New("Invalid first parameter.")
 		}
 		ret := 0
 
@@ -86,13 +86,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			if mode := f.Mode(); mode.IsRegular() {
 				ret = 1
 			}
-		} else if stdOs.IsExist(err) {
-			ret = 1
 		}
 		return ret, nil
 
 	default:
-		return nil, errors.New("Unsupported metric")
+		return nil, errors.New("Unsupported metric.")
 	}
 
 }
@@ -100,8 +98,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var stdOs std.Os
 
 func init() {
-	plugin.RegisterMetric(&impl, "filestats", "vfs.file.exists", "Returns if file exists or not")
-	plugin.RegisterMetric(&impl, "filestats", "vfs.file.size", "Returns file size")
-	plugin.RegisterMetric(&impl, "filestats", "vfs.file.time", "Returns file time information")
+	plugin.RegisterMetric(&impl, "filestats", "vfs.file.exists", "Returns if file exists or not.")
+	plugin.RegisterMetric(&impl, "filestats", "vfs.file.size", "Returns file size.")
+	plugin.RegisterMetric(&impl, "filestats", "vfs.file.time", "Returns file time information.")
 	stdOs = std.NewOs()
 }
