@@ -36,17 +36,7 @@ class C42ImportConverter extends CConverter {
 			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
 		}
 
-		$schema = (new C44XmlValidator('xml'))->getSchema();
-
-		foreach($schema['rules'] as $tag => $tag_rules) {
-			if (!array_key_exists($tag, $data['zabbix_export'])) {
-				continue;
-			}
-
-			$data['zabbix_export'][$tag] = $this->convertEmptyTags($data['zabbix_export'][$tag], $tag_rules);
-		}
-
-		$data['zabbix_export'] = $this->convertValueToConstant($data['zabbix_export'], $schema);
+		$data['zabbix_export'] = $this->convertFormat($data['zabbix_export']);
 
 		return $data;
 	}
@@ -142,7 +132,28 @@ class C42ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Convert values to constant.
+	 * Update imported data array to format used starting from Zabbix version 4.4.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected function convertFormat(array $data) {
+		$schema = (new C44XmlValidator('xml'))->getSchema();
+
+		foreach ($schema['rules'] as $tag => $tag_rules) {
+			if (!array_key_exists($tag, $data)) {
+				continue;
+			}
+
+			$data[$tag] = $this->convertEmptyTags($data[$tag], $tag_rules);
+		}
+
+		return $this->convertValueToConstant($data, $schema);
+	}
+
+	/**
+	 * Convert values to human readable constants.
 	 *
 	 * @param array|string $data
 	 * @param array        $rules
@@ -181,19 +192,19 @@ class C42ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Delete empty non-required tags
+	 * Delete empty non-required tags.
 	 *
 	 * @param array|string $data
 	 * @param array        $rules
 	 *
 	 * @return array
 	 */
-	public function convertEmptyTags($data, $rules) {
+	protected function convertEmptyTags($data, $rules) {
 		if ($rules['type'] & XML_ARRAY) {
 			foreach ($rules['rules'] as $tag => $tag_rules) {
 				if (array_key_exists($tag, $data)) {
 					if ($tag_rules['type'] & XML_STRING) {
-						if ($data[$tag] == '') {
+						if ($data[$tag] === '') {
 							if ($tag_rules['type'] & XML_REQUIRED) {
 								continue;
 							}
@@ -202,7 +213,7 @@ class C42ImportConverter extends CConverter {
 						continue;
 					}
 
-					if (count($data[$tag]) === 0) {
+					if (count($data[$tag]) == 0) {
 						if ($tag_rules['type'] & XML_REQUIRED) {
 							continue;
 						}
@@ -212,7 +223,8 @@ class C42ImportConverter extends CConverter {
 					}
 
 					$data[$tag] = $this->convertEmptyTags($data[$tag], $tag_rules);
-					if ($data[$tag] == '') {
+
+					if ($data[$tag] === '') {
 						unset($data[$tag]);
 					}
 				}
@@ -226,10 +238,8 @@ class C42ImportConverter extends CConverter {
 			}
 		}
 
-		if (is_array($data)) {
-			if (count($data) === 0) {
-				return '';
-			}
+		if (is_array($data) && count($data) == 0) {
+			return '';
 		}
 
 		return $data;
