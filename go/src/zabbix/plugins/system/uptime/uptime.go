@@ -43,5 +43,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds")
+	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds.")
 }

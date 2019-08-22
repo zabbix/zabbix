@@ -2,10 +2,12 @@
 
 SUBDIRS = \
 	debug \
+	kernel \
 	log \
 	proc \
 	system \
 	systemd \
 	vfs \
-	zabbix
+	zabbix \
+	net
 

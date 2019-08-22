@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"zabbix/internal/plugin"
+	"zabbix/pkg/version"
 )
 
 // Plugin -
@@ -43,12 +44,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return Options.Hostname, nil
 	case "agent.ping":
 		return 1, nil
+	case "agent.version":
+		return version.Long(), nil
 	}
 
 	return nil, fmt.Errorf("Not implemented: %s", key)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "agent", "agent.hostname", "Returns Hostname from agent configuration")
-	plugin.RegisterMetric(&impl, "agent", "agent.ping", "Returns agent availability check result")
+	plugin.RegisterMetric(&impl, "agent", "agent.hostname", "Returns Hostname from agent configuration.")
+	plugin.RegisterMetric(&impl, "agent", "agent.ping", "Returns agent availability check result.")
+	plugin.RegisterMetric(&impl, "agent", "agent.version", "Version of Zabbix agent.")
 }

@@ -254,8 +254,7 @@ func (p *Plugin) collectDeviceStats(devices map[string]*devUnit) (err error) {
 		if stats, tmperr := p.getDeviceStats(dev.name); tmperr == nil {
 			stats.clock = now.UnixNano()
 			dev.history[dev.tail] = *stats
-			dev.tail = dev.tail.inc()
-			if dev.tail == dev.head {
+			if dev.tail = dev.tail.inc(); dev.tail == dev.head {
 				dev.head = dev.head.inc()
 			}
 		}

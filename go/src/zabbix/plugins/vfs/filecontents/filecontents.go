@@ -136,7 +136,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var stdOs std.Os
 
 func init() {
-	plugin.RegisterMetric(&impl, "contents", "vfs.file.contents", "Retrieves contents of the file")
-	plugin.RegisterMetric(&impl, "contents", "vfs.file.regexp", "Find string in a file")
+	plugin.RegisterMetric(&impl, "contents", "vfs.file.contents", "Retrieves contents of the file.")
+	plugin.RegisterMetric(&impl, "contents", "vfs.file.regexp", "Find string in a file.")
 	stdOs = std.NewOs()
 }

@@ -63,5 +63,5 @@ func (p *Plugin) Configure(options map[string]string) {
 func init() {
 	stdOs = std.NewOs()
 	impl.interval = 1
-	plugin.RegisterMetric(&impl, "debugcollector", "debug.collector", "Returns empty value")
+	plugin.RegisterMetric(&impl, "debugcollector", "debug.collector", "Returns empty value.")
 }

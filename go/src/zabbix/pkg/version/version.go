@@ -72,10 +72,18 @@ func RC() string {
 	return ZABBIX_VERSION_RC
 }
 
-func Long() string {
+func LongStr() string {
 	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
 	if len(RC()) != 0 {
 		ver += " " + RC()
+	}
+	return ver
+}
+
+func Long() string {
+	var ver string = fmt.Sprintf("%d.%d.%d", Major(), Minor(), Patch())
+	if len(RC()) != 0 {
+		ver += RC()
 	}
 	return ver
 }
@@ -130,7 +138,7 @@ func TitleMessage() string {
 }
 
 func Display() {
-	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
+	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), LongStr())
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
 	fmt.Println(CopyrightMessage())
 }

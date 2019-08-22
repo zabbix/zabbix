@@ -20,13 +20,16 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 	"zabbix/internal/agent"
+	"zabbix/internal/agent/remotecontrol"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/agent/serverconnector"
 	"zabbix/internal/agent/serverlistener"
@@ -88,30 +91,112 @@ func configDefault(taskManager scheduler.Scheduler, o *agent.AgentOptions) error
 	return nil
 }
 
-func run() {
+var manager *scheduler.Manager
+var listener *serverlistener.ServerListener
+var serverConnectors []*serverconnector.Connector
+
+func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
+	if len(params) != 2 {
+		return errors.New("No loglevel parameter specified")
+	}
+	switch params[1] {
+	case "increase":
+		if log.IncreaseLogLevel() {
+			message := fmt.Sprintf("Increased log level to %s", log.Level())
+			log.Infof(message)
+			err = c.Reply(message)
+		} else {
+			err = fmt.Errorf("Cannot increase log level above %s", log.Level())
+			log.Infof(err.Error())
+		}
+	case "decrease":
+		if log.DecreaseLogLevel() {
+			message := fmt.Sprintf("Decreased log level to %s", log.Level())
+			log.Infof(message)
+			err = c.Reply(message)
+		} else {
+			err = fmt.Errorf("Cannot descrease log level below %s", log.Level())
+			log.Infof(err.Error())
+		}
+	default:
+		return errors.New("Invalid loglevel parameter")
+	}
+	return
+}
+
+func processMetricsCommand(c *remotecontrol.Client, params []string) (err error) {
+	data := manager.Query("metrics")
+	return c.Reply(data)
+}
+
+func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
+	help := `Remote control interface, available commands:
+	loglevel <increase|decrease> - increases/decreases logging level
+	metrics - lists available metrics
+	help - this message`
+	return c.Reply(help)
+}
+
+func processRemoteCommand(c *remotecontrol.Client) (err error) {
+	params := strings.Fields(c.Request())
+	if len(params) == 0 {
+		return errors.New("Empty command")
+	}
+	switch params[0] {
+	case "loglevel":
+		err = processLoglevelCommand(c, params)
+	case "help":
+		err = processHelpCommand(c, params)
+	case "metrics":
+		err = processMetricsCommand(c, params)
+	default:
+		return errors.New("Unknown command")
+	}
+	return
+}
+
+func run() (err error) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
 
+	var control *remotecontrol.Conn
+	if control, err = remotecontrol.New(agent.Options.ControlSocket); err != nil {
+		return
+	}
+	control.Start()
+
+loop:
 	for {
-		sig := <-sigs
-		switch sig {
-		case syscall.SIGINT, syscall.SIGTERM:
-			return
-		case syscall.SIGUSR1:
-			log.Debugf("user signal received")
-			return
+		select {
+		case sig := <-sigs:
+			switch sig {
+			case syscall.SIGINT, syscall.SIGTERM:
+				break loop
+			case syscall.SIGUSR1:
+				log.Debugf("user signal received")
+				break loop
+			}
+		case client := <-control.Client():
+			if rerr := processRemoteCommand(client); rerr != nil {
+				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
+					log.Warningf("cannot reply to remote command: %s", rerr)
+				}
+			}
 		}
 	}
+	control.Stop()
+	return nil
 }
+
+var confDefault string
 
 func main() {
 	var confFlag string
 	const (
-		confDefault     = "agent.conf"
 		confDescription = "Path to the configuration file"
 	)
 	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorhand)")
+	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
 
 	var foregroundFlag bool
 	const (
@@ -119,7 +204,7 @@ func main() {
 		foregroundDescription = "Run Zabbix agent in foreground"
 	)
 	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
-	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorhand)")
+	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorthand)")
 
 	var testFlag string
 	const (
@@ -127,7 +212,7 @@ func main() {
 		testDescription = "Test specified item and exit"
 	)
 	flag.StringVar(&testFlag, "test", testDefault, testDescription)
-	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorhand)")
+	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorthand)")
 
 	var printFlag bool
 	const (
@@ -135,15 +220,22 @@ func main() {
 		printDescription = "Print known items and exit"
 	)
 	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
-	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorhand)")
+	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
 
 	var versionFlag bool
 	const (
 		versionDefault     = false
-		versionDescription = "Print programm version and exit"
+		versionDescription = "Print program version and exit"
 	)
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorhand)")
+	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorthand)")
+
+	var remoteCommand string
+	const (
+		remoteDefault     = ""
+		remoteDescription = "Test specified item and exit"
+	)
+	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
 	flag.Parse()
 
@@ -153,12 +245,12 @@ func main() {
 	// does not offer automatic detection. Consider using third party package.
 	flag.Visit(func(f *flag.Flag) {
 		switch f.Name {
+		case "c", "config":
+			argConfig = true
 		case "t", "test":
 			argTest = true
 		case "p", "print":
 			argPrint = true
-		case "c", "config":
-			argConfig = true
 		case "v", "version":
 			argVersion = true
 		}
@@ -169,14 +261,22 @@ func main() {
 		os.Exit(0)
 	}
 
-	if argConfig {
-		if err := conf.Load(confFlag, &agent.Options); err != nil {
+	if err := conf.Load(confFlag, &agent.Options); err != nil {
+		if argConfig || !(argTest || argPrint) {
 			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
+		}
+		// create default configuration for testing options
+		if argConfig == false {
+			conf.Unmarshal([]byte{}, &agent.Options)
 		}
 	}
 
 	if argTest || argPrint {
+		if argConfig == false {
+			conf.Unmarshal([]byte{}, &agent.Options)
+		}
+
 		if err := log.Open(log.Console, log.Warning, ""); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 			os.Exit(1)
@@ -190,6 +290,20 @@ func main() {
 			agent.CheckMetrics()
 		}
 
+		os.Exit(0)
+	}
+
+	if remoteCommand != "" {
+		if agent.Options.ControlSocket == "" {
+			fmt.Fprintf(os.Stderr, "Cannot send remote command: ControlSocket configuration parameter is not defined\n")
+			os.Exit(0)
+		}
+
+		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand); err != nil {
+			fmt.Fprintf(os.Stderr, "Cannot send remote command: %s\n", err)
+		} else {
+			fmt.Fprintf(os.Stdout, "%s\n", reply)
+		}
 		os.Exit(0)
 	}
 
@@ -240,20 +354,21 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	taskManager := scheduler.NewManager()
-	listener := serverlistener.New(taskManager)
+	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
+	manager = scheduler.NewManager()
+	listener = serverlistener.New(manager)
 
-	taskManager.Start()
+	manager.Start()
 
-	var serverConnectors []*serverconnector.Connector
-
-	err = configDefault(taskManager, &agent.Options)
+	if err == nil {
+		err = configDefault(manager, &agent.Options)
+	}
 
 	if err == nil {
 		serverConnectors = make([]*serverconnector.Connector, len(addresses))
 
 		for i := 0; i < len(serverConnectors); i++ {
-			serverConnectors[i] = serverconnector.New(taskManager, addresses[i])
+			serverConnectors[i] = serverconnector.New(manager, addresses[i])
 			serverConnectors[i].Start()
 		}
 
@@ -261,8 +376,9 @@ func main() {
 	}
 
 	if err == nil {
-		run()
-	} else {
+		err = run()
+	}
+	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
 
@@ -272,7 +388,7 @@ func main() {
 		serverConnectors[i].Stop()
 	}
 
-	taskManager.Stop()
+	manager.Stop()
 	monitor.Wait()
 
 	farewell := fmt.Sprintf("Zabbix Agent stopped. (%s)", version.Long())

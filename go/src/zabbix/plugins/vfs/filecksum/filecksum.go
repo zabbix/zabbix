@@ -135,6 +135,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var stdOs std.Os
 
 func init() {
-	plugin.RegisterMetric(&impl, "checksum", "vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm")
+	plugin.RegisterMetric(&impl, "checksum", "vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.")
 	stdOs = std.NewOs()
 }
