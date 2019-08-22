@@ -51,7 +51,7 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func Open(address string, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
+func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect}
 	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
@@ -275,7 +275,7 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(address string, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
+func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
 	log.Tracef("connecting to [%s]", address)
 
 	var tlsconfig *tls.Config
