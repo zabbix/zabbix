@@ -64,7 +64,7 @@ class C42ImportConverter extends CConverter {
 				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 				unset($host['inventory']['inventory_mode']);
 
-				if (count($host['inventory']) == 0) {
+				if (count($host['inventory']) == 0 || $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					unset($host['inventory']);
 				}
 			}
