@@ -987,8 +987,6 @@ class CSvgGraph extends CSvg {
 				$path = reset($path);
 
 				foreach ($path as $point_index => $point) {
-					// $time_point = floor($time_points[$point_index] / $sec_per_px) * $sec_per_px;
-					// $time_point = $time_points[$point_index];
 					$time_point = ($sec_per_px > $px_per_sec)
 						? floor($time_points[$point_index] / $sec_per_px) * $sec_per_px
 						: $time_points[$point_index];
