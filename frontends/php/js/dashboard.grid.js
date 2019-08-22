@@ -1921,7 +1921,13 @@
 
 				doAction('onContentUpdated', $obj, data, null);
 
+				// The widget is loaded now, although possibly already resized.
 				widget['initial_load'] = false;
+
+				if (!widget['iterator']) {
+					// Update the widget, if it was resized before it was fully loaded.
+					resizeWidget($obj, data, widget);
+				}
 			})
 			.fail(function() {
 				// TODO: gentle message about failed update of widget content
@@ -2701,7 +2707,7 @@
 		var success = false;
 
 		if (widget['iterator']) {
-			// Iterators will selectively propagate the event to their child widgets.
+			// Iterators will sync first, then selectively propagate the resize event to the child widgets.
 			success = doAction('onResizeEnd', $obj, data, widget);
 		}
 		else {
@@ -2710,7 +2716,9 @@
 
 			if (!isEqualContentSize(size_old, size_new)) {
 				success = doAction('onResizeEnd', $obj, data, widget);
-				widget['content_size'] = size_new;
+				if (success) {
+					widget['content_size'] = size_new;
+				}
 			}
 		}
 
