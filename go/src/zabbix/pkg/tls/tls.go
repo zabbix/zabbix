@@ -158,7 +158,8 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 #define TLS_CIPHER_CERT	"RSA+aRSA+AES128"
 #define TLS_CIPHER_PSK	"kPSK+AES128"
 
-static void *tls_new_context(const char *ca_file, const char *cert_file, const char *key_file, char **error)
+static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
+		char **error)
 {
 	SSL_CTX	*ctx;
 	int		ret = -1;
@@ -176,6 +177,21 @@ static void *tls_new_context(const char *ca_file, const char *cert_file, const c
 			goto out;
 		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 		ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
+
+		if (NULL != crl_file)
+		{
+			X509_STORE	*store_cert;
+			X509_LOOKUP	*lookup_cert;
+			int		count_cert;
+
+			store_cert = SSL_CTX_get_cert_store(ctx);
+			if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
+				goto out;
+			if (0 >= (count_cert = X509_load_crl_file(lookup_cert, crl_file, X509_FILETYPE_PEM)))
+				goto out;
+			if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
+				goto out;
+		}
 	}
 	else
 		ciphers = TLS_CIPHER_PSK;
@@ -497,7 +513,8 @@ static int tls_init()
 	return -1;
 }
 
-static void *tls_new_context(const char *ca_file, const char *cert_file, const char *key_file, char **error)
+static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
+		 char **error)
 {
 	*error = strdup("built without OpenSSL");
 	return NULL;
@@ -964,6 +981,7 @@ type Config struct {
 	PSKIdentity       string
 	PSKKey            string
 	CAFile            string
+	CRLFile           string
 	CertFile          string
 	KeyFile           string
 	ServerCertIssuer  string
@@ -984,28 +1002,32 @@ func Init(config *Config) (err error) {
 		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
-	var cErr, cCaFile, cCertFile, cKeyFile, cNULL *C.char
+	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cNULL *C.char
 	if (config.Accept|config.Connect)&ConnCert != 0 {
 		cCaFile = C.CString(config.CAFile)
 		cCertFile = C.CString(config.CertFile)
 		cKeyFile = C.CString(config.KeyFile)
+		defer C.free(unsafe.Pointer(cCaFile))
+		defer C.free(unsafe.Pointer(cCertFile))
+		defer C.free(unsafe.Pointer(cKeyFile))
 
-		defer func() {
-			C.free(unsafe.Pointer(cCaFile))
-			C.free(unsafe.Pointer(cCertFile))
-			C.free(unsafe.Pointer(cKeyFile))
-		}()
+		if config.CRLFile != "" {
+			cCrlFile = C.CString(config.CRLFile)
+			defer C.free(unsafe.Pointer(cCrlFile))
+		}
 	}
 
-	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
+	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
 		err = fmt.Errorf("cannot initialize global TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
+		return
 	}
-	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
+	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
+		return
 	}
-	return err
+	return
 }
 
 func init() {
