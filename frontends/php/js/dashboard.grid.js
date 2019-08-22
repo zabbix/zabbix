@@ -163,7 +163,6 @@
 
 		if (widget['iterator']) {
 			widget['container']
-				.append($('<div>', {'class': 'dashbrd-grid-iterator-loading'}))
 				.append($('<div>', {'class': 'dashbrd-grid-iterator-too-small'})
 					.append($('<div>').html(t('Widget is too small for the specified number of columns and rows.')))
 				);
@@ -1470,19 +1469,20 @@
 	}
 
 	function addIteratorPlaceholders($obj, data, iterator, count) {
-		$('.dashbrd-grid-iterator-placeholder', iterator['content_body']).remove();
+		var $placeholders = $('.dashbrd-grid-iterator-placeholder', iterator['content_body']);
 
-		for (var index = 0; index < count; index++) {
-			iterator['content_body'].append(
-				$('<div>', {'class': 'dashbrd-grid-iterator-placeholder'}).append('<div>')
+		// Reusing placeholders not to disturb animations.
+		$placeholders.slice(count).remove();
+		for (var index = $placeholders.length; index < count; index++) {
+			iterator['content_body'].append($('<div>', {'class': 'dashbrd-grid-iterator-placeholder'})
+				.append('<div>')
+				.on('mouseenter', function() {
+					// Set single-line header for the iterator.
+					iterator['div'].removeClass('iterator-first-row-mouseenter');
+					slideKiosk($obj, data, 1);
+				})
 			);
 		}
-
-		// Set single-line header for the iterator.
-		$('.dashbrd-grid-iterator-placeholder', iterator['content_body']).on('mouseenter', function() {
-			iterator['div'].removeClass('iterator-first-row-mouseenter');
-			slideKiosk($obj, data, 1);
-		});
 	}
 
 	function alignIteratorContents($obj, data, iterator, pos) {
@@ -3007,6 +3007,12 @@
 				data.new_widget_placeholder.container.hide();
 
 				if (widget_local['iterator']) {
+					// Placeholders will be shown while the iterator will be loading.
+					addIteratorPlaceholders($this, data, widget_local,
+						numIteratorColumns(widget_local) * numIteratorRows(widget_local)
+					);
+					alignIteratorContents($this, data, widget_local, widget_local['pos']);
+
 					$this.dashboardGrid('addAction', 'onResizeEnd', onIteratorResizeEnd, widget_local['uniqueid'], {
 						parameters: [$this, data, widget_local],
 						trigger_name: 'onIteratorResizeEnd_' + widget_local['uniqueid']

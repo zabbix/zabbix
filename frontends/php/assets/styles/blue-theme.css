@@ -2524,16 +2524,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       flex-direction: column;
       border: 1px solid #dfe4e7;
       background-color: rgba(255, 255, 255, 0.3); }
-  .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-loading {
-    position: absolute;
-    top: .25rem;
-    left: .25rem;
-    right: .25rem;
-    bottom: .25rem;
-    border: 1px solid #dfe4e7;
-    background-color: rgba(255, 255, 255, 0.3);
-    transition: opacity .3s;
-    opacity: 0; }
   .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-too-small {
     position: absolute;
     top: .25rem;
@@ -2550,8 +2540,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px;
       text-align: center;
       color: #768d99; }
-  .dashbrd-grid-container .dashbrd-grid-iterator.iterator-loading .dashbrd-grid-iterator-loading {
-    opacity: 1; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-too-small {
     display: flex; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-content {
@@ -2575,6 +2563,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-container .dashbrd-grid-iterator.ui-resizable-resizing.resizing-left .dashbrd-grid-iterator-container {
     left: auto;
     right: 0; }
+  .dashbrd-grid-container .dashbrd-grid-iterator.iterator-loading .dashbrd-grid-iterator-placeholder {
+    opacity: 1; }
   .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content {
     position: absolute;
     top: .25rem;
