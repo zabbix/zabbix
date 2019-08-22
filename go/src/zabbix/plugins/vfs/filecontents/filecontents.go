@@ -81,8 +81,7 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	return
 }
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func exportContents(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 
 	if len(params) != 1 && len(params) != 2 {
 		return nil, errors.New("Wrong number of parameters")
@@ -122,9 +121,22 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 }
 
+// Export -
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	switch key {
+	case "vfs.file.contents":
+		return exportContents(key, params, ctx)
+	case "vfs.file.regexp":
+		return exportRegexp(key, params, ctx)
+	default:
+		return nil, errors.New("Unsupported metric")
+	}
+}
+
 var stdOs std.Os
 
 func init() {
 	plugin.RegisterMetric(&impl, "contents", "vfs.file.contents", "Retrieves contents of the file.")
+	plugin.RegisterMetric(&impl, "contents", "vfs.file.regexp", "Find string in a file.")
 	stdOs = std.NewOs()
 }

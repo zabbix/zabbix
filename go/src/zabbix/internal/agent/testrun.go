@@ -153,6 +153,7 @@ func CheckMetrics() {
 		"net.udp.service[ntp,127.0.0.1,123]",
 		"net.udp.service.perf[ntp,127.0.0.1,123]",
 		"system.hostname",
+
 	}
 
 	for _, metric := range metrics {
