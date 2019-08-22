@@ -1,7 +1,4 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	async \
-	sync \
-	stats
-
+	netif

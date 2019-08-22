@@ -141,7 +141,7 @@ func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters 
 		}
 
 		userParameter.parameters[key] = parameter
-		plugin.RegisterMetric(&userParameter, "userparameter", key, "")
+		plugin.RegisterMetric(&userParameter, "userparameter", key, fmt.Sprintf("User parameter: %s.", s[1]))
 	}
 
 	return nil

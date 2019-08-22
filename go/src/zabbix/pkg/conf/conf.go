@@ -27,6 +27,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 	"zabbix/pkg/std"
 )
 
@@ -38,6 +39,7 @@ type Node struct {
 	nodes  []*Node
 	parent *Node
 	line   int
+	level  int
 }
 
 // Meta structure is used to stroe the 'conf' tag metadata.
@@ -47,20 +49,6 @@ type Meta struct {
 	optional     bool
 	min          int64
 	max          int64
-}
-
-func isWhitespace(b byte) bool {
-	switch b {
-	case ' ':
-		return true
-	case '\n':
-		return true
-	case '\r':
-		return true
-	case '\t':
-		return true
-	}
-	return false
 }
 
 // get returns child node by name
@@ -135,28 +123,15 @@ func parseLine(line []byte) (key []byte, value []byte, err error) {
 		return nil, nil, errors.New("missing assignment operator")
 	}
 
-	keyTail := valueStart
-	for keyTail > 0 && isWhitespace(line[keyTail-1]) {
-		keyTail--
-	}
-	if keyTail == 0 {
+	if key = bytes.TrimSpace(line[:valueStart]); len(key) == 0 {
 		return nil, nil, errors.New("missing variable name")
 	}
 
-	valueStart++
-	valueTail := len(line)
-	for valueStart < valueTail && isWhitespace(line[valueStart]) {
-		valueStart++
-	}
-	if valueStart == valueTail {
-		return nil, nil, errors.New("missing variable value")
-	}
-
-	if err = validateParameterName(line[:keyTail]); err != nil {
+	if err = validateParameterName(key); err != nil {
 		return
 	}
 
-	return line[:keyTail], line[valueStart:], nil
+	return key, bytes.TrimSpace(line[valueStart+1:]), nil
 }
 
 // getMeta returns 'conf' tag metadata.
@@ -177,23 +152,29 @@ func getMeta(field reflect.StructField) (meta *Meta, err error) {
 			m.defaultValue = &tags[3]
 			fallthrough
 		case 3:
-			limits := strings.Split(tags[2], ":")
-			if len(limits) > 0 && limits[0] != "" {
-				m.min, _ = strconv.ParseInt(limits[0], 10, 64)
-			}
-			if len(limits) > 1 && limits[1] != "" {
-				m.max, _ = strconv.ParseInt(limits[1], 10, 64)
+			rangeTag := strings.Trim(tags[2], " \t")
+			if len(rangeTag) > 0 {
+				limits := strings.Split(rangeTag, ":")
+				if len(limits) != 2 {
+					return nil, errors.New("invalid range tag format")
+				}
+				if limits[0] != "" {
+					m.min, _ = strconv.ParseInt(limits[0], 10, 64)
+				}
+				if limits[1] != "" {
+					m.max, _ = strconv.ParseInt(limits[1], 10, 64)
+				}
 			}
 			fallthrough
 		case 2:
-			if tags[1] == "optional" {
+			if strings.Trim(tags[1], " \t") == "optional" {
 				m.optional = true
 			} else if tags[1] != "" {
 				return nil, fmt.Errorf("unknown 'conf' tag: %s", tags[1])
 			}
 			fallthrough
 		case 1:
-			m.name = tags[0]
+			m.name = strings.Trim(tags[0], " \t")
 		}
 	}
 	if m.name == "" {
@@ -418,26 +399,35 @@ func assignValues(v interface{}, root *Node) (err error) {
 }
 
 func parseConfig(root *Node, data []byte) (err error) {
-	var tail int
+	const maxStringLen = 2048
+	var line []byte
+
+	root.level++
+	if root.level > 10 {
+		return fmt.Errorf("Recursion detected! Skipped processing of configuration file")
+	}
+
 	for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
-		end = bytes.IndexByte(data[offset:], '\n')
-		if end != -1 {
-			tail = offset + end
+		if end = bytes.IndexByte(data[offset:], '\n'); end != -1 {
+			line = bytes.TrimSpace(data[offset : offset+end])
 		} else {
-			tail = len(data)
+			line = bytes.TrimSpace(data[offset:])
 		}
-		start := offset
-		for start < tail && isWhitespace(data[start]) {
-			start++
+
+		if len(line) > maxStringLen {
+			return fmt.Errorf("Cannot parse configuration at line %d: limit of %d bytes is exceeded", num, maxStringLen)
 		}
-		if start == tail || data[start] == '#' {
+
+		if len(line) == 0 || line[0] == '#' {
 			continue
 		}
-		for start < tail && isWhitespace(data[tail-1]) {
-			tail--
+
+		if !utf8.ValidString(string(line)) {
+			return fmt.Errorf("Cannot parse configuration at line %d: not a valid UTF-8 character found", num)
 		}
+
 		var key, value []byte
-		if key, value, err = parseLine(data[start:tail]); err != nil {
+		if key, value, err = parseLine(line); err != nil {
 			return fmt.Errorf("Cannot parse configuration at line %d: %s", num, err.Error())
 		}
 		if string(key) == "Include" {
@@ -452,8 +442,9 @@ func parseConfig(root *Node, data []byte) (err error) {
 			if _, err = buf.ReadFrom(file); err != nil {
 				return fmt.Errorf("Cannot read include file: %s", err.Error())
 			}
+
 			if err = parseConfig(root, buf.Bytes()); err != nil {
-				return fmt.Errorf("Cannot parse include file %s: %s", filename, err.Error())
+				return err
 			}
 		} else {
 			root.add(key, value, num)
