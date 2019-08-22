@@ -133,7 +133,7 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 	for scanner.Scan() {
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(agent.Options.Timeout) {
-			return nil, errors.New("Timeout while processing item")
+			return nil, errors.New("Timeout while processing item.")
 		}
 
 		curline++
