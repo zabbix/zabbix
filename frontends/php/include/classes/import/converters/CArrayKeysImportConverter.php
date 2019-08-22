@@ -36,7 +36,7 @@ class CArrayKeysImportConverter extends CConverter {
 		return $data;
 	}
 
-	public function normilizeArrayKeys($data, $rules) {
+	protected function normilizeArrayKeys($data, $rules) {
 		if (!is_array($data)) {
 			return $data;
 		}
