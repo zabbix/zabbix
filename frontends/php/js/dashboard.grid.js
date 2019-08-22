@@ -1926,7 +1926,7 @@
 	function showMessageExhausted(data) {
 		data.dialogue.body.children('.msg-warning').remove();
 		data.dialogue.body.prepend(makeMessageBox(
-			'warning', t('Cannot add widget: not enough free space in dashboard.'), null, false
+			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
 		));
 		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
