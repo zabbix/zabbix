@@ -52,6 +52,7 @@ else {
 						'property_zone_height = timeControl.objectList[img_id]["objDims"]["graphPropertyZoneHeight"],'.
 						'src = img.attr("src");'.
 						'timeControl.objectList[img_id]["objDims"].width = Math.floor(content.width());'.
+						'timeControl.objectList[img_id]["objDims"].graphHeight = Math.floor(content.height());'.
 
 					'if (typeof src === "undefined") {'.
 						'return;'.

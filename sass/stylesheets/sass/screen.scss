@@ -3104,7 +3104,8 @@ $form-icon-btn: (
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.ui-draggable .dashbrd-grid-widget-head {
+.ui-draggable .dashbrd-grid-widget-head,
+.ui-draggable .dashbrd-grid-iterator-head {
 	@extend %cursor-drag;
 }
 
@@ -3112,7 +3113,8 @@ $form-icon-btn: (
 
 	.drag-icon,
 	.dashbrd-widget-head,
-	.dashbrd-grid-widget-head {
+	.dashbrd-grid-widget-head,
+	.dashbrd-grid-iterator-head {
 		@extend %cursor-dragging;
 	}
 }
@@ -3412,8 +3414,15 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-content {
-	flex: 1;
+	position: absolute;
+	top: 2rem;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding-bottom: 8px;
 	overflow: auto;
+	z-index: 3;
+
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -3461,14 +3470,17 @@ $form-icon-btn: (
 }
 
 .layout-kioskmode {
-	// set the same speed as for the floating headers of the widgets.
-	transition: padding-top .3s 2s, margin-bottom .3s 2s;
+	// Set the same speed as for floating headers of the widgets.
+	transition: margin-top .3s;
 
-	&.widget-mouseenter {
-		padding-top: 40px;
-		margin-bottom: -30px;
-		// set the same speed as for the floating headers of the widgets.
-		transition: padding-top .3s, margin-bottom .3s;
+	&.kiosk-slide-lines-1 {
+		// Set to the height of the headers of the widgets.
+		margin-top: 2rem;
+	}
+
+	&.kiosk-slide-lines-2 {
+		// Set to double of the height of the headers of the widgets.
+		margin-top: 4rem;
 	}
 }
 
@@ -3489,53 +3501,53 @@ $form-icon-btn: (
 		&.dashbrd-grid-widget-hidden-header {
 
 			.dashbrd-grid-widget-container {
-				margin-top: -2.25em;
+				margin-top: -2rem;
 			}
 
 			.dashbrd-grid-widget-head {
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				z-index: 5;
 			}
 
 			.dashbrd-grid-widget-content {
-				padding-top: 4px;
-				margin-top: 2.25em;
-				z-index: 6;
+				top: 2rem;
 			}
 		}
 	}
 }
 
 .dashbrd-grid-widget-container {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
-	min-width: 8.33333%;
-	margin: .25rem;
+	position: absolute;
+	top: 0.25rem;
+	left: 0.25rem;
+	right: 0.25rem;
+	bottom: 0.25rem;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	padding-bottom: 8px;
 	z-index: 3;
 }
 
 .dashbrd-grid-widget-head {
-	position: relative;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2rem;
+	padding-left: 10px;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	flex-wrap: nowrap;
 	overflow: hidden;
-	height: 2.75em;
-	padding: 0 0 0 10px;
+	z-index: 2;
 
 	h4 {
 		flex-grow: 1;
+		margin-top: .5rem;
 		color: h4-widget-color($font-color);
 		font-weight: bold;
 		@extend %overflow-ellipsis;
 	}
 
 	ul {
-		align-self: flex-start;
 		flex-shrink: 0;
 
 		li {
@@ -3554,25 +3566,239 @@ $form-icon-btn: (
 	&.dashbrd-grid-widget-hidden-header {
 
 		.dashbrd-grid-widget-container {
-			padding: 8px 0;
-			position: relative;
 			transition: margin-top .3s;
 		}
 
 		.dashbrd-grid-widget-head {
 			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
-			position: absolute;
-			left: 0;
-			right: 0;
-			top: 0;
 			transition: box-shadow .3s;
-			z-index: 2;
+			z-index: 4;
 		}
 
 		.dashbrd-grid-widget-content {
+			top: 0;
+			padding-top: 8px;
 			background-color: $ui-bg-color;
-			transition: margin-top .3s, padding-top .3s;
+			transition: top .3s;
+			z-index: 5;
+		}
+	}
+}
+
+.dashbrd-grid-container {
+
+	.dashbrd-grid-iterator {
+		position: absolute;
+
+		.dashbrd-grid-iterator-container {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
 			z-index: 3;
+		}
+
+		.dashbrd-grid-iterator-head {
+			position: absolute;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			height: 0;
+			display: flex;
+			flex-wrap: nowrap;
+			overflow: hidden;
+			padding-left: 10px;
+			box-sizing: border-box;
+			border: 1px solid $ui-border-color;
+			border-bottom: 0;
+			background-color: $ui-bg-color;
+			transition: margin-top .3s, height .3s, opacity .3s, box-shadow .3s;
+			opacity: 0;
+
+			h4 {
+				flex-grow: 1;
+				margin-top: .5rem;
+				color: h4-widget-color($font-color);
+				font-weight: bold;
+				@extend %overflow-ellipsis;
+			}
+
+			ul {
+				flex-shrink: 0;
+
+				li {
+					float: left;
+					padding: 0;
+				}
+			}
+
+			.dashbrd-grid-iterator-pager {
+				margin: 0 10px;
+				height: 2rem;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				transition: opacity .3s ease-out;
+				opacity: 0;
+
+				.dashbrd-grid-iterator-pager-info {
+					margin: 2px .5em 0;
+					white-space: nowrap;
+				}
+			}
+
+			&.pager-visible .dashbrd-grid-iterator-pager {
+				opacity: 1;
+			}
+		}
+
+		.dashbrd-grid-iterator-content {
+			// To catch vertical resize events correctly.
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+
+			// To allow overflowing of the floating headers of child widgets.
+			overflow: visible;
+
+			flex-grow: 1;
+			z-index: 3;
+			transition: margin-top .3s;
+		}
+
+		.dashbrd-grid-iterator-placeholder {
+			position: absolute;
+			display: flex;
+			transition: opacity .3s;
+			opacity: 0;
+
+			div {
+				margin: .25rem;
+				display: flex;
+				flex-grow: 1;
+				flex-direction: column;
+				border: 1px solid $ui-border-color;
+				background-color: rgba($ui-bg-color, .3);
+			}
+		}
+
+		.dashbrd-grid-iterator-too-small {
+			position: absolute;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			bottom: .25rem;
+			overflow: hidden;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid $ui-border-color;
+			background-color: $ui-bg-color;
+
+			div {
+				padding: 0 10px;
+				text-align: center;
+			}
+		}
+
+		&.iterator-too-small {
+
+			.dashbrd-grid-iterator-too-small {
+				display: flex;
+			}
+
+			.dashbrd-grid-iterator-content {
+				display: none;
+			}
+		}
+
+		&.dashbrd-grid-iterator-focus, &:hover {
+
+			.dashbrd-grid-iterator-head {
+				margin-top: -2rem;
+				height: 2rem;
+				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				opacity: 1;
+				z-index: 4;
+			}
+
+			.dashbrd-grid-iterator-content {
+				z-index: 5;
+			}
+
+			.dashbrd-grid-iterator-placeholder {
+				opacity: 1;
+			}
+		}
+
+		&.dashbrd-grid-iterator-hidden-header.iterator-first-row-mouseenter {
+
+			.dashbrd-grid-iterator-head {
+				margin-top: -4rem;
+				height: 4rem;
+			}
+		}
+
+		&.ui-resizable-resizing.resizing-top {
+
+			.dashbrd-grid-iterator-container {
+				top: auto;
+				bottom: 0;
+			}
+		}
+
+		&.ui-resizable-resizing.resizing-left {
+
+			.dashbrd-grid-iterator-container {
+				left: auto;
+				right: 0;
+			}
+		}
+
+		&.iterator-messages {
+
+			.dashbrd-grid-iterator-content {
+				position: absolute;
+				top: 0.25rem;
+				left: 0.25rem;
+				right: 0.25rem;
+				bottom: 0.25rem;
+				border: 1px solid $ui-border-color;
+				background-color: $ui-bg-color;
+
+				.msg-good, .msg-bad {
+					margin: 10px;
+				}
+			}
+		}
+	}
+
+	&.dashbrd-mode-edit {
+
+		.dashbrd-grid-iterator {
+
+			.dashbrd-grid-iterator-head {
+				margin-top: 0;
+				height: 2rem;
+				border-bottom: 1px solid $ui-border-color;
+				box-shadow: 0 6px 8px -2px rgba(128,128,128,0.15);
+				transition: none;
+				z-index: 7;
+			}
+
+			&.dashbrd-grid-iterator-focus, &:hover {
+
+				.dashbrd-grid-iterator-head {
+					opacity: 1;
+				}
+			}
+
+			.dashbrd-grid-iterator-placeholder {
+				opacity: 1;
+			}
 		}
 	}
 }

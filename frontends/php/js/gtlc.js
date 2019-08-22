@@ -527,9 +527,12 @@ var timeControl = {
 				}
 
 				// url
-				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
+				if (isset('graphtype', obj.objDims)) {
+					// graph size might have changed regardless of graph's type
+
 					var graphUrl = new Curl(obj.src, false);
 					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
+					graphUrl.setArgument('height', Math.floor(obj.objDims.graphHeight));
 
 					obj.src = graphUrl.getUrl();
 				}

@@ -50,7 +50,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			$return = ['messages' => $messages->toString()];
 		}
 
-		echo (new CJson())->encode($return);
+		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
 	}
 
 	protected function doGraphPrototype($fields) {
