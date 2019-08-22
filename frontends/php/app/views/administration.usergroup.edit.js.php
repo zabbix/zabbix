@@ -217,27 +217,6 @@
 		 * Public API.
 		 */
 		window.usergroups = {
-
-			collectTagFilterFormData,
-			collectGroupRightFormData,
-			disableNewGroupRightForm,
-			disableNewTagFilterForm,
-			enableNewGroupRightForm,
-			enableNewTagFilterForm,
-			respNewGroupRight,
-			respNewTagFilter,
-			submitNewTagFilter,
-			submitNewGroupRight,
-
-			$new_group_right_table,
-			$group_right_table_container,
-			$new_tag_filter_table,
-			$tag_filter_table_container,
-			$ms_tag_filter_groups,
-			$ms_group_right_groups,
-			timeoutid_new_group_right,
-			timeoutid_new_tag_filter,
-
 			submitNewGroupRight: submitNewGroupRight,
 			submitNewTagFilter: submitNewTagFilter
 		};

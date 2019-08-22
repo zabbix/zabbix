@@ -61,7 +61,7 @@ class CControllerUsergroupList extends CController {
 			'profileIdx' => 'web.usergroup.filter',
 			'usergroups' => $this->selectUserGroups($paging, $filter),
 			'paging' => $paging,
-			'filter' => $filter,
+			'filter' => $filter
 		];
 
 		$response = new CControllerResponseData($data);

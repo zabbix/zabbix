@@ -49,7 +49,7 @@ class CControllerUsergroupEdit extends CController {
 		'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 		'users_status' => GROUP_STATUS_ENABLED,
 		'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-		'tag_filters' => [],
+		'tag_filters' => []
 	];
 
 	protected function init() {
