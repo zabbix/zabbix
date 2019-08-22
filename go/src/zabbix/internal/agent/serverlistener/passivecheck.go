@@ -34,7 +34,7 @@ type passiveCheck struct {
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
 	const notsupported = "ZBX_NOTSUPPORTED"
 
-	data = make([]byte, len(notsupported)+len(msg)+1)
+	data = make([]byte, len(notsupported)+len(msg))
 	copy(data, notsupported)
 	copy(data[len(notsupported)+1:], msg)
 	return
@@ -52,5 +52,4 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	if err != nil {
 		log.Warningf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
 	}
-
 }
