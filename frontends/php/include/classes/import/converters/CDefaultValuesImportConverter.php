@@ -31,7 +31,7 @@ class CDefaultValuesImportConverter extends CConverter {
 	}
 
 	public function convert($data) {
-		foreach($this->rules['rules'] as $tag => $tag_rules) {
+		foreach ($this->rules['rules'] as $tag => $tag_rules) {
 			if (!array_key_exists($tag, $data['zabbix_export'])) {
 				continue;
 			}
@@ -42,7 +42,7 @@ class CDefaultValuesImportConverter extends CConverter {
 		return $data;
 	}
 
-	public function addDefaultValue($data, $rules) {
+	protected function addDefaultValue($data, $rules) {
 		if ($rules['type'] & XML_ARRAY) {
 			foreach ($rules['rules'] as $tag => $tag_rules) {
 				if (array_key_exists($tag, $data)) {
@@ -51,7 +51,7 @@ class CDefaultValuesImportConverter extends CConverter {
 				else {
 					$data[$tag] = array_key_exists('default', $tag_rules)
 						? (string) $tag_rules['default']
-						: ($tag_rules['type'] & XML_STRING ? '' : []);
+						: ($tag_rules['type'] & XML_STRING) ? '' : [];
 				}
 			}
 		}
