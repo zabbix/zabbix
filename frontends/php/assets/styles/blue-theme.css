@@ -2574,6 +2574,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-good, .dashbrd-grid-container .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-bad {
       margin: 10px; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-head {
+  margin-top: 0;
   height: 2rem;
   border-bottom: 1px solid #dfe4e7;
   box-shadow: 0 6px 8px -2px rgba(128, 128, 128, 0.15);
