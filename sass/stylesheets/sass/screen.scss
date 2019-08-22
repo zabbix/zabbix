@@ -3639,7 +3639,7 @@ $form-icon-btn: (
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				transition: opacity .3s ease-out;
+				transition: opacity .3s;
 				opacity: 0;
 
 				.dashbrd-grid-iterator-pager-info {
@@ -3665,8 +3665,8 @@ $form-icon-btn: (
 			overflow: visible;
 
 			flex-grow: 1;
-			z-index: 3;
 			transition: margin-top .3s;
+			z-index: 3;
 		}
 
 		.dashbrd-grid-iterator-placeholder {
