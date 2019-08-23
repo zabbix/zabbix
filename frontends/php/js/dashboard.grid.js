@@ -279,7 +279,7 @@
 		var too_narrow = iterator['content_header'].width() <
 				$('.dashbrd-grid-iterator-pager', iterator['content_header']).outerWidth(true)
 					+ $('.dashbrd-grid-iterator-actions', iterator['content_header']).outerWidth(true),
-			pager_visible = iterator['page_count'] > 1 && !too_narrow;
+			pager_visible = iterator['page_count'] > 1 && !too_narrow && !getIteratorTooSmallState(iterator);
 
 		iterator['content_header'].toggleClass('pager-visible', pager_visible);
 	}
