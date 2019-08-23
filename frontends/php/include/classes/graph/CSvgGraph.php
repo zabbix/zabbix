@@ -971,7 +971,10 @@ class CSvgGraph extends CSvg {
 	 * Add metric of type bar to graph.
 	 */
 	protected function drawMetricsBar() {
-		$bar_min_width = [GRAPH_YAXIS_SIDE_LEFT => $this->canvas_width, GRAPH_YAXIS_SIDE_RIGHT => $this->canvas_width];
+		$bar_min_width = [
+			GRAPH_YAXIS_SIDE_LEFT => $this->canvas_width * .25,
+			GRAPH_YAXIS_SIDE_RIGHT => $this->canvas_width * .25
+		];
 		$bar_groups_indexes = [];
 		$bar_groups_position = [];
 
