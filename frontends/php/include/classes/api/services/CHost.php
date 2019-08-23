@@ -462,9 +462,7 @@ class CHost extends CHostGeneral {
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
 			if ($options['filter']['inventory_mode'] !== null) {
-				$inventory_mode_query = is_array($options['filter']['inventory_mode'])
-					? $options['filter']['inventory_mode']
-					: [$options['filter']['inventory_mode']];
+				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
 
 				$inventory_mode_where = [];
 				$null_position = array_search(HOST_INVENTORY_DISABLED, $inventory_mode_query);
