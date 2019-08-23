@@ -116,6 +116,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
+		log.Debugf("registering new client ID:%d", update.clientID)
 		requestClient = newClient(update.clientID, update.sink)
 		m.clients[update.clientID] = requestClient
 	}
@@ -344,14 +345,13 @@ func (m *Manager) Stop() {
 
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
-
-	m.input <- &updateRequest{
-		clientID:           clientID,
+	r := updateRequest{clientID: clientID,
 		sink:               writer,
 		requests:           requests,
 		refreshUnsupported: refreshUnsupported,
 		expressions:        expressions,
 	}
+	m.input <- &r
 }
 
 type resultWriter chan *plugin.Result
@@ -383,8 +383,9 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 		if r.Error == nil {
 			if r.Value != nil {
 				result = *r.Value
+			} else {
+				// TODO: check what must be returned on empty result
 			}
-			// TODO: check what must be returned on empty result
 		} else {
 			err = r.Error
 		}

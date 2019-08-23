@@ -86,6 +86,9 @@ func (c *client) Output() plugin.ResultWriter {
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var info *pluginInfo
 	var ok bool
+
+	log.Debugf("adding new request for key: '%s'", r.Key)
+
 	if info, ok = c.plugins[p]; !ok {
 		info = &pluginInfo{}
 	}
