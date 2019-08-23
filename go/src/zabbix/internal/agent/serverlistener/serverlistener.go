@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/agent/scheduler"
@@ -33,10 +34,13 @@ import (
 )
 
 type ServerListener struct {
-	listener  *zbxcomms.Listener
-	scheduler scheduler.Scheduler
-	options   *agent.AgentOptions
-	tlsConfig *tls.Config
+	listenerID   int
+	listener     *zbxcomms.Listener
+	scheduler    scheduler.Scheduler
+	options      *agent.AgentOptions
+	tlsConfig    *tls.Config
+	allowedPeers *AllowedPeers
+	bindIP       string
 }
 
 func (sl *ServerListener) processRequest(conn *zbxcomms.Connection, data []byte) (err error) {
@@ -73,12 +77,15 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 
 func (sl *ServerListener) run() {
 	defer log.PanicHook()
-	log.Debugf("starting listener")
+	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
 		conn, err := sl.listener.Accept()
 		if err == nil {
-			if err := sl.processConnection(conn); err != nil {
+			if false == sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
+				conn.Close()
+				log.Warningf("cannot accept incoming connection for peer: %s", conn.RemoteIP())
+			} else if err := sl.processConnection(conn); err != nil {
 				log.Warningf("cannot process incoming connection: %s", err.Error())
 			}
 		} else {
@@ -95,8 +102,8 @@ func (sl *ServerListener) run() {
 
 }
 
-func New(s scheduler.Scheduler, options *agent.AgentOptions) (sl *ServerListener) {
-	sl = &ServerListener{scheduler: s, options: options}
+func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {
+	sl = &ServerListener{listenerID: listenerID, scheduler: s, bindIP: bindIP, options: options}
 	return
 }
 
@@ -104,7 +111,10 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
 		return
 	}
-	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf(":%d", sl.options.ListenPort), sl.tlsConfig); err != nil {
+	if sl.allowedPeers, err = GetAllowedPeers(sl.options); err != nil {
+		return
+	}
+	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("%s:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
 		return
 	}
 	monitor.Register()
@@ -116,4 +126,66 @@ func (sl *ServerListener) Stop() {
 	if sl.listener != nil {
 		sl.listener.Close()
 	}
+}
+
+// ParseListenIP validate ListenIP value
+func ParseListenIP(options *agent.AgentOptions) (ips []string, err error) {
+	if 0 == len(options.ListenIP) {
+		return []string{"0.0.0.0"}, nil
+	}
+	lips := getListLocalIP()
+	opts := strings.Split(options.ListenIP, ",")
+	for _, o := range opts {
+		addr := strings.Trim(o, " \t")
+		if err = validateLocalIP(addr, lips); nil != err {
+			return nil, err
+		}
+		ips = append(ips, addr)
+	}
+	return ips, nil
+}
+
+func validateLocalIP(addr string, lips *[]net.IP) (err error) {
+	if ip := net.ParseIP(addr); nil != ip {
+		if ip.IsLoopback() || 0 == len(*lips) {
+			return nil
+		}
+		for _, lip := range *lips {
+			if lip.Equal(ip) {
+				return nil
+			}
+		}
+	} else {
+		return fmt.Errorf("incorrect value of ListenIP: \"%s\"", addr)
+	}
+	return fmt.Errorf("value of ListenIP not present on the host: \"%s\"", addr)
+}
+
+func getListLocalIP() *[]net.IP {
+	var ips []net.IP
+
+	ifaces, err := net.Interfaces()
+	if nil != err {
+		return &ips
+	}
+
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if nil != err {
+			return &ips
+		}
+
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			ips = append(ips, ip)
+		}
+	}
+
+	return &ips
 }

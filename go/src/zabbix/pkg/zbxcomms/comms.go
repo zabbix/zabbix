@@ -51,9 +51,12 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func Open(address string, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
+func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect}
-	if c.conn, err = net.DialTimeout("tcp", address, timeout); nil != err {
+	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
+	c.conn, err = d.Dial("tcp", address)
+
+	if nil != err {
 		return
 	}
 
@@ -272,7 +275,7 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(address string, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
+func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
 	log.Tracef("connecting to [%s]", address)
 
 	var tlsconfig *tls.Config
@@ -283,7 +286,7 @@ func Exchange(address string, timeout time.Duration, data []byte, args ...interf
 		}
 	}
 
-	c, err := Open(address, time.Second*time.Duration(timeout), tlsconfig)
+	c, err := Open(address, localAddr, time.Second*time.Duration(timeout), tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
