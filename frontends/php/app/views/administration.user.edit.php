@@ -115,9 +115,7 @@ if ($data['change_password']) {
 else {
 	$user_form_list->addRow(_('Password'),
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['action'] === 'userprofile.edit'
-					|| ($data['action'] === 'user.edit' && $data['db_user']['alias'] !== ZBX_GUEST_USER)
-			)
+			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -172,7 +170,7 @@ $user_form_list
 	);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'user.edit' && $data['db_user']['alias'] !== ZBX_GUEST_USER) {
+if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),
