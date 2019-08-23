@@ -93,7 +93,7 @@ func configDefault(taskManager scheduler.Scheduler, o *agent.AgentOptions) error
 }
 
 var manager *scheduler.Manager
-var listener *serverlistener.ServerListener
+var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
@@ -379,7 +379,19 @@ func main() {
 
 	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
 	manager = scheduler.NewManager()
-	listener = serverlistener.New(manager, &agent.Options)
+
+	// replacement of deprecated StartAgents
+	if 0 != len(agent.Options.Server) {
+		var listenIPs []string
+		if listenIPs, err = serverlistener.ParseListenIP(&agent.Options); nil != err {
+			log.Critf(err.Error())
+			os.Exit(1)
+		}
+		for i := 0; i < len(listenIPs); i++ {
+			listener := serverlistener.New(i, manager, listenIPs[i], &agent.Options)
+			listeners = append(listeners, listener)
+		}
+	}
 
 	manager.Start()
 
@@ -398,7 +410,11 @@ func main() {
 			serverConnectors[i].Start()
 		}
 
-		err = listener.Start()
+		for _, listener := range listeners {
+			if err = listener.Start(); nil != err {
+				break
+			}
+		}
 	}
 
 	if err == nil {
@@ -408,7 +424,9 @@ func main() {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
 
-	listener.Stop()
+	for _, listener := range listeners {
+		listener.Stop()
+	}
 
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].Stop()
