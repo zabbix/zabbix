@@ -20,7 +20,7 @@
 package zabbixsync
 
 import (
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -36,7 +36,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "zabbixsync",
+	plugin.RegisterMetrics(&impl, "ZabbixSync",
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs DNS query.",
 		"proc.mem", "Memory used by process in bytes.",

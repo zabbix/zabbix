@@ -17,45 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package fileexists
+package file
 
 import (
-	"errors"
-	"zabbix/internal/plugin"
+	"reflect"
+	"testing"
+	"time"
 	"zabbix/pkg/std"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+var CrcFile = "1234"
 
-var impl Plugin
+func TestFileCksum(t *testing.T) {
+	stdOs = std.NewMockOs()
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) != 1 {
-		return nil, errors.New("Wrong number of parameters")
-	}
-	if "" == params[0] {
-		return nil, errors.New("Invalid first parameter")
-	}
-	ret := 0
+	impl.timeout = time.Second * 3
 
-	if f, err := stdOs.Stat(params[0]); err == nil {
-		if mode := f.Mode(); mode.IsRegular() {
-			ret = 1
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {
+		t.Errorf("vfs.file.cksum returned error %s", err.Error())
+	} else {
+		if crc, ok := result.(uint32); !ok {
+			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if crc != 3582362371 {
+				t.Errorf("vfs.file.cksum returned invalid result")
+			}
 		}
-	} else if stdOs.IsExist(err) {
-		ret = 1
 	}
-	return ret, nil
-
-}
-
-var stdOs std.Os
-
-func init() {
-	plugin.RegisterMetric(&impl, "existance", "vfs.file.exists", "Returns if file exists or not.")
-	stdOs = std.NewOs()
 }

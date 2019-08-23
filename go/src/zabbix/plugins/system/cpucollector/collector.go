@@ -23,8 +23,8 @@ import (
 	"encoding/json"
 	"errors"
 	"strconv"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 // Plugin -
@@ -265,14 +265,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.cpu.util":
 		return p.getCpuUtil(params)
 	default:
-		return nil, errors.New("Unsupported metric")
+		return nil, errors.New("Unsupported metric.")
 	}
 }
 
 func init() {
 	impl.cpus = make(map[int]*cpuUnit)
-	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.discovery",
-		"List of detected CPUs/CPU cores. Used for low-level discovery.")
-	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.num", "Number of CPUs.")
-	plugin.RegisterMetric(&impl, "cpucollect", "system.cpu.util", "CPU utilisation percentage.")
+	plugin.RegisterMetrics(&impl, "CpuCollector",
+		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.num", "Number of CPUs.",
+		"system.cpu.util", "CPU utilisation percentage.")
 }

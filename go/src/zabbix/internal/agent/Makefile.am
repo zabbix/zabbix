@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	scheduler \
 	remotecontrol \
 	resultcache \
+	scheduler \
 	serverlistener \
 	serverconnector
 

@@ -1,4 +1,3 @@
 SUBDIRS = \
     agent \
-    monitor \
-    plugin
+    monitor

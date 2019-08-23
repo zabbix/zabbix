@@ -17,23 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filecksum
+package file
 
 import (
 	"errors"
 	"fmt"
 	"time"
-	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
 )
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
 
 var crctable []uint32 = []uint32{
 	0x0,
@@ -90,10 +80,12 @@ var crctable []uint32 = []uint32{
 	0xa2f33668, 0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 }
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) != 1 {
-		return nil, errors.New("Wrong number of parameters")
+func (p *Plugin) exportCksum(params []string) (result interface{}, err error) {
+	if len(params) > 1 {
+		return nil, errors.New("Too many parameters.")
+	}
+	if len(params) == 0 || params[0] == "" {
+		return nil, errors.New("Invalid first parameter.")
 	}
 
 	start := time.Now()
@@ -117,9 +109,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		flen += uint32(bnum)
-
-		elapsed := time.Since(start)
-		if elapsed.Seconds() > float64(agent.Options.Timeout) {
+		if time.Since(start) > p.timeout {
 			return nil, errors.New("Timeout while processing item")
 		}
 	}
@@ -130,11 +120,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	return ^crc, nil
 
-}
-
-var stdOs std.Os
-
-func init() {
-	plugin.RegisterMetric(&impl, "checksum", "vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.")
-	stdOs = std.NewOs()
 }

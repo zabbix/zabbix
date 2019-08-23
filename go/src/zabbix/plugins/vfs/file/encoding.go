@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filecontents
+package file
 
 //#include <iconv.h>
 //#include <stdlib.h>
@@ -27,21 +27,9 @@ package filecontents
 import "C"
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
 	"syscall"
 	"unsafe"
-	"zabbix/internal/plugin"
-	"zabbix/pkg/std"
 )
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
 
 func decode(encoder string, inbuf []byte) (outbuf []byte) {
 
@@ -79,64 +67,4 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 	C.iconv_close(cd)
 	return
-}
-
-func exportContents(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-
-	if len(params) != 1 && len(params) != 2 {
-		return nil, errors.New("Wrong number of parameters")
-	}
-
-	var encoder string
-
-	if len(params) == 2 {
-		encoder = params[1]
-	}
-
-	f, err := stdOs.Stat(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain file %s information: %s", params[0], err)
-	}
-	filelen := f.Size()
-
-	bnum := 64 * 1024
-	if filelen > int64(bnum) {
-		return nil, errors.New("File is too large for this check")
-	}
-
-	file, err := stdOs.Open(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
-	}
-	defer file.Close()
-
-	buf := bytes.Buffer{}
-	if _, err = buf.ReadFrom(file); err != nil {
-		return nil, fmt.Errorf("Cannot read from file: %s", err)
-	}
-
-	outbuf := decode(encoder, buf.Bytes())
-
-	return string(bytes.TrimRight(outbuf, "\n\r")), nil
-
-}
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	switch key {
-	case "vfs.file.contents":
-		return exportContents(key, params, ctx)
-	case "vfs.file.regexp":
-		return exportRegexp(key, params, ctx)
-	default:
-		return nil, errors.New("Unsupported metric")
-	}
-}
-
-var stdOs std.Os
-
-func init() {
-	plugin.RegisterMetric(&impl, "contents", "vfs.file.contents", "Retrieves contents of the file.")
-	plugin.RegisterMetric(&impl, "contents", "vfs.file.regexp", "Find string in a file.")
-	stdOs = std.NewOs()
 }

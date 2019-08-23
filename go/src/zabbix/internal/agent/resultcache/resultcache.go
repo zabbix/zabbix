@@ -49,9 +49,9 @@ import (
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/version"
 )
 

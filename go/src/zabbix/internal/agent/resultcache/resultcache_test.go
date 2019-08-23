@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 type mockWriter struct {

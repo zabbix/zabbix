@@ -22,8 +22,8 @@ package filemonitor
 import (
 	"fmt"
 	"io/ioutil"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/watch"
 
 	"github.com/fsnotify/fsnotify"
@@ -141,5 +141,5 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 func init() {
 	impl.manager = watch.NewManager(&impl)
 
-	plugin.RegisterMetric(&impl, "filewatcher", "file.watch", "Monitor file contents")
+	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents")
 }

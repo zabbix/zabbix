@@ -36,7 +36,7 @@ type Metric struct {
 var Metrics map[string]*Metric = make(map[string]*Metric)
 var Plugins map[string]Accessor = make(map[string]Accessor)
 
-func RegisterMetric(plugin Accessor, name string, key string, description string) {
+func registerMetric(plugin Accessor, name string, key string, description string) {
 	if ok, _ := regexp.MatchString(`^[A-Za-z0-9\._-]+$`, key); !ok {
 		panic(fmt.Sprintf(`cannot register metric "%s" having invalid format`, key))
 	}
@@ -109,7 +109,7 @@ func RegisterMetrics(impl Accessor, name string, params ...string) {
 		panic("expected even number of metric and description parameters")
 	}
 	for i := 0; i < len(params); i += 2 {
-		RegisterMetric(impl, name, params[i], params[i+1])
+		registerMetric(impl, name, params[i], params[i+1])
 	}
 }
 

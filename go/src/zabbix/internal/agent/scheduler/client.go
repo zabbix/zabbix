@@ -21,14 +21,13 @@ package scheduler
 
 import (
 	"hash/fnv"
-	"strings"
 	"sync/atomic"
 	"time"
 	"unsafe"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -193,7 +192,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if p.refcount == 0 {
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},
-				options:  agent.Options.Plugins[strings.Title(p.impl.Name())]}
+				options:  agent.Options.Plugins[p.impl.Name()]}
 			if err = task.reschedule(now); err != nil {
 				return
 			}

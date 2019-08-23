@@ -21,8 +21,7 @@ package uname
 
 import (
 	"errors"
-	"fmt"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 // Plugin -
@@ -35,7 +34,7 @@ var impl Plugin
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 
 	switch key {
@@ -45,12 +44,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return getHostname()
 	case "system.sw.arch":
 		return getSwArch()
+	default:
+		return nil, errors.New("Unsupported metric.")
 	}
-	return nil, fmt.Errorf("Not implemented: %s", key)
+
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname.")
-	plugin.RegisterMetric(&impl, "uname", "system.hostname", "Returns system host name.")
-	plugin.RegisterMetric(&impl, "uname", "system.sw.arch", "Software architecture information.")
+	plugin.RegisterMetrics(&impl, "Uname",
+		"system.uname", "Returns system uname.",
+		"system.hostname", "Returns system host name.",
+		"system.sw.arch", "Software architecture information.")
 }

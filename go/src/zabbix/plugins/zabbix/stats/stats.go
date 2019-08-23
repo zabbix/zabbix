@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxcomms"
 )
 
@@ -137,6 +137,6 @@ func (p *Plugin) Configure(options map[string]string) {
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "zabbixstats", "zabbix.stats", "Return a set of Zabbix server or proxy internal "+
+	plugin.RegisterMetrics(&impl, "ZabbixStats", "zabbix.stats", "Return a set of Zabbix server or proxy internal "+
 		"metrics or return number of monitored items in the queue which are delayed on Zabbix server or proxy.")
 }

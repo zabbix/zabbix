@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filecontents
+package file
 
 import (
 	"bufio"
@@ -28,11 +28,9 @@ import (
 	"regexp"
 	"strconv"
 	"time"
-	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 )
 
-func executeRegex(line []byte, rx *regexp.Regexp, output []byte) (result string, match bool) {
+func (p *Plugin) executeRegex(line []byte, rx *regexp.Regexp, output []byte) (result string, match bool) {
 	matches := rx.FindSubmatchIndex(line)
 	if len(matches) == 0 {
 		return "", false
@@ -72,7 +70,7 @@ func executeRegex(line []byte, rx *regexp.Regexp, output []byte) (result string,
 	return buf.String(), true
 }
 
-func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 	var startline, endline, curline uint64
 
 	start := time.Now()
@@ -132,13 +130,13 @@ func exportRegexp(key string, params []string, ctx plugin.ContextProvider) (resu
 	curline = 0
 	for scanner.Scan() {
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > float64(agent.Options.Timeout) {
+		if elapsed.Seconds() > float64(p.timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
 		curline++
 		if curline >= startline {
-			if out, ok := executeRegex(decode(encoder, scanner.Bytes()), rx, []byte(output)); ok {
+			if out, ok := p.executeRegex(decode(encoder, scanner.Bytes()), rx, []byte(output)); ok {
 				return out, nil
 			}
 		}

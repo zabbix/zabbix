@@ -17,40 +17,51 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package zabbixasync
+package file
 
 import (
+	"errors"
+	"time"
+	"zabbix/internal/agent"
 	"zabbix/pkg/plugin"
-	"zabbix/pkg/zbxlib"
+	"zabbix/pkg/std"
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	timeout time.Duration
 }
 
 var impl Plugin
 
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
+	switch key {
+	case "vfs.file.cksum":
+		return p.exportCksum(params)
+	case "vfs.file.contents":
+		return p.exportContents(params)
+	case "vfs.file.exists":
+		return p.exportExists(params)
+	case "vfs.file.regexp":
+		return p.exportRegexp(params)
+	default:
+		return nil, errors.New("Unsupported metric.")
+	}
 }
 
+func (p *Plugin) Configure(options map[string]string) {
+	p.timeout = time.Duration(agent.Options.Timeout) * time.Second
+}
+
+var stdOs std.Os
+
 func init() {
-	plugin.RegisterMetrics(&impl, "ZabbixAsync",
-		"system.localtime", "Returns system local time.",
-		"system.boottime", "Returns system boot time.",
-		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
-		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",
-		"sensor", "Hardware sensor reading.",
-		"system.cpu.load", "CPU load.",
-		"system.cpu.switches", "Count of context switches.",
-		"system.cpu.intr", "Device interrupts.",
-		"system.hw.cpu", "CPU information.",
-		"system.hw.macaddr", "Listing of MAC addresses.",
-		"system.sw.os", "Operating system information.",
-		"system.swap.in", "Swap in (from device into memory) statistics.",
-		"system.swap.out", "Swap out (from memory onto device) statistics.",
-		"vfs.file.md5sum", "MD5 checksum of file.",
-		"vfs.file.regmatch", "Find string in a file.",
-		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.")
+	stdOs = std.NewOs()
+	plugin.RegisterMetrics(&impl, "File",
+		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
+		"vfs.file.contents", "Retrieves contents of the file.",
+		"vfs.file.exists", "Returns if file exists or not.",
+		"vfs.file.regexp", "Find string in a file.")
 }

@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filecontents
+package file
 
 import (
 	"reflect"
 	"regexp"
 	"testing"
-	"zabbix/internal/agent"
+	"time"
 	"zabbix/pkg/std"
 )
 
@@ -52,7 +52,7 @@ func TestExecuteRegex(t *testing.T) {
 	for _, c := range tests {
 		t.Run(c.input, func(t *testing.T) {
 			rx, _ := regexp.Compile(c.pattern)
-			r, m := executeRegex([]byte(c.input), rx, []byte(c.output))
+			r, m := impl.executeRegex([]byte(c.input), rx, []byte(c.output))
 			if !m && c.match {
 				t.Errorf("expected match while returned false")
 			}
@@ -69,7 +69,7 @@ func TestExecuteRegex(t *testing.T) {
 func TestFileRegexpOutput(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a})
 	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(ф)", "iso-8859-5", "", "", "group 0: \\0 group 1: \\1 group 4: \\4"}, nil); err != nil {
@@ -88,7 +88,7 @@ func TestFileRegexpOutput(t *testing.T) {
 func TestFileRegexp(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a})
 	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
