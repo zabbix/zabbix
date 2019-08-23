@@ -361,7 +361,7 @@ func main() {
 	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
 	manager = scheduler.NewManager()
 
-	// replacment of deprecated StartAgents
+	// replacement of deprecated StartAgents
 	if 0 != len(agent.Options.Server) {
 		var listenIPs []string
 		if listenIPs, err = serverlistener.ParseListenIP(&agent.Options); nil != err {

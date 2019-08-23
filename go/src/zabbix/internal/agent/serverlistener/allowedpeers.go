@@ -32,8 +32,8 @@ type AllowedPeers struct {
 	names []string
 }
 
-// GetAllowdPeers is parses the Server field
-func GetAllowdPeers(options *agent.AgentOptions) (allowedPeers *AllowedPeers, err error) {
+// GetAllowedPeers is parses the Server field
+func GetAllowedPeers(options *agent.AgentOptions) (allowedPeers *AllowedPeers, err error) {
 	ap := &AllowedPeers{}
 
 	if options.Server != "" {

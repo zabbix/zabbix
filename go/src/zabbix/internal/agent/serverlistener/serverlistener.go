@@ -110,7 +110,7 @@ func (sl *ServerListener) Start() (err error) {
 	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
 		return
 	}
-	if sl.allowedPeers, err = GetAllowdPeers(sl.options); err != nil {
+	if sl.allowedPeers, err = GetAllowedPeers(sl.options); err != nil {
 		return
 	}
 	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf("%s:%d", sl.bindIP, sl.options.ListenPort), sl.tlsConfig); err != nil {
