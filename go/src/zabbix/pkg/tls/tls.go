@@ -388,6 +388,12 @@ static size_t tls_error(tls_t *tls, char **buf)
 	sz = BIO_ctrl_pending(tls->err);
 	if (sz == 0)
 	{
+		long	verify_result;
+		int	result_code;
+
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(tls->ssl)))
+			BIO_printf(tls->err, "%s: ", X509_verify_cert_error_string(verify_result));
+
 		ERR_print_errors(tls->err);
 		sz = BIO_ctrl_pending(tls->err);
 	}
@@ -501,6 +507,29 @@ out:
 	return ret;
 }
 
+#define TLS_MAX_BUF_LEN	2048
+
+static void tls_description(tls_t *tls, char **desc)
+{
+	X509	*cert;
+	char	*peer_issuer = NULL, *peer_subject = NULL, buf[TLS_MAX_BUF_LEN], *ptr = buf;
+
+	ptr += snprintf(ptr, sizeof(buf), "%s %s", SSL_get_version(tls->ssl), SSL_get_cipher(tls->ssl));
+
+	if (NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
+	{
+		if (0 == tls_get_x509_name(tls, X509_get_issuer_name(cert), &peer_issuer) &&
+			0 == tls_get_x509_name(tls, X509_get_subject_name(cert), &peer_subject))
+		{
+			ptr += snprintf(ptr, sizeof(buf) + ptr - buf, ", peer certificate issuer:\"%s\" subject:\"%s\"",
+			peer_issuer, peer_subject);
+		}
+	}
+	*desc = strdup(buf);
+	free(peer_issuer);
+	free(peer_subject);
+}
+
 #else // HAVE_OPENSSL 0
 
 typedef void * SSL_CTX_LP;
@@ -593,6 +622,10 @@ static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const 
 	return 0;
 }
 
+static void tls_description(tls_t *tls, char **desc)
+{
+}
+
 #endif
 
 */
@@ -605,6 +638,7 @@ import (
 	"runtime"
 	"time"
 	"unsafe"
+	"zabbix/pkg/log"
 )
 
 type tlsConn struct {
@@ -706,6 +740,14 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 			return c.Error()
 		}
 	}
+	return
+}
+
+func (c *tlsConn) String() (desc string) {
+	var cDesc *C.char
+	C.tls_description(C.tls_lp_t(c.tls), &cDesc)
+	desc = C.GoString(cDesc)
+	C.free(unsafe.Pointer(cDesc))
 	return
 }
 
@@ -829,6 +871,9 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		c.Close()
 		return
 	}
+
+	log.Debugf("connection established using %s", c)
+
 	return c, nil
 }
 
@@ -962,6 +1007,8 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		s.Close()
 		return
 	}
+
+	log.Debugf("connection established using %s", s)
 
 	return s, nil
 }
