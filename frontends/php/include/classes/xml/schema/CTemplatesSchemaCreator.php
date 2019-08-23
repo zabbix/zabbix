@@ -132,6 +132,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 															->setRequired()
 															->setSchema(
 																(new CArrayXmlTag('graph_item'))
+																	->setRequired()
 																	->setSchema(
 																		(new CArrayXmlTag('item'))
 																			->setRequired()
