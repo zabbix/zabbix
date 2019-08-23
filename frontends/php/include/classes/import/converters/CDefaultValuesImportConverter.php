@@ -51,7 +51,7 @@ class CDefaultValuesImportConverter extends CConverter {
 				else {
 					$data[$tag] = array_key_exists('default', $tag_rules)
 						? (string) $tag_rules['default']
-						: ($tag_rules['type'] & XML_STRING) ? '' : [];
+						: ($tag_rules['type'] & XML_STRING ? '' : []);
 				}
 			}
 		}
