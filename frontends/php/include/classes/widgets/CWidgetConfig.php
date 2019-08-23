@@ -195,7 +195,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function isScrollable($type) {
+	private static function isScrollable($type) {
 		switch ($type) {
 			case WIDGET_GRAPH:
 			case WIDGET_SVG_GRAPH:
@@ -217,7 +217,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	public static function hasPadding($type, $fields, $view_mode = ZBX_WIDGET_VIEW_MODE_NORMAL)
+	private static function hasPadding($type, $fields, $view_mode)
 	{
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
@@ -245,6 +245,23 @@ class CWidgetConfig {
 					return true;
 			}
 		}
+	}
+
+	/**
+	 * Get widget configuration based on widget type, fields and current view mode.
+	 *
+	 * @param string $type       Widget type
+	 * @param array  $fields     Widget form fields
+	 * @param int    $view_mode  Widget view mode
+	 *
+	 * @return array
+	 */
+	public static function getConfiguration($type, $fields, $view_mode)
+	{
+		return [
+			'scrollable' => self::isScrollable($type),
+			'padding' => self::hasPadding($type, $fields, $view_mode),
+		];
 	}
 
 	/**
