@@ -2482,16 +2482,15 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-head .dashbrd-grid-iterator-pager {
       margin: 0 10px;
       height: 2rem;
-      display: flex;
+      display: none;
       flex-direction: row;
-      align-items: center;
-      transition: opacity .3s;
-      opacity: 0; }
+      flex-shrink: 0;
+      align-items: center; }
       .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-head .dashbrd-grid-iterator-pager .dashbrd-grid-iterator-pager-info {
         margin: 2px .5em 0;
         white-space: nowrap; }
     .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-head.pager-visible .dashbrd-grid-iterator-pager {
-      opacity: 1; }
+      display: flex; }
   .dashbrd-grid-container .dashbrd-grid-iterator .dashbrd-grid-iterator-content {
     position: absolute;
     top: 0;

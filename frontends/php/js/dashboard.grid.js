@@ -274,6 +274,8 @@
 		$('.dashbrd-grid-iterator-pager-info', iterator['content_header'])
 			.text(iterator['page'] + ' / ' + iterator['page_count']);
 
+		iterator['content_header'].addClass('pager-visible');
+
 		var too_narrow = iterator['content_header'].width() <
 				$('.dashbrd-grid-iterator-pager', iterator['content_header']).outerWidth(true)
 					+ $('.dashbrd-grid-iterator-actions', iterator['content_header']).outerWidth(true),

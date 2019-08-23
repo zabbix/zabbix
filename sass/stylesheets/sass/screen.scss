@@ -3640,11 +3640,10 @@ $form-icon-btn: (
 			.dashbrd-grid-iterator-pager {
 				margin: 0 10px;
 				height: 2rem;
-				display: flex;
+				display: none;
 				flex-direction: row;
+				flex-shrink: 0; // IE11 fix.
 				align-items: center;
-				transition: opacity .3s;
-				opacity: 0;
 
 				.dashbrd-grid-iterator-pager-info {
 					margin: 2px .5em 0;
@@ -3653,7 +3652,7 @@ $form-icon-btn: (
 			}
 
 			&.pager-visible .dashbrd-grid-iterator-pager {
-				opacity: 1;
+				display: flex;
 			}
 		}
 
