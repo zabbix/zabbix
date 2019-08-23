@@ -26,14 +26,14 @@ import (
 	"zabbix/pkg/log"
 )
 
+const notsupported = "ZBX_NOTSUPPORTED"
+
 type passiveCheck struct {
 	conn      *passiveConnection
 	scheduler scheduler.Scheduler
 }
 
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
-	const notsupported = "ZBX_NOTSUPPORTED"
-
 	data = make([]byte, len(notsupported)+len(msg))
 	copy(data, notsupported)
 	copy(data[len(notsupported)+1:], msg)
@@ -44,8 +44,10 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	s, err := pc.scheduler.PerformTask(string(data), time.Second*time.Duration(agent.Options.Timeout))
 
 	if err != nil {
+		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
 		_, err = pc.conn.Write(pc.formatError(err.Error()))
 	} else {
+		log.Debugf("sending passive check response: '%s' to '%s'", s, pc.conn.Address())
 		_, err = pc.conn.Write([]byte(s))
 	}
 

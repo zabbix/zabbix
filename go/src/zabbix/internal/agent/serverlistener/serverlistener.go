@@ -59,6 +59,8 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 		return
 	}
 
+	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
+
 	if len(data) == 0 {
 		err = fmt.Errorf("received empty data from '%s'", conn.RemoteIP())
 		return
@@ -68,7 +70,6 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 		return sl.processRequest(conn, data)
 	}
 
-	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
 	go response.handleCheck(data)
 
