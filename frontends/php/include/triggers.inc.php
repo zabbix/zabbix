@@ -728,24 +728,21 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => null,
+		'show_recent' => null,
 		'time_from' => null,
 		'acknowledged' => null
 	];
 
-	$nondependent_triggers = [];
+	$nondependent_trigger_options = [
+		'output' => [],
+		'selectHosts' => null,
+		'selectDependencies' => null,
+		'skipDependent' => true,
+		'sortfield' => ''
+	] + $trigger_options;
 
-	if (array_key_exists('skipDependent', $trigger_options) && $trigger_options['skipDependent'] === false) {
-		$nondependent_trigger_options = [
-			'output' => [],
-			'selectHosts' => null,
-			'selectDependencies' => null,
-			'skipDependent' => true,
-			'sortfield' => ''
-		] + $trigger_options;
-
-		$nondependent_triggers = API::Trigger()->get($nondependent_trigger_options);
-		$trigger_options['skipDependent'] = null;
-	}
+	$nondependent_triggers = API::Trigger()->get($nondependent_trigger_options);
 
 	$triggers = API::Trigger()->get($trigger_options);
 
@@ -758,8 +755,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE && $nondependent_triggers
-				&& !array_key_exists($triggerid, $nondependent_triggers)) {
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE && (!$nondependent_triggers
+				|| !array_key_exists($triggerid, $nondependent_triggers))) {
 			$trigger['value'] = TRIGGER_VALUE_FALSE;
 		}
 	}
@@ -770,10 +767,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
-			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
-				? false
-				: null,
+			'recent' => $problem_options['show_recent'],
+			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 
