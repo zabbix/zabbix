@@ -777,7 +777,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('name'))->setRequired(),
 														(new CStringXmlTag('url'))->setRequired(),
 														(new CStringXmlTag('follow_redirects'))
-															->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
+															->setDefaultValue(DB::getDefault('httpstep', 'follow_redirects'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
 															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
 														(new CIndexedArrayXmlTag('headers'))
@@ -806,13 +806,12 @@ class CHostsSchemaCreator implements CSchemaCreator {
 															),
 														new CStringXmlTag('required'),
 														(new CStringXmlTag('retrieve_mode'))
-															->setDefaultValue(DB::getDefault('items', 'retrieve_mode'))
+															->setDefaultValue(DB::getDefault('httpstep', 'retrieve_mode'))
 															->addConstant(CXmlConstantName::BODY, CXmlConstantValue::BODY)
 															->addConstant(CXmlConstantName::HEADERS, CXmlConstantValue::HEADERS)
 															->addConstant(CXmlConstantName::BOTH, CXmlConstantValue::BOTH),
 														new CStringXmlTag('status_codes'),
-														// Default value is different from DB default value.
-														(new CStringXmlTag('timeout'))->setDefaultValue('15s'),
+														(new CStringXmlTag('timeout'))->setDefaultValue(DB::getDefault('httpstep', 'timeout')),
 														(new CIndexedArrayXmlTag('variables'))
 															->setSchema(
 																(new CArrayXmlTag('variable'))
