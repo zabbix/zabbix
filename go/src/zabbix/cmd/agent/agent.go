@@ -368,8 +368,8 @@ func main() {
 			log.Critf(err.Error())
 			os.Exit(1)
 		}
-		for _, listenIP := range listenIPs {
-			listener := serverlistener.New(manager, listenIP, &agent.Options)
+		for i := 0; i < len(listenIPs); i++ {
+			listener := serverlistener.New(i, manager, listenIPs[i], &agent.Options)
 			listeners = append(listeners, listener)
 		}
 	}

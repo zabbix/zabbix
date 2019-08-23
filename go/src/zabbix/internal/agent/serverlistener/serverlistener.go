@@ -34,6 +34,7 @@ import (
 )
 
 type ServerListener struct {
+	listenerID   int
 	listener     *zbxcomms.Listener
 	scheduler    scheduler.Scheduler
 	options      *agent.AgentOptions
@@ -76,7 +77,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 
 func (sl *ServerListener) run() {
 	defer log.PanicHook()
-	log.Debugf("starting listener")
+	log.Debugf("[%d] starting listener for '%s:%d'", sl.listenerID, sl.bindIP, sl.options.ListenPort)
 
 	for {
 		conn, err := sl.listener.Accept()
@@ -101,8 +102,8 @@ func (sl *ServerListener) run() {
 
 }
 
-func New(s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {
-	sl = &ServerListener{scheduler: s, bindIP: bindIP, options: options}
+func New(listenerID int, s scheduler.Scheduler, bindIP string, options *agent.AgentOptions) (sl *ServerListener) {
+	sl = &ServerListener{listenerID: listenerID, scheduler: s, bindIP: bindIP, options: options}
 	return
 }
 
