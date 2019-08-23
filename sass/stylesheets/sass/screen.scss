@@ -3420,10 +3420,14 @@ $form-icon-btn: (
 	right: 0;
 	bottom: 0;
 	padding-bottom: 8px;
-	overflow: auto;
+	overflow: hidden;
 	z-index: 3;
 
 	@extend %webkit-scrollbar;
+
+	&.scrollable {
+		overflow: auto;
+	}
 
 	.list-table {
 		border: none;

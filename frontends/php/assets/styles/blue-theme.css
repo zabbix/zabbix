@@ -2360,8 +2360,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   right: 0;
   bottom: 0;
   padding-bottom: 8px;
-  overflow: auto;
+  overflow: hidden;
   z-index: 3; }
+  .dashbrd-grid-widget-content.scrollable {
+    overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {

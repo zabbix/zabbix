@@ -154,8 +154,8 @@
 		}
 
 		widget['content_body'] = $('<div>', {'class': classes['content']})
-			// Note: 'no-padding' used only for widgets and not iterators.
-			.toggleClass('no-padding', !widget['iterator'] && !widget['configuration']['padding']);
+			.toggleClass('no-padding', !widget['configuration']['padding'])
+			.toggleClass('scrollable', widget['configuration']['scrollable']);
 
 		widget['container'] = $('<div>', {'class': classes['container']})
 			.append(widget['content_header'])
@@ -316,13 +316,25 @@
 		if (widget['configuration']['padding'] !== padding) {
 			widget['configuration']['padding'] = padding;
 			widget['content_body'].toggleClass('no-padding', !padding);
-			doAction('onResizeEnd', $obj, data, widget);
+			resizeWidget($obj, data, widget);
+		}
+	}
+
+	function setWidgetScrollable($obj, data, widget, scrollable) {
+		if (widget['configuration']['scrollable'] !== scrollable) {
+			widget['configuration']['scrollable'] = scrollable;
+			widget['content_body'].toggleClass('scrollable', scrollable);
+			resizeWidget($obj, data, widget);
 		}
 	}
 
 	function applyWidgetConfiguration($obj, data, widget, configuration) {
 		if ('padding' in configuration) {
 			setWidgetPadding($obj, data, widget, configuration['padding']);
+		}
+
+		if ('scrollable' in configuration) {
+			setWidgetScrollable($obj, data, widget, configuration['scrollable']);
 		}
 	}
 
@@ -1337,7 +1349,7 @@
 				// Invoke onResizeEnd on every affected widget.
 				data.widgets.each(function(box) {
 					if ('affected_axis' in box || box.uniqueid === widget.uniqueid) {
-						doAction('onResizeEnd', $obj, data, box);
+						resizeWidget($obj, data, box);
 					}
 				});
 			},
