@@ -34,7 +34,7 @@ type passiveCheck struct {
 }
 
 func (pc *passiveCheck) formatError(msg string) (data []byte) {
-	data = make([]byte, len(notsupported)+len(msg))
+	data = make([]byte, len(notsupported)+len(msg)+1)
 	copy(data, notsupported)
 	copy(data[len(notsupported)+1:], msg)
 	return

@@ -20,7 +20,6 @@
 package serverlistener
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -43,10 +42,6 @@ type ServerListener struct {
 	bindIP       string
 }
 
-func (sl *ServerListener) processRequest(conn *zbxcomms.Connection, data []byte) (err error) {
-	return errors.New("json requests are not yet supported")
-}
-
 func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err error) {
 	defer func() {
 		if err != nil {
@@ -60,15 +55,6 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	}
 
 	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
-
-	if len(data) == 0 {
-		err = fmt.Errorf("received empty data from '%s'", conn.RemoteIP())
-		return
-	}
-
-	if data[0] == '{' {
-		return sl.processRequest(conn, data)
-	}
 
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
 	go response.handleCheck(data)
