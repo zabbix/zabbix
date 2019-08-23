@@ -3799,6 +3799,14 @@ $form-icon-btn: (
 				z-index: 7;
 			}
 
+			// Fix for Opera, for disappearing iterator header while resizing.
+			&.ui-resizable-resizing {
+
+				.dashbrd-grid-iterator-head {
+					opacity: 1;
+				}
+			}
+
 			&.dashbrd-grid-iterator-focus, &:hover {
 
 				.dashbrd-grid-iterator-head {
