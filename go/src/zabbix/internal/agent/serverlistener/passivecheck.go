@@ -52,6 +52,6 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	}
 
 	if err != nil {
-		log.Warningf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
+		log.Debugf("could not send response to server '%s': %s", pc.conn.Address(), err.Error())
 	}
 }

@@ -141,9 +141,8 @@ func (t *exporterTask) perform(s Scheduler) {
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
 			log.Debugf("plugin %s: executing exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
-			ret, err = exporter.Export(key, params, t)
 
-			if err == nil {
+			if ret, err = exporter.Export(key, params, t); err == nil {
 				log.Debugf("plugin %s: executed exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)

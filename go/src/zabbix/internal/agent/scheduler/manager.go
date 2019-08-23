@@ -142,7 +142,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 				tacc.task().deactivate()
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			log.Debugf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
 
@@ -171,6 +171,8 @@ func (m *Manager) processQueue(now time.Time) {
 				if p.hasCapacity() {
 					heap.Push(&m.queue, p)
 				}
+			} else {
+				log.Debugf("cannot perform task for plugin %s: no capacity", p.name())
 			}
 		} else {
 			// plugins with empty task queue should not be in Manager queue
