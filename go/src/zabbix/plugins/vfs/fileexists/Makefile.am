@@ -1,12 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-all: build
-
-build:
-	go build
-
 clean:
 	go clean
 
 check:
-	go test
+	CGO_LDFLAGS="${CGO_LDFLAGS}" go test

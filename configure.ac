@@ -1999,6 +1999,7 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/log/Makefile
 	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/tls/Makefile
 	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/pkg/watch/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile

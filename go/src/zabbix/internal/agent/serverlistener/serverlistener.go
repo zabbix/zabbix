@@ -28,12 +28,15 @@ import (
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/log"
+	"zabbix/pkg/tls"
 	"zabbix/pkg/zbxcomms"
 )
 
 type ServerListener struct {
 	listener  *zbxcomms.Listener
 	scheduler scheduler.Scheduler
+	options   *agent.AgentOptions
+	tlsConfig *tls.Config
 }
 
 func (sl *ServerListener) processRequest(conn *zbxcomms.Connection, data []byte) (err error) {
@@ -48,8 +51,8 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	}()
 
 	var data []byte
-	if data, err = conn.Read(time.Second * time.Duration(agent.Options.Timeout)); err != nil {
-		return err
+	if data, err = conn.Read(time.Second * time.Duration(sl.options.Timeout)); err != nil {
+		return
 	}
 
 	if len(data) == 0 {
@@ -92,14 +95,17 @@ func (sl *ServerListener) run() {
 
 }
 
-func New(s scheduler.Scheduler) (sl *ServerListener) {
-	sl = &ServerListener{scheduler: s}
+func New(s scheduler.Scheduler, options *agent.AgentOptions) (sl *ServerListener) {
+	sl = &ServerListener{scheduler: s, options: options}
 	return
 }
 
 func (sl *ServerListener) Start() (err error) {
-	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf(":%d", agent.Options.ListenPort)); err != nil {
-		return err
+	if sl.tlsConfig, err = agent.GetTLSConfig(sl.options); err != nil {
+		return
+	}
+	if sl.listener, err = zbxcomms.Listen(fmt.Sprintf(":%d", sl.options.ListenPort), sl.tlsConfig); err != nil {
+		return
 	}
 	monitor.Register()
 	go sl.run()

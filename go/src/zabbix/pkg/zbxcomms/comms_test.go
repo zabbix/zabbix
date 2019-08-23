@@ -99,7 +99,7 @@ func (t mockRead) Read(p []byte) (n int, err error) {
 func TestReceive(t *testing.T) {
 	for _, result := range results {
 		t.Run("test", func(t *testing.T) {
-			data, err := read(m)
+			data, err := read(m, nil)
 			if err == nil {
 				if result.failed {
 					t.Errorf("Expcted error while got success")
