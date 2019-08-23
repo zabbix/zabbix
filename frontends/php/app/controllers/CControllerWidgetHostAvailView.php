@@ -43,7 +43,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 
-		$hosts_types = count($fields['interface_type']) === 0 ? array_keys($type_fields) : $fields['interface_type'];
+		$hosts_types = (count($fields['interface_type']) === 0) ? array_keys($type_fields) : $fields['interface_type'];
 
 		$hosts_total = array_fill_keys(array_keys($type_fields), 0);
 		$hosts_count = array_fill_keys(array_keys($type_fields), [
@@ -62,12 +62,12 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 		]);
 
 		foreach ($db_hosts as $host) {
-			$interface = [];
+			$interfaces = [];
 			foreach ($host['interfaces'] as $val) {
-				$interface[] = $val['type'];
+				$interfaces[$val['type']] = true;
 			}
 
-			foreach ($interface as $type) {
+			foreach (array_keys($interfaces) as $type) {
 				$hosts_count[$type][$host[$type_fields[$type]]]++;
 				$hosts_total[$type]++;
 			}
