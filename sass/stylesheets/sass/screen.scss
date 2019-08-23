@@ -3667,6 +3667,9 @@ $form-icon-btn: (
 			// To allow overflowing of the floating headers of child widgets.
 			overflow: visible;
 
+			// Not to see the placeholder through while dragging the iterator.
+			background-color: $body-bg-color;
+
 			transition: margin-top .3s;
 			z-index: 3;
 		}
