@@ -144,7 +144,7 @@ class CXmlValidatorGeneral {
 
 				switch ($this->format) {
 					case 'xml':
-						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index)) || $tag === $index;
+						$is_valid_tag = ($tag === $prefix.($index == 0 ? '' : $index) || $tag === $index);
 						break;
 
 					case 'json':
@@ -215,10 +215,8 @@ class CXmlValidatorGeneral {
 	}
 
 	private function validateConstant($value, $rules, $path) {
-		if (array_key_exists('in', $rules)) {
-			if (!in_array($value, array_values($rules['in']))) {
-				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
-			}
+		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
 		}
 	}
 }
