@@ -188,9 +188,7 @@ if ($type == SHOW_TRIGGERS) {
 		$trigger_options = [
 			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'filter' => [
-				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
-			],
+			'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
 
 		$problem_options = [
@@ -201,7 +199,7 @@ if ($type == SHOW_TRIGGERS) {
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];
 
-		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+		$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
 
 		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
 			$host_options, $trigger_options, $problem_options
