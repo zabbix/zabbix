@@ -460,8 +460,6 @@ class CHost extends CHostGeneral {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
 			if ($options['filter']['inventory_mode'] !== null) {
 				$inventory_mode_query = is_array($options['filter']['inventory_mode'])
