@@ -97,7 +97,7 @@ var serverConnectors []*serverconnector.Connector
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
-		return errors.New("No loglevel parameter specified")
+		return errors.New("No 'loglevel' parameter specified")
 	}
 	switch params[1] {
 	case "increase":
@@ -115,11 +115,11 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			log.Infof(message)
 			err = c.Reply(message)
 		} else {
-			err = fmt.Errorf("Cannot descrease log level below %s", log.Level())
+			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
 			log.Infof(err.Error())
 		}
 	default:
-		return errors.New("Invalid loglevel parameter")
+		return errors.New("Invalid 'loglevel' parameter")
 	}
 	return
 }
@@ -129,11 +129,18 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 	return c.Reply(data)
 }
 
+func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
+	data := version.Short()
+	return c.Reply(data)
+}
+
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel <increase|decrease> - increases/decreases logging level
-	metrics - lists available metrics
-	help - this message`
+	loglevel increase - Increase log level
+	loglevel decrease - Decrease log level
+	metrics - List available metrics
+	version - Display Agent version
+	help - Display this help message`
 	return c.Reply(help)
 }
 
@@ -149,6 +156,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processHelpCommand(c, params)
 	case "metrics":
 		err = processMetricsCommand(c, params)
+	case "version":
+		err = processVersionCommand(c, params)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -182,6 +191,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			client.Close()
 		}
 	}
 	control.Stop()
@@ -233,7 +243,7 @@ func main() {
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
-		remoteDescription = "Test specified item and exit"
+		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
