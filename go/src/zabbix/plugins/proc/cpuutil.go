@@ -359,5 +359,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "proc", "proc.cpu.util", "Process CPU utilisation percentage")
+	plugin.RegisterMetric(&impl, "proc", "proc.cpu.util", "Process CPU utilisation percentage.")
 }

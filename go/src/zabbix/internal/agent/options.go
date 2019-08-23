@@ -31,27 +31,27 @@ import (
 )
 
 type AgentOptions struct {
-	LogType              string   `conf:",,,console"`
+	LogType              string   `conf:",optional,,console"`
 	LogFile              string   `conf:",optional"`
-	DebugLevel           int      `conf:",,0:5,3"`
+	DebugLevel           int      `conf:",optional,0:5,3"`
 	ServerActive         string   `conf:",optional"`
-	RefreshActiveChecks  int      `conf:",,30:3600,120"`
-	Timeout              int      `conf:",,1-30,3"`
+	RefreshActiveChecks  int      `conf:",optional,30:3600,120"`
+	Timeout              int      `conf:",optional,1:30,3"`
 	Hostname             string   `conf:",optional"`
 	HostnameItem         string   `conf:",optional"`
 	HostMetadata         string   `conf:",optional"`
 	HostMetadataItem     string   `conf:",optional"`
-	BufferSend           int      `conf:",,1:3600,5"`
-	BufferSize           int      `conf:",,2:65535,100"`
+	BufferSend           int      `conf:",optional,1:3600,5"`
+	BufferSize           int      `conf:",optional,2:65535,100"`
 	ListenIP             string   `conf:",optional"`
 	ListenPort           int      `conf:",,1024:32767,10050"`
 	SourceIP             string   `conf:",optional"`
 	Server               string   `conf:",optional"`
 	MaxLinesPerSecond    int      `conf:",,1:1000,20"`
 	UserParameter        []string `conf:",optional"`
-	UnsafeUserParameters int      `conf:",,0:1,0"`
-	LogRemoteCommands    int      `conf:",,0:1,0"`
-	EnableRemoteCommands int      `conf:",,0:1,0"`
+	UnsafeUserParameters int      `conf:",optional,0:1,0"`
+	LogRemoteCommands    int      `conf:",optional,0:1,0"`
+	EnableRemoteCommands int      `conf:",optional,0:1,0"`
 	ControlSocket        string   `conf:",optional"`
 	TLSConnect           string   `conf:",optional"`
 	TLSAccept            string   `conf:",optional"`

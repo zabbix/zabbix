@@ -205,6 +205,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>]")
-	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>]")
+	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].")
+	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].")
 }

@@ -50,7 +50,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname")
-	plugin.RegisterMetric(&impl, "uname", "system.hostname", "Returns system host name")
-	plugin.RegisterMetric(&impl, "uname", "system.sw.arch", "Software architecture information")
+	plugin.RegisterMetric(&impl, "uname", "system.uname", "Returns system uname.")
+	plugin.RegisterMetric(&impl, "uname", "system.hostname", "Returns system host name.")
+	plugin.RegisterMetric(&impl, "uname", "system.sw.arch", "Software architecture information.")
 }

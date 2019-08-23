@@ -27,14 +27,18 @@ import (
 
 func TestParserErrors(t *testing.T) {
 	type Options struct {
-		Test string `conf:"Te$t,optional"`
+		Test  string `conf:"Te$t,optional"`
+		Range string `conf:",optional,1"`
 	}
 
 	var input = []string{
 		"abc",
 		"abc =",
 		" = abc",
-		"Te$t = value"}
+		"Test = value",
+		"Te$t = value",
+		"Range=1",
+	}
 
 	for _, data := range input {
 		var options Options
@@ -59,6 +63,11 @@ func TestParserSuccess(t *testing.T) {
 		" # comments\nText=6",
 		"    \nText=7",
 		"Text=8=9",
+		"Text=",
+		"Text=9\n#",
+		"Text=10\n",
+		"\n Text = 11 \n",
+		"\n#####Text=x\nText=12",
 	}
 
 	var output = []Options{
@@ -69,6 +78,11 @@ func TestParserSuccess(t *testing.T) {
 		{Text: "6"},
 		{Text: "7"},
 		{Text: "8=9"},
+		{Text: ""},
+		{Text: "9"},
+		{Text: "10"},
+		{Text: "11"},
+		{Text: "12"},
 	}
 
 	for i, data := range input {
@@ -79,6 +93,24 @@ func TestParserSuccess(t *testing.T) {
 		}
 		if options.Text != output[i].Text {
 			t.Errorf("[%d] expected %s while got %s\n", i, output[i].Text, options.Text)
+		}
+	}
+}
+
+func TestUtf8(t *testing.T) {
+	type Options struct {
+		Text string `conf:",optional"`
+	}
+
+	var input = []string{
+		"Text=\xFE",
+		"Text\xFE=2",
+	}
+
+	for i, data := range input {
+		var options Options
+		if err := Unmarshal([]byte(data), &options); err == nil {
+			t.Errorf("[%d] expected error while got success\n", i)
 		}
 	}
 }
@@ -310,4 +342,27 @@ func TestInclude(t *testing.T) {
 	var options Options
 	var expected Options = Options{[]int{1, 10, 20, 2, 100, 200, 3}}
 	checkUnmarshal(t, []byte(input), &expected, &options)
+}
+
+func TestRecursiveInclude(t *testing.T) {
+	stdOs = std.NewMockOs()
+	stdOs.(std.MockOs).MockFile("/tmp/array10.conf", []byte("Value=10\nValue=20\nInclude = /tmp/array10.conf"))
+
+	type Options struct {
+		Values []int `conf:"Value"`
+	}
+	input := `
+			Value = 1
+			Include = /tmp/array10.conf
+			Value = 2
+		`
+
+	var options Options
+	if err := Unmarshal([]byte(input), &options); err != nil {
+		if err.Error() != "Recursion detected! Skipped processing of configuration file" {
+			t.Errorf("Expected recursion error message while got: %s", err.Error())
+		}
+	} else {
+		t.Errorf("Expected error while got success")
+	}
 }

@@ -98,7 +98,7 @@ var serverConnectors []*serverconnector.Connector
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
-		return errors.New("No loglevel parameter specified")
+		return errors.New("No 'loglevel' parameter specified")
 	}
 	switch params[1] {
 	case "increase":
@@ -116,11 +116,11 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			log.Infof(message)
 			err = c.Reply(message)
 		} else {
-			err = fmt.Errorf("Cannot descrease log level below %s", log.Level())
+			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
 			log.Infof(err.Error())
 		}
 	default:
-		return errors.New("Invalid loglevel parameter")
+		return errors.New("Invalid 'loglevel' parameter")
 	}
 	return
 }
@@ -130,11 +130,18 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 	return c.Reply(data)
 }
 
+func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
+	data := version.Short()
+	return c.Reply(data)
+}
+
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel <increase|decrease> - increases/decreases logging level
-	metrics - lists available metrics
-	help - this message`
+	loglevel increase - Increase log level
+	loglevel decrease - Decrease log level
+	metrics - List available metrics
+	version - Display Agent version
+	help - Display this help message`
 	return c.Reply(help)
 }
 
@@ -150,6 +157,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processHelpCommand(c, params)
 	case "metrics":
 		err = processMetricsCommand(c, params)
+	case "version":
+		err = processVersionCommand(c, params)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -183,20 +192,22 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			client.Close()
 		}
 	}
 	control.Stop()
 	return nil
 }
 
+var confDefault string
+
 func main() {
 	var confFlag string
 	const (
-		confDefault     = "agent.conf"
 		confDescription = "Path to the configuration file"
 	)
 	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorhand)")
+	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
 
 	var foregroundFlag bool
 	const (
@@ -204,7 +215,7 @@ func main() {
 		foregroundDescription = "Run Zabbix agent in foreground"
 	)
 	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
-	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorhand)")
+	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorthand)")
 
 	var testFlag string
 	const (
@@ -212,7 +223,7 @@ func main() {
 		testDescription = "Test specified item and exit"
 	)
 	flag.StringVar(&testFlag, "test", testDefault, testDescription)
-	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorhand)")
+	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorthand)")
 
 	var printFlag bool
 	const (
@@ -220,20 +231,20 @@ func main() {
 		printDescription = "Print known items and exit"
 	)
 	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
-	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorhand)")
+	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
 
 	var versionFlag bool
 	const (
 		versionDefault     = false
-		versionDescription = "Print programm version and exit"
+		versionDescription = "Print program version and exit"
 	)
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorhand)")
+	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorthand)")
 
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
-		remoteDescription = "Test specified item and exit"
+		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
@@ -245,12 +256,12 @@ func main() {
 	// does not offer automatic detection. Consider using third party package.
 	flag.Visit(func(f *flag.Flag) {
 		switch f.Name {
+		case "c", "config":
+			argConfig = true
 		case "t", "test":
 			argTest = true
 		case "p", "print":
 			argPrint = true
-		case "c", "config":
-			argConfig = true
 		case "v", "version":
 			argVersion = true
 		}
@@ -261,14 +272,22 @@ func main() {
 		os.Exit(0)
 	}
 
-	if argConfig {
-		if err := conf.Load(confFlag, &agent.Options); err != nil {
+	if err := conf.Load(confFlag, &agent.Options); err != nil {
+		if argConfig || !(argTest || argPrint) {
 			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
+		}
+		// create default configuration for testing options
+		if argConfig == false {
+			conf.Unmarshal([]byte{}, &agent.Options)
 		}
 	}
 
 	if argTest || argPrint {
+		if argConfig == false {
+			conf.Unmarshal([]byte{}, &agent.Options)
+		}
+
 		if err := log.Open(log.Console, log.Warning, ""); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 			os.Exit(1)

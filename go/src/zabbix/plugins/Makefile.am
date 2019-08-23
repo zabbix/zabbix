@@ -8,5 +8,6 @@ SUBDIRS = \
 	system \
 	systemd \
 	vfs \
-	zabbix
+	zabbix \
+	net
 
