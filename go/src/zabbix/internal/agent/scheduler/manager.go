@@ -131,11 +131,11 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
+			} else {
+				err = requestClient.addRequest(p, r, update.sink, now)
 			}
 		}
-		if err == nil {
-			err = requestClient.addRequest(p, r, update.sink, now)
-		}
+
 		if err != nil {
 			if r.Itemid != 0 {
 				if tacc, ok := requestClient.exporters[r.Itemid]; ok {
