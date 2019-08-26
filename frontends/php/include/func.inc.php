@@ -1431,34 +1431,6 @@ function zbx_toCSV($values) {
 	return $csv;
 }
 
-/**
- * Filters associative array containing keys provided.
- *
- * @param array $keys   Keys array or an arrays of keys arrays.
- * @param array $array  Associative array.
- *
- * @return array
- */
-function zbx_array_mintersect($keys, $array) {
-	$result = [];
-
-	foreach ($keys as $field) {
-		if (is_array($field)) {
-			foreach ($field as $sub_field) {
-				if (isset($array[$sub_field])) {
-					$result[$sub_field] = $array[$sub_field];
-					break;
-				}
-			}
-		}
-		elseif (isset($array[$field])) {
-			$result[$field] = $array[$field];
-		}
-	}
-
-	return $result;
-}
-
 function zbx_str2links($text) {
 	$result = [];
 
