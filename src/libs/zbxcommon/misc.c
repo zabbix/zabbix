@@ -2214,22 +2214,19 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 }
 /******************************************************************************
  *                                                                            *
- * Function: calculate_item_nextcheck_unreachable                                         *
+ * Function: calculate_item_nextcheck_unreachable                             *
  *                                                                            *
- * Purpose: calculate nextcheck timestamp for item                            *
+ * Purpose: calculate nextcheck timestamp for item on unreachable host        *
  *                                                                            *
- * Parameters: seed             - [IN] the seed value applied to delay to     *
- *                                     spread item checks over the delay      *
- *                                     period                                 *
- *             simple_interval  - [IN] default delay value, can be overridden *
+ * Parameters: simple_interval  - [IN] default delay value, can be overridden *
  *             custom_intervals - [IN] preprocessed custom intervals          *
- *             disable_until    - [IN] timestamp for nex check                *
+ *             disable_until    - [IN] timestamp for next check               *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck_unreachable(zbx_uint64_t seed, int simple_interval,
-		const zbx_custom_interval_t *custom_intervals, time_t disable_until)
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until)
 {
 	int	nextcheck = 0;
 	time_t	next_interval, tmax, scheduled_check = 0;
