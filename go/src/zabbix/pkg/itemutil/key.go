@@ -258,6 +258,10 @@ func ParseKey(text string) (key string, params []string, err error) {
 	data := []byte(text)
 	for i, c := range data {
 		if !isKeyChar(c) {
+			if i == 0 {
+				err = errors.New("Cannot parse item key: empty key name")
+				return
+			}
 			if params, err = parseParams(data[i:]); err != nil {
 				err = fmt.Errorf("Cannot parse item key: %s", err)
 				return
