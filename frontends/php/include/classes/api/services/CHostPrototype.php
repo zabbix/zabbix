@@ -562,10 +562,12 @@ class CHostPrototype extends CHostBase {
 					$inventory = ['inventory_mode' => $host_prototype['inventory_mode']];
 
 					if ($ex_host_prototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-						DB::update('host_inventory', [
-							'values' => $inventory,
-							'where' => ['hostid' => $host_prototype['hostid']]
-						]);
+						if ($host_prototype['inventory_mode'] != $ex_host_prototype['inventory_mode']) {
+							DB::update('host_inventory', [
+								'values' => $inventory,
+								'where' => ['hostid' => $host_prototype['hostid']]
+							]);
+						}
 					}
 					else {
 						$inventory_create[] = $inventory + ['hostid' => $host_prototype['hostid']];
