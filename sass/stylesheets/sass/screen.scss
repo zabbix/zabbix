@@ -1619,6 +1619,15 @@ output {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
 			}
+
+			&.selected {
+
+				.subfilter-enabled,
+				.subfilter-disable-btn,
+				.subfilter-disable-btn:active {
+					background-color: $multiselect-selected-bg-color;
+				}
+			}
 		}
 	}
 

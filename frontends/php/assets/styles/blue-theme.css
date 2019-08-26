@@ -1077,6 +1077,10 @@ output {
       .multiselect .multiselect-list li .subfilter-enabled {
         padding: 0 9px 0 4px;
         line-height: 18px; }
+      .multiselect .multiselect-list li.selected .subfilter-enabled,
+      .multiselect .multiselect-list li.selected .subfilter-disable-btn,
+      .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
+        background-color: #93a5af; }
   .multiselect .disabled {
     opacity: 1;
     filter: alpha(opacity=100);
