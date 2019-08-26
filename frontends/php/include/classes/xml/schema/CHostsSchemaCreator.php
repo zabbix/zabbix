@@ -247,6 +247,7 @@ class CHostsSchemaCreator implements CSchemaCreator {
 											->setSchema(
 												(new CArrayXmlTag('host_prototype'))
 													->setSchema(
+														(new CStringXmlTag('host'))->setRequired(),
 														(new CIndexedArrayXmlTag('group_links'))
 															->setSchema(
 																(new CArrayXmlTag('group_link'))
@@ -264,7 +265,6 @@ class CHostsSchemaCreator implements CSchemaCreator {
 																		(new CStringXmlTag('name'))->setRequired()
 																	)
 															),
-														(new CStringXmlTag('host'))->setRequired(),
 														new CStringXmlTag('name'),
 														(new CStringXmlTag('status'))
 															->setDefaultValue(DB::getDefault('hosts', 'status'))
