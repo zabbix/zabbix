@@ -166,7 +166,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
 	 * @param int    $filter['show_suppressed']       (optional)
-	 * @param int    $filter['show_latest_values']    (optional)
+	 * @param int    $filter['show_opdata']           (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
 	 * @param bool   $resolve_comments
@@ -335,20 +335,20 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$show_latest_values =
-						(array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1);
+					$show_opdata = (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1);
 					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
 
-					if ($show_latest_values) {
+					if ($show_opdata) {
+						$options['output'][] = 'opdata';
 						$options['selectItems'] =
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_latest_values || $details) {
+					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
-					if ($show_latest_values || $details) {
+					if ($show_opdata || $details) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
 					}
 
@@ -569,7 +569,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $filter
 	 * @param int   $filter['details']
 	 * @param int   $filter['show']
-	 * @param int   $filter['show_latest_values']
+	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
 	 * @param bool  $resolve_urls
 	 *
@@ -596,7 +596,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
-		if ($filter['details'] == 1 || $filter['show_latest_values'] == 1) {
+		if ($filter['details'] == 1 || $filter['show_opdata'] == 1) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -611,7 +611,7 @@ class CScreenProblem extends CScreenBase {
 			]);
 
 			// Sort items.
-			if ($filter['show_latest_values'] == 1) {
+			if ($filter['show_opdata'] == 1) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
 
 				foreach ($data['triggers'] as &$trigger) {
@@ -769,7 +769,7 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * Process screen.
 	 *
-	 * @return CDiv (screen inside container)
+	 * @return string|CDiv (screen inside container)
 	 */
 	public function get() {
 		$this->dataId = 'problem';
@@ -804,6 +804,8 @@ class CScreenProblem extends CScreenBase {
 		if ($data['problems']) {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
+
+		$show_opdata = ($this->data['filter']['show_opdata'] && !$this->data['filter']['compact_view']);
 
 		if ($this->data['action'] === 'problem.view') {
 			$url_form = clone $url;
@@ -911,7 +913,7 @@ class CScreenProblem extends CScreenBase {
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-						$this->data['filter']['show_latest_values'] ? _('Latest values') : null,
+						$this->data['filter']['show_opdata'] ? _('Operational data') : null,
 						_('Duration'),
 						_('Ack'),
 						_('Actions'),
@@ -1081,6 +1083,27 @@ class CScreenProblem extends CScreenBase {
 					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT);
 
+				$opdata = null;
+				if ($show_opdata) {
+					$opdata = ($trigger['opdata'] !== '')
+						? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+							[
+								'triggerid' => $trigger['triggerid'],
+								'expression' => $trigger['expression'],
+								'opdata' => $trigger['opdata'],
+								'clock' => $problem['clock'],
+								'ns' => $problem['ns']
+							],
+							[
+								'events' => true,
+								'html' => true
+							]
+						)))
+							->addClass('opdata')
+							->addClass(ZBX_STYLE_WORDWRAP)
+						: (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
+				}
+
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
@@ -1090,9 +1113,7 @@ class CScreenProblem extends CScreenBase {
 					$cell_info,
 					$triggers_hosts[$trigger['triggerid']],
 					$description,
-					($this->data['filter']['show_latest_values'] && !$this->data['filter']['compact_view'])
-						? self::getLatestValues($trigger['items'])
-						: null,
+					$opdata,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
@@ -1113,103 +1134,125 @@ class CScreenProblem extends CScreenBase {
 
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
-		else {
-			$csv = [];
 
-			$csv[] = [
-				_('Severity'),
-				_('Time'),
-				_('Recovery time'),
-				_('Status'),
-				_('Host'),
-				_('Problem'),
-				_('Duration'),
-				_('Ack'),
-				_('Actions'),
-				_('Tags')
-			];
+		$csv = [];
 
-			$tags = makeTags($data['problems'], false);
+		$csv[] = [
+			_('Severity'),
+			_('Time'),
+			_('Recovery time'),
+			_('Status'),
+			_('Host'),
+			_('Problem'),
+			$show_opdata ? _('Operational data') : null,
+			_('Duration'),
+			_('Ack'),
+			_('Actions'),
+			_('Tags')
+		];
 
-			foreach ($data['problems'] as $problem) {
-				$trigger = $data['triggers'][$problem['objectid']];
+		$tags = makeTags($data['problems'], false);
 
-				if ($problem['r_eventid'] != 0) {
-					$value_str = _('RESOLVED');
-				}
-				else {
-					$in_closing = false;
+		foreach ($data['problems'] as $problem) {
+			$trigger = $data['triggers'][$problem['objectid']];
 
-					foreach ($problem['acknowledges'] as $acknowledge) {
-						if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-							$in_closing = true;
-							break;
-						}
+			if ($problem['r_eventid'] != 0) {
+				$value_str = _('RESOLVED');
+			}
+			else {
+				$in_closing = false;
+
+				foreach ($problem['acknowledges'] as $acknowledge) {
+					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+						$in_closing = true;
+						break;
 					}
-
-					$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 				}
 
-				$hosts = [];
-				foreach ($triggers_hosts[$trigger['triggerid']] as $trigger_host) {
-					$hosts[] = $trigger_host['name'];
-				}
-
-				$actions_performed = [];
-				if ($data['actions']['messages'][$problem['eventid']]['count'] > 0) {
-					$actions_performed[] =
-							_('Messages').' ('.$data['actions']['messages'][$problem['eventid']]['count'].')';
-				}
-				if ($data['actions']['severities'][$problem['eventid']]['count'] > 0) {
-					$actions_performed[] = _('Severity changes');
-				}
-				if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
-					$actions_performed[] =
-							_('Actions').' ('.$data['actions']['actions'][$problem['eventid']]['count'].')';
-				}
-
-				$csv[] = [
-					getSeverityName($problem['severity'], $this->config),
-					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-					($problem['r_eventid'] != 0)
-						? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
-						: '',
-					$value_str,
-					implode(', ', $hosts),
-					$problem['name'],
-					($problem['r_eventid'] != 0)
-						? zbx_date2age($problem['clock'], $problem['r_clock'])
-						: zbx_date2age($problem['clock']),
-					($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
-					implode(', ', $actions_performed),
-					implode(', ', $tags[$problem['eventid']])
-				];
+				$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			}
 
-			return zbx_toCSV($csv);
+			$hosts = [];
+			foreach ($triggers_hosts[$trigger['triggerid']] as $trigger_host) {
+				$hosts[] = $trigger_host['name'];
+			}
+
+			// operational data
+			$opdata = null;
+			if ($show_opdata) {
+				$opdata = ($trigger['opdata'] !== '')
+					? CMacrosResolverHelper::resolveTriggerOpdata(
+						[
+							'triggerid' => $trigger['triggerid'],
+							'expression' => $trigger['expression'],
+							'opdata' => $trigger['opdata'],
+							'clock' => $problem['clock'],
+							'ns' => $problem['ns']
+						],
+						['events' => true]
+					)
+					: self::getLatestValues($trigger['items'], false);
+			}
+
+			$actions_performed = [];
+			if ($data['actions']['messages'][$problem['eventid']]['count'] > 0) {
+				$actions_performed[] = _('Messages').
+					' ('.$data['actions']['messages'][$problem['eventid']]['count'].')';
+			}
+			if ($data['actions']['severities'][$problem['eventid']]['count'] > 0) {
+				$actions_performed[] = _('Severity changes');
+			}
+			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
+				$actions_performed[] = _('Actions').' ('.$data['actions']['actions'][$problem['eventid']]['count'].')';
+			}
+
+			$csv[] = [
+				getSeverityName($problem['severity'], $this->config),
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
+				($problem['r_eventid'] != 0)
+					? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
+					: '',
+				$value_str,
+				implode(', ', $hosts),
+				$problem['name'],
+				$opdata,
+				($problem['r_eventid'] != 0)
+					? zbx_date2age($problem['clock'], $problem['r_clock'])
+					: zbx_date2age($problem['clock']),
+				($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No'),
+				implode(', ', $actions_performed),
+				implode(', ', $tags[$problem['eventid']])
+			];
 		}
+
+		return zbx_toCSV($csv);
 	}
 
 	/**
-	 * Get Latest values column markup with hintBox.
-	 *
-	 * @param array $trigger_items    Array of trigger items.
+	 * Get item latest values.
 	 *
 	 * @static
 	 *
-	 * @return CCol
+	 * @param array $items  An array of trigger items.
+	 * @param bool  $html
+	 *
+	 * @return array|string
 	 */
-	public static function getLatestValues(array $trigger_items) {
-		$trigger_items = zbx_toHash($trigger_items, 'itemid');
-		$history_values = Manager::History()->getLastValues($trigger_items, 1, ZBX_HISTORY_PERIOD);
-		$tooltip = [];
-		$hint_table = (new CTable())->addClass('list-table');
+	public static function getLatestValues(array $items, $html = true) {
+		$latest_values = [];
 
-		foreach ($trigger_items as $itemid => $item) {
+		$items = zbx_toHash($items, 'itemid');
+		$history_values = Manager::History()->getLastValues($items, 1, ZBX_HISTORY_PERIOD);
+
+		if ($html) {
+			$hint_table = (new CTable())->addClass('list-table');
+		}
+
+		foreach ($items as $itemid => $item) {
 			if (array_key_exists($itemid, $history_values)) {
 				$last_value = reset($history_values[$itemid]);
 				$last_value['value'] = formatHistoryValue(str_replace(["\r\n", "\n"], [" "], $last_value['value']),
-					$item, true
+					$item
 				);
 			}
 			else {
@@ -1221,36 +1264,50 @@ class CScreenProblem extends CScreenBase {
 				];
 			}
 
-			$hint_table->addRow([
-				new CCol($item['name_expanded']),
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])),
-				new CCol($last_value['value']),
-				new CCol(($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-					? new CLink(_('Graph'), (new CUrl('history.php'))
-						->setArgument('action', HISTORY_GRAPH)
-						->setArgument('itemids[]', $itemid)
-						->getUrl()
+			if ($html) {
+				$hint_table->addRow([
+					new CCol($item['name_expanded']),
+					new CCol(
+						($last_value['clock'] !== null)
+							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
+							: UNRESOLVED_MACRO_STRING
+					),
+					new CCol($last_value['value']),
+					new CCol(
+						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+							? new CLink(_('Graph'), (new CUrl('history.php'))
+								->setArgument('action', HISTORY_GRAPH)
+								->setArgument('itemids[]', $itemid)
+								->getUrl()
+							)
+							: new CLink(_('History'), (new CUrl('history.php'))
+								->setArgument('action', HISTORY_VALUES)
+								->setArgument('itemids[]', $itemid)
+								->getUrl()
+							)
 					)
-					: new CLink(_('History'), (new CUrl('history.php'))
-						->setArgument('action', HISTORY_VALUES)
-						->setArgument('itemids[]', $itemid)
-						->getUrl()
-					)
-				)
-			]);
+				]);
 
-			$tooltip[] = (new CLinkAction($last_value['value']))
-				->addClass('hint-item')
-				->setAttribute('data-hintbox', '1');
-			$tooltip[] = ', ';
+				$latest_values[] = (new CLinkAction($last_value['value']))
+					->addClass('hint-item')
+					->setAttribute('data-hintbox', '1');
+				$latest_values[] = ', ';
+			}
+			else {
+				$latest_values[] = $last_value['value'];
+			}
 		}
 
-		array_pop($tooltip);
-		array_unshift($tooltip, (new CDiv())
-			->addClass('main-hint')
-			->setHint($hint_table)
-		);
+		if ($html) {
+			array_pop($latest_values);
+			array_unshift($latest_values, (new CDiv())
+				->addClass('main-hint')
+				->setHint($hint_table)
+			);
 
-		return (new CCol($tooltip))->addClass('latest-value');
+			return $latest_values;
+		}
+
+		return implode(', ', $latest_values);
 	}
 }
