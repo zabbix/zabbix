@@ -478,8 +478,11 @@ class CHost extends CHostGeneral {
 				if (count($inventory_mode_where) > 1) {
 					$sqlParts['where'][] = '(' . implode(' OR ', $inventory_mode_where) . ')';
 				}
-				else {
+				elseif (count($inventory_mode_where) == 1) {
 					$sqlParts['where'][] = array_pop($inventory_mode_where);
+				}
+				else {
+					$sqlParts['where'][] = '1 = 0';
 				}
 			}
 		}
