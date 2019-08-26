@@ -362,7 +362,6 @@ else {
 
 	if ($data['drules']) {
 		foreach ($data['drules'] as $key => $drule) {
-			// checks
 			$checks = [];
 
 			foreach ($drule['dchecks'] as $check) {
@@ -373,14 +372,9 @@ else {
 
 			$data['drules'][$key]['checks'] = $checks;
 
-			// description
-			$data['drules'][$key]['description'] = [];
-
-			if ($drule['proxy_hostid']) {
-				$proxy = get_host_by_hostid($drule['proxy_hostid']);
-
-				array_push($data['drules'][$key]['description'], $proxy['host'].NAME_DELIMITER);
-			}
+			$data['drules'][$key]['proxy'] = ($drule['proxy_hostid'] != 0)
+				? get_host_by_hostid($drule['proxy_hostid'])['host']
+				: '';
 		}
 
 		order_result($data['drules'], $sortField, $sortOrder);
