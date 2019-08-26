@@ -1079,10 +1079,7 @@ function getSelementsInfo(array $sysmap, array $options = []) {
 				$info[$selementId] = getHostsInfo($selement, $i, $sysmap['show_unack']);
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
 					$host_inventory = $host_inventories[$selement['elements'][0]['hostid']];
-
-					$info[$selementId]['iconid'] = ($host_inventory['inventory_mode'] == HOST_INVENTORY_DISABLED)
-						? $iconMap['default_iconid']
-						: getIconByMapping($iconMap, $host_inventory['inventory']);
+					$info[$selementId]['iconid'] = getIconByMapping($iconMap, $host_inventory);
 				}
 				break;
 
@@ -1576,17 +1573,21 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
  * Get icon id by mapping.
  *
  * @param array $icon_map
- * @param array $inventory
+ * @param array $host
  *
  * @return int
  */
-function getIconByMapping($icon_map, $inventory) {
+function getIconByMapping(array $icon_map, array $host) {
+	if ($host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+		return $iconMap['default_iconid'];
+	}
+
 	$inventories = getHostInventories();
 
 	foreach ($icon_map['mappings'] as $mapping) {
 		try {
 			$expr = new CGlobalRegexp($mapping['expression']);
-			if ($expr->match($inventory[$inventories[$mapping['inventory_link']]['db_field']])) {
+			if ($expr->match($host['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
 				return $mapping['iconid'];
 			}
 		}
