@@ -195,7 +195,7 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	public function formatTemplates(array $templates, array $simple_triggers) {
+	public function formatTemplates(array $templates, array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -360,7 +360,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @param array $valuemaps
 	 */
-	public function formatValuemaps(array $valuemaps, array $simple_triggers) {
+	public function formatValuemaps(array $valuemaps) {
 		$result = [];
 
 		CArrayHelper::sort($valuemaps, ['name']);
@@ -623,7 +623,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatGraphs(array $graphs, array $simple_triggers = null) {
+	protected function formatGraphs(array $graphs) {
 		$result = [];
 
 		CArrayHelper::sort($graphs, ['name']);
@@ -749,7 +749,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatTriggers(array $triggers, array $simple_triggers = null) {
+	protected function formatTriggers(array $triggers) {
 		$result = [];
 
 		CArrayHelper::sort($triggers, ['description', 'expression', 'recovery_expression']);
@@ -811,7 +811,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatGroups(array $groups, array $simple_triggers = null) {
+	protected function formatGroups(array $groups) {
 		$result = [];
 
 		CArrayHelper::sort($groups, ['name']);
