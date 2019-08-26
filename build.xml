@@ -23,7 +23,7 @@
 	 	<property name="dbpassword" value="${DBPASSWORD}"/>
 	 	<property name="phpunit_error_log" value="${PHPUNIT_ERROR_LOG}"/>
 	 	<property name="phpunit_port_prefix" value="${PHPUNIT_PORT_PREFIX}"/>
-		<property name="phpunit_reference_dir" value="${PHPUNIT_REFERENCE_DIR}"/>	<!-- Screenshot references directory -->
+		<property name="screenshot_reference_dir" value="${SCREENSHOT_REFERENCE_DIR}"/>
 		<property environment="env"/>
 
 		<!-- Create bootstrap.php -->
@@ -37,7 +37,7 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{CONFIG_DIR}" value="${basedir}/etc/"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{COMPONENT_DIR}" value="${basedir}/runtime/"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{PORT_PREFIX}" value="${phpunit_port_prefix}"/>
-		<replace file="frontends/php/tests/bootstrap.php" token="{PHPUNIT_REFERENCE_DIR}" value="${phpunit_reference_dir}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_REFERENCE_DIR}" value="${screenshot_reference_dir}"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="frontends/php/tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>
