@@ -414,6 +414,7 @@ class C44XmlValidator {
 							]],
 							'host_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
 								'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
+									'host' => ['type' => XML_STRING | XML_REQUIRED],
 									'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' => ['type' => XML_ARRAY, 'rules' => [
 											'group' => ['type' => XML_ARRAY, 'rules' => [
@@ -426,7 +427,6 @@ class C44XmlValidator {
 											'name' => ['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'host' => ['type' => XML_STRING | XML_REQUIRED],
 									'name' => ['type' => XML_STRING],
 									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
