@@ -83,7 +83,7 @@ class testHostInventoryCreate extends CAPITest {
 		);
 
 		$this->assertEquals(HOST_INVENTORY_MANUAL,
-			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid=' . $new_hostid)
+			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid='.$new_hostid)
 		);
 
 		$result = $this->call('hostprototype.create', [
@@ -99,7 +99,7 @@ class testHostInventoryCreate extends CAPITest {
 		);
 
 		$this->assertEquals(HOST_INVENTORY_AUTOMATIC,
-			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid=' . $new_hostid)
+			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid='.$new_hostid)
 		);
 	}
 

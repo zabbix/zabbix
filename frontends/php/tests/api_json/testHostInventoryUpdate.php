@@ -35,7 +35,7 @@ class testHostInventoryUpdate extends CAPITest {
 	 */
 	public function testHostPrototypeInventoryModeCanUpdate() {
 		$hostid = 50011;
-		$sql = 'SELECT inventory_mode FROM host_inventory WHERE hostid=' . $hostid;
+		$sql = 'SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostid;
 
 		$this->call('hostprototype.update', [
 			'hostid' => $hostid,

@@ -63,7 +63,7 @@ class testHostInventoryGet extends CAPITest {
 		], null);
 
 		$this->assertEquals(
-			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid=' . $hostprototypeid),
+			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostprototypeid),
 			CTestArrayHelper::get($response, 'result.0.inventory_mode', HOST_INVENTORY_AUTOMATIC)
 		);
 
@@ -80,7 +80,7 @@ class testHostInventoryGet extends CAPITest {
 		$hostid = 50009;
 
 		$this->assertEquals(0,
-			CDBHelper::getCount('SELECT inventory_mode FROM host_inventory WHERE hostid=' . $hostid)
+			CDBHelper::getCount('SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostid)
 		);
 
 		$response = $this->call('host.get', [
