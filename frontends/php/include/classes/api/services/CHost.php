@@ -448,7 +448,6 @@ class CHost extends CHostGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['inventory_mode'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
