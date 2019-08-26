@@ -39,6 +39,7 @@ class CScreenGraph extends CScreenBase {
 		$graphId = $graph['graphid'];
 		$legend = $graph['show_legend'];
 		$graph3d = $graph['show_3d'];
+		$src = null;
 
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 			// get host
@@ -93,16 +94,18 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			// get url
-			$this->screenitem['url'] = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
-				? 'chart7.php'
-				: 'chart3.php';
-			$this->screenitem['url'] = new CUrl($this->screenitem['url']);
+			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$src = new CUrl('chart7.php');
+			}
+			else {
+				$src = new CUrl('chart3.php');
+			}
 
 			foreach ($graph as $name => $value) {
 				if ($name == 'width' || $name == 'height') {
 					continue;
 				}
-				$this->screenitem['url']->setArgument($name, $value);
+				$src->setArgument($name, $value);
 			}
 
 			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
@@ -110,12 +113,11 @@ class CScreenGraph extends CScreenBase {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
 				foreach ($newGraphItem as $name => $value) {
-					$this->screenitem['url']->setArgument('items['.$i.']['.$name.']', $value);
+					$src->setArgument('items['.$i.']['.$name.']', $value);
 				}
 			}
 
-			$this->screenitem['url']->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
-			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
+			$src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
 		}
 
 		// get time control
@@ -129,21 +131,41 @@ class CScreenGraph extends CScreenBase {
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
-				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
+				$src = (new CUrl('chart6.php'))
+					->setArgument('graphid', $resourceId)
+					->setArgument('screenid', $this->screenitem['screenid']);
+
 				$isDefault = true;
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$legend.
-				'&graph3d='.$graph3d.$this->getProfileUrlParams();
-			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
-				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
+			$src
+				->setArgument('width', $this->screenitem['width'])
+				->setArgument('height', $this->screenitem['height'])
+				->setArgument('legend', $legend)
+				->setArgument('graph3d', $graph3d)
+				->setArgument('profileIdx', $this->profileIdx)
+				->setArgument('profileIdx2', $this->profileIdx2);
+
+			if ($this->mode == SCREEN_MODE_EDIT) {
+				$src
+					->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
+					->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+			}
+			else {
+				$src
+					->setArgument('from', $this->timeline['from'])
+					->setArgument('to', $this->timeline['to']);
+			}
+
+			$timeControlData['src'] = $src->getUrl();
 		}
 		else {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
-				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
+				$src = (new CUrl('chart2.php'))
+					->setArgument('graphid', $resourceId)
+					->setArgument('screenid', $this->screenitem['screenid']);
+
 				$isDefault = true;
 			}
 
@@ -153,11 +175,25 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$legend.$this->getProfileUrlParams();
-			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
-				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
+			$src
+				->setArgument('width', $this->screenitem['width'])
+				->setArgument('height', $this->screenitem['height'])
+				->setArgument('legend', $legend)
+				->setArgument('profileIdx', $this->profileIdx)
+				->setArgument('profileIdx2', $this->profileIdx2);
+
+			if ($this->mode == SCREEN_MODE_EDIT) {
+				$src
+					->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
+					->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+			}
+			else {
+				$src
+					->setArgument('from', $this->timeline['from'])
+					->setArgument('to', $this->timeline['to']);
+			}
+
+			$timeControlData['src'] = $src->getUrl();
 		}
 
 		// output

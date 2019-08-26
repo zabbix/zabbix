@@ -541,16 +541,18 @@ class CScreenHistory extends CScreenBase {
 	 * @return string
 	 */
 	protected function getGraphUrl(array $itemIds) {
-		$url = new CUrl('chart.php');
-		$url->setArgument('from', $this->timeline['from']);
-		$url->setArgument('to', $this->timeline['to']);
-		$url->setArgument('itemids', $itemIds);
-		$url->setArgument('type', $this->graphType);
+		$url = (new CUrl('chart.php'))
+			->setArgument('from', $this->timeline['from'])
+			->setArgument('to', $this->timeline['to'])
+			->setArgument('itemids', $itemIds)
+			->setArgument('type', $this->graphType)
+			->setArgument('profileIdx', $this->profileIdx)
+			->setArgument('profileIdx2', $this->profileIdx2);
 
 		if ($this->action == HISTORY_BATCH_GRAPH) {
 			$url->setArgument('batch', 1);
 		}
 
-		return $url->getUrl().$this->getProfileUrlParams();
+		return $url->getUrl();
 	}
 }
