@@ -834,6 +834,35 @@ class C44XmlValidator {
 							'status_codes' => ['type' => XML_STRING],
 							'timeout' => ['type' => XML_STRING],
 							'trends' => ['type' => XML_STRING, 'default' => '365d'],
+							'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' => ['type' => XML_ARRAY, 'rules' => [
+									'expression' => ['type' => XML_STRING | XML_REQUIRED],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' => ['type' => XML_STRING],
+									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' => ['type' => XML_STRING]
+										]]
+									]],
+									'description' => ['type' => XML_STRING],
+									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' => ['type' => XML_STRING],
+									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING]
+										]]
+									]],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' => ['type' => XML_STRING]
+								]]
+							]],
 							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
 							'units' => ['type' => XML_STRING],
 							'url' => ['type' => XML_STRING],
@@ -1299,6 +1328,35 @@ class C44XmlValidator {
 							'status_codes' => ['type' => XML_STRING],
 							'timeout' => ['type' => XML_STRING],
 							'trends' => ['type' => XML_STRING, 'default' => '365d'],
+							'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' => ['type' => XML_ARRAY, 'rules' => [
+									'expression' => ['type' => XML_STRING | XML_REQUIRED],
+									'name' => ['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' => ['type' => XML_STRING],
+									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' => ['type' => XML_STRING]
+										]]
+									]],
+									'description' => ['type' => XML_STRING],
+									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' => ['type' => XML_STRING],
+									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'tag' => ['type' => XML_STRING | XML_REQUIRED],
+											'value' => ['type' => XML_STRING]
+										]]
+									]],
+									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' => ['type' => XML_STRING]
+								]]
+							]],
 							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
 							'units' => ['type' => XML_STRING],
 							'url' => ['type' => XML_STRING],

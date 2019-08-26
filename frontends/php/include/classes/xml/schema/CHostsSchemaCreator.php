@@ -1168,6 +1168,64 @@ class CHostsSchemaCreator implements CSchemaCreator {
 										new CStringXmlTag('status_codes'),
 										new CStringXmlTag('timeout'),
 										(new CStringXmlTag('trends'))->setDefaultValue(DB::getDefault('items', 'trends')),
+										(new CIndexedArrayXmlTag('triggers'))
+											->setSchema(
+												(new CArrayXmlTag('trigger'))
+													->setSchema(
+														(new CStringXmlTag('expression'))->setRequired(),
+														(new CStringXmlTag('name'))->setRequired(),
+														(new CStringXmlTag('correlation_mode'))
+															->setDefaultValue(DB::getDefault('triggers', 'correlation_mode'))
+															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_DISABLED)
+															->addConstant(CXmlConstantName::TAG_VALUE, CXmlConstantValue::TRIGGER_TAG_VALUE),
+														new CStringXmlTag('correlation_tag'),
+														(new CIndexedArrayXmlTag('dependencies'))
+															->setSchema(
+																(new CArrayXmlTag('dependency'))
+																	->setSchema(
+																		(new CStringXmlTag('expression'))->setRequired(),
+																		(new CStringXmlTag('name'))->setRequired(),
+																		new CStringXmlTag('recovery_expression')
+																	)
+															),
+														new CStringXmlTag('description'),
+														(new CStringXmlTag('manual_close'))
+															->setDefaultValue(DB::getDefault('triggers', 'manual_close'))
+															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
+															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
+														(new CStringXmlTag('priority'))
+															->setDefaultValue(DB::getDefault('triggers', 'priority'))
+															->addConstant(CXmlConstantName::NOT_CLASSIFIED, CXmlConstantValue::NOT_CLASSIFIED)
+															->addConstant(CXmlConstantName::INFO, CXmlConstantValue::INFO)
+															->addConstant(CXmlConstantName::WARNING, CXmlConstantValue::WARNING)
+															->addConstant(CXmlConstantName::AVERAGE, CXmlConstantValue::AVERAGE)
+															->addConstant(CXmlConstantName::HIGH, CXmlConstantValue::HIGH)
+															->addConstant(CXmlConstantName::DISASTER, CXmlConstantValue::DISASTER),
+														new CStringXmlTag('recovery_expression'),
+														(new CStringXmlTag('recovery_mode'))
+															->setDefaultValue(DB::getDefault('triggers', 'recovery_mode'))
+															->addConstant(CXmlConstantName::EXPRESSION, CXmlConstantValue::TRIGGER_EXPRESSION)
+															->addConstant(CXmlConstantName::RECOVERY_EXPRESSION, CXmlConstantValue::TRIGGER_RECOVERY_EXPRESSION)
+															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::TRIGGER_NONE),
+														(new CStringXmlTag('status'))
+															->setDefaultValue(DB::getDefault('triggers', 'status'))
+															->addConstant(CXmlConstantName::ENABLED, CXmlConstantValue::ENABLED)
+															->addConstant(CXmlConstantName::DISABLED, CXmlConstantValue::DISABLED),
+														(new CIndexedArrayXmlTag('tags'))
+															->setSchema(
+																(new CArrayXmlTag('tag'))
+																	->setSchema(
+																		(new CStringXmlTag('tag'))->setRequired(),
+																		new CStringXmlTag('value')
+																	)
+															),
+														(new CStringXmlTag('type'))
+															->setDefaultValue(DB::getDefault('triggers', 'type'))
+															->addConstant(CXmlConstantName::SINGLE, CXmlConstantValue::SINGLE)
+															->addConstant(CXmlConstantName::MULTIPLE, CXmlConstantValue::MULTIPLE),
+														new CStringXmlTag('url')
+													)
+											),
 										(new CStringXmlTag('type'))
 											->setDefaultValue(DB::getDefault('items', 'type'))
 											->addConstant(CXmlConstantName::ZABBIX_PASSIVE, CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE)
