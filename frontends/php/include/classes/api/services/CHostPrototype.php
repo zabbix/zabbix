@@ -1127,7 +1127,7 @@ class CHostPrototype extends CHostBase {
 			$sqlParts['where'][] = ($options['inherited']) ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
 		}
 
-		if (array_key_exists('inventory_mode', $options['filter'])) {
+		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
 			if ($options['filter']['inventory_mode'] !== null) {
 				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
 
@@ -1139,19 +1139,11 @@ class CHostPrototype extends CHostBase {
 					$inventory_mode_where[] = 'hinv.inventory_mode IS NULL';
 				}
 
-				if ($inventory_mode_query) {
-					$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
-				}
+				$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
 
-				if (count($inventory_mode_where) > 1) {
-					$sqlParts['where'][] = '(' . implode(' OR ', $inventory_mode_where) . ')';
-				}
-				elseif (count($inventory_mode_where) == 1) {
-					$sqlParts['where'][] = array_pop($inventory_mode_where);
-				}
-				else {
-					$sqlParts['where'][] = '1 = 0';
-				}
+				$sqlParts['where'][] = (count($inventory_mode_where) > 1)
+					? '('.implode(' OR ', $inventory_mode_where).')'
+					: $inventory_mode_where[0];
 			}
 		}
 
