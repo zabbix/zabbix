@@ -347,13 +347,13 @@ func (m *Manager) Stop() {
 
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
-	r := updateRequest{clientID: clientID,
+
+	m.input <- &updateRequest{clientID: clientID,
 		sink:               writer,
 		requests:           requests,
 		refreshUnsupported: refreshUnsupported,
 		expressions:        expressions,
 	}
-	m.input <- &r
 }
 
 type resultWriter chan *plugin.Result
