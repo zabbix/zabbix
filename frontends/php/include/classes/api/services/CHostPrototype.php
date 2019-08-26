@@ -83,7 +83,7 @@ class CHostPrototype extends CHostBase {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['triggerid', 'inventory_mode'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['triggerid'], $options['output']);
 		}
 
 		if (!$options['preservekeys']) {
