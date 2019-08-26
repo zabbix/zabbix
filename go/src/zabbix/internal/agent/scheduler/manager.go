@@ -137,9 +137,11 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			err = requestClient.addRequest(p, r, update.sink, now)
 		}
 		if err != nil {
-			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
-				tacc.task().deactivate()
+			if r.Itemid != 0 {
+				if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+					tacc.task().deactivate()
+				}
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
 			log.Debugf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
