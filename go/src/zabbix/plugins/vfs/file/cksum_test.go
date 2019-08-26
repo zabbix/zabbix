@@ -17,43 +17,32 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package file
 
 import (
-	"errors"
-	"fmt"
-	"zabbix/pkg/plugin"
-	"zabbix/pkg/version"
+	"reflect"
+	"testing"
+	"time"
+	"zabbix/pkg/std"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+var CrcFile = "1234"
 
-var impl Plugin
+func TestFileCksum(t *testing.T) {
+	stdOs = std.NewMockOs()
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+	impl.timeout = time.Second * 3
+
+	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
+	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {
+		t.Errorf("vfs.file.cksum returned error %s", err.Error())
+	} else {
+		if crc, ok := result.(uint32); !ok {
+			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if crc != 3582362371 {
+				t.Errorf("vfs.file.cksum returned invalid result")
+			}
+		}
 	}
-
-	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
-	}
-
-	return nil, fmt.Errorf("Not implemented: %s", key)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.version", "Version of Zabbix agent.")
 }

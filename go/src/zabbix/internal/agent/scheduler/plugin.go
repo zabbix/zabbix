@@ -21,7 +21,7 @@ package scheduler
 
 import (
 	"container/heap"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 type pluginAgent struct {

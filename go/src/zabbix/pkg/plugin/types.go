@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	DefaultCapacity = 10
+	DefaultCapacity = 100
 )
 
 // Collector - interface for periodical metric collection

@@ -17,43 +17,33 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package file
 
 import (
 	"errors"
 	"fmt"
-	"zabbix/pkg/plugin"
-	"zabbix/pkg/version"
+	"syscall"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+func (p *Plugin) exportTime(params []string) (result interface{}, err error) {
+	if len(params) > 2 || len(params) == 0 {
+		return nil, errors.New("Invalid number of parameters.")
 	}
-
-	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
+	if "" == params[0] {
+		return nil, errors.New("Invalid first parameter.")
 	}
-
-	return nil, fmt.Errorf("Not implemented: %s", key)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.version", "Version of Zabbix agent.")
+	if f, err := stdOs.Stat(params[0]); err != nil {
+		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
+	} else {
+		if len(params) == 1 || params[1] == "" || params[1] == "modify" {
+			return f.ModTime().Unix(), nil
+		} else if params[1] == "access" {
+			return f.Sys().(*syscall.Stat_t).Atim.Sec, nil
+		} else if params[1] == "change" {
+			return f.Sys().(*syscall.Stat_t).Ctim.Sec, nil
+		} else {
+			return nil, errors.New("Invalid second parameter.")
+		}
+	}
 }

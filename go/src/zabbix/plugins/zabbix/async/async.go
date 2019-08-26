@@ -20,7 +20,7 @@
 package zabbixasync
 
 import (
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -36,7 +36,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "zabbixasync",
+	plugin.RegisterMetrics(&impl, "ZabbixAsync",
 		"system.localtime", "Returns system local time.",
 		"system.boottime", "Returns system boot time.",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
@@ -48,6 +48,8 @@ func init() {
 		"system.hw.cpu", "CPU information.",
 		"system.hw.macaddr", "Listing of MAC addresses.",
 		"system.sw.os", "Operating system information.",
+		"system.swap.in", "Swap in (from device into memory) statistics.",
+		"system.swap.out", "Swap out (from memory onto device) statistics.",
 		"vfs.file.md5sum", "MD5 checksum of file.",
 		"vfs.file.regmatch", "Find string in a file.",
 		"vfs.fs.discovery", "List of mounted filesystems. Used for low-level discovery.")

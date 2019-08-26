@@ -22,9 +22,8 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"strings"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 )
 
 func CheckMetric(metric string) (err error) {
@@ -54,7 +53,7 @@ func CheckMetric(metric string) (err error) {
 
 	var conf plugin.Configurator
 	if conf, ok = acc.(plugin.Configurator); ok {
-		conf.Configure(Options.Plugins[strings.Title(acc.Name())])
+		conf.Configure(Options.Plugins[acc.Name()])
 	}
 
 	var v interface{}
@@ -153,7 +152,6 @@ func CheckMetrics() {
 		"net.udp.service[ntp,127.0.0.1,123]",
 		"net.udp.service.perf[ntp,127.0.0.1,123]",
 		"system.hostname",
-
 	}
 
 	for _, metric := range metrics {

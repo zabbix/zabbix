@@ -25,14 +25,13 @@ import (
 	"math"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 type Manager struct {
@@ -288,13 +287,12 @@ func (m *Manager) init() {
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
 			capacity := metric.Plugin.Capacity()
-			section := strings.Title(metric.Plugin.Name())
-			if options, ok := agent.Options.Plugins[section]; ok {
+			if options, ok := agent.Options.Plugins[metric.Plugin.Name()]; ok {
 				if cap, ok := options["Capacity"]; ok {
 					var err error
 					if capacity, err = strconv.Atoi(cap); err != nil {
 						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-							section, cap, plugin.DefaultCapacity)
+							metric.Plugin.Name(), cap, plugin.DefaultCapacity)
 					}
 				}
 			}

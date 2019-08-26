@@ -17,76 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filestats
+package file
 
 import (
 	"reflect"
 	"testing"
-	"zabbix/internal/agent"
+	"time"
 	"zabbix/pkg/std"
 )
-
-func TestFileExists(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	agent.Options.Timeout = 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.exists", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.exists returned error %s", err.Error())
-	} else {
-		if exists, ok := result.(int); !ok {
-			t.Errorf("vfs.file.exists returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if exists != 1 {
-				t.Errorf("vfs.file.exists returned invalid result")
-			}
-		}
-	}
-}
-
-func TestFileNotExists(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	agent.Options.Timeout = 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.exists", []string{"text2.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.exists returned error %s", err.Error())
-	} else {
-		if exists, ok := result.(int); !ok {
-			t.Errorf("vfs.file.exists returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if exists != 0 {
-				t.Errorf("vfs.file.exists returned invalid result")
-			}
-		}
-	}
-}
-
-func TestFileSize(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	agent.Options.Timeout = 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.size returned error %s", err.Error())
-	} else {
-		if filesize, ok := result.(int64); !ok {
-			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if filesize != 4 {
-				t.Errorf("vfs.file.size returned invalid result")
-			}
-		}
-	}
-}
 
 func TestFileModifyTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	var filetime int64
 
@@ -112,7 +55,7 @@ func TestFileModifyTime(t *testing.T) {
 func TestFileAccessTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	var filetime int64
 
@@ -138,7 +81,7 @@ func TestFileAccessTime(t *testing.T) {
 func TestFileChangeTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	var filetime int64
 

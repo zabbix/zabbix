@@ -17,43 +17,57 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package file
 
 import (
 	"errors"
-	"fmt"
+	"time"
+	"zabbix/internal/agent"
 	"zabbix/pkg/plugin"
-	"zabbix/pkg/version"
+	"zabbix/pkg/std"
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	timeout time.Duration
 }
 
 var impl Plugin
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
-	}
-
 	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
+	case "vfs.file.cksum":
+		return p.exportCksum(params)
+	case "vfs.file.contents":
+		return p.exportContents(params)
+	case "vfs.file.exists":
+		return p.exportExists(params)
+	case "vfs.file.size":
+		return p.exportSize(params)
+	case "vfs.file.time":
+		return p.exportTime(params)
+	case "vfs.file.regexp":
+		return p.exportRegexp(params)
+	default:
+		return nil, errors.New("Unsupported metric.")
 	}
-
-	return nil, fmt.Errorf("Not implemented: %s", key)
 }
 
+func (p *Plugin) Configure(options map[string]string) {
+	p.timeout = time.Duration(agent.Options.Timeout) * time.Second
+}
+
+var stdOs std.Os
+
 func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.version", "Version of Zabbix agent.")
+	stdOs = std.NewOs()
+	plugin.RegisterMetrics(&impl, "File",
+		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
+		"vfs.file.contents", "Retrieves contents of the file.",
+		"vfs.file.exists", "Returns if file exists or not.",
+		"vfs.file.time", "Returns file time information.",
+		"vfs.file.size", "Returns file size.",
+		"vfs.file.regexp", "Find string in a file.")
 }

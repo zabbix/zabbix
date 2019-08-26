@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"reflect"
 	"time"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 

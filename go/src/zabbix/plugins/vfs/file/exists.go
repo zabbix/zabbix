@@ -17,43 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package file
 
 import (
 	"errors"
-	"fmt"
-	"zabbix/pkg/plugin"
-	"zabbix/pkg/version"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
+	if len(params) > 1 {
+		return nil, errors.New("Too many parameters.")
+	}
+	if len(params) == 0 || params[0] == "" {
+		return nil, errors.New("Invalid first parameter.")
 	}
 
-	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
+	ret := 0
+
+	if f, err := stdOs.Stat(params[0]); err == nil {
+		if mode := f.Mode(); mode.IsRegular() {
+			ret = 1
+		}
 	}
-
-	return nil, fmt.Errorf("Not implemented: %s", key)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.version", "Version of Zabbix agent.")
+	return ret, nil
 }
