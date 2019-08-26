@@ -55,13 +55,13 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 		for (p = tmp; isspace(*p); p++)
 			;
 
-		if ('-' == p[0] && 'I' == p[1] && isspace(p[2]))
+		if ('-' == p[0] && 'I' == p[1] && (isspace(p[2]) || ',' == p[2]))
 		{
 			*option = "-I";
 			continue;
 		}
 
-		if ('-' == p[0] && 'S' == p[1] && isspace(p[2]))
+		if ('-' == p[0] && 'S' == p[1] && (isspace(p[2]) || ',' == p[2]))
 		{
 			*option = "-S";
 			break;

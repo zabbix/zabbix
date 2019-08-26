@@ -21,80 +21,142 @@
 (function($) {
 	"use strict"
 
-	function makeWidgetDiv(data, widget) {
-		widget['content_header'] = $('<div>')
-			.addClass('dashbrd-grid-widget-head')
-			.append($('<h4>').text(
+	function makeWidgetDiv($obj, data, widget) {
+		widget['content_header'] = $('<div>', {'class': 'dashbrd-grid-widget-head'}).append(
+			$('<h4>').text(
 				(widget['header'] !== '') ? widget['header'] : data['widget_defaults'][widget['type']]['header']
-			));
-		widget['content_body'] = $('<div>').addClass('dashbrd-grid-widget-content');
+			))
+			.append(
+				$('<ul>', {'class': 'dashbrd-grid-widget-actions'})
+					.append(
+						(data['options']['editable'] && !data['options']['kioskmode'])
+							? $('<li>').append(
+								$('<button>', {
+									'type': 'button',
+									'class': 'btn-widget-edit',
+									'title': t('Edit')
+								}).on('click', function() {
+									if (!methods.isEditMode.call($obj)) {
+										showEditMode();
+									}
+									doAction('beforeConfigLoad', $obj, data, widget);
+									methods.editWidget.call($obj, widget, this);
+								}))
+							: ''
+						)
+					.append(
+						$('<li>').append(
+							$('<button>', {
+								'type': 'button',
+								'class': 'btn-widget-action',
+								'title': t('Adjust widget refresh interval'),
+								'data-menu-popup': JSON.stringify({
+									'type': 'refresh',
+									'data': {
+										'widgetName': widget['widgetid'],
+										'currentRate': widget['rf_rate'],
+										'multiplier': '0'
+									}
+								}),
+								'attr': {
+									'aria-haspopup': true
+								}
+							})
+						))
+					.append(
+						(data['options']['editable'] && !data['options']['kioskmode'])
+							? $('<li>').hide().append(
+								$('<button>', {
+									'type': 'button',
+									'class': 'btn-widget-delete',
+									'title': t('Delete')
+								}).on('click', function(){
+									methods.deleteWidget.call($obj, widget);
+								}))
+							: ''
+						)
+
+			);
+		widget['content_body'] = $('<div>', {'class': 'dashbrd-grid-widget-content'});
 		widget['content_script'] = $('<div>');
-		widget['content_header'].append($('<ul>')
-			.append($('<li>')
-				.append($('<button>', {
-					'type': 'button',
-					'class': 'btn-widget-action',
-					'title': t('Adjust widget refresh interval'),
-					'data-menu-popup': JSON.stringify({
-						'type': 'refresh',
-						'data': {
-							'widgetName': widget['widgetid'],
-							'currentRate': widget['rf_rate'],
-							'multiplier': '0'
-						}
-					}),
-					'attr': {
-						'aria-haspopup': true
-					}
-				}))
-			)
-		);
+
 		widget['container'] = $('<div>', {'class': 'dashbrd-grid-widget-container'})
-			.append(widget['content_header'])
+			.append(widget['content_header'].on('focusin focusout', function(event) {
+				var $widget = $(this).closest('.dashbrd-grid-widget');
+				$widget.toggleClass('dashbrd-grid-widget-focus', event.type === 'focusin');
+				if ($widget.hasClass('dashbrd-grid-widget-hidden-header') && $widget.position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'focusin');
+				}
+			}))
 			.append(widget['content_body'])
-			.append(widget['content_script']);
+			.append(widget['content_script'])
+			.toggleClass('no-padding', !widget['configuration']['padding']);
 
 		return $('<div>', {
-			'class': 'dashbrd-grid-widget' + (!widget['widgetid'].length ? ' new-widget' : ''),
+			'class': 'dashbrd-grid-widget' + (widget['view_mode'] == 1 ? ' dashbrd-grid-widget-hidden-header' : ''),
 			'css': {
 				'min-height': '' + data['options']['widget-height'] + 'px',
 				'min-width': '' + data['options']['widget-width'] + '%'
 			}
 		})
+			.toggleClass('new-widget', !widget['widgetid'].length)
 			.append($('<div>', {'class': 'dashbrd-grid-widget-mask'}))
-			.append(widget['container']);
+			.append(widget['container'])
+			.on('mouseenter mouseleave', function(event) {
+				if ($(this).hasClass('dashbrd-grid-widget-hidden-header') && $(this).position().top === 0) {
+					$('main.layout-kioskmode').toggleClass('widget-mouseenter', event.type === 'mouseenter');
+				}
+			});
 	}
 
-	function makeWidgetInfoBtns(btns) {
-		var info_btns = [];
+	function addWidgetInfoButtons($content_header, buttons) {
+		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
-		if (btns.length) {
-			btns.each(function(btn) {
-				info_btns.push(
-					$('<button>', {
-						'type': 'button',
-						'data-hintbox': 1,
-						'data-hintbox-static': 1
-					})
-						.addClass(btn.icon)
+		buttons.each(function(button) {
+			$widget_actions.prepend(
+				$('<li>', {'class': 'widget-info-button'})
+					.append(
+						$('<button>', {
+							'type': 'button',
+							'class': button.icon,
+							'data-hintbox': 1,
+							'data-hintbox-static': 1
+							})
+						)
+					.append(
+						$('<div>', {
+							'class': 'hint-box',
+							'html': button.hint
+						}).hide()
+					)
 				);
-				info_btns.push(
-					$('<div></div>')
-						.html(btn.hint)
-						.addClass('hint-box')
-						.hide()
-				);
-			});
+		});
+	}
+
+	function removeWidgetInfoButtons($content_header) {
+		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
+	}
+
+	function setWidgetPadding($obj, data, widget, padding) {
+		if (widget['configuration']['padding'] !== padding) {
+			widget['configuration']['padding'] = padding;
+			widget['container'].toggleClass('no-padding', !padding);
+			doAction('onResizeEnd', $obj, data, widget);
+		}
+	}
+
+	function setWidgetScrollable(widget, scrollable) {
+		widget['configuration']['scrollable'] = scrollable;
+	}
+
+	function applyWidgetConfiguration($obj, data, widget, configuration) {
+		if ('padding' in configuration) {
+			setWidgetPadding($obj, data, widget, configuration['padding']);
 		}
 
-		return info_btns.length ? info_btns : null;
-	}
-
-	function removeWidgetInfoBtns($content_header) {
-		$content_header.find('[data-hintbox=1]')
-			.trigger('remove')
-			.next('.hint-box')
-			.remove();
+		if ('scrollable' in configuration) {
+			setWidgetScrollable(widget, configuration['scrollable']);
+		}
 	}
 
 	/**
@@ -121,8 +183,15 @@
 			data['options']['rows'] = min_rows;
 		}
 
+		var height = data['options']['widget-height'] * data['options']['rows'];
+
+		if (data['options']['edit_mode']) {
+			// Occupy whole screen only if in edit mode, not to cause scrollbar in kiosk mode.
+			height = Math.max(height, data.minimalHeight);
+		}
+
 		$obj.css({
-			height: Math.max(data['options']['widget-height'] * data['options']['rows'], data.minimalHeight) + 'px'
+			height: height + 'px'
 		});
 	}
 
@@ -1156,6 +1225,10 @@
 			return;
 		}
 
+		if (widget['configuration']['scrollable'] == false) {
+			widget['content_body'].css('overflow', 'hidden');
+		}
+
 		var url = new Curl('zabbix.php'),
 			ajax_data;
 
@@ -1167,8 +1240,9 @@
 			'initial_load': widget['initial_load'] ? 1 : 0,
 			'edit_mode': data['options']['edit_mode'] ? 1 : 0,
 			'storage': widget['storage'],
-			'content_width': Math.floor(widget['content_body'].css('overflow', 'hidden').width()),
-			'content_height': Math.floor(widget['content_body'].height())
+			'content_width': Math.floor(widget['content_body'].width()),
+			'content_height': Math.floor(widget['content_body'].height()),
+			'view_mode': widget['view_mode']
 		};
 
 		if (widget['widgetid'] !== '') {
@@ -1192,8 +1266,9 @@
 			url: url.getUrl(),
 			method: 'POST',
 			data: ajax_data,
-			dataType: 'json',
-			success: function(resp) {
+			dataType: 'json'
+		})
+			.then(function(resp) {
 				stopPreloader(widget);
 				var $content_header = $('h4', widget['content_header']),
 					debug_visible = $('[name="zbx_debug_info"]', widget['content_body']).is(':visible');
@@ -1213,10 +1288,10 @@
 				if (typeof(resp.debug) !== 'undefined') {
 					$(resp.debug).appendTo(widget['content_body'])[debug_visible ? 'show' : 'hide']();
 				}
-				removeWidgetInfoBtns(widget['content_header']);
 
+				removeWidgetInfoButtons(widget['content_header']);
 				if (typeof(resp.info) !== 'undefined' && data['options']['edit_mode'] === false) {
-					widget['content_header'].find('ul > li').prepend(makeWidgetInfoBtns(resp.info));
+					addWidgetInfoButtons(widget['content_header'], resp.info);
 				}
 
 				// Creates new script elements and removes previous ones to force their re-execution.
@@ -1237,7 +1312,12 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
-
+			}, function() {
+				// TODO: gentle message about failed update of widget content
+				widget['update_attempts'] = 0;
+				startWidgetRefreshTimer($obj, data, widget, 3);
+			})
+			.then(function() {
 				var callOnDashboardReadyTrigger = false;
 				if (!widget['ready']) {
 					widget['ready'] = true; // leave it before registerDataExchangeCommit.
@@ -1252,13 +1332,7 @@
 				if (callOnDashboardReadyTrigger) {
 					doAction('onDashboardReady', $obj, data, null);
 				}
-			},
-			error: function() {
-				// TODO: gentle message about failed update of widget content
-				widget['update_attempts'] = 0;
-				startWidgetRefreshTimer($obj, data, widget, 3);
-			}
-		});
+			});
 
 		widget['initial_load'] = false;
 	}
@@ -1272,25 +1346,16 @@
 	}
 
 	function updateWidgetConfig($obj, data, widget) {
-		var	url = new Curl('zabbix.php'),
-			fields = $('form', data.dialogue['body']).serializeJSON(),
+		var	fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
-			ajax_data = {
-				type: type,
-				name: name
-			},
+			view_mode = (fields['show_header'] == 1) ? 0 : 1,
 			pos,
 			$placeholder;
 
 		delete fields['type'];
 		delete fields['name'];
-
-		url.setArgument('action', 'dashboard.widget.check');
-
-		if (Object.keys(fields).length != 0) {
-			ajax_data['fields'] = JSON.stringify(fields);
-		}
+		delete fields['show_header'];
 
 		if (widget === null || ('type' in widget) === false) {
 			if (widget && 'pos' in widget) {
@@ -1329,75 +1394,124 @@
 				.appendTo($obj);
 		}
 
+		// Prepare to call dashboard.widget.check.
+
+		var url = new Curl('zabbix.php');
+		url.setArgument('action', 'dashboard.widget.check');
+
+		var ajax_data = {
+			type: type,
+			name: name,
+			view_mode: view_mode
+		};
+
+		if (Object.keys(fields).length != 0) {
+			ajax_data['fields'] = JSON.stringify(fields);
+		}
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			dataType: 'json',
-			data: ajax_data,
-			success: function(resp) {
+			data: ajax_data
+		})
+			.then(function(resp) {
 				if (typeof(resp.errors) !== 'undefined') {
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
+
+					return $.Deferred().reject();
 				}
 				else {
 					// No errors, proceed with update.
 					overlayDialogueDestroy('widgetConfg');
-
-					if (widget === null || ('type' in widget) === false) {
-						// In case of ADD widget, create widget with required selected fields and add it to dashboard.
-						var widget_data = {
-								'type': type,
-								'header': name,
-								'pos': pos,
-								'rf_rate': 0,
-								'fields': fields
-							},
-							add_new_widget = function() {
-								methods.addWidget.call($obj, widget_data);
-								// New widget is last element in data['widgets'] array.
-								widget = data['widgets'].slice(-1)[0];
-								updateWidgetContent($obj, data, widget);
-								setWidgetModeEdit($obj, data, widget);
-								// Remove height attribute set for scroll animation.
-								$('body').css('height', '');
-							};
-
-						if (pos['y'] + pos['height'] > data['options']['rows']) {
-							resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
-							// Body height should be adjusted to animate scrollTop work.
-							$('body').css('height', Math.max(
-								$('body').height(),
-								(pos['y'] + pos['height']) * data['options']['widget-height']
-							));
-						}
-
-						// 5px shift is widget padding.
-						$('html, body')
-							.animate({scrollTop: pos['y'] * data['options']['widget-height']
-								+ $('.dashbrd-grid-container').position().top - 5})
-							.promise()
-							.then(add_new_widget);
-					}
-					else {
-						// In case of EDIT widget.
-						if (widget['type'] !== type) {
-							widget['type'] = type;
-							widget['initial_load'] = true;
-						}
-
-						widget['header'] = name;
-						widget['fields'] = fields;
-						doAction('afterUpdateWidgetConfig', $obj, data, null);
-						updateWidgetDynamic($obj, data, widget);
-						refreshWidget($obj, data, widget);
-					}
-
-					// Mark dashboard as updated.
-					data['options']['updated'] = true;
 				}
-			}
-		})
+			})
+			.then(function() {
+				// Prepare to call dashboard.widget.configure.
+
+				var url = new Curl('zabbix.php');
+				url.setArgument('action', 'dashboard.widget.configure');
+
+				var ajax_data = {
+					type: type,
+					view_mode: view_mode
+				};
+
+				if (Object.keys(fields).length != 0) {
+					ajax_data['fields'] = JSON.stringify(fields);
+				}
+
+				return $.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					dataType: 'json',
+					data: ajax_data
+				});
+			})
+			.then(function(resp) {
+				var configuration = {};
+				if ('configuration' in resp) {
+					configuration = resp['configuration'];
+				}
+
+				if (widget === null || ('type' in widget) === false) {
+					// In case of ADD widget, create widget with required selected fields and add it to dashboard.
+					var widget_data = {
+							'type': type,
+							'header': name,
+							'view_mode': view_mode,
+							'pos': pos,
+							'rf_rate': 0,
+							'fields': fields,
+							'configuration': configuration
+						},
+						add_new_widget = function() {
+							methods.addWidget.call($obj, widget_data);
+							// New widget is last element in data['widgets'] array.
+							widget = data['widgets'].slice(-1)[0];
+							updateWidgetContent($obj, data, widget);
+							setWidgetModeEdit($obj, data, widget);
+							// Remove height attribute set for scroll animation.
+							$('body').css('height', '');
+						};
+
+					if (pos['y'] + pos['height'] > data['options']['rows']) {
+						resizeDashboardGrid($obj, data, pos['y'] + pos['height']);
+						// Body height should be adjusted to animate scrollTop work.
+						$('body').css('height', Math.max(
+							$('body').height(),
+							(pos['y'] + pos['height']) * data['options']['widget-height']
+						));
+					}
+
+					// 5px shift is widget padding.
+					$('html, body')
+						.animate({scrollTop: pos['y'] * data['options']['widget-height']
+							+ $('.dashbrd-grid-container').position().top - 5})
+						.promise()
+						.then(add_new_widget);
+				}
+				else {
+					// In case of EDIT widget.
+					if (widget['type'] !== type) {
+						widget['type'] = type;
+						widget['initial_load'] = true;
+					}
+
+					widget['header'] = name;
+					widget['view_mode'] = view_mode;
+					widget['fields'] = fields;
+					applyWidgetConfiguration($obj, data, widget, configuration);
+					doAction('afterUpdateWidgetConfig', $obj, data, null);
+					updateWidgetDynamic($obj, data, widget);
+					refreshWidget($obj, data, widget);
+				}
+
+				// Mark dashboard as updated.
+				data['options']['updated'] = true;
+			})
 			.always(function() {
 				if ($placeholder) {
 					$placeholder.remove();
@@ -1583,7 +1697,7 @@
 			 * Unset if dimension width/height is equal to size of placeholder.
 			 * Widget default size will be used.
 			 */
-			if (dimension.width == 1 && dimension.height == 2) {
+			if (dimension.width == 2 && dimension.height == 2) {
 				delete dimension.width;
 				delete dimension.height;
 			}
@@ -1646,34 +1760,45 @@
 					return;
 				}
 
-				var o = data.options,
-					offset = $obj.offset(),
-					y = Math.min(o['max-rows'] - 1,
-							Math.max(0, Math.floor((event.pageY - offset.top) / o['widget-height']))
+				var offset = $obj.offset(),
+					y = Math.min(data.options['max-rows'] - 1,
+							Math.max(0, Math.floor((event.pageY - offset.top) / data.options['widget-height']))
 						),
-					x = Math.min(o['max-columns'] - 1,
+					x = Math.min(data.options['max-columns'] - 1,
 							Math.max(0, Math.floor((event.pageX - offset.left) / data['cell-width']))
 						),
-					pos = {
-						y: y,
-						x: x,
-						height: o['widget-min-rows'],
-						width: 1
-					},
 					overlap = false;
+
+				if (isNaN(x) || isNaN(y)) {
+					return;
+				}
+
+				var	pos = {
+					x: x,
+					y: y,
+					width: (x < data.options['max-columns'] - 1) ? 1 : 2,
+					height: data.options['widget-min-rows']
+				};
 
 				if (drag) {
 					if (('top' in data.add_widget_dimension) === false) {
-						data.add_widget_dimension = $.extend(data.add_widget_dimension, {top: Math.min(y, data.add_widget_dimension.y), left: x});
+						data.add_widget_dimension.left = x;
+						data.add_widget_dimension.top = Math.min(y, data.add_widget_dimension.y);
 					}
 
 					pos = {
-						x: Math.min(x, data.add_widget_dimension.left),
+						x: Math.min(x, (data.add_widget_dimension.left < x)
+							? data.add_widget_dimension.x
+							: data.add_widget_dimension.left
+						),
 						y: Math.min(y, (data.add_widget_dimension.top < y)
 							? data.add_widget_dimension.y
 							: data.add_widget_dimension.top
 						),
-						width: Math.abs(data.add_widget_dimension.left - x) + 1,
+						width: Math.max(1, (data.add_widget_dimension.left < x)
+							? x - data.add_widget_dimension.left + 1
+							: data.add_widget_dimension.left - x + 1
+						),
 						height: Math.max(2, (data.add_widget_dimension.top < y)
 							? y - data.add_widget_dimension.top + 1
 							: data.add_widget_dimension.top - y + 2
@@ -1691,37 +1816,63 @@
 					}
 				}
 				else {
-					if (rectOverlap(data.add_widget_dimension, {x: x, y: y, width: 1, height: 1})) {
-						return;
+
+					if ((pos.x + pos.width) > data.options['max-columns']) {
+						pos.x = data.options['max-columns'] - pos.width;
+					}
+					else if (data.add_widget_dimension.x < pos.x) {
+						--pos.x;
 					}
 
-					if ((pos.y + pos.height) > data['options']['max-rows']) {
-						pos.y = data['options']['max-rows'] - pos.height;
+					if ((pos.y + pos.height) > data.options['max-rows']) {
+						pos.y = data.options['max-rows'] - pos.height;
 					}
 					else if (data.add_widget_dimension.y < pos.y) {
 						--pos.y;
 					}
 
-					$.each(data.widgets, function(_, box) {
-						overlap |= rectOverlap(box.pos, pos);
-
-						return !overlap;
-					});
-
 					/**
 					 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
 					 * slot.
 					 */
-					if (overlap && pos.y > 0) {
-						overlap = false;
-						--pos.y;
+					var delta_check = [
+						[0, 0, 2],
+						[-1, 0, 2],
+						[0, 0, 1],
+						[0, -1, 2],
+						[0, -1, 1]
+					];
 
-						$.each(data.widgets, function(_, box) {
-							overlap |= rectOverlap(box.pos, pos);
-
-							return !overlap;
+					$.each(delta_check, function(i, val) {
+						var c_pos = $.extend({}, {
+							x: Math.max(0, (val[2] < 2 ? x : pos.x) + val[0]),
+							y: Math.max(0, pos.y + val[1]),
+							width: val[2],
+							height: pos.height
 						});
-					}
+
+						if (x > c_pos.x + 1) {
+							++c_pos.x;
+						}
+
+						overlap = false;
+						if (rectOverlap({
+							x: 0,
+							y: 0,
+							width: data.options['max-columns'],
+							height: data.options['max-rows']
+						}, c_pos)) {
+							$.each(data.widgets, function(_, box) {
+								overlap |= rectOverlap(box.pos, c_pos);
+								return !overlap;
+							});
+						}
+
+						if (!overlap) {
+							pos = c_pos;
+							return false;
+						}
+					});
 
 					if (overlap) {
 						data.add_widget_dimension = {};
@@ -1730,7 +1881,7 @@
 					}
 				}
 
-				if ((pos.y + pos.height) > data['options']['rows']) {
+				if ((pos.y + pos.height) > data.options['rows']) {
 					resizeDashboardGrid($obj, data, pos.y + pos.height);
 				}
 
@@ -1739,10 +1890,10 @@
 				data.new_widget_placeholder.container
 					.css({
 						position: 'absolute',
-						top: (data.add_widget_dimension.y * o['widget-height']) + 'px',
-						left: (data.add_widget_dimension.x * o['widget-width']) + '%',
-						height: (data.add_widget_dimension.height * o['widget-height']) + 'px',
-						width: (data.add_widget_dimension.width * o['widget-width']) + '%'
+						top: (data.add_widget_dimension.y * data.options['widget-height']) + 'px',
+						left: (data.add_widget_dimension.x * data.options['widget-width']) + '%',
+						height: (data.add_widget_dimension.height * data.options['widget-height']) + 'px',
+						width: (data.add_widget_dimension.width * data.options['widget-width']) + '%'
 					})
 					.show();
 
@@ -1753,30 +1904,10 @@
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
-		var	btn_edit = $('<button>')
-			.attr('type', 'button')
-			.addClass('btn-widget-edit')
-			.attr('title', t('Edit'))
-			.click(function() {
-				doAction('beforeConfigLoad', $obj, data, widget);
-				methods.editWidget.call($obj, widget, this);
-			});
-
-		var	btn_delete = $('<button>')
-			.attr('type', 'button')
-			.addClass('btn-widget-delete')
-			.attr('title', t('Delete'))
-			.click(function(){
-				methods.deleteWidget.call($obj, widget);
-			});
-
-		$('ul', widget['content_header']).hide();
-		widget['content_header'].append($('<ul>')
-			.addClass('dashbrd-widg-edit')
-			.append($('<li>').append(btn_edit))
-			.append($('<li>').append(btn_delete))
-		);
-
+		$('.btn-widget-action', widget['content_header']).parent('li').hide();
+		$('.btn-widget-delete', widget['content_header']).parent('li').show();
+		$('.dashbrd-grid-widget').removeClass('dashbrd-grid-widget-hidden-header');
+		removeWidgetInfoButtons(widget['content_header']);
 		stopWidgetRefreshTimer(widget);
 		makeDraggable($obj, data, widget);
 		makeResizable($obj, data, widget);
@@ -1817,6 +1948,7 @@
 			ajax_widget['pos'] = widget['pos'];
 			ajax_widget['type'] = widget['type'];
 			ajax_widget['name'] = widget['header'];
+			ajax_widget['view_mode'] = widget['view_mode'];
 			if (Object.keys(widget['fields']).length != 0) {
 				ajax_widget['fields'] = JSON.stringify(widget['fields']);
 			}
@@ -1992,8 +2124,6 @@
 			var default_options = {
 				'widget-height': 70,
 				'widget-min-rows': 2,
-				'max-rows': 64,
-				'max-columns': 12,
 				'rows': 0,
 				'updated': false,
 				'editable': true,
@@ -2008,7 +2138,7 @@
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
-						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'))
+						new_widget_placeholder.label.text(t('Cannot add widgets in kiosk mode'));
 						new_widget_placeholder.container.addClass('disabled');
 					}
 					else {
@@ -2023,6 +2153,7 @@
 					}
 				}
 				else {
+					new_widget_placeholder.label.text(t('You do not have permissions to edit dashboard'));
 					new_widget_placeholder.container.addClass('disabled');
 				}
 
@@ -2101,14 +2232,18 @@
 		},
 
 		addWidget: function(widget) {
-			// If no fields are given, 'fields' will contain empty array instead of simple object.
+			// Replace empty arrays with empty objects.
 			if (widget['fields'].length === 0) {
 				widget['fields'] = {};
 			}
-			widget = $.extend({}, {
+			if (widget['configuration'].length === 0) {
+				widget['configuration'] = {};
+			}
+			widget = $.extend({
 				'widgetid': '',
 				'type': '',
 				'header': '',
+				'view_mode': 0,
 				'pos': {
 					'x': 0,
 					'y': 0,
@@ -2122,7 +2257,6 @@
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
-				'fields': {},
 				'storage': {}
 			}, widget);
 
@@ -2131,7 +2265,7 @@
 					data = $this.data('dashboardGrid');
 
 				widget['uniqueid'] = generateUniqueId($this, data);
-				widget['div'] = makeWidgetDiv(data, widget).data('widget-index', data['widgets'].length);
+				widget['div'] = makeWidgetDiv($this, data, widget).data('widget-index', data['widgets'].length);
 				updateWidgetDynamic($this, data, widget);
 
 				data['widgets'].push(widget);
@@ -2332,7 +2466,10 @@
 
 					if (data.dialogue['widget_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
+						ajax_data['view_mode'] = (fields['show_header'] == 1) ? 0 : 1
+
 						delete fields['name'];
+						delete fields['show_header'];
 					}
 					else {
 						// Get default config if widget type changed.
@@ -2343,6 +2480,7 @@
 					// Open form with current config.
 					ajax_data['type'] = widget['type'];
 					ajax_data['name'] = widget['header'];
+					ajax_data['view_mode'] = widget['view_mode'];
 					fields = widget['fields'];
 				}
 				else {

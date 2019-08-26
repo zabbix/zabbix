@@ -472,6 +472,23 @@ function stripslashes(str) {
 }
 
 /**
+ * Function to remove preloader and moves focus to IU element that was clicked to open it.
+ *
+ * @param string   id			Preloader identifier.
+ * @param {object} xhr			(optional) XHR request that must be aborted.
+ */
+function overlayPreloaderDestroy(id, xhr) {
+	if (typeof id !== 'undefined') {
+		if (typeof xhr !== 'undefined') {
+			xhr.abort();
+		}
+
+		jQuery('#' + id).remove();
+		removeFromOverlaysStack(id);
+	}
+}
+
+/**
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid	Dialogue identifier to identify dialogue.

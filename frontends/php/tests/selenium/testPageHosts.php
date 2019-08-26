@@ -412,7 +412,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		// Check filtered result.
-		$this->checkTableData(CTestArrayHelper::get($data, 'result', []));
+		$this->assertTableData(CTestArrayHelper::get($data, 'result', []));
 
 		// Reset filter due to not influence further tests.
 		$form->query('button:Reset')->one()->click();

@@ -108,7 +108,15 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = process_agent_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
+	}
+	else if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -132,7 +140,15 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != (ret = process_sender_history_data(sock, jp, ts, &info)))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid sender data from \"%s\": %s", sock->peer, info);
+	}
+	else if (!ZBX_IS_RUNNING())
+	{
+		info = zbx_strdup(info, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
+		ret = FAIL;
+	}
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -1253,7 +1269,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
@@ -1290,4 +1306,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

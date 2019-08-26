@@ -707,6 +707,22 @@ class CHelpItems {
 					'description' => _('VMware service full name, <url> - VMware service URL')
 				],
 				[
+					'key' => 'vmware.datastore.read[<url>,<datastore>,<mode>]',
+					'description' => _('VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum')
+				],
+				[
+					'key' => 'vmware.datastore.size[<url>,<datastore>,<mode>]',
+					'description' => _('VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage')
+				],
+				[
+					'key' => 'vmware.datastore.write[<url>,<datastore>,<mode>]',
+					'description' => _('VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum')
+				],
+				[
+					'key' => 'vmware.datastore.hv.list[<url>,<datastore>]',
+					'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name')
+				],
+				[
 					'key' => 'vmware.hv.cluster.name[<url>,<uuid>]',
 					'description' => _('VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
@@ -725,6 +741,10 @@ class CHelpItems {
 				[
 					'key' => 'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
 					'description' => _('VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency')
+				],
+				[
+					'key' => 'vmware.hv.datastore.list[<url>,<uuid>]',
+					'description' => _('VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name')
 				],
 				[
 					'key' => 'vmware.hv.full.name[<url>,<uuid>]',

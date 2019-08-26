@@ -142,11 +142,11 @@ $form_list
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->setEnabled(!$readonly)
 						->addClass(ZBX_STYLE_BTN_LINK)
@@ -234,11 +234,11 @@ $form_list
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 1000))
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setEnabled(!$readonly)
@@ -302,7 +302,8 @@ $form_list
 			(new CComboBox($readonly ? '' : 'http_authtype', $data['http_authtype'], null, [
 				HTTPTEST_AUTH_NONE => _('None'),
 				HTTPTEST_AUTH_BASIC => _('Basic'),
-				HTTPTEST_AUTH_NTLM => _('NTLM')
+				HTTPTEST_AUTH_NTLM => _('NTLM'),
+				HTTPTEST_AUTH_KERBEROS => _('Kerberos')
 			]))->setEnabled(!$readonly)
 		],
 		'http_authtype_row'
@@ -557,6 +558,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('Executed script'), 'params_es'))->setAsteriskMark(),
 		(new CTextArea('params_es', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'label_executed_script'
@@ -564,6 +566,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('SQL query'), 'params_ap'))->setAsteriskMark(),
 		(new CTextArea('params_ap', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'label_params'
@@ -571,6 +574,7 @@ $form_list
 	->addRow(
 		(new CLabel(_('Formula'), 'params_f'))->setAsteriskMark(),
 		(new CTextArea('params_f', $data['params']))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'label_formula'
@@ -651,27 +655,36 @@ $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$form_list->addRow(_('Custom intervals'),
-	(new CDiv($delayFlexTable))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	'row_flex_intervals'
-);
-
-$keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history']))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
-$form_list->addRow((new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
-	$keepHistory
-);
-
-$keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends']))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
 $form_list
-	->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(), $keepTrend,
+	->addRow(_('Custom intervals'),
+		(new CDiv($delayFlexTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'row_flex_intervals'
+	)
+	->addRow((new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
+		(new CDiv([
+			(new CRadioButtonList('history_mode', (int) $data['history_mode']))
+				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('history', $data['history']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))->addClass('wrap-multiple-controls')
+	)
+	->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
+		(new CDiv([
+			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
+				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('trends', $data['trends']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))->addClass('wrap-multiple-controls'),
 		'row_trends'
 	)
 	->addRow(_('Log time format'),

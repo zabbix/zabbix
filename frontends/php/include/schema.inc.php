@@ -1420,18 +1420,6 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
-			'error' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
-				'default' => '',
-			],
-			'lastlogsize' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
-				'default' => '0',
-			],
 			'logtimefmt' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1493,12 +1481,6 @@ return [
 				'length' => 64,
 				'default' => '',
 			],
-			'mtime' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'flags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -1542,12 +1524,6 @@ return [
 				'default' => '0',
 			],
 			'snmpv3_privprotocol' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'state' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -5269,6 +5245,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'proxy_autoreg_host' => [
@@ -5314,6 +5296,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			],
+			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -6277,6 +6265,42 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'item_rtdata' => [
+		'key' => 'itemid',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'lastlogsize' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_UINT,
+				'length' => 20,
+				'default' => '0',
+			],
+			'state' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'mtime' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
 				'default' => '',
 			],
 		],
@@ -7415,6 +7439,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '2',
+			],
+			'view_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],

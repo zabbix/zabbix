@@ -269,7 +269,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'label' => _('User groups')
 				],
 				[
-					'url' => 'users.php',
+					'url' => 'zabbix.php',
+					'action' => 'user.list',
+					'active_if' => ['user.edit', 'user.list'],
 					'label' => _('Users')
 				],
 				[
@@ -297,7 +299,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			'pages' => [
 				[
 					'url' => 'index.php',
-					'sub_pages' => ['profile.php']
+					'sub_pages' => ['zabbix.php']
 				]
 			]
 		]

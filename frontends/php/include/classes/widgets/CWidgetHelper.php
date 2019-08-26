@@ -38,18 +38,26 @@ class CWidgetHelper {
 	 *
 	 * @param string $dialogue_name
 	 * @param string $type
+	 * @param int $view_mode (ZBX_WIDGET_VIEW_MODE_NORMAL|ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER)
 	 * @param array $known_widget_types
 	 * @param CWidgetFieldComboBox $field_rf_rate
 	 *
 	 * @return CFormList
 	 */
-	public static function createFormList($dialogue_name, $type, $known_widget_types, $field_rf_rate) {
+	public static function createFormList($dialogue_name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
 		return (new CFormList())
-			->addRow((new CLabel(_('Type'), 'type')),
-				(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types))
+			->addRow((new CLabel(_('Type'), 'type')), [
+					(new CComboBox('type', $type, 'updateWidgetConfigDialogue()', $known_widget_types)),
+					(new CDiv((new CCheckBox('show_header'))
+						->setLabel(_('Show header'))
+						->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
+						->setId('show_header')
+						->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
+					))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+				]
 			)
 			->addRow(_('Name'),
-				(new CTextBox('name',$dialogue_name))
+				(new CTextBox('name', $dialogue_name))
 					->setAttribute('placeholder', _('default'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)

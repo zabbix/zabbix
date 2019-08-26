@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -198,19 +198,23 @@ $fields = [
 									null
 								],
 	'http_authtype' =>			[T_ZBX_INT, O_OPT, null,
-									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
+									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM,
+										HTTPTEST_AUTH_KERBEROS
+									]),
 									null
 								],
 	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Username')
 								],
 	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
-											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
+											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.
+											' || {http_authtype} == '.HTTPTEST_AUTH_KERBEROS.')',
 									_('Password')
 								],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
@@ -369,9 +373,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = trim($step['params'][0]);
 					break;
 
+				case ZBX_PREPROC_XPATH:
 				case ZBX_PREPROC_JSONPATH:
 				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
+				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				case ZBX_PREPROC_SCRIPT:
 					$step['params'] = $step['params'][0];

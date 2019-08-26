@@ -312,7 +312,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'raw_data' => '=value',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Values without names are not allowed in form fields.'
+					'errors' => 'Cannot convert POST data: Values without names are not allowed in form fields.'
 				]
 			],
 			[
@@ -324,7 +324,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'raw_data' => 'test=%11',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Data is not properly encoded.'
+					'errors' => 'Cannot convert POST data: Data is not properly encoded.'
 				]
 			],
 			[
@@ -336,7 +336,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'raw_data' => 'value=%00',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Data is not properly encoded.'
+					'errors' => 'Cannot convert POST data: Data is not properly encoded.'
 				]
 			],
 			[
@@ -348,7 +348,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'raw_data' => 'name=val=ue',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Data is not properly encoded.'
+					'errors' => 'Cannot convert POST data: Data is not properly encoded.'
 				]
 			],
 			[
@@ -360,7 +360,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'raw_data' => 'value=%EA%EE%EB%E1%E0%F1%EA%E8',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Data is not properly encoded.'
+					'errors' => 'Cannot convert POST data: URIError: URI malformed'
 				]
 			],
 			[
@@ -376,7 +376,7 @@ class testFormWebStep extends CLegacyWebTest {
 							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
 					'raw' => true,
 					'to_form' => true,
-					'errors' => 'Cannot convert POST data from raw data format to form field data format. Name of the form field should not exceed 255 characters.'
+					'errors' => 'Cannot convert POST data: Name of the form field should not exceed 255 characters.'
 				]
 			],
 			// Variables -just numbers
@@ -792,7 +792,7 @@ class testFormWebStep extends CLegacyWebTest {
 	 */
 	protected function addPairs($context, $items) {
 		$parent = $this->webDriver->findElement(WebDriverBy::xpath($context));
-		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "pairRow")]'));
+		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
 		if (($element = end($rows)) === false) {
 			$this->fail('Pair rows were not found for context "'.$context.'"!');
 		}
@@ -812,7 +812,7 @@ class testFormWebStep extends CLegacyWebTest {
 			}
 
 			$parent->findElement(WebDriverBy::xpath('.//button[text()="Add"]'))->click();
-			$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "pairRow")]'));
+			$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
 			$element = end($rows);
 		}
 	}
@@ -825,7 +825,7 @@ class testFormWebStep extends CLegacyWebTest {
 	protected function getPairs($context) {
 		$pairs = [];
 		$parent = $this->webDriver->findElement(WebDriverBy::xpath($context));
-		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "pairRow")]'));
+		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
 
 		foreach ($rows as $row) {
 			$pair = [];
@@ -871,7 +871,7 @@ class testFormWebStep extends CLegacyWebTest {
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
-		$this->zbxTestClickWait('add_step');
+		$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
 		$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 
 		if (array_key_exists('step_name', $data)) {
@@ -888,13 +888,13 @@ class testFormWebStep extends CLegacyWebTest {
 			'variables'	=> 'variables',
 			'headers'	=> 'headers'
 		];
-		foreach ($fields as $field => $id) {
+		foreach ($fields as $field => $data_type) {
 			if (array_key_exists($field, $data)) {
 				if ($data[$field] === 'post') {
 					// Synthetic wait
 					sleep(2);
 				}
-				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$id.'"]', $data[$field]);
+				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]', $data[$field]);
 			}
 		}
 
@@ -916,16 +916,21 @@ class testFormWebStep extends CLegacyWebTest {
 					. '//label[text()="'.$data['retrieve'].'"]');
 
 			// Check disabled fields for Headers mode.
-			$ids = ['post_type_0', 'post_type_1', 'pairs_4_name', 'pairs_4_value'];
+			$paths = [
+				'input[@id="post_type_0"',
+				'input[@id="post_type_1"',
+				'table[@data-type="post_fields"]//input[@data-type="name"',
+				'table[@data-type="post_fields"]//input[@data-type="value"'
+			];
 			if ($data['retrieve'] === 'Headers') {
-				foreach ($ids as $id) {
-					$this->zbxTestAssertElementPresentXpath('//div[@class="overlay-dialogue-body"]//input[@id="'.$id.'"][@disabled]');
+				foreach ($paths as $path) {
+					$this->zbxTestAssertElementPresentXpath('//div[@class="overlay-dialogue-body"]//'.$path.'][@disabled]');
 				}
 				$this->zbxTestAssertElementNotPresentXpath("//div[@class='overlay-dialogue-body']//input[@id='required'][@disabled]");
 			}
 			else {
-				foreach ($ids as $id) {
-					$this->zbxTestAssertElementNotPresentXpath('//div[@class="overlay-dialogue-body"]//input[@id="'.$id.'"][@disabled]');
+				foreach ($paths as $path) {
+					$this->zbxTestAssertElementNotPresentXpath('//div[@class="overlay-dialogue-body"]//'.$path.'][@disabled]');
 				}
 			}
 		}
@@ -954,7 +959,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
-		foreach (['parse_query' => 'query_fields', 'check_post' => 'post_fields'] as $key => $id) {
+		foreach (['parse_query' => 'query_fields', 'check_post' => 'post_fields'] as $key => $data_type) {
 			if (!array_key_exists($key, $data)) {
 				continue;
 			}
@@ -962,7 +967,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 
-			$pairs = $this->getPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$id.'"]');
+			$pairs = $this->getPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]');
 			$this->assertEquals($this->serializePairs($data[$key]), $this->serializePairs($pairs));
 
 			if (array_key_exists('check_url', $data)) {

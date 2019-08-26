@@ -26,12 +26,34 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait TableTrait {
 
 	/**
+	 * Perform data array normalization.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected function normalizeData($data) {
+		foreach ($data as &$values) {
+			foreach ($values as &$value) {
+				if (!is_array($value)) {
+					$value = ['text' => $value];
+				}
+			}
+			unset($value);
+		}
+		unset($values);
+
+		return $data;
+	}
+
+	/**
 	 * Check if values in table rows match data from data provider.
 	 *
 	 * @param array   $data     data array to be match with result in table
+	 * @param string $selector	table selector
 	 */
-	public function checkTableData($data = []) {
-		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
+	public function assertTableData($data = [], $selector = 'class:list-table') {
+		$rows = $this->query($selector)->asTable()->one()->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $rows->asText());
@@ -44,29 +66,12 @@ trait TableTrait {
 				'Row indices don\'t not match indices in data provider.'
 		);
 
-		foreach ($data as $i => $values) {
+		foreach ($this->normalizeData($data) as $i => $values) {
 			$row = $rows->get($i);
 
 			foreach ($values as $name => $value) {
-				if (!is_array($value)) {
-					$value = ['text' => $value];
-				}
-
-				if (!array_key_exists('text', $value)) {
-					// There is only support for text (currently).
+				if (($text = $row->getColumnData($name, $value)) === null) {
 					continue;
-				}
-
-				if (array_key_exists('selector', $value)) {
-					$text = (!is_array($value['text']))
-							? $row->getColumn($name)->query($value['selector'])->one()->getText()
-							: $row->getColumn($name)->query($value['selector'])->all()->asText();
-				}
-				else {
-					$text = $row->getColumn($name)->getText();
-					if (is_array($value['text'])) {
-						$text = [$text];
-					}
 				}
 
 				$this->assertEquals($value['text'], $text);
@@ -80,12 +85,31 @@ trait TableTrait {
 	 * @param array   $rows        data array to be match with result in table
 	 * @param string  $field       table column name
 	 */
-	public function checkTableDataColumn($rows = [], $field = 'Name') {
+	public function assertTableDataColumn($rows = [], $field = 'Name') {
 		$data = [];
 		foreach ($rows as $row) {
 			$data[] = [$field => $row];
 		}
 
-		$this->checkTableData($data);
+		$this->assertTableData($data);
+	}
+
+	/**
+	 * Select table rows.
+	 *
+	 * @param mixed $data		rows to be selected
+	 * @param string $selector	table selector
+	 */
+	public function selectTableRows($data = [], $selector = 'class:list-table') {
+		$table = $this->query($selector)->asTable()->one();
+
+		if (!$data) {
+			// Select all rows in table.
+			$table->query('xpath:./thead/tr/th/input[@type="checkbox"]')->asCheckbox()->one()->check();
+
+			return;
+		}
+
+		$table->findRows($data)->select();
 	}
 }

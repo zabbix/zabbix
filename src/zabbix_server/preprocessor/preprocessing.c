@@ -998,76 +998,30 @@ void	zbx_preprocessor_unpack_test_request(unsigned char *value_type, char **valu
  * Purpose: tests item preprocessing with the specified input value and steps *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_test(unsigned char value_type, const char *value, const char *last_value, const char *last_ts,
-		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, char **preproc_error, char **error)
+int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
+		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
+		char **preproc_error, char **error)
 {
-	unsigned char		*data = NULL;
-	zbx_uint32_t		size;
-	zbx_timespec_t		ts, timestamps[2];
-	int			ret = FAIL, i, values_num = 0;
-	zbx_vector_ptr_t	history;
-	const char		*values[2];
+	unsigned char	*data = NULL;
+	zbx_uint32_t	size;
+	int		ret = FAIL;
+	unsigned char	*result;
 
-	zbx_timespec(&ts);
-	zbx_vector_ptr_create(&history);
+	size = preprocessor_pack_test_request(&data, value_type, value, ts, history, steps);
 
-	if (NULL != last_value)
+	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TEST_REQUEST,
+			SEC_PER_MIN, data, size, &result, error))
 	{
-		const char	*ptr;
-		int		delay;
-
-		values[values_num] = last_value;
-		timestamps[values_num] = ts;
-
-		if (0 != strncmp(last_ts, "now", ZBX_CONST_STRLEN("now")))
-		{
-			*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", last_ts);
-			goto out;
-		}
-
-		ptr = last_ts + ZBX_CONST_STRLEN("now");
-
-		if ('\0' != *ptr)
-		{
-			if ('-' != *ptr || FAIL == is_time_suffix(ptr + 1, &delay, strlen(ptr + 1)))
-			{
-				*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", last_ts);
-				goto out;
-			}
-
-			timestamps[values_num].sec -= delay;
-		}
-		values_num++;
+		goto out;
 	}
 
-	values[values_num] = value;
-	timestamps[values_num++] = ts;
-
-	for (i = 0; i < values_num; i++)
-	{
-		unsigned char	*result;
-
-		zbx_free(data);
-		size = preprocessor_pack_test_request(&data, value_type, values[i], &timestamps[i], &history, steps);
-
-		if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, ZBX_IPC_PREPROCESSOR_TEST_REQUEST,
-				SEC_PER_MIN, data, size, &result, error))
-		{
-			goto out;
-		}
-
-		zbx_vector_ptr_clear_ext(results, (zbx_clean_func_t)zbx_preproc_result_free);
-		zbx_free(*preproc_error);
-		zbx_preprocessor_unpack_test_result(results, &history, preproc_error, result);
-		zbx_free(result);
-	}
+	zbx_preprocessor_unpack_test_result(results, history, preproc_error, result);
+	zbx_free(result);
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
-	zbx_vector_ptr_destroy(&history);
-
 	zbx_free(data);
 
 	return ret;
 }
+

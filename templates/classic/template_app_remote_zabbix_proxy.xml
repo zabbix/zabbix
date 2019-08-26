@@ -1529,7 +1529,7 @@
                     <history>1w</history>
                     <trends>365d</trends>
                     <status>0</status>
-                    <value_type>3</value_type>
+                    <value_type>0</value_type>
                     <allowed_hosts/>
                     <units/>
                     <snmpv3_contextname/>
@@ -1560,6 +1560,12 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.all</params>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -1631,6 +1637,12 @@
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1696,6 +1708,12 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.log</params>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -1767,6 +1785,12 @@
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1832,6 +1856,12 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.str</params>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -1903,6 +1933,12 @@
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
                     </preprocessing>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
@@ -1968,6 +2004,12 @@
                         <step>
                             <type>12</type>
                             <params>$.data.wcache.values.uint</params>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
+                        <step>
+                            <type>10</type>
+                            <params/>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -2297,6 +2339,7 @@
                     </screen_items>
                 </screen>
             </screens>
+	     <tags/>
         </template>
     </templates>
     <triggers>

@@ -19,7 +19,7 @@
 **/
 
 $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
-	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
+	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
 $buttons = [

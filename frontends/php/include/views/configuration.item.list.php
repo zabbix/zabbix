@@ -44,6 +44,7 @@ $widget->addItem($data['main_filter']);
 
 // create form
 $itemForm = (new CForm())->setName('items');
+$itemForm->addVar('checkbox_hash', $data['checkbox_hash']);
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
 }
@@ -247,7 +248,8 @@ $itemForm->addItem([
 			'item.masscopyto' => ['name' => _('Copy')],
 			'item.massupdateform' => ['name' => _('Mass update')],
 			'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?')]
-		]
+		],
+		$data['checkbox_hash']
 	)
 ]);
 

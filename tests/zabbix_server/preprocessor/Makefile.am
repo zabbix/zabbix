@@ -1,5 +1,5 @@
 if SERVER
-SERVER_tests = zbx_item_preproc 
+SERVER_tests = zbx_item_preproc
 
 if HAVE_LIBXML2
 SERVER_tests +=	item_preproc_xpath
@@ -13,6 +13,7 @@ COMMON_SRC_FILES = \
 JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
@@ -32,7 +33,6 @@ JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \
-	../../../src/zabbix_server/preprocessor/item_preproc.c \
 	zbx_item_preproc.c 
 
 zbx_item_preproc_LDADD = $(JSON_LIBS)
@@ -53,4 +53,5 @@ item_preproc_xpath_LDADD += @SERVER_LIBS@
 item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@
 
 item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests @LIBXML2_CFLAGS@
+
 endif

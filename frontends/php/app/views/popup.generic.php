@@ -382,22 +382,6 @@ switch ($data['popup_type']) {
 		unset($data['table_records']);
 		break;
 
-	case 'screens2':
-		foreach ($data['table_records'] as $screen) {
-			$screen['resourceid'] = $screen['screenid'];
-			$name = new CLink($screen['name'], 'javascript:void(0);');
-
-			$action = get_window_opener($options['dstfrm'], $options['dstfld1'], $screen[$options['dstfld1']]);
-			$action .= $options['srcfld2']
-				? get_window_opener($options['dstfrm'], $options['dstfld2'], $screen[$options['srcfld2']])
-				: '';
-
-			$name->onClick($action.$js_action_onclick);
-			$table->addRow($name);
-		}
-		unset($data['table_records']);
-		break;
-
 	case 'items':
 	case 'item_prototypes':
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
@@ -407,15 +391,15 @@ switch ($data['popup_type']) {
 				$item['hostname'] = $host['name'];
 
 				$description = new CLink($item['name_expanded'], 'javascript:void(0);');
-				$item['name'] = $item['hostname'] . NAME_DELIMITER . $item['name_expanded'];
+				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name_expanded'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
 					? $item[$options['srcfld1']]
 					: zbx_jsValue($item[$options['srcfld1']]);
 
 				if ($data['multiselect']) {
-					$js_action = 'javascript: addValue(' . zbx_jsvalue($options['reference']) . ', ' .
-						zbx_jsvalue($item['itemid']) . ', ' . $options['parentid'] . ');';
+					$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
+						zbx_jsvalue($item['itemid']).', '.$options['parentid'].');';
 				}
 				else {
 					$values = [];
@@ -430,21 +414,23 @@ switch ($data['popup_type']) {
 					}
 
 					$submit_parent = array_key_exists('submit_parent', $options) ? 'true' : 'false';
-					$js_action = 'javascript: addValues(' . zbx_jsvalue($options['dstfrm']) . ', ' .
-						zbx_jsvalue($values) . ', ' . $submit_parent . ');';
+					$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
+						zbx_jsvalue($values).', '.$submit_parent.');';
 				}
 
-				$description->onClick($js_action . $js_action_onclick);
+				$description->onClick($js_action.$js_action_onclick);
 
 				$table->addRow([
 					($options['hostid'] > 0) ? null : $item['hostname'],
-					$data['multiselect'] ? new CCheckBox('item[' . $checkbox_key . ']', $item['itemid']) : null,
+					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
 					$description,
 					$item['key_'],
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
-					(new CSpan(itemIndicator($item['status'], $item['state'])))
-						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+					($data['popup_type'] === 'items')
+						? (new CSpan(itemIndicator($item['status'], $item['state'])))
+							->addClass(itemIndicatorStyle($item['status'], $item['state']))
+						: null
 				]);
 
 				if ($data['multiselect']) {
@@ -461,13 +447,16 @@ switch ($data['popup_type']) {
 				}
 			}
 			unset($item);
-		} else {
+		}
+		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
 
 				$table->addRow([
 					($options['hostid'] > 0) ? null : $host['name'],
-					$data['multiselect'] ? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid']) : null,
+					$data['multiselect']
+						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
+						: null,
 					(new CLink($item['name_expanded'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
 							CJs::encodeJson($options['reference']).', '.
@@ -477,8 +466,10 @@ switch ($data['popup_type']) {
 					$item['key_'],
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
-					(new CSpan(itemIndicator($item['status'], $item['state'])))
-						->addClass(itemIndicatorStyle($item['status'], $item['state']))
+					($data['popup_type'] === 'items')
+						? (new CSpan(itemIndicator($item['status'], $item['state'])))
+							->addClass(itemIndicatorStyle($item['status'], $item['state']))
+						: null
 				]);
 
 				$item = [

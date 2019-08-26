@@ -134,48 +134,65 @@ class CConfigurationExport {
 	 * The resulting export format depends on the export writer that was set,
 	 * the export structure depends on the builder that was set.
 	 *
-	 * @return string
+	 * @return string result or false on insufficient user permissions.
 	 */
 	public function export() {
-		$this->gatherData();
+		try {
+			$this->gatherData();
 
-		if ($this->data['groups']) {
-			$this->builder->buildGroups($this->data['groups']);
+			$simple_triggers = [];
+
+			if ($this->data['groups']) {
+				$this->builder->buildGroups($this->data['groups']);
+			}
+
+			if ($this->data['triggers']) {
+				foreach ($this->data['triggers'] as $triggerid => $trigger) {
+					if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+							&& $trigger['items'][0]['templateid'] == 0) {
+						$simple_triggers[] = $trigger;
+						unset($this->data['triggers'][$triggerid]);
+					}
+				}
+			}
+
+			if ($this->data['templates']) {
+				$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
+			}
+
+			if ($this->data['hosts']) {
+				$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
+			}
+
+			if ($this->data['triggers']) {
+				$this->builder->buildTriggers($this->data['triggers']);
+			}
+
+			if ($this->data['graphs']) {
+				$this->builder->buildGraphs($this->data['graphs']);
+			}
+
+			if ($this->data['screens']) {
+				$this->builder->buildScreens($this->data['screens']);
+			}
+
+			if ($this->data['images']) {
+				$this->builder->buildImages($this->data['images']);
+			}
+
+			if ($this->data['maps']) {
+				$this->builder->buildMaps($this->data['maps']);
+			}
+
+			if ($this->data['valueMaps']) {
+				$this->builder->buildValueMaps($this->data['valueMaps']);
+			}
+
+			return $this->writer->write($this->builder->getExport());
 		}
-
-		if ($this->data['templates']) {
-			$this->builder->buildTemplates($this->data['templates']);
+		catch (CConfigurationExportException $e) {
+			return false;
 		}
-
-		if ($this->data['hosts']) {
-			$this->builder->buildHosts($this->data['hosts']);
-		}
-
-		if ($this->data['triggers']) {
-			$this->builder->buildTriggers($this->data['triggers']);
-		}
-
-		if ($this->data['graphs']) {
-			$this->builder->buildGraphs($this->data['graphs']);
-		}
-
-		if ($this->data['screens']) {
-			$this->builder->buildScreens($this->data['screens']);
-		}
-
-		if ($this->data['images']) {
-			$this->builder->buildImages($this->data['images']);
-		}
-
-		if ($this->data['maps']) {
-			$this->builder->buildMaps($this->data['maps']);
-		}
-
-		if ($this->data['valueMaps']) {
-			$this->builder->buildValueMaps($this->data['valueMaps']);
-		}
-
-		return $this->writer->write($this->builder->getExport());
 	}
 
 	/**
@@ -458,6 +475,7 @@ class CConfigurationExport {
 		$items = $this->prepareItems($items);
 
 		foreach ($items as $item) {
+			$item['host'] = $hosts[$item['hostid']]['host'];
 			$hosts[$item['hostid']]['items'][] = $item;
 		}
 
@@ -558,6 +576,10 @@ class CConfigurationExport {
 				}
 
 				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+			}
+
+			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
+				$discovery_rule['itemPrototypes'][$itemid]['host'] = $hosts[$discovery_rule['hostid']]['host'];
 			}
 
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
@@ -961,7 +983,7 @@ class CConfigurationExport {
 				'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
-			'selectItems' => ['itemid', 'flags', 'type'],
+			'selectItems' => ['itemid', 'flags', 'type', 'templateid'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
@@ -1110,7 +1132,6 @@ class CConfigurationExport {
 	 * @param array $exportScreens
 	 */
 	protected function prepareScreenExport(array &$exportScreens) {
-		$screenIds = [];
 		$sysmapIds = [];
 		$groupIds = [];
 		$hostIds = [];
@@ -1149,10 +1170,6 @@ class CConfigurationExport {
 							$sysmapIds[$screenItem['resourceid']] = $screenItem['resourceid'];
 							break;
 
-						case SCREEN_RESOURCE_SCREEN:
-							$screenIds[$screenItem['resourceid']] = $screenItem['resourceid'];
-							break;
-
 						case SCREEN_RESOURCE_CLOCK:
 							if ($screenItem['style'] == TIME_TYPE_HOST) {
 								$itemIds[$screenItem['resourceid']] = $screenItem['resourceid'];
@@ -1163,7 +1180,6 @@ class CConfigurationExport {
 			}
 		}
 
-		$screens = $this->getScreensReferences($screenIds);
 		$sysmaps = $this->getMapsReferences($sysmapIds);
 		$groups = $this->getGroupsReferences($groupIds);
 		$hosts = $this->getHostsReferences($hostIds);
@@ -1201,10 +1217,6 @@ class CConfigurationExport {
 
 						case SCREEN_RESOURCE_MAP:
 							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
 							break;
 
 						case SCREEN_RESOURCE_CLOCK:
@@ -1344,6 +1356,11 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		// Access denied for some objects?
+		if (count($groups) != count($groupIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($groups as &$group) {
 			$group = ['name' => $group['name']];
 		}
@@ -1368,31 +1385,13 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		foreach ($hosts as $id => $host) {
-			$ids[$id] = ['host' => $host['host']];
+		// Access denied for some objects?
+		if (count($hosts) != count($hostIds)) {
+			throw new CConfigurationExportException();
 		}
 
-		return $ids;
-	}
-
-	/**
-	 * Get screens references by screen ids.
-	 *
-	 * @param array $screenIds
-	 *
-	 * @return array
-	 */
-	protected function getScreensReferences(array $screenIds) {
-		$ids = [];
-
-		$screens = API::Screen()->get([
-			'screenids' => $screenIds,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-
-		foreach ($screens as $id => $screen) {
-			$ids[$id] = ['name' => $screen['name']];
+		foreach ($hosts as $id => $host) {
+			$ids[$id] = ['host' => $host['host']];
 		}
 
 		return $ids;
@@ -1413,6 +1412,11 @@ class CConfigurationExport {
 			'output' => ['name'],
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($maps) != count($mapIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($maps as $id => $map) {
 			$ids[$id] = ['name' => $map['name']];
@@ -1438,6 +1442,11 @@ class CConfigurationExport {
 			'preservekeys' => true,
 			'filter' => ['flags' => null]
 		]);
+
+		// Access denied for some objects?
+		if (count($graphs) != count($graphIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($graphs as $id => $graph) {
 			$host = reset($graph['hosts']);
@@ -1470,6 +1479,11 @@ class CConfigurationExport {
 			'filter' => ['flags' => null]
 		]);
 
+		// Access denied for some objects?
+		if (count($items) != count($itemIds)) {
+			throw new CConfigurationExportException();
+		}
+
 		foreach ($items as $id => $item) {
 			$host = reset($item['hosts']);
 
@@ -1497,6 +1511,11 @@ class CConfigurationExport {
 			'triggerids' => $triggerIds,
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($triggers) != count($triggerIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
@@ -1528,6 +1547,11 @@ class CConfigurationExport {
 			'imageids' => $imageIds,
 			'preservekeys' => true
 		]);
+
+		// Access denied for some objects?
+		if (count($images) != count($imageIds)) {
+			throw new CConfigurationExportException();
+		}
 
 		foreach ($images as $id => $image) {
 			$ids[$id] = ['name' => $image['name']];

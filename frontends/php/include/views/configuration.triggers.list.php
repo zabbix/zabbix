@@ -181,6 +181,7 @@ $widget->addItem($filter);
 
 // create form
 $triggers_form = (new CForm())
+	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->setName('triggersForm');
 
 $url = (new CUrl('triggers.php'))->getUrl();
@@ -331,7 +332,8 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
-		]
+		],
+		$data['checkbox_hash']
 	)
 ]);
 

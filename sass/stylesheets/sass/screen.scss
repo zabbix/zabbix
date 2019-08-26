@@ -15,7 +15,7 @@ body {
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 60px;
-	min-width: 950px;
+	min-width: 1200px;
 
 	font: {
 		family: $font-stack;
@@ -211,6 +211,20 @@ pre {
 	span {
 		@extend %space-pre-wrap;
 	}
+}
+
+.disabled {
+	@include opacity(0.35);
+	cursor: default !important;
+
+	.disabled,
+	[disabled] {
+		opacity: 1 !important;
+	}
+}
+
+.monospace-font {
+	font-family: $font-stack-mono;
 }
 
 %space-pre-wrap {
@@ -1500,6 +1514,26 @@ output {
 	}
 }
 
+.disabled {
+	background-color: transparent;
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: darken($ui-bg-selected-color, 25%);
+		}
+	}
+}
+
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1597,23 +1631,17 @@ output {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
 			}
+		}
+	}
 
-			&.selected {
+	.disabled {
+		@include opacity(1);
+		background-color: $multiselect-disabled-bg-color;
 
-				.subfilter-enabled {
-					background-color: lighten($ui-bg-selected-color, 10%);
-				}
-
-				.subfilter-disable-btn {
-					background-color: lighten($ui-bg-selected-color, 10%);
-					@include opacity(1);
-
-					&:active {
-						background-color: lighten($ui-bg-selected-color, 10%);
-						@include opacity(1);
-					}
-				}
-			}
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			background-color: $multiselect-item-disabled-bg-color;
+			color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -1803,6 +1831,10 @@ output {
 			&:last-child {
 				padding-right: 0;
 			}
+		}
+
+		.wrap-multiple-controls {
+			display: flex;
 		}
 
 		.table-forms-separator {
@@ -2067,7 +2099,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
 		@extend %form-disabled;
 	}
 }
@@ -2220,7 +2252,8 @@ select {
 	}
 
 	+ label.label-pos-left span {
-		margin-left: 4px;
+		margin-left: 6px;
+		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -2872,34 +2905,6 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
-.disabled {
-	cursor: default !important;
-	background-color: transparent !important;
-	@include opacity(0.35);
-
-	.subfilter-enabled {
-		color: darken($ui-bg-selected-color, 35%);
-	}
-
-	.subfilter-disable-btn {
-		cursor: default;
-		color: darken($ui-bg-selected-color, 25%);
-		background-color: $ui-bg-selected-color;
-
-		&:hover {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:focus {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:active {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-	}
-}
-
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -3009,6 +3014,32 @@ $var-icons: (
 		&::before {
 			background: $bgimage;
 			@extend %var-icons;
+		}
+	}
+}
+
+.icon-none {
+	margin-left: 18px;
+}
+
+$trigger-expression-tree-icons: (
+	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
+	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
+	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
+	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+);
+
+@each $var-icon, $bgimage in $trigger-expression-tree-icons {
+	.icon-tree-#{$var-icon} {
+		margin: 0 12px 0 0;
+
+		&::before {
+			background: $bgimage;
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			content: '';
 		}
 	}
 }
@@ -3420,6 +3451,49 @@ $form-icon-btn: (
 .dashbrd-grid-widget {
 	display: flex;
 	position: absolute;
+
+	.dashbrd-grid-widget-actions {
+		@include opacity(0);
+		@include transition(opacity .2s ease-out);
+	}
+}
+
+.layout-kioskmode {
+	transition: padding-top .3s 2s;
+
+	&.widget-mouseenter {
+		padding-top: 40px;
+		transition: padding-top .3s;
+	}
+}
+
+.dashbrd-grid-container {
+
+	&.dashbrd-mode-edit .dashbrd-grid-widget,
+	.dashbrd-grid-widget-focus,
+	.dashbrd-grid-widget:hover {
+
+		.dashbrd-grid-widget-actions {
+			@include opacity(1);
+		}
+	}
+
+	.dashbrd-grid-widget-focus,
+	.dashbrd-grid-widget:hover {
+
+		&.dashbrd-grid-widget-hidden-header {
+
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				transform: translate3d(0, -94%, 0);
+				z-index: 5;
+			}
+
+			.dashbrd-grid-widget-content {
+				z-index: 6;
+			}
+		}
+	}
 }
 
 .dashbrd-grid-widget-container {
@@ -3434,6 +3508,9 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-head {
+	border: 1px solid $ui-border-color;
+	border-bottom: none;
+	margin: -1px -1px 0 -1px;
 	position: relative;
 	padding: 8px 65px 8px 10px;
 	min-height: 17px;
@@ -3457,6 +3534,35 @@ $form-icon-btn: (
 			select {
 				margin: 4px 0;
 			}
+		}
+	}
+}
+
+.dashbrd-grid-widget {
+
+	&.dashbrd-grid-widget-hidden-header {
+
+		.dashbrd-grid-widget-container {
+			padding: 8px 0;
+			position: relative;
+		}
+
+		.dashbrd-grid-widget-head {
+			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
+			background-color: $ui-bg-color;
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			transform: translate3d(0, 0, 0);
+			transition: transform .3s, box-shadow .3s, z-index .3s;
+			z-index: 2;
+		}
+
+		.dashbrd-grid-widget-content {
+			background-color: $ui-bg-color;
+			transition: z-index .3s;
+			z-index: 3;
 		}
 	}
 }
@@ -3788,7 +3894,7 @@ $form-icon-btn: (
 }
 
 // Action Menus, Pop-up Menus
-.action-menu {
+.menu-popup {
 	position: absolute;
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
@@ -3812,7 +3918,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -3859,7 +3965,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -4020,6 +4126,11 @@ $form-icon-btn: (
 		margin-left: -10px;
 		@extend %webkit-scrollbar;
 	}
+
+	.table-forms-second-column {
+		float: right;
+		line-height: 24px;
+	}
 }
 
 // Multiline input control.
@@ -4042,7 +4153,6 @@ $form-icon-btn: (
 		}
 
 		&.monospace-font {
-			font-family: $font-stack-mono;
 			padding-top: 1px;
 		}
 	}
@@ -4123,7 +4233,6 @@ $form-icon-btn: (
 
 		li {
 			color: $font-alt-color;
-			font-family: $font-stack-mono;
 			line-height: $line-height;
 			text-align: right;
 			min-width: 24px;
@@ -4159,14 +4268,31 @@ $form-icon-btn: (
 		float: left;
 		line-height: 24px;
 	}
+}
 
-	&.monospace-font {
+// Flexible textarea.
+.textarea-flexible-container {
 
-		.multilineinput-textarea,
-		.multilineinput-label {
-			font-family: $font-stack-mono;
+	td {
+		line-height: 22px;
+
+		&.textarea-flexible-parent {
+			vertical-align: top;
+		}
+
+		button {
+			line-height: normal;
 		}
 	}
+}
+
+.textarea-flexible {
+	display: block;
+	min-height: 24px;
+	overflow: hidden;
+	resize: none;
+	word-break: break-all;
+	white-space: normal;
 }
 
 // Map widget back to parent button.
@@ -4416,6 +4542,15 @@ $form-icon-btn: (
 	float: left;
 	margin: 2px 0 0 -19px;
 	@include border-radius(2px);
+
+	.notif-indic-snooze {
+		width: 14px;
+		height: 14px;
+		float: left;
+		margin-top: 20px;
+		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+	}
+
 }
 
 .notif-indic-container {
@@ -4515,6 +4650,9 @@ $form-icon-btn: (
 	vertical-align: middle;
 }
 
+.no-padding {
+	padding: 0 !important;
+}
 
 .graph-selection {
 	position: absolute;
@@ -5058,6 +5196,7 @@ a.link-action {
 ) {
 	.#{$severity-type} {
 		color: darken($color, 45%);
+		position: relative;
 
 		@if $severity-type == normal-bg {
 			background-color: $color;
@@ -5597,10 +5736,29 @@ a.overlay-close-btn {
 	background-color: rgba($ui-bg-color, .8);
 	@include border-radius(50%);
 	@include transform(translateY(-50%));
+
+	&.menu-popup-preloader {
+		@include border-radius(0);
+		@include box-shadow(0 4px 20px 0 $action-shadow-color);
+		@include transform(none);
+		background: $action-preloader-bg-color;
+		border: 1px solid $action-border-color;
+		height: 120px;
+		width: 120px;
+		position: fixed;
+		right: auto;
+		bottom: auto;
+		display: flex;
+		align-items: center;
+		margin: 0;
+		z-index: 1010;
+	}
 }
 
 .preloader {
 	@include border-radius(50%);
+	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+	background-color: rgba($ui-bg-color, .8);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;
@@ -5849,6 +6007,11 @@ svg {
 	.map-container {
 		display: table;
 	}
+
+	.flickerfreescreen {
+		display: inline-block;
+	}
+
 	.table-forms-container {
 		display: table;
 		margin: 0;
@@ -6590,6 +6753,10 @@ ul.checkbox-list {
 	}
 }
 
+#expressions_list .ui-sortable-helper {
+	display: table;
+}
+
 // RANGE CONTROL
 $range-track-color: silver;
 $range-progress-color: $link-color;
@@ -6750,6 +6917,7 @@ $range-input-width: 31px;
 }
 
 table.preprocessing-test-results {
+
 	td {
 		vertical-align: top !important;
 	}
@@ -6763,6 +6931,120 @@ table.preprocessing-test-results {
 #preprocessing-test-form {
 	.table-forms-separator {
 		margin-top: -2px;
+	}
+}
+
+// WIDGET "HOST AVAILABILITY"
+
+.host-avail-widget {
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+
+	td {
+		line-height: 18px;
+		overflow: hidden;
+		padding: 0 10px;
+		vertical-align: middle;
+	}
+
+	.host-avail-count {
+		font-size: 16px;
+	}
+
+	&.host-avail-layout-horizontal {
+		min-width: 305px;
+
+		td {
+			height: 100%;
+			text-align: center;
+		}
+
+		.host-avail-count {
+			display: block;
+		}
+	}
+
+	&.host-avail-layout-vertical {
+
+		td {
+			padding-top: 3px;
+		}
+
+		.host-avail-count {
+			margin-right: 5px;
+		}
+	}
+
+	.host-avail-true {
+		background: $host-avail-true-bg-color;
+	}
+
+	.host-avail-false {
+		background: $host-avail-false-bg-color;
+	}
+
+	.host-avail-unknown {
+		background: $host-avail-unknown-bg-color;
+	}
+
+	.host-avail-total {
+		background: $host-avail-total-bg-color;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+	height: 100%;
+	display: flex;
+
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
+		line-height: 18px;
+		overflow: hidden;
+		padding: 0 10px;
+		position: relative;
+	}
+
+	.by-severity-count {
+		font-size: 16px;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
+		}
+	}
+
+	&.by-severity-layout-vertical {
+		flex-direction: column;
+
+		> div {
+			min-height: 26px;
+			padding-top: 3px;
+		}
+
+		.by-severity-count {
+			margin-right: 5px;
+		}
+	}
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+	/* for IE11 only. Fixed cell height if table has 100% height */
+	.host-avail-widget {
+
+		td {
+			height: 100%;
+		}
 	}
 }
 
@@ -7306,27 +7588,27 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
-<ul class="action-menu">
+<ul class="menu-popup">
    <li>
       <h3>Favourite screens</h3>
    </li>
-   <li><span class="action-menu-item">Add</span></li>
+   <li><span class="menu-popup-item">Add</span></li>
    <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
+      <span class="menu-popup-item">Remove<span class="arrow-right"></span></span>
+      <ul class="menu-popup" style="top: 47px; left: 203px;">
+         <li><span class="menu-popup-item">Zabbix server</span></li>
       </ul>
    </li>
-   <li><span class="action-menu-item">Remove all</span></li>
+   <li><span class="menu-popup-item">Remove all</span></li>
    <li>
       <div></div>
    </li>
    <li>
       <h3>Favourite slide shows</h3>
    </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
+   <li><span class="menu-popup-item selected">Add</span></li>
+   <li><span class="menu-popup-item-disabled">Remove</span></li>
+   <li><span class="menu-popup-item-disabled">Remove all</span></li>
 </ul>
 ```
 */
