@@ -268,7 +268,6 @@ run:
 			}
 		}
 	}
-	close(m.input)
 	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
