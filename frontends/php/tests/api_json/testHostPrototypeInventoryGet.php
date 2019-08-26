@@ -26,25 +26,51 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is retrieved
  * from an associative field in `host_inventory` table.
  */
-class testHostInventoryGet extends CAPITest {
+class testHostPrototypeInventoryGet extends CAPITest {
 
 	/**
-	 * Assert that datatype for inventory field is array when disabled.
+	 * Host prototype object has no inventory object (it used to have it).
+	 * Assert that API does not return that.
 	 */
-	public function testHostInventoryObjectIsEmptyArrayIfModeIsDisabled() {
-		$hostid = 50009;
+	public function testHostPrototypeHasNoInventoryObject() {
+		$method = 'hostprototype.get';
+		$hostprototypeid = 50011;
 
-		$this->assertEquals(0,
-			CDBHelper::getCount('SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostid)
+
+		$response = $this->call($method,
+			['output' => ['hostid'], 'hostids' => $hostprototypeid, 'selectInventory' => ['inventory_mode']]
 		);
 
-		$response = $this->call('host.get', [
-			'output' => null,
-			'hostids' => $hostid,
-			'selectInventory' => ['type']
+		$this->assertEquals(
+			['hostid' => $hostprototypeid],
+			CTestArrayHelper::get($response, 'result.0')
+		);
+	}
+
+	/**
+	 * @backup host_inventory
+	 */
+	public function testHostPrototypeRetrievesInventoryModeProperty() {
+		$hostprototypeid = 50011;
+		$this->call('hostprototype.update', [
+			'hostid' => $hostprototypeid,
+			'inventory_mode' => HOST_INVENTORY_MANUAL
+		]);
+
+		$response = $this->call('hostprototype.get', [
+			'output' => ['inventory_mode'],
+			'hostids' => $hostprototypeid
 		], null);
 
-		$this->assertEquals(CTestArrayHelper::get($response, 'result.0.inventory'), []);
+		$this->assertEquals(
+			CDBHelper::getValue('SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostprototypeid),
+			CTestArrayHelper::get($response, 'result.0.inventory_mode', HOST_INVENTORY_AUTOMATIC)
+		);
+
+		$this->assertEquals(
+			CTestArrayHelper::get($response, 'result.0.inventory_mode', HOST_INVENTORY_AUTOMATIC),
+			HOST_INVENTORY_MANUAL
+		);
 	}
 
 	/**
@@ -74,85 +100,59 @@ class testHostInventoryGet extends CAPITest {
 	}
 
 	/**
-	 * When selectInventory is used, there should not be either hostid or imventory_mode fields.
-	 *
-	 * @backup host_inventory
-	 */
-	public function testHostInventoryObjectProperties() {
-		$hostid = 50009;
-
-		$this->call('host.update', [
-			'hostid' => $hostid,
-			'inventory_mode' => HOST_INVENTORY_MANUAL,
-		]);
-
-		$response = $this->call('host.get', [
-			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
-			'selectInventory' => API_OUTPUT_EXTEND
-		]);
-
-		$this->assertNull(CTestArrayHelper::get($response, 'result.0.inventory.hostid'));
-		$this->assertNull(CTestArrayHelper::get($response, 'result.0.inventory.inventory_mode'));
-		$this->assertNotNull(CTestArrayHelper::get($response, 'result.0.inventory.type'));
-
-		$this->assertEquals(HOST_INVENTORY_MANUAL, CTestArrayHelper::get($response, 'result.0.inventory_mode'));
-	}
-
-	/**
 	 * Assert that filter does work for host and hostprototype having a related record and without.
 	 */
 	public function testItDoesFilterByInventoryModeValue() {
-		$hostid = 50009;
+		$hostprototypeid = 50011;
 
-		// Host with record.
-		$this->call('host.update',
-			['hostid' => $hostid, 'inventory_mode' => HOST_INVENTORY_MANUAL]
+		// Hostprototype with record.
+		$this->call('hostprototype.update',
+			['hostid' => $hostprototypeid, 'inventory_mode' => HOST_INVENTORY_MANUAL,]
 		);
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_MANUAL]
 		]);
 		$this->assertNotNull(CTestArrayHelper::get($response, 'result.0'));
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_DISABLED]
 		]);
 		$this->assertNull(CTestArrayHelper::get($response, 'result.0'));
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC]
 		]);
 		$this->assertNull(CTestArrayHelper::get($response, 'result.0'));
 
-		// Host without record.
-		$this->call('host.update',
-			['hostid' => $hostid, 'inventory_mode' => HOST_INVENTORY_DISABLED]
+		// Hostprototype without record.
+		$this->call('hostprototype.update',
+			['hostid' => $hostprototypeid, 'inventory_mode' => HOST_INVENTORY_DISABLED]
 		);
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_DISABLED]
 		]);
 		$this->assertNotNull(CTestArrayHelper::get($response, 'result.0'));
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_MANUAL]
 		]);
 		$this->assertNull(CTestArrayHelper::get($response, 'result.0'));
 
-		$response = $this->call('host.get', [
+		$response = $this->call('hostprototype.get', [
 			'output' => ['inventory_mode'],
-			'hostids' => [$hostid],
+			'hostids' => [$hostprototypeid],
 			'filter' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC]
 		]);
 		$this->assertNull(CTestArrayHelper::get($response, 'result.0'));

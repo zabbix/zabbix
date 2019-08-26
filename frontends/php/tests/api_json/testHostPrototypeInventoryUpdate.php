@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is updated in
  * associated table `host_inventory`.
  */
-class testHostInventoryUpdate extends CAPITest {
+class testHostPrototypeInventoryUpdate extends CAPITest {
 
 	/**
 	 * This test asserts that `host_inventory` table updates as expected when `hostprototype.update` and `host.update`
@@ -98,5 +98,4 @@ class testHostInventoryUpdate extends CAPITest {
 			'inventory' => ['type' => '']
 		], -32602);
 	}
-
 }
