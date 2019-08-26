@@ -20,24 +20,27 @@
 package file
 
 import (
-	"errors"
+	"reflect"
+	"testing"
+	"time"
+	"zabbix/pkg/std"
 )
 
-// Export -
-func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
-	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
-	}
-	if len(params) == 0 || params[0] == "" {
-		return nil, errors.New("Invalid first parameter.")
-	}
+func TestFileSize(t *testing.T) {
+	stdOs = std.NewMockOs()
 
-	ret := 0
+	impl.timeout = time.Second * 3
 
-	if f, err := stdOs.Stat(params[0]); err == nil {
-		if mode := f.Mode(); mode.IsRegular() {
-			ret = 1
+	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
+	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
+		t.Errorf("vfs.file.size returned error %s", err.Error())
+	} else {
+		if filesize, ok := result.(int64); !ok {
+			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if filesize != 4 {
+				t.Errorf("vfs.file.size returned invalid result")
+			}
 		}
 	}
-	return ret, nil
 }

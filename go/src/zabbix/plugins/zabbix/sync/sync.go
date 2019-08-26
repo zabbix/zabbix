@@ -56,8 +56,6 @@ func init() {
 		"system.swap.size", "Swap space size in bytes or in percentage from total.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
-		"vfs.file.size", "File size (in bytes).",
-		"vfs.file.time", "File time information.",
 		"vfs.fs.inode", "Number or percentage of inodes.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.")

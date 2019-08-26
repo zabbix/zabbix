@@ -21,23 +21,21 @@ package file
 
 import (
 	"errors"
+	"fmt"
 )
 
 // Export -
-func (p *Plugin) exportExists(params []string) (result interface{}, err error) {
-	if len(params) > 1 {
-		return nil, errors.New("Too many parameters.")
+func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
+	if len(params) != 1 {
+		return nil, errors.New("Invalid number of parameters.")
 	}
-	if len(params) == 0 || params[0] == "" {
+	if "" == params[0] {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	ret := 0
-
 	if f, err := stdOs.Stat(params[0]); err == nil {
-		if mode := f.Mode(); mode.IsRegular() {
-			ret = 1
-		}
+		return f.Size(), nil
+	} else {
+		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
 	}
-	return ret, nil
 }

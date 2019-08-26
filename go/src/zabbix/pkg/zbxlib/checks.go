@@ -61,8 +61,6 @@ int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -180,10 +178,6 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 		cfunc = unsafe.Pointer(C.VFS_FILE_MD5SUM)
 	case "vfs.file.regmatch":
 		cfunc = unsafe.Pointer(C.VFS_FILE_REGMATCH)
-	case "vfs.file.size":
-		cfunc = unsafe.Pointer(C.VFS_FILE_SIZE)
-	case "vfs.file.time":
-		cfunc = unsafe.Pointer(C.VFS_FILE_TIME)
 	case "vfs.fs.discovery":
 		cfunc = unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":

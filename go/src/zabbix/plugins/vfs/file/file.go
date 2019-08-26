@@ -44,6 +44,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return p.exportContents(params)
 	case "vfs.file.exists":
 		return p.exportExists(params)
+	case "vfs.file.size":
+		return p.exportSize(params)
+	case "vfs.file.time":
+		return p.exportTime(params)
 	case "vfs.file.regexp":
 		return p.exportRegexp(params)
 	default:
@@ -63,5 +67,7 @@ func init() {
 		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
 		"vfs.file.contents", "Retrieves contents of the file.",
 		"vfs.file.exists", "Returns if file exists or not.",
+		"vfs.file.time", "Returns file time information.",
+		"vfs.file.size", "Returns file size.",
 		"vfs.file.regexp", "Find string in a file.")
 }
