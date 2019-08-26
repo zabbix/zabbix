@@ -64,7 +64,7 @@ class testHostInventoryCreate extends CAPITest {
 			'ruleid' => $ruleid,
 			'groupLinks' => [['groupid' => 5]],
 			'inventory_mode' => null
-		], null);
+		], -32602);
 
 		$this->assertEquals($initial_count_in_inventories + 1,
 			CDBHelper::getCount('SELECT inventory_mode FROM host_inventory')

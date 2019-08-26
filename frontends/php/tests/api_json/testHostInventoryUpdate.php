@@ -53,7 +53,7 @@ class testHostInventoryUpdate extends CAPITest {
 		$this->call('hostprototype.update', [
 			'hostid' => $hostid,
 			'inventory_mode' => null,
-		], null);
+		], -32602);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$this->assertEquals(HOST_INVENTORY_MANUAL, CDBHelper::getValue($sql));
 
