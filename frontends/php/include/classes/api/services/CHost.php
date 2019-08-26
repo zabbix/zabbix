@@ -1442,12 +1442,7 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true
 			]);
 
-			foreach ($inventory as &$inventory_fields) {
-				unset($inventory_fields['hostid']);
-				unset($inventory_fields['inventory_mode']);
-			}
-			unset($inventory_fields);
-
+			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], []);
 			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
