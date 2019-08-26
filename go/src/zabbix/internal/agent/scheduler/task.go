@@ -190,7 +190,7 @@ func (t *exporterTask) perform(s Scheduler) {
 }
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
-	if t.item.itemid != 0 {
+	if t.client.ID() != 0 {
 		var nextcheck time.Time
 		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
 		if err != nil {
@@ -198,6 +198,7 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 		}
 		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	} else {
+		// single passive check
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
 	return
