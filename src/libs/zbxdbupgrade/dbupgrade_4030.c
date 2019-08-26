@@ -206,6 +206,42 @@ static int	DBpatch_4030016(void)
 
 static int	DBpatch_4030017(void)
 {
+	const ZBX_FIELD	field = {"opdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("triggers", "details", &field);
+}
+
+static int	DBpatch_4030018(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.problem.filter.show_opdata'"
+				" where idx='web.problem.filter.show_latest_values'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030019(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update widget_field"
+				" set name='show_opdata'"
+				" where name='show_latest_values'"
+					" and exists (select null"
+						" from widget"
+						" where widget.widgetid=widget_field.widgetid"
+							" and widget.type in ('problems','problemsbysv'))"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030020(void)
+{
 
 	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -236,5 +272,8 @@ DBPATCH_ADD(4030014, 0, 1)
 DBPATCH_ADD(4030015, 0, 1)
 DBPATCH_ADD(4030016, 0, 1)
 DBPATCH_ADD(4030017, 0, 1)
+DBPATCH_ADD(4030018, 0, 1)
+DBPATCH_ADD(4030019, 0, 1)
+DBPATCH_ADD(4030020, 0, 1)
 
 DBPATCH_END()
