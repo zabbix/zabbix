@@ -61,8 +61,8 @@ class ApiJsonTests {
 		$suite->addTestSuite('testHistory');
 		$suite->addTestSuite('testHost');
 		$suite->addTestSuite('testHostInventoryGet');
-		$suite->addTestSuite('testHostInventoryUpdate');
 		$suite->addTestSuite('testHostInventoryCreate');
+		$suite->addTestSuite('testHostInventoryUpdate');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');
