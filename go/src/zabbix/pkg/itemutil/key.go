@@ -248,22 +248,26 @@ func parseParams(data []byte) (params []string, err error) {
 	return
 }
 
+func newKeyError() (err error) {
+	return errors.New("Invalid item key format.")
+}
+
 // ParseKey parses item key in format key[param1, param2, ...] and returns
 // the parsed key and parameteres.
 func ParseKey(text string) (key string, params []string, err error) {
 	if text == "" {
-		err = errors.New("Cannot parse empty item key")
+		err = newKeyError()
 		return
 	}
 	data := []byte(text)
 	for i, c := range data {
 		if !isKeyChar(c) {
 			if i == 0 {
-				err = errors.New("Cannot parse item key: empty key name")
+				err = newKeyError()
 				return
 			}
 			if params, err = parseParams(data[i:]); err != nil {
-				err = fmt.Errorf("Cannot parse item key: %s", err)
+				err = newKeyError()
 				return
 			}
 			key = string(data[:i])
