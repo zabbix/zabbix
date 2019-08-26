@@ -74,8 +74,8 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
-		if c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout); err != nil {
-			return
+		if tlsconfig != nil {
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout)
 		}
 	}
 	return
