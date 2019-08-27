@@ -114,7 +114,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				: $this->screenitem['resourceid'];
 
 			$options = [
-				'output' => API_OUTPUT_EXTEND,
+				'output' => ['graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'show_work_period', 'templated'],
 				'selectDiscoveryRule' => ['hostid']
 			];
 
