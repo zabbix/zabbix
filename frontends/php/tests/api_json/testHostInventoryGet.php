@@ -31,7 +31,7 @@ class testHostInventoryGet extends CAPITest {
 	/**
 	 * Assert that datatype for inventory field is array when disabled.
 	 */
-	public function testHostInventoryObjectIsEmptyArrayIfModeIsDisabled() {
+	public function testSelectingDisabledObject() {
 		$hostid = 50009;
 
 		$this->assertEquals(0,
@@ -52,7 +52,7 @@ class testHostInventoryGet extends CAPITest {
 	 *
 	 * @backup host_inventory
 	 */
-	public function testHostInventoryOutputContainsNoExtraFields() {
+	public function testOutputHasNoExtraFields() {
 		$hostid = 50009;
 
 		$this->call('host.update', [
@@ -74,11 +74,11 @@ class testHostInventoryGet extends CAPITest {
 	}
 
 	/**
-	 * When selectInventory is used, there should not be either hostid or imventory_mode fields.
+	 * When selectInventory is used, there should not be either hostid or inventory_mode fields.
 	 *
 	 * @backup host_inventory
 	 */
-	public function testHostInventoryObjectProperties() {
+	public function testInventoryObjectFields() {
 		$hostid = 50009;
 
 		$this->call('host.update', [

@@ -32,7 +32,7 @@ class testHostPrototypeInventoryGet extends CAPITest {
 	 * Host prototype object has no inventory object (it used to have it).
 	 * Assert that API does not return that.
 	 */
-	public function testHostPrototypeHasNoInventoryObject() {
+	public function testHasNoInventoryObject() {
 		$method = 'hostprototype.get';
 		$hostprototypeid = 50011;
 
@@ -50,7 +50,7 @@ class testHostPrototypeInventoryGet extends CAPITest {
 	/**
 	 * @backup host_inventory
 	 */
-	public function testHostPrototypeRetrievesInventoryModeProperty() {
+	public function testRetrievesInventoryModeProperty() {
 		$hostprototypeid = 50011;
 		$this->call('hostprototype.update', [
 			'hostid' => $hostprototypeid,
@@ -74,35 +74,9 @@ class testHostPrototypeInventoryGet extends CAPITest {
 	}
 
 	/**
-	 * Field 'inventory_mode' value in fact is a value of a related inventory object.
-	 *
-	 * @backup host_inventory
-	 */
-	public function testHostInventoryOutputContainsNoExtraFields() {
-		$hostid = 50009;
-
-		$this->call('host.update', [
-			'hostid' => $hostid,
-			'inventory_mode' => HOST_INVENTORY_MANUAL,
-			'inventory' => []
-		]);
-
-		$response = $this->call('host.get', [
-			'output' => ['hostid'],
-			'hostids' => [$hostid],
-			'selectInventory' => ['type']
-		]);
-
-		$this->assertEquals(
-			CTestArrayHelper::get($response, 'result.0'),
-			['hostid' => $hostid, 'inventory' => ['type' => '']]
-		);
-	}
-
-	/**
 	 * Assert that filter does work for host and hostprototype having a related record and without.
 	 */
-	public function testItDoesFilterByInventoryModeValue() {
+	public function testFiltersByInventoryModeValue() {
 		$hostprototypeid = 50011;
 
 		// Hostprototype with record.

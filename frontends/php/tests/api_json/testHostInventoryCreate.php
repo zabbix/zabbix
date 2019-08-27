@@ -35,7 +35,7 @@ class testHostInventoryCreate extends CAPITest {
 	 * @backup host_discovery
 	 * @backup hosts
 	 */
-	public function testHostInventoryTypeIsNotInInventoryObject() {
+	public function testItErrorsOnModePropertyWrite() {
 		$interfaces = [['type' => 1, 'main' => 1, 'useip' => 1, 'ip' => '192.168.3.1', 'dns' => '', 'port' => '10050']];
 
 		$this->call('host.create', [

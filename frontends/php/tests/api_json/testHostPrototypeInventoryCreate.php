@@ -29,14 +29,11 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testHostPrototypeInventoryCreate extends CAPITest {
 
 	/**
-	 * During update 'inventory_mode' field is optional int field.
-	 * Null is accepted as value to switch field off. Else field is integer and only one of defined.
-	 *
 	 * @backup host_inventory
 	 * @backup host_discovery
 	 * @backup hosts
 	 */
-	public function testHostPrototypeInventoryTypeCreated() {
+	public function testInventoryModeDB() {
 		$ruleid = 23278;
 
 		$initial_count_in_inventories = CDBHelper::getCount('SELECT inventory_mode FROM host_inventory');
@@ -104,13 +101,13 @@ class testHostPrototypeInventoryCreate extends CAPITest {
 	}
 
 	/**
-	 * There is no such invetory object.
+	 * There is no such field 'inventory_mode' in invetory object.
 	 *
 	 * @backup host_inventory
 	 * @backup host_discovery
 	 * @backup hosts
 	 */
-	public function testHostPrototypeInventoryObjectCannotBeCreated() {
+	public function testItErrorsOnModePropertyWrite() {
 		$ruleid = 23278;
 
 		$this->call('hostprototype.create', [

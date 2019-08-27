@@ -33,7 +33,7 @@ class testHostPrototypeInventoryUpdate extends CAPITest {
 	 * methods are issued. During update, 'inventory_mode' field is optional int field. Null is accepted as value to
 	 * switch field off. Else field is integer and only one of allowd.
 	 */
-	public function testHostPrototypeInventoryModeCanUpdate() {
+	public function testUpdatesInventoryMode() {
 		$hostid = 50011;
 		$sql = 'SELECT inventory_mode FROM host_inventory WHERE hostid='.$hostid;
 
@@ -90,7 +90,7 @@ class testHostPrototypeInventoryUpdate extends CAPITest {
 	/**
 	 * There is no invetory object.
 	 */
-	public function testHostPrototypeInventoryObjectCannotBeUpdated() {
+	public function testItErrorsOnInventoryObjectUpdate() {
 		$hostid = 50011;
 
 		$this->call('hostprototype.update', [
