@@ -175,7 +175,7 @@ func writePidFile() (err error) {
 	}
 
 	pidID := os.Getpid()
-	pid := []byte(strconv.Itoa(pidID) + "\n")
+	pid := []byte(strconv.Itoa(pidID))
 	flockT := syscall.Flock_t{
 		Type:   syscall.F_WRLCK,
 		Whence: io.SeekStart,
@@ -191,6 +191,7 @@ func writePidFile() (err error) {
 		return fmt.Errorf("Is this process already running? Could not lock PID file [%s]: %s",
 			agent.Options.PidFile, err.Error())
 	}
+	pidFile.Truncate(0)
 	pidFile.Write(pid)
 	pidFile.Sync()
 
