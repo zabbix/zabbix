@@ -472,7 +472,8 @@ switch ($data['method']) {
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
 					],
-					'webitems' => true,
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
 					'limit' => $config['search_limit']
 				];
 
