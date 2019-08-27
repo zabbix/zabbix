@@ -1007,6 +1007,7 @@ class CHttpTestManager {
 			), 'key_');
 		}
 
+		$steps_itemids = [];
 		foreach ($websteps as $snum => &$webstep) {
 			$webstep['httpstepid'] = $webstepids[$snum];
 
@@ -1064,6 +1065,7 @@ class CHttpTestManager {
 
 			if ($insert_items) {
 				$step_itemids = DB::insert('items', $insert_items);
+				$steps_itemids += array_flip($step_itemids);
 
 				if (array_key_exists('applicationid', $http_test)) {
 					$this->createItemsApplications($step_itemids, $http_test['applicationid']);
@@ -1081,6 +1083,12 @@ class CHttpTestManager {
 			DB::insert('httpstepitem', $webstepitems);
 		}
 		unset($webstep);
+
+		$steps_items_rtdata = [];
+		foreach ($steps_itemids as $itemid => $value) {
+			$step_items_rtdata[] = ['itemid' => $itemid];
+		}
+		DB::insert('item_rtdata', $step_items_rtdata, false);
 
 		$this->updateHttpStepFields($websteps, 'create');
 	}
