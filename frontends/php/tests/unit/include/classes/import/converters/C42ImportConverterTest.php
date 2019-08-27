@@ -162,6 +162,28 @@ class C42ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
+				],
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'inventory_mode' => 1,
+								'type' => ''
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'type' => ''
+							],
+							'inventory_mode' => 1
+						]
+					]
 				]
 			]
 		];
