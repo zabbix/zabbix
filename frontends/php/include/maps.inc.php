@@ -1574,6 +1574,8 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
  *
  * @param array $icon_map
  * @param array $host
+ * @param int   $host['inventory_mode']
+ * @param array $host['inventory']
  *
  * @return int
  */
