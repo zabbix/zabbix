@@ -69,6 +69,12 @@ class CAudit {
 				$table_name = 'applications';
 				break;
 
+			case AUDIT_RESOURCE_AUTOREGISTRATION:
+				$field_name_resourceid = 'autoreg_tlsid';
+				$field_name_resourcename = 'tls_psk_identity';
+				$table_name = 'config_autoreg_tls';
+				break;
+
 			case AUDIT_RESOURCE_CORRELATION:
 				$field_name_resourceid = 'correlationid';
 				$field_name_resourcename = 'name';

@@ -113,6 +113,7 @@ class CAutoregistration extends CApiService {
 		$db_autoreg = $this->getAutoreg(['output' => API_OUTPUT_EXTEND], true);
 		reset($db_autoreg);
 		$autoreg['autoreg_tlsid'] = key($db_autoreg);
+		$audit = [$autoreg];
 
 		$this->validateUpdate($autoreg, $db_autoreg);
 		$update = [];
@@ -121,6 +122,7 @@ class CAutoregistration extends CApiService {
 			if ($autoreg['tls_accept'] == HOST_ENCRYPTION_NONE) {
 				$autoreg['tls_psk_identity'] = '';
 				$autoreg['tls_psk'] = '';
+				$audit = [$autoreg];
 			}
 
 			update_config(['autoreg_tls_accept' => $autoreg['tls_accept']]);
@@ -134,6 +136,8 @@ class CAutoregistration extends CApiService {
 			}
 		}
 		DB::update('config_autoreg_tls', $update);
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION, $audit, $db_autoreg);
 
 		return true;
 	}
