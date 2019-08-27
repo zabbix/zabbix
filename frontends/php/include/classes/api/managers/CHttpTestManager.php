@@ -754,6 +754,12 @@ class CHttpTestManager {
 
 		$newTestItemIds = DB::insert('items', $insertItems);
 
+		$items_rtdata = [];
+		foreach ($newTestItemIds as $itemid) {
+			$items_rtdata[] = ['itemid' => $itemid];
+		}
+		DB::insert('item_rtdata', $items_rtdata, false);
+
 		if (array_key_exists('applicationid', $httpTest)) {
 			$this->createItemsApplications($newTestItemIds, $httpTest['applicationid']);
 		}
