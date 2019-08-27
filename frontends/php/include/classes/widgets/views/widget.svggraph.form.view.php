@@ -122,6 +122,11 @@ $scripts[] =
 				'form_fields.ds[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.ds[i]);'.
 			'}'.
 		'}'.
+		'if ("or" in form_fields) {'.
+			'for (var i in form_fields.or) {'.
+				'form_fields.or[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.or[i]);'.
+			'}'.
+		'}'.
 		'data.fields = JSON.stringify(form_fields);'.
 
 		'jQuery.ajax({'.
