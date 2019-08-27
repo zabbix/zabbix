@@ -22,6 +22,7 @@ package log
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"runtime/debug"
@@ -56,6 +57,7 @@ type LogStat struct {
 
 var logStat LogStat
 var logAccess sync.Mutex
+var logAccessLocked bool
 
 func CheckLogLevel(level int) bool {
 	if level != Info && (level > logLevel || Empty == level) {
@@ -124,42 +126,48 @@ func Open(logType int, level int, filename string, filesize int) error {
 
 func Critf(format string, args ...interface{}) {
 	if CheckLogLevel(Crit) {
-		procLog(format, args...)
+		procLog(format, args)
 	}
 }
 
 func Infof(format string, args ...interface{}) {
-	procLog(format, args...)
+	procLog(format, args)
 }
 
 func Warningf(format string, args ...interface{}) {
 	if CheckLogLevel(Warning) {
-		procLog(format, args...)
+		procLog(format, args)
 	}
 }
 
 func Tracef(format string, args ...interface{}) {
 	if CheckLogLevel(Trace) {
-		procLog(format, args...)
+		procLog(format, args)
 	}
 }
 
 func Debugf(format string, args ...interface{}) {
 	if CheckLogLevel(Debug) {
-		procLog(format, args...)
+		procLog(format, args)
 	}
 }
 
 func Errf(format string, args ...interface{}) {
 	if CheckLogLevel(Err) {
-		procLog(format, args...)
+		procLog(format, args)
 	}
 }
-func procLog(format string, args ...interface{}) {
+
+func procLog(format string, args []interface{}) {
+	logAccessLocked = true
 	logAccess.Lock()
+	defer func() {
+		logAccess.Unlock()
+		logAccessLocked = false
+	}()
 	rotateLog()
 	logger.Printf(format, args...)
-	logAccess.Unlock()
+
 }
 
 func rotateLog() {
@@ -182,15 +190,21 @@ func rotateLog() {
 			}
 
 			logStat.f, err = os.OpenFile(logStat.filename, os.O_CREATE|os.O_WRONLY, 0644)
-			if err == nil {
-				logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+			if err != nil {
+				errmsg := "Cannot open log file"
 				if printError != "" {
-					logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
-						logStat.filename, filenameOld, printError)
-					logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
-						" moving it to \"%s\" failed. The logfile was truncated.",
-						logStat.filename, filenameOld)
+					errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
 				}
+				panic(errmsg)
+			}
+
+			logger = log.New(logStat.f, "", log.Lmicroseconds|log.Ldate)
+			if printError != "" {
+				logger.Printf("cannot rename log file \"%s\" to \"%s\":%s\n",
+					logStat.filename, filenameOld, printError)
+				logger.Printf("Logfile \"%s\" size reached configured limit LogFileSize but"+
+					" moving it to \"%s\" failed. The logfile was truncated.",
+					logStat.filename, filenameOld)
 			}
 		}
 	}
@@ -199,7 +213,9 @@ func rotateLog() {
 func PanicHook() {
 	if r := recover(); r != nil {
 		data := debug.Stack()
-		Critf("Critical failure: %v", r)
+		if !logAccessLocked {
+			Critf("Critical failure: %v", r)
+		}
 		var tail int
 		for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
 			end = bytes.IndexByte(data[offset:], '\n')
@@ -208,7 +224,9 @@ func PanicHook() {
 			} else {
 				tail = len(data)
 			}
-			Critf("%s", string(data[offset:tail]))
+			if !logAccessLocked {
+				Critf("%s", string(data[offset:tail]))
+			}
 		}
 		panic(r)
 	}
