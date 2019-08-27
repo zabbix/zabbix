@@ -1134,6 +1134,8 @@ class CWidgetHelper {
 					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
 					'});'.
+					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
