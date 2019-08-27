@@ -97,14 +97,15 @@ class CHostPrototype extends CHostBase {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
-			$sqlParts['select']['inventory_mode'] = 'COALESCE(hinv.inventory_mode, '.HOST_INVENTORY_DISABLED.') AS inventory_mode';
+			$sqlParts['select']['inventory_mode'] =
+				'COALESCE(hinv.inventory_mode,'.HOST_INVENTORY_DISABLED.') AS inventory_mode';
 		}
 
-		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])
-			|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
+		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
+				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 			$sqlParts['left_join'][] = [
 				'from' => 'host_inventory hinv',
-				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.'.$this->pk()
+				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
 			];
 
 			$sqlParts['left_table'] = array_search($this->tableName().' '.$this->tableAlias(), $sqlParts['from']);
