@@ -34,6 +34,7 @@ type AgentOptions struct {
 	LogType              string   `conf:",optional,,console"`
 	LogFile              string   `conf:",optional"`
 	DebugLevel           int      `conf:",optional,0:5,3"`
+	PidFile              string   `conf:",optional,,/tmp/zabbix_agentd.pid"`
 	ServerActive         string   `conf:",optional"`
 	RefreshActiveChecks  int      `conf:",optional,30:3600,120"`
 	Timeout              int      `conf:",optional,1:30,3"`

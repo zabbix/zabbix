@@ -23,8 +23,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -163,6 +165,44 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		return errors.New("Unknown command")
 	}
 	return
+}
+
+var pidFile *os.File
+
+func writePidFile() (err error) {
+	if agent.Options.PidFile == "" {
+		return nil
+	}
+
+	pid := os.Getpid()
+	flockT := syscall.Flock_t{
+		Type:   syscall.F_WRLCK,
+		Whence: io.SeekStart,
+		Start:  0,
+		Len:    0,
+		Pid:    int32(pid),
+	}
+	if pidFile, err = os.OpenFile(agent.Options.PidFile, os.O_WRONLY|os.O_CREATE|syscall.O_CLOEXEC, 0644); nil != err {
+		return fmt.Errorf("cannot open PID file [%s]: %s", agent.Options.PidFile, err.Error())
+	}
+	if err = syscall.FcntlFlock(pidFile.Fd(), syscall.F_SETLK, &flockT); nil != err {
+		pidFile.Close()
+		return fmt.Errorf("Is this process already running? Could not lock PID file [%s]: %s",
+			agent.Options.PidFile, err.Error())
+	}
+	pidFile.Truncate(0)
+	pidFile.WriteString(strconv.Itoa(pid))
+	pidFile.Sync()
+
+	return nil
+}
+
+func deletePidFile() {
+	if nil == pidFile {
+		return
+	}
+	pidFile.Close()
+	os.Remove(pidFile.Name())
 }
 
 func run() (err error) {
@@ -364,6 +404,12 @@ func main() {
 			}
 		}
 	}
+
+	if err = writePidFile(); err != nil {
+		log.Critf(err.Error())
+		os.Exit(1)
+	}
+	defer deletePidFile()
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
 	log.Infof(greeting)
