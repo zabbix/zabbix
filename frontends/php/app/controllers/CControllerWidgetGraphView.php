@@ -250,7 +250,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 				if ($resourceid) {
 					$graph_src = new CUrl('chart.php');
-					$graph_src->setArgument('itemids[]', $resourceid);
+					$graph_src->setArgument('itemids', [$resourceid]);
 					$graph_src->setArgument('width', $width);
 					$graph_src->setArgument('height', $height);
 					$graph_src->setArgument('legend', $fields['show_legend']);
@@ -276,40 +276,49 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid && $resourceid) {
-					$chart_file = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
-						? 'chart7.php'
-						: 'chart3.php';
-
-					$graph_src = new CUrl($chart_file);
-
-					foreach ($graph as $name => $value) {
-						if ($name === 'width' || $name === 'height') {
-							continue;
-						}
-						$graph_src->setArgument($name, $value);
+					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
+						$graph_src = (new CUrl('chart7.php'))
+							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+							->setArgument('graphtype', $graph['graphtype'])
+							->setArgument('graph3d', $graph['show_3d']);
+					}
+					else {
+						$graph_src = (new CUrl('chart3.php'))
+							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+							->setArgument('ymin_type', $graph['ymin_type'])
+							->setArgument('ymax_type', $graph['ymax_type'])
+							->setArgument('ymin_itemid', $graph['ymin_itemid'])
+							->setArgument('ymax_itemid', $graph['ymax_itemid'])
+							->setArgument('showworkperiod', $graph['show_work_period'])
+							->setArgument('showtriggers', $graph['show_triggers'])
+							->setArgument('graphtype', $graph['graphtype'])
+							->setArgument('yaxismin', $graph['yaxismin'])
+							->setArgument('yaxismax', $graph['yaxismax'])
+							->setArgument('percent_left', $graph['percent_left'])
+							->setArgument('percent_right', $graph['percent_right']);
 					}
 
 					$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
 
-					foreach ($new_graph_items as $new_graph_item) {
+					foreach ($new_graph_items as &$new_graph_item) {
 						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
-
-						foreach ($new_graph_item as $name => $value) {
-							$graph_src->setArgument('items['.$new_graph_item['itemid'].']['.$name.']', $value);
-						}
 					}
+					unset($new_graph_item);
+
+					$graph_src->setArgument('items', $new_graph_items);
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
-						$graph_src = new CUrl('chart6.php');
-						$graph_src->setArgument('graphid', $resourceid);
+						$graph_src = (new CUrl('chart6.php'))
+							->setArgument('graphid', $resourceid)
+							->setArgument('graph3d', $graph['show_3d']);
 					}
 				}
 				else {
 					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
-						$graph_src = new CUrl('chart2.php');
-						$graph_src->setArgument('graphid', $resourceid);
+						$graph_src = (new CUrl('chart2.php'))
+							->setArgument('graphid', $resourceid);
 					}
 
 					if (!$edit_mode) {
@@ -319,13 +328,9 @@ class CControllerWidgetGraphView extends CControllerWidget {
 
 				$graph_src->setArgument('width', $width);
 				$graph_src->setArgument('height', $height);
-				$graph_src->setArgument('legend', ($fields['show_legend'] == 1 && $graph['show_legend'] == 1) ? 1 : 0);
+				$graph_src->setArgument('legend', ($fields['show_legend'] && $graph['show_legend']) ? 1 : 0);
 				$graph_src->setArgument('from', $timeline['from']);
 				$graph_src->setArgument('to', $timeline['to']);
-
-				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-					$graph_src->setArgument('graph3d', $graph['show_3d']);
-				}
 			}
 
 			$graph_src->setArgument('profileIdx', $profileIdx);

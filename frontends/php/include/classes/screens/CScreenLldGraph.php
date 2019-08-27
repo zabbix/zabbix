@@ -114,7 +114,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				: $this->screenitem['resourceid'];
 
 			$options = [
-				'output' => ['graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'],
+				'output' => API_OUTPUT_EXTEND,
 				'selectDiscoveryRule' => ['hostid']
 			];
 
@@ -150,19 +150,20 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	 * @return CTag
 	 */
 	protected function getPreviewOutput() {
-		$graphPrototype = $this->getGraphPrototype();
+		$graph_prototype = $this->getGraphPrototype();
 
-		switch ($graphPrototype['graphtype']) {
+		switch ($graph_prototype['graphtype']) {
 			case GRAPH_TYPE_NORMAL:
 			case GRAPH_TYPE_STACKED:
-				$url = 'chart3.php';
+				$src = (new CUrl('chart3.php'))
+					->setArgument('showworkperiod', $graph_prototype['show_work_period']);
 				break;
 
 			case GRAPH_TYPE_EXPLODED:
 			case GRAPH_TYPE_3D_EXPLODED:
 			case GRAPH_TYPE_3D:
 			case GRAPH_TYPE_PIE:
-				$url = 'chart7.php';
+				$src = new CUrl('chart7.php');
 				break;
 
 			default:
@@ -170,26 +171,23 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				exit;
 		}
 
-		$graphPrototypeItems = API::GraphItem()->get([
+		$graph_prototype_items = API::GraphItem()->get([
 			'output' => [
 				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc', 'drawtype', 'yaxisside', 'color'
 			],
-			'graphids' => [$graphPrototype['graphid']]
+			'graphids' => [$graph_prototype['graphid']]
 		]);
 
-		$queryParams = [
-			'items' => $graphPrototypeItems,
-			'graphtype' => $graphPrototype['graphtype'],
-			'period' => 3600,
-			'legend' => $graphPrototype['show_legend'],
-			'graph3d' => $graphPrototype['show_3d'],
-			'width' => $this->screenitem['width'],
-			'height' => $this->screenitem['height'],
-			'name' => $graphPrototype['name']
-		];
+		$src
+			->setArgument('items', $graph_prototype_items)
+			->setArgument('graphtype', $graph_prototype['graphtype'])
+			->setArgument('period', 3600)
+			->setArgument('legend', $graph_prototype['show_legend'])
+			->setArgument('graph3d', $graph_prototype['show_3d'])
+			->setArgument('width', $this->screenitem['width'])
+			->setArgument('height', $this->screenitem['height'])
+			->setArgument('name', $graph_prototype['name']);
 
-		$url .= '?'.http_build_query($queryParams);
-
-		return new CSpan(new CImg($url));
+		return new CSpan(new CImg($src->getUrl()));
 	}
 }
