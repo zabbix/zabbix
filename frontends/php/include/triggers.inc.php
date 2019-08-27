@@ -738,12 +738,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$problem_triggerids = [];
 
 	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE
-				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
-			$problem_triggerids[] = $triggerid;
-			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		}
+		$problem_triggerids[] = $triggerid;
+		$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		$trigger['resolved'] = true;
+		$trigger['problem']['acknowledged'] = 1;
 	}
 	unset($trigger);
 
@@ -766,16 +764,61 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				$triggers[$problem['objectid']]['resolved'] = false;
 			}
 
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
+			$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
+
+			if ($triggers[$problem['objectid']]['priority'] < $problem['severity'] && $problem['r_eventid'] == 0) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
-				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
-				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
 			}
+
 			$objectids[$problem['objectid']] = true;
 		}
 
-		foreach ($triggers as $triggerid => $trigger) {
-			$triggers[$triggerid]['value'] = ($triggers[$triggerid]['resolved'] === true)
+		foreach ($triggers as $triggerid => &$trigger) {
+			$all_resolved = true;
+			$all_unresolved = true;
+
+			foreach ($problems as $problem) {
+				if ($triggerid == $problem['objectid']) {
+					if ($problem['r_eventid'] == 0) {
+						$all_resolved = false;
+					}
+					else {
+						$all_unresolved = false;
+					}
+				}
+			}
+
+			if ($all_resolved && array_key_exists($triggerid, $objectids)) {
+				foreach ($problems as $problem) {
+					if ($triggerid == $problem['objectid'] && $problem['r_eventid'] != 0
+							&& $problem['acknowledged'] == 0) {
+						$trigger['problem']['acknowledged'] = 0;
+						break;
+					}
+				}
+			}
+			elseif ($all_resolved && !array_key_exists($triggerid, $objectids)) {
+				$trigger['problem']['acknowledged'] = 0;
+			}
+			elseif ($all_unresolved) {
+				foreach ($problems as $problem) {
+					if ($triggerid == $problem['objectid'] && $problem['acknowledged'] == 0) {
+						$trigger['problem']['acknowledged'] = 0;
+						break;
+					}
+				}
+			}
+			elseif (!$all_resolved && !$all_unresolved && array_key_exists($triggerid, $objectids)) {
+				foreach ($problems as $problem) {
+					if ($triggerid == $problem['objectid'] && $problem['r_eventid'] == 0
+							&& $problem['acknowledged'] == 0) {
+						$trigger['problem']['acknowledged'] = 0;
+						break;
+					}
+				}
+			}
+
+			$trigger['value'] = ($triggers[$triggerid]['resolved'] === true)
 				? TRIGGER_VALUE_FALSE
 				: TRIGGER_VALUE_TRUE;
 
@@ -786,12 +829,13 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			if (!array_key_exists('only_true', $trigger_options)
 					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
 				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
-				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
+				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 			else {
 				unset($triggers[$triggerid]);
 			}
 		}
+		unset($trigger);
 	}
 
 	return $triggers;
@@ -969,11 +1013,11 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 			if (array_key_exists('problem', $trigger)) {
 				$eventid = $trigger['problem']['eventid'];
 				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
-
-				if ($trigger['problem']['acknowledged'] == 1) {
-					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-				}
 			}
+		}
+
+		if ($trigger['problem']['acknowledged'] == 1) {
+			$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 		}
 
 		$desc = array_key_exists($trigger['triggerid'], $dependencies)
@@ -2618,35 +2662,6 @@ function isReadableTriggers(array $triggerids) {
 		'triggerids' => $triggerids,
 		'countOutput' => true
 	]);
-}
-
-/**
- * Get last problems by given trigger IDs.
- *
- * @param array $triggerids
- * @param array $output         List of output fields.
- *
- * @return array
- */
-function getTriggerLastProblems(array $triggerids, array $output) {
-	$problems = DBfetchArray(DBselect(
-		'SELECT '.implode(',e.', $output).
-		' FROM events e'.
-		' JOIN ('.
-			'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
-			' FROM events e2'.
-			' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
-				' AND e2.object='.EVENT_OBJECT_TRIGGER.
-				' AND e2.value='.TRIGGER_VALUE_TRUE.
-				' AND '.dbConditionInt('e2.objectid', $triggerids).
-			' GROUP BY e2.source,e2.object,e2.objectid'.
-		') e3 ON e3.source=e.source'.
-			' AND e3.object=e.object'.
-			' AND e3.objectid=e.objectid'.
-			' AND e3.clock=e.clock'
-	));
-
-	return $problems;
 }
 
 /**
