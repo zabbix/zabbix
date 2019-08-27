@@ -211,8 +211,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 					'triggerid' => $trigger['triggerid'],
 					'expression' => $trigger['expression'],
 					'opdata' => $trigger['opdata'],
-					'clock' => $problem['clock'],
-					'ns' => $problem['ns']
+					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
 				],
 				[
 					'events' => true,
