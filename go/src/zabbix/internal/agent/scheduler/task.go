@@ -130,7 +130,6 @@ type exporterTask struct {
 func (t *exporterTask) perform(s Scheduler) {
 	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
 	// from performer goroutine
-	log.Tracef("plugin %s: executing exporter task for item %d: %s", t.plugin.name(), t.item.itemid, t.item.key)
 	go func(itemkey string) {
 		var result *plugin.Result
 		exporter, _ := t.plugin.impl.(plugin.Exporter)
@@ -138,9 +137,13 @@ func (t *exporterTask) perform(s Scheduler) {
 		var key string
 		var params []string
 		var err error
+
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
+			log.Debugf("plugin %s: executing exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
+
 			if ret, err = exporter.Export(key, params, t); err == nil {
+				log.Debugf("plugin %s: executed exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
@@ -167,6 +170,8 @@ func (t *exporterTask) perform(s Scheduler) {
 						t.output.Write(&plugin.Result{})
 					}
 				}
+			} else {
+				log.Debugf("plugin %s: failed to execute exporter task for itemid:%d key '%s' error: '%s'", t.plugin.name(), t.item.itemid, t.item.key, err.Error())
 			}
 		}
 		if err != nil {
@@ -185,7 +190,7 @@ func (t *exporterTask) perform(s Scheduler) {
 }
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
-	if t.item.itemid != 0 {
+	if t.client.ID() != 0 {
 		var nextcheck time.Time
 		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
 		if err != nil {
@@ -193,6 +198,7 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 		}
 		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	} else {
+		// single passive check
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
 	return

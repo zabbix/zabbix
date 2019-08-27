@@ -250,7 +250,6 @@ func (c *ResultCache) run() {
 			c.updateOptions(v.(*agent.AgentOptions))
 		}
 	}
-	close(c.input)
 	log.Debugf("[%d] result cache has been stopped", c.clientID)
 	monitor.Unregister()
 }

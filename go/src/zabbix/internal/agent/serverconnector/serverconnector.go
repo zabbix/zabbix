@@ -336,7 +336,6 @@ run:
 			}
 		}
 	}
-	close(c.input)
 	log.Debugf("[%d] server connector has been stopped", c.clientID)
 	monitor.Unregister()
 }

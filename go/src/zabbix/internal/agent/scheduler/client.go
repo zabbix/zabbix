@@ -86,6 +86,9 @@ func (c *client) Output() plugin.ResultWriter {
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var info *pluginInfo
 	var ok bool
+
+	log.Debugf("adding new request for key: '%s'", r.Key)
+
 	if info, ok = c.plugins[p]; !ok {
 		info = &pluginInfo{}
 	}
@@ -193,9 +196,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},
 				options:  agent.Options.Plugins[p.impl.Name()]}
-			if err = task.reschedule(now); err != nil {
-				return
-			}
+			_ = task.reschedule(now)
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 		}
