@@ -174,14 +174,13 @@ func writePidFile() (err error) {
 		return nil
 	}
 
-	pidID := os.Getpid()
-	pid := []byte(strconv.Itoa(pidID))
+	pid := os.Getpid()
 	flockT := syscall.Flock_t{
 		Type:   syscall.F_WRLCK,
 		Whence: io.SeekStart,
 		Start:  0,
 		Len:    0,
-		Pid:    int32(pidID),
+		Pid:    int32(pid),
 	}
 	if pidFile, err = os.OpenFile(agent.Options.PidFile, os.O_WRONLY|os.O_CREATE|syscall.O_CLOEXEC, 0644); nil != err {
 		return fmt.Errorf("cannot open PID file [%s]: %s", agent.Options.PidFile, err.Error())
@@ -192,7 +191,7 @@ func writePidFile() (err error) {
 			agent.Options.PidFile, err.Error())
 	}
 	pidFile.Truncate(0)
-	pidFile.Write(pid)
+	pidFile.WriteString(strconv.Itoa(pid))
 	pidFile.Sync()
 
 	return nil
