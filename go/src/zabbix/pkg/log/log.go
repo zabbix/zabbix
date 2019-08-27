@@ -57,7 +57,6 @@ type LogStat struct {
 
 var logStat LogStat
 var logAccess sync.Mutex
-var logAccessLocked bool
 
 func CheckLogLevel(level int) bool {
 	if level != Info && (level > logLevel || Empty == level) {
@@ -159,15 +158,10 @@ func Errf(format string, args ...interface{}) {
 }
 
 func procLog(format string, args []interface{}) {
-	logAccessLocked = true
 	logAccess.Lock()
-	defer func() {
-		logAccess.Unlock()
-		logAccessLocked = false
-	}()
+	defer logAccess.Unlock()
 	rotateLog()
 	logger.Printf(format, args...)
-
 }
 
 func rotateLog() {
@@ -195,6 +189,7 @@ func rotateLog() {
 				if printError != "" {
 					errmsg = fmt.Sprintf("%s and cannot rename it: %s", errmsg, printError)
 				}
+				logStat.logType = Undefined
 				panic(errmsg)
 			}
 
@@ -212,19 +207,17 @@ func rotateLog() {
 
 func PanicHook() {
 	if r := recover(); r != nil {
-		data := debug.Stack()
-		if !logAccessLocked {
+		if logStat.logType != Undefined {
+			data := debug.Stack()
 			Critf("Critical failure: %v", r)
-		}
-		var tail int
-		for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
-			end = bytes.IndexByte(data[offset:], '\n')
-			if end != -1 {
-				tail = offset + end
-			} else {
-				tail = len(data)
-			}
-			if !logAccessLocked {
+			var tail int
+			for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
+				end = bytes.IndexByte(data[offset:], '\n')
+				if end != -1 {
+					tail = offset + end
+				} else {
+					tail = len(data)
+				}
 				Critf("%s", string(data[offset:tail]))
 			}
 		}
