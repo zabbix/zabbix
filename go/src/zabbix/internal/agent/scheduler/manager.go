@@ -112,7 +112,6 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
-	// TODO: client expiry - remove unused owners after timeout (day+?)
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
@@ -244,6 +243,12 @@ run:
 			if now.Sub(cleaned) >= time.Hour {
 				if passive, ok := m.clients[0]; ok {
 					m.cleanupClient(passive, now)
+				}
+				// remove inactive clients
+				for _, client := range m.clients {
+					if len(client.pluginsInfo) == 0 {
+						delete(m.clients, client.ID())
+					}
 				}
 				cleaned = now
 			}
