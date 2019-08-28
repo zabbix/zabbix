@@ -558,6 +558,7 @@ class CWidgetHelper {
 									'srcfld1' => 'itemid',
 									'real_hosts' => 1,
 									'numeric' => 1,
+									'webitems' => 1,
 									'dstfrm' => $form_name,
 									'dstfld1' => zbx_formatDomId($field->getName().'['.$row_num.'][items][]')
 								]
@@ -907,6 +908,7 @@ class CWidgetHelper {
 									'srcfld1' => 'name',
 									'real_hosts' => 1,
 									'numeric' => 1,
+									'webitems' => 1,
 									'dstfrm' => $form_name,
 									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
 								]

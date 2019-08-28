@@ -492,7 +492,15 @@ switch ($data['method']) {
 				$row = $row['name'];
 			}
 			unset($row);
-			$result = array_keys(array_flip($result));
+
+			$result = array_flip($result);
+
+			// Remove searched entry from result, it will be added in JS.
+			if (array_key_exists($search, $result)) {
+				unset($result[$search]);
+			}
+
+			$result = array_keys($result);
 
 			foreach ($result as &$row) {
 				$row = [
