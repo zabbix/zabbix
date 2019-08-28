@@ -467,11 +467,13 @@ class CHost extends CHostGeneral {
 				$null_position = array_search(HOST_INVENTORY_DISABLED, $inventory_mode_query);
 
 				if ($null_position !== false) {
-					array_splice($inventory_mode_query, $null_position, 1);
+					unset($inventory_mode_query[$null_position]);
 					$inventory_mode_where[] = 'hinv.inventory_mode IS NULL';
 				}
 
-				$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
+				if ($null_position === false || $inventory_mode_query) {
+					$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
+				}
 
 				$sqlParts['where'][] = (count($inventory_mode_where) > 1)
 					? '('.implode(' OR ', $inventory_mode_where).')'
