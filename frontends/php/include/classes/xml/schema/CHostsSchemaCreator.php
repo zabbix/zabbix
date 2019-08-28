@@ -539,9 +539,11 @@ class CHostsSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('type'))
 															->setRequired()
 															->addConstant(CXmlConstantName::REGEX, CXmlConstantValue::REGEX)
+															->addConstant(CXmlConstantName::XMLPATH, CXmlConstantValue::XMLPATH)
 															->addConstant(CXmlConstantName::JSONPATH, CXmlConstantValue::JSONPATH)
 															->addConstant(CXmlConstantName::NOT_MATCHES_REGEX, CXmlConstantValue::NOT_MATCHES_REGEX)
 															->addConstant(CXmlConstantName::CHECK_JSON_ERROR, CXmlConstantValue::CHECK_JSON_ERROR)
+															->addConstant(CXmlConstantName::CHECK_XML_ERROR, CXmlConstantValue::CHECK_XML_ERROR)
 															->addConstant(CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT, CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT)
 															->addConstant(CXmlConstantName::JAVASCRIPT, CXmlConstantValue::JAVASCRIPT)
 															->addConstant(CXmlConstantName::PROMETHEUS_TO_JSON, CXmlConstantValue::PROMETHEUS_TO_JSON),

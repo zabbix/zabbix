@@ -52,9 +52,11 @@ class C44XmlValidator {
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
 		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
+		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
 		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
 		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
+		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON
