@@ -77,7 +77,6 @@ Changes for 4.2.6rc1
 
 New features:
 ..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
-..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
 
 Bug fixes:
 ..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
