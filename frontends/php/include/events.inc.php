@@ -139,13 +139,15 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 /**
  *
- * @param array  $event								An array of event data.
- * @param string $event['eventid']					Event ID.
- * @param string $event['correlationid']			OK Event correlation ID.
- * @param string $event['userid]					User ID who generated the OK event.
- * @param string $event['name']						Event name.
- * @param string $event['acknowledged']				State of acknowledgement.
- * @param string $backurl							A link back after acknowledgement has been clicked.
+ * @param array  $event                   An array of event data.
+ * @param string $event['eventid']        Event ID.
+ * @param string $event['objectid']       Object ID.
+ * @param string $event['correlationid']  OK Event correlation ID.
+ * @param string $event['userid']         User ID who generated the OK event.
+ * @param string $event['name']           Event name.
+ * @param string $event['acknowledged']   State of acknowledgement.
+ * @param CCOl   $event['opdata']         Operational data with expanded macros.
+ * @param string $backurl                 A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
  */
@@ -162,6 +164,10 @@ function make_event_details($event, $backurl) {
 		->addRow([
 			_('Event'),
 			$event['name']
+		])
+		->addRow([
+			_('Operational data'),
+			$event['opdata']
 		])
 		->addRow([
 			_('Severity'),
@@ -221,7 +227,7 @@ function make_event_details($event, $backurl) {
 					$table->addRow([_('Resolved by'), getUserFullname($user[0])]);
 				}
 				else {
-					$table->addRow([_('Resolved by'), _('User')]);
+					$table->addRow([_('Resolved by'), _('Inaccessible user')]);
 				}
 			}
 		}

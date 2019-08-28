@@ -69,6 +69,7 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
+#define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
@@ -306,6 +307,7 @@ typedef struct
 	char		*url;
 	char		*comments;
 	char		*correlation_tag;
+	char		*opdata;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;

@@ -1376,9 +1376,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_THROTTLE_VALUE:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
@@ -1767,6 +1764,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];
 			$data['correlation_mode'] = $trigger['correlation_mode'];

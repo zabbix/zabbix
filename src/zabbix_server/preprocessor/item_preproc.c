@@ -1337,9 +1337,11 @@ static int	item_preproc_get_error_from_json(const zbx_variant_t *value, const ch
 
 	if (NULL != *error)
 	{
-		zbx_lrtrim(*error, " \t\n\r");
+		zbx_lrtrim(*error, ZBX_WHITESPACE);
 		if ('\0' == **error)
 			zbx_free(*error);
+		else
+			ret = FAIL;
 	}
 out:
 	zbx_variant_clear(&value_str);
@@ -1432,9 +1434,11 @@ static int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const cha
 			break;
 	}
 
-	zbx_lrtrim(*error, " \t\n\r");
+	zbx_lrtrim(*error, ZBX_WHITESPACE);
 	if ('\0' == **error)
 		zbx_free(*error);
+	else
+		ret = FAIL;
 out:
 	zbx_variant_clear(&value_str);
 
@@ -1503,9 +1507,11 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 
 	if (NULL != *error)
 	{
-		zbx_lrtrim(*error, " \t\n\r");
+		zbx_lrtrim(*error, ZBX_WHITESPACE);
 		if ('\0' == **error)
 			zbx_free(*error);
+		else
+			ret = FAIL;
 	}
 out:
 	zbx_variant_clear(&value_str);

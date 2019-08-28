@@ -221,63 +221,6 @@ static int	DBpatch_4000003(void)
 	return ret;
 }
 
-static int	DBpatch_4000004(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='no_sound.mp3'"
-			" where value_str='no_sound.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_ok.mp3'"
-			" where value_str='alarm_ok.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_information.mp3'"
-			" where value_str='alarm_information.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_warning.mp3'"
-			" where value_str='alarm_warning.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_average.mp3'"
-			" where value_str='alarm_average.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_high.mp3'"
-			" where value_str='alarm_high.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set value_str='alarm_disaster.mp3'"
-			" where value_str='alarm_disaster.wav'"
-				" and idx='web.messages'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 #endif
 
 DBPATCH_START(4000)
@@ -288,6 +231,5 @@ DBPATCH_ADD(4000000, 0, 1)
 DBPATCH_ADD(4000001, 0, 0)
 DBPATCH_ADD(4000002, 0, 0)
 DBPATCH_ADD(4000003, 0, 0)
-DBPATCH_ADD(4000004, 0, 0)
 
 DBPATCH_END()

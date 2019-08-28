@@ -104,6 +104,32 @@ if ($event['r_eventid'] != 0) {
 	}
 }
 
+if ($trigger['opdata'] !== '') {
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'opdata' => $trigger['opdata'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		[
+			'events' => true,
+			'html' => true
+		]
+	)))
+		->addClass('opdata')
+		->addClass(ZBX_STYLE_WORDWRAP);
+}
+else {
+	$db_items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'triggerids' => $event['objectid']
+	]);
+	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
+}
+
 $config = select_config();
 $severity_config = [
 	'severity_name_0' => $config['severity_name_0'],
