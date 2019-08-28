@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  *
  * @backup hosts
  */
-class testHostInventory extends CAPITest {
+class testHostPrototypeInventory extends CAPITest {
 
 	public static function dataProviderCreate() {
 		$ruleid = 23278;
