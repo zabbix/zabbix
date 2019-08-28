@@ -217,8 +217,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	private static function hasPadding($type, $fields, $view_mode)
-	{
+	private static function hasPadding($type, $fields, $view_mode) {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
 				case WIDGET_CLOCK:
@@ -234,8 +233,8 @@ class CWidgetConfig {
 		else {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
-					return (!array_key_exists('interface_type', $fields))
-						|| !is_string($fields['interface_type']);
+					return !(array_key_exists('interface_type', $fields)
+						&& count($fields['interface_type']) === 1);
 
 				case WIDGET_PROBLEMS_BY_SV:
 					return (!array_key_exists('show_type', $fields)
@@ -256,11 +255,10 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	public static function getConfiguration($type, $fields, $view_mode)
-	{
+	public static function getConfiguration($type, $fields, $view_mode) {
 		return [
 			'scrollable' => self::isScrollable($type),
-			'padding' => self::hasPadding($type, $fields, $view_mode),
+			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];
 	}
 
