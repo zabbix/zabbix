@@ -6141,6 +6141,11 @@ svg {
 		}
 	}
 
+	.list-accordion-item-head,
+	.list-accordion-item-body {
+		padding-bottom: 2px;
+	}
+
 	.list-accordion-item-closed {
 		@extend .multiselect-collapsed;
 		height: 30px;

@@ -4376,6 +4376,9 @@ svg {
       position: relative;
       right: -10px;
       top: 3px; }
+  .list-vertical-accordion .list-accordion-item-head,
+  .list-vertical-accordion .list-accordion-item-body {
+    padding-bottom: 2px; }
   .list-vertical-accordion .list-accordion-item-closed {
     height: 30px; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
