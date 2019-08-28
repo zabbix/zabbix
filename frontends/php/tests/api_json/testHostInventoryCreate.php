@@ -22,9 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * Tests API methods 'hostprototype.create' 'host.create'. It is tested that `inventory_mode` field acts as `host` and
- * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is updated in
- * associated table `host_inventory`.
+ * Tests API methods 'host.create'. It is tested that `inventory_mode` field acts as `host` object field, having read,
+ * write, filter properties. Meanwhile value for this field is updated in associated table `host_inventory`.
  */
 class testHostInventoryCreate extends CAPITest {
 

@@ -22,9 +22,9 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * Tests API methods 'hostprototype.get' 'host.get'. It is tested that `inventory_mode` field acts as `host` and
- * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is retrieved
- * from an associative field in `host_inventory` table.
+ * Tests API methods 'hostprototype.get'. It is tested that `inventory_mode` field acts as `hostprototype` object field,
+ * having read, write, filter properties. Meanwhile value for this field is retrieved from an associative field in
+ * `host_inventory` table.
  */
 class testHostPrototypeInventoryGet extends CAPITest {
 
@@ -35,7 +35,6 @@ class testHostPrototypeInventoryGet extends CAPITest {
 	public function testHasNoInventoryObject() {
 		$method = 'hostprototype.get';
 		$hostprototypeid = 50011;
-
 
 		$response = $this->call($method,
 			['output' => ['hostid'], 'hostids' => $hostprototypeid, 'selectInventory' => ['inventory_mode']]
@@ -74,14 +73,14 @@ class testHostPrototypeInventoryGet extends CAPITest {
 	}
 
 	/**
-	 * Assert that filter does work for host and hostprototype having a related record and without.
+	 * Assert that filter does work for hostprototype having a related record and without.
 	 */
 	public function testFiltersByInventoryModeValue() {
 		$hostprototypeid = 50011;
 
 		// Hostprototype with record.
 		$this->call('hostprototype.update',
-			['hostid' => $hostprototypeid, 'inventory_mode' => HOST_INVENTORY_MANUAL,]
+			['hostid' => $hostprototypeid, 'inventory_mode' => HOST_INVENTORY_MANUAL]
 		);
 
 		$response = $this->call('hostprototype.get', [

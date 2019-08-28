@@ -22,16 +22,15 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * Tests API methods 'hostprototype.update' 'host.update'. It is tested that `inventory_mode` field acts as `host` and
- * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is updated in
- * associated table `host_inventory`.
+ * Tests API methods 'hostprototype.update'. It is tested that `inventory_mode` field acts as `hostprototype` object
+ * field, having read, write, filter properties. Meanwhile value for this field is updated in associated table
+ * `host_inventory`.
  */
 class testHostPrototypeInventoryUpdate extends CAPITest {
 
 	/**
-	 * This test asserts that `host_inventory` table updates as expected when `hostprototype.update` and `host.update`
-	 * methods are issued. During update, 'inventory_mode' field is optional int field. Null is accepted as value to
-	 * switch field off. Else field is integer and only one of allowd.
+	 * This test asserts that `host_inventory` table updates as expected when `hostprototype.update` methods are issued.
+	 * During update, 'inventory_mode' field is optional int field.
 	 */
 	public function testUpdatesInventoryMode() {
 		$hostid = 50011;
@@ -52,7 +51,7 @@ class testHostPrototypeInventoryUpdate extends CAPITest {
 
 		$this->call('hostprototype.update', [
 			'hostid' => $hostid,
-			'inventory_mode' => null,
+			'inventory_mode' => null
 		], -32602);
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$this->assertEquals(HOST_INVENTORY_MANUAL, CDBHelper::getValue($sql));

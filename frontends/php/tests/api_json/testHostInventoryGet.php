@@ -22,9 +22,9 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * Tests API methods 'hostprototype.get' 'host.get'. It is tested that `inventory_mode` field acts as `host` and
- * `hostprototype` object field, having read, write, filter properties. Meanwhile value for this field is retrieved
- * from an associative field in `host_inventory` table.
+ * Tests API methods 'host.get'. It is tested that `inventory_mode` field acts as `host` object field, having read,
+ * write, filter properties. Meanwhile value for this field is retrieved from an associative field in `host_inventory`
+ * table.
  */
 class testHostInventoryGet extends CAPITest {
 
@@ -100,7 +100,7 @@ class testHostInventoryGet extends CAPITest {
 	}
 
 	/**
-	 * Assert that filter does work for host and hostprototype having a related record and without.
+	 * Assert that filter does work for host having a related record and without.
 	 */
 	public function testItDoesFilterByInventoryModeValue() {
 		$hostid = 50009;
