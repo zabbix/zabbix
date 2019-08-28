@@ -157,7 +157,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if task.item.delay != r.Delay {
 				task.item.delay = r.Delay
 				if err = task.reschedule(now); err != nil {
-					task.deactivate()
 					return
 				}
 				p.tasks.Update(task)
