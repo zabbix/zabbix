@@ -3414,14 +3414,12 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-content {
-	position: absolute;
-	top: 2rem;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	flex-grow: 1;
+	margin-top: 2rem;
 	padding-bottom: 8px;
 	overflow: hidden;
-	z-index: 3;
+	border: 1px solid $ui-border-color;
+	background-color: $ui-bg-color;
 
 	@extend %webkit-scrollbar;
 
@@ -3464,7 +3462,6 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget {
-	display: flex;
 	position: absolute;
 
 	.dashbrd-grid-widget-actions {
@@ -3489,6 +3486,8 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-container {
+	// For floating headers to appear over the breadcrumbs.
+	z-index: 3;
 
 	&.dashbrd-mode-edit .dashbrd-grid-widget,
 	.dashbrd-grid-widget-focus,
@@ -3504,16 +3503,10 @@ $form-icon-btn: (
 
 		&.dashbrd-grid-widget-hidden-header {
 
-			.dashbrd-grid-widget-container {
-				margin-top: -2rem;
-			}
-
 			.dashbrd-grid-widget-head {
+				height: 2rem;
+				margin-top: -2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-			}
-
-			.dashbrd-grid-widget-content {
-				top: 2rem;
 			}
 		}
 	}
@@ -3525,9 +3518,8 @@ $form-icon-btn: (
 	left: 0.25rem;
 	right: 0.25rem;
 	bottom: 0.25rem;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	z-index: 3;
+	display: flex;
+	flex-direction: column;
 }
 
 .dashbrd-grid-widget-head {
@@ -3538,10 +3530,17 @@ $form-icon-btn: (
 	height: 2rem;
 	padding-left: 10px;
 	display: flex;
+	flex-direction: row;
 	align-items: flex-start;
 	flex-wrap: nowrap;
 	overflow: hidden;
-	z-index: 2;
+	border: 1px solid $ui-border-color;
+	border-bottom: 0;
+	background-color: $ui-bg-color;
+
+	// For floating headers to appear over other widgets.
+	// Cannot rely on DOM order here, since widgets of iterators can be suffled on refresh.
+	z-index: 1;
 
 	h4 {
 		flex-grow: 1;
@@ -3569,22 +3568,15 @@ $form-icon-btn: (
 
 	&.dashbrd-grid-widget-hidden-header {
 
-		.dashbrd-grid-widget-container {
-			transition: margin-top .3s;
-		}
-
 		.dashbrd-grid-widget-head {
+			height: 0;
 			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
-			transition: box-shadow .3s;
-			z-index: 4;
+			transition: height .3s, margin-top .3s, box-shadow .3s;
 		}
 
 		.dashbrd-grid-widget-content {
-			top: 0;
+			margin-top: 0;
 			padding-top: 8px;
-			background-color: $ui-bg-color;
-			transition: top .3s;
-			z-index: 5;
 		}
 	}
 }
@@ -3600,7 +3592,6 @@ $form-icon-btn: (
 			left: 0;
 			width: 100%;
 			height: 100%;
-			z-index: 3;
 		}
 
 		.dashbrd-grid-iterator-head {
@@ -3617,7 +3608,7 @@ $form-icon-btn: (
 			border: 1px solid $ui-border-color;
 			border-bottom: 0;
 			background-color: $ui-bg-color;
-			transition: margin-top .3s, height .3s, opacity .3s, box-shadow .3s;
+			transition: margin-top .3s, height .3s, opacity 0s .3s, box-shadow .3s;
 			opacity: 0;
 
 			h4 {
@@ -3668,7 +3659,6 @@ $form-icon-btn: (
 			overflow: visible;
 
 			transition: margin-top .3s;
-			z-index: 3;
 		}
 
 		.dashbrd-grid-iterator-placeholder {
@@ -3725,11 +3715,9 @@ $form-icon-btn: (
 				height: 2rem;
 				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
 				opacity: 1;
-				z-index: 4;
-			}
 
-			.dashbrd-grid-iterator-content {
-				z-index: 5;
+				// Not inheriting opacity transition here.
+				transition: margin-top .3s, height .3s, box-shadow .3s;
 			}
 
 			.dashbrd-grid-iterator-placeholder {
