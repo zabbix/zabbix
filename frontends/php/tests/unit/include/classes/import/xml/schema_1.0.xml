@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export version="1.0" date="25.11.14" time="12.21">
-    <hosts>
+	<hosts>
 		<host name="Template_Simple">
 			<proxy_hostid>0</proxy_hostid>
 			<useip>1</useip>
@@ -289,46 +289,47 @@
 				<poc_2_notes>test</poc_2_notes>
 			</host_profiles_ext>
 		</host>
-        <host name="host">
+		<host name="host">
 			<proxy_hostid>0</proxy_hostid>
-            <useip>1</useip>
-            <dns>localhost</dns>
-            <ip>10.0.0.6</ip>
-            <port>10050</port>
-            <status>0</status>
-            <useipmi>1</useipmi>
-            <ipmi_ip>10.0.0.7</ipmi_ip>
-            <ipmi_port>623</ipmi_port>
-            <ipmi_authtype>0</ipmi_authtype>
-            <ipmi_privilege>2</ipmi_privilege>
-            <ipmi_username/>
-            <ipmi_password/>
-            <groups>
-                <group>Linux servers</group>
-            </groups>
-            <items/>
-            <triggers/>
-            <templates/>
-            <graphs/>
-            <macros/>
-        </host>
-    </hosts>
-    <dependencies>
-    	<dependency>
+			<useip>1</useip>
+			<dns>localhost</dns>
+			<ip>10.0.0.6</ip>
+			<port>10050</port>
+			<status>0</status>
+			<useipmi>1</useipmi>
+			<ipmi_ip>10.0.0.7</ipmi_ip>
+			<ipmi_port>623</ipmi_port>
+			<ipmi_authtype>0</ipmi_authtype>
+			<ipmi_privilege>2</ipmi_privilege>
+			<ipmi_username/>
+			<ipmi_password/>
+			<groups>
+				<group>Linux servers</group>
+			</groups>
+			<items/>
+			<triggers/>
+			<templates/>
+			<graphs/>
+			<macros/>
+		</host>
+	</hosts>
+	<dependencies>
+		<dependency>
 			<depends>test</depends>
 			<description>test:test</description>
-    	</dependency>
-    </dependencies>
-    <screens>
-    	<screen>
+		</dependency>
+	</dependencies>
+	<screens>
+		<screen>
 			<name>test</name>
 			<hsize>test</hsize>
 			<vsize>test</vsize>
 			<screenitems>
 				<screenitem>
-					<resourcetype>test</resourcetype>
+					<resourcetype>1</resourcetype>
 					<resourceid>
-						<key_>test</key_>
+						<key_>ftp,21</key_>
+						<host>Template_Simple</host>
 					</resourceid>
 					<width>test</width>
 					<height>test</height>
@@ -344,13 +345,13 @@
 					<url>test</url>
 				</screenitem>
 			</screenitems>
-    	</screen>
-    </screens>
-    <images>
+		</screen>
+	</screens>
+	<images>
 		<image>
 			<name>test</name>
 			<imagetype>test</imagetype>
 			<encodedImage>test</encodedImage>
 		</image>
-    </images>
+	</images>
 </zabbix_export>
