@@ -114,20 +114,26 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if r.Itemid != 0 {
+		var task *exporterTask
+		var tacc exporterTaskAccessor
+
+		if c.id != 0 {
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
-		}
-		var task *exporterTask
-		tacc, ok := c.exporters[r.Itemid]
-		if ok && tacc.task().plugin != p {
-			// create new task if item key has been changed and now is handled by other plugin
+
+			tacc, ok = c.exporters[r.Itemid]
+			if ok && tacc.task().plugin != p {
+				// create new task if item key has been changed and now is handled by other plugin
+				ok = false
+			}
+		} else {
 			ok = false
 		}
+
 		if !ok {
 			task = &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
+				taskBase: taskBase{plugin: p, active: true, recurring: c.id != 0},
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
 				client:   c,
@@ -137,9 +143,11 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if err = task.reschedule(now); err != nil {
 				return
 			}
-			if r.Itemid != 0 {
+
+			if c.id != 0 {
 				c.exporters[r.Itemid] = task
 			}
+
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
 		} else {

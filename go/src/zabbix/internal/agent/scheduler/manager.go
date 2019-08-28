@@ -137,7 +137,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 
 		if err != nil {
-			if r.Itemid != 0 {
+			if c.id != 0 {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
 					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 					tacc.task().deactivate()
