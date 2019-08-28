@@ -120,7 +120,12 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			}
 		}
 		var task *exporterTask
-		if tacc, ok := c.exporters[r.Itemid]; !ok {
+		tacc, ok := c.exporters[r.Itemid]
+		if ok && tacc.task().plugin != p {
+			// create new task if item key has been changed and now is handled by other plugin
+			ok = false
+		}
+		if !ok {
 			task = &exporterTask{
 				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
