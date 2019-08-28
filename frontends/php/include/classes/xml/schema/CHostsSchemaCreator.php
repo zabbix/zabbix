@@ -81,8 +81,8 @@ class CHostsSchemaCreator implements CSchemaCreator {
 													: CXmlConstantValue::ITEM_TYPE_SSH;
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
-										// Default value is different from DB default value.
-										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
+										// Default value is different from DB default value. Using defines.inc.php default value.
+										(new CStringXmlTag('delay'))->setDefaultValue(ZBX_ITEM_DELAY_DEFAULT),
 										new CStringXmlTag('description'),
 										(new CArrayXmlTag('filter'))
 											->setSchema(
@@ -326,8 +326,8 @@ class CHostsSchemaCreator implements CSchemaCreator {
 																	: CXmlConstantValue::ITEM_TYPE_SSH;
 																return (string) $class->getConstantValueByName($data['authtype'], $type);
 															}),
-														// Default value is different from DB default value.
-														(new CStringXmlTag('delay'))->setDefaultValue('1m'),
+														// Default value is different from DB default value. Using defines.inc.php default value.
+														(new CStringXmlTag('delay'))->setDefaultValue(ZBX_ITEM_DELAY_DEFAULT),
 														new CStringXmlTag('description'),
 														(new CStringXmlTag('follow_redirects'))
 															->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
@@ -969,8 +969,8 @@ class CHostsSchemaCreator implements CSchemaCreator {
 													: CXmlConstantValue::ITEM_TYPE_SSH;
 												return (string) $class->getConstantValueByName($data['authtype'], $type);
 											}),
-										// Default value is different from DB default value.
-										(new CStringXmlTag('delay'))->setDefaultValue('1m'),
+										// Default value is different from DB default value. Using defines.inc.php default value.
+										(new CStringXmlTag('delay'))->setDefaultValue(ZBX_ITEM_DELAY_DEFAULT),
 										new CStringXmlTag('description'),
 										(new CStringXmlTag('follow_redirects'))
 											->setDefaultValue(DB::getDefault('items', 'follow_redirects'))
