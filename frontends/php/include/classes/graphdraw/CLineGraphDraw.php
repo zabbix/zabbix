@@ -2330,7 +2330,10 @@ class CLineGraphDraw extends CGraphDraw {
 			if ($this->m_maxY[$side] === null) {
 				$this->m_maxY[$side] = 1;
 			}
-			if (bccomp($this->m_minY[$side], $this->m_maxY[$side], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) == 0) {
+			
+			$delta = bccomp($this->m_minY[$side], $this->m_maxY[$side], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+
+			if ($delta === 0) {
 				if ($this->graphOrientation[$side] == '-') {
 					$this->m_maxY[$side] = 0;
 				}
@@ -2341,7 +2344,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$this->m_minY[$side] = 0;
 				}
 			}
-			elseif ($this->m_minY[$side] > $this->m_maxY[$side]) {
+			elseif ($delta === 1) {
 				if ($this->graphOrientation[$side] == '-') {
 					$this->m_minY[$side] = bcmul($this->m_maxY[$side], 0.2);
 				}
