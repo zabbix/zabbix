@@ -149,7 +149,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			}
 
 			tasks = append(tasks, task)
-			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
+			log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
+				c.id, p.name(), task.item.itemid, task.item.key)
 		} else {
 			task = tacc.task()
 			task.updated = now
@@ -160,7 +161,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					return
 				}
 				p.tasks.Update(task)
-				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
+				log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
+					c.id, p.name(), task.item.itemid, task.item.key)
 			}
 		}
 		task.meta.SetLastLogsize(*r.LastLogsize)
