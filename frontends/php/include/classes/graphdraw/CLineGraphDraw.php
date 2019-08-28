@@ -705,7 +705,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @param float $max		Y axis max value
 	 */
 	protected function validateMinMax($min, $max) {
-		if (bccomp($min, $max) == 0 || bccomp($min, $max) == 1) {
+		if (bccomp($max, $min, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) < 1) {
 			show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
 			exit;
 		}
@@ -2330,8 +2330,7 @@ class CLineGraphDraw extends CGraphDraw {
 			if ($this->m_maxY[$side] === null) {
 				$this->m_maxY[$side] = 1;
 			}
-
-			if ($this->m_minY[$side] == $this->m_maxY[$side]) {
+			if (bccomp($this->m_minY[$side], $this->m_maxY[$side], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) == 0) {
 				if ($this->graphOrientation[$side] == '-') {
 					$this->m_maxY[$side] = 0;
 				}
