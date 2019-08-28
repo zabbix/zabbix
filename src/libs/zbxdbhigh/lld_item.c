@@ -1413,13 +1413,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	DB_ROW				row;
 	int				i, j;
 	zbx_lld_item_t			*item;
-	zbx_vector_uint64_t		itemids;
 	zbx_vector_str_t		keys;
 	zbx_hashset_t			items_keys;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&itemids);
 	zbx_vector_str_create(&keys);		/* list of item keys */
 
 	/* check an item name validity */
@@ -1553,9 +1551,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		if (0 != item->itemid)
-			zbx_vector_uint64_append(&itemids, item->itemid);
-
 		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 			continue;
 
@@ -1570,7 +1565,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select key_"
+				"select itemid,key_"
 				" from items"
 				" where hostid=" ZBX_FS_UI64
 					" and",
@@ -1578,26 +1573,22 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "key_",
 				(const char **)keys.values, keys.values_num);
 
-		if (0 != itemids.values_num)
-		{
-			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
-					itemids.values, itemids.values_num);
-		}
-
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			for (i = 0; i < items->values_num; i++)
 			{
+				zbx_uint64_t db_itemid;
+
+				ZBX_STR2UINT64(db_itemid, row[0]);
+
 				item = (zbx_lld_item_t *)items->values[i];
 
 				if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 					continue;
 
-				if (0 == strcmp(item->key, row[0]))
+				if (0 == strcmp(item->key, row[1]) && item->itemid != db_itemid)
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s item:"
 							" item with the same key \"%s\" already exists.\n",
@@ -1621,7 +1612,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 	}
 
 	zbx_vector_str_destroy(&keys);
-	zbx_vector_uint64_destroy(&itemids);
 
 	/* check limit of dependent items in the dependency tree */
 	if (0 != item_dependencies->values_num)
