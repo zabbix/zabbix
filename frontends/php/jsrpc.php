@@ -504,9 +504,7 @@ switch ($data['method']) {
 		}
 
 		// Add wildcard containing pattern to the list of results.
-		if (strstr($search, '*')) {
-			array_unshift($result, ['name' => $search, 'id' => $search]);
-		}
+		array_unshift($result, ['name' => $search, 'id' => $search]);
 
 		if (array_key_exists('limit', $data)) {
 			$result = array_slice($result, 0, $data['limit']);
