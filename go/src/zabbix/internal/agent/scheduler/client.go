@@ -45,7 +45,7 @@ type pluginInfo struct {
 type client struct {
 	id                 uint64
 	exporters          map[uint64]exporterTaskAccessor
-	plugins            map[*pluginAgent]*pluginInfo
+	pluginsInfo        map[*pluginAgent]*pluginInfo
 	refreshUnsupported int
 	globalRegexp       unsafe.Pointer
 	output             plugin.ResultWriter
@@ -89,7 +89,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	log.Debugf("adding new request for key: '%s'", r.Key)
 
-	if info, ok = c.plugins[p]; !ok {
+	if info, ok = c.pluginsInfo[p]; !ok {
 		info = &pluginInfo{}
 	}
 
@@ -207,7 +207,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	if info.used.IsZero() {
 		p.refcount++
-		c.plugins[p] = info
+		c.pluginsInfo[p] = info
 	}
 	info.used = now
 
@@ -215,9 +215,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 }
 
 func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
-	released = make([]*pluginAgent, 0, len(c.plugins))
+	released = make([]*pluginAgent, 0, len(c.pluginsInfo))
 	// remover references to temporary watcher tasks
-	for _, p := range c.plugins {
+	for _, p := range c.pluginsInfo {
 		p.watcher = nil
 	}
 
@@ -242,7 +242,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 	// deactivate plugins
 	for _, p := range plugins {
-		if info, ok := c.plugins[p]; ok {
+		if info, ok := c.pluginsInfo[p]; ok {
 			if info.used.Before(expiry) {
 				// perform empty watch task before closing
 				if c.id != 0 {
@@ -264,7 +264,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 				}
 
 				released = append(released, p)
-				delete(c.plugins, p)
+				delete(c.pluginsInfo, p)
 				p.refcount--
 				// TODO: define uniform time format
 				if c.id != 0 {
@@ -297,10 +297,10 @@ func (c *client) updateExpressions(expressions []*glexpr.Expression) {
 
 func newClient(id uint64, output plugin.ResultWriter) (b *client) {
 	b = &client{
-		id:        id,
-		exporters: make(map[uint64]exporterTaskAccessor),
-		plugins:   make(map[*pluginAgent]*pluginInfo),
-		output:    output,
+		id:          id,
+		exporters:   make(map[uint64]exporterTaskAccessor),
+		pluginsInfo: make(map[*pluginAgent]*pluginInfo),
+		output:      output,
 	}
 
 	return
