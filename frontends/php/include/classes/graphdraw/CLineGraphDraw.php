@@ -2330,7 +2330,7 @@ class CLineGraphDraw extends CGraphDraw {
 			if ($this->m_maxY[$side] === null) {
 				$this->m_maxY[$side] = 1;
 			}
-			
+
 			$delta = bccomp($this->m_minY[$side], $this->m_maxY[$side], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
 
 			if ($delta === 0) {
