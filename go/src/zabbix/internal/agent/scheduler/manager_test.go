@@ -330,7 +330,7 @@ func (m *mockManager) mockTasks() {
 			}
 			tasks[j].setIndex(-1)
 		}
-		m.queue.Update(p)
+		m.pluginQueue.Update(p)
 	}
 }
 
@@ -558,19 +558,19 @@ func (t *mockConfigerTask) getWeight() int {
 func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clientItem) {
 	lastCheck := time.Time{}
 	n := 0
-	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if task := p.peekTask(); task != nil {
 			if task.getScheduled().Before(lastCheck) {
 				t.Errorf("Out of order tasks detected")
 			}
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 			p.popTask()
 			n++
 			if p.peekTask() != nil {
-				heap.Push(&m.queue, p)
+				heap.Push(&m.pluginQueue, p)
 			}
 		} else {
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 		}
 	}
 	if len(items) != n {
@@ -649,8 +649,8 @@ func TestTaskCreate(t *testing.T) {
 
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 3 {
-		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
+	if len(manager.pluginQueue) != 3 {
+		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
 	checkExporterTasks(t, manager, 1, items)
@@ -717,8 +717,8 @@ func TestTaskUpdate(t *testing.T) {
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 3 {
-		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
+	if len(manager.pluginQueue) != 3 {
+		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
 	checkExporterTasks(t, manager, 1, items)

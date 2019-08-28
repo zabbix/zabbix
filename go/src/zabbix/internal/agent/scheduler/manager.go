@@ -36,10 +36,10 @@ import (
 )
 
 type Manager struct {
-	input   chan interface{}
-	plugins map[string]*pluginAgent
-	queue   pluginHeap
-	clients map[uint64]*client
+	input       chan interface{}
+	plugins     map[string]*pluginAgent
+	pluginQueue pluginHeap
+	clients     map[uint64]*client
 }
 
 type updateRequest struct {
@@ -97,14 +97,14 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 			log.Debugf("created stopper task for plugin %s", p.name())
 
 			if p.queued() {
-				m.queue.Update(p)
+				m.pluginQueue.Update(p)
 			}
 		}
 
 		// queue plugin if there are still some tasks left to be finished before deactivating
 		if len(p.tasks) != 0 {
 			if !p.queued() {
-				heap.Push(&m.queue, p)
+				heap.Push(&m.pluginQueue, p)
 			}
 		}
 	}
@@ -149,9 +149,9 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 
 		if !p.queued() {
-			heap.Push(&m.queue, p)
+			heap.Push(&m.pluginQueue, p)
 		} else {
-			m.queue.Update(p)
+			m.pluginQueue.Update(p)
 		}
 	}
 
@@ -160,25 +160,25 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 
 func (m *Manager) processQueue(now time.Time) {
 	seconds := now.Unix()
-	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if task := p.peekTask(); task != nil {
 			if task.getScheduled().Unix() > seconds {
 				break
 			}
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 			if p.hasCapacity() {
 				p.popTask()
 				p.reserveCapacity(task)
 				task.perform(m)
 				if p.hasCapacity() {
-					heap.Push(&m.queue, p)
+					heap.Push(&m.pluginQueue, p)
 				}
 			} else {
 				log.Debugf("cannot perform task for plugin %s: no capacity", p.name())
 			}
 		} else {
 			// plugins with empty task queue should not be in Manager queue
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 		}
 	}
 }
@@ -194,7 +194,7 @@ func (m *Manager) processFinishRequest(task performer) {
 		}
 	}
 	if !p.queued() && p.hasCapacity() {
-		heap.Push(&m.queue, p)
+		heap.Push(&m.pluginQueue, p)
 	}
 }
 
@@ -202,8 +202,8 @@ func (m *Manager) processFinishRequest(task performer) {
 // difference between ticks exceeds limits (for example during daylight saving changes).
 func (m *Manager) rescheduleQueue(now time.Time) {
 	// easier to rebuild queues than update each element
-	queue := make(pluginHeap, 0, len(m.queue))
-	for _, p := range m.queue {
+	queue := make(pluginHeap, 0, len(m.pluginQueue))
+	for _, p := range m.pluginQueue {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for _, t := range tasks {
@@ -213,7 +213,7 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 		}
 		heap.Push(&queue, p)
 	}
-	m.queue = queue
+	m.pluginQueue = queue
 }
 
 func (m *Manager) run() {
@@ -280,7 +280,7 @@ run:
 
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
-	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
+	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
 
