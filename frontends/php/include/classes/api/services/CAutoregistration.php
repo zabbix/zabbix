@@ -36,7 +36,9 @@ class CAutoregistration extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options) {
-		return (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) : [];
+		$result = (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) : [];
+
+		return array_diff_key($result, ['tls_psk_identity' => true, 'tls_psk' => true]);
 	}
 
 	/**

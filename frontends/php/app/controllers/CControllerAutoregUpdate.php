@@ -66,11 +66,15 @@ class CControllerAutoregUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$autoreg = [
-			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE),
-			'tls_psk_identity' => $this->getInput('tls_psk_identity', ''),
-			'tls_psk' => $this->getInput('tls_psk', '')
-		];
+		$autoreg = ['tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)];
+
+		if ($this->getInput('tls_psk_identity', '') !== '') {
+			$autoreg['tls_psk_identity'] = $this->getInput('tls_psk_identity');
+		}
+
+		if ($this->getInput('tls_psk', '') !== '') {
+			$autoreg['tls_psk'] = $this->getInput('tls_psk');
+		}
 
 		$result = (bool) API::Autoregistration()->update($autoreg);
 

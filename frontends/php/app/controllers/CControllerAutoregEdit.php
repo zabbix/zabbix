@@ -30,7 +30,8 @@ class CControllerAutoregEdit extends CController {
 			'tls_accept' =>				'in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
 			'tls_psk_identity' =>		'db config_autoreg_tls.tls_psk_identity',
 			'tls_psk' =>				'db config_autoreg_tls.tls_psk',
-			'enable_confirmation' =>	'in 1'
+			'enable_confirmation' =>	'in 1',
+			'change_psk' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -49,12 +50,13 @@ class CControllerAutoregEdit extends CController {
 	protected function doAction() {
 		// get values from the database
 		$autoreg = API::Autoregistration()->get([
-			'output' => ['tls_accept', 'tls_psk_identity', 'tls_psk']
+			'output' => ['tls_accept']
 		]);
 
 		$data['tls_accept'] = $autoreg['tls_accept'];
-		$data['tls_psk_identity'] = $autoreg['tls_psk_identity'];
-		$data['tls_psk'] = $autoreg['tls_psk'];
+		$data['tls_psk_identity'] = '';
+		$data['tls_psk'] = '';
+		$data['change_psk'] = $this->hasInput('change_psk') || $this->hasInput('tls_psk_identity');
 
 		// overwrite with input variables
 		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);

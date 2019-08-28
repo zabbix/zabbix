@@ -36,6 +36,16 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
+$autoreg_form = (new CForm())
+	->setId('autoreg-form')
+	->setName('autoreg-form')
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'autoreg.edit')
+		->getUrl()
+	)
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('tls_accept', $data['tls_accept']);
+
 $autoreg_tab = (new CFormList())
 	->addRow(_('Encryption level'),
 		(new CList())
@@ -46,37 +56,52 @@ $autoreg_tab = (new CFormList())
 			->addItem((new CCheckBox('tls_in_psk'))
 				->setLabel(_('PSK'))
 			)
-	)
-	->addRow(
-		(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired(),
-		null,
-		'tls_psk'
-	)
-	->addRow(
-		(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired(),
-		null,
-		'tls_psk'
 	);
+
+if ($data['change_psk']) {
+	$autoreg_form->disablePasswordAutofill();
+
+	$autoreg_tab
+		->addRow(
+			(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
+			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAttribute('autocomplete', 'off')
+				->setAriaRequired(),
+			null,
+			'tls_psk'
+		)
+		->addRow(
+			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAttribute('autocomplete', 'off')
+				->setAriaRequired(),
+			null,
+			'tls_psk'
+		);
+
+}
+else {
+	$autoreg_tab
+		->addRow(
+			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CSimpleButton(_('Change PSK')))
+				->setId('tls_psk')
+				->setAttribute('autofocus', 'autofocus')
+				->onClick('javascript: submitFormWithParam("'.$autoreg_form->getName().'", "change_psk", "1");')
+				->addClass(ZBX_STYLE_BTN_GREY),
+			null,
+			'tls_psk'
+		);
+
+}
 
 $autoreg_view = (new CTabView())
 	->addTab('autoreg', _('Auto registration'), $autoreg_tab)
-	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+	->setFooter(makeFormFooter((new CSubmitButton(_('Update'), 'action', 'autoreg.update'))->setId('update')));
 
-$autoreg_form = (new CForm())
-	->setId('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'autoreg.update')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('tls_accept', $data['tls_accept'])
-	->addItem($autoreg_view);
+$autoreg_form->addItem($autoreg_view);
 
 $widget
 	->addItem($autoreg_form)
