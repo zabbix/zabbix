@@ -25,8 +25,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxcmd"
 )
 
@@ -141,7 +141,7 @@ func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters 
 		}
 
 		userParameter.parameters[key] = parameter
-		plugin.RegisterMetric(&userParameter, "userparameter", key, fmt.Sprintf("User parameter: %s.", s[1]))
+		plugin.RegisterMetrics(&userParameter, "UserParameter", key, fmt.Sprintf("User parameter: %s.", s[1]))
 	}
 
 	return nil

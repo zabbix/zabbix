@@ -1998,7 +1998,9 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/log/Makefile
+	go/src/zabbix/pkg/plugin/Makefile
 	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/tls/Makefile
 	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/pkg/watch/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
@@ -2012,7 +2014,6 @@ AC_OUTPUT([
 	go/src/zabbix/internal/agent/serverconnector/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
@@ -2030,9 +2031,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/filecksum/Makefile
-	go/src/zabbix/plugins/vfs/filecontents/Makefile
-	go/src/zabbix/plugins/vfs/fileexists/Makefile
+	go/src/zabbix/plugins/vfs/file/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/stats/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile

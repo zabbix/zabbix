@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxcmd"
 )
 
@@ -82,5 +82,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "systemrun", "system.run", "Run specified command.")
+	plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
 }

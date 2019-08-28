@@ -2,7 +2,7 @@ package agent
 
 import (
 	"testing"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 type Input struct {

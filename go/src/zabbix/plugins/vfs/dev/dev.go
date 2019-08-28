@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 // Plugin -
@@ -126,7 +126,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.dev.discovery":
 		return p.getDiscovery()
 	default:
-		return nil, errors.New("Unsupported metric")
+		return nil, errors.New("Unsupported metric.")
 	}
 
 	statType := statTypeSPS
@@ -243,8 +243,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	impl.devices = make(map[string]*devUnit)
-	plugin.RegisterMetric(&impl, "vfsdev", "vfs.dev.read", "Disk read statistics.")
-	plugin.RegisterMetric(&impl, "vfsdev", "vfs.dev.write", "Disk write statistics.")
-	plugin.RegisterMetric(&impl, "vfsdev", "vfs.dev.discovery", "List of block devices and their type."+
-		" Used for low-level discovery.")
+	plugin.RegisterMetrics(&impl, "VFSDev",
+		"vfs.dev.read", "Disk read statistics.",
+		"vfs.dev.write", "Disk write statistics.",
+		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.")
 }

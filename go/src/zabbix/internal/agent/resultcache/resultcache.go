@@ -49,9 +49,9 @@ import (
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/version"
 )
 
@@ -250,7 +250,6 @@ func (c *ResultCache) run() {
 			c.updateOptions(v.(*agent.AgentOptions))
 		}
 	}
-	close(c.input)
 	log.Debugf("[%d] result cache has been stopped", c.clientID)
 	monitor.Unregister()
 }

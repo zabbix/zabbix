@@ -3,7 +3,9 @@ SUBDIRS = \
 	glexpr \
 	itemutil \
 	log \
+	plugin \
 	std \
+	tls \
 	version \
 	watch \
 	zbxcomms \

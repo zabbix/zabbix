@@ -17,32 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package filecksum
+package file
 
 import (
-	"reflect"
-	"testing"
-	"zabbix/internal/agent"
-	"zabbix/pkg/std"
+	"errors"
+	"fmt"
 )
 
-var CrcFile = "1234"
+// Export -
+func (p *Plugin) exportSize(params []string) (result interface{}, err error) {
+	if len(params) != 1 {
+		return nil, errors.New("Invalid number of parameters.")
+	}
+	if "" == params[0] {
+		return nil, errors.New("Invalid first parameter.")
+	}
 
-func TestFileCksum(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	agent.Options.Timeout = 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte(CrcFile))
-	if result, err := impl.Export("vfs.file.cksum", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.cksum returned error %s", err.Error())
+	if f, err := stdOs.Stat(params[0]); err == nil {
+		return f.Size(), nil
 	} else {
-		if crc, ok := result.(uint32); !ok {
-			t.Errorf("vfs.file.cksum returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if crc != 3582362371 {
-				t.Errorf("vfs.file.cksum returned invalid result")
-			}
-		}
+		return nil, fmt.Errorf("Cannot obtain file information: %s", err)
 	}
 }

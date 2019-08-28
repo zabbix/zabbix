@@ -17,19 +17,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package fileexists
+package file
 
 import (
 	"reflect"
 	"testing"
-	"zabbix/internal/agent"
+	"time"
 	"zabbix/pkg/std"
 )
 
 func TestFileExists(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text.txt"}, nil); err != nil {
@@ -48,7 +48,7 @@ func TestFileExists(t *testing.T) {
 func TestFileNotExists(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-	agent.Options.Timeout = 3
+	impl.timeout = time.Second * 3
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text2.txt"}, nil); err != nil {

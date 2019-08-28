@@ -17,43 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package agent
+package file
 
 import (
-	"errors"
-	"fmt"
-	"zabbix/pkg/plugin"
-	"zabbix/pkg/version"
+	"reflect"
+	"testing"
+	"time"
+	"zabbix/pkg/std"
 )
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
+func TestFileSize(t *testing.T) {
+	stdOs = std.NewMockOs()
 
-var impl Plugin
+	impl.timeout = time.Second * 3
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
+	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
+		t.Errorf("vfs.file.size returned error %s", err.Error())
+	} else {
+		if filesize, ok := result.(int64); !ok {
+			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if filesize != 4 {
+				t.Errorf("vfs.file.size returned invalid result")
+			}
+		}
 	}
-
-	switch key {
-	case "agent.hostname":
-		return Options.Hostname, nil
-	case "agent.ping":
-		return 1, nil
-	case "agent.version":
-		return version.Long(), nil
-	}
-
-	return nil, fmt.Errorf("Not implemented: %s", key)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.version", "Version of Zabbix agent.")
 }

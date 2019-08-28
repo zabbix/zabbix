@@ -25,14 +25,13 @@ import (
 	"math"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 type Manager struct {
@@ -117,6 +116,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	var requestClient *client
 	var ok bool
 	if requestClient, ok = m.clients[update.clientID]; !ok {
+		log.Debugf("registering new client ID:%d", update.clientID)
 		requestClient = newClient(update.clientID, update.sink)
 		m.clients[update.clientID] = requestClient
 	}
@@ -131,18 +131,20 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
+			} else {
+				err = requestClient.addRequest(p, r, update.sink, now)
 			}
 		}
-		if err == nil {
-			err = requestClient.addRequest(p, r, update.sink, now)
-		}
+
 		if err != nil {
-			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
-				tacc.task().deactivate()
+			if r.Itemid != 0 {
+				if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+					tacc.task().deactivate()
+				}
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			log.Debugf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
 			continue
 		}
 
@@ -171,6 +173,8 @@ func (m *Manager) processQueue(now time.Time) {
 				if p.hasCapacity() {
 					heap.Push(&m.queue, p)
 				}
+			} else {
+				log.Debugf("cannot perform task for plugin %s: no capacity", p.name())
 			}
 		} else {
 			// plugins with empty task queue should not be in Manager queue
@@ -264,7 +268,6 @@ run:
 			}
 		}
 	}
-	close(m.input)
 	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
@@ -288,13 +291,12 @@ func (m *Manager) init() {
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
 			capacity := metric.Plugin.Capacity()
-			section := strings.Title(metric.Plugin.Name())
-			if options, ok := agent.Options.Plugins[section]; ok {
+			if options, ok := agent.Options.Plugins[metric.Plugin.Name()]; ok {
 				if cap, ok := options["Capacity"]; ok {
 					var err error
 					if capacity, err = strconv.Atoi(cap); err != nil {
 						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-							section, cap, plugin.DefaultCapacity)
+							metric.Plugin.Name(), cap, plugin.DefaultCapacity)
 					}
 				}
 			}
@@ -346,13 +348,13 @@ func (m *Manager) Stop() {
 
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
-	r := updateRequest{clientID: clientID,
+
+	m.input <- &updateRequest{clientID: clientID,
 		sink:               writer,
 		requests:           requests,
 		refreshUnsupported: refreshUnsupported,
 		expressions:        expressions,
 	}
-	m.input <- &r
 }
 
 type resultWriter chan *plugin.Result
