@@ -21,6 +21,7 @@ package scheduler
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"math"
 	"sort"
@@ -392,7 +393,8 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 			if r.Value != nil {
 				result = *r.Value
 			} else {
-				// TODO: check what must be returned on empty result
+				// single metric requests do not support empty values, return error instead
+				err = errors.New("No values have been gathered yet.")
 			}
 		} else {
 			err = r.Error
