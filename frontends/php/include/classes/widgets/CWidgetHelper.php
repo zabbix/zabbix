@@ -799,6 +799,8 @@ class CWidgetHelper {
 					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
 						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
 					'});'.
+					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
