@@ -57,7 +57,7 @@ $table = (new CTableInfo())
 			' &bullet; ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
-		$data['fields']['show_latest_values'] ? _('Latest values') : null,
+		$data['fields']['show_opdata'] ? _('Operational data') : null,
 		_('Duration'),
 		_('Ack'),
 		_('Actions'),
@@ -140,7 +140,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			$info_icons[] = makeInformationIcon(
 				array_key_exists($problem['userid'], $data['data']['users'])
 					? _s('Resolved by user "%1$s".', getUserFullname($data['data']['users'][$problem['userid']]))
-					: _('Resolved by user.')
+					: _('Resolved by inaccessible user.')
 			);
 		}
 	}
@@ -202,6 +202,28 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
+	// operational data
+	$opdata = null;
+	if ($data['fields']['show_opdata']) {
+		$opdata = ($trigger['opdata'] !== '')
+			? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+				[
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => $problem['clock'],
+					'ns' => $problem['ns']
+				],
+				[
+					'events' => true,
+					'html' => true
+				]
+			)))
+				->addClass('opdata')
+				->addClass(ZBX_STYLE_WORDWRAP)
+			: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+	}
+
 	// Create acknowledge url.
 	$problem_update_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'acknowledge.edit')
@@ -215,7 +237,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		$data['fields']['show_latest_values'] ? CScreenProblem::getLatestValues($trigger['items']) : null,
+		$opdata,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))

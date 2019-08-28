@@ -1888,7 +1888,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 					item->host.host, item->key_orig, h->value.str);
 
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
-					NULL, NULL, 0, 0, NULL, 0, NULL, 0, h->value.err);
+					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, h->value.err);
 
 			if (0 != strcmp(item->error, h->value.err))
 				item_error = h->value.err;
@@ -1901,7 +1901,7 @@ static zbx_item_diff_t	*calculate_item_update(const DC_ITEM *item, const ZBX_DC_
 			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
 			/* supported is handled in lld_process_discovery_rule()        */
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
-					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 
 			item_error = "";
 		}
@@ -2147,6 +2147,8 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 				case ITEM_VALUE_TYPE_TEXT:
 					pvalue = h->value.str;
 					break;
+				case ITEM_VALUE_TYPE_LOG:
+					continue;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;

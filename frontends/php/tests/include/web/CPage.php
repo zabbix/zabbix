@@ -152,8 +152,12 @@ class CPage {
 	 */
 	public function logout() {
 		try {
-			if (self::$cookie !== null) {
-				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(self::$cookie['value']));
+			$session = (self::$cookie === null)
+					? CTestArrayHelper::get($this->driver->manage()->getCookieNamed('zbx_sessionid'), 'value')
+					: self::$cookie['value'];
+
+			if ($session !== null) {
+				DBExecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr($session));
 			}
 
 			$this->driver->manage()->deleteAllCookies();

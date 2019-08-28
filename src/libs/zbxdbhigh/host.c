@@ -2085,7 +2085,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 		zbx_uint64_t triggerid, const char *description, const char *expression,
 		const char *recovery_expression, unsigned char recovery_mode, unsigned char status, unsigned char type,
 		unsigned char priority, const char *comments, const char *url, unsigned char flags,
-		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close)
+		unsigned char correlation_mode, const char *correlation_tag, unsigned char manual_close,
+		const char *opdata)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2104,7 +2105,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 			*url_esc = NULL,
 			*function_esc = NULL,
 			*parameter_esc = NULL,
-			*correlation_tag_esc;
+			*correlation_tag_esc,
+			*opdata_esc;
 	int		res = FAIL;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
@@ -2113,6 +2115,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 	description_esc = DBdyn_escape_string(description);
 	correlation_tag_esc = DBdyn_escape_string(correlation_tag);
+	opdata_esc = DBdyn_escape_string(opdata);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.expression,t.recovery_expression"
@@ -2141,9 +2144,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 					",correlation_mode=%d"
 					",correlation_tag='%s'"
 					",manual_close=%d"
+					",opdata='%s'"
 				" where triggerid=" ZBX_FS_UI64 ";\n",
 				triggerid, (int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-				(int)manual_close, h_triggerid);
+				(int)manual_close, opdata_esc, h_triggerid);
 
 		*new_triggerid = 0;
 		*cur_triggerid = h_triggerid;
@@ -2170,14 +2174,14 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
 						"comments,url,type,value,state,templateid,flags,recovery_mode,"
-						"correlation_mode,correlation_tag,manual_close)"
+						"correlation_mode,correlation_tag,manual_close,opdata)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
 						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,%d,"
-						"%d,'%s',%d);\n",
+						"%d,'%s',%d,'%s');\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
 					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, triggerid,
 					(int)flags, (int)recovery_mode, (int)correlation_mode, correlation_tag_esc,
-					(int)manual_close);
+					(int)manual_close, opdata_esc);
 
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
@@ -2263,6 +2267,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t *cur
 
 	zbx_free(sql);
 	zbx_free(correlation_tag_esc);
+	zbx_free(opdata_esc);
 	zbx_free(description_esc);
 
 	return res;
@@ -3215,23 +3220,22 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 				if (host_prototype->hostid == hostid)
+				{
+					if (FAIL == (i = zbx_vector_uint64_bsearch(&host_prototype->lnk_templateids,
+							templateid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						ZBX_STR2UINT64(hosttemplateid, row[2]);
+						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
+					}
+					else
+						zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
+
 					break;
+				}
 			}
 
 			if (i == host_prototypes->values_num)
-			{
 				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			if (FAIL == (i = zbx_vector_uint64_bsearch(&host_prototype->lnk_templateids, templateid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				ZBX_STR2UINT64(hosttemplateid, row[2]);
-				zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
-			}
-			else
-				zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
 		}
 		DBfree_result(result);
 	}
@@ -3343,34 +3347,37 @@ static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
 				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 
 				if (host_prototype->hostid == hostid)
-					break;
-			}
-
-			if (i == host_prototypes->values_num)
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
-
-			ZBX_STR2UINT64(group_prototypeid, row[1]);
-			ZBX_DBROW2UINT64(groupid, row[2]);
-
-			for (i = 0; i < host_prototype->group_prototypes.values_num; i++)
-			{
-				group_prototype = (zbx_group_prototype_t *)host_prototype->group_prototypes.values[i];
-
-				if (0 != group_prototype->group_prototypeid)
-					continue;
-
-				if (group_prototype->groupid == groupid && 0 == strcmp(group_prototype->name, row[3]))
 				{
-					group_prototype->group_prototypeid = group_prototypeid;
+					int	k;
+
+					ZBX_STR2UINT64(group_prototypeid, row[1]);
+					ZBX_DBROW2UINT64(groupid, row[2]);
+
+					for (k = 0; k < host_prototype->group_prototypes.values_num; k++)
+					{
+						group_prototype = (zbx_group_prototype_t *)
+								host_prototype->group_prototypes.values[k];
+
+						if (0 != group_prototype->group_prototypeid)
+							continue;
+
+						if (group_prototype->groupid == groupid &&
+								0 == strcmp(group_prototype->name, row[3]))
+						{
+							group_prototype->group_prototypeid = group_prototypeid;
+							break;
+						}
+					}
+
+					if (k == host_prototype->group_prototypes.values_num)
+						zbx_vector_uint64_append(del_group_prototypeids, group_prototypeid);
+
 					break;
 				}
 			}
 
-			if (i == host_prototype->group_prototypes.values_num)
-				zbx_vector_uint64_append(del_group_prototypeids, group_prototypeid);
+			if (i == host_prototypes->values_num)
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 		DBfree_result(result);
 	}
@@ -3634,7 +3641,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,t.description,t.expression,t.status,"
 				"t.type,t.priority,t.comments,t.url,t.flags,t.recovery_expression,t.recovery_mode,"
-				"t.correlation_mode,t.correlation_tag,t.manual_close"
+				"t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -3662,7 +3669,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 				(unsigned char)atoi(row[8]),	/* flags */
 				(unsigned char)atoi(row[11]),	/* correlation_mode */
 				row[12],			/* correlation_tag */
-				(unsigned char)atoi(row[13]));	/* manual_close */
+				(unsigned char)atoi(row[13]),	/* manual_close */
+				row[14]);			/* opdata */
 
 		if (0 != new_triggerid)				/* new trigger added */
 			zbx_vector_uint64_append(&new_triggerids, new_triggerid);
@@ -5061,6 +5069,7 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  *             ip     - [IN] IP address                                       *
  *             dns    - [IN] DNS address                                      *
  *             port   - [IN] port                                             *
+ *             flags  - [IN] the used connection type                         *
  *                                                                            *
  * Return value: upon successful completion return interface identificator    *
  *                                                                            *
@@ -5069,8 +5078,8 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
-		unsigned char useip, const char *ip, const char *dns, unsigned short port)
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
+		const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -5098,24 +5107,69 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		if (1 == db_main)
 			main_ = 0;
 
-		if (db_useip != useip)
-			continue;
+		if (ZBX_CONN_DEFAULT == flags)
+		{
+			if (db_useip != useip)
+				continue;
+			if (useip && 0 != strcmp(db_ip, ip))
+				continue;
 
-		if (useip && 0 != strcmp(db_ip, ip))
-			continue;
+			if (!useip && 0 != strcmp(db_dns, dns))
+				continue;
 
-		if (!useip && 0 != strcmp(db_dns, dns))
-			continue;
+			zbx_free(tmp);
+			tmp = strdup(row[4]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+					&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+				continue;
 
-		zbx_free(tmp);
-		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
-				&tmp, MACRO_TYPE_COMMON, NULL, 0);
-		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
-			continue;
+			ZBX_STR2UINT64(interfaceid, row[0]);
+			break;
+		}
 
-		ZBX_STR2UINT64(interfaceid, row[0]);
-		break;
+		/* update main interface if explicit connection flags were passed (flags != ZBX_CONN_DEFAULT) */
+		if (1 == db_main)
+		{
+			char	*update = NULL, delim = ' ';
+			size_t	update_alloc = 0, update_offset = 0;
+
+			ZBX_STR2UINT64(interfaceid, row[0]);
+
+			if (db_useip != useip)
+			{
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cuseip=%d", delim, useip);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_IP == flags && 0 != strcmp(db_ip, ip))
+			{
+				ip_esc = DBdyn_escape_field("interface", "ip", ip);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cip='%s'", delim, ip_esc);
+				zbx_free(ip_esc);
+				delim = ',';
+			}
+
+			if (ZBX_CONN_DNS == flags && 0 != strcmp(db_dns, dns))
+			{
+				dns_esc = DBdyn_escape_field("interface", "dns", dns);
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cdns='%s'", delim,
+						dns_esc);
+				zbx_free(dns_esc);
+				delim = ',';
+			}
+
+			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
+
+			if (0 != update_alloc)
+			{
+				DBexecute("update interface set%s where interfaceid=" ZBX_FS_UI64, update,
+						interfaceid);
+				zbx_free(update);
+			}
+			break;
+		}
 	}
 	DBfree_result(result);
 

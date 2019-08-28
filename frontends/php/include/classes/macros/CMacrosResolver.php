@@ -456,14 +456,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve macros in trigger description.
+	 * Resolve macros in trigger description and operational data.
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[$triggerid]['expression']
-	 * @param string $triggers[$triggerid]['comments']
+	 * @param string $triggers[$triggerid][<sources>]     See $options['sources'].
 	 * @param int    $triggers[$triggerid]['clock']       (optional)
 	 * @param int    $triggers[$triggerid]['ns']          (optional)
+	 * @param array  $options
 	 * @param bool   $options['events']                   Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool   $options['html']
+	 * @param array  $options['sources']                  An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
 	 */
@@ -492,7 +495,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($triggers as $triggerid => $trigger) {
 			$functionids = $this->findFunctions($trigger['expression']);
 
-			$matched_macros = $this->extractMacros([$trigger['comments']], $types);
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $trigger[$source];
+			}
+
+			$matched_macros = $this->extractMacros($texts, $types);
 
 			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
 				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
@@ -538,7 +546,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options['events']);
+		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -566,15 +574,38 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$types = $this->transformToPositionTypes($types);
 
-		// Replace macros to value
+		// Replace macros to value.
 		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
-			$matched_macros = $this->getMacroPositions($trigger['comments'], $types);
+			foreach ($options['sources'] as $source) {
+				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
 
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$trigger['comments'] =
-					substr_replace($trigger['comments'], $macro_values[$triggerid][$macro], $pos, strlen($macro));
+				if ($options['html']) {
+					$macro_string = [];
+					$pos_left = 0;
+
+					foreach ($matched_macros as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$triggerid])) {
+							if ($pos_left != $pos) {
+								$macro_string[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+							}
+
+							$macro_string[] = $macro_values[$triggerid][$macro];
+							$pos_left = $pos + strlen($macro);
+						}
+					}
+					$macro_string[] = substr($trigger[$source], $pos_left);
+
+					$trigger[$source] = $macro_string;
+				}
+				else {
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						$trigger[$source] = substr_replace($trigger[$source], $macro_values[$triggerid][$macro], $pos,
+							strlen($macro)
+						);
+					}
+				}
 			}
 		}
 		unset($trigger);
@@ -1676,7 +1707,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'([0-9]+['.ZBX_TIME_SUFFIXES.']?)?'.
 				'\)}{1})/Uux';
 
-		if (preg_match_all($pattern, $label, $matches) != false && array_key_exists('macros', $matches)) {
+		if (preg_match_all($pattern, $label, $matches) !== false && array_key_exists('macros', $matches)) {
+			// $replaceHosts with key '0' is used for macros without reference.
+			if ($replaceHosts !== null && array_key_exists(0, $replaceHosts)) {
+				$replaceHosts[''] = $replaceHosts[0];
+				unset($replaceHosts[0]);
+			}
+
 			// For each functional macro.
 			foreach ($matches['macros'] as $expr) {
 				$macro = $expr;
@@ -2015,7 +2052,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			/**
+			/*
 			 * If macros are found, put elementid to list of elements to fetch API.
 			 * Since only supported host-group macro is {HOSTGROUP.ID}, it's useless to collect host group id-s in order
 			 * to fetch additional details from database.
@@ -2134,7 +2171,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$matched_macros = $macros_by_selementid[$selid];
-			$hosts_by_nr = [];
+			$hosts_by_nr = null;
 			$trigger = null;
 			$host = null;
 			$map = null;
@@ -2197,6 +2234,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					if (array_key_exists($elementid, $hosts)) {
 						$host = $hosts[$elementid];
+						$hosts_by_nr = [0 => $host];
 					}
 					break;
 			}
@@ -2347,6 +2385,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
+				// Resolve functional macros like: {{HOST.HOST}:log[{HOST.HOST}.log].last(0)}.
+				$sel['label'] = $this->resolveMapLabelMacros($sel['label'], $hosts_by_nr);
+
 				// Replace macros by resolved values in selement label.
 				$macros_position = $this->getMacroPositions($sel['label'], $types);
 				foreach (array_reverse($macros_position, true) as $pos => $macro) {
@@ -2355,9 +2396,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						: UNRESOLVED_MACRO_STRING;
 					$sel['label'] = substr_replace($sel['label'], $value, $pos, strlen($macro));
 				}
-
-				// Resolve functional macros. Macros used in functional macros are already replaced at this point.
-				$sel['label'] = $this->resolveMapLabelMacros($sel['label']);
 			}
 
 			// Replace macros in selement URLs.

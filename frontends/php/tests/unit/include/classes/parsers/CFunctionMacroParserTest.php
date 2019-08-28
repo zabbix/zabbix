@@ -45,7 +45,9 @@ class CFunctionMacroParserTest extends CParserTest {
 			['{host:item.func}', 0, CParser::PARSE_FAIL, ''],
 			['{host:item.func(}', 0, CParser::PARSE_FAIL, ''],
 			['{host:item.func()', 0, CParser::PARSE_FAIL, ''],
-			['{host.item.func()}', 0, CParser::PARSE_FAIL, '']
+			['{host.item.func()}', 0, CParser::PARSE_FAIL, ''],
+			['{ host:item.func()}', 0, CParser::PARSE_FAIL, ''],
+			['{host :item.func()}', 0, CParser::PARSE_FAIL, '']
 		];
 	}
 

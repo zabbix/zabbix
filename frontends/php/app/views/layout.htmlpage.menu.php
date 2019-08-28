@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
@@ -65,22 +66,17 @@ $user_menu = (new CList())
 
 if (!$data['user']['is_guest']) {
 	$user_menu->addItem(
-		(new CLink(SPACE, 'profile.php'))
+		(new CLink(SPACE, 'zabbix.php?action=userprofile.edit'))
 			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setTitle(getUserFullname($data['user']))
 	);
 }
 
 $user_menu->addItem(
-	(new CLink(SPACE,
-		(new CUrl('index.php'))
-			->setArgument('reconnect', 1)
-			->setArgument('form', 'default')
-			->toString()
-	))
+	(new CLink(SPACE, 'javascript:;'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
-		->addSID()
+		->onClick('ZABBIX.logout()')
 );
 
 $user_navigation->addItem($user_menu);

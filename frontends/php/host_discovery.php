@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js'];
+$page['scripts'] = ['class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js', 'textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -373,9 +373,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = trim($step['params'][0]);
 					break;
 
+				case ZBX_PREPROC_XPATH:
 				case ZBX_PREPROC_JSONPATH:
 				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
 				case ZBX_PREPROC_ERROR_FIELD_JSON:
+				case ZBX_PREPROC_ERROR_FIELD_XML:
 				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				case ZBX_PREPROC_SCRIPT:
 					$step['params'] = $step['params'][0];

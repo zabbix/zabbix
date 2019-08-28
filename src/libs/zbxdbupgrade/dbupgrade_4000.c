@@ -27,6 +27,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char program_type;
+
 static int	DBpatch_4000000(void)
 {
 	return SUCCEED;

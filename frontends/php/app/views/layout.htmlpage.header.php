@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
 $page_title = $data['page']['title'];
@@ -45,7 +46,9 @@ if (!empty($DB['DB'])) {
 
 // Show GUI messages in pages with menus and in fullscreen and kiosk mode.
 $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU')
-	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) ? 1 : null;
+	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]))
+		? intval(!CWebUser::isGuest())
+		: null;
 
 $pageHeader
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
