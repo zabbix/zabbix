@@ -139,26 +139,7 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$src
-				->setArgument('width', $this->screenitem['width'])
-				->setArgument('height', $this->screenitem['height'])
-				->setArgument('legend', $legend)
-				->setArgument('graph3d', $graph3d)
-				->setArgument('profileIdx', $this->profileIdx)
-				->setArgument('profileIdx2', $this->profileIdx2);
-
-			if ($this->mode == SCREEN_MODE_EDIT) {
-				$src
-					->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
-					->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
-			}
-			else {
-				$src
-					->setArgument('from', $this->timeline['from'])
-					->setArgument('to', $this->timeline['to']);
-			}
-
-			$timeControlData['src'] = $src->getUrl();
+			$src->setArgument('graph3d', $graph3d);
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
@@ -174,27 +155,27 @@ class CScreenGraph extends CScreenBase {
 					$timeControlData['loadSBox'] = 1;
 				}
 			}
-
-			$src
-				->setArgument('width', $this->screenitem['width'])
-				->setArgument('height', $this->screenitem['height'])
-				->setArgument('legend', $legend)
-				->setArgument('profileIdx', $this->profileIdx)
-				->setArgument('profileIdx2', $this->profileIdx2);
-
-			if ($this->mode == SCREEN_MODE_EDIT) {
-				$src
-					->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
-					->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
-			}
-			else {
-				$src
-					->setArgument('from', $this->timeline['from'])
-					->setArgument('to', $this->timeline['to']);
-			}
-
-			$timeControlData['src'] = $src->getUrl();
 		}
+
+		$src
+			->setArgument('width', $this->screenitem['width'])
+			->setArgument('height', $this->screenitem['height'])
+			->setArgument('legend', $legend)
+			->setArgument('profileIdx', $this->profileIdx)
+			->setArgument('profileIdx2', $this->profileIdx2);
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$src
+				->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
+				->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+		}
+		else {
+			$src
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to']);
+		}
+
+		$timeControlData['src'] = $src->getUrl();
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
