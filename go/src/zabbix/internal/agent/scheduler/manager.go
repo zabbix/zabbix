@@ -113,16 +113,16 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	log.Debugf("processing update request (%d requests)", len(update.requests))
 
 	// TODO: client expiry - remove unused owners after timeout (day+?)
-	var requestClient *client
+	var c *client
 	var ok bool
-	if requestClient, ok = m.clients[update.clientID]; !ok {
+	if c, ok = m.clients[update.clientID]; !ok {
 		log.Debugf("registering new client ID:%d", update.clientID)
-		requestClient = newClient(update.clientID, update.sink)
-		m.clients[update.clientID] = requestClient
+		c = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = c
 	}
 
-	requestClient.refreshUnsupported = update.refreshUnsupported
-	requestClient.updateExpressions(update.expressions)
+	c.refreshUnsupported = update.refreshUnsupported
+	c.updateExpressions(update.expressions)
 
 	for _, r := range update.requests {
 		var key string
@@ -132,13 +132,13 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			if p, ok = m.plugins[key]; !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = requestClient.addRequest(p, r, update.sink, now)
+				err = c.addRequest(p, r, update.sink, now)
 			}
 		}
 
 		if err != nil {
 			if r.Itemid != 0 {
-				if tacc, ok := requestClient.exporters[r.Itemid]; ok {
+				if tacc, ok := c.exporters[r.Itemid]; ok {
 					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
 					tacc.task().deactivate()
 				}
@@ -155,7 +155,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 	}
 
-	m.cleanupClient(requestClient, now)
+	m.cleanupClient(c, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
