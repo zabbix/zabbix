@@ -50,7 +50,7 @@ typedef struct {
 	char *psk_key;
 } tls_t, *tls_lp_t;
 
-static int tls_init()
+static int tls_init(void)
 {
 	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
 	ERR_load_crypto_strings();
@@ -382,6 +382,7 @@ static int tls_accept(tls_t *tls)
 	}
 	return 0;
 }
+
 static size_t tls_error(tls_t *tls, char **buf)
 {
 	size_t	sz;
@@ -1038,6 +1039,7 @@ type Config struct {
 func Supported() bool {
 	return supported
 }
+
 func Init(config *Config) (err error) {
 	if !supported {
 		return errors.New("built without TLS support")
