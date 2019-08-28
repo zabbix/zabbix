@@ -69,6 +69,7 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
+#define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
@@ -306,6 +307,7 @@ typedef struct
 	char		*url;
 	char		*comments;
 	char		*correlation_tag;
+	char		*opdata;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
@@ -599,22 +601,30 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, int now);
+		unsigned short port, const char *host_metadata, unsigned short flag, int now);
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, int now);
+		unsigned short port, const char *host_metadata, unsigned short flag, int now);
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		const char *host_metadata);
+		const char *host_metadata, unsigned short flag);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 const char	*DBsql_id_ins(zbx_uint64_t id);
 const char	*DBsql_id_cmp(zbx_uint64_t id);
 
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
-		unsigned char useip, const char *ip, const char *dns, unsigned short port);
+typedef enum
+{
+	ZBX_CONN_DEFAULT = 0,
+	ZBX_CONN_IP,
+	ZBX_CONN_DNS,
+}
+zbx_conn_flags_t;
+
+zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip, const char *ip,
+		const char *dns, unsigned short port, zbx_conn_flags_t flags);
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 

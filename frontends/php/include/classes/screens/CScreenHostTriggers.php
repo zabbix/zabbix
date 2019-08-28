@@ -174,7 +174,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'show' => TRIGGERS_OPTION_IN_PROBLEM,
 			'show_timeline' => 0,
 			'details' => 1,
-			'show_latest_values' => 0,
+			'show_opdata' => 0,
 			'sort_field' => '',
 			'sort_order' => ZBX_SORT_DOWN
 		];
@@ -246,7 +246,7 @@ class CScreenHostTriggers extends CScreenBase {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['userid'], $data['users'])
 							? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
-							: _('Resolved by user.')
+							: _('Resolved by inaccessible user.')
 					);
 				}
 			}

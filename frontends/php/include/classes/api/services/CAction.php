@@ -660,12 +660,15 @@ class CAction extends CApiService {
 		// Insert actions into db, get back array with new actionids.
 		$actions = DB::save('actions', $actions);
 		$actions = zbx_toHash($actions, 'actionid');
+		$audit = [];
 
 		$conditions_to_create = [];
 		$operations_to_create = [];
 
 		// Collect conditions and operations to be created and set appropriate action ID.
 		foreach ($actions as $actionid => $action) {
+			$audit[] = ['actionid' => $actionid, 'name' => $action['name']];
+
 			if (isset($action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionid;
@@ -728,6 +731,8 @@ class CAction extends CApiService {
 		// Add operations.
 		$this->addOperations($operations_to_create);
 
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $audit);
+
 		return ['actionids' => array_keys($actions)];
 	}
 
@@ -772,7 +777,7 @@ class CAction extends CApiService {
 		$operations_to_update = [];
 		$operationids_to_delete = [];
 
-		$actionsUpdateData = [];
+		$actions_update_data = [];
 
 		$newActionConditions = null;
 		foreach ($actions as $actionId => $action) {
@@ -945,12 +950,13 @@ class CAction extends CApiService {
 			}
 
 			if ($actionUpdateValues) {
-				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+				$actions_update_data[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
 			}
 		}
 
-		if ($actionsUpdateData) {
-			DB::update('actions', $actionsUpdateData);
+		if ($actions_update_data) {
+			DB::update('actions', $actions_update_data);
+			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
 		}
 
 		// add, update and delete operations

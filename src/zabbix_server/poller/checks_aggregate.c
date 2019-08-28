@@ -349,12 +349,13 @@ static int	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct i.itemid"
-			" from items i,hosts h,hosts_groups hg"
+			" from items i,hosts h,hosts_groups hg,item_rtdata ir"
 			" where i.hostid=h.hostid"
 				" and h.hostid=hg.hostid"
 				" and i.key_='%s'"
 				" and i.status=%d"
-				" and i.state=%d"
+				" and ir.itemid=i.itemid"
+				" and ir.state=%d"
 				" and h.status=%d"
 				" and",
 			esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);

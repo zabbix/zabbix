@@ -38,7 +38,7 @@ class CControllerWidgetNavTreeItemUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && trim(getRequest('map_name', '')) === '') {
-			error(_s('Incorrect value for field "%1$s": cannot be empty.', _('Name')));
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 			$ret = false;
 		}
 

@@ -479,7 +479,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// expandComment
 		if ($options['expandComment'] !== null && $result && array_key_exists('comments', reset($result))) {
-			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
+			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result, ['sources' => ['comments']]);
 		}
 
 		// expand expressions

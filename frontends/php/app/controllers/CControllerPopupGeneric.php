@@ -272,8 +272,7 @@ class CControllerPopupGeneric extends CController {
 					_('Name'),
 					_('Key'),
 					_('Type'),
-					_('Type of information'),
-					_('Status')
+					_('Type of information')
 				]
 			],
 			'sysmaps' => [
@@ -802,10 +801,13 @@ class CControllerPopupGeneric extends CController {
 			case 'items':
 			case 'item_prototypes':
 				$options = [
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status', 'state'],
+					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
 					'selectHosts' => ['name'],
 					'preservekeys' => true
 				];
+				if ($this->source_table === 'items') {
+					$options['output'] = array_merge($options['output'], ['state']);
+				}
 
 				if ($page_options['parent_discoveryid']) {
 					$options['discoveryids'] = [$page_options['parent_discoveryid']];
