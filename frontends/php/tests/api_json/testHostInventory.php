@@ -34,6 +34,7 @@ class testHostInventory extends CAPITest {
 
 		return [
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0001',
 					'groups' => [['groupid' => '5']],
@@ -44,6 +45,7 @@ class testHostInventory extends CAPITest {
 				null
 			],
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0002',
 					'groups' => [['groupid' => '5']],
@@ -54,6 +56,7 @@ class testHostInventory extends CAPITest {
 				null
 			],
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0003',
 					'groups' => [['groupid' => '5']],
@@ -63,6 +66,7 @@ class testHostInventory extends CAPITest {
 				null
 			],
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0004',
 					'groups' => [['groupid' => '5']],
@@ -72,6 +76,7 @@ class testHostInventory extends CAPITest {
 				null
 			],
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0005',
 					'groups' => [['groupid' => '5']],
@@ -81,6 +86,7 @@ class testHostInventory extends CAPITest {
 				null
 			],
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0006',
 					'groups' => [['groupid' => '5']],
@@ -92,6 +98,7 @@ class testHostInventory extends CAPITest {
 			],
 			// Assert that inventory_mode is not accepted as inventory object field.
 			[
+				'host.create',
 				[[
 					'host' => 'TEST.HOST.0007',
 					'groups' => [['groupid' => '5']],
@@ -103,11 +110,78 @@ class testHostInventory extends CAPITest {
 		];
 	}
 
+	public static function dataProviderUpdate() {
+		$hostid = 50009;
+
+		return [
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_MANUAL,
+					'inventory' => ['type' => 'test']
+				]],
+				null
+			],
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_AUTOMATIC,
+					'inventory' => ['os' => 'Windows']
+				]],
+				null
+			],
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_MANUAL
+				]],
+				null
+			],
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_AUTOMATIC
+				]],
+				null
+			],
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_DISABLED
+				]],
+				null
+			],
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory_mode' => HOST_INVENTORY_DISABLED,
+					'inventory' => ['type' => 'test']
+				]],
+				'Cannot set inventory fields for disabled inventory.'
+			],
+			// Assert that inventory_mode is not accepted as inventory object field.
+			[
+				'host.update',
+				[[
+					'hostid' => $hostid,
+					'inventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC, 'type' => 'test']
+				]],
+				'Incorrect inventory field "inventory_mode".'
+			]
+		];
+	}
 	/**
 	 * @dataProvider dataProviderCreate
+	 * @dataProvider dataProviderUpdate
 	 */
-	public function testHostInventoryCreate($params, $expected_error) {
-		$result = $this->call('host.create', $params, $expected_error);
+	public function testHostInventoryMethods($method, $params, $expected_error) {
+		$result = $this->call($method, $params, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['hostids'] as $index => $hostid) {
@@ -151,12 +225,14 @@ class testHostInventory extends CAPITest {
 					unset($db_inventory['hostid'], $db_inventory['inventory_mode']);
 
 					foreach ($db_inventory as $field => $value) {
-						$expected = (array_key_exists('inventory', $params[$index])
-								&& array_key_exists($field, $params[$index]['inventory']))
-							? $params[$index]['inventory'][$field]
-							: '';
+						if (array_key_exists('inventory', $params[$index])
+								&& array_key_exists($field, $params[$index]['inventory'])) {
+							$this->assertSame($params[$index]['inventory'][$field], $value);
+						}
+						elseif ($method === 'host.create') {
+							$this->assertSame('', $value);
+						}
 
-						$this->assertSame($expected, $value);
 					}
 
 					// Test host.get method.
@@ -177,12 +253,13 @@ class testHostInventory extends CAPITest {
 					);
 
 					foreach (CTestArrayHelper::get($response, 'result.0.inventory') as $field => $value) {
-						$expected = (array_key_exists('inventory', $params[$index])
-								&& array_key_exists($field, $params[$index]['inventory']))
-							? $params[$index]['inventory'][$field]
-							: '';
-
-						$this->assertSame($expected, $value);
+						if (array_key_exists('inventory', $params[$index])
+								&& array_key_exists($field, $params[$index]['inventory'])) {
+							$this->assertSame($params[$index]['inventory'][$field], $value);
+						}
+						elseif ($method === 'host.create') {
+							$this->assertSame('', $value);
+						}
 					}
 
 					// Test filtering in host.get method.
