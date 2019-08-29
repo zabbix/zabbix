@@ -48,6 +48,13 @@ class CFunctionMacroParser extends CParser {
 	 */
 	private $function_parser;
 
+	/**
+	 * Parser for host names.
+	 *
+	 * @var CHostNameParser
+	 */
+	private $host_name_parser;
+
 	private $host = '';
 	private $item = '';
 	private $function = '';
@@ -62,6 +69,7 @@ class CFunctionMacroParser extends CParser {
 
 		$this->item_key_parser = new CItemKey(['18_simple_checks' => $this->options['18_simple_checks']]);
 		$this->function_parser = new CFunctionParser();
+		$this->host_name_parser = new CHostNameParser();
 	}
 
 	/**
@@ -145,32 +153,13 @@ class CFunctionMacroParser extends CParser {
 	 * @return bool
 	 */
 	protected function parseHost($source, &$pos) {
-		$p = $pos;
-
-		for (; isset($source[$p]) && $this->isHostChar($source[$p]); $p++) {
-			// Code is not missing here.
-		}
-
-		// is host empty?
-		if ($p == $pos) {
+		if ($this->host_name_parser->parse($source, $pos) == self::PARSE_FAIL) {
 			return false;
 		}
 
-		$pos = $p;
+		$pos += $this->host_name_parser->getLength();
 
 		return true;
-	}
-
-	/**
-	 * Returns true if the char is allowed in the host name, false otherwise.
-	 *
-	 * @param string $c
-	 *
-	 * @return bool
-	 */
-	protected function isHostChar($c) {
-		return (($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z') || ($c >= '0' && $c <= '9')
-			|| $c == '.' || $c == ' ' || $c == '_' || $c == '-');
 	}
 
 	/**
