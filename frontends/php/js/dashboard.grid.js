@@ -1493,7 +1493,10 @@
 				.on('mouseenter', function() {
 					// Set single-line header for the iterator.
 					iterator['div'].removeClass('iterator-first-row-mouseenter');
-					slideKiosk($obj, data, 1);
+
+					if (iterator['div'].position().top === 0) {
+						slideKiosk($obj, data, 1);
+					}
 				})
 			);
 		}
