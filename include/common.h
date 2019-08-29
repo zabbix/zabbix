@@ -1135,9 +1135,9 @@ zbx_range_t;
 
 typedef struct
 {
-	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V46 */
-	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)            */
-	/*                                  0       1       2       3             */
+	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
+	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)           */
+	/*                                  0       1       2       3            */
 	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
 
 	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */

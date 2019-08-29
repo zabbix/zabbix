@@ -43,6 +43,7 @@ check_fields($fields);
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
+	redirect('index.php');
 }
 
 $config = select_config();
