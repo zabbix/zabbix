@@ -3166,22 +3166,20 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	value_esc = DBdyn_escape_string(value);
 	result = DBselect(
-			"select newvalue,value"
+			"select newvalue"
 			" from mappings"
 			" where valuemapid=" ZBX_FS_UI64
-				" and value='%s'",
-			valuemapid, value_esc);
+				" and value" ZBX_SQL_STRCMP,
+			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
 	zbx_free(value_esc);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 	{
-		if (0 == strcmp(value, row[1])){
-			del_zeros(row[0]);
+		del_zeros(row[0]);
 
-			value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
-			zbx_strlcpy_utf8(value, value_tmp, max_len);
-			zbx_free(value_tmp);
-		}
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
 
 		ret = SUCCEED;
 	}
