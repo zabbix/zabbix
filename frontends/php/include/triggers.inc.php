@@ -796,8 +796,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			$trigger['problem']['acknowledged'] = (
 				// Trigger has only resolved problems, all acknowledged.
 				($stats['has_resolved'] && !$stats['has_resolved_unacknowledged'] && !$stats['has_unresolved'])
-				// Trigger has unresolved problems, all acknowledged.
-				|| ($stats['has_unresolved'] && !$stats['has_unresolved_unacknowledged'])
+					// Trigger has unresolved problems, all acknowledged.
+					|| ($stats['has_unresolved'] && !$stats['has_unresolved_unacknowledged'])
 			) ? 1 : 0;
 
 			$trigger['value'] = ($triggers[$triggerid]['resolved'] === true)
