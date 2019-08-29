@@ -300,6 +300,13 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 																		(new CStringXmlTag('name'))->setRequired()
 																	)
 															),
+														(new CIndexedArrayXmlTag('application_prototypes'))
+															->setSchema(
+																(new CArrayXmlTag('application_prototype'))
+																	->setSchema(
+																		(new CStringXmlTag('name'))->setRequired()
+																	)
+															),
 														(new CStringXmlTag('authtype'))
 															->setDefaultValue(DB::getDefault('items', 'authtype'))
 															->addConstant(CXmlConstantName::NONE, CXmlConstantValue::NONE, CXmlConstantValue::ITEM_TYPE_HTTP_AGENT)
@@ -496,14 +503,7 @@ class CTemplatesSchemaCreator implements CSchemaCreator {
 														(new CStringXmlTag('verify_peer'))
 															->setDefaultValue(DB::getDefault('items', 'verify_peer'))
 															->addConstant(CXmlConstantName::NO, CXmlConstantValue::NO)
-															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES),
-														(new CIndexedArrayXmlTag('application_prototypes'))
-															->setSchema(
-																(new CArrayXmlTag('application_prototype'))
-																	->setSchema(
-																		(new CStringXmlTag('name'))->setRequired()
-																	)
-															)
+															->addConstant(CXmlConstantName::YES, CXmlConstantValue::YES)
 													)
 											),
 										new CStringXmlTag('jmx_endpoint'),
