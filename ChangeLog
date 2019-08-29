@@ -1,10 +1,24 @@
+Changes for 4.0.13rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.12
+
+4.0.12rc1 was released as 4.0.12 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.12rc1
 
 New features:
 ..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
 
 Bug fixes:
-..F....... [ZBX-16128] Audit log show incorrect action ID (rlataria)
+..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
+A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
+..F....... [ZBX-16128] fixed incorrect action ID in audit log (rlataria)
 ..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
 .......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
 ..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)

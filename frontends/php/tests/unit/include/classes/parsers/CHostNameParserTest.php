@@ -28,59 +28,67 @@ class CHostNameParserTest extends PHPUnit_Framework_TestCase {
 		return [
 			// success
 			[
-				'   ', 0, [],
+				'Host Name One', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '   ',
+					'match' => 'Host Name One',
 					'macros' => []
 				]
 			],
 			[
-				'   a   ', 0, [],
+				'a{#B}c  {#D}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '   a   ',
-					'macros' => []
-				]
-			],
-			[
-				'   a{#B}c  {#D}   ', 0, ['lldmacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '   a{#B}c  {#D}   ',
+					'match' => 'a{#B}c  {#D}',
 					'macros' => ['{#B}', '{#D}']
 				]
 			],
 			[
-				'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}   ', 0, ['lldmacros' => true],
+				'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => 'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}   ',
+					'match' => 'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}',
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}']
 				]
 			],
 			// partial success
 			[
-				'   /', 0, [],
+				'Host Name Two ', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '   ',
+					'match' => 'Host Name Two',
 					'macros' => []
 				]
 			],
 			[
-				' abc/edf', 0, [],
+				'a/', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => ' abc',
+					'match' => 'a',
 					'macros' => []
 				]
 			],
 			[
-				'abc    /', 0, [],
+				'abc/edf', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'abc    ',
+					'match' => 'abc',
+					'macros' => []
+				]
+			],
+			[
+				'abc/', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'abc',
+					'macros' => []
+				]
+			],
+			[
+				'abc   ', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'abc',
 					'macros' => []
 				]
 			],
@@ -96,12 +104,20 @@ class CHostNameParserTest extends PHPUnit_Framework_TestCase {
 				'   a{#B}c  {#D}   ', 8, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => 'c  ',
+					'match' => 'c',
 					'macros' => []
 				]
 			],
 			[
-				'abc{#DEF}ghi/  ', 0, ['lldmacros' => true],
+				'   a{#B}c  {#D}   ', 8, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'c  {#D}',
+					'macros' => ['{#D}']
+				]
+			],
+			[
+				'abc{#DEF}ghi    ', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'match' => 'abc{#DEF}ghi',
@@ -109,16 +125,40 @@ class CHostNameParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
-				' a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}/e ', 0, ['lldmacros' => true],
+				'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}/e', 0, ['lldmacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => ' a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}',
+					'match' => 'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}',
+					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}', '{#D}']
+				]
+			],
+			[
+				'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}     ', 0, ['lldmacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => 'a{#B}{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}{#D}',
 					'macros' => ['{#B}', '{{#C}.regsub("^([0-9]+\/[A-Za-z])", "{#C}: \1")}', '{#D}']
 				]
 			],
 			// fail
 			[
 				'', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'macros' => []
+				]
+			],
+			[
+				'   ', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'macros' => []
+				]
+			],
+			[
+				' Host Name Three', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'match' => '',
