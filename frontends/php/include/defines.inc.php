@@ -1255,6 +1255,7 @@ define('API_RANGE_TIME',		26);
 define('API_COLOR',				27);
 define('API_NUMERIC',			28);
 define('API_LLD_MACRO',			29);
+define('API_PSK',				30);
 
 // flags
 define('API_REQUIRED',				0x0001);
