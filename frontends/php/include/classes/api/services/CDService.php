@@ -121,15 +121,10 @@ class CDService extends CApiService {
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dchecks'] = 'dchecks dc';
-
-			$sqlParts['where'][] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
-			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
+			$sqlParts['where'][] = dbConditionInt('ds.dcheckid', $options['dcheckids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['dcheckid'] = 'dc.dcheckid';
+				$sqlParts['group']['dcheckid'] = 'ds.dcheckid';
 			}
 		}
 
