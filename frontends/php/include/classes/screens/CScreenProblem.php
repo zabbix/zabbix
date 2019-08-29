@@ -808,7 +808,7 @@ class CScreenProblem extends CScreenBase {
 		if ($this->data['action'] === 'problem.view') {
 			$url_form = clone $url;
 
-			$form = (new CForm('get', 'zabbix.php'))
+			$form = (new CForm('post', 'zabbix.php'))
 				->setName('problem')
 				->cleanItems()
 				->addVar('backurl',
@@ -1015,7 +1015,7 @@ class CScreenProblem extends CScreenBase {
 						$info_icons[] = makeInformationIcon(
 							array_key_exists($problem['userid'], $data['users'])
 								? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
-								: _('Resolved by user.')
+								: _('Resolved by inaccessible user.')
 						);
 					}
 				}
