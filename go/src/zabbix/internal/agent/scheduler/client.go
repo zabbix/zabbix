@@ -246,6 +246,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 		task := tacc.task()
 		if task.updated.Before(now) {
 			delete(c.exporters, task.item.itemid)
+			log.Debugf("[%d] released unused exporter for itemid:%d", c.id, task.item.itemid)
 			task.deactivate()
 		}
 	}
