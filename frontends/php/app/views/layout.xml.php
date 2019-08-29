@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -17,9 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef JSONPATH_NEXT_TEST_H
-#define JSONPATH_NEXT_TEST_H
 
-int	zbx_jsonpath_next(const char *path, const char **pnext, zbx_strloc_t *loc, int *type);
+header('Content-Type: text/xml; charset=utf-8');
+header('Content-Disposition: attachment; filename="'.$data['page']['file'].'"');
 
-#endif
+echo $data['main_block'];

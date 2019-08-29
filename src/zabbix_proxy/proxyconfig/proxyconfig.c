@@ -65,27 +65,28 @@ static void	process_configuration_sync(size_t *data_size)
 	/* reset the performance metric */
 	*data_size = 0;
 
-	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY);	/* retry till have a connection */
+	if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY))	/* retry till have a connection */
+		goto out;
 
 	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);
-		goto out;
+		goto error;
 	}
 
 	if ('\0' == *sock.buffer)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, "empty string received");
-		goto out;
+		goto error;
 	}
 
 	if (SUCCEED != zbx_json_open(sock.buffer, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, zbx_json_strerror());
-		goto out;
+		goto error;
 	}
 
 	*data_size = (size_t)(jp.end - jp.start + 1);     /* performance metric */
@@ -104,18 +105,18 @@ static void	process_configuration_sync(size_t *data_size)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, info);
 		zbx_free(info);
-		goto out;
+		goto error;
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
 			sock.peer, (zbx_fs_size_t)*data_size);
 
 	process_proxyconfig(&jp);
-out:
+error:
 	disconnect_server(&sock);
 
 	zbx_free(error);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -155,7 +156,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	zbx_set_sigusr_handler(zbx_proxyconfig_sigusr_handler);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -171,4 +172,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_sleep_loop(CONFIG_PROXYCONFIG_FREQUENCY);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

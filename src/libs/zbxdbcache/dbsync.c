@@ -1280,8 +1280,8 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HOST		*host;
 	ZBX_DC_HTTPITEM		*httpitem;
-	unsigned char		value_type, type, history, trends;
-	int			history_sec = 0;
+	unsigned char		value_type, type;
+	int			history_sec, trends_sec;
 
 	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
 		return FAIL;
@@ -1308,20 +1308,13 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_uint64(dbrow[25], item->interfaceid))
 		return FAIL;
 
-	if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
-	{
-		history = (0 != dbsync_env.cache->config->hk.history);
+	if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
+		history_sec = ZBX_HK_PERIOD_MAX;
+
+	if (0 != history_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.history_global)
 		history_sec = dbsync_env.cache->config->hk.history;
-	}
-	else
-	{
-		if (SUCCEED != is_time_suffix(dbrow[31], &history_sec, ZBX_LENGTH_UNLIMITED))
-			return FAIL;
 
-		history = zbx_time2bool(dbrow[31]);
-	}
-
-	if (item->history != history)
+	if (item->history != (0 != history_sec))
 		return FAIL;
 
 	if (history_sec != item->history_sec)
@@ -1349,12 +1342,13 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (NULL == numitem)
 			return FAIL;
 
-		if (ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.trends_global)
-			trends = (0 != dbsync_env.cache->config->hk.trends);
-		else
-			trends = zbx_time2bool(dbrow[32]);
+		if (SUCCEED != is_time_suffix(dbrow[32], &trends_sec, ZBX_LENGTH_UNLIMITED))
+			trends_sec = ZBX_HK_PERIOD_MAX;
 
-		if (trends != numitem->trends)
+		if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == dbsync_env.cache->config->hk.trends_global)
+			trends_sec = dbsync_env.cache->config->hk.trends;
+
+		if (numitem->trends != (0 != trends_sec))
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[35], numitem->units))

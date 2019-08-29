@@ -152,12 +152,15 @@ $fields = [
 		'isset({parent_discoveryid}) && (isset({add}) || isset({update}))'
 	],
 	'application_prototypes' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'history' =>					[T_ZBX_STR, O_OPT, null,	null, 'isset({add}) || isset({update})',
+	'history_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
+	'history' =>					[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
 		_('History storage period')
 	],
+	'trends_mode' =>				[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'trends' =>						[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type})'.
-			' && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+		'(isset({add}) || isset({update})) && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
+			' && isset({value_type}) && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
 	],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -435,7 +438,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'value_type'	=> getRequest('value_type'),
 			'trapper_hosts'	=> getRequest('trapper_hosts'),
 			'port'			=> getRequest('port'),
-			'history'		=> getRequest('history'),
+			'history'		=> (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+				? ITEM_NO_STORAGE_VALUE
+				: getRequest('history'),
 			'units'			=> getRequest('units'),
 			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
 			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
@@ -461,7 +466,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			$item['trends'] = getRequest('trends');
+			$item['trends'] = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+				? ITEM_NO_STORAGE_VALUE
+				: getRequest('trends');
 		}
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -725,6 +732,24 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($itemPrototype);
 	$data['config'] = select_config();
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	$history_in_seconds = timeUnitToSeconds($data['history']);
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
+		$data['history'] = DB::getDefault('items', 'history');
+	}
+	else {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
+	}
+
+	$trends_in_seconds = timeUnitToSeconds($data['trends']);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
+		$data['trends'] = $data['trends_default'];
+	}
+	else {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
+	}
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [

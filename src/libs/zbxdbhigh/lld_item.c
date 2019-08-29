@@ -223,8 +223,10 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE			__UINT64_C(0x02)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS			__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE							\
-		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP			__UINT64_C(0x08)
+#define ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE								\
+		(ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE | ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_PARAMS |	\
+		ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP)
 #define ZBX_FLAG_LLD_ITEM_PREPROC_DELETE				__UINT64_C(0x08)
 	zbx_uint64_t	flags;
 }
@@ -1338,6 +1340,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 	char		err[MAX_STRING_LEN];
 	char		pattern[ITEM_PREPROC_PARAMS_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *output;
 	const char*	regexp_err = NULL;
+	zbx_jsonpath_t	jsonpath;
 
 	*err = '\0';
 
@@ -1345,7 +1348,6 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			|| (SUCCEED == zbx_token_find(pp->params, 0, &token, ZBX_TOKEN_SEARCH_BASIC)
 			&& 0 != (token.type & ZBX_TOKEN_USER_MACRO)))
 	{
-
 		return SUCCEED;
 	}
 
@@ -1368,7 +1370,10 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			break;
 		case ZBX_PREPROC_JSONPATH:
-			ret = zbx_json_path_check(pp->params, err, sizeof(err));
+			if (FAIL == (ret = zbx_jsonpath_compile(pp->params, &jsonpath)))
+				zbx_strlcpy(err, zbx_json_strerror(), sizeof(err));
+			else
+				zbx_jsonpath_clear(&jsonpath);
 			break;
 		case ZBX_PREPROC_XPATH:
 			ret = xml_xpath_check(pp->params, err, sizeof(err));
@@ -2576,6 +2581,13 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes, zbx_
 				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE;
 			}
 
+			if (ppdst->step != ppsrc->step)
+			{
+				/* this should never happen */
+				ppdst->step = ppsrc->step;
+				ppdst->flags |= ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP;
+			}
+
 			if (SUCCEED != lld_items_preproc_susbstitute_params_macros(ppsrc, item->lld_row, item->itemid,
 					&sub_params, error))
 			{
@@ -3340,6 +3352,12 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, 
 			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_TYPE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctype=%d", delim, preproc_op->type);
+				delim = ',';
+			}
+
+			if (0 != (preproc_op->flags & ZBX_FLAG_LLD_ITEM_PREPROC_UPDATE_STEP))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstep=%d", delim, preproc_op->step);
 				delim = ',';
 			}
 

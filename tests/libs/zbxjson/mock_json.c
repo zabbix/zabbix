@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "zbxjson.h"
+#include "mock_json.h"
 
 const char	*zbx_mock_json_type_to_str(int type)
 {

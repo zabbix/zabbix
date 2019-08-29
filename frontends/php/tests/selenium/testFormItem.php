@@ -2346,8 +2346,8 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
-		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings');
+		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
+		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 
 		$this->zbxTestOpen('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
@@ -2366,8 +2366,10 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestAssertElementText("//input[@id='history']/..", 'Overridden by global housekeeping settings (99d)');
-		$this->zbxTestAssertElementText("//li[@id='row_trends']/div[@class='table-forms-td-right']", 'Overridden by global housekeeping settings (455d)');
+		$this->zbxTestClickWait('history_mode_hint');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestClickWait('trends_mode_hint');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('adm.gui.php');
 		$this->zbxTestAssertElementPresentId('configDropDown');
@@ -2386,8 +2388,8 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//ul[contains(@class, 'object-group')]//a[text()='Items']");
 		$this->zbxTestClickLinkTextWait($this->item);
 
-		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (99 days)');
-		$this->zbxTestTextNotPresent('Overridden by global housekeeping settings (455 days)');
+		$this->zbxTestAssertElementNotPresentId('history_mode_hint');
+		$this->zbxTestAssertElementNotPresentId('trends_mode_hint');
 	}
 
 	public static function preprocessing() {

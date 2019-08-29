@@ -104,72 +104,134 @@ static const char	*get_drive_type_string(UINT type)
 	}
 }
 
+static void	add_fs_to_json(wchar_t *path, struct zbx_json *j)
+{
+	wchar_t	fs_name[MAX_PATH + 1], *long_path = NULL;
+	char	*utf8;
+	size_t	sz;
+
+	utf8 = zbx_unicode_to_utf8(path);
+	sz = strlen(utf8);
+
+	if (0 < sz && '\\' == utf8[--sz])
+		utf8[sz] = '\0';
+
+	zbx_json_addobject(j, NULL);
+	zbx_json_addstring(j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
+	zbx_free(utf8);
+
+	/* add \\?\ prefix if path exceeds MAX_PATH */
+	if (MAX_PATH < (sz = wcslen(path) + 1) && 0 != wcsncmp(path, L"\\\\?\\", 4))
+	{
+		/* allocate memory buffer enough to hold null-terminated path and prefix */
+		long_path = (wchar_t*)zbx_malloc(long_path, (sz + 4) * sizeof(wchar_t));
+
+		long_path[0] = L'\\';
+		long_path[1] = L'\\';
+		long_path[2] = L'?';
+		long_path[3] = L'\\';
+
+		memcpy(long_path + 4, path, sz * sizeof(wchar_t));
+		path = long_path;
+	}
+
+	if (FALSE != GetVolumeInformation(path, NULL, 0, NULL, NULL, NULL, fs_name, ARRSIZE(fs_name)))
+	{
+		utf8 = zbx_unicode_to_utf8(fs_name);
+		zbx_json_addstring(j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
+		zbx_free(utf8);
+	}
+	else
+		zbx_json_addstring(j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addstring(j, "{#FSDRIVETYPE}", get_drive_type_string(GetDriveType(path)),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_close(j);
+
+	zbx_free(long_path);
+}
+
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	wchar_t		fsName[MAX_PATH + 1];
-	wchar_t 	*buffer = NULL, *p;
-	char		*utf8;
-	DWORD		dwSize;
+	wchar_t		*buffer = NULL, volume_name[MAX_PATH + 1], *p;
+	DWORD		size_dw;
 	size_t		sz;
 	struct zbx_json	j;
+	HANDLE		volume;
+	int		ret;
 
-	/* Make an initial call to GetLogicalDriveStrings to
-	   get the necessary size into the dwSize variable */
-	if (0 == (dwSize = GetLogicalDriveStrings(0, buffer)))
+	/* make an initial call to GetLogicalDriveStrings() to get the necessary size into the dwSize variable */
+	if (0 == (size_dw = GetLogicalDriveStrings(0, buffer)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain necessary buffer size from system."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	buffer = (wchar_t *)zbx_malloc(buffer, (dwSize + 1) * sizeof(wchar_t));
-
-	/* Make a second call to GetLogicalDriveStrings to get
-	   the actual data we require */
-	if (0 == (dwSize = GetLogicalDriveStrings(dwSize, buffer)))
-	{
-		zbx_free(buffer);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
-		return SYSINFO_RET_FAIL;
-	}
-
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
+	buffer = (wchar_t *)zbx_malloc(buffer, (size_dw + 1) * sizeof(wchar_t));
+
+	/* make a second call to GetLogicalDriveStrings() to get the actual data we require */
+	if (0 == (size_dw = GetLogicalDriveStrings(size_dw, buffer)))
 	{
-		zbx_json_addobject(&j, NULL);
-
-		utf8 = zbx_unicode_to_utf8(p);
-
-		/* remove trailing backslash */
-		if ('A' <= utf8[0] && utf8[0] <= 'Z' && ':' == utf8[1] && '\\' == utf8[2] && '\0' == utf8[3])
-			utf8[2] = '\0';
-
-		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
-		zbx_free(utf8);
-
-		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, ARRSIZE(fsName)))
-		{
-			utf8 = zbx_unicode_to_utf8(fsName);
-			zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
-			zbx_free(utf8);
-		}
-		else
-			zbx_json_addstring(&j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
-
-		zbx_json_addstring(&j, "{#FSDRIVETYPE}", get_drive_type_string(GetDriveType(p)), ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&j);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
+	/* add drive letters */
+	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
+		add_fs_to_json(p, &j);
+
+	if (INVALID_HANDLE_VALUE == (volume = FindFirstVolume(volume_name, ARRSIZE(volume_name))))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find a volume."));
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
+
+	/* search volumes for mount point folder paths */
+	do
+	{
+		while (FALSE == GetVolumePathNamesForVolumeName(volume_name, buffer, size_dw, &size_dw))
+		{
+			if (ERROR_MORE_DATA != GetLastError())
+			{
+				FindVolumeClose(volume);
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a list of filesystems."));
+				ret = SYSINFO_RET_FAIL;
+				goto out;
+			}
+
+			buffer = (wchar_t*)zbx_realloc(buffer, size_dw * sizeof(wchar_t));
+		}
+
+		for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
+		{
+			/* add mount point folder paths but skip drive letters */
+			if (3 < sz)
+				add_fs_to_json(p, &j);
+		}
+
+	} while (FALSE != FindNextVolume(volume, volume_name, ARRSIZE(volume_name)));
+
+	if (ERROR_NO_MORE_FILES != GetLastError())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain complete list of filesystems."));
+		ret = SYSINFO_RET_FAIL;
+	}
+	else
+	{
+		zbx_json_close(&j);
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+
+	FindVolumeClose(volume);
+out:
+	zbx_json_free(&j);
 	zbx_free(buffer);
 
-	zbx_json_close(&j);
-
-	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-	zbx_json_free(&j);
-
-	return SYSINFO_RET_OK;
+	return ret;
 }

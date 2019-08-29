@@ -1208,6 +1208,8 @@ output {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+    .table-forms .table-forms-td-right .wrap-multiple-controls {
+      display: flex; }
   .table-forms .table-forms-td-right {
     position: relative; }
   .table-forms h4 {
@@ -2946,6 +2948,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
+  .notif-indic .notif-indic-snooze {
+    width: 14px;
+    height: 14px;
+    float: left;
+    margin-top: 20px;
+    background: url(../img/icon-sprite.svg) no-repeat -11px -587px; }
 
 .notif-indic-container {
   border-top: 1px solid #ebeef0;
