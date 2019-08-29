@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"errors"
 	"hash/fnv"
 	"sync/atomic"
 	"time"
@@ -87,7 +88,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	var info *pluginInfo
 	var ok bool
 
-	log.Debugf("adding new request for key: '%s'", r.Key)
+	log.Debugf("[%d] adding new request for key: '%s'", c.id, r.Key)
 
 	if info, ok = c.pluginsInfo[p]; !ok {
 		info = &pluginInfo{}
@@ -121,11 +122,16 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
-
-			tacc, ok = c.exporters[r.Itemid]
-			if ok && tacc.task().plugin != p {
-				// create new task if item key has been changed and now is handled by other plugin
-				ok = false
+			if tacc, ok = c.exporters[r.Itemid]; ok {
+				task = tacc.task()
+				if task.updated.Equal(now) {
+					return errors.New("duplicate itemid found")
+				}
+				if task.plugin != p {
+					// create new task if item key has been changed and now is handled by other plugin
+					task.deactivate()
+					ok = false
+				}
 			}
 		} else {
 			ok = false

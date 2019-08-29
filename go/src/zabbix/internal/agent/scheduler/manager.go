@@ -69,7 +69,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		if p.refcount != 0 {
 			continue
 		}
-		log.Debugf("deactivate unused plugin %s", p.name())
+		log.Debugf("[%d] deactivate unused plugin %s", c.id, p.name())
 
 		// deactivate recurring tasks
 		for deactivate := true; deactivate; {
@@ -90,11 +90,11 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err := task.reschedule(now); err != nil {
-				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				log.Debugf("[%d] cannot schedule stopper task for plugin %s", c.id, p.name())
 				continue
 			}
 			p.enqueueTask(task)
-			log.Debugf("created stopper task for plugin %s", p.name())
+			log.Debugf("[%d] created stopper task for plugin %s", c.id, p.name())
 
 			if p.queued() {
 				m.pluginQueue.Update(p)
@@ -111,12 +111,12 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("processing update request (%d requests)", len(update.requests))
+	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
 
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
-		log.Debugf("registering new client ID:%d", update.clientID)
+		log.Debugf("[%d] registering new client", update.clientID)
 		c = newClient(update.clientID, update.sink)
 		m.clients[update.clientID] = c
 	}
@@ -139,12 +139,12 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		if err != nil {
 			if c.id != 0 {
 				if tacc, ok := c.exporters[r.Itemid]; ok {
-					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+					log.Debugf("[%d] deactivate exporter task for itemid %d: %s", update.clientID, r.Itemid, err)
 					tacc.task().deactivate()
 				}
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Debugf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			log.Debugf("[%d] cannot monitor metric \"%s\": %s", update.clientID, r.Key, err.Error())
 			continue
 		}
 
