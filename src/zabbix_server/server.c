@@ -149,8 +149,9 @@ static char	shortopts[] = "c:hVR:f";
 
 /* end of COMMAND LINE OPTIONS */
 
-int	threads_num = 0;
-pid_t	*threads = NULL;
+int		threads_num = 0;
+pid_t		*threads = NULL;
+static int	*threads_flags;
 
 unsigned char	program_type		= ZBX_PROGRAM_TYPE_SERVER;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -1082,6 +1083,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
+	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
@@ -1149,6 +1151,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
+				threads_flags[i] = ZBX_THREAD_WAIT_EXIT;
 				zbx_thread_start(dbsyncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ESCALATOR:
@@ -1212,12 +1215,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;
 
-	zbx_on_exit();
+	zbx_on_exit(FAIL);
 
 	return SUCCEED;
 }
 
-void	zbx_on_exit(void)
+void	zbx_on_exit(int ret)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
@@ -1226,8 +1229,9 @@ void	zbx_on_exit(void)
 
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_num);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
 		zbx_free(threads);
+		zbx_free(threads_flags);
 	}
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();

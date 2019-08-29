@@ -607,7 +607,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -615,7 +615,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'host_access' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/host_access": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/host_access": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -706,7 +706,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'type' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -714,7 +714,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'type' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -722,7 +722,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'type' => '1.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/type": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -739,7 +739,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -747,7 +747,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
 			],
 			[
 				'script' => [
@@ -755,7 +755,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'execute_on' => '1.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/execute_on": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/execute_on": an integer is expected.'
 			],
 			[
 				'script' => [

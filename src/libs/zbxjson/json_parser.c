@@ -21,6 +21,7 @@
 
 #include "zbxjson.h"
 #include "json_parser.h"
+#include "json.h"
 
 #include "log.h"
 
