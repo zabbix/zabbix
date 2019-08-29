@@ -735,20 +735,26 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 	$triggers = API::Trigger()->get($trigger_options);
 
-	$problem_triggerids = [];
+	if ($triggers) {
+		$problem_stats = [];
 
-	foreach ($triggers as $triggerid => &$trigger) {
-		$problem_triggerids[] = $triggerid;
-		$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		$trigger['resolved'] = true;
-		$trigger['problem']['acknowledged'] = 1;
-	}
-	unset($trigger);
+		foreach ($triggers as $triggerid => &$trigger) {
+			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			$trigger['resolved'] = true;
+			$trigger['problem']['acknowledged'] = 1;
 
-	if ($problem_triggerids) {
+			$problem_stats[$triggerid] = [
+				'has_resolved' => false,
+				'has_unresolved' => false,
+				'has_resolved_unacknowledged' => false,
+				'has_unresolved_unacknowledged' => false,
+			];
+		}
+		unset($trigger);
+
 		$problems = API::Problem()->get([
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
-			'objectids' => $problem_triggerids,
+			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
 			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
@@ -757,72 +763,49 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'time_from' => $problem_options['time_from']
 		]);
 
-		$objectids = [];
-
 		foreach ($problems as $problem) {
+			$triggerid = $problem['objectid'];
+
 			if ($problem['r_eventid'] == 0) {
-				$triggers[$problem['objectid']]['resolved'] = false;
+				$triggers[$triggerid]['resolved'] = false;
 			}
 
-			$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
+			$triggers[$triggerid]['problem']['eventid'] = $problem['eventid'];
 
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity'] && $problem['r_eventid'] == 0) {
-				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
+			if ($triggers[$triggerid]['priority'] < $problem['severity'] && $problem['r_eventid'] == 0) {
+				$triggers[$triggerid]['priority'] = $problem['severity'];
 			}
 
-			$objectids[$problem['objectid']] = true;
+			if ($problem['r_eventid'] != 0) {
+				$problem_stats[$triggerid]['has_resolved'] = true;
+				if ($problem['acknowledged'] == 0) {
+					$problem_stats[$triggerid]['has_resolved_unacknowledged'] = true;
+				}
+			}
+			else {
+				$problem_stats[$triggerid]['has_unresolved'] = true;
+				if ($problem['acknowledged'] == 0) {
+					$problem_stats[$triggerid]['has_unresolved_unacknowledged'] = true;
+				}
+			}
 		}
 
 		foreach ($triggers as $triggerid => &$trigger) {
-			$all_resolved = true;
-			$all_unresolved = true;
+			$stats = $problem_stats[$triggerid];
 
-			foreach ($problems as $problem) {
-				if ($triggerid == $problem['objectid']) {
-					if ($problem['r_eventid'] == 0) {
-						$all_resolved = false;
-					}
-					else {
-						$all_unresolved = false;
-					}
-				}
-			}
-
-			if ($all_resolved && array_key_exists($triggerid, $objectids)) {
-				foreach ($problems as $problem) {
-					if ($triggerid == $problem['objectid'] && $problem['r_eventid'] != 0
-							&& $problem['acknowledged'] == 0) {
-						$trigger['problem']['acknowledged'] = 0;
-						break;
-					}
-				}
-			}
-			elseif ($all_resolved && !array_key_exists($triggerid, $objectids)) {
-				$trigger['problem']['acknowledged'] = 0;
-			}
-			elseif ($all_unresolved) {
-				foreach ($problems as $problem) {
-					if ($triggerid == $problem['objectid'] && $problem['acknowledged'] == 0) {
-						$trigger['problem']['acknowledged'] = 0;
-						break;
-					}
-				}
-			}
-			elseif (!$all_resolved && !$all_unresolved && array_key_exists($triggerid, $objectids)) {
-				foreach ($problems as $problem) {
-					if ($triggerid == $problem['objectid'] && $problem['r_eventid'] == 0
-							&& $problem['acknowledged'] == 0) {
-						$trigger['problem']['acknowledged'] = 0;
-						break;
-					}
-				}
-			}
+			$trigger['problem']['acknowledged'] = (
+				// Trigger has only resolved problems, all acknowledged.
+				($stats['has_resolved'] && !$stats['has_resolved_unacknowledged'] && !$stats['has_unresolved'])
+				// Trigger has unresolved problems, all acknowledged.
+				|| ($stats['has_unresolved'] && !$stats['has_unresolved_unacknowledged'])
+			) ? 1 : 0;
 
 			$trigger['value'] = ($triggers[$triggerid]['resolved'] === true)
 				? TRIGGER_VALUE_FALSE
 				: TRIGGER_VALUE_TRUE;
 
-			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+			if (($stats['has_resolved'] || $stats['has_unresolved'])
+					&& $trigger['priority'] >= $problem_options['min_severity']) {
 				continue;
 			}
 
