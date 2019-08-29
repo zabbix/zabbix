@@ -747,7 +747,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				'has_resolved' => false,
 				'has_unresolved' => false,
 				'has_resolved_unacknowledged' => false,
-				'has_unresolved_unacknowledged' => false,
+				'has_unresolved_unacknowledged' => false
 			];
 		}
 		unset($trigger);
