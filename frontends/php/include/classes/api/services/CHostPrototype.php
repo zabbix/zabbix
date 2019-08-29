@@ -168,7 +168,7 @@ class CHostPrototype extends CHostBase {
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
+			'inventory_mode' =>		['type' => API_INT32, 'default' => HOST_INVENTORY_DISABLED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -555,7 +555,7 @@ class CHostPrototype extends CHostBase {
 			}
 
 			// inventory
-			if ($host_prototype['inventory_mode'] !== null) {
+			if (array_key_exists('inventory_mode', $host_prototype)) {
 				if ($host_prototype['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 					$inventory_deleteids[] = $host_prototype['hostid'];
 				}
