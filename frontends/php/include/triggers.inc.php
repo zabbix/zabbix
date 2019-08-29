@@ -332,7 +332,7 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
+			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
@@ -408,6 +408,7 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 			// The dependencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
+				'opdata' => $srcTrigger['opdata'],
 				'expression' => $srcTrigger['expression'],
 				'url' => $srcTrigger['url'],
 				'status' => $srcTrigger['status'],
@@ -731,6 +732,8 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => null,
+		'show_recent' => null,
 		'time_from' => null,
 		'acknowledged' => null
 	];
@@ -753,10 +756,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
-			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
-				? false
-				: null,
+			'recent' => $problem_options['show_recent'],
+			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 

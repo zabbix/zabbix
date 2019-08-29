@@ -2494,7 +2494,7 @@ static int	proxy_add_hist_data(struct zbx_json *j, int records_num, const DC_ITE
 
 		if (PROXY_HISTORY_FLAG_NOVALUE != (hd->flags & PROXY_HISTORY_MASK_NOVALUE))
 		{
-			if (0 != hd->state)
+			if (ITEM_STATE_NORMAL != hd->state)
 				zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
 			if (0 == (hd->flags & PROXY_HISTORY_FLAG_NOVALUE))

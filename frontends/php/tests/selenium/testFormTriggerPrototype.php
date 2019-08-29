@@ -870,7 +870,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype added');
 					$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 					$this->zbxTestAssertElementText("//tbody//a[text()='$description']", $description);
-					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[4]", $expression);
+					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[5]", $expression);
 					$this->zbxTestTextPresent($this->discoveryRule);
 					break;
 				case TEST_BAD:
