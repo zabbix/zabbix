@@ -168,7 +168,7 @@ class CHostPrototype extends CHostBase {
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory_mode' =>		['type' => API_INT32, 'default' => HOST_INVENTORY_DISABLED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -281,7 +281,7 @@ class CHostPrototype extends CHostBase {
 			];
 
 			// inventory
-			if ($hostPrototype['inventory_mode'] !== null
+			if (array_key_exists('inventory_mode', $hostPrototype)
 					&& $hostPrototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 				$hostPrototypeInventory[] = [
 					'hostid' => $hostPrototype['hostid'],
@@ -306,7 +306,7 @@ class CHostPrototype extends CHostBase {
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
 
 		// save inventory
-		DB::insert('host_inventory', $hostPrototypeInventory, false);
+		DB::insertBatch('host_inventory', $hostPrototypeInventory, false);
 
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -578,7 +578,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// save inventory
-		DB::insert('host_inventory', $inventory_create, false);
+		DB::insertBatch('host_inventory', $inventory_create, false);
 		DB::delete('host_inventory', ['hostid' => $inventory_deleteids]);
 
 		return $host_prototypes;
