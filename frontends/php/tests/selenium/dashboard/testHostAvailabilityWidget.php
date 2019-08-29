@@ -231,7 +231,7 @@ class testHostAvailabilityWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference widget')->edit();
 
-		// Attempt to update the widget and revert changes if something goes wrong.
+		// Update the widget.
 		$header = ($data['fields']['Name'] === '') ? 'Host availability' : $data['fields']['Name'];
 		$form->fill($data['fields']);
 		$form->submit();
