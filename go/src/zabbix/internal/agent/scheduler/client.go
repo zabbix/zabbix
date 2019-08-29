@@ -155,7 +155,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			}
 
 			tasks = append(tasks, task)
-			log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
+			log.Debugf("[%d] created exporter task for plugin '%s' itemid:%d key '%s'",
 				c.id, p.name(), task.item.itemid, task.item.key)
 		} else {
 			task = tacc.task()
