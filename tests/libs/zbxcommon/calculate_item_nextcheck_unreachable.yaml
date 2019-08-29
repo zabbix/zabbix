@@ -71,7 +71,7 @@ out:
   checks:
     - 2018-01-29 13:00:00 +02:00
 ---
-test case: Calculate nextcheck for unreachable host (8)
+test case: Calculate nextcheck for unreachable host (9)
 in:
   delay: 1m;0/1-7,00:00-13:00;0/1-7,13:00-24:00;wd1-7h15-18
   timezone: :Europe/Riga
