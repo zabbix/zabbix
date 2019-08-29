@@ -730,11 +730,10 @@ class CHttpTestManager {
 			), 'key_');
 		}
 
-		$insert_items = [];
-
 		$delay = array_key_exists('delay', $http_test) ? $http_test['delay'] : DB::getDefault('httptest', 'delay');
 		$status = array_key_exists('status', $http_test) ? $http_test['status'] : DB::getDefault('httptest', 'status');
 
+		$ins_items = [];
 		foreach ($checkitems as $item) {
 			$item['hostid'] = $http_test['hostid'];
 			$item['delay'] = $delay;
@@ -749,30 +748,29 @@ class CHttpTestManager {
 				$item['templateid'] = $parent_items[$item['key_']]['itemid'];
 			}
 
-			$insert_items[] = $item;
+			$ins_items[] = $item;
 		}
-
-		$new_test_itemids = DB::insert('items', $insert_items);
-
-		$items_rtdata = [];
-		foreach ($new_test_itemids as $itemid) {
-			$items_rtdata[] = ['itemid' => $itemid];
-		}
-		DB::insert('item_rtdata', $items_rtdata, false);
+		$itemids = DB::insert('items', $ins_items);
 
 		if (array_key_exists('applicationid', $http_test)) {
-			$this->createItemsApplications($new_test_itemids, $http_test['applicationid']);
+			$this->createItemsApplications($itemids, $http_test['applicationid']);
 		}
 
-		$http_test_items = [];
+		$ins_item_rtdata = [];
+		foreach ($itemids as $itemid) {
+			$ins_item_rtdata[] = ['itemid' => $itemid];
+		}
+		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
+
+		$ins_httptestitem = [];
 		foreach ($checkitems as $inum => $item) {
-			$http_test_items[] = [
+			$ins_httptestitem[] = [
 				'httptestid' => $http_test['httptestid'],
-				'itemid' => $new_test_itemids[$inum],
+				'itemid' => $itemids[$inum],
 				'type' => $item['httptestitemtype']
 			];
 		}
-		DB::insert('httptestitem', $http_test_items);
+		DB::insertBatch('httptestitem', $ins_httptestitem);
 	}
 
 	/**
@@ -1007,7 +1005,9 @@ class CHttpTestManager {
 			), 'key_');
 		}
 
-		$steps_itemids = [];
+		$ins_httpstepitem = [];
+		$ins_item_rtdata = [];
+
 		foreach ($websteps as $snum => &$webstep) {
 			$webstep['httpstepid'] = $webstepids[$snum];
 
@@ -1036,18 +1036,20 @@ class CHttpTestManager {
 			];
 
 			if (!isset($http_test['delay']) || !isset($http_test['status'])) {
-				$dbtest = DBfetch(DBselect('SELECT ht.delay,ht.status FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($http_test['httptestid'])));
-				$delay = $dbtest['delay'];
-				$status = $dbtest['status'];
+				$db_httptest = DBfetch(DBselect(
+					'SELECT ht.delay,ht.status'.
+					' FROM httptest ht'.
+					' WHERE ht.httptestid='.zbx_dbstr($http_test['httptestid'])
+				));
+				$delay = $db_httptest['delay'];
+				$status = $db_httptest['status'];
 			}
 			else {
 				$delay = $http_test['delay'];
 				$status = $http_test['status'];
 			}
 
-			$insert_items = [];
-			$step_itemids = [];
-
+			$ins_items = [];
 			foreach ($stepitems as $item) {
 				$item['hostid'] = $http_test['hostid'];
 				$item['delay'] = $delay;
@@ -1060,35 +1062,30 @@ class CHttpTestManager {
 					$item['templateid'] = $parent_step_items[$item['key_']]['itemid'];
 				}
 
-				$insert_items[] = $item;
+				$ins_items[] = $item;
+			}
+			$itemids = DB::insert('items', $ins_items);
+
+			if (array_key_exists('applicationid', $http_test)) {
+				$this->createItemsApplications($itemids, $http_test['applicationid']);
 			}
 
-			if ($insert_items) {
-				$step_itemids = DB::insert('items', $insert_items);
-				$steps_itemids += array_flip($step_itemids);
-
-				if (array_key_exists('applicationid', $http_test)) {
-					$this->createItemsApplications($step_itemids, $http_test['applicationid']);
-				}
-			}
-
-			$webstepitems = [];
 			foreach ($stepitems as $inum => $item) {
-				$webstepitems[] = [
+				$ins_httpstepitem[] = [
 					'httpstepid' => $webstep['httpstepid'],
-					'itemid' => $step_itemids[$inum],
+					'itemid' => $itemids[$inum],
 					'type' => $item['httpstepitemtype']
 				];
 			}
-			DB::insert('httpstepitem', $webstepitems);
+
+			foreach ($itemids as $itemid) {
+				$ins_item_rtdata[] = ['itemid' => $itemid];
+			}
 		}
 		unset($webstep);
 
-		$steps_items_rtdata = [];
-		foreach ($steps_itemids as $itemid => $value) {
-			$step_items_rtdata[] = ['itemid' => $itemid];
-		}
-		DB::insert('item_rtdata', $step_items_rtdata, false);
+		DB::insertBatch('httpstepitem', $ins_httpstepitem);
+		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
 
 		$this->updateHttpStepFields($websteps, 'create');
 	}
