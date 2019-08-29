@@ -103,7 +103,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 			$data['messages']['enabled'] = 0;
 		}
 		if (!isset($data['messages']['sounds.recovery'])) {
-			$data['messages']['sounds.recovery'] = 'alarm_ok.wav';
+			$data['messages']['sounds.recovery'] = 'alarm_ok.mp3';
 		}
 		if (!isset($data['messages']['triggers.recovery'])) {
 			$data['messages']['triggers.recovery'] = 0;

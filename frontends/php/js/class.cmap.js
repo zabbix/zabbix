@@ -17,23 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var ZABBIX = ZABBIX || {};
-
-ZABBIX.namespace = function(namespace) {
-	var parts = namespace.split('.'),
-		parent = this,
-		i;
-
-	for (i = 0; i < parts.length; i++) {
-		if (typeof parent[parts[i]] === 'undefined') {
-			parent[parts[i]] = {};
-		}
-
-		parent = parent[parts[i]];
-	}
-
-	return parent;
-};
 
 ZABBIX.namespace('classes.Observer');
 

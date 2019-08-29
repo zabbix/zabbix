@@ -27,6 +27,8 @@
 
 #ifndef HAVE_SQLITE3
 
+extern unsigned char program_type;
+
 static int	DBpatch_4000000(void)
 {
 	return SUCCEED;
@@ -219,6 +221,37 @@ static int	DBpatch_4000003(void)
 	return ret;
 }
 
+static int	DBpatch_4000004(void)
+{
+	int		i;
+	const char      *values[] = {
+			"alarm_ok",
+			"no_sound",
+			"alarm_information",
+			"alarm_warning",
+			"alarm_average",
+			"alarm_high",
+			"alarm_disaster"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set value_str='%s.mp3'"
+				" where value_str='%s.wav'"
+					" and idx='web.messages'", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4000)
@@ -229,5 +262,6 @@ DBPATCH_ADD(4000000, 0, 1)
 DBPATCH_ADD(4000001, 0, 0)
 DBPATCH_ADD(4000002, 0, 0)
 DBPATCH_ADD(4000003, 0, 0)
+DBPATCH_ADD(4000004, 0, 0)
 
 DBPATCH_END()
