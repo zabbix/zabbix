@@ -165,17 +165,21 @@ func (m *Manager) processQueue(now time.Time) {
 			if task.getScheduled().Unix() > seconds {
 				break
 			}
+
 			heap.Pop(&m.pluginQueue)
-			if p.hasCapacity() {
-				p.popTask()
-				p.reserveCapacity(task)
-				task.perform(m)
-				if p.hasCapacity() {
-					heap.Push(&m.pluginQueue, p)
-				}
-			} else {
-				log.Debugf("cannot perform task for plugin %s: no capacity", p.name())
+
+			if !p.hasCapacity() {
+				continue
 			}
+
+			p.reserveCapacity(p.popTask())
+			task.perform(m)
+
+			if !p.hasCapacity() {
+				continue
+			}
+
+			heap.Push(&m.pluginQueue, p)
 		} else {
 			// plugins with empty task queue should not be in Manager queue
 			heap.Pop(&m.pluginQueue)
