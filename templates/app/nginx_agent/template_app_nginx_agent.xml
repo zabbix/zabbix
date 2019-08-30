@@ -17,7 +17,7 @@ https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx&#13;
 &#13;
-Template tooling version used: 0.21</description>
+Template tooling version used: 0.22</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -878,7 +878,7 @@ if (a) {
                <snmp_community/>
                <snmp_oid/>
                <key>proc.num[nginx]</key>
-               <delay>5m</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -937,7 +937,7 @@ if (a) {
                <snmp_community/>
                <snmp_oid/>
                <key>proc.mem[nginx,,,,vsize]</key>
-               <delay>5m</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -996,7 +996,7 @@ if (a) {
                <snmp_community/>
                <snmp_oid/>
                <key>proc.mem[nginx,,,,rss]</key>
-               <delay>5m</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <trends>365d</trends>
                <status>0</status>
@@ -1055,11 +1055,11 @@ if (a) {
                <snmp_community/>
                <snmp_oid/>
                <key>proc.cpu.util[nginx]</key>
-               <delay>5m</delay>
+               <delay>1m</delay>
                <history>7d</history>
                <trends>365d</trends>
                <status>0</status>
-               <value_type>3</value_type>
+               <value_type>0</value_type>
                <allowed_hosts/>
                <units>%</units>
                <snmpv3_contextname/>
