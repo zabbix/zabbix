@@ -62,7 +62,7 @@ if ($data['change_psk']) {
 	$autoreg_tab
 		->addRow(
 			(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
-			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+			(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, PSK_IDENTITY_MAX_LEN))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('autocomplete', 'off')
 				->setAriaRequired(),
@@ -71,7 +71,7 @@ if ($data['change_psk']) {
 		)
 		->addRow(
 			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
-			(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+			(new CTextBox('tls_psk', $data['tls_psk'], false, PSK_MAX_LEN))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setAttribute('autocomplete', 'off')
 				->setAriaRequired(),

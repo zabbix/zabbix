@@ -319,7 +319,9 @@ define('HOST_ENCRYPTION_CERTIFICATE',	4);
 
 define('HOST_COMPRESSION_ON', 1);
 
-define('PSK_MIN_LEN',	32);
+define('PSK_MIN_LEN',			32);
+define('PSK_MAX_LEN',			512);
+define('PSK_IDENTITY_MAX_LEN',	128);
 
 define('HOST_MAINTENANCE_STATUS_OFF',	0);
 define('HOST_MAINTENANCE_STATUS_ON',	1);
