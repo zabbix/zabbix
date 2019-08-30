@@ -116,6 +116,10 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
+		if len(update.requests) == 0 {
+			log.Debugf("[%d] skipping empty update for unregistered client", update.clientID)
+			return
+		}
 		log.Debugf("[%d] registering new client", update.clientID)
 		c = newClient(update.clientID, update.sink)
 		m.clients[update.clientID] = c
