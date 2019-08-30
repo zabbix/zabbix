@@ -39,8 +39,7 @@ class CControllerAutoregUpdate extends CController {
 		$fields = [
 			'tls_accept' =>				'in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
 			'tls_psk_identity' =>		'db config_autoreg_tls.tls_psk_identity',
-			'tls_psk' =>				'db config_autoreg_tls.tls_psk',
-			'enable_confirmation' =>	'in 1'
+			'tls_psk' =>				'db config_autoreg_tls.tls_psk'
 		];
 
 		$ret = $this->validateInput($fields);

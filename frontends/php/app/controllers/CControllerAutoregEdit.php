@@ -30,7 +30,6 @@ class CControllerAutoregEdit extends CController {
 			'tls_accept' =>				'in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
 			'tls_psk_identity' =>		'db config_autoreg_tls.tls_psk_identity',
 			'tls_psk' =>				'db config_autoreg_tls.tls_psk',
-			'enable_confirmation' =>	'in 1',
 			'change_psk' =>				'in 1'
 		];
 
