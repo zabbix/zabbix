@@ -48,11 +48,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.DROP_RATE.MAX.WARN}|The critical rate of the dropped connections for trigger expression.|1|
-|{$NGINX.RESPONSE_TIME.MAX.WARN}|The Nginx maximum response time in seconds for trigger expression.|10|
-|{$NGINX.STUB_STATUS.PATH}|The path of Nginx stub_status page.|basic_status|
-|{$NGINX.STUB_STATUS.PORT}|The port of Nginx stub_status host or container.|80|
-|{$NGINX.STUB_STATUS.SCHEME}|The protocol http or https of Nginx stub_status host or container.|http|
+|{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for trigger expression.</p>|1|
+|{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The Nginx maximum response time in seconds for trigger expression.</p>|10|
+|{$NGINX.STUB_STATUS.PATH}|<p>The path of Nginx stub_status page.</p>|basic_status|
+|{$NGINX.STUB_STATUS.PORT}|<p>The port of Nginx stub_status host or container.</p>|80|
+|{$NGINX.STUB_STATUS.SCHEME}|<p>The protocol http or https of Nginx stub_status host or container.</p>|http|
 
 ## Template links
 
@@ -65,29 +65,29 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Nginx|Nginx: Service status|-|SIMPLE|net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]</br>**Preprocessing**:</br> - DISCARD_UNCHANGED_HEARTBEAT: `10m`|
-|Nginx|Nginx: Service response time|-|SIMPLE|net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]|
-|Nginx|Nginx: Requests total|The total number of client requests.|DEPENDENT|nginx.requests.total</br>**Preprocessing**:</br> - REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \3`|
-|Nginx|Nginx: Requests per second|The total number of client requests.|DEPENDENT|nginx.requests.total.rate</br>**Preprocessing**:</br> - REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \3`</br> - CHANGE_PER_SECOND|
-|Nginx|Nginx: Connections accepted per second|The total number of accepted client connections.|DEPENDENT|nginx.connections.accepted.rate</br>**Preprocessing**:</br> - REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \1`</br> - CHANGE_PER_SECOND|
-|Nginx|Nginx: Connections dropped per second|The total number of dropped client connections.|DEPENDENT|nginx.connections.dropped.rate</br>**Preprocessing**:</br> - JAVASCRIPT: `var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/) if (a) {     return a[1]-a[2] }`</br> - CHANGE_PER_SECOND|
-|Nginx|Nginx: Connections handled per second|The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).|DEPENDENT|nginx.connections.handled.rate</br>**Preprocessing**:</br> - REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \2`</br> - CHANGE_PER_SECOND|
-|Nginx|Nginx: Connections active|The current number of active client connections including Waiting connections.|DEPENDENT|nginx.connections.active</br>**Preprocessing**:</br> - REGEX: `Active connections: ([0-9]+) \1`|
-|Nginx|Nginx: Connections reading|The current number of connections where nginx is reading the request header.|DEPENDENT|nginx.connections.reading</br>**Preprocessing**:</br> - REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`|
-|Nginx|Nginx: Connections waiting|The current number of idle client connections waiting for a request.|DEPENDENT|nginx.connections.waiting</br>**Preprocessing**:</br> - REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \3`|
-|Nginx|Nginx: Connections writing|The current number of connections where nginx is writing the response back to the client.|DEPENDENT|nginx.connections.writing</br>**Preprocessing**:</br> - REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`|
-|Nginx|Nginx: Version|-|DEPENDENT|nginx.version</br>**Preprocessing**:</br> - REGEX: `Server: nginx/(.+) \1`</br> - DISCARD_UNCHANGED_HEARTBEAT: `1d`|
-|Zabbix_raw_items|Nginx: Get stub status page|The following status information is provided:</br>Active connections - the current number of active client connections including Waiting connections.</br>Accepts - the total number of accepted client connections.</br>Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</br>Requests - the total number of client requests.</br>Reading - the current number of connections where nginx is reading the request header.</br>Writing - the current number of connections where nginx is writing the response back to the client.</br>Waiting - the current number of idle client connections waiting for a request.|HTTP_AGENT|nginx.get_stub_status|
+|Nginx|Nginx: Service status|<p>-</p>|SIMPLE|net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p>|
+|Nginx|Nginx: Service response time|<p>-</p>|SIMPLE|net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]|
+|Nginx|Nginx: Requests total|<p>The total number of client requests.</p>|DEPENDENT|nginx.requests.total<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \3`</p>|
+|Nginx|Nginx: Requests per second|<p>The total number of client requests.</p>|DEPENDENT|nginx.requests.total.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \3`</p><p>- CHANGE_PER_SECOND|
+|Nginx|Nginx: Connections accepted per second|<p>The total number of accepted client connections.</p>|DEPENDENT|nginx.connections.accepted.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \1`</p><p>- CHANGE_PER_SECOND|
+|Nginx|Nginx: Connections dropped per second|<p>The total number of dropped client connections.</p>|DEPENDENT|nginx.connections.dropped.rate<p>**Preprocessing**:</p><p>- JAVASCRIPT: `var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/) if (a) {     return a[1]-a[2] }`</p><p>- CHANGE_PER_SECOND|
+|Nginx|Nginx: Connections handled per second|<p>The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p>|DEPENDENT|nginx.connections.handled.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \2`</p><p>- CHANGE_PER_SECOND|
+|Nginx|Nginx: Connections active|<p>The current number of active client connections including Waiting connections.</p>|DEPENDENT|nginx.connections.active<p>**Preprocessing**:</p><p>- REGEX: `Active connections: ([0-9]+) \1`</p>|
+|Nginx|Nginx: Connections reading|<p>The current number of connections where nginx is reading the request header.</p>|DEPENDENT|nginx.connections.reading<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`</p>|
+|Nginx|Nginx: Connections waiting|<p>The current number of idle client connections waiting for a request.</p>|DEPENDENT|nginx.connections.waiting<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \3`</p>|
+|Nginx|Nginx: Connections writing|<p>The current number of connections where nginx is writing the response back to the client.</p>|DEPENDENT|nginx.connections.writing<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`</p>|
+|Nginx|Nginx: Version|<p>-</p>|DEPENDENT|nginx.version<p>**Preprocessing**:</p><p>- REGEX: `Server: nginx/(.+) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
+|Zabbix_raw_items|Nginx: Get stub status page|<p>The following status information is provided:</p><p>Active connections - the current number of active client connections including Waiting connections.</p><p>Accepts - the total number of accepted client connections.</p><p>Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p><p>Requests - the total number of client requests.</p><p>Reading - the current number of connections where nginx is reading the request header.</p><p>Writing - the current number of connections where nginx is writing the response back to the client.</p><p>Waiting - the current number of idle client connections waiting for a request.</p>|HTTP_AGENT|nginx.get_stub_status|
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Nginx: Service is down|Last value: {ITEM.LASTVALUE1}.|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|Manual close: YES</br>|
-|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|Last value: {ITEM.LASTVALUE1}.|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|Manual close: YES</br>**Depends on**:</br> - Nginx: Service is down</br>|
-|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|Last value: {ITEM.LASTVALUE1}.</br>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|**Depends on**:</br> - Nginx: Service is down</br>|
-|Nginx: Version has changed (new version: {ITEM.VALUE})|Last value: {ITEM.LASTVALUE1}.</br>Nginx version has changed. Ack to close.|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|Manual close: YES</br>|
-|Nginx: Failed to fetch stub status page (or no data for 30m)|Last value: {ITEM.LASTVALUE1}.</br>Zabbix has not received data for items for the last 30 minutes.|`{TEMPLATE_NAME:nginx.get_stub_status.str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:nginx.get_stub_status.nodata(30m)}=1`|WARNING|Manual close: YES</br>**Depends on**:</br> - Nginx: Service is down</br>|
+|Nginx: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
+|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
+|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|<p>**Depends on**:</p><p>- Nginx: Service is down</p>|
+|Nginx: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Nginx version has changed. Ack to close.</p>|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|Nginx: Failed to fetch stub status page (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:nginx.get_stub_status.str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:nginx.get_stub_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p>|
 
 ## Feedback
 
