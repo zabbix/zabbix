@@ -53,10 +53,12 @@ class CControllerAutoregEdit extends CController {
 			'output' => ['tls_accept']
 		]);
 
-		$data['tls_accept'] = $autoreg['tls_accept'];
-		$data['tls_psk_identity'] = '';
-		$data['tls_psk'] = '';
-		$data['change_psk'] = $this->hasInput('change_psk') || $this->hasInput('tls_psk_identity');
+		$data = [
+			'tls_accept' => $autoreg['tls_accept'],
+			'tls_psk_identity' => '',
+			'tls_psk' => '',
+			'change_psk' => $this->hasInput('change_psk') || $this->hasInput('tls_psk_identity')
+		];
 
 		// overwrite with input variables
 		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
