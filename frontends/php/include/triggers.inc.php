@@ -885,11 +885,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority']
+				'priority' => $trigger['priority'],
+				'problem' => $trigger['problem']
 			];
-			if (array_key_exists('problem', $trigger)) {
-				$trigger_data['problem'] = $trigger['problem'];
-			}
 
 			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = $trigger_data;
 			$trcounter[$host['name']][$trigger_name]++;
@@ -991,12 +989,8 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$ack = null;
-
-			if (array_key_exists('problem', $trigger)) {
-				$eventid = $trigger['problem']['eventid'];
-				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
-			}
+			$eventid = $trigger['problem']['eventid'];
+			$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
 		}
 
 		if ($trigger['problem']['acknowledged'] == 1) {
