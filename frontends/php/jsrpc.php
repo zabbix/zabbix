@@ -495,7 +495,7 @@ switch ($data['method']) {
 
 			$result = array_flip($result);
 
-			// Remove searched entry from result, it will be added in JS.
+			// Remove searched entry from result to add it to the beginning of list.
 			if (array_key_exists($search, $result)) {
 				unset($result[$search]);
 			}

@@ -847,7 +847,7 @@ class CControllerPopupGeneric extends CController {
 
 				// Resolve item names by default.
 				$records = array_key_exists('orig_names', $page_options)
-					? CArrayHelper::renameObjectsKeys($records, ['name' => 'name_expanded'])
+					? CArrayHelper::copyObjectsKeys($records, ['name' => 'name_expanded'])
 					: CMacrosResolverHelper::resolveItemNames($records);
 
 				CArrayHelper::sort($records, ['name_expanded']);
@@ -1040,7 +1040,7 @@ class CControllerPopupGeneric extends CController {
 
 				case 'items':
 					foreach ($records as $itmeid => $row) {
-						$records[$row['name']] = ['itemid' => $row['name']] + $row;
+						$records[$row['name_expanded']] = ['itemid' => $row['name_expanded']] + $row;
 						unset($records[$itmeid]);
 					}
 				break;
