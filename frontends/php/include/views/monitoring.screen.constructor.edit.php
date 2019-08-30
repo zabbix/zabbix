@@ -175,39 +175,46 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		}
 	}
 
-	$screenFormList->addRow(
-		(new CLabel(_('Graph prototype'), 'resourceid_ms'))->setAsteriskMark(),
-		(new CMultiSelect([
-			'name' => 'resourceid',
-			'object_name' => 'graph_prototypes',
-			'multiple' => false,
-			'data' => $graph_prototype
-				? [
-					[
-						'id' => $resourceId,
-						'prefix' => $graph_prototype['host']['name'].NAME_DELIMITER,
-						'name' => $graph_prototype['name']
+	$screenFormList
+		->addRow(
+			(new CLabel(_('Graph prototype'), 'resourceid_ms'))->setAsteriskMark(),
+			(new CMultiSelect([
+				'name' => 'resourceid',
+				'object_name' => 'graph_prototypes',
+				'multiple' => false,
+				'data' => $graph_prototype
+					? [
+						[
+							'id' => $resourceId,
+							'prefix' => $graph_prototype['host']['name'].NAME_DELIMITER,
+							'name' => $graph_prototype['name']
+						]
 					]
+					: [],
+				'popup' => [
+					'parameters' => array_merge([
+						'srctbl' => 'graph_prototypes',
+						'srcfld1' => 'graphid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'resourceid'
+					], $this->data['screen']['templateid'] ? [
+						'templated_hosts' => '1',
+						'only_hostid' => $data['screen']['templateid']
+					] : [
+						'real_hosts' => '1'
+					]),
 				]
-				: [],
-			'popup' => [
-				'parameters' => array_merge([
-					'srctbl' => 'graph_prototypes',
-					'srcfld1' => 'graphid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'resourceid'
-				], $this->data['screen']['templateid'] ? [
-					'templated_hosts' => '1',
-					'only_hostid' => $data['screen']['templateid']
-				] : [
-					'real_hosts' => '1'
-				]),
-			]
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(true)
-	);
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+		->addRow(
+			(new CLabel(_('Max columns'), 'max_columns'))->setAsteriskMark(),
+			(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setAriaRequired()
+		);
 }
 
 /*
