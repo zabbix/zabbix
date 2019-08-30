@@ -72,8 +72,17 @@ Bug fixes:
 Changes for 4.2.7rc1
 
 New features:
+.......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
+.......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
+...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
+..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
+..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
+..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get 'dcheckids' property (vasilijs)
+..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
 
 --------------------------------------------------------------------------------
 Changes for 4.2.6
