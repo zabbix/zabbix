@@ -80,7 +80,6 @@ if ($data['change_psk']) {
 			null,
 			'tls_psk'
 		);
-
 }
 else {
 	$autoreg_tab
@@ -94,7 +93,6 @@ else {
 			null,
 			'tls_psk'
 		);
-
 }
 
 $autoreg_view = (new CTabView())
