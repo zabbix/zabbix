@@ -1071,13 +1071,7 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
 						if (!array_key_exists('itemid', $new_item)) {
-							$new_item['rtdata'] = DB::getDefaults($this->getSecondaryTableName());
-							foreach ($this->secondary_table_fields as $field) {
-								if (array_key_exists($field, $new_item)) {
-									$new_item['rtdata'][$field] = $new_item[$field];
-									unset($new_item[$field]);
-								}
-							}
+							$new_item['rtdata'] = DB::getDefaults('item_rtdata');
 						}
 					}
 				}
