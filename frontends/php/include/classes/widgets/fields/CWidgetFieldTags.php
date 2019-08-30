@@ -43,7 +43,7 @@ class CWidgetFieldTags extends CWidgetField {
 		$this->value = (array) $value;
 
 		foreach ($this->value as $index => $val) {
-			if (!array_key_exists('tag', $val) || ($val['tag'] === '' && $val['value'] === '')) {
+			if ($val['tag'] === '' && $val['value'] === '') {
 				unset($this->value[$index]);
 			}
 		}
