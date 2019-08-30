@@ -233,12 +233,10 @@ class CWidgetConfig {
 		else {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
-					return !(array_key_exists('interface_type', $fields)
-						&& count($fields['interface_type']) === 1);
+					return count($fields['interface_type']) === 1;
 
 				case WIDGET_PROBLEMS_BY_SV:
-					return (!array_key_exists('show_type', $fields)
-						|| $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS);
+					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
 
 				default:
 					return true;
