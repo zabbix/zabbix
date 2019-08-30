@@ -213,6 +213,20 @@ static int	DBpatch_4030020(void)
 	return DBcreate_index("config_autoreg_tls", "config_autoreg_tls_1", "tls_psk_identity", 1);
 }
 
+static int	DBpatch_4030021(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= DBexecute("insert into config_autoreg_tls (autoreg_tlsid,tls_psk_identity,tls_psk)"
+			" values ('1','','')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -240,5 +254,6 @@ DBPATCH_ADD(4030017, 0, 1)
 DBPATCH_ADD(4030018, 0, 1)
 DBPATCH_ADD(4030019, 0, 1)
 DBPATCH_ADD(4030020, 0, 1)
+DBPATCH_ADD(4030021, 0, 1)
 
 DBPATCH_END()
