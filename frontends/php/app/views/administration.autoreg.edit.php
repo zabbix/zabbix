@@ -59,8 +59,6 @@ $autoreg_tab = (new CFormList())
 	);
 
 if ($data['change_psk']) {
-	$autoreg_form->disablePasswordAutofill();
-
 	$autoreg_tab
 		->addRow(
 			(new CLabel(_('PSK identity'), 'tls_psk_identity'))->setAsteriskMark(),
