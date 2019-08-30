@@ -31,8 +31,6 @@ class CControllerAutoregUpdate extends CController {
 			->setArgument('action', 'autoreg.edit')
 			->getUrl()
 		);
-
-		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
