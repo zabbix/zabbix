@@ -2244,6 +2244,9 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 
 	while (nextcheck < tmax)
 	{
+		if (NULL == custom_intervals)
+			break;
+
 		if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
 			break;
 
