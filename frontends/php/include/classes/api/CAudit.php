@@ -53,7 +53,8 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true]
+			'users' => ['passwd' => true],
+			'config_autoreg_tls' => ['tls_psk_identity' => true, 'tls_psk' => true,]
 		];
 
 		switch ($resourcetype) {
@@ -70,8 +71,8 @@ class CAudit {
 				break;
 
 			case AUDIT_RESOURCE_AUTOREGISTRATION:
-				$field_name_resourceid = 'autoreg_tlsid';
-				$field_name_resourcename = 'tls_psk_identity';
+				$field_name_resourceid = 'configid';
+				$field_name_resourcename = 'name';
 				$table_name = 'config_autoreg_tls';
 				break;
 
