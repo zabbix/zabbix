@@ -139,7 +139,7 @@ class CAutoregistration extends CApiService {
 		$config = select_config();
 		$audit['configid'] = $config['configid'];
 		$old_audit = reset($db_autoreg);
-      	$old_audit['name'] = _('Auto registration');
+		$old_audit['name'] = _('Auto registration');
 
 		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION, [$audit],
 				[$config['configid'] => $old_audit]
