@@ -741,7 +741,6 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		foreach ($triggers as $triggerid => &$trigger) {
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 			$trigger['resolved'] = true;
-			$trigger['problem']['acknowledged'] = 1;
 
 			$problem_stats[$triggerid] = [
 				'has_resolved' => false,
