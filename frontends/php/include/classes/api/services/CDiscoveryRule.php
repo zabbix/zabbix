@@ -376,15 +376,17 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
+		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'filter' => ['hostid' => zbx_objectValues($items, 'hostid')],
+			'hostids' => zbx_objectValues($items, 'hostid'),
+			'preservekeys' => true
 		]);
-		$hostids = zbx_objectValues($hosts, 'hostid');
+		$hostids = array_keys($hosts);
 		if ($hostids) {
 			foreach ($items as &$item) {
 				if (in_array($item['hostid'], $hostids)) {
-					$item['rtdata'] = DB::getDefaults('item_rtdata');
+					$item['rtdata'] = true;
 				}
 			}
 			unset($item, $hostids, $hosts);
@@ -948,7 +950,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			if (array_key_exists('rtdata', $item)) {
-				$items_rtdata[$key] = $item['rtdata'];
+				$items_rtdata[$key] = [];
 				unset($item['rtdata']);
 			}
 
@@ -956,11 +958,11 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		$create_items = DB::save('items', $create_items);
 
-		if ($items_rtdata) {
-			foreach ($items_rtdata as $key => &$rtdata) {
-				$rtdata['itemid'] = $create_items[$key]['itemid'];
+		if (count($items_rtdata) > 0) {
+			foreach ($items_rtdata as $key => &$value) {
+				$value['itemid'] = $create_items[$key]['itemid'];
 			}
-			unset($rtdata);
+			unset($value);
 
 			DB::insert('item_rtdata', $items_rtdata, false);
 		}

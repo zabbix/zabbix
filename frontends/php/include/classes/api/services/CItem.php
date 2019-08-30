@@ -503,15 +503,17 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
+		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'filter' => ['hostid' => zbx_objectValues($items, 'hostid')],
+			'hostids' => zbx_objectValues($items, 'hostid'),
+			'preservekeys' => true
 		]);
-		$hostids = zbx_objectValues($hosts, 'hostid');
+		$hostids = array_keys($hosts);
 		if ($hostids) {
 			foreach ($items as &$item) {
 				if (in_array($item['hostid'], $hostids)) {
-					$item['rtdata'] = DB::getDefaults('item_rtdata');
+					$item['rtdata'] = true;
 				}
 			}
 			unset($item, $hostids, $hosts);
@@ -537,19 +539,19 @@ class CItem extends CItemGeneral {
 			}
 
 			if (array_key_exists('rtdata', $item)) {
-				$items_rtdata[$key] = $item['rtdata'];
+				$items_rtdata[$key] = [];
 				unset($item['rtdata']);
 			}
 		}
 		unset($item);
 
-		$itemids = DB::insert($this->tableName(), $items);
+		$itemids = DB::insert('items', $items);
 
-		if ($items_rtdata) {
-			foreach ($items_rtdata as $key => &$rtdata) {
-				$rtdata['itemid'] = $itemids[$key];
+		if (count($items_rtdata) > 0) {
+			foreach ($items_rtdata as $key => &$value) {
+				$value['itemid'] = $itemids[$key];
 			}
-			unset($rtdata);
+			unset($value);
 
 			DB::insert('item_rtdata', $items_rtdata, false);
 		}
