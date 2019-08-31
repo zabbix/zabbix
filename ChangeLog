@@ -4,6 +4,7 @@ New features:
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
 ........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
 ...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
 .......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
