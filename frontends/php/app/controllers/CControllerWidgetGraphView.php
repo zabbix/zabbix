@@ -249,18 +249,19 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 
 				if ($resourceid) {
-					$graph_src = new CUrl('chart.php');
-					$graph_src->setArgument('itemids', [$resourceid]);
-					$graph_src->setArgument('width', $width);
-					$graph_src->setArgument('height', $height);
-					$graph_src->setArgument('legend', $fields['show_legend']);
+					$graph_src = (new CUrl('chart.php'))
+						->setArgument('itemids', [$resourceid])
+						->setArgument('width', $width)
+						->setArgument('height', $height)
+						->setArgument('legend', $fields['show_legend']);
 				}
 				else {
 					$graph_src = new CUrl('chart3.php');
 				}
 
-				$graph_src->setArgument('from', $timeline['from']);
-				$graph_src->setArgument('to', $timeline['to']);
+				$graph_src
+					->setArgument('from', $timeline['from'])
+					->setArgument('to', $timeline['to']);
 
 				$item = CMacrosResolverHelper::resolveItemNames([$item])[0];
 				$header_label = $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
@@ -317,8 +318,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				}
 				else {
 					if ($fields['dynamic'] == WIDGET_SIMPLE_ITEM || $graph_src === '') {
-						$graph_src = (new CUrl('chart2.php'))
-							->setArgument('graphid', $resourceid);
+						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
 					if (!$edit_mode) {
@@ -326,15 +326,17 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					}
 				}
 
-				$graph_src->setArgument('width', $width);
-				$graph_src->setArgument('height', $height);
-				$graph_src->setArgument('legend', ($fields['show_legend'] && $graph['show_legend']) ? 1 : 0);
-				$graph_src->setArgument('from', $timeline['from']);
-				$graph_src->setArgument('to', $timeline['to']);
+				$graph_src
+					->setArgument('width', $width)
+					->setArgument('height', $height)
+					->setArgument('legend', ($fields['show_legend'] && $graph['show_legend']) ? 1 : 0)
+					->setArgument('from', $timeline['from'])
+					->setArgument('to', $timeline['to']);
 			}
 
-			$graph_src->setArgument('profileIdx', $profileIdx);
-			$graph_src->setArgument('profileIdx2', $profileIdx2);
+			$graph_src
+				->setArgument('profileIdx', $profileIdx)
+				->setArgument('profileIdx2', $profileIdx2);
 
 			if ($graph_dims['graphtype'] != GRAPH_TYPE_PIE && $graph_dims['graphtype'] != GRAPH_TYPE_EXPLODED) {
 				$graph_src->setArgument('outer', '1');
