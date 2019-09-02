@@ -72,7 +72,7 @@ class CAudit {
 
 			case AUDIT_RESOURCE_AUTOREGISTRATION:
 				$field_name_resourceid = 'configid';
-				$field_name_resourcename = 'name';
+				$field_name_resourcename = null;
 				$table_name = 'config';
 				break;
 
@@ -213,10 +213,10 @@ class CAudit {
 
 				$objects_diff[] = $object_diff;
 
-				$resourcename = $object_old[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
 			}
 			else {
-				$resourcename = $object[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object[$field_name_resourcename] : '';
 			}
 
 			if (mb_strlen($resourcename) > 255) {
