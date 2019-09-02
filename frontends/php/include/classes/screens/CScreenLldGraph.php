@@ -155,8 +155,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 		switch ($graph_prototype['graphtype']) {
 			case GRAPH_TYPE_NORMAL:
 			case GRAPH_TYPE_STACKED:
-				$src = (new CUrl('chart3.php'))
-					->setArgument('showworkperiod', $graph_prototype['show_work_period']);
+				$src = (new CUrl('chart3.php'))->setArgument('showworkperiod', $graph_prototype['show_work_period']);
 				break;
 
 			case GRAPH_TYPE_EXPLODED:
