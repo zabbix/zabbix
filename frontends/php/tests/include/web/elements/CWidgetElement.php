@@ -40,6 +40,15 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
+	 * Get header of widget.
+	 *
+	 * @return string
+	 */
+	public function getHeaderText() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
+	}
+
+	/**
 	 * Get content of widget.
 	 *
 	 * @return CElement

@@ -1,9 +1,22 @@
 Changes for 4.4.0beta1
 
 New features:
+.........T [ZBXNEXT-5142] added "Template App Nginx" (mchudinov)
+..F....... [ZBXNEXT-1657] split proxy and host names in separate columns in Configuration->Hosts list, Configuration->Discovery rules list and Administration->Queue pages (Ivo)
+.......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 A.F.....S. [ZBXNEXT-4942] implemented support of displaying operational data in the list of problems (agriscenko, asestakovs)
 
 Bug fixes:
+A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
+........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
+.......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
+...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
+..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
+..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
+..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get 'dcheckids' property (vasilijs)
+..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
+..F....... [ZBX-16502] fixed user edit form having a disabled and hidden fields when alias is the same as guest user (Ivo)
 ..F....... [ZBX-16507] fixed vertical scrollbar in kiosk mode when focusinig widgets with hidden headers (averza)
 
 --------------------------------------------------------------------------------
@@ -29,8 +42,6 @@ Bug fixes:
 A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
 ..F....... [ZBX-16128] fixed incorrect action ID in audit log (rlataria)
 ..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
-.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
-..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 ..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
 ..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
 ..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
@@ -68,6 +79,23 @@ Bug fixes:
 ..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
 
 --------------------------------------------------------------------------------
+Changes for 4.2.7rc1
+
+New features:
+.......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
+
+Bug fixes:
+A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
+........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
+.......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
+...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
+..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
+..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
+..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get 'dcheckids' property (vasilijs)
+..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 4.2.6
 
 4.2.6rc1 was released as 4.2.6 without any changes
@@ -77,15 +105,12 @@ Changes for 4.2.6rc1
 
 New features:
 ..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
-..F....... [ZBX-11299] changed font for fields of trigger expressions and scripts to monospaced (agriscenko)
 
 Bug fixes:
 ..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
 A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
 ..F....... [ZBX-16128] fixed incorrect action ID in audit log (rlataria)
 ..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
-.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
-..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 ..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
 ..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
 ..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
@@ -597,6 +622,23 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.13rc1
+
+New features:
+.......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
+
+Bug fixes:
+A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
+........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
+...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
+.......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
+..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
+..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
+..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get 'dcheckids' property (vasilijs)
+..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
+
+--------------------------------------------------------------------------------
 Changes for 4.0.12
 
 4.0.12rc1 was released as 4.0.12 without any changes
@@ -612,8 +654,6 @@ Bug fixes:
 A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
 ..F....... [ZBX-16128] fixed incorrect action ID in audit log (rlataria)
 ..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
-.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
-..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
 ..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
 ..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
 ..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
