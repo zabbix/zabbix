@@ -218,11 +218,8 @@ static int	DBpatch_4030021(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= DBexecute("insert into config_autoreg_tls (autoreg_tlsid,tls_psk_identity,tls_psk)"
-			" values ('1','','')"))
-	{
+	if (ZBX_DB_OK <= DBexecute("insert into config_autoreg_tls (autoreg_tlsid) values (1)"))
 		return SUCCEED;
-	}
 
 	return FAIL;
 }
