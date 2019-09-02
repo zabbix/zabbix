@@ -215,7 +215,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
-<output class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></output>
+<output class="<?= ZBX_STYLE_MSG_GLOBAL_FOOTER.' '.ZBX_STYLE_MSG_WARNING ?>" id="msg-global-footer"></output>
 <?php
 }
 

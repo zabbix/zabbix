@@ -319,7 +319,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
+		int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -355,10 +356,21 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, i
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 		{
-			/* supported items and items that could not have been scheduled previously, but had their */
-			/* update interval fixed, should be scheduled using their update intervals */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
-					now);
+			int disable_until;
+
+			if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
+					DCget_disable_until(item, host)))
+			{
+				item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+						custom_intervals, disable_until);
+			}
+			else
+			{
+				/* supported items and items that could not have been scheduled previously, but had */
+				/*  their update interval fixed, should be scheduled using their update intervals */
+				item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
+						custom_intervals, now);
+			}
 		}
 		else
 		{
@@ -2789,7 +2801,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
+				if (FAIL == DCitem_nextcheck_update(item, host, item->state, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -3158,6 +3170,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &trigger->expression, row[2]);
 		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
 		DCstrpool_replace(found, &trigger->correlation_tag, row[13]);
+		DCstrpool_replace(found, &trigger->opdata, row[14]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
@@ -3222,6 +3235,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			zbx_strpool_release(trigger->recovery_expression);
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
+			zbx_strpool_release(trigger->opdata);
 
 			zbx_vector_ptr_destroy(&trigger->tags);
 
@@ -6696,6 +6710,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
+	dst_trigger->opdata = zbx_strdup(NULL, src_trigger->opdata);
 	dst_trigger->flags = 0;
 
 	dst_trigger->expression = NULL;
@@ -6749,6 +6764,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->description);
 	zbx_free(trigger->correlation_tag);
+	zbx_free(trigger->opdata);
 
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&trigger->tags);
@@ -7726,7 +7742,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
+	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -11451,7 +11467,8 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
+			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec,
+					NULL);
 	}
 
 	UNLOCK_CACHE;
