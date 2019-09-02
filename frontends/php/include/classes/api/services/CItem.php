@@ -137,8 +137,7 @@ class CItem extends CItemGeneral {
 						|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts = $this->addQuerySelect('ir.*', $sqlParts);
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid = i.itemid'];
+			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
 			$sqlParts['left_table'] = $this->tableName();
 		}
 
@@ -509,15 +508,12 @@ class CItem extends CItemGeneral {
 			'hostids' => zbx_objectValues($items, 'hostid'),
 			'preservekeys' => true
 		]);
-		$hostids = array_keys($hosts);
-		if ($hostids) {
-			foreach ($items as &$item) {
-				if (in_array($item['hostid'], $hostids)) {
-					$item['rtdata'] = true;
-				}
+		foreach ($items as &$item) {
+			if (array_key_exists($item['hostid'], $hosts)) {
+				$item['rtdata'] = true;
 			}
-			unset($item, $hostids, $hosts);
 		}
+		unset($item, $hosts);
 
 		$this->createReal($items);
 		$this->inherit($items);
@@ -547,14 +543,12 @@ class CItem extends CItemGeneral {
 
 		$itemids = DB::insert('items', $items);
 
-		if (count($items_rtdata) > 0) {
-			foreach ($items_rtdata as $key => &$value) {
-				$value['itemid'] = $itemids[$key];
-			}
-			unset($value);
-
-			DB::insert('item_rtdata', $items_rtdata, false);
+		foreach ($items_rtdata as $key => &$value) {
+			$value['itemid'] = $itemids[$key];
 		}
+		unset($value);
+
+		DB::insert('item_rtdata', $items_rtdata, false);
 
 		$item_applications = [];
 		foreach ($items as $key => $item) {
@@ -1234,7 +1228,7 @@ class CItem extends CItemGeneral {
 				if ($this->outputIsRequested('error', $options['output'])) {
 					// SQL func COALESCE use for template items because they dont have record
 					// in item_rtdata table and DBFetch convert null to '0'
-					$sqlParts = $this->addQuerySelect("COALESCE(ir.error, '') `error`", $sqlParts);
+					$sqlParts = $this->addQuerySelect("COALESCE(ir.error,'') AS error", $sqlParts);
 				}
 			}
 
