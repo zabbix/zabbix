@@ -3723,7 +3723,6 @@ void	zbx_update_env(double time_now)
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
 		int refresh_unsupported, int *nextcheck, char **error)
 {
-
 	if (ITEM_STATE_NORMAL == state)
 	{
 		int			simple_interval;

@@ -140,10 +140,10 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("plugin %s: executing exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
+			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
 			if ret, err = exporter.Export(key, params, t); err == nil {
-				log.Debugf("plugin %s: executed exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
+				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
@@ -171,7 +171,7 @@ func (t *exporterTask) perform(s Scheduler) {
 					}
 				}
 			} else {
-				log.Debugf("plugin %s: failed to execute exporter task for itemid:%d key '%s' error: '%s'", t.plugin.name(), t.item.itemid, t.item.key, err.Error())
+				log.Debugf("failed to execute exporter task for itemid:%d key '%s' error: '%s'", t.item.itemid, itemkey, err.Error())
 			}
 		}
 		if err != nil {

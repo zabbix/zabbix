@@ -187,3 +187,4 @@ bin/mock_server
 bin/zabbix_get
 bin/zabbix_sender
 .cproject
+etc/agent.conf

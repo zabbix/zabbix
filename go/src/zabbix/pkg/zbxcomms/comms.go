@@ -286,7 +286,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 		}
 	}
 
-	c, err := Open(address, localAddr, time.Second*time.Duration(timeout), tlsconfig)
+	c, err := Open(address, localAddr, timeout, tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
