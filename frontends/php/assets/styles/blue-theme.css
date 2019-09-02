@@ -2416,7 +2416,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     align-items: center; }
     .dashbrd-grid-iterator-head .dashbrd-grid-iterator-pager .dashbrd-grid-iterator-pager-info {
       margin: 2px .5em 0;
-      white-space: nowrap; }
+      white-space: nowrap;
+      color: #3c5563; }
   .dashbrd-grid-iterator-head.pager-visible .dashbrd-grid-iterator-pager {
     display: flex; }
 

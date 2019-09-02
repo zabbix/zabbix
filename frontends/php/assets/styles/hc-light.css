@@ -2403,7 +2403,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     align-items: center; }
     .dashbrd-grid-iterator-head .dashbrd-grid-iterator-pager .dashbrd-grid-iterator-pager-info {
       margin: 2px .5em 0;
-      white-space: nowrap; }
+      white-space: nowrap;
+      color: #262626; }
   .dashbrd-grid-iterator-head.pager-visible .dashbrd-grid-iterator-pager {
     display: flex; }
 
@@ -5222,6 +5223,12 @@ table.preprocessing-test-results .rel-container {
 .icon-wzrd-action {
   background: transparent url(../img/icon-sprite.svg) no-repeat -168px -617px;
   margin-top: -16px; }
+
+.btn-iterator-page-previous {
+  background: url(../img/icon-sprite.svg) no-repeat -244px -657px; }
+
+.btn-iterator-page-next {
+  background: url(../img/icon-sprite.svg) no-repeat -242px -623px; }
 
 .btn-widget-action {
   background: url(../img/icon-sprite.svg) no-repeat -165px -618px; }

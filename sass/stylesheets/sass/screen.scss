@@ -3376,7 +3376,7 @@ $form-icon-btn: (
 	h4 {
 		flex-grow: 1;
 		margin-top: .5rem;
-		color: h4-widget-color($font-color);
+		color: widget-head-font-color($font-color);
 		font-weight: bold;
 		@extend %overflow-ellipsis;
 	}
@@ -3513,7 +3513,7 @@ $form-icon-btn: (
 	h4 {
 		flex-grow: 1;
 		margin-top: .5rem;
-		color: h4-widget-color($font-color);
+		color: widget-head-font-color($font-color);
 		font-weight: bold;
 		@extend %overflow-ellipsis;
 	}
@@ -3538,6 +3538,7 @@ $form-icon-btn: (
 		.dashbrd-grid-iterator-pager-info {
 			margin: 2px .5em 0;
 			white-space: nowrap;
+			color: widget-head-font-color($font-color);
 		}
 	}
 
@@ -4101,7 +4102,7 @@ $form-icon-btn: (
 	padding: 8px 60px 8px 10px;
 
 	h4 {
-		color: h4-widget-color($font-color);
+		color: widget-head-font-color($font-color);
 		font-weight: bold;
 	}
 
