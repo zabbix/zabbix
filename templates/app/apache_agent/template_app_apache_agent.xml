@@ -71,7 +71,7 @@ Template tooling version used: 0.21</description>
                <preprocessing>
                   <step>
                      <type>21</type>
-                     <params>// Convert Apache status to JSON.
+                     <params>// Convert Apache status to JSON
 var lines = value.split("\n");
 var fields = {},
     output = {},
@@ -82,15 +82,18 @@ var fields = {},
         "I": 0, ".": 0
     };
 
-// Get all "Key: Value" pairs as an object.
+// Get all "Key: Value" pairs as an object
 for (var i = 0; i &lt; lines.length; i++) {
     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);
     if (line !== null) {
         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);
     }
 }
+
+// For versions without "ServerUptimeSeconds" metric
+output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime
  
-// Parse "Scoreboard" to get worker count.
+// Parse "Scoreboard" to get worker count
 if (typeof output.Scoreboard === 'string') {
     for (var i = 0; i &lt; output.Scoreboard.length; i++) {
         var char = output.Scoreboard[i];
@@ -98,7 +101,7 @@ if (typeof output.Scoreboard === 'string') {
     }
 }
  
-// Add worker data to the output.
+// Add worker data to the output
 output.Workers = {
     waiting: workers["_"], starting: workers["S"], reading: workers["R"],
     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],
@@ -106,7 +109,7 @@ output.Workers = {
     cleanup: workers["I"], slot: workers["."]
 };
  
-// Return JSON string.
+// Return JSON string
 return JSON.stringify(output);</params>
                      <error_handler>0</error_handler>
                      <error_handler_params/>
