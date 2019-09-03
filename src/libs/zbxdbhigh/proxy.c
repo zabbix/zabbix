@@ -2185,7 +2185,7 @@ try_again:
 		if (0 != hd->logeventid)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 
-		if (0 != hd->state)
+		if (ITEM_STATE_NORMAL != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
 		if (0 == (PROXY_HISTORY_FLAG_NOVALUE & hd->flags))
