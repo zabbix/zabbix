@@ -166,6 +166,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	if !result.persistent {
 		for i, r := range c.results {
 			if r.Itemid == result.Itemid {
+				log.Debugf("[%d] cache is full, replacing oldest value for itemid:%d", c.clientID, r.Itemid)
 				index = i
 				break
 			}
@@ -177,6 +178,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 				if result.persistent {
 					c.persistValueNum++
 				}
+				log.Debugf("[%d] cache is full, removing oldest value for itemid:%d", c.clientID, r.Itemid)
 				index = i
 				break
 			}
