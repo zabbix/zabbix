@@ -1177,7 +1177,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 	else {
 		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valemapid', 'name']
+			'output' => ['valuemapid', 'name']
 		]);
 
 		CArrayHelper::sort($data['valuemaps'], ['name']);
@@ -1764,6 +1764,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];
 			$data['correlation_mode'] = $trigger['correlation_mode'];

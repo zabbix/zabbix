@@ -49,8 +49,8 @@ check_fields($fields);
  */
 if (hasRequest('valuemapid')) {
 	$valuemaps = API::ValueMap()->get([
-		'output' => ['valuemapid'],
-		'valuemapids' => [getRequest('valuemapid')]
+		'output' => [],
+		'valuemapids' => getRequest('valuemapid')
 	]);
 
 	if (!$valuemaps) {
@@ -95,8 +95,8 @@ elseif (getRequest('action') === 'valuemap.delete' && hasRequest('valuemapids'))
 	}
 	else {
 		$valuemaps = API::ValueMap()->get([
-			'valuemapids' => getRequest('valuemapids'),
-			'output' => []
+			'output' => ['valuemapid'],
+			'valuemapids' => getRequest('valuemapids')
 		]);
 		uncheckTableRows(null, zbx_objectValues($valuemaps, 'valuemapid'));
 	}
@@ -124,7 +124,7 @@ if (hasRequest('form')) {
 		$valuemaps = API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'selectMappings' => ['value', 'newvalue'],
-			'valuemapids' => [$data['valuemapid']]
+			'valuemapids' => $data['valuemapid']
 		]);
 		$valuemap = reset($valuemaps);
 
