@@ -2330,10 +2330,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   height: 2rem;
   padding-left: 10px;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
   flex-wrap: nowrap;
+  flex-direction: row;
   overflow: hidden;
+  align-items: flex-start;
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
@@ -2382,7 +2382,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   height: 0;
-  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0);
   transition: height .3s, margin-top .3s, box-shadow .3s; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
@@ -2413,13 +2412,14 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   height: 0;
   display: flex;
   flex-wrap: nowrap;
+  flex-direction: row;
   overflow: hidden;
   padding-left: 10px;
   box-sizing: border-box;
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
-  transition: margin-top .3s, height .3s, opacity 0s .3s, box-shadow .3s;
+  transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
   opacity: 0; }
   .dashbrd-grid-iterator-head h4 {
     flex-grow: 1;
@@ -5239,6 +5239,12 @@ table.preprocessing-test-results .rel-container {
 .list-table.compact-view td.na-bg, .list-table.compact-view td.info-bg, .list-table.compact-view td.warning-bg, .list-table.compact-view td.average-bg, .list-table.compact-view td.high-bg, .list-table.compact-view td.disaster-bg {
   color: black;
   box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1); }
+
+.dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
+  box-shadow: inset 0 -12px 8px -8px rgba(0, 0, 0, 0.5), 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
+
+.dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head, .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
+  box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, 0.5); }
 
 .btn-back-map-container .btn-back-map .btn-back-map-icon {
   background-position: -85px -725px; }

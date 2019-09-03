@@ -133,6 +133,24 @@ $ok-ack-fg-color: #00ff00;
 @import 'screen.scss';
 
 // DASHBOARD
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus, &:hover {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 -6px 8px -2px #000;
+		}
+	}
+}
+
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		&.dashbrd-grid-widget-focus, &:hover {
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+	}
+}
+
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,

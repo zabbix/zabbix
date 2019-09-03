@@ -1541,6 +1541,20 @@
 					height: (height * data['options']['widget-height']) + 'px'
 				};
 
+			if (cell_column == num_columns - 1) {
+				// Setting right side for last column of widgets (fixes IE11 and Opera issues).
+				$.extend(css, {
+					width: 'auto',
+					right: '0px'
+				});
+			}
+			else {
+				$.extend(css, {
+					width: Math.round(width / pos['width'] * 100 * 100) / 100 + '%',
+					right: 'auto'
+				});
+			}
+
 			if (index < iterator['children'].length) {
 				iterator['children'][index]['div'].css(css);
 			}

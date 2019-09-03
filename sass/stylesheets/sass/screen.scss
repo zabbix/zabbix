@@ -3361,10 +3361,10 @@ $form-icon-btn: (
 	height: 2rem;
 	padding-left: 10px;
 	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
 	flex-wrap: nowrap;
+	flex-direction: row;
 	overflow: hidden;
+	align-items: flex-start;
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
 	background-color: $ui-bg-color;
@@ -3454,7 +3454,6 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-head {
 			height: 0;
-			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
 			transition: height .3s, margin-top .3s, box-shadow .3s;
 		}
 
@@ -3501,13 +3500,14 @@ $form-icon-btn: (
 	height: 0;
 	display: flex;
 	flex-wrap: nowrap;
+	flex-direction: row;
 	overflow: hidden;
 	padding-left: 10px;
 	box-sizing: border-box;
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
 	background-color: $ui-bg-color;
-	transition: margin-top .3s, height .3s, opacity 0s .3s, box-shadow .3s;
+	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 	opacity: 0;
 
 	h4 {
