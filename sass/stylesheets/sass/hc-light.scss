@@ -125,6 +125,9 @@ $problem-ack-fg-color: #cc0000;
 $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
+// MULTISELECT
+$multiselect-selected-bg-color: #777;
+
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
@@ -563,15 +566,12 @@ ul.top-nav-icons {
 
 	.multiselect-list {
 
-		li {
+		li.selected {
 
-			&.selected {
-
-				.subfilter-enabled,
-				.subfilter-disable-btn {
-					background-color: #777;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
+			.subfilter-enabled,
+			.subfilter-disable-btn,
+			.subfilter-disable-btn:active {
+				@include box-shadow(0 0 0 1px rgba($blue, 1));
 			}
 		}
 	}
