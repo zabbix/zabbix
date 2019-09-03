@@ -921,6 +921,7 @@ class CApiInputValidator {
 	 * PSK key validator.
 	 *
 	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -929,23 +930,27 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validatePSK($rule, &$data, $path, &$error) {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
 
-		if (preg_match('/^([0-9a-f]{2})+$/i', $data) !== 1) {
+		$mb_len = mb_strlen($data);
+
+		if ($mb_len != 0 && $mb_len < PSK_MIN_LEN) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('minimum length is %1$s characters', PSK_MIN_LEN));
+			return false;
+		}
+
+		if (preg_match('/^([0-9a-f]{2})*$/i', $data) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('an even number of hexadecimal characters is expected')
 			);
 			return false;
 		}
 
-		if (strlen($data) < PSK_MIN_LEN) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('minimum length is %1$s characters', PSK_MIN_LEN));
-			return false;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+		if (array_key_exists('length', $rule) && $mb_len > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}

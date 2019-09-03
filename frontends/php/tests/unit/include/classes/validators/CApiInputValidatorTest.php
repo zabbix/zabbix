@@ -2723,19 +2723,31 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_PSK],
 				'0123456789abcdef0123456789abcde',
 				'/psk',
-				'Invalid parameter "/psk": an even number of hexadecimal characters is expected.'
+				'Invalid parameter "/psk": minimum length is 32 characters.'
 			],
 			[
 				['type' => API_PSK],
 				'xyz',
 				'/psk',
-				'Invalid parameter "/psk": an even number of hexadecimal characters is expected.'
+				'Invalid parameter "/psk": minimum length is 32 characters.'
 			],
 			[
 				['type' => API_PSK],
 				'0123456789abcdef0123456789abcd',
 				'/psk',
 				'Invalid parameter "/psk": minimum length is 32 characters.'
+			],
+			[
+				['type' => API_PSK],
+				'',
+				'/psk',
+				''
+			],
+			[
+				['type' => API_PSK, 'flags' => API_NOT_EMPTY],
+				'',
+				'/psk',
+				'Invalid parameter "/psk": cannot be empty.'
 			],
 			[
 				['type' => API_PSK],

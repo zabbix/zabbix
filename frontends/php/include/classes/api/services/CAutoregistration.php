@@ -100,68 +100,53 @@ class CAutoregistration extends CApiService {
 	}
 
 	/**
-	 * Update autoregistration configuration.
-	 *
 	 * @param array  $autoreg
-	 * @param int    $autoreg['tls_accept']
-	 * @param string $autoreg['tls_psk_identity']
-	 * @param string $autoreg['tls_psk']
 	 *
-	 * @throws APIException if incorrect encryption options.
-	 *
-	 * @return true if no errors
+	 * @return bool
 	 */
 	public function update(array $autoreg) {
 		$this->validateUpdate($autoreg, $db_autoreg);
 
-		reset($db_autoreg);
-		$autoreg['autoreg_tlsid'] = key($db_autoreg);
-		$update = [];
+		$upd_config = [];
+		$upd_config_autoreg_tls = [];
 
-		if ($autoreg['tls_accept'] == HOST_ENCRYPTION_NONE) {
-			$autoreg['tls_psk_identity'] = '';
-			$autoreg['tls_psk'] = '';
-		}
-		$audit = $autoreg;
-
-		update_config(['autoreg_tls_accept' => $autoreg['tls_accept']]);
-		unset($autoreg['tls_accept']);
-
-		if ($autoreg) {
-			$update[] = [
-				'values' => $autoreg,
-				'where' => ['autoreg_tlsid' => $autoreg['autoreg_tlsid']]
-			];
+		if (array_key_exists('tls_accept', $autoreg) && $autoreg['tls_accept'] != $db_autoreg['tls_accept']) {
+			$upd_config['autoreg_tls_accept'] = $autoreg['tls_accept'];
 		}
 
-		DB::update('config_autoreg_tls', $update);
+		// strings
+		foreach (['tls_psk_identity', 'tls_psk'] as $field_name) {
+			if (array_key_exists($field_name, $autoreg) && $autoreg[$field_name] !== $db_autoreg[$field_name]) {
+				$upd_config_autoreg_tls[$field_name] = $autoreg[$field_name];
+			}
+		}
 
-		$config = select_config();
-		$audit['configid'] = $config['configid'];
-		$old_audit = reset($db_autoreg);
+		if ($upd_config) {
+			DB::update('config', [
+				'values' => $upd_config,
+				'where' => ['configid' => $db_autoreg['configid']]
+			]);
+		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION, [$audit],
-				[$config['configid'] => $old_audit]
+		if ($upd_config_autoreg_tls) {
+			DB::update('config_autoreg_tls', [
+				'values' => $upd_config_autoreg_tls,
+				'where' => ['autoreg_tlsid' => $db_autoreg['autoreg_tlsid']]
+			]);
+		}
+
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_AUTOREGISTRATION,
+			[['configid' => $db_autoreg['configid']] + $autoreg], [$db_autoreg['configid'] => $db_autoreg]
 		);
 
 		return true;
 	}
 
 	/**
-	 * Validate autoregistration connections and PSK fields.
-	 *
 	 * @param array  $autoreg
-	 * @param int    $autoreg['tls_accept']
-	 * @param string $autoreg['tls_psk_identity']
-	 * @param string $autoreg['tls_psk']
-	 * @param array  $db_autoreg                                       (optional)
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['autoreg_tlsid']
-	 * @param int    $db_autoreg[<autoreg_tlsid>]['tls_accept']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk_identity']
-	 * @param string $db_autoreg[<autoreg_tlsid>]['tls_psk']
-	 * @param int    $autoreg_tlsid
+	 * @param array  $db_autoreg
 	 *
-	 * @throws APIException if incorrect encryption options.
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$autoreg, array &$db_autoreg = null) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -173,44 +158,44 @@ class CAutoregistration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_autoreg = $this->getAutoreg(['output' => API_OUTPUT_EXTEND], true);
-
-		$tls_accept = array_key_exists('tls_accept', $autoreg) ? $autoreg['tls_accept'] : HOST_ENCRYPTION_NONE;
-		$tls_psk_identity = array_key_exists('tls_psk_identity', $autoreg) ? $autoreg['tls_psk_identity'] : '';
-		$tls_psk = array_key_exists('tls_psk', $autoreg) ? $autoreg['tls_psk'] : '';
-
-		$autoreg['tls_accept'] = $tls_accept;
-
-		// PSK validation.
-		if ($tls_accept & HOST_ENCRYPTION_PSK) {
-			if ($tls_psk_identity === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('cannot be empty'))
-				);
-			}
-
-			if ($tls_psk === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('cannot be empty'))
-				);
-			}
-		}
-		else {
-			if (array_key_exists('tls_psk_identity', $autoreg) && $autoreg['tls_psk_identity'] !== '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('should be empty'))
-				);
-			}
-
-			if (array_key_exists('tls_psk', $autoreg) && $autoreg['tls_psk'] !== '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('should be empty'))
-				);
-			}
-		}
 		// Check permissions.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_autoreg = DBfetch(DBselect(
+			"SELECT c.configid,c.autoreg_tls_accept AS tls_accept,ca.autoreg_tlsid,ca.tls_psk_identity,ca.tls_psk".
+			" FROM config c,config_autoreg_tls ca"
+		));
+
+		$tls_accept = array_key_exists('tls_accept', $autoreg) ? $autoreg['tls_accept'] : $db_autoreg['tls_accept'];
+
+		// PSK validation.
+		foreach (['tls_psk_identity', 'tls_psk'] as $field_name) {
+			if ($tls_accept & HOST_ENCRYPTION_PSK) {
+				if (!array_key_exists($field_name, $autoreg) && $db_autoreg[$field_name] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', '/',
+						_s('the parameter "%1$s" is missing', $field_name)
+					));
+				}
+
+				if (array_key_exists($field_name, $autoreg) && $autoreg[$field_name] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', '/'.$field_name, _('cannot be empty'))
+					);
+				}
+			}
+			else {
+				if (array_key_exists($field_name, $autoreg) && $autoreg[$field_name] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', '/'.$field_name, _('should be empty'))
+					);
+				}
+
+				if (!array_key_exists($field_name, $autoreg) && $db_autoreg[$field_name] !== '') {
+					$autoreg[$field_name] = '';
+				}
+			}
 		}
 	}
 }
