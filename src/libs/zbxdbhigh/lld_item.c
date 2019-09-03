@@ -3120,8 +3120,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	if (0 == items->values_num)
 		goto out;
 
-	sql = (char*)zbx_malloc(NULL, sql_alloc);
-
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
@@ -3155,6 +3153,9 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 
 		*host_locked = 1;
 	}
+
+	if (0 != upd_items)
+		sql = (char*)zbx_malloc(NULL, sql_alloc);
 
 	if (0 != upd_keys.values_num)
 	{
