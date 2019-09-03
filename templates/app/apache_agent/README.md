@@ -60,7 +60,8 @@ This template was tested on:
 ## Setup
 
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
-Check module availability: httpd -M 2>/dev/null | grep status_module
+
+Check module availability: `httpd -M 2>/dev/null | grep status_module`
 
 Example configuration of Apache:
 
@@ -71,7 +72,7 @@ Example configuration of Apache:
 </Location>
 ```
 
-If you use another path, then don't forget to change {$APACHE.STATUS.PATH} macro.
+If you use another path, then don't forget to change `{$APACHE.STATUS.PATH}` macro.
 Install and setup [Zabbix agent](https://www.zabbix.com/documentation/current/manual/installation/install_from_packages).
 
 
@@ -86,7 +87,7 @@ No specific Zabbix configuration is required.
 |{$APACHE.PROCESS_NAME}|<p>Apache server process name</p>|httpd|
 |{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|10|
 |{$APACHE.STATUS.HOST}|<p>Hostname or IP address of the Apache status page</p>|127.0.0.1|
-|{$APACHE.STATUS.PATH}|<p>The URL-path to the Apache status page</p>|server-status?auto|
+|{$APACHE.STATUS.PATH}|<p>The URL-path</p>|server-status?auto|
 |{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|80|
 
 ## Template links
