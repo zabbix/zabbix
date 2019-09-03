@@ -38,12 +38,11 @@ class CTemplateImporter extends CImporter {
 
 		$this->checkCircularTemplateReferences($templates);
 
-		foreach ($templates as &$template) {
-			if (!$this->options['templateLinkage']['createMissing']) {
-				unset($template['templates']);
+		if (!$this->options['templateLinkage']['createMissing']) {
+			foreach ($templates as $name => $template) {
+				unset($templates[$name]['templates']);
 			}
 		}
-		unset($template);
 
 		do {
 			$independentTemplates = $this->getIndependentTemplates($templates);
@@ -64,7 +63,8 @@ class CTemplateImporter extends CImporter {
 					unset($template['templates']);
 				}
 
-				if (array_key_exists('templateid', $template) && $this->options['templates']['updateExisting']) {
+				if (array_key_exists('templateid', $template) && ($this->options['templates']['updateExisting']
+						|| $this->options['process_templates'])) {
 					$templatesToUpdate[] = $template;
 				}
 				else if ($this->options['templates']['createMissing']) {
@@ -94,8 +94,10 @@ class CTemplateImporter extends CImporter {
 				}
 			}
 
-			if ($this->options['templates']['updateExisting'] && $templatesToUpdate) {
-				API::Template()->update($templatesToUpdate);
+			if ($templatesToUpdate) {
+				if ($this->options['templates']['updateExisting']) {
+					API::Template()->update($templatesToUpdate);
+				}
 
 				foreach ($templatesToUpdate as $updatedTemplate) {
 					$this->processedTemplateIds[$updatedTemplate['templateid']] = $updatedTemplate['templateid'];

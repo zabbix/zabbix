@@ -945,3 +945,108 @@ function parseUrlString(url) {
 		'pairs': pairs
 	};
 }
+
+/**
+ * Message formatting function.
+ *
+ * @param {string}       type            Message type. ('good'|'bad'|'warning')
+ * @param {string|array} messages        Array with details messages or message string with normal font.
+ * @param {string}       title           Larger font title.
+ * @param {bool}         show_close_box  Show close button.
+ * @param {bool}         show_details    Show details on opening.
+ *
+ * @return {string}
+ */
+function makeMessageBox(type, messages, title, show_close_box, show_details) {
+	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
+		msg_class = classes[type];
+
+	if (typeof msg_class === 'undefined') {
+		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
+	}
+
+	if (typeof title === 'undefined') {
+		title = null;
+	}
+	if (typeof show_close_box === 'undefined') {
+		show_close_box = true;
+	}
+	if (typeof show_details === 'undefined') {
+		show_details = false;
+	}
+
+	var	$list = jQuery('<ul>'),
+		$msg_details = jQuery('<div>')
+			.addClass('msg-details')
+			.append($list),
+		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
+		$msg_box = jQuery('<output>')
+			.addClass(msg_class).attr('role', 'contentinfo')
+			.attr('aria-label', aria_labels[type]),
+		$details_arrow = jQuery('<span>')
+			.attr('id', 'details-arrow')
+			.addClass(show_details ? 'arrow-up' : 'arrow-down'),
+		$link_details = jQuery('<a>')
+			.text(t('Details') + ' ')
+			.addClass('link-action')
+			.attr('href', 'javascript:void(0)')
+			.attr('role', 'button')
+			.append($details_arrow)
+			.attr('aria-expanded', show_details ? 'true' : 'false');
+
+		$link_details.click(function() {
+			showHide(jQuery(this)
+				.siblings('.msg-details')
+				.find('.msg-details-border')
+			);
+			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
+			jQuery(this).attr('aria-expanded', jQuery(this)
+				.find('.arrow-down')
+				.length == 0
+			);
+		});
+
+	if (title !== null) {
+		$msg_box.prepend($link_details);
+		jQuery('<span>')
+			.text(title)
+			.appendTo($msg_box);
+
+		$list.addClass('msg-details-border');
+
+		if (!show_details) {
+			$list.hide();
+		}
+	}
+
+	if (Array.isArray(messages) && messages.length > 0) {
+		jQuery.map(messages, function(message) {
+			jQuery('<li>')
+				.text(message)
+				.appendTo($list);
+			return null;
+		});
+
+		$msg_box.append($msg_details);
+	}
+	else {
+		jQuery('<li>')
+			.text(messages ? messages : ' ')
+			.appendTo($list);
+		$msg_box.append($msg_details);
+	}
+
+	if (show_close_box) {
+		var $button = jQuery('<button>')
+				.addClass('overlay-close-btn')
+				.attr('title', t('Close'))
+				.click(function() {
+					jQuery(this)
+						.closest('.' + classes[index])
+						.remove();
+				});
+		$msg_box.append($button);
+	}
+
+	return $msg_box;
+}
