@@ -452,6 +452,11 @@ class C44XmlValidator {
 											'name' => ['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
+									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'delay' => ['type' => XML_STRING, 'default' => '1m'],
 									'description' => ['type' => XML_STRING],
@@ -551,12 +556,7 @@ class C44XmlValidator {
 										'name' => ['type' => XML_STRING | XML_REQUIRED],
 									]],
 									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
+									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 								]]
 							]],
 							'jmx_endpoint' => ['type' => XML_STRING],
@@ -1067,6 +1067,11 @@ class C44XmlValidator {
 											'name' => ['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
+									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'name' => ['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'delay' => ['type' => XML_STRING, 'default' => '1m'],
 									'description' => ['type' => XML_STRING],
@@ -1135,12 +1140,7 @@ class C44XmlValidator {
 										'name' => ['type' => XML_STRING | XML_REQUIRED]
 									]],
 									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
+									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 								]]
 							]],
 							'jmx_endpoint' => ['type' => XML_STRING],
