@@ -84,9 +84,8 @@ if ($data['change_psk']) {
 else {
 	$autoreg_tab
 		->addRow(
-			(new CLabel(_('PSK'), 'tls_psk'))->setAsteriskMark(),
+			(new CLabel(_('PSK')))->setAsteriskMark(),
 			(new CSimpleButton(_('Change PSK')))
-				->setId('tls_psk')
 				->setAttribute('autofocus', 'autofocus')
 				->onClick('javascript: submitFormWithParam("'.$autoreg_form->getName().'", "change_psk", "1");')
 				->addClass(ZBX_STYLE_BTN_GREY),

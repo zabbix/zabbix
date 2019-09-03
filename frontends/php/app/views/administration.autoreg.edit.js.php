@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	jQuery(function($) {
-		var $tls_psk = $('#tls_psk_identity, #tls_psk').closest('.tls_psk');
+		var $tls_psk = $('.tls_psk', $('#autoreg-form'));
 
 		// Refresh field visibility on document load.
 		if (($('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
