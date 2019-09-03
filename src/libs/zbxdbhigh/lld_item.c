@@ -3104,18 +3104,18 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 {
 	const char		*__function_name = "lld_items_save";
 
-	int			ret = SUCCEED, i, new_items = 0;
+	int			ret = SUCCEED, i, new_items = 0, upd_items = 0;
 	zbx_lld_item_t		*item;
 	zbx_uint64_t		itemid, itemdiscoveryid;
 	zbx_db_insert_t		db_insert, db_insert_idiscovery;
 	zbx_lld_item_index_t	item_index_local;
-	zbx_vector_uint64_t	updates;
+	zbx_vector_uint64_t	upd_keys;
 	char			*sql = NULL;
 	size_t			sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&updates);
+	zbx_vector_uint64_create(&upd_keys);
 
 	if (0 == items->values_num)
 		goto out;
@@ -3130,12 +3130,18 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 			continue;
 
 		if (0 == item->itemid)
+		{
 			new_items++;
+		}
 		else if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
-			zbx_vector_uint64_append(&updates, item->itemid);
+		{
+			upd_items++;
+			if(0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+				zbx_vector_uint64_append(&upd_keys, item->itemid);
+		}
 	}
 
-	if (0 == new_items && 0 == updates.values_num)
+	if (0 == new_items && 0 == upd_items)
 		goto out;
 
 	if (0 == *host_locked)
@@ -3150,19 +3156,19 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		*host_locked = 1;
 	}
 
-	if (0 != updates.values_num)
+	if (0 != upd_keys.values_num)
 	{
 		sql_offset = 0;
 
-		zbx_vector_uint64_sort(&updates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&upd_keys, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 #ifdef HAVE_MYSQL
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set key_=concat('#',key_) where");
 #else
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set key_='#'||key_ where",
 #endif
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", updates.values,
-				updates.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", upd_keys.values,
+				upd_keys.values_num);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 		{
@@ -3230,7 +3236,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 		zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
-	if (0 != updates.values_num)
+	if (0 != upd_items)
 	{
 		zbx_lld_item_prototype_t	*item_prototype;
 		int				index;
@@ -3268,7 +3274,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prot
 	}
 out:
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&updates);
+	zbx_vector_uint64_destroy(&upd_keys);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
