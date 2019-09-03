@@ -28,9 +28,6 @@
 			if ($('#tls_in_psk').is(':checked')) {
 				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
 			}
-			else {
-				$('#tls_psk_identity, #tls_psk').val('');
-			}
 
 			$('#tls_accept').val(tls_accept);
 		});
