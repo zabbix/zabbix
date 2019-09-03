@@ -24,79 +24,44 @@
  */
 class CAutoregistration extends CApiService {
 
-	protected $tableName = 'config_autoreg_tls';
-	protected $tableAlias = 'ca';
+	protected $tableName = 'config';
+	protected $tableAlias = 'c';
 
 	/**
-	 * Get autoregistration configuration.
-	 *
 	 * @param array $options
-	 * @param array $options['output']
+	 *
+	 * @throws APIException if the input is invalid.
 	 *
 	 * @return array
 	 */
 	public function get(array $options) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'output' =>	['type' => API_OUTPUT, 'in' => implode(',', ['tls_accept']), 'default' => API_OUTPUT_EXTEND]
+			'output' =>	['type' => API_OUTPUT, 'in' => 'tls_accept', 'default' => API_OUTPUT_EXTEND]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$result = (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? $this->getAutoreg($options) : [];
-
-		return array_diff_key($result, ['tls_psk_identity' => true, 'tls_psk' => true]);
-	}
-
-	/**
-	 * Internal get autoregistration configuration.
-	 *
-	 * @param array $options
-	 * @param array $options['output']
-	 * @param bool  $update_mode
-	 *
-	 * @return array
-	 */
-	protected function getAutoreg(array $options, $update_mode = false) {
-		$sql_parts = [
-			'select'	=> ['config_autoreg_tls' => 'ca.autoreg_tlsid'],
-			'from'		=> ['config_autoreg_tls' => 'config_autoreg_tls ca'],
-			'where'		=> [],
-			'group'		=> [],
-			'order'		=> [],
-			'limit'		=> null
-		];
-
-		$def_options = [
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => $update_mode
-		];
-		$options = array_merge($def_options, $options);
-
-		$ini_autoreg = [];
-
-		if ($options['output'] == API_OUTPUT_EXTEND || in_array('tls_accept', $options['output'])) {
-			$config = select_config();
-			$ini_autoreg['tls_accept'] = $config['autoreg_tls_accept'];
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			return [];
 		}
 
-		$result = [];
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
-		while ($autoreg = DBfetch($res)) {
-			$autoreg = $ini_autoreg + $autoreg;
-			$result[$autoreg['autoreg_tlsid']] = $autoreg;
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = ['tls_accept'];
 		}
 
-		if (!$result || $update_mode) {
-			return $result;
+		$options['output'] = preg_replace("/^(tls_accept)$/", "autoreg_$1", $options['output']);
+
+		$db_autoreg = [];
+
+		$result = DBselect($this->createSelectQuery($this->tableName(), $options));
+		while ($row = DBfetch($result)) {
+			$db_autoreg[] = $row;
 		}
+		$db_autoreg = CArrayHelper::renameObjectsKeys($db_autoreg, ['autoreg_tls_accept' => 'tls_accept']);
+		$db_autoreg = $this->unsetExtraFields($db_autoreg, ['configid'], []);
 
-		$result = reset($result);
-		unset($result['autoreg_tlsid']);
-
-		return $result;
+		return $db_autoreg[0];
 	}
 
 	/**
