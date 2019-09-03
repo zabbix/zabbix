@@ -166,7 +166,7 @@ class C42ImportConverter extends CConverter {
 				return $data;
 			}
 
-			$data = (string) $rules['in'][$data];
+			$data = $rules['in'][$data];
 		}
 		elseif ($rules['type'] & XML_ARRAY) {
 			foreach ($rules['rules'] as $tag => $tag_rules) {

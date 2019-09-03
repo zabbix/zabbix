@@ -100,10 +100,15 @@ class CXmlValidatorGeneral {
 						));
 					}
 				}
+				unset($value);
 			}
 
 			// validation of the values type
 			foreach ($rules['rules'] as $tag => $rule) {
+				if (array_key_exists('import', $rule)) {
+					$data[$tag] = call_user_func($rule['import'], $data);
+				}
+
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
 					$this->validateData($rule, $data[$tag], $data, $subpath);

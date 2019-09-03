@@ -90,7 +90,52 @@ class CXmlExportWriter extends CExportWriter {
 	 * @return bool
 	 */
 	public function mapName($name) {
-		$map = CXmlConstantValue::$subtags;
+		$map = [
+			'groups' => 'group',
+			'templates' => 'template',
+			'hosts' => 'host',
+			'interfaces' => 'interface',
+			'applications' => 'application',
+			'items' => 'item',
+			'discovery_rules' => 'discovery_rule',
+			'conditions' => 'condition',
+			'item_prototypes' => 'item_prototype',
+			'application_prototypes' => 'application_prototype',
+			'trigger_prototypes' => 'trigger_prototype',
+			'graph_prototypes' => 'graph_prototype',
+			'host_prototypes' => 'host_prototype',
+			'group_links' => 'group_link',
+			'group_prototypes' => 'group_prototype',
+			'triggers' => 'trigger',
+			'dependencies' => 'dependency',
+			'screen_items' => 'screen_item',
+			'macros' => 'macro',
+			'screens' => 'screen',
+			'images' => 'image',
+			'graphs' => 'graph',
+			'graph_items' => 'graph_item',
+			'maps' => 'map',
+			'urls' => 'url',
+			'selements' => 'selement',
+			'elements' => 'element',
+			'links' => 'link',
+			'linktriggers' => 'linktrigger',
+			'value_maps' => 'value_map',
+			'mappings' => 'mapping',
+			'httptests' => 'httptest',
+			'steps' => 'step',
+			'tags' => 'tag',
+			'preprocessing' => 'step',
+			'headers' => 'header',
+			'variables' => 'variable',
+			'query_fields' => 'query_field',
+			'posts' => 'post_field',
+			'shapes' => 'shape',
+			'lines' => 'line',
+			'headers' => 'header',
+			'lld_macro_paths' => 'lld_macro_path',
+			'tls_accept' => 'option'
+		];
 
 		return isset($map[$name]) ? $map[$name] : false;
 	}

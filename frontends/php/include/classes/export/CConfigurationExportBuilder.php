@@ -56,21 +56,24 @@ class CConfigurationExportBuilder {
 			$simple_triggers = $this->createTriggers($data['triggers']);
 		}
 
-		$schema = (new CXmlSchemaBuilder)->getFullSchema();
+		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();
+		$tags = [
+			'graphs' => 'graphs',
+			'groups' => 'groups',
+			'hosts' => 'hosts',
+			'valueMaps' => 'value_maps',
+			'templates' => 'templates',
+			'triggers' => 'triggers'
+		];
 
-		foreach ($schema as $class) {
-			$key = $class->getKey() ?: $class->getTag();
-
+		foreach ($tags as $key => $tag) {
 			if (!$data[$key]) {
 				continue;
 			}
 
-			$format_method = 'format'.(ucfirst(str_replace('_', '', $key)));
-			if (method_exists($this, $format_method)) {
-				$data[$key] = call_user_func([$this, $format_method], $data[$key], $simple_triggers);
-			}
+			$data[$key] = call_user_func([$this, $schema['rules'][$tag]['formatter']], $data[$key], $simple_triggers);
 
-			$this->data[$class->getTag()] = $this->build($class, $data[$key]);
+			$this->data[$tag] = $this->build($schema['rules'][$tag], $data[$key], $tag);
 		}
 	}
 
@@ -82,25 +85,28 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function build(CXmlTagInterface $schema_class, array $data) {
+	protected function build(array $schema, array $data, $main_tag = null) {
 		$n = 0;
 		$result = [];
 
-		$schema = $this->prepareSchema($schema_class);
+		$rules = $schema['rules'];
+
+		if ($schema['type'] & XML_INDEXED_ARRAY) {
+			$rules = $schema['rules'][$schema['prefix']]['rules'];
+		}
 
 		foreach ($data as $row) {
 			$store = [];
-			foreach ($schema as $tag => $class) {
-				$is_require = $class->isRequired();
-				$is_array = ($class instanceof CArrayXmlTagInterface);
-				$is_indexed_array = ($class instanceof CIndexedArrayXmlTagInterface);
-				$is_string = ($class instanceof CStringXmlTagInterface);
+			foreach ($rules as $tag => $val) {
+				$is_required = $val['type'] & XML_REQUIRED;
+				$is_array = $val['type'] & XML_ARRAY;
+				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
 				$has_data = array_key_exists($tag, $row);
-				$default_value = $is_string ? $class->getDefaultValue() : null;
+				$default_value = array_key_exists('default', $val) ? $val['default'] : null;
 
 				if (!$default_value && !$has_data) {
-					if ($is_require) {
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $schema_class->getTag(),
+					if ($is_required) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag,
 							_s('the tag "%1$s" is missing', $tag)
 						));
 					}
@@ -109,22 +115,38 @@ class CConfigurationExportBuilder {
 
 				$value = $has_data ? $row[$tag] : $default_value;
 
-				if (!$is_require && $has_data && $default_value == $value) {
+				if (!$is_required && $has_data && $default_value == $value) {
 					continue;
 				}
 
 				if (($is_indexed_array || $is_array) && $has_data) {
-					$temp_store = $this->build($class, $is_array ? [$value] : $value);
-					if ($is_require || count($temp_store) > 0) {
+					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
+					if ($is_required || $temp_store) {
 						$store[$tag] = $temp_store;
 					}
 					continue;
 				}
 
-				$store[$tag] = (new CTagExporter($class))->export($row);
+				if (array_key_exists('export', $val)) {
+					$store[$tag] = call_user_func($val['export'], $row);
+				}
+				else {
+					if (array_key_exists('in', $val)) {
+						if (!array_key_exists($value, $val['in'])) {
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag,
+								_s('unexpected constant value "%1$s"', $value)
+							));
+						}
+
+						$store[$tag] = $val['in'][$value];
+					}
+					else {
+						$store[$tag] = $value;
+					}
+				}
 			}
 
-			if ($schema_class instanceof CIndexedArrayXmlTagInterface) {
+			if ($schema['type'] & XML_INDEXED_ARRAY) {
 				$result[$n++] = $store;
 			}
 			else {
@@ -133,30 +155,6 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Prepare schema array for building export file.
-	 *
-	 * @param CXmlTagInterface $class
-	 *
-	 * @return array
-	 */
-	protected function prepareSchema(CXmlTagInterface $class) {
-		$builder = new CXmlSchemaBuilder;
-		$schema_tag = array_key_exists($class->getTag(), CXmlConstantValue::$subtags)
-			? CXmlConstantValue::$subtags[$class->getTag()]
-			: $class->getTag();
-		$schema = $builder->build($class);
-
-		$schema = $schema[$schema_tag];
-
-		if ($schema instanceof CXmlTagInterface) {
-			$schema = $builder->build($schema);
-			$schema = $schema[$schema_tag];
-		}
-
-		return $schema;
 	}
 
 	/**
@@ -258,12 +256,17 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
+				'inventory_mode' => $this->formatHostInventoryMode($host['inventory']),
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags'])
 			];
 		}
 
 		return $result;
+	}
+
+	protected function formatHostInventoryMode(array $data) {
+		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
 	}
 
 	/**
@@ -612,6 +615,7 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatHostInventory(array $inventory) {
 		unset($inventory['hostid']);
+		unset($inventory['inventory_mode']);
 
 		return $inventory;
 	}

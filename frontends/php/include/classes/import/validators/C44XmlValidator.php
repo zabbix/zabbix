@@ -295,7 +295,7 @@ class C44XmlValidator {
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' => ['type' => XML_STRING | XML_REQUIRED],
 			'date' => ['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
-			'graphs' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [
+			'graphs' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'formatter' => 'formatGraphs', 'rules' => [
 				'graph' => ['type' => XML_ARRAY, 'rules' => [
 					'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
 						'graph_item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -325,18 +325,18 @@ class C44XmlValidator {
 					'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
 					// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 					'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymax_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'default' => '0'],
+					'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 					// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 					'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymin_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'default' => '0']
+					'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 				]]
 			]],
-			'groups' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
+			'groups' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'formatter' => 'formatGroups', 'rules' => [
 				'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 					'name' => ['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
-			'hosts' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => [
+			'hosts' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'formatter' => 'formatHosts', 'rules' => [
 				'host' => ['type' => XML_ARRAY, 'rules' => [
 					'groups' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
 						'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -356,7 +356,7 @@ class C44XmlValidator {
 							'name' => ['type' => XML_STRING | XML_REQUIRED],
 							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'allowed_hosts' => ['type' => XML_STRING],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'delay' => ['type' => XML_STRING, 'default' => '1m'],
 							'description' => ['type' => XML_STRING],
 							'filter' => ['type' => XML_ARRAY, 'rules' => [
@@ -370,7 +370,7 @@ class C44XmlValidator {
 								]],
 								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' => ['type' => XML_STRING]
-							]],
+							], 'import' => [$this, 'itemFilterImport']],
 							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
 								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
@@ -402,10 +402,10 @@ class C44XmlValidator {
 									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'default' => '0'],
+									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'default' => '0']
+									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 								]]
 							]],
 							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
@@ -452,7 +452,7 @@ class C44XmlValidator {
 											'name' => ['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'delay' => ['type' => XML_STRING, 'default' => '1m'],
 									'description' => ['type' => XML_STRING],
 									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -512,6 +512,36 @@ class C44XmlValidator {
 									'status_codes' => ['type' => XML_STRING],
 									'timeout' => ['type' => XML_STRING],
 									'trends' => ['type' => XML_STRING, 'default' => '365d'],
+									'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
+											'expression' => ['type' => XML_STRING | XML_REQUIRED],
+											'name' => ['type' => XML_STRING | XML_REQUIRED],
+											'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+											'correlation_tag' => ['type' => XML_STRING],
+											'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' => ['type' => XML_ARRAY, 'rules' => [
+													'expression' => ['type' => XML_STRING | XML_REQUIRED],
+													'name' => ['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' => ['type' => XML_STRING]
+												]]
+											]],
+											'description' => ['type' => XML_STRING],
+											'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'opdata' => ['type' => XML_STRING],
+											'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+											'recovery_expression' => ['type' => XML_STRING],
+											'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+											'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' => ['type' => XML_ARRAY, 'rules' => [
+													'tag' => ['type' => XML_STRING | XML_REQUIRED],
+													'value' => ['type' => XML_STRING]
+												]]
+											]],
+											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+											'url' => ['type' => XML_STRING]
+										]]
+									]],
 									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
 									'units' => ['type' => XML_STRING],
 									'url' => ['type' => XML_STRING],
@@ -592,6 +622,7 @@ class C44XmlValidator {
 									]],
 									'description' => ['type' => XML_STRING],
 									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' => ['type' => XML_STRING],
 									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'recovery_expression' => ['type' => XML_STRING],
 									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
@@ -776,7 +807,7 @@ class C44XmlValidator {
 									'name' => ['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'delay' => ['type' => XML_STRING, 'default' => '1m'],
 							'description' => ['type' => XML_STRING],
 							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -851,6 +882,7 @@ class C44XmlValidator {
 									]],
 									'description' => ['type' => XML_STRING],
 									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' => ['type' => XML_STRING],
 									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'recovery_expression' => ['type' => XML_STRING],
 									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
@@ -900,7 +932,7 @@ class C44XmlValidator {
 						]]
 					]],
 					// tls_accept converted on CXmlValidatorGeneral via preprocessor.
-					'tls_accept' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'preprocessor' => [$this, 'tlsAcceptConstantPreprocessor']],
+					'tls_accept' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'preprocessor' => [$this, 'tlsAcceptConstantPreprocessor'], 'export' => [$this, 'hostTlsAcceptExport']],
 					'tls_connect' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
 					'tls_issuer' => ['type' => XML_STRING],
 					'tls_psk' => ['type' => XML_STRING],
@@ -908,7 +940,7 @@ class C44XmlValidator {
 					'tls_subject' => ['type' => XML_STRING]
 				]]
 			]],
-			'value_maps' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
+			'value_maps' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'formatter' => 'formatValuemaps', 'rules' => [
 				'value_map' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 					'name' => ['type' => XML_STRING | XML_REQUIRED],
 					'mappings' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
@@ -919,7 +951,7 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
-			'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+			'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'formatter' => 'formatTemplates', 'rules' => [
 				'template' => ['type' => XML_ARRAY, 'rules' => [
 					'groups' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
 						'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -940,7 +972,7 @@ class C44XmlValidator {
 							'name' => ['type' => XML_STRING | XML_REQUIRED],
 							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'allowed_hosts' => ['type' => XML_STRING],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'delay' => ['type' => XML_STRING, 'default' => '1m'],
 							'description' => ['type' => XML_STRING],
 							'filter' => ['type' => XML_ARRAY, 'rules' => [
@@ -954,7 +986,7 @@ class C44XmlValidator {
 								]],
 								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
 								'formula' => ['type' => XML_STRING]
-							]],
+							], 'import' => [$this, 'itemFilterImport']],
 							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
 								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
@@ -986,10 +1018,10 @@ class C44XmlValidator {
 									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'default' => '0'],
+									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' => ['type' => 0, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'default' => '0']
+									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 								]]
 							]],
 							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
@@ -1035,7 +1067,7 @@ class C44XmlValidator {
 											'name' => ['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'delay' => ['type' => XML_STRING, 'default' => '1m'],
 									'description' => ['type' => XML_STRING],
 									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1175,6 +1207,7 @@ class C44XmlValidator {
 									]],
 									'description' => ['type' => XML_STRING],
 									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' => ['type' => XML_STRING],
 									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'recovery_expression' => ['type' => XML_STRING],
 									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
@@ -1271,7 +1304,7 @@ class C44XmlValidator {
 									'name' => ['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'delay' => ['type' => XML_STRING, 'default' => '1m'],
 							'description' => ['type' => XML_STRING],
 							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
@@ -1345,6 +1378,7 @@ class C44XmlValidator {
 									]],
 									'description' => ['type' => XML_STRING],
 									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' => ['type' => XML_STRING],
 									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
 									'recovery_expression' => ['type' => XML_STRING],
 									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
@@ -1418,33 +1452,34 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
-			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
-				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
-					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-					'correlation_tag' =>		['type' => XML_STRING],
-					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-						'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-							'recovery_expression' =>	['type' => XML_STRING]
+			'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'formatter' => 'formatTriggers', 'rules' => [
+				'trigger' => ['type' => XML_ARRAY, 'rules' => [
+					'expression' => ['type' => XML_STRING | XML_REQUIRED],
+					'name' => ['type' => XML_STRING | XML_REQUIRED],
+					'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+					'correlation_tag' => ['type' => XML_STRING],
+					'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+						'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'name' => ['type' => XML_STRING | XML_REQUIRED],
+							'expression' => ['type' => XML_STRING | XML_REQUIRED],
+							'recovery_expression' => ['type' => XML_STRING]
 						]]
 					]],
-					'description' =>			['type' => XML_STRING],
-					'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-					'recovery_expression' =>	['type' => XML_STRING],
-					'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-						'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING]
+					'description' => ['type' => XML_STRING],
+					'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'opdata' => ['type' => XML_STRING],
+					'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+					'recovery_expression' => ['type' => XML_STRING],
+					'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+					'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+					'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+						'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'tag' => ['type' => XML_STRING | XML_REQUIRED],
+							'value' => ['type' => XML_STRING]
 						]]
 					]],
-					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-					'url' =>					['type' => XML_STRING]
+					'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+					'url' => ['type' => XML_STRING]
 				]]
 			]],
 			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
@@ -1968,5 +2003,79 @@ class C44XmlValidator {
 		}
 
 		return (string) $result;
+	}
+
+	public function graphMaxItemExport(array $data) {
+		if ($data['ymax_type_1'] == CXmlConstantValue::ITEM
+				&& array_key_exists('ymax_item_1', $data)
+				&& (!array_key_exists('host', $data['ymax_item_1'])
+					|| !array_key_exists('key', $data['ymax_item_1']))) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+				'/zabbix_export/graphs/graph/ymax_item_1', _('an array is expected')
+			));
+		}
+
+		return $data['ymax_item_1'];
+	}
+
+	public function graphMinItemExport(array $data) {
+		if ($data['ymin_type_1'] == CXmlConstantValue::ITEM
+				&& array_key_exists('ymin_item_1', $data)
+				&& (!array_key_exists('host', $data['ymin_item_1'])
+					|| !array_key_exists('key', $data['ymin_item_1']))) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+				'/zabbix_export/graphs/graph/ymin_item_1', _('an array is expected')
+			));
+		}
+
+		return $data['ymin_item_1'];
+	}
+
+	public function itemAuthtypeExport(array $data) {
+		if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
+				&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
+			return CXmlConstantName::NONE;
+		}
+
+		$rules = $this->getAuthTypeExtendedRules($data);
+
+		if (!array_key_exists($data['type'], $rules['in'])) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+				'authtype', _s('unexpected constant value "%1$s"', $data['type'])
+			));
+		}
+
+		return $rules['in'][$data['authtype']];
+	}
+
+	public function itemFilterImport(array $data) {
+		if (!array_key_exists('filter', $data)) {
+			return [
+				'conditions' => '',
+				'evaltype' => CXmlConstantName::AND_OR,
+				'formula' => ''
+			];
+		}
+
+		return $data['filter'];
+	}
+
+	public function hostTlsAcceptExport(array $data) {
+		$consts = [
+			CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION,
+			CXmlConstantValue::TLS_PSK=> CXmlConstantName::TLS_PSK,
+			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
+			CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE,
+			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
+			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
+			7 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
+		];
+
+		if (!array_key_exists($data['tls_accept'], $consts)) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
+				'/zabbix_export/hosts/host/tls_accept', _s('unexpected constant "%1$s"', $data['tls_accept'])));
+		}
+
+		return is_array($consts[$data['tls_accept']]) ? $consts[$data['tls_accept']] : [$consts[$data['tls_accept']]];
 	}
 }
