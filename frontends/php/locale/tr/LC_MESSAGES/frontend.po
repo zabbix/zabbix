@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:44+0300\n"
+"POT-Creation-Date: 2019-09-03 14:30+0300\n"
 "PO-Revision-Date: 2017-11-10 20:32+0300\n"
 "Last-Translator: Anıl <ozbekanil@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -366,9 +366,9 @@ msgstr[1] "Hesap %1$s saniyeliğine bloke edildi."
 #: include/actions.inc.php:157 include/actions.inc.php:337
 #: include/blocks.inc.php:737
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:895
-#: include/classes/screens/CScreenProblem.php:918
-#: include/classes/screens/CScreenProblem.php:1149 include/events.inc.php:256
+#: include/classes/screens/CScreenProblem.php:898
+#: include/classes/screens/CScreenProblem.php:921
+#: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:256
 #: include/events.inc.php:468 include/views/configuration.action.edit.php:1215
 msgid "Ack"
 msgstr "Onay"
@@ -520,10 +520,10 @@ msgstr "Eylem güncellendi"
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:738
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1150
-#: include/classes/screens/CScreenProblem.php:1206 include/events.inc.php:257
+#: include/classes/screens/CScreenProblem.php:899
+#: include/classes/screens/CScreenProblem.php:922
+#: include/classes/screens/CScreenProblem.php:1153
+#: include/classes/screens/CScreenProblem.php:1209 include/events.inc.php:257
 #: include/forms.inc.php:1249 include/menu.inc.php:217
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
@@ -1515,8 +1515,8 @@ msgstr "SERT"
 #: app/views/monitoring.widget.problems.view.php:93
 #: include/classes/graph/CSvgGraph.php:977
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:993
-#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:346
+#: include/classes/screens/CScreenProblem.php:996
+#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
 #: include/events.inc.php:548
 msgid "CLOSING"
 msgstr "KAPANMA"
@@ -5391,9 +5391,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "\"%2$s\" ekranı için kullanıcı gruplarında \"%1$s\" usrgrpid'si mükerrer."
 
 #: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:736
-#: include/classes/screens/CScreenProblem.php:894
-#: include/classes/screens/CScreenProblem.php:917
-#: include/classes/screens/CScreenProblem.php:1148 include/events.inc.php:255
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:920
+#: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:255
 #: include/events.inc.php:467 include/views/configuration.action.edit.php:435
 msgid "Duration"
 msgstr "Süre"
@@ -6516,7 +6516,7 @@ msgstr "Gradyan çizgi"
 
 #: charts.php:99 include/audit.inc.php:30
 #: include/classes/macros/CMacrosResolverGeneral.php:804
-#: include/classes/screens/CScreenProblem.php:1278
+#: include/classes/screens/CScreenProblem.php:1281
 #: include/classes/widgets/CWidgetConfig.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -6969,7 +6969,7 @@ msgstr ""
 #: app/views/monitoring.acknowledge.edit.php:34
 #: app/views/monitoring.problem.view.php:93 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:809
-#: include/classes/screens/CScreenProblem.php:1283
+#: include/classes/screens/CScreenProblem.php:1286
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:284 include/forms.inc.php:718
@@ -7038,9 +7038,9 @@ msgstr "Yatay hizalama"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:185
 #: include/classes/screens/CScreenHttpTest.php:115
-#: include/classes/screens/CScreenProblem.php:890
-#: include/classes/screens/CScreenProblem.php:914
-#: include/classes/screens/CScreenProblem.php:1145
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:917
+#: include/classes/screens/CScreenProblem.php:1148
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -8850,8 +8850,8 @@ msgstr "Endonezyaca (id_ID)"
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
 #: include/blocks.inc.php:732 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:889
-#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:916
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.application.list.php:65
 #: include/views/configuration.host.discovery.list.php:60
@@ -10536,7 +10536,7 @@ msgstr "Seçileni işaretle"
 msgid "Mask"
 msgstr "Maske"
 
-#: include/classes/screens/CScreenProblem.php:1132
+#: include/classes/screens/CScreenProblem.php:1135
 #: include/views/configuration.host.list.php:448
 #: include/views/configuration.item.list.php:249
 #: include/views/configuration.item.prototype.list.php:174
@@ -10748,7 +10748,7 @@ msgstr "Mesaj zaman aşımı"
 msgid "Message/Command"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1199
+#: include/classes/screens/CScreenProblem.php:1202
 msgid "Messages"
 msgstr "Mesajlar"
 
@@ -11234,8 +11234,8 @@ msgstr "Sonraki adım"
 #: include/actions.inc.php:33 include/blocks.inc.php:618
 #: include/blocks.inc.php:833
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1082
-#: include/classes/screens/CScreenProblem.php:1222 include/events.inc.php:182
+#: include/classes/screens/CScreenProblem.php:1085
+#: include/classes/screens/CScreenProblem.php:1225 include/events.inc.php:182
 #: include/events.inc.php:382 include/events.inc.php:607
 #: include/triggers.inc.php:1246 include/triggers.inc.php:1251
 #: include/views/configuration.host.prototype.list.php:126
@@ -11726,8 +11726,8 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:979
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -12295,11 +12295,11 @@ msgstr[1] "Yalnızca seçili problemler"
 msgid "Only super admins can create correlations."
 msgstr "Yalnızca süper yöneticiler korelasyon oluşturabilir."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Yalnızca süper yöneticiler değer haritaları oluşturabilir."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Yalnızca süper yöneticiler değer haritalarını silebilir."
 
@@ -12311,7 +12311,7 @@ msgstr ""
 msgid "Only super admins can update correlations."
 msgstr "Yalnızca süper yöneticiler korelasyonları güncelleyebilir."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Yalnızca süper yöneticiler değer haritalarını güncelleyebilir."
 
@@ -12370,8 +12370,8 @@ msgstr "İşlem tipi"
 
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.triggerwizard.php:74 include/blocks.inc.php:735
-#: include/classes/screens/CScreenProblem.php:916
-#: include/classes/screens/CScreenProblem.php:1147 include/events.inc.php:169
+#: include/classes/screens/CScreenProblem.php:919
+#: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:169
 #: include/views/configuration.trigger.prototype.edit.php:68
 #: include/views/configuration.trigger.prototype.list.php:52
 #: include/views/configuration.triggers.edit.php:89
@@ -12743,8 +12743,8 @@ msgstr "POP"
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
 #: include/classes/graph/CSvgGraph.php:972
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:993
-#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:346
+#: include/classes/screens/CScreenProblem.php:996
+#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
 #: include/events.inc.php:548 include/maps.inc.php:290
 #: include/maps.inc.php:374 include/maps.inc.php:467 include/maps.inc.php:555
 #: include/triggers.inc.php:234 include/views/monitoring.overview.items.php:32
@@ -13224,10 +13224,10 @@ msgstr "Öncelik seviyesi"
 
 #: app/views/monitoring.problem.view.php:163
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:734
-#: include/classes/screens/CScreenProblem.php:892
-#: include/classes/screens/CScreenProblem.php:915
-#: include/classes/screens/CScreenProblem.php:1049
-#: include/classes/screens/CScreenProblem.php:1146
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:918
+#: include/classes/screens/CScreenProblem.php:1052
+#: include/classes/screens/CScreenProblem.php:1149
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:58
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:58
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -13462,8 +13462,8 @@ msgstr "Güncellenecek öğelerin sırası"
 #: app/views/monitoring.widget.problems.view.php:79
 #: include/classes/graph/CSvgGraph.php:968
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:979
-#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:351
+#: include/classes/screens/CScreenProblem.php:982
+#: include/classes/screens/CScreenProblem.php:1163 include/events.inc.php:351
 #: include/events.inc.php:534
 msgid "RESOLVED"
 msgstr "ÇÖZÜLDÜ"
@@ -13554,7 +13554,7 @@ msgid "Recipient (descending)"
 msgstr "Alıcı (azalan)"
 
 #: app/views/administration.user.edit.php:376
-#: include/classes/screens/CScreenProblem.php:1050
+#: include/classes/screens/CScreenProblem.php:1053
 #: include/views/configuration.item.list.php:169
 #: include/views/configuration.trigger.prototype.list.php:131
 #: include/views/configuration.triggers.list.php:298
@@ -13581,9 +13581,9 @@ msgstr "Kurtarma işlemleri"
 
 #: app/views/monitoring.widget.problems.view.php:51
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:887
-#: include/classes/screens/CScreenProblem.php:910
-#: include/classes/screens/CScreenProblem.php:1143 include/events.inc.php:252
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:1146 include/events.inc.php:252
 #: include/events.inc.php:465
 msgid "Recovery time"
 msgstr "Kurtarma zamanı"
@@ -13953,26 +13953,26 @@ msgstr "Çözümleyen"
 
 #: app/views/monitoring.widget.problems.view.php:133
 #: include/classes/screens/CScreenHostTriggers.php:239
-#: include/classes/screens/CScreenProblem.php:1010
+#: include/classes/screens/CScreenProblem.php:1013
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "\"%1$s\" korelasyon kuralıyla çözümlenmiş."
 
 #: app/views/monitoring.widget.problems.view.php:136
 #: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:1013
+#: include/classes/screens/CScreenProblem.php:1016
 msgid "Resolved by correlation rule."
 msgstr "Korelasyon kuralıyla çözümlenmiş."
 
 #: app/views/monitoring.widget.problems.view.php:143
 #: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1020
+#: include/classes/screens/CScreenProblem.php:1023
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:248
-#: include/classes/screens/CScreenProblem.php:1019
+#: include/classes/screens/CScreenProblem.php:1022
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "\"%1$s\" kullanıcısı tarafından çözümlenmiş."
@@ -14945,9 +14945,9 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:95
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:258
-#: include/classes/screens/CScreenProblem.php:884
-#: include/classes/screens/CScreenProblem.php:906
-#: include/classes/screens/CScreenProblem.php:1141
+#: include/classes/screens/CScreenProblem.php:887
+#: include/classes/screens/CScreenProblem.php:909
+#: include/classes/screens/CScreenProblem.php:1144
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:67
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -14978,7 +14978,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1829
-#: include/classes/screens/CScreenProblem.php:1203
+#: include/classes/screens/CScreenProblem.php:1206
 msgid "Severity changes"
 msgstr ""
 
@@ -15432,9 +15432,9 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:119
-#: include/classes/screens/CScreenProblem.php:888
-#: include/classes/screens/CScreenProblem.php:912
-#: include/classes/screens/CScreenProblem.php:1144
+#: include/classes/screens/CScreenProblem.php:891
+#: include/classes/screens/CScreenProblem.php:915
+#: include/classes/screens/CScreenProblem.php:1147
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:253 include/events.inc.php:466
@@ -15775,9 +15775,9 @@ msgstr "Etiket değeri"
 
 #: app/views/monitoring.problem.view.php:283
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:739
-#: include/classes/screens/CScreenProblem.php:866
-#: include/classes/screens/CScreenProblem.php:920
-#: include/classes/screens/CScreenProblem.php:1151
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:923
+#: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:241 include/events.inc.php:469
@@ -16208,8 +16208,8 @@ msgstr "Kadar"
 #: include/actions.inc.php:2044 include/blocks.inc.php:714
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:843
-#: include/classes/screens/CScreenProblem.php:1142
+#: include/classes/screens/CScreenProblem.php:846
+#: include/classes/screens/CScreenProblem.php:1145
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:194
@@ -16294,7 +16294,7 @@ msgstr "Kime"
 msgid "To set a host interface select a single item type for all items"
 msgstr "Ana makine arayüzü ayarlamak için tüm öğeler için tek bir öğe türü seçin"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2678
+#: include/classes/screens/CScreenProblem.php:742 include/func.inc.php:2678
 #: srv_status.php:39
 msgid "Today"
 msgstr "Bugün"
@@ -17824,7 +17824,7 @@ msgstr "Değer önbellek istatistikleri. Geçerli kipler şunlardır: total, fre
 msgid "Value map"
 msgstr "Değer eşlemesi"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "\"%1$s\" değer eşlemesi zaten var."
@@ -18316,8 +18316,8 @@ msgstr "Yıllık"
 #: include/actions.inc.php:32 include/blocks.inc.php:618
 #: include/blocks.inc.php:833
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1082
-#: include/classes/screens/CScreenProblem.php:1222 include/events.inc.php:182
+#: include/classes/screens/CScreenProblem.php:1085
+#: include/classes/screens/CScreenProblem.php:1225 include/events.inc.php:182
 #: include/events.inc.php:382 include/events.inc.php:607
 #: include/triggers.inc.php:1245 include/triggers.inc.php:1250
 #: include/views/administration.general.valuemapping.list.php:65
@@ -18333,7 +18333,7 @@ msgstr "Yıllık"
 msgid "Yes"
 msgstr "Evet"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2672
+#: include/classes/screens/CScreenProblem.php:750 include/func.inc.php:2672
 msgid "Yesterday"
 msgstr "Dün"
 
