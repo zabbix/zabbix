@@ -33,7 +33,6 @@ $font-alt-color: #333;
 $body-bg-color: #fff;
 $overlay-bg-color: #000;
 
-
 // UI
 $ui-bg-color: #fff;
 $ui-bg-selected-color: #333;
@@ -52,7 +51,6 @@ $table-border-color: #888;
 
 $ui-tab-bg-selected-color: #888;
 
-
 // FORMS
 $form-font-color: #000;
 $form-bg-color: #fff;
@@ -68,6 +66,12 @@ $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
 $input-placeholder-color: #777;
+
+// ERROR MESSAGES
+$msg-bad-color: $red;
+$msg-good-color: $green;
+$msg-warning-color: #b37e12;
+$msg-warning-border-color: #ffb319;
 
 // BUTTONS
 $btn-font-color: #fff;
@@ -862,35 +866,12 @@ td.inactive-bg {
 }
 
 // ERROR MESSAGES
-.msg-bad {
-	.link-action {
-		color: $red;
+.msg-bad,
+.msg-good,
+.msg-warning {
 
-		.arrow-up {
-			border-bottom-color: $red;
-		}
-		.arrow-down {
-			border-top-color: $red;
-		}
-		&:hover {
+	.link-action:hover {
 		color: $link-hover-color;
-		}
-	}
-}
-
-.msg-good {
-	.link-action {
-		color: $green;
-
-		.arrow-up {
-			border-bottom-color: $green;
-		}
-		.arrow-down {
-			border-top-color: $green;
-		}
-		&:hover {
-		color: $link-hover-color;
-		}
 	}
 }
 

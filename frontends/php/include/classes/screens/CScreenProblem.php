@@ -517,7 +517,7 @@ class CScreenProblem extends CScreenBase {
 
 		$r_events = $r_eventids
 			? API::Event()->get([
-				'output' => ['clock', 'correlationid', 'userid'],
+				'output' => ['clock', 'ns', 'correlationid', 'userid'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
@@ -528,11 +528,13 @@ class CScreenProblem extends CScreenBase {
 		foreach ($events as &$event) {
 			if (array_key_exists($event['r_eventid'], $r_events)) {
 				$event['r_clock'] = $r_events[$event['r_eventid']]['clock'];
+				$event['r_ns'] = $r_events[$event['r_eventid']]['ns'];
 				$event['correlationid'] = $r_events[$event['r_eventid']]['correlationid'];
 				$event['userid'] = $r_events[$event['r_eventid']]['userid'];
 			}
 			else {
 				$event['r_clock'] = 0;
+				$event['r_ns'] = 0;
 				$event['correlationid'] = 0;
 				$event['userid'] = 0;
 			}
@@ -551,7 +553,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
-			'output' => ['eventid', 'r_eventid', 'r_clock', 'correlationid', 'userid', 'acknowledged'],
+			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
 			'selectTags' => ['tag', 'value'],
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -663,6 +665,7 @@ class CScreenProblem extends CScreenBase {
 
 				$problem['r_eventid'] = $problem_data['r_eventid'];
 				$problem['r_clock'] = $problem_data['r_clock'];
+				$problem['r_ns'] = $problem_data['r_ns'];
 				$problem['acknowledges'] = $problem_data['acknowledges'];
 				$problem['tags'] = $problem_data['tags'];
 				$problem['correlationid'] = $problem_data['correlationid'];
@@ -1091,8 +1094,8 @@ class CScreenProblem extends CScreenBase {
 								'triggerid' => $trigger['triggerid'],
 								'expression' => $trigger['expression'],
 								'opdata' => $trigger['opdata'],
-								'clock' => $problem['clock'],
-								'ns' => $problem['ns']
+								'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+								'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
 							],
 							[
 								'events' => true,
@@ -1186,8 +1189,8 @@ class CScreenProblem extends CScreenBase {
 							'triggerid' => $trigger['triggerid'],
 							'expression' => $trigger['expression'],
 							'opdata' => $trigger['opdata'],
-							'clock' => $problem['clock'],
-							'ns' => $problem['ns']
+							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
 						],
 						['events' => true]
 					)

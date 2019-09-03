@@ -119,7 +119,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			],
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
-			'action' => $this->getAction()
+			'action' => $this->getAction(),
+			'db_user' => ['alias' => '']
 		];
 		$user_groups = [];
 
@@ -141,6 +142,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['user_medias'] = $this->user['medias'];
 			$data['type'] = $this->user['type'];
+			$data['db_user']['alias'] = $this->user['alias'];
 		}
 		else {
 			$data['change_password'] = true;
