@@ -51,11 +51,10 @@ $autoreg_tab = (new CFormList())
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 			->addItem((new CCheckBox('tls_in_none'))
+				->setAttribute('autofocus', 'autofocus')
 				->setLabel(_('No encryption'))
 			)
-			->addItem((new CCheckBox('tls_in_psk'))
-				->setLabel(_('PSK'))
-			)
+			->addItem((new CCheckBox('tls_in_psk'))->setLabel(_('PSK')))
 	);
 
 if ($data['change_psk']) {
@@ -86,7 +85,6 @@ else {
 		->addRow(
 			(new CLabel(_('PSK')))->setAsteriskMark(),
 			(new CSimpleButton(_('Change PSK')))
-				->setAttribute('autofocus', 'autofocus')
 				->onClick('javascript: submitFormWithParam("'.$autoreg_form->getName().'", "change_psk", "1");')
 				->addClass(ZBX_STYLE_BTN_GREY),
 			null,
