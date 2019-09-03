@@ -50,6 +50,7 @@ Scoreboard: __________________________________________W_____________W___________
 ```
 
 
+
 This template was tested on:
 
 - Apache, version 2.4.41
@@ -68,7 +69,7 @@ Example configuration of Apache:
 </Location>
 ```
 
-If you use another location, don't forget to change {$APACHE.STATUS.PATH} macro.
+If you use another path, then don't forget to change {$APACHE.STATUS.PATH} macro.
 
 
 ## Zabbix configuration
@@ -79,10 +80,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.RESPONSE_TIME.MAX.WARN}|Maximum Apache response time in seconds for trigger expression|10|
-|{$APACHE.STATUS.PATH}|The URL-path to the Apache status page|server-status?auto|
-|{$APACHE.STATUS.PORT}|The port of Apache status page|80|
-|{$APACHE.STATUS.SCHEME}|Request scheme which may be http or https|http|
+|{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|10|
+|{$APACHE.STATUS.PATH}|<p>The URL-path to the Apache status page</p>|server-status?auto|
+|{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|80|
+|{$APACHE.STATUS.SCHEME}|<p>Request scheme which may be http or https</p>|http|
 
 ## Template links
 
@@ -92,50 +93,50 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Event MPM discovery|Additional metrics if event MPM is used</br>https://httpd.apache.org/docs/current/mod/event.html</br>|DEPENDENT|apache.mpm.event.discovery</br>**Preprocessing**:</br> - JSONPATH: `$.ServerMPM`</br> - JAVASCRIPT: `return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);`|
+|Event MPM discovery|<p>Additional metrics if event MPM is used</p><p>https://httpd.apache.org/docs/current/mod/event.html</p>|DEPENDENT|apache.mpm.event.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerMPM`</p><p>- JAVASCRIPT: `return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);`</p>|
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Apache|Apache: Service ping|-|SIMPLE|net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]</br>**Preprocessing**:</br> - DISCARD_UNCHANGED_HEARTBEAT: `10m`|
-|Apache|Apache: Service response time|-|SIMPLE|net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]|
-|Apache|Apache: Total bytes|Total bytes served|DEPENDENT|apache.bytes</br>**Preprocessing**:</br> - JSONPATH: `$["Total kBytes"]`</br> - MULTIPLIER: `1024`|
-|Apache|Apache: Bytes per second||DEPENDENT|apache.bytes.rate</br>**Preprocessing**:</br> - JSONPATH: `$["Total kBytes"]`</br> - MULTIPLIER: `1024`</br> - CHANGE_PER_SECOND|
-|Apache|Apache: Requests per second|Calculated as change rate for 'Total requests' stat.</br>ReqPerSec is not used, as it counts average since last Apache server start.|DEPENDENT|apache.requests.rate</br>**Preprocessing**:</br> - JSONPATH: `$["Total Accesses"]`</br> - CHANGE_PER_SECOND|
-|Apache|Apache: Total requests|A total number of accesses|DEPENDENT|apache.requests</br>**Preprocessing**:</br> - JSONPATH: `$["Total Accesses"]`|
-|Apache|Apache: Uptime|Service uptime in seconds|DEPENDENT|apache.uptime</br>**Preprocessing**:</br> - JSONPATH: `$.ServerUptimeSeconds`|
-|Apache|Apache: Version|Service version|DEPENDENT|apache.version</br>**Preprocessing**:</br> - JSONPATH: `$.ServerVersion`</br> - DISCARD_UNCHANGED_HEARTBEAT: `1d`|
-|Apache|Apache: Total workers busy|Total number of busy worker threads/processes|DEPENDENT|apache.workers_total.busy</br>**Preprocessing**:</br> - JSONPATH: `$.BusyWorkers`|
-|Apache|Apache: Total workers idle|Total number of idle worker threads/processes|DEPENDENT|apache.workers_total.idle</br>**Preprocessing**:</br> - JSONPATH: `$.IdleWorkers`|
-|Apache|Apache: Workers closing connection|Number of workers in closing state|DEPENDENT|apache.workers.closing</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.closing`|
-|Apache|Apache: Workers DNS lookup|Number of workers in dnslookup state|DEPENDENT|apache.workers.dnslookup</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.dnslookup`|
-|Apache|Apache: Workers finishing|Number of workers in finishing state|DEPENDENT|apache.workers.finishing</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.finishing`|
-|Apache|Apache: Workers idle cleanup|Number of workers in cleanup state|DEPENDENT|apache.workers.cleanup</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.cleanup`|
-|Apache|Apache: Workers keepalive (read)|Number of workers in keepalive state|DEPENDENT|apache.workers.keepalive</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.keepalive`|
-|Apache|Apache: Workers logging|Number of workers in logging state|DEPENDENT|apache.workers.logging</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.logging`|
-|Apache|Apache: Workers reading request|Number of workers in reading state|DEPENDENT|apache.workers.reading</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.reading`|
-|Apache|Apache: Workers sending reply|Number of workers in sending state|DEPENDENT|apache.workers.sending</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.sending`|
-|Apache|Apache: Workers slot with no current process|Number of slots with no current process|DEPENDENT|apache.workers.slot</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.slot`|
-|Apache|Apache: Workers starting up|Number of workers in starting state|DEPENDENT|apache.workers.starting</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.starting`|
-|Apache|Apache: Workers waiting for connection|Number of workers in waiting state|DEPENDENT|apache.workers.waiting</br>**Preprocessing**:</br> - JSONPATH: `$.Workers.waiting`|
-|Apache|Apache: Connections async closing|Number of async connections in closing state (only applicable to event MPM)|DEPENDENT|apache.connections[async_closing{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.ConnsAsyncClosing`|
-|Apache|Apache: Connections async keep alive|Number of async connections in keep-alive state (only applicable to event MPM)|DEPENDENT|apache.connections[async_keep_alive{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.ConnsAsyncKeepAlive`|
-|Apache|Apache: Connections async writing|Number of async connections in writing state (only applicable to event MPM)|DEPENDENT|apache.connections[async_writing{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.ConnsAsyncWriting`|
-|Apache|Apache: Connections total|Number of total connections|DEPENDENT|apache.connections[total{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.ConnsTotal`|
-|Apache|Apache: Bytes per request|Average number of client requests per second|DEPENDENT|apache.bytes[per_request{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.BytesPerReq`|
-|Apache|Apache: Number of async processes|Number of async processes|DEPENDENT|apache.process[num{#SINGLETON}]</br>**Preprocessing**:</br> - JSONPATH: `$.Processes`|
-|Zabbix_raw_items|Apache: Get status|Getting data from a machine-readable version of the Apache status page|HTTP_AGENT|apache.get_status</br>**Preprocessing**:</br> - JAVASCRIPT: `// Convert Apache status to JSON. var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object. for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } }   // Parse "Scoreboard" to get worker count. if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output. output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string. return JSON.stringify(output);`|
+|Apache|Apache: Service ping|<p>-</p>|SIMPLE|net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p>|
+|Apache|Apache: Service response time|<p>-</p>|SIMPLE|net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]|
+|Apache|Apache: Total bytes|<p>Total bytes served</p>|DEPENDENT|apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p>|
+|Apache|Apache: Bytes per second||DEPENDENT|apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND|
+|Apache|Apache: Requests per second|<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p>|DEPENDENT|apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND|
+|Apache|Apache: Total requests|<p>A total number of accesses</p>|DEPENDENT|apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p>|
+|Apache|Apache: Uptime|<p>Service uptime in seconds</p>|DEPENDENT|apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p>|
+|Apache|Apache: Version|<p>Service version</p>|DEPENDENT|apache.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerVersion`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
+|Apache|Apache: Total workers busy|<p>Total number of busy worker threads/processes</p>|DEPENDENT|apache.workers_total.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.BusyWorkers`</p>|
+|Apache|Apache: Total workers idle|<p>Total number of idle worker threads/processes</p>|DEPENDENT|apache.workers_total.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.IdleWorkers`</p>|
+|Apache|Apache: Workers closing connection|<p>Number of workers in closing state</p>|DEPENDENT|apache.workers.closing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.closing`</p>|
+|Apache|Apache: Workers DNS lookup|<p>Number of workers in dnslookup state</p>|DEPENDENT|apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p>|
+|Apache|Apache: Workers finishing|<p>Number of workers in finishing state</p>|DEPENDENT|apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p>|
+|Apache|Apache: Workers idle cleanup|<p>Number of workers in cleanup state</p>|DEPENDENT|apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p>|
+|Apache|Apache: Workers keepalive (read)|<p>Number of workers in keepalive state</p>|DEPENDENT|apache.workers.keepalive<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.keepalive`</p>|
+|Apache|Apache: Workers logging|<p>Number of workers in logging state</p>|DEPENDENT|apache.workers.logging<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.logging`</p>|
+|Apache|Apache: Workers reading request|<p>Number of workers in reading state</p>|DEPENDENT|apache.workers.reading<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.reading`</p>|
+|Apache|Apache: Workers sending reply|<p>Number of workers in sending state</p>|DEPENDENT|apache.workers.sending<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.sending`</p>|
+|Apache|Apache: Workers slot with no current process|<p>Number of slots with no current process</p>|DEPENDENT|apache.workers.slot<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.slot`</p>|
+|Apache|Apache: Workers starting up|<p>Number of workers in starting state</p>|DEPENDENT|apache.workers.starting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.starting`</p>|
+|Apache|Apache: Workers waiting for connection|<p>Number of workers in waiting state</p>|DEPENDENT|apache.workers.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.waiting`</p>|
+|Apache|Apache: Connections async closing|<p>Number of async connections in closing state (only applicable to event MPM)</p>|DEPENDENT|apache.connections[async_closing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncClosing`</p>|
+|Apache|Apache: Connections async keep alive|<p>Number of async connections in keep-alive state (only applicable to event MPM)</p>|DEPENDENT|apache.connections[async_keep_alive{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncKeepAlive`</p>|
+|Apache|Apache: Connections async writing|<p>Number of async connections in writing state (only applicable to event MPM)</p>|DEPENDENT|apache.connections[async_writing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncWriting`</p>|
+|Apache|Apache: Connections total|<p>Number of total connections</p>|DEPENDENT|apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p>|
+|Apache|Apache: Bytes per request|<p>Average number of client requests per second</p>|DEPENDENT|apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p>|
+|Apache|Apache: Number of async processes|<p>Number of async processes</p>|DEPENDENT|apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p>|
+|Zabbix_raw_items|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page</p>|HTTP_AGENT|apache.get_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON. var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object. for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } }   // Parse "Scoreboard" to get worker count. if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output. output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string. return JSON.stringify(output);`</p>|
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Apache: Service is down|Last value: {ITEM.LASTVALUE1}.|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0`|AVERAGE|Manual close: YES</br>|
-|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)|Last value: {ITEM.LASTVALUE1}.|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}`|WARNING|Manual close: YES</br>**Depends on**:</br> - Apache: Service is down</br>|
-|Apache: has been restarted (uptime < 10m)|Last value: {ITEM.LASTVALUE1}.</br>The Apache uptime is less than 10 minutes|`{TEMPLATE_NAME:apache.uptime.last()}<10m`|INFO|Manual close: YES</br>|
-|Apache: Version has changed (new version: {ITEM.VALUE})|Last value: {ITEM.LASTVALUE1}.</br>Apache version has changed. Ack to close.|`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0`|INFO|Manual close: YES</br>|
-|Apache: Failed to fetch status page (or no data for 30m)|Last value: {ITEM.LASTVALUE1}.</br>Zabbix has not received data for items for the last 30 minutes.|`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1`|WARNING|Manual close: YES</br>**Depends on**:</br> - Apache: Service is down</br>|
+|Apache: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
+|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
+|Apache: has been restarted (uptime < 10m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The Apache uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:apache.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
+|Apache: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Apache version has changed. Ack to close.</p>|`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|Apache: Failed to fetch status page (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
 
 ## Feedback
 
