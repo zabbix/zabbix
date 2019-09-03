@@ -21,18 +21,6 @@
 
 class CControllerAutoregUpdate extends CController {
 
-	/**
-	 * @var CControllerResponseRedirect
-	 */
-	private $response;
-
-	protected function init() {
-		$this->response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'autoreg.edit')
-			->getUrl()
-		);
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'tls_accept' =>				'in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
@@ -45,9 +33,13 @@ class CControllerAutoregUpdate extends CController {
 		if (!$ret) {
 			switch ($this->GetValidationError()) {
 				case self::VALIDATION_ERROR:
-					$this->response->setFormData($this->getInputAll());
-					$this->response->setMessageError(_('Cannot update configuration'));
-					$this->setResponse($this->response);
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'autoreg.edit')
+						->getUrl()
+					);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+					$this->setResponse($response);
 					break;
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
@@ -75,14 +67,19 @@ class CControllerAutoregUpdate extends CController {
 
 		$result = (bool) API::Autoregistration()->update($autoreg);
 
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'autoreg.edit')
+			->getUrl()
+		);
+
 		if ($result) {
-			$this->response->setMessageOk(_('Configuration updated'));
+			$response->setMessageOk(_('Configuration updated'));
 		}
 		else {
-			$this->response->setFormData($this->getInputAll());
-			$this->response->setMessageError(_('Cannot update configuration'));
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
 		}
 
-		$this->setResponse($this->response);
+		$this->setResponse($response);
 	}
 }
