@@ -2447,7 +2447,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             <screen>
                <name>Apache performance</name>
                <hsize>2</hsize>
-               <vsize>2</vsize>
+               <vsize>3</vsize>
                <screen_items>
                   <screen_item>
                      <resourcetype>0</resourcetype>
@@ -2494,11 +2494,55 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <application/>
                   </screen_item>
                   <screen_item>
-                     <resourcetype>0</resourcetype>
+                     <resourcetype>20</resourcetype>
+                     <width>320</width>
+                     <height>200</height>
+                     <x>0</x>
+                     <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <style>0</style>
+                     <url/>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <resource>
+                        <name>Apache: Current async connections{#SINGLETON}</name>
+                        <host>Template App Apache by Zabbix agent</host>
+                     </resource>
+                     <max_columns>3</max_columns>
+                     <application/>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
                      <width>320</width>
                      <height>200</height>
                      <x>1</x>
                      <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <style>0</style>
+                     <url/>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <resource>
+                        <name>Apache: Current async processes{#SINGLETON}</name>
+                        <host>Template App Apache by Zabbix agent</host>
+                     </resource>
+                     <max_columns>3</max_columns>
+                     <application/>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>0</resourcetype>
+                     <width>320</width>
+                     <height>200</height>
+                     <x>0</x>
+                     <y>2</y>
                      <colspan>1</colspan>
                      <rowspan>1</rowspan>
                      <elements>25</elements>
