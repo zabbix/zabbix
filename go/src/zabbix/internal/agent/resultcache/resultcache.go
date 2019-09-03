@@ -174,6 +174,9 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	if index == -1 && (!result.persistent || c.persistValueNum < c.maxBufferSize/2) {
 		for i, r := range c.results {
 			if !r.persistent {
+				if result.persistent {
+					c.persistValueNum++
+				}
 				index = i
 				break
 			}
@@ -183,10 +186,6 @@ func (c *ResultCache) insertResult(result *AgentData) {
 		log.Warningf("[%d] cache is full and cannot cannot find a value to replace, adding new instead", c.clientID)
 		c.addResult(result)
 		return
-	}
-
-	if result.persistent {
-		c.persistValueNum++
 	}
 
 	copy(c.results[index:], c.results[index+1:])
