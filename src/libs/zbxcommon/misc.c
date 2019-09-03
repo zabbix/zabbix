@@ -2242,21 +2242,21 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 	nextcheck = disable_until;
 	tmax = disable_until + SEC_PER_YEAR;
 
-	while (nextcheck < tmax)
+	if (NULL != custom_intervals)
 	{
-		if (NULL == custom_intervals)
-			break;
-
-		if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
-			break;
-
-		/* find the flexible interval change */
-		if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+		while (nextcheck < tmax)
 		{
-			nextcheck = ZBX_JAN_2038;
-			break;
+			if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
+				break;
+
+			/* find the flexible interval change */
+			if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+			{
+				nextcheck = ZBX_JAN_2038;
+				break;
+			}
+			nextcheck = next_interval;
 		}
-		nextcheck = next_interval;
 	}
 
 	if (0 != scheduled_check && scheduled_check < nextcheck)
