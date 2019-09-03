@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2019-03-17 20:03+0300\n"
 "Last-Translator: hugosantos <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
@@ -11443,8 +11443,8 @@ msgstr "Sem permissões para acesso ao sistema."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11999,11 +11999,11 @@ msgstr[1] "Apenas os incidentes selecionados"
 msgid "Only super admins can create correlations."
 msgstr "Apenas super administradores podem criar correlacionamentos."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Apenas utilizadores com perfil de super administradores podem criar mapas de valor."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Apenas utilizadores com perfil de super administradores podem excluir mapeamentos de valor."
 
@@ -12015,7 +12015,7 @@ msgstr "Apenas super administradores podem definir o proprietário do dashboard.
 msgid "Only super admins can update correlations."
 msgstr "Apenas super administradores podem atualizar correlacionamentos."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Apenas utilizadores com perfil de super administradores podem atualizar mapeamentos de valor."
 
@@ -17304,7 +17304,7 @@ msgstr "Estatísticas do cache de valores. Modos válidos: total, free, pfree, u
 msgid "Value map"
 msgstr "Mapa de valores"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "O mapa de valores \"%1$s\" já existe."

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2018-11-30 14:01+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -11441,8 +11441,8 @@ msgstr "אין הרשאות לגישה למערכת."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11997,11 +11997,11 @@ msgstr[1] "רק בעיות נבחרות"
 msgid "Only super admins can create correlations."
 msgstr "רק מנהלי על יכולים ליצור יחסים."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "רק מנהלי על יכולים ליצור מפות יחסים."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "רק מנהלי על יכולים למחוק מפות ערכים."
 
@@ -12013,7 +12013,7 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על לוח מ
 msgid "Only super admins can update correlations."
 msgstr "רק מנהלי על יכולים לעדכן יחסים."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "רק מנהלי על יכולים לעדכן מפות ערכים."
 
@@ -17302,7 +17302,7 @@ msgstr "סטטיסטיקת זכרון המטמון של הערכים. המשתנ
 msgid "Value map"
 msgstr "מפת ערכים"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "מפת הערכים „%1$s“ כבר קיימת."

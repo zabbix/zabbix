@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2019-03-19 11:57+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
@@ -11441,8 +11441,8 @@ msgstr "No permissions for system access."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11997,11 +11997,11 @@ msgstr[1] "Only selected problems"
 msgid "Only super admins can create correlations."
 msgstr "Only super admins can create correlations."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Only super admins can create value maps."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Only super admins can delete value maps."
 
@@ -12013,7 +12013,7 @@ msgstr "Only super admins can set dashboard owner."
 msgid "Only super admins can update correlations."
 msgstr "Only super admins can update correlations."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Only super admins can update value maps."
 
@@ -17302,7 +17302,7 @@ msgstr "Value cache statistics. Valid modes are: total, free, pfree, used and pu
 msgid "Value map"
 msgstr "Value map"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "Value map \"%1$s\" already exists."

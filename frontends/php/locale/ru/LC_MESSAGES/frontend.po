@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2019-03-13 13:33+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -11528,8 +11528,8 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -12085,11 +12085,11 @@ msgstr[2] "Только выбранные проблемы"
 msgid "Only super admins can create correlations."
 msgstr "Только супер администраторы могут создавать корреляции."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Только супер администраторы могут создавать преобразования значений."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Только супер администраторы могут удалять преобразования значений."
 
@@ -12101,7 +12101,7 @@ msgstr "Только супер администраторы могут зада
 msgid "Only super admins can update correlations."
 msgstr "Только супер администраторы могут обновлять корреляции."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Только супер администраторы могут обновлять преобразования значений."
 
@@ -17401,7 +17401,7 @@ msgstr "Статистика кэша значений. Допустимые з�
 msgid "Value map"
 msgstr "Преобразование значений"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "Преобразование значений \"%1$s\" уже существует."

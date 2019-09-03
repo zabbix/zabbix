@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2019-03-21 16:26+0300\n"
 "Last-Translator: Daudet <aremy@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -11444,8 +11444,8 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -12000,11 +12000,11 @@ msgstr[1] "Seulement les problèmes sélectionnés"
 msgid "Only super admins can create correlations."
 msgstr "Seuls les super administateurs peuvent créer des corrélations."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Seuls les super administrateurs peuvent créer des tables de correspondance."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Seuls les super administrateurs peuvent effacer des tables de correspondance."
 
@@ -12016,7 +12016,7 @@ msgstr "Seul les super-admin peuvent spécifier le propriétaire d'un tableau de
 msgid "Only super admins can update correlations."
 msgstr "Seuls les super administrateurs peuvent mettre à jour les corrélations."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Seuls les super administrateurs peuvent mettre à jour les tables de correspondances."
 
@@ -17305,7 +17305,7 @@ msgstr "Statistiques du cache de valeurs. Les modes valides sont : total, free, 
 msgid "Value map"
 msgstr "Table de correspondance"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "La table de correspondance \"%1$s\" existe déjà."

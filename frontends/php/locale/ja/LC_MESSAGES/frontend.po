@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-01 01:43+0300\n"
+"POT-Creation-Date: 2019-09-03 14:28+0300\n"
 "PO-Revision-Date: 2019-04-15 04:25+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -11356,8 +11356,8 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11911,11 +11911,11 @@ msgstr[0] "選択した障害のみ"
 msgid "Only super admins can create correlations."
 msgstr "特権管理者のみが相関関係を作成できます。"
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "特権管理者のみが値のマッピングを作成できます。"
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "特権管理者のみが値のマッピングを削除できます。"
 
@@ -11927,7 +11927,7 @@ msgstr "特権管理者のみがダッシュボードのオーナーを設定で
 msgid "Only super admins can update correlations."
 msgstr "特権管理者のみが相関関係を更新できます。"
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "特権管理者のみが値のマッピングを更新できます。"
 
@@ -17205,7 +17205,7 @@ msgstr "値キャッシュ統計。有効なパラメータ：total, free, pfree
 msgid "Value map"
 msgstr "値のマッピング"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "値のマッピング\"%1$s\"はすでに存在します。"
