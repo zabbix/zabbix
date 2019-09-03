@@ -3169,8 +3169,8 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			"select newvalue"
 			" from mappings"
 			" where valuemapid=" ZBX_FS_UI64
-				" and value='%s'",
-			valuemapid, value_esc);
+				" and value" ZBX_SQL_STRCMP,
+			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
 	zbx_free(value_esc);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
