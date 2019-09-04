@@ -262,8 +262,7 @@ func (c *ResultCache) run() {
 		case Uploader:
 			c.flushOutput(v.(Uploader))
 		case *plugin.Result:
-			r := v.(*plugin.Result)
-			c.write(r)
+			c.write(v.(*plugin.Result))
 		case *agent.AgentOptions:
 			c.updateOptions(v.(*agent.AgentOptions))
 		}
