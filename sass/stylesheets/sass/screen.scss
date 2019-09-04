@@ -3339,6 +3339,68 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
+	display: flex;
+	height: 200px;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+	color: $font-alt-color;
+	cursor: pointer;
+
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background-color: rgba($ui-bg-color, .7);
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
+		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
+}
+
 .dashbrd-grid-widget {
 	position: absolute;
 }
@@ -3727,68 +3789,6 @@ $form-icon-btn: (
 		background-color: darken($body-bg-color, 6%) !important;
 		position: absolute;
 		z-index: 999;
-	}
-
-	.dashbrd-grid-new-widget-placeholder {
-		box-sizing: border-box;
-		display: flex;
-		height: 200px;
-		padding: .25rem;
-		width: calc(100% / 6 - .65rem);
-		z-index: 999;
-		color: $font-alt-color;
-		cursor:pointer;
-
-		.dashbrd-grid-widget-new-box,
-		.dashbrd-grid-widget-set-position,
-		.dashbrd-grid-widget-set-size {
-			@include box-shadow(2px 2px 6px $action-shadow-color);
-			border: 1px dashed $form-border-color;
-			background-color: rgba($ui-bg-color, .7);
-			flex: 1;
-			position: relative;
-			overflow: hidden;
-		}
-
-		.dashbrd-grid-widget-set-size {
-			@include box-shadow(inset 2px 2px 6px $action-shadow-color);
-			background: darken($body-bg-color, 6%);
-		}
-
-		.dashbrd-grid-new-widget-label {
-			$icon-height: 28px;
-
-			position: absolute;
-			left: 0;
-			top: calc(50% - #{$icon-height / 2});
-			right: 0;
-			bottom: 0;
-			padding: ($icon-height + 10px) 5px 5px;
-			text-align: center;
-
-			&::before {
-				background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
-				content: ' ';
-				height: $icon-height;
-				width: 36px;
-				position: absolute;
-				top: 0;
-				left: 50%;
-				transform: translateX(-50%);
-			}
-		}
-
-		&.disabled {
-			@include opacity(1);
-
-			.dashbrd-grid-widget-new-box {
-				background-color: rgba($ui-bg-color, .7);
-
-				.dashbrd-grid-new-widget-label::before {
-					background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
-				}
-			}
-		}
 	}
 
 	.dashbrd-grid-widget-set-size {
