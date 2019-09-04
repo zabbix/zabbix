@@ -1792,14 +1792,17 @@
 			return;
 		}
 
-		var check_dashboard_ready = false;
+		var ready_updated = false,
+			dashboard_was_ready = !data['widgets'].filter(function(widget) {
+				return !widget['ready'];
+			}).length;
 
 		if (widget['iterator']) {
 			if (!widget['children'].length) {
 				// Set empty iterator to ready state.
 
+				ready_updated = !widget['ready'];
 				widget['ready'] = true;
-				check_dashboard_ready = true;
 			}
 		}
 		else if (widget['parent']) {
@@ -1813,23 +1816,29 @@
 			if (!children_not_ready.length) {
 				// Set parent iterator to ready state.
 
+				ready_updated = !widget['parent']['ready'];
 				widget['parent']['ready'] = true;
-				check_dashboard_ready = true;
 			}
 		}
 		else {
-			widget['ready'] = true; // Leave this before registerDataExchangeCommit.
-			check_dashboard_ready = true;
-			methods.registerDataExchangeCommit.call($obj);
+			ready_updated = !widget['ready'];
+			widget['ready'] = true;
 		}
 
-		if (check_dashboard_ready) {
-			var widgets_not_ready = data['widgets'].filter(function(widget) {
-					return !widget['ready'];
-				});
+		if (ready_updated) {
+			if (dashboard_was_ready) {
+				methods.registerDataExchangeCommit.call($obj);
+			}
+			else {
+				var dashboard_is_ready = !data['widgets'].filter(function(widget) {
+						return !widget['ready'];
+					}).length;
 
-			if (!widgets_not_ready.length) {
-				doAction('onDashboardReady', $obj, data, null);
+				if (dashboard_is_ready) {
+					methods.registerDataExchangeCommit.call($obj);
+
+					doAction('onDashboardReady', $obj, data, null);
+				}
 			}
 		}
 	}
@@ -1926,7 +1935,7 @@
 			data: ajax_data,
 			dataType: 'json'
 		})
-			.done(function(response) {
+			.then(function(response) {
 				delete widget['updating_content'];
 
 				stopPreloader(widget);
@@ -1952,14 +1961,17 @@
 					updateWidgetCallback($obj, data, widget, response, options);
 				}
 
+				doAction('onContentUpdated', $obj, data, null);
+			})
+			.then(function() {
+				// Separate 'then' section allows to execute scripts added by widgets in previous section first.
+
 				setWidgetReady($obj, data, widget);
 
 				if (!widget['parent']) {
 					// Iterator child widgets are excluded here.
 					setUpdateWidgetContentTimer($obj, data, widget);
 				}
-
-				doAction('onContentUpdated', $obj, data, null);
 
 				// The widget is loaded now, although possibly already resized.
 				widget['initial_load'] = false;
