@@ -1,6 +1,8 @@
 Changes for 4.4.0beta1
 
 New features:
+.........T [ZBXNEXT-5141] added "Template App Apache" (afayantsev)
+..F....... [ZBXNEXT-854] Support Bar Graphs (ashubin, rlataria)
 A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
 .........T [ZBXNEXT-5142] added "Template App Nginx" (mchudinov)
 ..F....... [ZBXNEXT-1657] split proxy and host names in separate columns in Configuration->Hosts list, Configuration->Discovery rules list and Administration->Queue pages (Ivo)
@@ -8,6 +10,9 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 A.F.....S. [ZBXNEXT-4942] implemented support of displaying operational data in the list of problems (agriscenko, asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
+........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
+A......... [ZBX-16550] fixed web monitoring items has no real-time data entry in "item_rtdata" (talbergs)
 .........T [ZBX-16539] fixed "Template Net Juniper SNMPv2" (afayantsev)
 A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
 ........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
