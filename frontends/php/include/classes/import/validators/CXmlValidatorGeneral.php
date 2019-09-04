@@ -170,8 +170,6 @@ class CXmlValidatorGeneral {
 			}
 			unset($value);
 
-			// indexing the array numerically
-
 			$extra = null;
 
 			if (array_key_exists('extra', $rules)) {

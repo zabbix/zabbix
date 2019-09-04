@@ -2026,7 +2026,11 @@ class C44XmlValidator {
 	 */
 	public function tlsAcceptConstantPreprocessor($data, array $parent_data = null) {
 		$result = 0;
-		$rules = [CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION, CXmlConstantName::TLS_PSK => CXmlConstantValue::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE => CXmlConstantValue::TLS_CERTIFICATE];
+		$rules = [
+			CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION,
+			CXmlConstantName::TLS_PSK => CXmlConstantValue::TLS_PSK,
+			CXmlConstantName::TLS_CERTIFICATE => CXmlConstantValue::TLS_CERTIFICATE
+		];
 
 		foreach ($data as $const) {
 			$result += $rules[$const];
@@ -2040,9 +2044,7 @@ class C44XmlValidator {
 				&& array_key_exists('ymax_item_1', $data)
 				&& (!array_key_exists('host', $data['ymax_item_1'])
 					|| !array_key_exists('key', $data['ymax_item_1']))) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'/zabbix_export/graphs/graph/ymax_item_1', _('an array is expected')
-			));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'ymax_item_1', _('an array is expected')));
 		}
 
 		return $data['ymax_item_1'];
@@ -2053,9 +2055,7 @@ class C44XmlValidator {
 				&& array_key_exists('ymin_item_1', $data)
 				&& (!array_key_exists('host', $data['ymin_item_1'])
 					|| !array_key_exists('key', $data['ymin_item_1']))) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'/zabbix_export/graphs/graph/ymin_item_1', _('an array is expected')
-			));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'ymin_item_1', _('an array is expected')));
 		}
 
 		return $data['ymin_item_1'];
@@ -2103,7 +2103,8 @@ class C44XmlValidator {
 
 		if (!array_key_exists($data['tls_accept'], $consts)) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'/zabbix_export/hosts/host/tls_accept', _s('unexpected constant "%1$s"', $data['tls_accept'])));
+				'tls_accept', _s('unexpected constant "%1$s"', $data['tls_accept'])
+			));
 		}
 
 		return is_array($consts[$data['tls_accept']]) ? $consts[$data['tls_accept']] : [$consts[$data['tls_accept']]];

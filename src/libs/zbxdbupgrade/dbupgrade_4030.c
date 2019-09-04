@@ -242,7 +242,6 @@ static int	DBpatch_4030019(void)
 
 static int	DBpatch_4030020(void)
 {
-
 	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("interface", &field);
