@@ -88,6 +88,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob)
 	data.lastcheck = now
 
+	if ctx.Output().PersistSlotsAvailable() == 0 {
+		p.Warningf("buffer is full, cannot store persistent value")
+	}
+
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))
 		for i, r := range logitem.Results {
