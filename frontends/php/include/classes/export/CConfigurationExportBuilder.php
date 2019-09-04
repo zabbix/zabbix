@@ -56,7 +56,10 @@ class CConfigurationExportBuilder {
 			$simple_triggers = $this->extractSimpleTriggers($data['triggers']);
 		}
 
-		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();
+		$schema = (new CImportValidatorFactory('xml'))
+			->getObject(ZABBIX_EXPORT_VERSION)
+			->getSchema();
+
 		$tags = [
 			'graphs' => 'graphs',
 			'groups' => 'groups',

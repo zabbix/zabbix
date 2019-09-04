@@ -154,16 +154,23 @@ class CConfiguration extends CApiService {
 				continue;
 			}
 
-			$data = $importConverterFactory->getObject($version)->convert($data);
+			$data = $importConverterFactory
+				->getObject($version)
+				->convert($data);
 			$data = (new CXmlValidator)->validate($data, $params['format']);
 		}
 
 		// Get schema for converters.
-		$schema = $importValidatorFactory->getObject(ZABBIX_EXPORT_VERSION)->getSchema();
-		// Convert human readable import constants to values Zabbix API can work with.
+		$schema = $importValidatorFactory
+			->getObject(ZABBIX_EXPORT_VERSION)
+			->getSchema();
+
+			// Convert human readable import constants to values Zabbix API can work with.
 		$data = (new CConstantImportConverter($schema))->convert($data);
+
 		// Add default values in place of missed tags.
 		$data = (new CDefaultValuesImportConverter($schema))->convert($data);
+
 		// Normalize array keys.
 		$data = (new CArrayKeysImportConverter($schema))->convert($data);
 
