@@ -116,6 +116,7 @@ const char	*help_message[] = {
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier, up to 65535. For larger",
 	"                                 values specify target as \"process-type,N\"",
+	"      " ZBX_LOGFILE_REDIRECT "        Redirect stdout and stderr to the new logfile",
 	"",
 	"  -h --help                      Display this help message",
 	"  -V --version                   Display version number",
