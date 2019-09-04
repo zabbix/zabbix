@@ -108,7 +108,7 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 			options.TLSConnect != "" ||
 			options.TLSPSKFile != "" ||
 			options.TLSPSKIdentity != "" {
-			return nil, errors.New("cannot user TLS configuration: encryption support was not compiled in")
+			return nil, errors.New(tls.SupportedErrMsg())
 		}
 		return
 	}

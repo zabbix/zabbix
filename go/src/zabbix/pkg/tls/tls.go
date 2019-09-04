@@ -29,14 +29,16 @@ package tls
 #include <ctype.h>
 #include "config.h"
 
+const char	*tls_crypto_init_msg;
+
 #ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
 
-#define TLS_EX_DATA_ERRBIO		0
+#define TLS_EX_DATA_ERRBIO	0
 #define TLS_EX_DATA_IDENTITY	1
-#define TLS_EX_DATA_KEY			2
+#define TLS_EX_DATA_KEY		2
 
 typedef SSL_CTX * SSL_CTX_LP;
 
@@ -52,12 +54,20 @@ typedef struct {
 
 static int tls_init(void)
 {
-	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
-	ERR_load_crypto_strings();
-	ERR_load_SSL_strings();
-	OpenSSL_add_all_algorithms();
-	SSL_library_init();
-	return 0;
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)
+// OpenSSL 1.1.0 or newer, not LibreSSL
+	if (1 == OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
+	{
+		tls_crypto_init_msg = "OpenSSL library successfully initialized";
+		return 0;
+	}
+
+	tls_crypto_init_msg = "cannot initialize OpenSSL library";
+	return -1;
+#elif	// OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL - currently not supported
+	zbx_crypto_lib_init_msg = "OpenSSL older than 1.1.0 and LibreSSL currently are not supported";
+	return -1;
+#endif
 }
 
 static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity,
@@ -540,6 +550,7 @@ typedef struct {
 
 static int tls_init()
 {
+	tls_crypto_init_msg = "encryption support was not compiled in";
 	return -1;
 }
 
@@ -818,7 +829,7 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nc, nil
 	}
 	if !supported {
-		return nil, errors.New("built without TLS support")
+		return nil, errors.New(SupportedErrMsg())
 	}
 	var cfg *Config
 	var ok bool
@@ -941,7 +952,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nc, nil
 	}
 	if !supported {
-		return nil, errors.New("built without TLS support")
+		return nil, errors.New(SupportedErrMsg())
 	}
 	var cfg *Config
 	var ok bool
@@ -1015,6 +1026,7 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 }
 
 var supported bool
+var supportedMsg string
 var pskContext, defaultContext unsafe.Pointer
 
 const (
@@ -1040,9 +1052,13 @@ func Supported() bool {
 	return supported
 }
 
+func SupportedErrMsg() string {
+	return supportedMsg
+}
+
 func Init(config *Config) (err error) {
 	if !supported {
-		return errors.New("built without TLS support")
+		return errors.New(SupportedErrMsg())
 	}
 	if pskContext != nil {
 		C.tls_free_context(C.SSL_CTX_LP(pskContext))
@@ -1081,4 +1097,8 @@ func Init(config *Config) (err error) {
 
 func init() {
 	supported = C.tls_init() != -1
+
+	if !supported {
+		supportedMsg = C.GoString(C.tls_crypto_init_msg)
+	}
 }
