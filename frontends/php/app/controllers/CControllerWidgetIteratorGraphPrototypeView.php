@@ -68,7 +68,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'output' => ['name'],
 				'graphids' => reset($fields['graphid'])
 			]);
-			$graph_prototype = reset($graph_prototype);
+			if ($graph_prototype) {
+				$graph_prototype = reset($graph_prototype);
+			}
+			else {
+				return $this->inaccessibleError();
+			}
 
 			// Analog graph prototype for the selected dynamic host.
 			$options['hostids'] = [$dynamic_hostid];
@@ -81,7 +86,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		// Use this graph prototype as base for collecting created graphs.
 		$graph_prototype = API::GraphPrototype()->get($options);
-		$graph_prototype = reset($graph_prototype);
+		if ($graph_prototype) {
+			$graph_prototype = reset($graph_prototype);
+		}
+		else {
+			return $this->inaccessibleError();
+		}
 
 		$graphs_collected = [];
 
@@ -153,7 +163,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'output' => ['key_'],
 				'itemids' => reset($fields['itemid'])
 			]);
-			$item_prototype = reset($item_prototype);
+			if ($item_prototype) {
+				$item_prototype = reset($item_prototype);
+			}
+			else {
+				return $this->inaccessibleError();
+			}
 
 			// Analog item prototype for the selected dynamic host.
 			$options['hostids'] = [$dynamic_hostid];
@@ -166,7 +181,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		// Use this item prototype as base for collecting created items.
 		$item_prototype = API::ItemPrototype()->get($options);
-		$item_prototype = reset($item_prototype);
+		if ($item_prototype) {
+			$item_prototype = reset($item_prototype);
+		}
+		else {
+			return $this->inaccessibleError();
+		}
 
 		$items_collected = [];
 
@@ -223,6 +243,15 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
+		];
+	}
+
+	protected function inaccessibleError()
+	{
+		return [
+			'body' => (new CTableInfo())
+				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
+				->toString()
 		];
 	}
 }

@@ -153,9 +153,13 @@
 			});
 		}
 
-		widget['content_body'] = $('<div>', {'class': classes['content']})
-			.toggleClass('no-padding', !widget['configuration']['padding'])
-			.toggleClass('scrollable', widget['configuration']['scrollable']);
+		widget['content_body'] = $('<div>', {'class': classes['content']});
+
+		if (!widget['iterator']) {
+			widget['content_body']
+				.toggleClass('no-padding', !widget['configuration']['padding'])
+				.toggleClass('scrollable', widget['configuration']['scrollable']);
+		}
 
 		widget['container'] = $('<div>', {'class': classes['container']})
 			.append(widget['content_header'])
@@ -315,7 +319,7 @@
 	}
 
 	function setWidgetPadding($obj, data, widget, padding) {
-		if (widget['configuration']['padding'] !== padding) {
+		if (!widget['iterator'] && widget['configuration']['padding'] !== padding) {
 			widget['configuration']['padding'] = padding;
 			widget['content_body'].toggleClass('no-padding', !padding);
 			resizeWidget($obj, data, widget);
@@ -323,7 +327,7 @@
 	}
 
 	function setWidgetScrollable($obj, data, widget, scrollable) {
-		if (widget['configuration']['scrollable'] !== scrollable) {
+		if (!widget['iterator'] && widget['configuration']['scrollable'] !== scrollable) {
 			widget['configuration']['scrollable'] = scrollable;
 			widget['content_body'].toggleClass('scrollable', scrollable);
 			resizeWidget($obj, data, widget);
@@ -1629,16 +1633,25 @@
 		iterator['content_body'].empty();
 		iterator['children'] = [];
 
-		iterator['div'].removeClass('iterator-messages');
+		iterator['div'].removeClass('iterator-alt-content');
 	}
 
 	function updateIteratorCallback($obj, data, iterator, response, options) {
-		if (getIteratorTooSmallState(iterator) || typeof response.messages !== 'undefined') {
+		var has_alt_content = typeof response.messages !== 'undefined' || typeof response.body !== 'undefined';
+
+		if (has_alt_content || getIteratorTooSmallState(iterator)) {
 			clearIterator($obj, data, iterator);
 
-			if (typeof response.messages !== 'undefined') {
-				iterator['div'].addClass('iterator-messages');
-				iterator['content_body'].append(response.messages);
+			if (has_alt_content) {
+				var $alt_content = $('<div>');
+				if (typeof response.messages !== 'undefined') {
+					$alt_content.append(response.messages);
+				}
+				if (typeof response.body !== 'undefined') {
+					$alt_content.append(response.body);
+				}
+				iterator['content_body'].append($alt_content);
+				iterator['div'].addClass('iterator-alt-content');
 			}
 			else {
 				iterator['update_pending'] = true;
@@ -1836,7 +1849,6 @@
 
 				if (dashboard_is_ready) {
 					methods.registerDataExchangeCommit.call($obj);
-
 					doAction('onDashboardReady', $obj, data, null);
 				}
 			}

@@ -3720,7 +3720,7 @@ $form-icon-btn: (
 		}
 	}
 
-	&.iterator-messages {
+	&.iterator-alt-content {
 
 		.dashbrd-grid-iterator-content {
 			position: absolute;
@@ -3731,8 +3731,35 @@ $form-icon-btn: (
 			border: 1px solid $ui-border-color;
 			background-color: $ui-bg-color;
 
-			.msg-good, .msg-bad {
-				margin: 10px;
+			& > div {
+				padding-top: 8px;
+
+				.list-table {
+					border: none;
+
+					th {
+						@extend %dashbrd-widget-td;
+					}
+
+					td {
+						@extend %dashbrd-widget-td;
+					}
+
+					tbody tr {
+
+						&:last-child th, &:last-child td {
+							border-bottom: 1px solid $table-border-color;
+
+							&.list-table-footer {
+								border-bottom: none;
+							}
+						}
+					}
+				}
+
+				.msg-good, .msg-bad {
+					margin: 0 10px;
+				}
 			}
 		}
 	}
@@ -3780,6 +3807,14 @@ $form-icon-btn: (
 
 			.dashbrd-grid-iterator-head {
 				opacity: 1;
+			}
+		}
+
+		&.iterator-alt-content {
+
+			.dashbrd-grid-iterator-content {
+				padding-top: 2rem;
+				background-color: $ui-bg-color;
 			}
 		}
 	}

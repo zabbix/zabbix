@@ -2520,7 +2520,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   right: 0; }
 .dashbrd-grid-iterator.iterator-loading .dashbrd-grid-iterator-placeholder {
   opacity: 1; }
-.dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content {
+.dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
   position: absolute;
   top: .25rem;
   left: .25rem;
@@ -2528,8 +2528,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   bottom: .25rem;
   border: 1px solid #9f9f9f;
   background-color: #fff; }
-  .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-good, .dashbrd-grid-iterator.iterator-messages .dashbrd-grid-iterator-content .msg-bad {
-    margin: 10px; }
+  .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div {
+    padding-top: 8px; }
+    .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table {
+      border: none; }
+      .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table tbody tr:last-child th, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table tbody tr:last-child td {
+        border-bottom: 1px solid #888; }
+        .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table tbody tr:last-child th.list-table-footer, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table tbody tr:last-child td.list-table-footer {
+          border-bottom: none; }
+    .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-good, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-bad {
+      margin: 0 10px; }
 
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .dashbrd-grid-widget-actions {
   opacity: 1;
@@ -2549,6 +2557,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   opacity: 1; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
   opacity: 1; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
+  padding-top: 2rem;
+  background-color: #fff; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {
   border-color: #f0f0f0 !important;
   background-color: #f0f0f0 !important;
@@ -2784,9 +2795,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .list-table tbody tr.nothing-to-show td:hover {
     background-color: #fff; }
 
-.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
+.dashbrd-grid-widget-content .list-table th:first-child, .dashbrd-grid-widget-content .list-table td:first-child, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table th:first-child, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table td:first-child, .dashbrd-widget .list-table th:first-child, .dashbrd-widget .list-table td:first-child, .overlay-dialogue .list-table th:first-child, .overlay-dialogue .list-table td:first-child {
   padding-left: 10px; }
-.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
+.dashbrd-grid-widget-content .list-table th:last-child, .dashbrd-grid-widget-content .list-table td:last-child, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table th:last-child, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .list-table td:last-child, .dashbrd-widget .list-table th:last-child, .dashbrd-widget .list-table td:last-child, .overlay-dialogue .list-table th:last-child, .overlay-dialogue .list-table td:last-child {
   padding-right: 10px; }
 
 .dashbrd-widget-head {
