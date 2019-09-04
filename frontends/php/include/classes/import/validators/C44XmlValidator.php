@@ -293,1193 +293,1223 @@ class C44XmlValidator {
 	 */
 	public function getSchema() {
 		return ['type' => XML_ARRAY, 'rules' => [
-			'version' => ['type' => XML_STRING | XML_REQUIRED],
-			'date' => ['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
-			'graphs' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'formatter' => 'formatGraphs', 'rules' => [
-				'graph' => ['type' => XML_ARRAY, 'rules' => [
-					'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-						'graph_item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-								'host' => ['type' => XML_STRING | XML_REQUIRED],
-								'key' => ['type' => XML_STRING | XML_REQUIRED]
+			'version' =>				['type' => XML_STRING | XML_REQUIRED],
+			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
+			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'formatter' => 'formatGraphs', 'rules' => [
+				'graph' =>					['type' => XML_ARRAY, 'rules' => [
+					'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+						'graph_item' =>			['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'item' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+								'host' =>					['type' => XML_STRING | XML_REQUIRED],
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
-							'color' => ['type' => XML_STRING],
-							'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
-							'sortorder' => ['type' => XML_STRING, 'default' => '0'],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
-							'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
+							'calc_fnc' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
+							'color' =>					['type' => XML_STRING],
+							'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
+							'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
+							'yaxisside' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
 						]]
 					]],
-					'name' => ['type' => XML_STRING | XML_REQUIRED],
-					'height' => ['type' => XML_STRING, 'default' => '200'],
-					'percent_left' => ['type' => XML_STRING, 'default' => '0'],
-					'percent_right' => ['type' => XML_STRING, 'default' => '0'],
-					'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
-					'width' => ['type' => XML_STRING, 'default' => '900'],
-					'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
-					'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'height' =>					['type' => XML_STRING, 'default' => '200'],
+					'percent_left' =>			['type' => XML_STRING, 'default' => '0'],
+					'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
+					'show_3d' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_legend' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_triggers' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_work_period' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
+					'width' =>					['type' => XML_STRING, 'default' => '900'],
+					'yaxismax' =>				['type' => XML_STRING, 'default' => '100'],
+					'yaxismin' =>				['type' => XML_STRING, 'default' => '0'],
 					// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
-					'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+					'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+					'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 					// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
-					'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
+					'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+					'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 				]]
 			]],
-			'groups' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'formatter' => 'formatGroups', 'rules' => [
-				'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-					'name' => ['type' => XML_STRING | XML_REQUIRED]
+			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'formatter' => 'formatGroups', 'rules' => [
+				'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
-			'hosts' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'formatter' => 'formatHosts', 'rules' => [
-				'host' => ['type' => XML_ARRAY, 'rules' => [
-					'groups' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
-						'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+			'hosts' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'formatter' => 'formatHosts', 'rules' => [
+				'host' =>					['type' => XML_ARRAY, 'rules' => [
+					'groups' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
+						'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'host' => ['type' => XML_STRING | XML_REQUIRED],
-					'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-						'application' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+					'host' =>					['type' => XML_STRING | XML_REQUIRED],
+					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+						'application' =>			['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'description' => ['type' => XML_STRING],
-					'discovery_rules' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
-						'discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
-							'key' => ['type' => XML_STRING | XML_REQUIRED],
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'allowed_hosts' => ['type' => XML_STRING],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'description' => ['type' => XML_STRING],
-							'filter' => ['type' => XML_ARRAY, 'rules' => [
-								'conditions' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-									'condition' => ['type' => XML_ARRAY, 'rules' => [
-										'formulaid' => ['type' => XML_STRING | XML_REQUIRED],
-										'macro' => ['type' => XML_STRING | XML_REQUIRED],
-										'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
-										'value' => ['type' => XML_STRING]
+					'description' =>			['type' => XML_STRING],
+					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
+							'key' =>					['type' => XML_STRING | XML_REQUIRED],
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'allowed_hosts' =>			['type' => XML_STRING],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'description' =>			['type' => XML_STRING],
+							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED],
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
+										'value' =>					['type' => XML_STRING]
 									]]
 								]],
-								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
-								'formula' => ['type' => XML_STRING]
-							], 'import' => [$this, 'itemFilterImport']],
-							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
-								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-										'graph_item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-												'host' => ['type' => XML_STRING | XML_REQUIRED],
-												'key' => ['type' => XML_STRING | XML_REQUIRED]
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
+								'formula' =>				['type' => XML_STRING]
+							]],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
+								'graph_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+										'graph_item' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'item' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'host' =>					['type' => XML_STRING | XML_REQUIRED],
+												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]],
-											'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
-											'color' => ['type' => XML_STRING],
-											'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
-											'sortorder' => ['type' => XML_STRING, 'default' => '0'],
-											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
-											'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
+											'calc_fnc' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
+											'color' =>					['type' => XML_STRING],
+											'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
+											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
+											'yaxisside' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
 										]]
 									]],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'height' => ['type' => XML_STRING, 'default' => '200'],
-									'percent_left' => ['type' => XML_STRING, 'default' => '0'],
-									'percent_right' => ['type' => XML_STRING, 'default' => '0'],
-									'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
-									'width' => ['type' => XML_STRING, 'default' => '900'],
-									'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
-									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'height' =>					['type' => XML_STRING, 'default' => '200'],
+									'percent_left' =>			['type' => XML_STRING, 'default' => '0'],
+									'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
+									'show_3d' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_legend' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_triggers' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_work_period' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
+									'width' =>					['type' => XML_STRING, 'default' => '900'],
+									'yaxismax' =>				['type' => XML_STRING, 'default' => '100'],
+									'yaxismin' =>				['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
-									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
-									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
+									'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 								]]
 							]],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'host_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
-								'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'host' => ['type' => XML_STRING | XML_REQUIRED],
-									'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
-										'group_link' => ['type' => XML_ARRAY, 'rules' => [
-											'group' => ['type' => XML_ARRAY, 'rules' => [
-												'name' => ['type' => XML_STRING | XML_REQUIRED]
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
+									'host' =>					['type' => XML_STRING | XML_REQUIRED],
+									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
+										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
+											'group' =>					['type' => XML_ARRAY, 'rules' => [
+												'name' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
 									]],
-									'group_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
-										'group_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
+									'group_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
+										'group_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'name' => ['type' => XML_STRING],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-										'template' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
-								]]
-							]],
-							'http_proxy' => ['type' => XML_STRING],
-							'interface_ref' => ['type' => XML_STRING],
-							'ipmi_sensor' => ['type' => XML_STRING],
-							'item_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
-								'item_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'key' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'allowed_hosts' => ['type' => XML_STRING],
-									'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-										'application' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-									'delay' => ['type' => XML_STRING, 'default' => '1m'],
-									'description' => ['type' => XML_STRING],
-									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-										'header' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'history' => ['type' => XML_STRING, 'default' => '90d'],
-									'http_proxy' => ['type' => XML_STRING],
-									'interface_ref' => ['type' => XML_STRING],
-									'inventory_link' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-									'ipmi_sensor' => ['type' => XML_STRING],
-									'jmx_endpoint' => ['type' => XML_STRING],
-									'logtimefmt' => ['type' => XML_STRING],
-									'master_item' => ['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'prefix' => 'master_item', 'rules' => [
-										'key' => ['type' => XML_STRING | XML_REQUIRED]
-									]],
-									'output_format' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
-									'params' => ['type' => XML_STRING],
-									'password' => ['type' => XML_STRING],
-									'port' => ['type' => XML_STRING],
-									'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-									'posts' => ['type' => XML_STRING],
-									'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-										'step' => ['type' => XML_ARRAY, 'rules' => [
-											'params' => ['type' => XML_STRING | XML_REQUIRED],
-											'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'error_handler' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-											'error_handler_params' => ['type' => XML_STRING]
-										]]
-									]],
-									'privatekey' => ['type' => XML_STRING],
-									'publickey' => ['type' => XML_STRING],
-									'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-										'query_field' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-									'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-									'snmp_community' => ['type' => XML_STRING],
-									'snmp_oid' => ['type' => XML_STRING],
-									'snmpv3_authpassphrase' => ['type' => XML_STRING],
-									'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-									'snmpv3_contextname' => ['type' => XML_STRING],
-									'snmpv3_privpassphrase' => ['type' => XML_STRING],
-									'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-									'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-									'snmpv3_securityname' => ['type' => XML_STRING],
-									'ssl_cert_file' => ['type' => XML_STRING],
-									'ssl_key_file' => ['type' => XML_STRING],
-									'ssl_key_password' => ['type' => XML_STRING],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'status_codes' => ['type' => XML_STRING],
-									'timeout' => ['type' => XML_STRING],
-									'trends' => ['type' => XML_STRING, 'default' => '365d'],
-									'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
-										'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'expression' => ['type' => XML_STRING | XML_REQUIRED],
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-											'correlation_tag' => ['type' => XML_STRING],
-											'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-												'dependency' => ['type' => XML_ARRAY, 'rules' => [
-													'expression' => ['type' => XML_STRING | XML_REQUIRED],
-													'name' => ['type' => XML_STRING | XML_REQUIRED],
-													'recovery_expression' => ['type' => XML_STRING]
-												]]
-											]],
-											'description' => ['type' => XML_STRING],
-											'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-											'opdata' => ['type' => XML_STRING],
-											'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-											'recovery_expression' => ['type' => XML_STRING],
-											'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-											'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-											'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' => ['type' => XML_ARRAY, 'rules' => [
-													'tag' => ['type' => XML_STRING | XML_REQUIRED],
-													'value' => ['type' => XML_STRING]
-												]]
-											]],
-											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-											'url' => ['type' => XML_STRING]
-										]]
-									]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-									'units' => ['type' => XML_STRING],
-									'url' => ['type' => XML_STRING],
-									'username' => ['type' => XML_STRING],
-									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
-									'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-										'name' => ['type' => XML_STRING | XML_REQUIRED],
-									]],
-									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-								]]
-							]],
-							'jmx_endpoint' => ['type' => XML_STRING],
-							'lifetime' => ['type' => XML_STRING, 'default' => '30d'],
-							'lld_macro_paths' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
-								'lld_macro_path' => ['type' => XML_ARRAY, 'rules' => [
-									'lld_macro' => ['type' => XML_STRING],
-									'path' => ['type' => XML_STRING]
-								]]
-							]],
-							'master_item' => ['type' => XML_ARRAY, 'rules' => [
-								'key' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'params' => ['type' => XML_STRING],
-							'password' => ['type' => XML_STRING],
-							'port' => ['type' => XML_STRING],
-							'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-							'posts' => ['type' => XML_STRING],
-							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'params' => ['type' => XML_STRING | XML_REQUIRED],
-									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'error_handler_params' => ['type' => XML_STRING]
-								]]
-							]],
-							'privatekey' => ['type' => XML_STRING],
-							'publickey' => ['type' => XML_STRING],
-							'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-								'query_field' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING]
-								]]
-							]],
-							'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-							'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-							'snmp_community' => ['type' => XML_STRING],
-							'snmp_oid' => ['type' => XML_STRING],
-							'snmpv3_authpassphrase' => ['type' => XML_STRING],
-							'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_contextname' => ['type' => XML_STRING],
-							'snmpv3_privpassphrase' => ['type' => XML_STRING],
-							'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_securityname' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'status_codes' => ['type' => XML_STRING],
-							'timeout' => ['type' => XML_STRING],
-							'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
-								'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'expression' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-									'correlation_tag' => ['type' => XML_STRING],
-									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' => ['type' => XML_ARRAY, 'rules' => [
-											'expression' => ['type' => XML_STRING | XML_REQUIRED],
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' => ['type' => XML_STRING]
-										]]
-									]],
-									'description' => ['type' => XML_STRING],
-									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'opdata' => ['type' => XML_STRING],
-									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'recovery_expression' => ['type' => XML_STRING],
-									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' => ['type' => XML_ARRAY, 'rules' => [
-											'tag' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-									'url' => ['type' => XML_STRING]
-								]]
-							]],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'url' => ['type' => XML_STRING],
-							'username' => ['type' => XML_STRING],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'httptests' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
-						'httptest' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'steps' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'url' => ['type' => XML_STRING | XML_REQUIRED],
-									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-										'header' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'posts' => ['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
-									'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-										'query_field' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'required' => ['type' => XML_STRING],
-									'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-									'status_codes' => ['type' => XML_STRING],
-									'timeout' => ['type' => XML_STRING, 'default' => '15s'],
-									'variables' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
-										'variable' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
+									'name' =>					['type' => XML_STRING],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+										'template' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
 								]]
 							]],
-							'agent' => ['type' => XML_STRING, 'default' => 'Zabbix'],
-							'application' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'attempts' => ['type' => XML_STRING, 'default' => '1'],
-							'authentication' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'http_password' => ['type' => XML_STRING],
-							'http_proxy' => ['type' => XML_STRING],
-							'http_user' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'variables' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
-								'variable' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'interfaces' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
-						'interface' => ['type' => XML_ARRAY, 'rules' => [
-							'interface_ref' => ['type' => XML_STRING | XML_REQUIRED],
-							'bulk' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'default' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'dns' => ['type' => XML_STRING],
-							'ip' => ['type' => XML_STRING],
-							'port' => ['type' => XML_STRING],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
-							'useip' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'inventory' => ['type' => XML_ARRAY, 'rules' => [
-						'type' => ['type' => XML_STRING],
-						'type_full' => ['type' => XML_STRING],
-						'name' => ['type' => XML_STRING],
-						'alias' => ['type' => XML_STRING],
-						'os' => ['type' => XML_STRING],
-						'os_full' => ['type' => XML_STRING],
-						'os_short' => ['type' => XML_STRING],
-						'serialno_a' => ['type' => XML_STRING],
-						'serialno_b' => ['type' => XML_STRING],
-						'tag' => ['type' => XML_STRING],
-						'asset_tag' => ['type' => XML_STRING],
-						'macaddress_a' => ['type' => XML_STRING],
-						'macaddress_b' => ['type' => XML_STRING],
-						'hardware' => ['type' => XML_STRING],
-						'hardware_full' => ['type' => XML_STRING],
-						'software' => ['type' => XML_STRING],
-						'software_full' => ['type' => XML_STRING],
-						'software_app_a' => ['type' => XML_STRING],
-						'software_app_b' => ['type' => XML_STRING],
-						'software_app_c' => ['type' => XML_STRING],
-						'software_app_d' => ['type' => XML_STRING],
-						'software_app_e' => ['type' => XML_STRING],
-						'contact' => ['type' => XML_STRING],
-						'location' => ['type' => XML_STRING],
-						'location_lat' => ['type' => XML_STRING],
-						'location_lon' => ['type' => XML_STRING],
-						'notes' => ['type' => XML_STRING],
-						'chassis' => ['type' => XML_STRING],
-						'model' => ['type' => XML_STRING],
-						'hw_arch' => ['type' => XML_STRING],
-						'vendor' => ['type' => XML_STRING],
-						'contract_number' => ['type' => XML_STRING],
-						'installer_name' => ['type' => XML_STRING],
-						'deployment_status' => ['type' => XML_STRING],
-						'url_a' => ['type' => XML_STRING],
-						'url_b' => ['type' => XML_STRING],
-						'url_c' => ['type' => XML_STRING],
-						'host_networks' => ['type' => XML_STRING],
-						'host_netmask' => ['type' => XML_STRING],
-						'host_router' => ['type' => XML_STRING],
-						'oob_ip' => ['type' => XML_STRING],
-						'oob_netmask' => ['type' => XML_STRING],
-						'oob_router' => ['type' => XML_STRING],
-						'date_hw_purchase' => ['type' => XML_STRING],
-						'date_hw_install' => ['type' => XML_STRING],
-						'date_hw_expiry' => ['type' => XML_STRING],
-						'date_hw_decomm' => ['type' => XML_STRING],
-						'site_address_a' => ['type' => XML_STRING],
-						'site_address_b' => ['type' => XML_STRING],
-						'site_address_c' => ['type' => XML_STRING],
-						'site_city' => ['type' => XML_STRING],
-						'site_state' => ['type' => XML_STRING],
-						'site_country' => ['type' => XML_STRING],
-						'site_zip' => ['type' => XML_STRING],
-						'site_rack' => ['type' => XML_STRING],
-						'site_notes' => ['type' => XML_STRING],
-						'poc_1_name' => ['type' => XML_STRING],
-						'poc_1_email' => ['type' => XML_STRING],
-						'poc_1_phone_a' => ['type' => XML_STRING],
-						'poc_1_phone_b' => ['type' => XML_STRING],
-						'poc_1_cell' => ['type' => XML_STRING],
-						'poc_1_screen' => ['type' => XML_STRING],
-						'poc_1_notes' => ['type' => XML_STRING],
-						'poc_2_name' => ['type' => XML_STRING],
-						'poc_2_email' => ['type' => XML_STRING],
-						'poc_2_phone_a' => ['type' => XML_STRING],
-						'poc_2_phone_b' => ['type' => XML_STRING],
-						'poc_2_cell' => ['type' => XML_STRING],
-						'poc_2_screen' => ['type' => XML_STRING],
-						'poc_2_notes' => ['type' => XML_STRING]
-					]],
-					'inventory_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]],
-					'ipmi_authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::XML_DEFAULT, 'in' => [CXmlConstantValue::XML_DEFAULT => CXmlConstantName::XML_DEFAULT, CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::MD2 => CXmlConstantName::MD2, CXmlConstantValue::MD5 => CXmlConstantName::MD5, CXmlConstantValue::STRAIGHT => CXmlConstantName::STRAIGHT, CXmlConstantValue::OEM => CXmlConstantName::OEM, CXmlConstantValue::RMCP_PLUS => CXmlConstantName::RMCP_PLUS]],
-					'ipmi_password' => ['type' => XML_STRING],
-					'ipmi_privilege' => ['type' => XML_STRING, 'default' => CXmlConstantValue::USER, 'in' => [CXmlConstantValue::CALLBACK => CXmlConstantName::CALLBACK, CXmlConstantValue::USER => CXmlConstantName::USER, CXmlConstantValue::OPERATOR => CXmlConstantName::OPERATOR, CXmlConstantValue::ADMIN => CXmlConstantName::ADMIN, CXmlConstantValue::OEM => CXmlConstantName::OEM]],
-					'ipmi_username' => ['type' => XML_STRING],
-					'items' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
-						'item' => ['type' => XML_ARRAY, 'rules' => [
-							'key' => ['type' => XML_STRING | XML_REQUIRED],
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'allowed_hosts' => ['type' => XML_STRING],
-							'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-								'application' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'description' => ['type' => XML_STRING],
-							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'history' => ['type' => XML_STRING, 'default' => '90d'],
-							'http_proxy' => ['type' => XML_STRING],
-							'interface_ref' => ['type' => XML_STRING],
-							'inventory_link' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-							'ipmi_sensor' => ['type' => XML_STRING],
-							'jmx_endpoint' => ['type' => XML_STRING],
-							'logtimefmt' => ['type' => XML_STRING],
-							'master_item' => ['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
-								'key' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'output_format' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
-							'params' => ['type' => XML_STRING],
-							'password' => ['type' => XML_STRING],
-							'port' => ['type' => XML_STRING],
-							'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-							'posts' => ['type' => XML_STRING],
-							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'params' => ['type' => XML_STRING | XML_REQUIRED],
-									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'error_handler' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-									'error_handler_params' => ['type' => XML_STRING]
-								]]
-							]],
-							'privatekey' => ['type' => XML_STRING],
-							'publickey' => ['type' => XML_STRING],
-							'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-								'query_field' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING]
-								]]
-							]],
-							'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-							'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-							'snmp_community' => ['type' => XML_STRING],
-							'snmp_oid' => ['type' => XML_STRING],
-							'snmpv3_authpassphrase' => ['type' => XML_STRING],
-							'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_contextname' => ['type' => XML_STRING],
-							'snmpv3_privpassphrase' => ['type' => XML_STRING],
-							'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_securityname' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'status_codes' => ['type' => XML_STRING],
-							'timeout' => ['type' => XML_STRING],
-							'trends' => ['type' => XML_STRING, 'default' => '365d'],
-							'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
-								'trigger' => ['type' => XML_ARRAY, 'rules' => [
-									'expression' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-									'correlation_tag' => ['type' => XML_STRING],
-									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'expression' => ['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' => ['type' => XML_STRING]
+							'http_proxy' =>				['type' => XML_STRING],
+							'interface_ref' =>			['type' => XML_STRING],
+							'ipmi_sensor' =>			['type' => XML_STRING],
+							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
+								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
+									'key' =>					['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'allowed_hosts' =>			['type' => XML_STRING],
+									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+										'application' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'description' => ['type' => XML_STRING],
-									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'opdata' => ['type' => XML_STRING],
-									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'recovery_expression' => ['type' => XML_STRING],
-									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'tag' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
+									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-									'url' => ['type' => XML_STRING]
+									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+									'description' =>			['type' => XML_STRING],
+									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'history' =>				['type' => XML_STRING, 'default' => '90d'],
+									'http_proxy' =>				['type' => XML_STRING],
+									'interface_ref' =>			['type' => XML_STRING],
+									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+									'ipmi_sensor' =>			['type' => XML_STRING],
+									'jmx_endpoint' =>			['type' => XML_STRING],
+									'logtimefmt' =>				['type' => XML_STRING],
+									'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'],  'rules' => [
+										'key' =>					['type' => XML_STRING | XML_REQUIRED]
+									]],
+									'output_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
+									'params' =>					['type' => XML_STRING],
+									'password' =>				['type' => XML_STRING],
+									'port' =>					['type' => XML_STRING],
+									'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+									'posts' =>					['type' => XML_STRING],
+									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+										'step' =>					['type' => XML_ARRAY, 'rules' => [
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler_params' =>	['type' => XML_STRING]
+										]]
+									]],
+									'privatekey' =>				['type' => XML_STRING],
+									'publickey' =>				['type' => XML_STRING],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+									'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+									'snmp_community' =>			['type' => XML_STRING],
+									'snmp_oid' =>				['type' => XML_STRING],
+									'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+									'snmpv3_contextname' =>		['type' => XML_STRING],
+									'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+									'snmpv3_securityname' =>	['type' => XML_STRING],
+									'ssl_cert_file' =>			['type' => XML_STRING],
+									'ssl_key_file' =>			['type' => XML_STRING],
+									'ssl_key_password' =>		['type' => XML_STRING],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'status_codes' =>			['type' => XML_STRING],
+									'timeout' =>				['type' => XML_STRING],
+									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
+									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+											'correlation_tag' =>		['type' => XML_STRING],
+											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+													'name' =>					['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' =>	['type' => XML_STRING]
+												]]
+											]],
+											'description' =>			['type' => XML_STRING],
+											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'opdata' =>					['type' => XML_STRING],
+											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+											'recovery_expression' =>	['type' => XML_STRING],
+											'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING]
+												]]
+											]],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+											'url' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'units' =>					['type' => XML_STRING],
+									'url' =>					['type' => XML_STRING],
+									'username' =>				['type' => XML_STRING],
+									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+										'name' =>					['type' => XML_STRING | XML_REQUIRED]
+									]],
+									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 								]]
 							]],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-							'units' => ['type' => XML_STRING],
-							'url' => ['type' => XML_STRING],
-							'username' => ['type' => XML_STRING],
-							'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
-							'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING | XML_REQUIRED]
+							'jmx_endpoint' =>			['type' => XML_STRING],
+							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
+							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' =>				['type' => XML_STRING],
+									'path' =>					['type' => XML_STRING]
+								]]
 							]],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'params' =>					['type' => XML_STRING],
+							'password' =>				['type' => XML_STRING],
+							'port' =>					['type' => XML_STRING],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'posts' =>					['type' => XML_STRING],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING]
+								]]
+							]],
+							'privatekey' =>				['type' => XML_STRING],
+							'publickey' =>				['type' => XML_STRING],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING]
+								]]
+							]],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'snmp_community' =>			['type' => XML_STRING],
+							'snmp_oid' =>				['type' => XML_STRING],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_securityname' =>	['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'status_codes' =>			['type' => XML_STRING],
+							'timeout' =>				['type' => XML_STRING],
+							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+								'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' =>		['type' => XML_STRING],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING]
+										]]
+									]],
+									'description' =>			['type' => XML_STRING],
+									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' =>					['type' => XML_STRING],
+									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' =>	['type' => XML_STRING],
+									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' =>					['type' => XML_STRING]
+								]]
+							]],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'url' =>					['type' => XML_STRING],
+							'username' =>				['type' => XML_STRING],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]],
-					'macros' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-						'macro' => ['type' => XML_ARRAY, 'rules' => [
-							'macro' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING]
+					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
+						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'steps' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'required' =>				['type' => XML_STRING],
+									'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+									'status_codes' =>			['type' => XML_STRING],
+									'timeout' =>				['type' => XML_STRING, 'default' => '15s'],
+									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
+										'variable' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]]
+								]]
+							]],
+							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
+							'application' =>			['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'http_password' =>			['type' => XML_STRING],
+							'http_proxy' =>				['type' => XML_STRING],
+							'http_user' =>				['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
+								'variable' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]],
-					'name' => ['type' => XML_STRING],
-					'proxy' => ['type' => XML_ARRAY, 'rules' => [
-						'name' => ['type' => XML_STRING | XML_REQUIRED]
-					]],
-					'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-					'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-						'tag' => ['type' => XML_ARRAY, 'rules' => [
-							'tag' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING]
+					'interfaces' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'interface', 'rules' => [
+						'interface' =>				['type' => XML_ARRAY, 'rules' => [
+							'interface_ref' =>			['type' => XML_STRING | XML_REQUIRED],
+							'bulk' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'default' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'dns' =>					['type' => XML_STRING],
+							'ip' =>						['type' => XML_STRING],
+							'port' =>					['type' => XML_STRING],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ZABBIX, 'in' => [CXmlConstantValue::ZABBIX => CXmlConstantName::ZABBIX, CXmlConstantValue::SNMP => CXmlConstantName::SNMP, CXmlConstantValue::IPMI => CXmlConstantName::IPMI, CXmlConstantValue::JMX => CXmlConstantName::JMX]],
+							'useip' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]],
-					'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-						'template' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+					'inventory' =>				['type' => XML_ARRAY, 'rules' => [
+						'type' =>					['type' => XML_STRING],
+						'type_full' =>				['type' => XML_STRING],
+						'name' =>					['type' => XML_STRING],
+						'alias' =>					['type' => XML_STRING],
+						'os' =>						['type' => XML_STRING],
+						'os_full' =>				['type' => XML_STRING],
+						'os_short' =>				['type' => XML_STRING],
+						'serialno_a' =>				['type' => XML_STRING],
+						'serialno_b' =>				['type' => XML_STRING],
+						'tag' =>					['type' => XML_STRING],
+						'asset_tag' =>				['type' => XML_STRING],
+						'macaddress_a' =>			['type' => XML_STRING],
+						'macaddress_b' =>			['type' => XML_STRING],
+						'hardware' =>				['type' => XML_STRING],
+						'hardware_full' =>			['type' => XML_STRING],
+						'software' =>				['type' => XML_STRING],
+						'software_full' =>			['type' => XML_STRING],
+						'software_app_a' =>			['type' => XML_STRING],
+						'software_app_b' =>			['type' => XML_STRING],
+						'software_app_c' =>			['type' => XML_STRING],
+						'software_app_d' =>			['type' => XML_STRING],
+						'software_app_e' =>			['type' => XML_STRING],
+						'contact' =>				['type' => XML_STRING],
+						'location' =>				['type' => XML_STRING],
+						'location_lat' =>			['type' => XML_STRING],
+						'location_lon' =>			['type' => XML_STRING],
+						'notes' =>					['type' => XML_STRING],
+						'chassis' =>				['type' => XML_STRING],
+						'model' =>					['type' => XML_STRING],
+						'hw_arch' =>				['type' => XML_STRING],
+						'vendor' =>					['type' => XML_STRING],
+						'contract_number' =>		['type' => XML_STRING],
+						'installer_name' =>			['type' => XML_STRING],
+						'deployment_status' =>		['type' => XML_STRING],
+						'url_a' =>					['type' => XML_STRING],
+						'url_b' =>					['type' => XML_STRING],
+						'url_c' =>					['type' => XML_STRING],
+						'host_networks' =>			['type' => XML_STRING],
+						'host_netmask' =>			['type' => XML_STRING],
+						'host_router' =>			['type' => XML_STRING],
+						'oob_ip' =>					['type' => XML_STRING],
+						'oob_netmask' =>			['type' => XML_STRING],
+						'oob_router' =>				['type' => XML_STRING],
+						'date_hw_purchase' =>		['type' => XML_STRING],
+						'date_hw_install' =>		['type' => XML_STRING],
+						'date_hw_expiry' =>			['type' => XML_STRING],
+						'date_hw_decomm' =>			['type' => XML_STRING],
+						'site_address_a' =>			['type' => XML_STRING],
+						'site_address_b' =>			['type' => XML_STRING],
+						'site_address_c' =>			['type' => XML_STRING],
+						'site_city' =>				['type' => XML_STRING],
+						'site_state' =>				['type' => XML_STRING],
+						'site_country' =>			['type' => XML_STRING],
+						'site_zip' =>				['type' => XML_STRING],
+						'site_rack' =>				['type' => XML_STRING],
+						'site_notes' =>				['type' => XML_STRING],
+						'poc_1_name' =>				['type' => XML_STRING],
+						'poc_1_email' =>			['type' => XML_STRING],
+						'poc_1_phone_a' =>			['type' => XML_STRING],
+						'poc_1_phone_b' =>			['type' => XML_STRING],
+						'poc_1_cell' =>				['type' => XML_STRING],
+						'poc_1_screen' =>			['type' => XML_STRING],
+						'poc_1_notes' =>			['type' => XML_STRING],
+						'poc_2_name' =>				['type' => XML_STRING],
+						'poc_2_email' =>			['type' => XML_STRING],
+						'poc_2_phone_a' =>			['type' => XML_STRING],
+						'poc_2_phone_b' =>			['type' => XML_STRING],
+						'poc_2_cell' =>				['type' => XML_STRING],
+						'poc_2_screen' =>			['type' => XML_STRING],
+						'poc_2_notes' =>			['type' => XML_STRING]
+					]],
+					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]],
+					'ipmi_authtype' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::XML_DEFAULT, 'in' => [CXmlConstantValue::XML_DEFAULT => CXmlConstantName::XML_DEFAULT, CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::MD2 => CXmlConstantName::MD2, CXmlConstantValue::MD5 => CXmlConstantName::MD5, CXmlConstantValue::STRAIGHT => CXmlConstantName::STRAIGHT, CXmlConstantValue::OEM => CXmlConstantName::OEM, CXmlConstantValue::RMCP_PLUS => CXmlConstantName::RMCP_PLUS]],
+					'ipmi_password' =>			['type' => XML_STRING],
+					'ipmi_privilege' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::USER, 'in' => [CXmlConstantValue::CALLBACK => CXmlConstantName::CALLBACK, CXmlConstantValue::USER => CXmlConstantName::USER, CXmlConstantValue::OPERATOR => CXmlConstantName::OPERATOR, CXmlConstantValue::ADMIN => CXmlConstantName::ADMIN, CXmlConstantValue::OEM => CXmlConstantName::OEM]],
+					'ipmi_username' =>			['type' => XML_STRING],
+					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
+						'item' =>					['type' => XML_ARRAY, 'rules' => [
+							'key' =>					['type' => XML_STRING | XML_REQUIRED],
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'allowed_hosts' =>			['type' => XML_STRING],
+							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+								'application' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'description' =>			['type' => XML_STRING],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'history' =>				['type' => XML_STRING, 'default' => '90d'],
+							'http_proxy' =>				['type' => XML_STRING],
+							'interface_ref' =>			['type' => XML_STRING],
+							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+							'ipmi_sensor' =>			['type' => XML_STRING],
+							'jmx_endpoint' =>			['type' => XML_STRING],
+							'logtimefmt' =>				['type' => XML_STRING],
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'output_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
+							'params' =>					['type' => XML_STRING],
+							'password' =>				['type' => XML_STRING],
+							'port' =>					['type' => XML_STRING],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'posts' =>					['type' => XML_STRING],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING]
+								]]
+							]],
+							'privatekey' =>				['type' => XML_STRING],
+							'publickey' =>				['type' => XML_STRING],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING]
+								]]
+							]],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'snmp_community' =>			['type' => XML_STRING],
+							'snmp_oid' =>				['type' => XML_STRING],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_securityname' =>	['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'status_codes' =>			['type' => XML_STRING],
+							'timeout' =>				['type' => XML_STRING],
+							'trends' =>					['type' => XML_STRING, 'default' => '365d'],
+							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' =>		['type' => XML_STRING],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING]
+										]]
+									]],
+									'description' =>			['type' => XML_STRING],
+									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' =>					['type' => XML_STRING],
+									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' =>	['type' => XML_STRING],
+									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' =>					['type' => XML_STRING]
+								]]
+							]],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+							'units' =>					['type' => XML_STRING],
+							'url' =>					['type' => XML_STRING],
+							'username' =>				['type' => XML_STRING],
+							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+						]]
+					]],
+					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+						'macro' =>					['type' => XML_ARRAY, 'rules' => [
+							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING]
+						]]
+					]],
+					'name' =>					['type' => XML_STRING],
+					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
+						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+					]],
+					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING]
+						]]
+					]],
+					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+						'template' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
 					// tls_accept converted on CXmlValidatorGeneral via preprocessor.
-					'tls_accept' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'preprocessor' => [$this, 'tlsAcceptConstantPreprocessor'], 'export' => [$this, 'hostTlsAcceptExport']],
-					'tls_connect' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
-					'tls_issuer' => ['type' => XML_STRING],
-					'tls_psk' => ['type' => XML_STRING],
-					'tls_psk_identity' => ['type' => XML_STRING],
-					'tls_subject' => ['type' => XML_STRING]
+					'tls_accept' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'preprocessor' => [$this, 'tlsAcceptConstantPreprocessor'], 'export' => [$this, 'hostTlsAcceptExport']],
+					'tls_connect' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
+					'tls_issuer' =>				['type' => XML_STRING],
+					'tls_psk' =>				['type' => XML_STRING],
+					'tls_psk_identity' =>		['type' => XML_STRING],
+					'tls_subject' =>			['type' => XML_STRING]
 				]]
 			]],
-			'value_maps' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'formatter' => 'formatValuemaps', 'rules' => [
-				'value_map' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-					'name' => ['type' => XML_STRING | XML_REQUIRED],
-					'mappings' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
-						'mapping' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'value' => ['type' => XML_STRING],
-							'newvalue' => ['type' => XML_STRING]
+			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'formatter' => 'formatValuemaps', 'rules' => [
+				'value_map' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
+						'mapping' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'value' =>					['type' => XML_STRING],
+							'newvalue' =>				['type' => XML_STRING]
 						]]
 					]]
 				]]
 			]],
-			'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'formatter' => 'formatTemplates', 'rules' => [
-				'template' => ['type' => XML_ARRAY, 'rules' => [
-					'groups' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
-						'group' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'formatter' => 'formatTemplates', 'rules' => [
+				'template' =>				['type' => XML_ARRAY, 'rules' => [
+					'groups' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
+						'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'template' => ['type' => XML_STRING | XML_REQUIRED],
-					'description' => ['type' => XML_STRING],
-					'name' => ['type' => XML_STRING],
-					'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-						'application' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+					'template' =>				['type' => XML_STRING | XML_REQUIRED],
+					'description' =>			['type' => XML_STRING],
+					'name' =>					['type' => XML_STRING],
+					'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+						'application' =>			['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
-					'discovery_rules' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
-						'discovery_rule' => ['type' => XML_ARRAY, 'rules' => [
-							'key' => ['type' => XML_STRING | XML_REQUIRED],
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'allowed_hosts' => ['type' => XML_STRING],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'description' => ['type' => XML_STRING],
-							'filter' => ['type' => XML_ARRAY, 'rules' => [
-								'conditions' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-									'condition' => ['type' => XML_ARRAY, 'rules' => [
-										'formulaid' => ['type' => XML_STRING | XML_REQUIRED],
-										'macro' => ['type' => XML_STRING | XML_REQUIRED],
-										'operator' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
-										'value' => ['type' => XML_STRING]
+					'discovery_rules' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'discovery_rule', 'rules' => [
+						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
+							'key' =>					['type' => XML_STRING | XML_REQUIRED],
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'allowed_hosts' =>			['type' => XML_STRING],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'description' =>			['type' => XML_STRING],
+							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
+								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED],
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => [CXmlConstantValue::CONDITION_MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX, CXmlConstantValue::CONDITION_NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX]],
+										'value' =>					['type' => XML_STRING]
 									]]
 								]],
-								'evaltype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
-								'formula' => ['type' => XML_STRING]
-							], 'import' => [$this, 'itemFilterImport']],
-							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'graph_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
-								'graph_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'graph_items' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-										'graph_item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'item' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-												'host' => ['type' => XML_STRING | XML_REQUIRED],
-												'key' => ['type' => XML_STRING | XML_REQUIRED]
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
+								'formula' =>				['type' => XML_STRING]
+							]],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph_prototype', 'rules' => [
+								'graph_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
+										'graph_item' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'item' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'host' =>					['type' => XML_STRING | XML_REQUIRED],
+												'key' =>					['type' => XML_STRING | XML_REQUIRED]
 											]],
-											'calc_fnc' => ['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
-											'color' => ['type' => XML_STRING],
-											'drawtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
-											'sortorder' => ['type' => XML_STRING, 'default' => '0'],
-											'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
-											'yaxisside' => ['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
+											'calc_fnc' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AVG, 'in' => $this->GRAPH_GRAPH_ITEM_CALC_FNC],
+											'color' =>					['type' => XML_STRING],
+											'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
+											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SIMPLE, 'in' => $this->GRAPH_GRAPH_ITEM_TYPE],
+											'yaxisside' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::LEFT, 'in' => $this->GRAPH_GRAPH_ITEM_YAXISSIDE]
 										]]
 									]],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'height' => ['type' => XML_STRING, 'default' => '200'],
-									'percent_left' => ['type' => XML_STRING, 'default' => '0'],
-									'percent_right' => ['type' => XML_STRING, 'default' => '0'],
-									'show_3d' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_legend' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_triggers' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'show_work_period' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
-									'width' => ['type' => XML_STRING, 'default' => '900'],
-									'yaxismax' => ['type' => XML_STRING, 'default' => '100'],
-									'yaxismin' => ['type' => XML_STRING, 'default' => '0'],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'height' =>					['type' => XML_STRING, 'default' => '200'],
+									'percent_left' =>			['type' => XML_STRING, 'default' => '0'],
+									'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
+									'show_3d' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_legend' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_triggers' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'show_work_period' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::NORMAL, 'in' => $this->GRAPH_TYPE],
+									'width' =>					['type' => XML_STRING, 'default' => '900'],
+									'yaxismax' =>				['type' => XML_STRING, 'default' => '100'],
+									'yaxismin' =>				['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
-									'ymax_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
-									'ymin_type_1' => ['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' => ['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
+									'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
+									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']]
 								]]
 							]],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]],
-							'host_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
-								'host_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'group_links' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
-										'group_link' => ['type' => XML_ARRAY, 'rules' => [
-											'group' => ['type' => XML_ARRAY, 'rules' => [
-												'name' => ['type' => XML_STRING | XML_REQUIRED]
+							'host_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_prototype', 'rules' => [
+								'host_prototype' =>			['type' => XML_ARRAY, 'rules' => [
+									'host' =>					['type' => XML_STRING | XML_REQUIRED],
+									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
+										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
+											'group' =>					['type' => XML_ARRAY, 'rules' => [
+												'name' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
 									]],
-									'group_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
-										'group_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
+									'group_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_prototype', 'rules' => [
+										'group_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'host' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-										'template' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]]
-								]]
-							]],
-							'http_proxy' => ['type' => XML_STRING],
-							'ipmi_sensor' => ['type' => XML_STRING],
-							'item_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
-								'item_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'key' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'allowed_hosts' => ['type' => XML_STRING],
-									'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-										'application' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'application_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
-										'application_prototype' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-									'delay' => ['type' => XML_STRING, 'default' => '1m'],
-									'description' => ['type' => XML_STRING],
-									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-										'header' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									'history' => ['type' => XML_STRING, 'default' => '90d'],
-									'http_proxy' => ['type' => XML_STRING],
-									'inventory_link' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-									'ipmi_sensor' => ['type' => XML_STRING],
-									'jmx_endpoint' => ['type' => XML_STRING],
-									'logtimefmt' => ['type' => XML_STRING],
-									'master_item' => ['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
-										'key' => ['type' => XML_STRING | XML_REQUIRED]
-									]],
-									'output_format' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
-									'params' => ['type' => XML_STRING],
-									'password' => ['type' => XML_STRING],
-									'port' => ['type' => XML_STRING],
-									'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-									'posts' => ['type' => XML_STRING],
-									'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-										'step' => ['type' => XML_ARRAY, 'rules' => [
-											'params' => ['type' => XML_STRING | XML_REQUIRED],
-											'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'error_handler' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-											'error_handler_params' => ['type' => XML_STRING]
-										]]
-									]],
-									'privatekey' => ['type' => XML_STRING],
-									'publickey' => ['type' => XML_STRING],
-									'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-										'query_field' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-									'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-									'snmp_community' => ['type' => XML_STRING],
-									'snmp_oid' => ['type' => XML_STRING],
-									'snmpv3_authpassphrase' => ['type' => XML_STRING],
-									'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-									'snmpv3_contextname' => ['type' => XML_STRING],
-									'snmpv3_privpassphrase' => ['type' => XML_STRING],
-									'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-									'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-									'snmpv3_securityname' => ['type' => XML_STRING],
-									'ssl_cert_file' => ['type' => XML_STRING],
-									'ssl_key_file' => ['type' => XML_STRING],
-									'ssl_key_password' => ['type' => XML_STRING],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'status_codes' => ['type' => XML_STRING],
-									'timeout' => ['type' => XML_STRING],
-									'trends' => ['type' => XML_STRING, 'default' => '365d'],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-									'units' => ['type' => XML_STRING],
-									'url' => ['type' => XML_STRING],
-									'username' => ['type' => XML_STRING],
-									'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
-									'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-										'name' => ['type' => XML_STRING | XML_REQUIRED]
-									]],
-									'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-								]]
-							]],
-							'jmx_endpoint' => ['type' => XML_STRING],
-							'lifetime' => ['type' => XML_STRING, 'default' => '30d'],
-							'lld_macro_paths' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
-								'lld_macro_path' => ['type' => XML_ARRAY, 'rules' => [
-									'lld_macro' => ['type' => XML_STRING],
-									'path' => ['type' => XML_STRING]
-								]]
-							]],
-							'master_item' => ['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
-								'key' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'params' => ['type' => XML_STRING],
-							'password' => ['type' => XML_STRING],
-							'port' => ['type' => XML_STRING],
-							'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-							'posts' => ['type' => XML_STRING],
-							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'params' => ['type' => XML_STRING | XML_REQUIRED],
-									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'error_handler' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-									'error_handler_params' => ['type' => XML_STRING]
-								]]
-							]],
-							'privatekey' => ['type' => XML_STRING],
-							'publickey' => ['type' => XML_STRING],
-							'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-								'query_field' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING]
-								]]
-							]],
-							'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-							'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-							'snmp_community' => ['type' => XML_STRING],
-							'snmp_oid' => ['type' => XML_STRING],
-							'snmpv3_authpassphrase' => ['type' => XML_STRING],
-							'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_contextname' => ['type' => XML_STRING],
-							'snmpv3_privpassphrase' => ['type' => XML_STRING],
-							'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_securityname' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'status_codes' => ['type' => XML_STRING],
-							'timeout' => ['type' => XML_STRING],
-							'trigger_prototypes' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
-								'trigger_prototype' => ['type' => XML_ARRAY, 'rules' => [
-									'expression' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-									'correlation_tag' => ['type' => XML_STRING],
-									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' => ['type' => XML_ARRAY, 'rules' => [
-											'expression' => ['type' => XML_STRING | XML_REQUIRED],
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' => ['type' => XML_STRING]
-										]]
-									]],
-									'description' => ['type' => XML_STRING],
-									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'opdata' => ['type' => XML_STRING],
-									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'recovery_expression' => ['type' => XML_STRING],
-									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' => ['type' => XML_ARRAY, 'rules' => [
-											'tag' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-									'url' => ['type' => XML_STRING]
-								]]
-							]],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'url' => ['type' => XML_STRING],
-							'username' => ['type' => XML_STRING],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'httptests' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
-						'httptest' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'steps' => ['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'url' => ['type' => XML_STRING | XML_REQUIRED],
-									'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-										'header' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									// Type = 0 to disable type validation.
-									'posts' => ['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
-									'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-										'query_field' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
-										]]
-									]],
-									'required' => ['type' => XML_STRING],
-									'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-									'status_codes' => ['type' => XML_STRING],
-									'timeout' => ['type' => XML_STRING, 'default' => '15s'],
-									'variables' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
-										'variable' => ['type' => XML_ARRAY, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING | XML_REQUIRED]
+									'name' =>					['type' => XML_STRING],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+										'template' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
 								]]
 							]],
-							'agent' => ['type' => XML_STRING, 'default' => 'Zabbix'],
-							'application' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'attempts' => ['type' => XML_STRING, 'default' => '1'],
-							'authentication' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'http_password' => ['type' => XML_STRING],
-							'http_proxy' => ['type' => XML_STRING],
-							'http_user' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'variables' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
-								'variable' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'items' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
-						'item' => ['type' => XML_ARRAY, 'rules' => [
-							'key' => ['type' => XML_STRING | XML_REQUIRED],
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'allow_traps' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'allowed_hosts' => ['type' => XML_STRING],
-							'applications' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
-								'application' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'authtype' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
-							'delay' => ['type' => XML_STRING, 'default' => '1m'],
-							'description' => ['type' => XML_STRING],
-							'follow_redirects' => ['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'headers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-								'header' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'history' => ['type' => XML_STRING, 'default' => '90d'],
-							'http_proxy' => ['type' => XML_STRING],
-							'inventory_link' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
-							'ipmi_sensor' => ['type' => XML_STRING],
-							'jmx_endpoint' => ['type' => XML_STRING],
-							'logtimefmt' => ['type' => XML_STRING],
-							'master_item' => ['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
-								'key' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'output_format' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
-							'params' => ['type' => XML_STRING],
-							'password' => ['type' => XML_STRING],
-							'port' => ['type' => XML_STRING],
-							'post_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-							'posts' => ['type' => XML_STRING],
-							'preprocessing' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
-								'step' => ['type' => XML_ARRAY, 'rules' => [
-									'params' => ['type' => XML_STRING | XML_REQUIRED],
-									'type' => ['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'error_handler' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-									'error_handler_params' => ['type' => XML_STRING]
-								]]
-							]],
-							'privatekey' => ['type' => XML_STRING],
-							'publickey' => ['type' => XML_STRING],
-							'query_fields' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-								'query_field' => ['type' => XML_ARRAY, 'rules' => [
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'value' => ['type' => XML_STRING]
-								]]
-							]],
-							'request_method' => ['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-							'retrieve_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-							'snmp_community' => ['type' => XML_STRING],
-							'snmp_oid' => ['type' => XML_STRING],
-							'snmpv3_authpassphrase' => ['type' => XML_STRING],
-							'snmpv3_authprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
-							'snmpv3_contextname' => ['type' => XML_STRING],
-							'snmpv3_privpassphrase' => ['type' => XML_STRING],
-							'snmpv3_privprotocol' => ['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
-							'snmpv3_securitylevel' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
-							'snmpv3_securityname' => ['type' => XML_STRING],
-							'ssl_cert_file' => ['type' => XML_STRING],
-							'ssl_key_file' => ['type' => XML_STRING],
-							'ssl_key_password' => ['type' => XML_STRING],
-							'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'status_codes' => ['type' => XML_STRING],
-							'timeout' => ['type' => XML_STRING],
-							'trends' => ['type' => XML_STRING, 'default' => '365d'],
-							'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
-								'trigger' => ['type' => XML_ARRAY, 'rules' => [
-									'expression' => ['type' => XML_STRING | XML_REQUIRED],
-									'name' => ['type' => XML_STRING | XML_REQUIRED],
-									'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-									'correlation_tag' => ['type' => XML_STRING],
-									'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'name' => ['type' => XML_STRING | XML_REQUIRED],
-											'expression' => ['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' => ['type' => XML_STRING]
+							'http_proxy' =>				['type' => XML_STRING],
+							'ipmi_sensor' =>			['type' => XML_STRING],
+							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
+								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
+									'key' =>					['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'allowed_hosts' =>			['type' => XML_STRING],
+									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+										'application' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'description' => ['type' => XML_STRING],
-									'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-									'opdata' => ['type' => XML_STRING],
-									'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'recovery_expression' => ['type' => XML_STRING],
-									'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-									'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-									'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-											'tag' => ['type' => XML_STRING | XML_REQUIRED],
-											'value' => ['type' => XML_STRING]
+									'application_prototypes' =>	['type' => XML_INDEXED_ARRAY, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>	['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
-									'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-									'url' => ['type' => XML_STRING]
+									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+									'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+									'description' =>			['type' => XML_STRING],
+									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'history' =>				['type' => XML_STRING, 'default' => '90d'],
+									'http_proxy' =>				['type' => XML_STRING],
+									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+									'ipmi_sensor' =>			['type' => XML_STRING],
+									'jmx_endpoint' =>			['type' => XML_STRING],
+									'logtimefmt' =>				['type' => XML_STRING],
+									'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'],  'rules' => [
+										'key' =>					['type' => XML_STRING | XML_REQUIRED]
+									]],
+									'output_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
+									'params' =>					['type' => XML_STRING],
+									'password' =>				['type' => XML_STRING],
+									'port' =>					['type' => XML_STRING],
+									'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+									'posts' =>					['type' => XML_STRING],
+									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+										'step' =>					['type' => XML_ARRAY, 'rules' => [
+											'params' =>					['type' => XML_STRING | XML_REQUIRED],
+											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+											'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+											'error_handler_params' =>	['type' => XML_STRING]
+										]]
+									]],
+									'privatekey' =>				['type' => XML_STRING],
+									'publickey' =>				['type' => XML_STRING],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+									'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+									'snmp_community' =>			['type' => XML_STRING],
+									'snmp_oid' =>				['type' => XML_STRING],
+									'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+									'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+									'snmpv3_contextname' =>		['type' => XML_STRING],
+									'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+									'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+									'snmpv3_securityname' =>	['type' => XML_STRING],
+									'ssl_cert_file' =>			['type' => XML_STRING],
+									'ssl_key_file' =>			['type' => XML_STRING],
+									'ssl_key_password' =>		['type' => XML_STRING],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'status_codes' =>			['type' => XML_STRING],
+									'timeout' =>				['type' => XML_STRING],
+									'trends' =>					['type' => XML_STRING, 'default' => '365d'],
+									'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+										'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+											'correlation_tag' =>		['type' => XML_STRING],
+											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+													'name' =>					['type' => XML_STRING | XML_REQUIRED],
+													'recovery_expression' =>	['type' => XML_STRING]
+												]]
+											]],
+											'description' =>			['type' => XML_STRING],
+											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+											'opdata' =>					['type' => XML_STRING],
+											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+											'recovery_expression' =>	['type' => XML_STRING],
+											'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING]
+												]]
+											]],
+											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+											'url' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+									'units' =>					['type' => XML_STRING],
+									'url' =>					['type' => XML_STRING],
+									'username' =>				['type' => XML_STRING],
+									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+										'name' =>					['type' => XML_STRING | XML_REQUIRED]
+									]],
+									'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 								]]
 							]],
-							'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
-							'units' => ['type' => XML_STRING],
-							'url' => ['type' => XML_STRING],
-							'username' => ['type' => XML_STRING],
-							'value_type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
-							'valuemap' => ['type' => XML_ARRAY, 'rules' => [
-								'name' => ['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'verify_host' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-							'verify_peer' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
-						]]
-					]],
-					'macros' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-						'macro' => ['type' => XML_ARRAY, 'rules' => [
-							'macro' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING]
-						]]
-					]],
-					'screens' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
-						'screen' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING],
-							'hsize' => ['type' => XML_STRING],
-							'screen_items' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
-								'screen_item' => ['type' => XML_ARRAY, 'rules' => [
-									'x' => ['type' => XML_STRING],
-									'y' => ['type' => XML_STRING],
-									'application' => ['type' => XML_STRING],
-									'colspan' => ['type' => XML_STRING],
-									'dynamic' => ['type' => XML_STRING],
-									'elements' => ['type' => XML_STRING],
-									'halign' => ['type' => XML_STRING],
-									'height' => ['type' => XML_STRING],
-									'max_columns' => ['type' => XML_STRING],
-									'resource' => ['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
-									'resourcetype' => ['type' => XML_STRING],
-									'rowspan' => ['type' => XML_STRING],
-									'sort_triggers' => ['type' => XML_STRING],
-									'style' => ['type' => XML_STRING],
-									'url' => ['type' => XML_STRING],
-									'valign' => ['type' => XML_STRING],
-									'width' => ['type' => XML_STRING]
+							'jmx_endpoint' =>			['type' => XML_STRING],
+							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
+							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
+								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
+									'lld_macro' =>				['type' => XML_STRING],
+									'path' =>					['type' => XML_STRING]
 								]]
 							]],
-							'vsize' => ['type' => XML_STRING]
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'params' =>					['type' => XML_STRING],
+							'password' =>				['type' => XML_STRING],
+							'port' =>					['type' => XML_STRING],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'posts' =>					['type' => XML_STRING],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING]
+								]]
+							]],
+							'privatekey' =>				['type' => XML_STRING],
+							'publickey' =>				['type' => XML_STRING],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING]
+								]]
+							]],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'snmp_community' =>			['type' => XML_STRING],
+							'snmp_oid' =>				['type' => XML_STRING],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_securityname' =>	['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'status_codes' =>			['type' => XML_STRING],
+							'timeout' =>				['type' => XML_STRING],
+							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger_prototype', 'rules' => [
+								'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' =>		['type' => XML_STRING],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING]
+										]]
+									]],
+									'description' =>			['type' => XML_STRING],
+									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' =>					['type' => XML_STRING],
+									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' =>	['type' => XML_STRING],
+									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' =>					['type' => XML_STRING]
+								]]
+							]],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
+							'url' =>					['type' => XML_STRING],
+							'username' =>				['type' => XML_STRING],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]],
-					'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-						'tag' => ['type' => XML_ARRAY, 'rules' => [
-							'tag' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING]
+					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
+						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'steps' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+										'header' =>					['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
+									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'required' =>				['type' => XML_STRING],
+									'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+									'status_codes' =>			['type' => XML_STRING],
+									'timeout' =>				['type' => XML_STRING, 'default' => '15s'],
+									'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
+										'variable' =>				['type' => XML_ARRAY, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]]
+								]]
+							]],
+							'agent' =>					['type' => XML_STRING, 'default' => 'Zabbix'],
+							'application' =>			['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'attempts' =>				['type' => XML_STRING, 'default' => '1'],
+							'authentication' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM]],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'http_password' =>			['type' => XML_STRING],
+							'http_proxy' =>				['type' => XML_STRING],
+							'http_user' =>				['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'variables' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'variable', 'rules' => [
+								'variable' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
 						]]
 					]],
-					'templates' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-						'template' => ['type' => XML_ARRAY, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED]
+					'items' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'item', 'rules' => [
+						'item' =>					['type' => XML_ARRAY, 'rules' => [
+							'key' =>					['type' => XML_STRING | XML_REQUIRED],
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'allowed_hosts' =>			['type' => XML_STRING],
+							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
+								'application' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
+							'description' =>			['type' => XML_STRING],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]],
+							'history' =>				['type' => XML_STRING, 'default' => '90d'],
+							'http_proxy' =>				['type' => XML_STRING],
+							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
+							'ipmi_sensor' =>			['type' => XML_STRING],
+							'jmx_endpoint' =>			['type' => XML_STRING],
+							'logtimefmt' =>				['type' => XML_STRING],
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'output_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => [CXmlConstantValue::RAW => CXmlConstantName::RAW, CXmlConstantValue::JSON => CXmlConstantName::JSON]],
+							'params' =>					['type' => XML_STRING],
+							'password' =>				['type' => XML_STRING],
+							'port' =>					['type' => XML_STRING],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'posts' =>					['type' => XML_STRING],
+							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'params' =>					['type' => XML_STRING | XML_REQUIRED],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING]
+								]]
+							]],
+							'privatekey' =>				['type' => XML_STRING],
+							'publickey' =>				['type' => XML_STRING],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING]
+								]]
+							]],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'snmp_community' =>			['type' => XML_STRING],
+							'snmp_oid' =>				['type' => XML_STRING],
+							'snmpv3_authpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_authprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SNMPV3_MD5, 'in' => [CXmlConstantValue::SNMPV3_MD5 => CXmlConstantName::MD5, CXmlConstantValue::SNMPV3_SHA => CXmlConstantName::SHA]],
+							'snmpv3_contextname' =>		['type' => XML_STRING],
+							'snmpv3_privpassphrase' =>	['type' => XML_STRING],
+							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
+							'snmpv3_securitylevel' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::NOAUTHNOPRIV, 'in' => $this->ITEM_SNMPV3_SECURITYLEVEL],
+							'snmpv3_securityname' =>	['type' => XML_STRING],
+							'ssl_cert_file' =>			['type' => XML_STRING],
+							'ssl_key_file' =>			['type' => XML_STRING],
+							'ssl_key_password' =>		['type' => XML_STRING],
+							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+							'status_codes' =>			['type' => XML_STRING],
+							'timeout' =>				['type' => XML_STRING],
+							'trends' =>					['type' => XML_STRING, 'default' => '365d'],
+							'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
+								'trigger' =>				['type' => XML_ARRAY, 'rules' => [
+									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+									'correlation_tag' =>		['type' => XML_STRING],
+									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'name' =>					['type' => XML_STRING | XML_REQUIRED],
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING]
+										]]
+									]],
+									'description' =>			['type' => XML_STRING],
+									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'opdata' =>					['type' => XML_STRING],
+									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+									'recovery_expression' =>	['type' => XML_STRING],
+									'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING]
+										]]
+									]],
+									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+									'url' =>					['type' => XML_STRING]
+								]]
+							]],
+							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE],
+							'units' =>					['type' => XML_STRING],
+							'url' =>					['type' => XML_STRING],
+							'username' =>				['type' => XML_STRING],
+							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
+							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
+								'name' =>					['type' => XML_STRING | XML_REQUIRED]
+							]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]]
+						]]
+					]],
+					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
+						'macro' =>					['type' => XML_ARRAY, 'rules' => [
+							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING]
+						]]
+					]],
+					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
+						'screen' =>					['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING],
+							'hsize' =>					['type' => XML_STRING],
+							'screen_items' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen_item', 'rules' => [
+								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
+									'x' =>						['type' => XML_STRING],
+									'y' =>						['type' => XML_STRING],
+									'application' =>			['type' => XML_STRING],
+									'colspan' =>				['type' => XML_STRING],
+									'dynamic' =>				['type' => XML_STRING],
+									'elements' =>				['type' => XML_STRING],
+									'halign' =>					['type' => XML_STRING],
+									'height' =>					['type' => XML_STRING],
+									'max_columns' =>			['type' => XML_STRING],
+									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
+									'resourcetype' =>			['type' => XML_STRING],
+									'rowspan' =>				['type' => XML_STRING],
+									'sort_triggers' =>			['type' => XML_STRING],
+									'style' =>					['type' => XML_STRING],
+									'url' =>					['type' => XML_STRING],
+									'valign' =>					['type' => XML_STRING],
+									'width' =>					['type' => XML_STRING]
+								]]
+							]],
+							'vsize' =>					['type' => XML_STRING]
+						]]
+					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING]
+						]]
+					]],
+					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+						'template' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]
 			]],
-			'triggers' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'formatter' => 'formatTriggers', 'rules' => [
-				'trigger' => ['type' => XML_ARRAY, 'rules' => [
-					'expression' => ['type' => XML_STRING | XML_REQUIRED],
-					'name' => ['type' => XML_STRING | XML_REQUIRED],
-					'correlation_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
-					'correlation_tag' => ['type' => XML_STRING],
-					'dependencies' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-						'dependency' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'name' => ['type' => XML_STRING | XML_REQUIRED],
-							'expression' => ['type' => XML_STRING | XML_REQUIRED],
-							'recovery_expression' => ['type' => XML_STRING]
+			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'formatter' => 'formatTriggers', 'rules' => [
+				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
+					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'correlation_mode' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_DISABLED, 'in' => [CXmlConstantValue::TRIGGER_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::TRIGGER_TAG_VALUE => CXmlConstantName::TAG_VALUE]],
+					'correlation_tag' =>		['type' => XML_STRING],
+					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
+						'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+							'recovery_expression' =>	['type' => XML_STRING]
 						]]
 					]],
-					'description' => ['type' => XML_STRING],
-					'manual_close' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-					'opdata' => ['type' => XML_STRING],
-					'priority' => ['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-					'recovery_expression' => ['type' => XML_STRING],
-					'recovery_mode' => ['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
-					'status' => ['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-					'tags' => ['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-						'tag' => ['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-							'tag' => ['type' => XML_STRING | XML_REQUIRED],
-							'value' => ['type' => XML_STRING]
+					'description' =>			['type' => XML_STRING],
+					'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'opdata' =>					['type' => XML_STRING],
+					'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
+					'recovery_expression' =>	['type' => XML_STRING],
+					'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
+					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING]
 						]]
 					]],
-					'type' => ['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
-					'url' => ['type' => XML_STRING]
+					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
+					'url' =>					['type' => XML_STRING]
 				]]
 			]],
 			'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
