@@ -21,8 +21,6 @@
 #include "db.h"
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
 /*
  * 4.4 development database patches
  */
@@ -176,7 +174,7 @@ static int	DBpatch_4030015(void)
 static int	DBpatch_4030016(void)
 {
 	int		i;
-	const char      *values[] = {
+	const char	*values[] = {
 			"alarm_ok",
 			"no_sound",
 			"alarm_information",
