@@ -450,24 +450,19 @@ switch ($data['method']) {
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search],
-					'limit' => $config['search_limit'],
-					'preservekeys' => true
+					'searchWildcardsEnabled' => true,
+					'preservekeys' => true,
+					'limit' => $config['search_limit']
 				];
 
-				$result = API::Host()->get($options);
-
-				if (strstr($search, '*')) {
-					$wildcard_search_results = API::Host()->get($options + ['searchWildcardsEnabled' => true]);
-					$result = array_merge($result, $wildcard_search_results);
-				}
+				$db_result = API::Host()->get($options);
 				break;
 
 			case 'items':
 				$options = [
 					'output' => ['name'],
-					'search' => [
-						'name' => $search
-					],
+					'search' => ['name' => $search],
+					'searchWildcardsEnabled' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
@@ -477,45 +472,32 @@ switch ($data['method']) {
 					'limit' => $config['search_limit']
 				];
 
-				$result = API::Item()->get($options);
-
-				if (strstr($search, '*')) {
-					$wildcard_search_results = API::Item()->get($options + ['searchWildcardsEnabled' => true]);
-					$result = array_merge($result, $wildcard_search_results);
-				}
+				$db_result = API::Item()->get($options);
 				break;
 		}
 
-		if ($result) {
-			// Unset duplicates.
-			foreach ($result as &$row) {
-				$row = $row['name'];
-			}
-			unset($row);
+		$result[] = [
+			'name' => $search,
+			'id' => $search
+		];
 
-			$result = array_flip($result);
+		if ($db_result) {
+			$db_result = array_flip(zbx_objectValues($db_result, 'name'));
 
-			// Remove searched entry from result to add it to the beginning of list.
-			if (array_key_exists($search, $result)) {
-				unset($result[$search]);
+			if (array_key_exists($search, $db_result)) {
+				unset($db_result[$search]);
 			}
 
-			$result = array_keys($result);
+			if (array_key_exists('limit', $data)) {
+				$db_result = array_slice($db_result, 0, $data['limit']);
+			}
 
-			foreach ($result as &$row) {
-				$row = [
-					'name' => $row,
-					'id' => $row
+			foreach ($db_result as $name => $id) {
+				$result[] = [
+					'name' => $name,
+					'id' => $name
 				];
 			}
-			unset($row);
-		}
-
-		// Add wildcard containing pattern to the list of results.
-		array_unshift($result, ['name' => $search, 'id' => $search]);
-
-		if (array_key_exists('limit', $data)) {
-			$result = array_slice($result, 0, $data['limit']);
 		}
 		break;
 

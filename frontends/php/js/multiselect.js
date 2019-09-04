@@ -894,8 +894,16 @@ jQuery(function($) {
 
 	function removeSelected(id, $obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', $obj).remove();
-		$('input[value="' + id + '"]', $obj).remove();
+		$('.selected li[data-id]', $obj).each(function(){
+			if ($(this).data('id') == id) {
+				$(this).remove();
+			}
+		});
+		$('input', $obj).each(function(){
+			if ($(this).val() == id) {
+				$(this).remove();
+			}
+		});
 
 		delete values.selected[id];
 
