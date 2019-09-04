@@ -41,12 +41,14 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 			INTERFACE_TYPE_IPMI => 'ipmi_available'
 		];
 
+		$interface_types = array_keys($type_fields);
+
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
 
-		$hosts_types = (count($fields['interface_type']) === 0) ? array_keys($type_fields) : $fields['interface_type'];
+		$hosts_types = $fields['interface_type'] ? $fields['interface_type'] : $interface_types;
 
-		$hosts_total = array_fill_keys(array_keys($type_fields), 0);
-		$hosts_count = array_fill_keys(array_keys($type_fields), [
+		$hosts_total = array_fill_keys($interface_types, 0);
+		$hosts_count = array_fill_keys($interface_types, [
 			HOST_AVAILABLE_UNKNOWN => 0,
 			HOST_AVAILABLE_TRUE => 0,
 			HOST_AVAILABLE_FALSE => 0
