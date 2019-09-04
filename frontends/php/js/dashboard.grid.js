@@ -1660,6 +1660,11 @@
 			return;
 		}
 
+		if (iterator['div'].hasClass('iterator-alt-content')) {
+			// Returning from alt-content to normal mode.
+			clearIterator($obj, data, iterator);
+		}
+
 		iterator['page'] = response.page;
 		iterator['page_count'] = response.page_count;
 		updateIteratorPager(iterator);
