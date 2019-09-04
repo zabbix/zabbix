@@ -44,7 +44,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
-	"io"
 	"sync/atomic"
 	"time"
 	"zabbix/internal/agent"
@@ -71,6 +70,7 @@ type ResultCache struct {
 	totalValueNum   int32
 	persistValueNum int32
 	retry           *time.Timer
+	timeout         int
 }
 
 type AgentData struct {
@@ -94,7 +94,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	io.Writer
+	Write(data []byte, timeout time.Duration) (err error)
 	Addr() (s string)
 	CanRetry() (enabled bool)
 }
@@ -121,10 +121,11 @@ func (c *ResultCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	if u == nil {
-		u = c.output
+	timeout := len(c.results) * c.timeout
+	if timeout > 60 {
+		timeout = 60
 	}
-	if _, err = u.Write(data); err != nil {
+	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
 			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
 			c.lastError = err
@@ -279,6 +280,7 @@ func newToken() string {
 
 func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
 	c.maxBufferSize = int32(options.BufferSize)
+	c.timeout = options.Timeout
 }
 
 func (c *ResultCache) init() {

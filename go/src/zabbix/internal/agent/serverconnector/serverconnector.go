@@ -329,7 +329,6 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 	ac := &activeConnection{
 		address:   address,
 		localAddr: c.localAddr,
-		timeout:   options.Timeout,
 		tlsConfig: c.tlsConfig,
 	}
 	c.resultCache = resultcache.NewActive(c.clientID, ac)
