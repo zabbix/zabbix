@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
+$page['scripts'] = ['textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -35,6 +36,7 @@ $fields = [
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'opdata' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
@@ -199,6 +201,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 	$description = getRequest('description', '');
+	$opdata = getRequest('opdata', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
 	$recovery_expression = getRequest('recovery_expression', '');
@@ -214,6 +217,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('add')) {
 		$trigger_prototype = [
 			'description' => $description,
+			'opdata' => $opdata,
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
 			'type' => $type,
@@ -245,7 +249,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -263,6 +267,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($db_trigger_prototype['templateid'] == 0) {
 			if ($db_trigger_prototype['description'] !== $description) {
 				$trigger_prototype['description'] = $description;
+			}
+			if ($db_trigger_prototype['opdata'] !== $opdata) {
+				$trigger_prototype['opdata'] = $opdata;
 			}
 			if ($db_trigger_prototype['expression'] !== $expression) {
 				$trigger_prototype['expression'] = $expression;
@@ -542,6 +549,7 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
 		'recovery_mode' => getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
 		'description' => getRequest('description', ''),
+		'opdata' => getRequest('opdata', ''),
 		'type' => getRequest('type', 0),
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
@@ -604,7 +612,7 @@ else {
 
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
-			'recovery_expression'
+			'recovery_expression', 'opdata'
 		],
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],

@@ -198,7 +198,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$pageHeader->addJsFile((new CUrl('jsLoader.php'))
 			->setArgument('ver', ZABBIX_VERSION)
 			->setArgument('lang', CWebUser::$data['lang'])
-			->setArgument('showGuiMessaging', $is_standard_page ? 1 : null)
+			->setArgument('showGuiMessaging', ($is_standard_page && !CWebUser::isGuest()) ? 1 : null)
 			->getUrl()
 		);
 
@@ -215,7 +215,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
-<output class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></output>
+<output class="<?= ZBX_STYLE_MSG_GLOBAL_FOOTER.' '.ZBX_STYLE_MSG_WARNING ?>" id="msg-global-footer"></output>
 <?php
 }
 
@@ -275,10 +275,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 // unset multiple variables
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
-
-if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
-	zbx_add_post_js('initMessages();');
-}
 
 // if a user logs in after several unsuccessful attempts, display a warning
 if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

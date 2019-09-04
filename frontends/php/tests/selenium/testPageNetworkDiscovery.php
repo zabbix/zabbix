@@ -27,7 +27,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(['Name', 'IP range', 'Interval', 'Checks', 'Status']);
+		$this->zbxTestTextPresent(['Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status']);
 		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);
 	}
 
