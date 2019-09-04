@@ -5185,6 +5185,9 @@ table.preprocessing-test-results .rel-container {
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head, .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
   box-shadow: 0 -6px 8px -2px #000; }
 
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-head {
+  box-shadow: 0 6px 8px -2px #000; }
+
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {

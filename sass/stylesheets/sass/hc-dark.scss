@@ -151,6 +151,14 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-iterator {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 6px 8px -2px #000;
+		}
+	}
+}
+
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,

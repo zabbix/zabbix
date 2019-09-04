@@ -211,6 +211,14 @@ $ok-ack-fg-color: #00ff00;
 	}
 }
 
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-iterator {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 6px 8px -2px rgba(0,0,0,.5);
+		}
+	}
+}
+
 // GRAPH AND MAP
 .btn-back-map-container {
 	.btn-back-map {
