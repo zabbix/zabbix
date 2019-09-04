@@ -59,6 +59,10 @@ func (w *mockWriter) Addr() string {
 	return ""
 }
 
+func (w *mockWriter) CanRetry() bool {
+	return false
+}
+
 func TestResultCache(t *testing.T) {
 	agent.Options.BufferSize = 10
 	_ = log.Open(log.Console, log.Debug, "", 0)

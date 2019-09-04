@@ -55,6 +55,10 @@ import (
 	"zabbix/pkg/version"
 )
 
+const (
+	UploadRetryInterval = time.Second
+)
+
 type ResultCache struct {
 	input           chan interface{}
 	output          Uploader
@@ -66,6 +70,7 @@ type ResultCache struct {
 	maxBufferSize   int32
 	totalValueNum   int32
 	persistValueNum int32
+	retry           *time.Timer
 }
 
 type AgentData struct {
@@ -91,9 +96,10 @@ type AgentDataRequest struct {
 type Uploader interface {
 	io.Writer
 	Addr() (s string)
+	CanRetry() (enabled bool)
 }
 
-func (c *ResultCache) flushOutput(u Uploader) {
+func (c *ResultCache) upload(u Uploader) (err error) {
 	if len(c.results) == 0 {
 		return
 	}
@@ -108,7 +114,6 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Version: version.Short(),
 	}
 
-	var err error
 	var data []byte
 
 	if data, err = json.Marshal(&request); err != nil {
@@ -141,6 +146,18 @@ func (c *ResultCache) flushOutput(u Uploader) {
 
 	c.totalValueNum = 0
 	c.persistValueNum = 0
+	return
+}
+
+func (c *ResultCache) flushOutput(u Uploader) {
+	if c.retry != nil {
+		c.retry.Stop()
+		c.retry = nil
+	}
+
+	if c.upload(u) != nil && u.CanRetry() {
+		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.flushOutput(u) })
+	}
 }
 
 // addResult appends received result at the end of results slice
