@@ -157,7 +157,7 @@ func (c *ResultCache) flushOutput(u Uploader) {
 	}
 
 	if c.upload(u) != nil && u.CanRetry() {
-		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.flushOutput(u) })
+		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.FlushOutput(u) })
 	}
 }
 
