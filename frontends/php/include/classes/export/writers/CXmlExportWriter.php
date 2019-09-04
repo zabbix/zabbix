@@ -89,7 +89,7 @@ class CXmlExportWriter extends CExportWriter {
 	 *
 	 * @return bool
 	 */
-	public function mapName($name) {
+	private function mapName($name) {
 		$map = [
 			'groups' => 'group',
 			'templates' => 'template',

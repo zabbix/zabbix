@@ -357,7 +357,6 @@ class CConfigurationExport {
 		}
 
 		if ($proxy_hostids) {
-			// TODO: rewrite via API
 			$db_proxies = DBfetchArray(DBselect(
 				'SELECT h.hostid,h.host'.
 				' FROM hosts h'.
