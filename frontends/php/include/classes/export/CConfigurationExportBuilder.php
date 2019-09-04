@@ -53,7 +53,7 @@ class CConfigurationExportBuilder {
 		$simple_triggers = [];
 
 		if ($data['triggers']) {
-			$simple_triggers = $this->createTriggers($data['triggers']);
+			$simple_triggers = $this->extractSimpleTriggers($data['triggers']);
 		}
 
 		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();
@@ -80,8 +80,9 @@ class CConfigurationExportBuilder {
 	/**
 	 * Build XML data.
 	 *
-	 * @param CXmlTagInterface $schema_class
-	 * @param array            $data
+	 * @param array  $schema   tag schema from validation class
+	 * @param array  $data     export data
+	 * @param string $main_tag tag name for error
 	 *
 	 * @return array
 	 */
@@ -164,7 +165,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function createTriggers(array &$triggers) {
+	protected function extractSimpleTriggers(array &$triggers) {
 		$simple_triggers = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
