@@ -377,14 +377,14 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getCheckBoxList($field, array $config) {
-		$checkbox = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
 
 		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
-			$checkbox->addClass(ZBX_STYLE_HOR_LIST);
+			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
 		}
 
 		foreach ($config as $key => $label) {
-			$checkbox->addItem(
+			$checkbox_list->addItem(
 				(new CCheckBox($field->getName().'[]', $key))
 					->setLabel($label)
 					->setId($field->getName().'_'.$key)
@@ -393,7 +393,7 @@ class CWidgetHelper {
 			);
 		}
 
-		return $checkbox;
+		return $checkbox_list;
 	}
 
 	/**

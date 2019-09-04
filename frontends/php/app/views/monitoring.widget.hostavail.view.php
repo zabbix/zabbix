@@ -39,13 +39,13 @@ foreach ($type_field_names as $key => $value) {
 	$header[STYLE_VERTICAL][] = $value;
 }
 
-if (count($data['hosts_types']) === 1) {
+if (count($data['hosts_types']) == 1) {
 	$counts = $data['hosts_count'][$data['hosts_types'][0]];
 
 	$table = (new CDiv())
 		->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET)
 		->addClass(ZBX_STYLE_TOTALS_LIST)
-		->addClass($data['layout'] == STYLE_HORIZONTAL
+		->addClass(($data['layout'] == STYLE_HORIZONTAL)
 			? ZBX_STYLE_TOTALS_LIST_HORIZONTAL
 			: ZBX_STYLE_TOTALS_LIST_VERTICAL
 		);
