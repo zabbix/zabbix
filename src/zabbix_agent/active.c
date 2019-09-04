@@ -24,7 +24,7 @@
 #include "cfg.h"
 #include "log.h"
 #include "sysinfo.h"
-#include "logs/logfiles.h"
+#include "logfiles/logfiles.h"
 #ifdef _WINDOWS
 #	include "eventlog.h"
 #	include <delayimp.h>

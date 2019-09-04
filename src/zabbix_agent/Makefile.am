@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	logs
+	logfiles
 	
 EXTRA_DIST = \
 	eventlog.c eventlog.h \
@@ -29,7 +29,7 @@ zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
 	libzbxagent.a \
-	logs/libzbxlogs.a \
+	logfiles/libzbxlogfiles.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \

@@ -25,7 +25,7 @@ package zbxlib
 #include "common.h"
 #include "sysinfo.h"
 #include "../src/zabbix_agent/metrics.h"
-#include "../src/zabbix_agent/logs/logfiles.h"
+#include "../src/zabbix_agent/logfiles/logfiles.h"
 
 extern int CONFIG_MAX_LINES_PER_SECOND;
 
