@@ -53,6 +53,13 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson($return)]));
 	}
 
+	/**
+	 * Get graph prototype widget data for graph prototype source.
+	 *
+	 * @param array $fields  Widget form fields data
+	 *
+	 * @return array  Dashboard response data
+	 */
 	protected function doGraphPrototype($fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
@@ -148,6 +155,13 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		];
 	}
 
+	/**
+	 * Get graph prototype widget data for simple graph prototype source.
+	 *
+	 * @param array $fields  Widget form fields data
+	 *
+	 * @return array  Dashboard response data
+	 */
 	protected function doSimpleGraphPrototype($fields) {
 		$options = [
 			'output' => ['itemid', 'name'],
@@ -246,8 +260,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		];
 	}
 
-	protected function inaccessibleError()
-	{
+	/**
+	 * Get graph prototype widget data for no permissions error.
+	 *
+	 * @return array  Dashboard response data
+	 */
+	protected function inaccessibleError() {
 		return [
 			'body' => (new CTableInfo())
 				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))

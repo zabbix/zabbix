@@ -37,6 +37,13 @@ abstract class CControllerWidgetIterator extends CControllerWidget {
 		$this->setValidationRules(self::$iterator_validation_rules);
 	}
 
+	/**
+	 * Set validation rules for input parameters.
+	 *
+	 * @param array $validation_rules  Validation rules for input parameters.
+	 *
+	 * @return object
+	 */
 	protected function setValidationRules(array $validation_rules) {
 		return parent::setValidationRules(array_merge(self::$iterator_validation_rules, $validation_rules));
 	}
@@ -49,10 +56,7 @@ abstract class CControllerWidgetIterator extends CControllerWidget {
 	 * @return int  Page number.
 	 */
 	protected function getIteratorPage($num_widgets) {
-		$page = (int)$this->getInput('page');
-
-		// No less than one, no more than total number of pages.
-		return max(1, min($page, $this->getIteratorPageCount($num_widgets)));
+		return max(1, min((int)$this->getInput('page'), $this->getIteratorPageCount($num_widgets)));
 	}
 
 	/**
