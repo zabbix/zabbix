@@ -36,10 +36,10 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
 
-		if ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+		if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
 			$return = $this->doGraphPrototype($fields);
 		}
-		elseif ($fields['source_type'] === ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+		elseif ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
 			$return = $this->doSimpleGraphPrototype($fields);
 		}
 		else {
