@@ -1844,6 +1844,13 @@
 		}
 
 		if (ready_updated) {
+			/**
+			 * The conception:
+			 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
+			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
+			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' for each new widget added in edit mode.
+			 */
+
 			if (dashboard_was_ready) {
 				methods.registerDataExchangeCommit.call($obj);
 			}
@@ -3384,63 +3391,60 @@
 					data = $this.data('dashboardGrid'),
 					erase;
 
-				if (data['widget_relation_submissions'].length
-						&& !data['widgets'].filter(function(widget) {return !widget['ready']}).length) {
-					$.each(data['widget_relation_submissions'], function(rel_index, rel) {
-						erase = false;
+				$.each(data['widget_relation_submissions'], function(rel_index, rel) {
+					erase = false;
 
-						// No linked widget reference given. Just register as data receiver.
-						if (typeof rel.linkedto === 'undefined') {
-							if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
-								data['widget_relations']['tasks'][rel.uniqueid] = [];
-							}
-
-							data['widget_relations']['tasks'][rel.uniqueid].push({
-								data_name: rel.data_name,
-								callback: rel.callback
-							});
-							erase = true;
+					// No linked widget reference given. Just register as data receiver.
+					if (typeof rel.linkedto === 'undefined') {
+						if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+							data['widget_relations']['tasks'][rel.uniqueid] = [];
 						}
-						/*
-						 * Linked widget reference is given. Register two direction relationship as well as
-						 * register data receiver.
-						 */
-						else {
-							$.each(data['widgets'], function(index, widget) {
-								if (typeof widget['fields']['reference'] !== 'undefined'
-										&& widget['fields']['reference'] === rel.linkedto) {
-									if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
-										data['widget_relations']['relations'][widget.uniqueid] = [];
-									}
-									if (typeof data['widget_relations']['relations'][rel.uniqueid] === 'undefined') {
-										data['widget_relations']['relations'][rel.uniqueid] = [];
-									}
-									if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
-										data['widget_relations']['tasks'][rel.uniqueid] = [];
-									}
 
-									data['widget_relations']['relations'][widget.uniqueid].push(rel.uniqueid);
-									data['widget_relations']['relations'][rel.uniqueid].push(widget.uniqueid);
-									data['widget_relations']['tasks'][rel.uniqueid].push({
-										data_name: rel.data_name,
-										callback: rel.callback
-									});
-									erase = true;
+						data['widget_relations']['tasks'][rel.uniqueid].push({
+							data_name: rel.data_name,
+							callback: rel.callback
+						});
+						erase = true;
+					}
+					/*
+					 * Linked widget reference is given. Register two direction relationship as well as
+					 * register data receiver.
+					 */
+					else {
+						$.each(data['widgets'], function(index, widget) {
+							if (typeof widget['fields']['reference'] !== 'undefined'
+									&& widget['fields']['reference'] === rel.linkedto) {
+								if (typeof data['widget_relations']['relations'][widget.uniqueid] === 'undefined') {
+									data['widget_relations']['relations'][widget.uniqueid] = [];
 								}
-							});
-						}
+								if (typeof data['widget_relations']['relations'][rel.uniqueid] === 'undefined') {
+									data['widget_relations']['relations'][rel.uniqueid] = [];
+								}
+								if (typeof data['widget_relations']['tasks'][rel.uniqueid] === 'undefined') {
+									data['widget_relations']['tasks'][rel.uniqueid] = [];
+								}
 
-						if (erase) {
-							used_indexes.push(rel_index);
-						}
-					});
-
-					for (var i = used_indexes.length - 1; i >= 0; i--) {
-						data['widget_relation_submissions'].splice(used_indexes[i], 1);
+								data['widget_relations']['relations'][widget.uniqueid].push(rel.uniqueid);
+								data['widget_relations']['relations'][rel.uniqueid].push(widget.uniqueid);
+								data['widget_relations']['tasks'][rel.uniqueid].push({
+									data_name: rel.data_name,
+									callback: rel.callback
+								});
+								erase = true;
+							}
+						});
 					}
 
-					methods.callWidgetDataShare.call($this);
+					if (erase) {
+						used_indexes.push(rel_index);
+					}
+				});
+
+				for (var i = used_indexes.length - 1; i >= 0; i--) {
+					data['widget_relation_submissions'].splice(used_indexes[i], 1);
 				}
+
+				methods.callWidgetDataShare.call($this);
 			});
 		},
 
