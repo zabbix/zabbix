@@ -279,6 +279,7 @@ void	zbx_handle_log(void)
 		return;
 
 	LOCK_LOG;
+
 	rotate_log(log_filename);
 
 	UNLOCK_LOG;
