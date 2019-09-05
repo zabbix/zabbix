@@ -80,9 +80,6 @@ static void	common_sigusr_handler(int flags)
 						zabbix_get_log_level_string());
 			}
 			break;
-		case ZBX_RTC_LOGFILE_REDIRECT:
-			zbx_redirect_log();
-			break;
 		default:
 			if (NULL != zbx_sigusr_handler)
 				zbx_sigusr_handler(flags);
@@ -236,10 +233,6 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zbx_signal_process_by_pid(ZBX_RTC_GET_DATA(flags), flags);
 			else
 				zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags), flags);
-			break;
-		case ZBX_RTC_LOGFILE_REDIRECT:
-			zbx_signal_process_by_pid(0, flags);
-			zbx_redirect_log();
 			break;
 	}
 #endif

@@ -272,18 +272,6 @@ static void	unlock_log(void)
 }
 #endif
 
-void	zbx_redirect_log(void)
-{
-	if (LOG_TYPE_FILE != log_type)
-		return;
-
-	LOCK_LOG;
-
-	zbx_redirect_stdio(log_filename);
-
-	UNLOCK_LOG;
-}
-
 void	zbx_handle_log(void)
 {
 	if (LOG_TYPE_FILE != log_type)
