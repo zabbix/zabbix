@@ -53,6 +53,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Validate is used to set default value for invalid fields.
+		$form->validate();
 
 		$config = select_config();
 

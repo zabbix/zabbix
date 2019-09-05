@@ -42,13 +42,24 @@ class CWidgetFieldTags extends CWidgetField {
 	public function setValue($value) {
 		$this->value = (array) $value;
 
-		foreach ($this->value as $index => $val) {
+		return $this;
+	}
+
+	/**
+	 * Get field value. If no value is set, will return default value.
+	 *
+	 * @return mixed
+	 */
+	public function getValue() {
+		$value = parent::getValue();
+
+		foreach ($value as $index => $val) {
 			if ($val['tag'] === '' && $val['value'] === '') {
-				unset($this->value[$index]);
+				unset($value[$index]);
 			}
 		}
 
-		return $this;
+		return $value;
 	}
 
 	/**
