@@ -1266,6 +1266,7 @@
 			autoHide: true,
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
+			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height'],
 			start: function(event) {
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
@@ -1372,8 +1373,7 @@
 						resizeWidget($obj, data, box);
 					}
 				});
-			},
-			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height']
+			}
 		});
 	}
 
