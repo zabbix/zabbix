@@ -219,7 +219,7 @@ out:
  *           json and success is returned.                                    *
  *                                                                            *
  ******************************************************************************/
-static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	char			*values[2] = {NULL, NULL}, *preproc_error = NULL;
 	int			ret = FAIL, i, values_num = 0, single;
@@ -353,7 +353,7 @@ int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	zbx_json_init(&json, 1024);
 
-	if (SUCCEED == (ret = trapper_preproc_test_run(jp, &json, &error)))
+	if (SUCCEED == (ret = zbx_trapper_preproc_test_run(jp, &json, &error)))
 	{
 		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
 	}
