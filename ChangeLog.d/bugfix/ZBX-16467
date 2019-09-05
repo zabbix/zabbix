@@ -1,0 +1,1 @@
+.......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
