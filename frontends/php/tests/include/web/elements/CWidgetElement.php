@@ -86,4 +86,14 @@ class CWidgetElement extends CElement {
 			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
 		};
 	}
+
+	/**
+	 * Delete a widget.
+	 *
+	 * @return boolean
+	 */
+	public function delete() {
+		$this->query("xpath:.//button[@title='Delete']")->one()->click()->waitUntilNotVisible();
+	}
 }
+
