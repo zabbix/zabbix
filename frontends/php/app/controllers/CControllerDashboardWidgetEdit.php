@@ -173,7 +173,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($field->getValue() as $id) {
 				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
-				$$var[$id][] = $field_name;
+				$tmp = &$$var;
+				$tmp[$id][] = $field_name;
 			}
 		}
 
