@@ -15,7 +15,7 @@ A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when import
 ..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
 ..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
 ..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
-A......... [ZBX-16398] fixed selection of discovered services by dservice.get 'dcheckids' property (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get "dcheckids" property (vasilijs)
 ..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
 
 --------------------------------------------------------------------------------
