@@ -122,15 +122,6 @@ class CDiscoveryRule extends CItemGeneral {
 				')';
 		}
 
-		if (((!$options['countOutput'] || ($options['countOutput'] && $options['groupCount']))
-					&& ($this->outputIsRequested('state', $options['output'])
-						|| $this->outputIsRequested('error', $options['output'])))
-				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-			$sqlParts['left_table'] = $this->tableName();
-		}
-
 		// templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
@@ -212,21 +203,14 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// search
 		if (is_array($options['search'])) {
-			$item_data_search = [
-				'search' => [],
-				'startSearch' => $options['startSearch'],
-				'excludeSearch' => $options['excludeSearch'],
-				'searchByAny' => $options['searchByAny'],
-				'searchWildcardsEnabled' => $options['searchWildcardsEnabled']
-			];
-
 			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
-				$item_data_search['search']['error'] = $options['search']['error'];
+				zbx_db_search('item_rtdata ir', ['search' => ['error' => $options['search']['error']]] + $options,
+					$sqlParts
+				);
 				unset($options['search']['error']);
 			}
 
 			zbx_db_search('items i', $options, $sqlParts);
-			zbx_db_search('item_rtdata ir', $item_data_search, $sqlParts);
 		}
 
 		// filter
@@ -240,15 +224,14 @@ class CDiscoveryRule extends CItemGeneral {
 				$options['filter']['lifetime'] = getTimeUnitFilters($options['filter']['lifetime']);
 			}
 
-			$item_data_filter = ['filter' => [], 'searchByAny' => $options['searchByAny']];
-
 			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
-				$item_data_filter['filter']['state'] = $options['filter']['state'];
+				$this->dbFilter('item_rtdata ir', ['filter' => ['state' => $options['filter']['state']]] + $options,
+					$sqlParts
+				);
 				unset($options['filter']['state']);
 			}
 
 			$this->dbFilter('items i', $options, $sqlParts);
-			$this->dbFilter('item_rtdata ir', $item_data_filter, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -2026,7 +2009,13 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
-			if (array_key_exists('left_join', $sqlParts) && array_key_exists('item_rtdata', $sqlParts['left_join'])) {
+			if ((($this->outputIsRequested('state', $options['output'])
+						|| $this->outputIsRequested('error', $options['output'])))
+					|| (is_array($options['search']) && array_key_exists('error', $options['search']))
+					|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
+				$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
+				$sqlParts['left_table'] = $tableName;
+
 				if ($this->outputIsRequested('state', $options['output'])) {
 					$sqlParts = $this->addQuerySelect('ir.state', $sqlParts);
 				}
