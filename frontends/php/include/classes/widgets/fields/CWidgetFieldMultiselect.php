@@ -21,10 +21,18 @@
 
 class CWidgetFieldMultiselect extends CWidgetField {
 
-	// Is selecting multiple objects or a single one?
+	/**
+	 * Is selecting multiple objects or a single one?
+	 *
+	 * @var boolean
+	 */
 	protected $multiple = true;
 
-	// Additional filter parameters used for data selection.
+	/**
+	 * Additional filter parameters used for data selection.
+	 *
+	 * @var array
+	 */
 	protected $filter_parameters = [];
 
 	/**

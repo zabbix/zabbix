@@ -69,7 +69,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($fields['dynamic'] && $dynamic_hostid) {
+		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
@@ -107,6 +107,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				'output' => ['graphid', 'name'],
 				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
 				'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
+				'selectHosts' => ['name'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 				'expandName' => true
 			]);
@@ -114,7 +115,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			// Collect graphs based on the graph prototype.
 			foreach ($graphs_created_all as $graph) {
 				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
-					$graphs_collected[$graph['graphid']] = $graph['name'];
+					if (count($graph['hosts']) == 1 || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
+						$graphs_collected[$graph['graphid']] = $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name'];
+					}
+					else {
+						$graphs_collected[$graph['graphid']] = $graph['name'];
+					}
 				}
 			}
 			natsort($graphs_collected);
@@ -171,7 +177,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
-		if ($fields['dynamic'] && $dynamic_hostid) {
+		if ($fields['dynamic'] == WIDGET_DYNAMIC_ITEM && $dynamic_hostid) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
@@ -220,7 +226,8 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 				}
 			}
 			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
-				$items_collected[$item['itemid']] = $item['name_expanded'];
+				$items_collected[$item['itemid']] =
+					$item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
 			}
 			natsort($items_collected);
 		}

@@ -102,7 +102,7 @@ class CWidgetConfig {
 			$ret[$type] = [
 				'header' => $name,
 				'size' => $dimensions[$type],
-				'iterator' => self::isIterator($type),
+				'iterator' => self::isIterator($type)
 			];
 		}
 
