@@ -915,6 +915,9 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 			case '\t':
 				break;
 			case ',':
+				if (NULL != start)
+					break;
+
 				if (0 == parsed_name)
 				{
 					ret = zbx_jsonpath_error(end);
