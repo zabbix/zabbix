@@ -1294,10 +1294,26 @@
 
 				// 1. Prevent physically resizing widgets beyond the allowed limits.
 				// 2. Prevent browser's vertical scrollbar from appearing when resizing right size of the widgets.
+
+				if (ui.position.left < 0) {
+					ui.size.width += ui.position.left;
+					ui.position.left = 0;
+				}
+
+				if (ui.position.top < 0) {
+					ui.size.height += ui.position.top;
+					ui.position.top = 0;
+				}
+
 				widget['div'].css({
-					'max-width': data['cell-width'] * data['options']['max-columns'] - Math.max(0, ui.position.left),
-					'max-height':
-						data.options['widget-max-rows'] * data.options['widget-height'] - Math.max(0, ui.position.top)
+					'left': ui.position.left,
+					'top': ui.position.top,
+					'max-width': Math.min(ui.size.width,
+						data['cell-width'] * data['options']['max-columns'] - ui.position.left
+					),
+					'max-height': Math.min(ui.size.height,
+						data.options['widget-max-rows'] * data.options['widget-height'] - ui.position.top
+					)
 				});
 
 				doWidgetResize($obj, data, widget);
