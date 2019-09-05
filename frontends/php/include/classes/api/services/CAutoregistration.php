@@ -58,7 +58,9 @@ class CAutoregistration extends CApiService {
 		while ($row = DBfetch($result)) {
 			$db_autoreg[] = $row;
 		}
-		$db_autoreg = CArrayHelper::renameObjectsKeys($db_autoreg, ['autoreg_tls_accept' => 'tls_accept']);
+		if ($this->outputIsRequested('autoreg_tls_accept', $options['output'])) {
+			$db_autoreg = CArrayHelper::renameObjectsKeys($db_autoreg, ['autoreg_tls_accept' => 'tls_accept']);
+		}
 		$db_autoreg = $this->unsetExtraFields($db_autoreg, ['configid'], []);
 
 		return $db_autoreg[0];
