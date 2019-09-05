@@ -1200,7 +1200,7 @@
 			handle: widget['content_header'],
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
-			start: function(event, ui) {
+			start: function() {
 				data.calculated = {
 					'left-max': $obj.width() - widget['div'].width(),
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - widget['div'].height()
@@ -1226,7 +1226,7 @@
 
 				doWidgetPositioning($obj, widget['div'], data);
 			},
-			stop: function(event, ui) {
+			stop: function() {
 				delete data.calculated;
 				delete data.undo_pos;
 
@@ -1266,7 +1266,7 @@
 			autoHide: true,
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
-			start: function(event, ui) {
+			start: function(event) {
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
@@ -1316,20 +1316,18 @@
 					}
 				}
 			},
-			stop: function(event) {
+			stop: function() {
 				delete widget.prev_pos;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
-				stopWidgetPositioning($obj, $(event.target), data);
+				stopWidgetPositioning($obj, widget['div'], data);
 
 				if (widget['iterator']) {
 					$('.dashbrd-grid-iterator-container', widget['div']).removeAttr('style');
 				}
 
-				// Hide resize handles for situation when mouse button was released outside dashboard container area.
-				if (widget['div'].has(event.toElement).length == 0) {
-					widget['div'].find('.ui-resizable-handle').hide();
-				}
+				// Hide resize handles if mouse button was released outside dashboard container area.
+				widget['div'].find('.ui-resizable-handle').hide();
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
 				if (SF) {
