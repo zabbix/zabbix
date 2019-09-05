@@ -187,7 +187,7 @@ static int	DBpatch_4030016(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; i < ARRSIZE(values); i++)
+	for (i = 0; i < (int)ARRSIZE(values); i++)
 	{
 		if (ZBX_DB_OK > DBexecute(
 				"update profiles"
