@@ -3407,19 +3407,21 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-container {
 	position: absolute;
-	top: 0.25rem;
-	left: 0.25rem;
-	right: 0.25rem;
-	bottom: 0.25rem;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: .25rem;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 }
 
 .dashbrd-grid-widget-head {
 	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
 	height: 2rem;
 	padding-left: 10px;
 	display: flex;
@@ -3538,6 +3540,22 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
+		}
+	}
+
+	&.ui-resizable-resizing.resizing-top {
+
+		.dashbrd-grid-widget-container {
+			top: auto;
+			bottom: 0;
+		}
+	}
+
+	&.ui-resizable-resizing.resizing-left {
+
+		.dashbrd-grid-widget-container {
+			left: auto;
+			right: 0;
 		}
 	}
 }
@@ -3767,14 +3785,21 @@ $form-icon-btn: (
 
 .dashbrd-grid-container.dashbrd-mode-edit {
 
+	$resizing_background_color: darken($body-bg-color, 4%);
+
 	.dashbrd-grid-widget {
 
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
 		}
+
+		&.ui-resizable-resizing {
+			background-color: $resizing_background_color;
+		}
 	}
 
 	.dashbrd-grid-iterator {
+
 		.dashbrd-grid-iterator-head {
 			margin-top: 0;
 			height: 2rem;
@@ -3794,19 +3819,23 @@ $form-icon-btn: (
 			opacity: 1;
 		}
 
+		&.dashbrd-grid-iterator-focus, &:hover {
+
+			.dashbrd-grid-iterator-head {
+				opacity: 0;
+			}
+		}
+
 		&.ui-resizable-resizing {
-			background-color: $body-bg-color;
+			background-color: $resizing_background_color;
 
 			// Fix for Opera, for disappearing iterator headers while resizing.
 			.dashbrd-grid-iterator-head {
 				opacity: 1;
 			}
-		}
 
-		&.dashbrd-grid-iterator-focus, &:hover {
-
-			.dashbrd-grid-iterator-head {
-				opacity: 1;
+			.dashbrd-grid-iterator-content {
+				background-color: $resizing_background_color;
 			}
 		}
 
@@ -3815,6 +3844,19 @@ $form-icon-btn: (
 			.dashbrd-grid-iterator-content {
 				padding-top: 2rem;
 				background-color: $ui-bg-color;
+			}
+		}
+	}
+
+	&:not(.dashbrd-resizing) {
+
+		.dashbrd-grid-iterator {
+
+			&.dashbrd-grid-iterator-focus, &:hover {
+
+				.dashbrd-grid-iterator-head {
+					opacity: 1;
+				}
 			}
 		}
 	}
@@ -3832,15 +3874,6 @@ $form-icon-btn: (
 				background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
 			}
 		}
-	}
-
-	.dashbrd-grid-widget-mask {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		background: transparent;
-		z-index: 80;
-		display: none;
 	}
 
 	.dashbrd-grid-widget-draggable {

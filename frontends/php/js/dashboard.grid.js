@@ -32,7 +32,6 @@
 				'content': 'dashbrd-grid-iterator-content',
 				'focus': 'dashbrd-grid-iterator-focus',
 				'actions': 'dashbrd-grid-iterator-actions',
-				'mask': 'dashbrd-grid-widget-mask',
 				'hidden_header': 'dashbrd-grid-iterator-hidden-header'
 
 			},
@@ -43,7 +42,6 @@
 				'content': 'dashbrd-grid-widget-content',
 				'focus': 'dashbrd-grid-widget-focus',
 				'actions': 'dashbrd-grid-widget-actions',
-				'mask': 'dashbrd-grid-widget-mask',
 				'hidden_header': 'dashbrd-grid-widget-hidden-header'
 			},
 			classes = widget['iterator'] ? iterator_classes : widget_classes;
@@ -181,12 +179,10 @@
 				.toggleClass('new-widget', widget['new_widget']);
 
 		if (!widget['parent']) {
-			$div
-				.append($('<div>', {'class': classes['mask']}))
-				.css({
-					'min-height': data['options']['widget-height'] + 'px',
-					'min-width': data['options']['widget-width'] + '%'
-				});
+			$div.css({
+				'min-height': data['options']['widget-height'] + 'px',
+				'min-width': data['options']['widget-width'] + '%'
+			});
 		}
 
 		$div.append(widget['container']);
@@ -411,7 +407,7 @@
 			cell_w = data['cell-width'],
 			cell_h = data['options']['widget-height'];
 
-		if (widget['iterator'] && data['pos-action'] === 'resize') {
+		if (data['pos-action'] === 'resize') {
 			// 0.49 refers to pixels in the following calculations.
 			var place_w = Math.round($div.width() / cell_w - 0.49),
 				place_h = Math.round($div.height() / cell_h - 0.49),
@@ -467,11 +463,7 @@
 	function startWidgetPositioning($obj, data, widget, action) {
 		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
-
-		var placeholder_hidden = widget['iterator'] && action === 'resize';
-		data['placeholder'].css('visibility', placeholder_hidden ? 'hidden' : 'visible').show();
-
-		$('.dashbrd-grid-widget-mask', widget['div']).show();
+		data['placeholder'].css('visibility', (action === 'resize') ? 'hidden' : 'visible').show();
 		widget['div'].addClass('dashbrd-grid-widget-draggable');
 		data.new_widget_placeholder.container.hide();
 		resetCurrentPositions(data['widgets']);
@@ -1165,7 +1157,6 @@
 
 		data['placeholder'].hide();
 		data['pos-action'] = '';
-		$('.dashbrd-grid-widget-mask', $div).hide();
 
 		$div.removeClass('dashbrd-grid-widget-draggable');
 
@@ -1268,6 +1259,11 @@
 			minWidth: getCurrentCellWidth(data),
 			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height'],
 			start: function(event) {
+				$obj.addClass('dashbrd-resizing');
+
+				// Hide all other widgets resize handles which may appear on fast mouse movement.
+				$obj.find('.ui-resizable-handle').not(widget['div'].find('.ui-resizable-handle')).hide();
+
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
 				});
@@ -1319,19 +1315,10 @@
 
 				doWidgetResize($obj, data, widget);
 
-				if (widget['iterator']) {
-					if (getIteratorTooSmallState(widget)) {
-						// Do not align size of iterator to the dashboard grid while in too small state.
-						$('.dashbrd-grid-iterator-container', widget['div']).removeAttr('style');
-					}
-					else {
-						// Align size of iterator to the dashboard grid.
-						$('.dashbrd-grid-iterator-container', widget['div']).css({
-							'width': data['placeholder'].width(),
-							'height': data['placeholder'].height()
-						});
-					}
-				}
+				widget['container'].css({
+					'width': data['placeholder'].width(),
+					'height': data['placeholder'].height()
+				});
 			},
 			stop: function() {
 				delete widget.prev_pos;
@@ -1339,9 +1326,7 @@
 				setResizableState('enable', data.widgets, widget.uniqueid);
 				stopWidgetPositioning($obj, widget['div'], data);
 
-				if (widget['iterator']) {
-					$('.dashbrd-grid-iterator-container', widget['div']).removeAttr('style');
-				}
+				widget['container'].removeAttr('style');
 
 				// Hide resize handles if mouse button was released outside dashboard container area.
 				widget['div'].find('.ui-resizable-handle').hide();
@@ -1373,6 +1358,8 @@
 						resizeWidget($obj, data, box);
 					}
 				});
+
+				$obj.removeClass('dashbrd-resizing');
 			}
 		});
 	}
