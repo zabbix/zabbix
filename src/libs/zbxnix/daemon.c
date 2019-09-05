@@ -81,7 +81,7 @@ static void	common_sigusr_handler(int flags)
 			}
 			break;
 		case ZBX_RTC_LOGFILE_REDIRECT:
-			zbx_log_redirect();
+			zbx_redirect_log();
 			break;
 		default:
 			if (NULL != zbx_sigusr_handler)
@@ -239,7 +239,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			break;
 		case ZBX_RTC_LOGFILE_REDIRECT:
 			zbx_signal_process_by_pid(0, flags);
-			zbx_log_redirect();
+			zbx_redirect_log();
 			break;
 	}
 #endif
