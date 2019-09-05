@@ -368,3 +368,6 @@ int	zbx_trapper_preproc_test(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	return ret;
 }
 
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/trapper/trapper_preproc_test_run.c"
+#endif
