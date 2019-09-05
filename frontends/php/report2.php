@@ -194,14 +194,17 @@ elseif (hasRequest('filter_hostid')) {
 			])
 	));
 
-	$triggerOptions = [
-		'output' => ['triggerid', 'description', 'expression', 'value'],
-		'expandDescription' => true,
-		'monitored' => true,
-		'selectHosts' => ['name'],
-		'filter' => [],
+	$trigger_options = [
+		'output' => ['triggerid', 'description', 'expression', 'value', 'status'],
+		'selectHosts' => ['name', 'status'],
+		'selectGroups' => ['groupid'],
+		'selectItems' => ['status'],
 		'hostids' => null,
-		'limit' => $config['search_limit'] + 1
+		'groupids' => null,
+		'expandDescription' => true,
+		'filter' => [],
+		'limit' => $config['search_limit'] + 1,
+		'preservekeys' => true
 	];
 
 	/*
@@ -216,202 +219,292 @@ elseif (hasRequest('filter_hostid')) {
 
 	$filter_column = new CFormList();
 
-	// report by template
+	$filter_hostid = getRequest('filter_hostid');
+	$filter_groupid = getRequest('filter_groupid');
+	$tpl_triggerid = getRequest('tpl_triggerid');
+	$hostgroupid = getRequest('hostgroupid');
+
+	$filter_groupids = null;
+
+	$group_options = [
+		'output' => ['name'],
+		'with_triggers' => true,
+		'preservekeys' => true
+	];
+
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-		// trigger options
-		if (!empty($_REQUEST['filter_hostid'])) {
-			$hosts = API::Host()->get([
-				'output' => ['hostid'],
-				'templateids' => $_REQUEST['filter_hostid']
-			]);
+		$group_options['templated_hosts'] = true;
+	}
+	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
+		$group_options['monitored_hosts'] = true;
+	}
 
-			$triggerOptions['hostids'] = zbx_objectValues($hosts, 'hostid');
+	$groups = API::HostGroup()->get($group_options);
+	$groups = enrichParentGroups($groups);
+	CArrayHelper::sort($groups, ['name']);
+
+	if ($filter_groupid != 0 && array_key_exists($filter_groupid, $groups)) {
+		$filter_groupids = [$filter_groupid];
+		$parent = $groups[$filter_groupid]['name'].'/';
+
+		foreach ($groups as $groupid => $group) {
+			if (strpos($group['name'], $parent) === 0) {
+				$filter_groupids[] = $groupid;
+			}
 		}
-		if (isset($_REQUEST['tpl_triggerid']) && !empty($_REQUEST['tpl_triggerid'])) {
-			$triggerOptions['filter']['templateid'] = $_REQUEST['tpl_triggerid'];
-		}
+	}
+	else {
+		/*
+		 * In case user has selected a "Template group" in mode "By trigger template" and then switched to
+		 * mode "By host", the chosen $filter_groupid will not be in $groups. So reset "Host group" dropdown in
+		 * mode "By host" to "all".
+		 */
+		$filter_groupid = 0;
+	}
 
-		// filter template group
-		$groupsComboBox = (new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();'))
-				->setAttribute('autofocus', 'autofocus');
-		$groupsComboBox->addItem(0, _('all'));
+	// Prepare Template groups and Host groups dropdown depending on selected mode.
+	$groups_cmb_box = (new CComboBox('filter_groupid', $filter_groupid, 'javascript: submit();'))
+		->setAttribute('autofocus', 'autofocus')
+		->addItem(0, _('all'));
 
-		$groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'templated_hosts' => true,
+	foreach ($groups as $groupid => $group) {
+		$groups_cmb_box->addItem($groupid, $group['name']);
+	}
+
+	// Report by template.
+	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		$templates = API::Template()->get([
+			'output' => ['name'],
+			'selectGroups' => ['groupid'],
+			'groupids' => $filter_groupids,
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = enrichParentGroups($groups);
+		CArrayHelper::sort($templates, ['name']);
 
-		order_result($groups, 'name');
-
-		foreach ($groups as $group) {
-			$groupsComboBox->addItem($group['groupid'], $group['name']);
+		if ($filter_hostid != 0 && !array_key_exists($filter_hostid, $templates)) {
+			/*
+			 * In case user has selected a "Template group" and "Template" and then changed "Template group" to a
+			 * different one, it is possible that the previous template does not belong to that group.
+			 * Reset the "Template" to "all".
+			 */
+			$filter_hostid = 0;
 		}
-		$filter_column->addRow(_('Template group'), $groupsComboBox);
 
-		// filter template
-		$templateComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
-		$templateComboBox->addItem(0, _('all'));
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'selectHosts' => ['name'],
+			'selectItems' => ['status'],
+			'templateids' => ($filter_hostid == 0) ? array_keys($templates) : $filter_hostid,
+			'groupids' => $filter_groupids,
+			'templated' => true,
+			'filter' => ['status' => TRIGGER_STATUS_ENABLED, 'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
+			'sortfield' => 'description',
+			'preservekeys' => true
+		]);
 
-		if (getRequest('filter_groupid')) {
-			$filter_groupids = [getRequest('filter_groupid')];
-			$parent = $groups[getRequest('filter_groupid')]['name'].'/';
-			foreach ($groups as $group) {
-				if (strpos($group['name'], $parent) === 0) {
-					$filter_groupids[] = $group['groupid'];
+		foreach ($triggers as $triggerid => $trigger) {
+			foreach ($trigger['items'] as $item) {
+				if ($item['status'] != ITEM_STATUS_ACTIVE) {
+					unset($triggers[$triggerid]);
 				}
 			}
 		}
-		else {
-			$filter_groupids = null;
+
+		if ($tpl_triggerid != 0 && !array_key_exists($tpl_triggerid, $triggers)) {
+			/*
+			 * In case user has selected "Template" and "Template trigger" and then changed "Template" to a different
+			 * one, it is possible that the previous template trigger does not blong to that template.
+			 * Reset "Template" to "all".
+			 */
+			$tpl_triggerid = 0;
 		}
 
-		$templates = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'groupids' => $filter_groupids,
-			'with_triggers' => true
-		]);
-		order_result($templates, 'name');
-
-		$templateIds = [];
-		foreach ($templates as $template) {
-			$templateIds[$template['templateid']] = $template['templateid'];
-
-			$templateComboBox->addItem($template['templateid'], $template['name']);
-		}
-		$filter_column->addRow(_('Template'), $templateComboBox);
-
-		// filter trigger
-		$triggerComboBox = new CComboBox('tpl_triggerid', getRequest('tpl_triggerid', 0), 'javascript: submit()');
-		$triggerComboBox->addItem(0, _('all'));
-
-		$sqlCondition = empty($_REQUEST['filter_hostid'])
-			? ' AND '.dbConditionInt('h.hostid', $templateIds)
-			: ' AND h.hostid='.zbx_dbstr($_REQUEST['filter_hostid']);
-
-		$sql =
-			'SELECT DISTINCT t.triggerid,t.description,h.name'.
-			' FROM triggers t,hosts h,items i,functions f'.
-			' WHERE f.itemid=i.itemid'.
-				' AND h.hostid=i.hostid'.
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.triggerid=f.triggerid'.
-				' AND h.status='.HOST_STATUS_TEMPLATE.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-					$sqlCondition.
-			' ORDER BY t.description';
-		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
+		$trigger_cmb_box = (new CComboBox('tpl_triggerid', $tpl_triggerid, 'javascript: submit()'))
+			->addItem(0, _('all'));
 
 		foreach ($triggers as $trigger) {
-			$templateName = empty($_REQUEST['filter_hostid']) ? $trigger['name'].NAME_DELIMITER : '';
+			$template_name = ($filter_hostid == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '';
 
-			$triggerComboBox->addItem($trigger['triggerid'], $templateName.$trigger['description']);
+			if (!array_key_exists('templateid', $trigger_options['filter'])) {
+				$trigger_options['filter']['templateid'] = [];
+			}
+
+			$trigger_options['filter']['templateid'][] = $trigger['triggerid'];
+
+			$trigger_cmb_box->addItem($trigger['triggerid'], $template_name.$trigger['description']);
 		}
 
-		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
-			unset($triggerOptions['filter']['templateid']);
+		// Filter triggers by specific template trigger. Overwrites previous IDs of a specific trigger is selected.
+		if ($tpl_triggerid != 0) {
+			$trigger_options['filter']['templateid'] = [$tpl_triggerid];
 		}
 
-		$filter_column->addRow(_('Template trigger'), $triggerComboBox);
-
-		// filter host group
-		$hostGroupsComboBox = new CComboBox('hostgroupid', getRequest('hostgroupid', 0), 'javascript: submit()');
-		$hostGroupsComboBox->addItem(0, _('all'));
-
-		$groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'hostids' => $triggerOptions['hostids'],
+		$host_groups = API::HostGroup()->get([
+			'output' => ['name'],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
-		$groups = enrichParentGroups($groups);
+		$host_groups = enrichParentGroups($host_groups);
+		CArrayHelper::sort($host_groups, ['name']);
 
-		order_result($groups, 'name');
+		$groupids = [];
 
-		if (hasRequest('hostgroupid') && getRequest('hostgroupid')) {
-			$triggerOptions['groupids'] = [getRequest('hostgroupid')];
-			if (array_key_exists(getRequest('hostgroupid'), $groups)) {
-				$parent = $groups[getRequest('hostgroupid')]['name'].'/';
-				foreach ($groups as $group) {
+		if ($hostgroupid != 0) {
+			$groupids[$hostgroupid] = true;
+
+			if (array_key_exists($hostgroupid, $host_groups)) {
+				$parent = $host_groups[$hostgroupid]['name'].'/';
+
+				foreach ($host_groups as $groupid => $group) {
 					if (strpos($group['name'], $parent) === 0) {
-						$triggerOptions['groupids'][] = $group['groupid'];
+						$groupids[$groupid] = true;
+					}
+				}
+
+				/*
+				 * Collect group IDs for trigger selecetion to narrow down search results if all template groups are
+				 * selected.
+				 */
+				if ($filter_groupid == 0) {
+					$trigger_options['groupids'] = array_keys($groupids);
+				}
+			}
+		}
+
+		$triggers = API::Trigger()->get($trigger_options);
+
+		/*
+		 * Check if result belongs to template or host. If resulting triggers belong to template, continue searching
+		 * till host is reached. If resulting triggers belong to host, just store them for later use.
+		 */
+		if ($trigger_options['filter']['templateid']) {
+			$host_triggers = [];
+
+			while ($trigger_options['filter']['templateid']) {
+				$trigger_options['filter']['templateid'] = [];
+
+				foreach ($triggers as $trigger) {
+					if ($trigger['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
+						$trigger_options['filter']['templateid'][] = $trigger['triggerid'];
+					}
+					else {
+						$host_triggers[$trigger['triggerid']] = $trigger;
+					}
+				}
+
+				if ($trigger_options['filter']['templateid']) {
+					$triggers = API::Trigger()->get($trigger_options);
+				}
+			}
+
+			$triggers = $host_triggers;
+		}
+
+		/*
+		 * Filter by selected host group. This filtering is required because some results may have been on template
+		 * level rather than host level, and hosts could belong to different host groups. That's why
+		 * $trigger_options['groupids'] is not in API request and this post-fileting by groups is necessary.
+		 */
+		if ($filter_groupid != 0 && $groupids) {
+			$triggers_tmp = $triggers;
+			$triggers = [];
+
+			foreach ($triggers_tmp as $triggerid => $trigger) {
+				foreach ($trigger['groups'] as $group) {
+					if (array_key_exists($group['groupid'], $groupids)) {
+						$trigger['host_name'] = $trigger['hosts'][0]['name'];
+						$triggers[$trigger['triggerid']] = $trigger;
 					}
 				}
 			}
 		}
 		else {
-			$triggerOptions['groupids'] = null;
+			foreach ($triggers as $triggerid => &$trigger) {
+				$trigger['host_name'] = $trigger['hosts'][0]['name'];
+			}
+			unset($trigger);
 		}
 
-		foreach ($groups as $group) {
-			$hostGroupsComboBox->addItem($group['groupid'], $group['name']);
+		/*
+		 * Filter "monitored". Since "monitored" property limits trigger.get to host level, it didn't go in API request.
+		 * So this post-filtering by item status, host status and trigger status is required.
+		 */
+		foreach ($triggers as $triggerid => $trigger) {
+			if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+				unset($triggers[$triggerid]);
+				continue;
+			}
+
+			foreach ($trigger['hosts'] as $host) {
+				if ($host['status'] != HOST_STATUS_MONITORED) {
+					unset($triggers[$triggerid]);
+				}
+			}
+
+			foreach ($trigger['items'] as $item) {
+				if ($item['status'] == ITEM_STATUS_DISABLED) {
+					unset($triggers[$triggerid]);
+				}
+			}
 		}
 
-		if (isset($_REQUEST['hostgroupid']) && !isset($groups[$_REQUEST['hostgroupid']])) {
-			unset($triggerOptions['groupids']);
+		// Build combo boxes and add them to the column.
+		$host_groups_cmb_box = (new CComboBox('hostgroupid', $hostgroupid, 'javascript: submit()'))
+			->addItem(0, _('all'));
+
+		foreach ($host_groups as $groupid => $group) {
+			$host_groups_cmb_box->addItem($groupid, $group['name']);
 		}
 
-		$filter_column->addRow(_('Host group'), $hostGroupsComboBox);
+		$template_cmb_box = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
+			->addItem(0, _('all'));
+
+		foreach ($templates as $templateid => $template) {
+			$template_cmb_box->addItem($templateid, $template['name']);
+		}
+
+		$filter_column
+			->addRow(_('Template group'), $groups_cmb_box)
+			->addRow(_('Template'), $template_cmb_box)
+			->addRow(_('Template trigger'), $trigger_cmb_box)
+			->addRow(_('Host group'), $host_groups_cmb_box);
 	}
-	// report by host
+	// Report by host.
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
-		// filter host group
-		$groupsComboBox = (new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();'))
-			->setAttribute('autofocus', 'autofocus');
-		$groupsComboBox->addItem(0, _('all'));
-
-		$groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
+		$hosts = API::Host()->get([
+			'output' => ['name'],
+			'groupids' => $filter_groupids,
 			'monitored_hosts' => true,
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = enrichParentGroups($groups);
+		CArrayHelper::sort($hosts, ['name']);
 
-		order_result($groups, 'name');
+		$trigger_options['groupids'] = $filter_groupids;
+		$trigger_options['monitored'] = true;
 
-		foreach ($groups as $group) {
-			$groupsComboBox->addItem($group['groupid'], $group['name']);
-		}
-		$filter_column->addRow(_('Host group'), $groupsComboBox);
-
-		// filter host
-		$hostsComboBox = new CComboBox('filter_hostid', $_REQUEST['filter_hostid'], 'javascript: submit();');
-		$hostsComboBox->addItem(0, _('all'));
-		if (getRequest('filter_groupid')) {
-			$filter_groupids = [getRequest('filter_groupid')];
-			$parent = $groups[getRequest('filter_groupid')]['name'].'/';
-			foreach ($groups as $group) {
-				if (strpos($group['name'], $parent) === 0) {
-					$filter_groupids[] = $group['groupid'];
-				}
-			}
-		}
-		else {
-			$filter_groupids = null;
+		if ($filter_hostid != 0 && array_key_exists($filter_hostid, $hosts)) {
+			$trigger_options['hostids'] = $filter_hostid;
 		}
 
-		$hosts = API::Host()->get([
-			'groupids' => $filter_groupids,
-			'output' => ['hostid', 'name'],
-			'monitored_hosts' => true,
-			'with_triggers' => true
-		]);
-		order_result($hosts, 'name');
-		$hosts = zbx_toHash($hosts, 'hostid');
+		$triggers = API::Trigger()->get($trigger_options);
 
-		foreach ($hosts as $host) {
-			$hostsComboBox->addItem($host['hostid'], $host['name']);
+		foreach ($triggers as $triggerid => &$trigger) {
+			$trigger['host_name'] = $trigger['hosts'][0]['name'];
 		}
-		$filter_column->addRow(_('Host'), $hostsComboBox);
+		unset($trigger);
 
-		// trigger options
-		$triggerOptions['groupids'] = $filter_groupids;
-		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']])) {
-			$triggerOptions['hostids'] = $_REQUEST['filter_hostid'];
+		$hosts_cmb_box = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
+			->addItem(0, _('all'));
+
+		foreach ($hosts as $hostid => $host) {
+			$hosts_cmb_box->addItem($hostid, $host['name']);
 		}
+
+		$filter_column
+			->addRow(_('Host group'), $groups_cmb_box)
+			->addRow(_('Host'), $hosts_cmb_box);
 	}
 
 	$reportWidget->addItem(
@@ -428,13 +521,6 @@ elseif (hasRequest('filter_hostid')) {
 	 * Triggers
 	 */
 	$triggerTable = (new CTableInfo())->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')]);
-
-	$triggers = API::Trigger()->get($triggerOptions);
-
-	foreach ($triggers as &$trigger) {
-		$trigger['host_name'] = $trigger['hosts'][0]['name'];
-	}
-	unset($trigger);
 
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
