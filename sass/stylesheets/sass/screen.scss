@@ -3775,8 +3775,6 @@ $form-icon-btn: (
 	}
 
 	.dashbrd-grid-iterator {
-		background-color: $body-bg-color;
-
 		.dashbrd-grid-iterator-head {
 			margin-top: 0;
 			height: 2rem;
@@ -3796,9 +3794,10 @@ $form-icon-btn: (
 			opacity: 1;
 		}
 
-		// Fix for Opera, for disappearing iterator headers while resizing.
 		&.ui-resizable-resizing {
+			background-color: $body-bg-color;
 
+			// Fix for Opera, for disappearing iterator headers while resizing.
 			.dashbrd-grid-iterator-head {
 				opacity: 1;
 			}
