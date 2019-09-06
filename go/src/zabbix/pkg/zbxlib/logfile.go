@@ -40,9 +40,9 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	metric->key = key;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	metric->flags = flags;
+	metric->flags = flags | ZBX_METRIC_FLAG_NEW;
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
-	metric->flags = ZBX_METRIC_FLAG_NEW;
+
 	return metric;
 }
 
