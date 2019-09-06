@@ -355,7 +355,7 @@ func main() {
 	log.Infof("using configuration file: %s", confFlag)
 
 	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
-	manager = scheduler.NewManager()
+	manager, err = scheduler.NewManager(agent.Options)
 	listener = serverlistener.New(manager)
 
 	manager.Start()

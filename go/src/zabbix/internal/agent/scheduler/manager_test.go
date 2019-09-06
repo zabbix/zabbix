@@ -614,7 +614,7 @@ func TestTaskCreate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
-	manager := NewManager()
+	manager, _ := NewManager(agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -667,7 +667,7 @@ func TestTaskUpdate(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
-	manager := NewManager()
+	manager, _ := NewManager(agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -735,7 +735,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
-	manager := NewManager()
+	manager, _ := NewManager(agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
@@ -791,7 +791,7 @@ func TestTaskDelete(t *testing.T) {
 		plugin.RegisterMetric(p, name, name, "Debug.")
 	}
 
-	manager := NewManager()
+	manager, _ := NewManager(agent.Options)
 
 	items := []*clientItem{
 		&clientItem{itemid: 1, delay: "151", key: "debug1"},
