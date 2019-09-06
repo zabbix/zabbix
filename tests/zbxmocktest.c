@@ -174,6 +174,7 @@ char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
+char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
 void	zbx_on_exit(int ret)

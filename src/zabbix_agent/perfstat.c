@@ -68,7 +68,8 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error)
+zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error)
 {
 	const char		*__function_name = "add_perf_counter";
 	zbx_perf_counter_data_t	*cptr = NULL;
@@ -98,12 +99,13 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 				cptr->name = zbx_strdup(NULL, name);
 			cptr->counterpath = zbx_strdup(NULL, counterpath);
 			cptr->interval = interval;
+			cptr->lang = lang;
 			cptr->value_current = -1;
 			cptr->value_array = (double *)zbx_malloc(cptr->value_array, sizeof(double) * interval);
 
 			/* add the counter to the query */
 			pdh_status = zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, counterpath,
-					&cptr->handle);
+					lang, &cptr->handle);
 
 			cptr->next = ppsd.pPerfCounterList;
 			ppsd.pPerfCounterList = cptr;
@@ -119,17 +121,22 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 		}
 
 		if (NULL != name && 0 == strcmp(cptr->name, name))
+		{
 			break;
+		}
 
-		if (NULL == name && 0 == strcmp(cptr->counterpath, counterpath) && cptr->interval == interval)
+		if (NULL == name && 0 == strcmp(cptr->counterpath, counterpath) &&
+				cptr->interval == interval && cptr->lang == lang)
+		{
 			break;
+		}
 	}
 
 	if (FAIL == added)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() counter '%s' already exists", __function_name, counterpath);
 	}
-	else if (NULL != name)
+	else if (NULL != name && NULL != cptr)
 	{
 		char	*alias_name;
 
@@ -356,7 +363,7 @@ void	collect_perfstat(void)
 			if (PERF_COUNTER_NOTSUPPORTED != cptr->status)
 				continue;
 
-			zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, cptr->counterpath, &cptr->handle);
+			zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, cptr->counterpath, cptr->lang, &cptr->handle);
 		}
 
 		ppsd.nextcheck = now + UNSUPPORTED_REFRESH_PERIOD;
@@ -521,7 +528,11 @@ out:
 	if (NULL != counterpath)
 	{
 		/* request counter value directly from Windows performance counters */
-		if (ERROR_SUCCESS == calculate_counter_value(__function_name, counterpath, value))
+		PDH_STATUS pdh_status = calculate_counter_value(__function_name, counterpath, perfs->lang, value);
+
+		if (PDH_NOT_IMPLEMENTED == pdh_status)
+			*error = zbx_strdup(*error, "Counter is not compatible with this OS");
+		else if (ERROR_SUCCESS == pdh_status)
 			ret = SUCCEED;
 
 		zbx_free(counterpath);
@@ -540,6 +551,7 @@ out:
  *                                                                            *
  * Parameters: counterpath - [IN] the performance counter path                *
  *             interval    - [IN] the data collection interval in seconds     *
+ *             lang        - [IN] counterpath language (default or English)   *
  *             value       - [OUT] the calculated value                       *
  *             error       - [OUT] the error message                          *
  *                                                                            *
@@ -551,13 +563,15 @@ out:
  *           possible.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	get_perf_counter_value_by_path(const char *counterpath, int interval, double *value, char **error)
+int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_perf_counter_lang_t lang,
+		double *value, char **error)
 {
 	const char		*__function_name = "get_perf_counter_value_by_path";
 	int			ret = FAIL;
 	zbx_perf_counter_data_t	*perfs = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s interval:%d", __function_name, counterpath, interval);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s interval:%d lang:%d", __function_name, counterpath,
+			interval, lang);
 
 	LOCK_PERFCOUNTERS;
 
@@ -569,7 +583,7 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, double
 
 	for (perfs = ppsd.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 	{
-		if (0 == strcmp(perfs->counterpath, counterpath))
+		if (0 == strcmp(perfs->counterpath, counterpath) && perfs->lang == lang)
 		{
 			if (perfs->interval < interval)
 				extend_perf_counter_interval(perfs, interval);
@@ -586,14 +600,14 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, double
 
 	/* if the requested counter is not already being monitored - start monitoring */
 	if (NULL == perfs)
-		perfs = add_perf_counter(NULL, counterpath, interval, error);
+		perfs = add_perf_counter(NULL, counterpath, interval, lang, error);
 out:
 	UNLOCK_PERFCOUNTERS;
 
 	if (SUCCEED != ret && NULL != perfs)
 	{
 		/* request counter value directly from Windows performance counters */
-		if (ERROR_SUCCESS == calculate_counter_value(__function_name, counterpath, value))
+		if (ERROR_SUCCESS == calculate_counter_value(__function_name, counterpath, lang, value))
 			ret = SUCCEED;
 	}
 
