@@ -2141,6 +2141,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	{
 		zbx_vmware_dev_t	*dev;
 		char			*unitNumber = NULL, *controllerKey = NULL, *busNumber = NULL,
+					*controllerLabel = NULL, *controllerType = NULL,
 					*scsiCtlrUnitNumber = NULL;
 		xmlXPathObject		*xpathObjController = NULL;
 
@@ -2184,12 +2185,27 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber> */
 			/* where controller type is either ide or scsi depending on the controller type   */
-			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", (NULL == scsiCtlrUnitNumber ? "ide" : "scsi"),
-					busNumber, unitNumber);
 
 			dev->label = zbx_xml_read_node_value(details, nodeset->nodeTab[i],
 					"*[local-name()='deviceInfo']/*[local-name()='label']");
 
+			controllerLabel = zbx_xml_read_node_value(details, xpathObjController->nodesetval->nodeTab[0],
+				"*[local-name()='deviceInfo']/*[local-name()='label']");
+
+			if (NULL != scsiCtlrUnitNumber || (NULL != controllerLabel && NULL != strstr(controllerLabel, "SCSI")))
+			{
+				controllerType = "scsi";
+			}
+			else if (NULL != controllerLabel && NULL != strstr(controllerLabel, "SATA"))
+			{
+				controllerType = "sata";
+			}
+			else
+			{
+				controllerType = "ide";
+			}
+
+			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", controllerType, busNumber, unitNumber);
 			zbx_vector_ptr_append(&vm->devs, dev);
 
 			disks++;
