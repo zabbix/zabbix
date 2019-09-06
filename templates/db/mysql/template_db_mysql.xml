@@ -204,10 +204,10 @@ password=&lt;password&gt;</description>
                     <snmpv3_authpassphrase/>
                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
                     <snmpv3_privpassphrase/>
-                    <params>last( mysql.innodb_buffer_pool_reads ) / &#13;
-( last( mysql.innodb_buffer_pool_read_requests ) + &#13;
-( last( mysql.innodb_buffer_pool_read_requests ) = 0 ) ) * 100 * &#13;
-( last( mysql.innodb_buffer_pool_read_requests ) &gt; 0 )</params>
+                    <params>last(mysql.innodb_buffer_pool_reads) / &#13;
+( last(mysql.innodb_buffer_pool_read_requests) + &#13;
+( last(mysql.innodb_buffer_pool_read_requests) = 0 ) ) * 100 * &#13;
+( last(mysql.innodb_buffer_pool_read_requests) &gt; 0 )</params>
                     <ipmi_sensor/>
                     <authtype>0</authtype>
                     <username/>
@@ -266,11 +266,11 @@ password=&lt;password&gt;</description>
                     <snmpv3_authpassphrase/>
                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
                     <snmpv3_privpassphrase/>
-                    <params>( last( mysql.innodb_buffer_pool_pages_total ) - &#13;
-last( mysql.innodb_buffer_pool_pages_free ) ) / &#13;
-( last( mysql.innodb_buffer_pool_pages_total ) + &#13;
-( last( mysql.innodb_buffer_pool_pages_total ) = 0 ) ) * 100 *&#13;
-( last ( mysql.innodb_buffer_pool_pages_total ) &gt; 0 )</params>
+                    <params>( last(mysql.innodb_buffer_pool_pages_total) - &#13;
+last(mysql.innodb_buffer_pool_pages_free) ) / &#13;
+( last(mysql.innodb_buffer_pool_pages_total) + &#13;
+( last(mysql.innodb_buffer_pool_pages_total) = 0 ) ) * 100 *&#13;
+( last(mysql.innodb_buffer_pool_pages_total) &gt; 0 )</params>
                     <ipmi_sensor/>
                     <authtype>0</authtype>
                     <username/>

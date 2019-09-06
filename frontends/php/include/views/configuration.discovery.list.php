@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
 	->setControls((new CTag('nav', true,
@@ -59,14 +60,13 @@ $discoveryTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], 'discoveryconf.php'),
 		_('IP range'),
+		_('Proxy'),
 		_('Interval'),
 		_('Checks'),
 		_('Status')
 	]);
 
 foreach ($data['drules'] as $drule) {
-	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
-
 	$status = new CCol(
 		(new CLink(
 			discovery_status2str($drule['status']),
@@ -80,8 +80,9 @@ foreach ($data['drules'] as $drule) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
-		$drule['description'],
+		new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']),
 		$drule['iprange'],
+		$drule['proxy'],
 		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status
