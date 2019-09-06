@@ -2615,24 +2615,41 @@
 	}
 
 	/**
+	 * Remove widget actions added by addAction.
+	 */
+	function removeWidgetActions($obj, data, widget)
+	{
+		for (var hook_name in data['triggers']) {
+			for (var index = 0; index < data['triggers'][hook_name].length; index++) {
+				if (widget['uniqueid'] === data['triggers'][hook_name][index]['uniqueid']) {
+					data['triggers'][hook_name].splice(index, 1);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Remove the widget without updating the dashboard.
 	 */
 	function removeWidget($obj, data, widget) {
 		if (widget['iterator']) {
 			widget['children'].forEach(function(child) {
 				doAction('onWidgetDelete', $obj, data, child);
+				removeWidgetActions($obj, data, child);
 				child['div'].remove();
 			});
 		}
 
 		if (widget['parent']) {
 			doAction('onWidgetDelete', $obj, data, widget);
+			removeWidgetActions($obj, data, widget);
 			widget['div'].remove();
 		}
 		else {
 			var index = widget['div'].data('widget-index');
 
 			doAction('onWidgetDelete', $obj, data, widget);
+			removeWidgetActions($obj, data, widget);
 			widget['div'].remove();
 
 			data['widgets'].splice(index, 1);
