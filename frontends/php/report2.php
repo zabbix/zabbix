@@ -380,13 +380,19 @@ elseif (hasRequest('filter_hostid')) {
 		 */
 		if ($trigger_options['filter']['templateid']) {
 			$host_triggers = [];
+			$processedids = [];
 
 			while ($trigger_options['filter']['templateid']) {
 				$trigger_options['filter']['templateid'] = [];
 
 				foreach ($triggers as $trigger) {
+					if (array_key_exists($trigger['triggerid'], $processedids)) {
+						continue;
+					}
+
 					if ($trigger['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
 						$trigger_options['filter']['templateid'][] = $trigger['triggerid'];
+						$processedids[$trigger['triggerid']] = true;
 					}
 					else {
 						$host_triggers[$trigger['triggerid']] = $trigger;
