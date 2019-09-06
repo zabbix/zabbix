@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/url"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -75,21 +76,37 @@ type agentDataResponse struct {
 	Info     string `json:"info"`
 }
 
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
 func ParseServerActive() ([]string, error) {
+	if 0 == len(strings.TrimSpace(agent.Options.ServerActive)) {
+		return []string{}, nil
+	}
+
 	addresses := strings.Split(agent.Options.ServerActive, ",")
 
 	for i := 0; i < len(addresses); i++ {
-		if strings.IndexByte(addresses[i], ':') == -1 {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
+		addresses[i] = strings.TrimSpace(addresses[i])
+		u := url.URL{Host: addresses[i]}
+		if 0 == len(strings.TrimSpace(u.Hostname())) {
+			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": empty value", addresses[i])
+		}
+		if nil != net.ParseIP(addresses[i]) {
+			a := net.JoinHostPort(addresses[i], "10051")
+			if _, _, err := net.SplitHostPort(a); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
 			}
-			addresses[i] += ":10051"
+			addresses[i] = a
+		} else if 0 == len(u.Port()) {
+			a := net.JoinHostPort(u.Hostname(), "10051")
+			if _, _, err := net.SplitHostPort(a); err != nil {
+				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			}
+			addresses[i] = a
 		} else {
 			if _, _, err := net.SplitHostPort(addresses[i]); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
 			}
 		}
-
 		for j := 0; j < i; j++ {
 			if addresses[j] == addresses[i] {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
