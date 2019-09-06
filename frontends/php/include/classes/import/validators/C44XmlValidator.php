@@ -296,7 +296,7 @@ class C44XmlValidator {
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
 			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'formatter' => 'formatGroups', 'rules' => [
-				'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+				'group' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
@@ -304,7 +304,7 @@ class C44XmlValidator {
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
-					'description' =>			['type' => XML_STRING],
+					'description' =>			['type' => XML_STRING, 'default' => ''],
 					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
 						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]],
@@ -325,7 +325,7 @@ class C44XmlValidator {
 						]]
 					]],
 					'groups' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
-						'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'group' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
@@ -367,7 +367,7 @@ class C44XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'params' =>					['type' => XML_STRING],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -375,7 +375,7 @@ class C44XmlValidator {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => ''],
-							'description' =>			['type' => XML_STRING],
+							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
 								'application' =>			['type' => XML_ARRAY, 'rules' => [
@@ -407,7 +407,7 @@ class C44XmlValidator {
 									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
 							]],
-							'posts' =>					['type' => XML_STRING],
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
 							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -439,14 +439,14 @@ class C44XmlValidator {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' =>	['type' => XML_STRING]
+											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -476,7 +476,7 @@ class C44XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'params' =>					['type' => XML_STRING],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -497,7 +497,7 @@ class C44XmlValidator {
 								]]
 							]],
 							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
-							'description' =>			['type' => XML_STRING],
+							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'interface_ref' =>			['type' => XML_STRING],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
@@ -520,7 +520,7 @@ class C44XmlValidator {
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-									'params' =>					['type' => XML_STRING],
+									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -528,7 +528,7 @@ class C44XmlValidator {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'port' =>					['type' => XML_STRING, 'default' => ''],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
 										'application' =>			['type' => XML_ARRAY, 'rules' => [
@@ -562,10 +562,10 @@ class C44XmlValidator {
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING]
+											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
-									'posts' =>					['type' => XML_STRING],
+									'posts' =>					['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -597,20 +597,20 @@ class C44XmlValidator {
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-											'description' =>			['type' => XML_STRING],
+											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 												'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 													'name' =>					['type' => XML_STRING | XML_REQUIRED],
 													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-													'recovery_expression' =>	['type' => XML_STRING]
+													'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 												]]
 											]],
 											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 												'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-													'value' =>					['type' => XML_STRING]
+													'value' =>					['type' => XML_STRING, 'default' => '']
 												]]
 											]]
 										]]
@@ -629,14 +629,14 @@ class C44XmlValidator {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' =>	['type' => XML_STRING]
+											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -716,10 +716,10 @@ class C44XmlValidator {
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING]
+									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
 							]],
-							'posts' =>					['type' => XML_STRING],
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
 							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -792,7 +792,7 @@ class C44XmlValidator {
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING]
+											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
@@ -820,13 +820,13 @@ class C44XmlValidator {
 					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 						'tag' =>					['type' => XML_ARRAY, 'rules' => [
 							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING]
+							'value' =>					['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING]
+							'value' =>					['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'inventory' =>				['type' => XML_ARRAY, 'rules' => [
@@ -844,19 +844,19 @@ class C44XmlValidator {
 						'macaddress_a' =>			['type' => XML_STRING, 'default' => ''],
 						'macaddress_b' =>			['type' => XML_STRING, 'default' => ''],
 						'hardware' =>				['type' => XML_STRING, 'default' => ''],
-						'hardware_full' =>			['type' => XML_STRING],
+						'hardware_full' =>			['type' => XML_STRING, 'default' => ''],
 						'software' =>				['type' => XML_STRING, 'default' => ''],
-						'software_full' =>			['type' => XML_STRING],
+						'software_full' =>			['type' => XML_STRING, 'default' => ''],
 						'software_app_a' =>			['type' => XML_STRING, 'default' => ''],
 						'software_app_b' =>			['type' => XML_STRING, 'default' => ''],
 						'software_app_c' =>			['type' => XML_STRING, 'default' => ''],
 						'software_app_d' =>			['type' => XML_STRING, 'default' => ''],
 						'software_app_e' =>			['type' => XML_STRING, 'default' => ''],
-						'contact' =>				['type' => XML_STRING],
-						'location' =>				['type' => XML_STRING],
+						'contact' =>				['type' => XML_STRING, 'default' => ''],
+						'location' =>				['type' => XML_STRING, 'default' => ''],
 						'location_lat' =>			['type' => XML_STRING, 'default' => ''],
 						'location_lon' =>			['type' => XML_STRING, 'default' => ''],
-						'notes' =>					['type' => XML_STRING],
+						'notes' =>					['type' => XML_STRING, 'default' => ''],
 						'chassis' =>				['type' => XML_STRING, 'default' => ''],
 						'model' =>					['type' => XML_STRING, 'default' => ''],
 						'hw_arch' =>				['type' => XML_STRING, 'default' => ''],
@@ -867,7 +867,7 @@ class C44XmlValidator {
 						'url_a' =>					['type' => XML_STRING, 'default' => ''],
 						'url_b' =>					['type' => XML_STRING, 'default' => ''],
 						'url_c' =>					['type' => XML_STRING, 'default' => ''],
-						'host_networks' =>			['type' => XML_STRING],
+						'host_networks' =>			['type' => XML_STRING, 'default' => ''],
 						'host_netmask' =>			['type' => XML_STRING, 'default' => ''],
 						'host_router' =>			['type' => XML_STRING, 'default' => ''],
 						'oob_ip' =>					['type' => XML_STRING, 'default' => ''],
@@ -885,21 +885,21 @@ class C44XmlValidator {
 						'site_country' =>			['type' => XML_STRING, 'default' => ''],
 						'site_zip' =>				['type' => XML_STRING, 'default' => ''],
 						'site_rack' =>				['type' => XML_STRING, 'default' => ''],
-						'site_notes' =>				['type' => XML_STRING],
+						'site_notes' =>				['type' => XML_STRING, 'default' => ''],
 						'poc_1_name' =>				['type' => XML_STRING, 'default' => ''],
 						'poc_1_email' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_1_phone_a' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_1_phone_b' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_1_cell' =>				['type' => XML_STRING, 'default' => ''],
 						'poc_1_screen' =>			['type' => XML_STRING, 'default' => ''],
-						'poc_1_notes' =>			['type' => XML_STRING],
+						'poc_1_notes' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_name' =>				['type' => XML_STRING, 'default' => ''],
 						'poc_2_email' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_phone_a' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_phone_b' =>			['type' => XML_STRING, 'default' => ''],
 						'poc_2_cell' =>				['type' => XML_STRING, 'default' => ''],
 						'poc_2_screen' =>			['type' => XML_STRING, 'default' => ''],
-						'poc_2_notes' =>			['type' => XML_STRING]
+						'poc_2_notes' =>			['type' => XML_STRING, 'default' => '']
 					]],
 					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
 				]]
@@ -908,7 +908,7 @@ class C44XmlValidator {
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
-					'description' =>			['type' => XML_STRING],
+					'description' =>			['type' => XML_STRING, 'default' => ''],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -945,7 +945,7 @@ class C44XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'params' =>					['type' => XML_STRING],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -953,7 +953,7 @@ class C44XmlValidator {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'port' =>					['type' => XML_STRING, 'default' => ''],
-							'description' =>			['type' => XML_STRING],
+							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 							'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
 								'application' =>			['type' => XML_ARRAY, 'rules' => [
@@ -981,10 +981,10 @@ class C44XmlValidator {
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING]
+									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
 							]],
-							'posts' =>					['type' => XML_STRING],
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
 							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -1016,14 +1016,14 @@ class C44XmlValidator {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' =>	['type' => XML_STRING]
+											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1053,7 +1053,7 @@ class C44XmlValidator {
 							'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 							'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 							'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-							'params' =>					['type' => XML_STRING],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -1063,7 +1063,7 @@ class C44XmlValidator {
 							'port' =>					['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => [CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR, CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND, CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR, CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]],
-								'formula' =>				['type' => XML_STRING],
+								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
 										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1074,7 +1074,7 @@ class C44XmlValidator {
 								]]
 							]],
 							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
-							'description' =>			['type' => XML_STRING],
+							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1096,7 +1096,7 @@ class C44XmlValidator {
 									'snmpv3_authpassphrase' =>	['type' => XML_STRING, 'default' => ''],
 									'snmpv3_privprotocol' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::DES, 'in' => [CXmlConstantValue::DES => CXmlConstantName::DES, CXmlConstantValue::AES => CXmlConstantName::AES]],
 									'snmpv3_privpassphrase' =>	['type' => XML_STRING, 'default' => ''],
-									'params' =>					['type' => XML_STRING],
+									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
 									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
 									'username' =>				['type' => XML_STRING, 'default' => ''],
@@ -1104,7 +1104,7 @@ class C44XmlValidator {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'port' =>					['type' => XML_STRING, 'default' => ''],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'applications' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'application', 'rules' => [
 										'application' =>			['type' => XML_ARRAY, 'rules' => [
@@ -1137,10 +1137,10 @@ class C44XmlValidator {
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING]
+											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
-									'posts' =>					['type' => XML_STRING],
+									'posts' =>					['type' => XML_STRING, 'default' => ''],
 									'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 									'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -1172,14 +1172,14 @@ class C44XmlValidator {
 											'url' =>					['type' => XML_STRING, 'default' => ''],
 											'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 											'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-											'description' =>			['type' => XML_STRING],
+											'description' =>			['type' => XML_STRING, 'default' => ''],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 												'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 													'name' =>					['type' => XML_STRING | XML_REQUIRED],
 													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-													'recovery_expression' =>	['type' => XML_STRING]
+													'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 												]]
 											]],
 											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1204,14 +1204,14 @@ class C44XmlValidator {
 									'url' =>					['type' => XML_STRING, 'default' => ''],
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-									'description' =>			['type' => XML_STRING],
+									'description' =>			['type' => XML_STRING, 'default' => ''],
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-											'recovery_expression' =>	['type' => XML_STRING]
+											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1291,10 +1291,10 @@ class C44XmlValidator {
 							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
-									'value' =>					['type' => XML_STRING]
+									'value' =>					['type' => XML_STRING, 'default' => '']
 								]]
 							]],
-							'posts' =>					['type' => XML_STRING],
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
 							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
 							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
@@ -1367,7 +1367,7 @@ class C44XmlValidator {
 									'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
 										'query_field' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'value' =>					['type' => XML_STRING]
+											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'posts' =>					['type' => 0, 'ex_validate' => [$this, 'validateHttpPosts']],
@@ -1395,13 +1395,13 @@ class C44XmlValidator {
 					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
 						'tag' =>					['type' => XML_ARRAY, 'rules' => [
 							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING]
+							'value' =>					['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING]
+							'value' =>					['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
@@ -1448,14 +1448,14 @@ class C44XmlValidator {
 					'url' =>					['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'priority' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NOT_CLASSIFIED, 'in' => $this->TRIGGER_PRIORITY],
-					'description' =>			['type' => XML_STRING],
+					'description' =>			['type' => XML_STRING, 'default' => ''],
 					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 					'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 						'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
-							'recovery_expression' =>	['type' => XML_STRING]
+							'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1956,7 +1956,7 @@ class C44XmlValidator {
 		}
 		else {
 			// Posts can be string.
-			$rules = ['type' => XML_STRING];
+			$rules = ['type' => XML_STRING, 'default' => ''];
 		}
 
 		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
