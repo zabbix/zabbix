@@ -279,6 +279,9 @@ func ParseKey(text string) (key string, params []string, err error) {
 }
 
 func mustQuote(param string) bool {
+	if len(param) > 0 && param[0] == '"' {
+		return true
+	}
 	for _, b := range param {
 		switch b {
 		case ',', ']':
@@ -317,7 +320,6 @@ func MakeKey(key string, params []string) (text string) {
 		}
 		buf.WriteByte(']')
 	}
-
 	return buf.String()
 }
 
