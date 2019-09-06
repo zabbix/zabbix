@@ -668,7 +668,7 @@ class C44XmlValidator {
 									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
 									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-										'graph_item' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
 											'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
 											'color' =>					['type' => XML_STRING, 'default' => '009600'],
@@ -915,7 +915,7 @@ class C44XmlValidator {
 						]]
 					]],
 					'groups' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'group', 'rules' => [
-						'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'group' =>					['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]],
@@ -1243,7 +1243,7 @@ class C44XmlValidator {
 									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
 									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-										'graph_item' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
 											'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
 											'color' =>					['type' => XML_STRING, 'default' => '009600'],
@@ -1487,7 +1487,7 @@ class C44XmlValidator {
 					'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
 					'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
 					'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'rules' => [
-						'graph_item' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 							'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
 							'drawtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE_LINE, 'in' => $this->GRAPH_GRAPH_ITEM_DRAWTYPE],
 							'color' =>					['type' => XML_STRING, 'default' => '009600'],
