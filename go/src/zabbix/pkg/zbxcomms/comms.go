@@ -60,12 +60,14 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 		return
 	}
 
-	if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
-		return
-	}
+	if timeout != 0 {
+		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
 
-	if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
-		return
+		if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
 	}
 
 	var tlsconfig *tls.Config

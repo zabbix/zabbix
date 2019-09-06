@@ -21,7 +21,6 @@ package serverconnector
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -99,12 +98,6 @@ func ParseServerActive() ([]string, error) {
 	}
 
 	return addresses, nil
-}
-
-// Write function is used by ResultCache to print diagnostic information. It will be callled from
-// different goroutine.
-func (c *Connector) Addr() (s string) {
-	return c.address
 }
 
 func (c *Connector) refreshActiveChecks() {
@@ -278,33 +271,6 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
-// Write function is used by ResultCache to upload cached history. It will be called from
-// different goroutine.
-func (c *Connector) Write(data []byte) (n int, err error) {
-	// While runtime configuration changes are not supported, directly accessing connector configuration
-	// is okay. However in future the history uploading logic must be moved into separate structure.
-	b, err := zbxcomms.Exchange(c.address, &c.localAddr, time.Second*time.Duration(c.options.Timeout), data, c.tlsConfig)
-	if err != nil {
-		return 0, err
-	}
-
-	var response agentDataResponse
-
-	err = json.Unmarshal(b, &response)
-	if err != nil {
-		return 0, err
-	}
-
-	if response.Response != "success" {
-		if len(response.Info) != 0 {
-			return 0, fmt.Errorf("%s", response.Info)
-		}
-		return 0, errors.New("unsuccessful response")
-	}
-
-	return len(data), nil
-}
-
 func (c *Connector) run() {
 	var lastRefresh time.Time
 	var lastFlush time.Time
@@ -333,6 +299,8 @@ run:
 			switch v.(type) {
 			case *agent.AgentOptions:
 				c.updateOptions(v.(*agent.AgentOptions))
+				// TODO: when runtime configuration reload is implemented the result cache active
+				// connection properties must be updated too
 			}
 		}
 	}
@@ -351,13 +319,20 @@ func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOp
 		address:     address,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
-		options:     options,
 	}
-	c.resultCache = resultcache.NewActive(c.clientID, c)
 
+	c.updateOptions(options)
 	if c.tlsConfig, err = agent.GetTLSConfig(c.options); err != nil {
 		return
 	}
+
+	ac := &activeConnection{
+		address:   address,
+		localAddr: c.localAddr,
+		tlsConfig: c.tlsConfig,
+	}
+	c.resultCache = resultcache.NewActive(c.clientID, ac)
+
 	return c, nil
 }
 

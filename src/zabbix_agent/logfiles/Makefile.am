@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxlogs.a
+noinst_LIBRARIES = libzbxlogfiles.a
 
-libzbxlogs_a_SOURCES = \
+libzbxlogfiles_a_SOURCES = \
 	logfiles.c logfiles.h \
 	../metrics.h
 	

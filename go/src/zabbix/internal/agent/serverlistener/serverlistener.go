@@ -69,7 +69,7 @@ func (sl *ServerListener) run() {
 	for {
 		conn, err := sl.listener.Accept()
 		if err == nil {
-			if false == sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
+			if !sl.allowedPeers.CheckPeer(net.ParseIP(conn.RemoteIP())) {
 				conn.Close()
 				log.Warningf("cannot accept incoming connection for peer: %s", conn.RemoteIP())
 			} else if err := sl.processConnection(conn); err != nil {

@@ -1815,7 +1815,7 @@ AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
 CGO_LDFLAGS="-Wl,--start-group \
-	\${abs_top_builddir}/src/zabbix_agent/logs/libzbxlogs.a \
+	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -1954,7 +1954,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
-	src/zabbix_agent/logs/Makefile
+	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
