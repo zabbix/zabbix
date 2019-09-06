@@ -1292,6 +1292,7 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
 #define ZBX_PSK_FOR_HOST		0x01				/* PSK can be used for a known host */
 #define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
+#define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);

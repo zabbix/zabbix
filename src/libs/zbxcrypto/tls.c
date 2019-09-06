@@ -1219,6 +1219,12 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
 	return len;
 }
 
+static void	zbx_psk_warn_misconfig(const char *psk_identity)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "same PSK identity \"%s\" but different PSK values used in proxy configuration"
+			" file, for host or for autoregistration; autoregistration will not be allowed", psk_identity);
+}
+
 #if defined(HAVE_POLARSSL)
 /******************************************************************************
  *                                                                            *
@@ -1258,45 +1264,57 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%.*s\"", __func__, (int)psk_identity_len,
 			psk_identity);
 
-	/* try PSK from configuration file first (it is already in binary form) */
+	psk_usage = 0;
 
-	if (0 < my_psk_identity_len && my_psk_identity_len == psk_identity_len &&
-			0 == memcmp(my_psk_identity, psk_identity, psk_identity_len))
+	if (HOST_TLS_PSK_IDENTITY_LEN < psk_identity_len)
 	{
-		psk = (unsigned char *)my_psk;
-		psk_len = my_psk_len;
+		THIS_SHOULD_NEVER_HAPPEN;
+		return -1;
 	}
-	else	/* search the required PSK in configuration cache */
+
+	memcpy(tls_psk_identity, psk_identity, psk_identity_len);
+	tls_psk_identity[psk_identity_len] = '\0';
+
+	/* call the function DCget_psk_by_identity() by pointer */
+	if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, &psk_usage))
 	{
-		if (HOST_TLS_PSK_IDENTITY_LEN < psk_identity_len)
+		/* The PSK is in configuration cache. Convert PSK to binary form. */
+		if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			/* this should have been prevented by validation in frontend or API */
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
+					" \"%.*s\"", (int)psk_identity_len, psk_identity);
 			return -1;
 		}
 
-		memcpy(tls_psk_identity, psk_identity, psk_identity_len);
-		tls_psk_identity[psk_identity_len] = '\0';
+		psk = psk_buf;
+		psk_len = (size_t)psk_bin_len;
+	}
 
-		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, &psk_usage))
-		{
-			/* convert PSK to binary form */
-			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
-			{
-				/* this should have been prevented by validation in frontend or API */
-				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
-						" \"%.*s\"", (int)psk_identity_len, psk_identity);
-				return -1;
-			}
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) &&
+			0 < my_psk_identity_len &&
+			my_psk_identity_len == psk_identity_len &&
+			0 == memcmp(my_psk_identity, psk_identity, psk_identity_len))
+	{
+		/* the PSK is in proxy configuration file */
+		psk_usage |= ZBX_PSK_FOR_PROXY;
 
-			psk = psk_buf;
-			psk_len = (size_t)psk_bin_len;
-		}
-		else
+		if (0 < psk_len && (psk_len != my_psk_len || 0 != memcmp(psk, my_psk, psk_len)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%.*s\"", __func__,
-					(int)psk_identity_len, psk_identity);
+			/* PSK was also found in configuration cache but with different value */
+			zbx_psk_warn_misconfig((const char *)psk_identity);
+			psk_usage &= ~(unsigned int)ZBX_PSK_FOR_AUTOREG;
 		}
+
+		psk = (unsigned char *)my_psk;	/* prefer PSK from proxy configuration file */
+		psk_len = my_psk_len;
+	}
+
+	if (0 == psk_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%.*s\"",
+				(int)psk_identity_len, psk_identity);
+		return -1;
 	}
 
 	if (0 < psk_len)
@@ -1348,21 +1366,14 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __func__, psk_identity);
 
-	/* try PSK from configuration file first (it is already in binary form) */
+	psk_usage = 0;
 
-	if (0 < my_psk_identity_len && 0 == strcmp(my_psk_identity, psk_identity))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
-		psk = my_psk;
-		psk_len = my_psk_len;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
-	{
-		/* search the required PSK in configuration cache */
-
 		/* call the function DCget_psk_by_identity() by pointer */
 		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
-			/* convert PSK to binary form */
+			/* The PSK is in configuration cache. Convert PSK to binary form. */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
@@ -1374,13 +1385,47 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 			psk = (char *)psk_buf;
 			psk_len = (size_t)psk_bin_len;
 		}
-		else
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) &&
+				0 < my_psk_identity_len &&
+				0 == strcmp(my_psk_identity, psk_identity))
+		{
+			/* the PSK is in proxy configuration file */
+			psk_usage |= ZBX_PSK_FOR_PROXY;
+
+			if (0 < psk_len && (psk_len != my_psk_len || 0 != memcmp(psk, my_psk, psk_len)))
+			{
+				/* PSK was also found in configuration cache but with different value */
+				zbx_psk_warn_misconfig(psk_identity);
+				psk_usage &= ~(unsigned int)ZBX_PSK_FOR_AUTOREG;
+			}
+
+			psk = my_psk;	/* prefer PSK from proxy configuration file */
+			psk_len = my_psk_len;
+		}
+
+		if (0 == psk_len)
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", psk_identity);
+			return -1;	/* fail */
+		}
 	}
-	else if (0 < my_psk_identity_len)
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
-				" \"%s\"", psk_identity, my_psk_identity);
+		if (0 < my_psk_identity_len)
+		{
+			if (0 == strcmp(my_psk_identity, psk_identity))
+			{
+				psk = my_psk;
+				psk_len = my_psk_len;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK"
+						" identity \"%s\"", psk_identity, my_psk_identity);
+				return -1;	/* fail */
+			}
+		}
 	}
 
 	if (0 < psk_len)
@@ -1492,22 +1537,14 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __func__, identity);
 
 	incoming_connection_has_psk = 1;
+	psk_usage = 0;
 
-	/* try PSK from configuration file first (it is already in binary form) */
-
-	if (0 < my_psk_identity_len && 0 == strcmp(my_psk_identity, identity))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
-		psk_loc = my_psk;
-		psk_len = my_psk_len;
-	}
-	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
-	{
-		/* search the required PSK in configuration cache */
-
 		/* call the function DCget_psk_by_identity() by pointer */
 		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, &psk_usage))
 		{
-			/* convert PSK to binary form */
+			/* The PSK is in configuration cache. Convert PSK to binary form. */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
 			{
 				/* this should have been prevented by validation in frontend or API */
@@ -1519,16 +1556,47 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 			psk_loc = (char *)psk_buf;
 			psk_len = (size_t)psk_bin_len;
 		}
-		else
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) &&
+				0 < my_psk_identity_len &&
+				0 == strcmp(my_psk_identity, identity))
+		{
+			/* the PSK is in proxy configuration file */
+			psk_usage |= ZBX_PSK_FOR_PROXY;
+
+			if (0 < psk_len && (psk_len != my_psk_len || 0 != memcmp(psk_loc, my_psk, psk_len)))
+			{
+				/* PSK was also found in configuration cache but with different value */
+				zbx_psk_warn_misconfig(identity);
+				psk_usage &= ~(unsigned int)ZBX_PSK_FOR_AUTOREG;
+			}
+
+			psk_loc = my_psk;	/* prefer PSK from proxy configuration file */
+			psk_len = my_psk_len;
+		}
+
+		if (0 == psk_len)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\"", identity);
 			goto fail;
 		}
 	}
-	else if (0 < my_psk_identity_len)
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK identity"
-				" \"%s\"", identity, my_psk_identity);
+		if (0 < my_psk_identity_len)
+		{
+			if (0 == strcmp(my_psk_identity, identity))
+			{
+				psk_loc = my_psk;
+				psk_len = my_psk_len;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot find requested PSK identity \"%s\", available PSK"
+						" identity \"%s\"", identity, my_psk_identity);
+				goto fail;
+			}
+		}
 	}
 
 	if (0 < psk_len)
