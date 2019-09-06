@@ -95,11 +95,11 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 static int	get_interval_option(const char * fping, const char *dst)
 {
 	int	value, ret;
-	char	tmp[MAX_STRING_LEN], error, *out = NULL;
+	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i0 %s", fping, dst);
 
-	if ((SUCCEED == (ret = zbx_execute(tmp, &out, &error, 0, 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
+	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
 			ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
 	{
 		value = 0;
