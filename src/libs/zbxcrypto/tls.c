@@ -3911,7 +3911,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			int	psk_len;
 			char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, (unsigned char *)psk_buf,
+			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
 					sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
@@ -4102,7 +4102,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			int		psk_len;
 			unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
+			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
 				goto out;
@@ -4344,7 +4344,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			int	psk_len;
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, (unsigned char *)psk_buf,
+			if (0 >= (psk_len = zbx_psk_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
 					sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
