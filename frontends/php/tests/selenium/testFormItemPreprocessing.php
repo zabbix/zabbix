@@ -90,7 +90,7 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormItemPreprocessing_CreateAllSteps($data) {
-		$this->executeCreate($data);
+		$this->checkCreate($data);
 	}
 
 	/**
@@ -152,7 +152,7 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getItemCustomOnFailData
 	 */
 	public function testFormItemPreprocessing_CustomOnFail($data) {
-		$this->executeCustomOnFail($data);
+		$this->checkCustomOnFail($data);
 	}
 
 	/**
@@ -162,6 +162,6 @@ class testFormItemPreprocessing extends testFormPreprocessing {
 		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_TEMPLATE_ID;
 		$host_link = 'items.php?filter_set=1&filter_hostids[0]='.self::INHERITANCE_HOST_ID;
 
-		$this->executePreprocessingInheritance($data, $host_link);
+		$this->checkPreprocessingInheritance($data, $host_link);
 	}
 }

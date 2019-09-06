@@ -156,11 +156,11 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CreateAllSteps($data) {
-		$this->executeCreate($data);
+		$this->checkCreate($data);
 	}
 
 	/**
-	 * @dataProvider getPreprocessingTrailingSpacesData
+	 * @dataProvider getCommonPreprocessingTrailingSpacesData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_TrailingSpaces($data) {
 		$this->checkTrailingSpaces($data);
@@ -170,7 +170,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCommonCustomOnFailData
 	 */
 	public function testFormLowLevelDiscoveryPreprocessing_CustomOnFail($data) {
-		$this->executeCustomOnFail($data);
+		$this->checkCustomOnFail($data);
 	}
 
 	/**
@@ -180,6 +180,6 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 		$this->link = 'host_discovery.php?hostid='.self::INHERITANCE_TEMPLATE_ID;
 		$host_link = 'host_discovery.php?hostid='.self::INHERITANCE_HOST_ID;
 
-		$this->executePreprocessingInheritance($data, $host_link);
+		$this->checkPreprocessingInheritance($data, $host_link);
 	}
 }

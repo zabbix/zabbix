@@ -1699,7 +1699,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check creating items, item prototypes or LLD rules with preprocessing steps.
 	 */
-	protected function executeCreate($data) {
+	protected function checkCreate($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
@@ -1973,7 +1973,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
-	public function executeCustomOnFail($data) {
+	public function checkCustomOnFail($data) {
 		$form = $this->addItemWithPreprocessing($data);
 		$steps = $this->getPreprocessingSteps();
 
@@ -2274,7 +2274,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check inheritance of preprocessing steps in items or LLD rules.
 	 */
-	protected function executePreprocessingInheritance($data, $host_link) {
+	protected function checkPreprocessingInheritance($data, $host_link) {
 		// Create item on template.
 		$form = $this->addItemWithPreprocessing($data);
 		$form->submit();

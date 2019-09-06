@@ -97,14 +97,14 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormItemPrototypePreprocessing_CreateAllSteps($data) {
-		$this->executeCreate($data);
+		$this->checkCreate($data);
 	}
 
 	/**
 	 * @dataProvider getItemCustomOnFailData
 	 */
 	public function testFormItemPrototypePreprocessing_CustomOnFail($data) {
-		$this->executeCustomOnFail($data);
+		$this->checkCustomOnFail($data);
 	}
 
 	/**
@@ -121,6 +121,6 @@ class testFormItemPrototypePreprocessing extends testFormPreprocessing {
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.self::TEMPL_DISCOVERY_RULE_ID;
 		$host_link = 'disc_prototypes.php?parent_discoveryid='.self::HOST_DISCOVERY_RULE_ID;
 
-		$this->executePreprocessingInheritance($data, $host_link);
+		$this->checkPreprocessingInheritance($data, $host_link);
 	}
 }
