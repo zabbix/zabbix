@@ -207,7 +207,6 @@ class CDiscoveryRule extends CItemGeneral {
 				zbx_db_search('item_rtdata ir', ['search' => ['error' => $options['search']['error']]] + $options,
 					$sqlParts
 				);
-				unset($options['search']['error']);
 			}
 
 			zbx_db_search('items i', $options, $sqlParts);
@@ -228,7 +227,6 @@ class CDiscoveryRule extends CItemGeneral {
 				$this->dbFilter('item_rtdata ir', ['filter' => ['state' => $options['filter']['state']]] + $options,
 					$sqlParts
 				);
-				unset($options['filter']['state']);
 			}
 
 			$this->dbFilter('items i', $options, $sqlParts);
@@ -2008,22 +2006,24 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput']) {
-			if ((($this->outputIsRequested('state', $options['output'])
-						|| $this->outputIsRequested('error', $options['output'])))
-					|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-					|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-				$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
-				$sqlParts['left_table'] = $tableName;
+		if ((($this->outputIsRequested('state', $options['output'])
+					|| $this->outputIsRequested('error', $options['output'])))
+				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
+				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
+			$sqlParts['left_join']['item_rtdata'] = ['from' => 'item_rtdata ir', 'on' => 'ir.itemid=i.itemid'];
+			$sqlParts['left_table'] = $tableName;
+		}
 
-				if ($this->outputIsRequested('state', $options['output'])) {
-					$sqlParts = $this->addQuerySelect('ir.state', $sqlParts);
-				}
-				if ($this->outputIsRequested('error', $options['output'])) {
-					// SQL func COALESCE use for template items because they dont have record
-					// in item_rtdata table and DBFetch convert null to '0'
-					$sqlParts = $this->addQuerySelect("COALESCE(ir.error,'') AS error", $sqlParts);
-				}
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('state', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('ir.state', $sqlParts);
+			}
+			if ($this->outputIsRequested('error', $options['output'])) {
+				/*
+				 * SQL func COALESCE use for template items because they dont have record
+				 * in item_rtdata table and DBFetch convert null to '0'
+				 */
+				$sqlParts = $this->addQuerySelect("COALESCE(ir.error,'') AS error", $sqlParts);
 			}
 
 			// add filter fields

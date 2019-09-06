@@ -1071,7 +1071,7 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
 						if (!array_key_exists('itemid', $new_item)) {
-							$new_item['rtdata'] = DB::getDefaults('item_rtdata');
+							$new_item['rtdata'] = true;
 						}
 					}
 				}
