@@ -31,8 +31,6 @@ jQuery(document).ready(function($) {
 			var mediatypes_by_type = <?= (new CJson())->encode($data['mediatypes']) ?>,
 				mediatypeid = $(this).val();
 
-			$('#type').val(mediatypes_by_type[mediatypeid]);
-
 			if (mediatypes_by_type[mediatypeid] == <?= MEDIA_TYPE_EMAIL ?>) {
 				$('#mediatype_send_to').hide();
 				$('#mediatype_email_send_to').show();

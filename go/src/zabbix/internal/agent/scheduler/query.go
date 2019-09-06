@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 type pluginMetrics struct {

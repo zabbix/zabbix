@@ -23,8 +23,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -36,6 +38,7 @@ import (
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
+	"zabbix/pkg/tls"
 	"zabbix/pkg/version"
 	"zabbix/pkg/zbxlib"
 	_ "zabbix/plugins"
@@ -92,12 +95,12 @@ func configDefault(taskManager scheduler.Scheduler, o *agent.AgentOptions) error
 }
 
 var manager *scheduler.Manager
-var listener *serverlistener.ServerListener
+var listeners []*serverlistener.ServerListener
 var serverConnectors []*serverconnector.Connector
 
 func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error) {
 	if len(params) != 2 {
-		return errors.New("No loglevel parameter specified")
+		return errors.New("No 'loglevel' parameter specified")
 	}
 	switch params[1] {
 	case "increase":
@@ -115,11 +118,11 @@ func processLoglevelCommand(c *remotecontrol.Client, params []string) (err error
 			log.Infof(message)
 			err = c.Reply(message)
 		} else {
-			err = fmt.Errorf("Cannot descrease log level below %s", log.Level())
+			err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
 			log.Infof(err.Error())
 		}
 	default:
-		return errors.New("Invalid loglevel parameter")
+		return errors.New("Invalid 'loglevel' parameter")
 	}
 	return
 }
@@ -129,11 +132,18 @@ func processMetricsCommand(c *remotecontrol.Client, params []string) (err error)
 	return c.Reply(data)
 }
 
+func processVersionCommand(c *remotecontrol.Client, params []string) (err error) {
+	data := version.Short()
+	return c.Reply(data)
+}
+
 func processHelpCommand(c *remotecontrol.Client, params []string) (err error) {
 	help := `Remote control interface, available commands:
-	loglevel <increase|decrease> - increases/decreases logging level
-	metrics - lists available metrics
-	help - this message`
+	loglevel increase - Increase log level
+	loglevel decrease - Decrease log level
+	metrics - List available metrics
+	version - Display Agent version
+	help - Display this help message`
 	return c.Reply(help)
 }
 
@@ -149,10 +159,50 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processHelpCommand(c, params)
 	case "metrics":
 		err = processMetricsCommand(c, params)
+	case "version":
+		err = processVersionCommand(c, params)
 	default:
 		return errors.New("Unknown command")
 	}
 	return
+}
+
+var pidFile *os.File
+
+func writePidFile() (err error) {
+	if agent.Options.PidFile == "" {
+		return nil
+	}
+
+	pid := os.Getpid()
+	flockT := syscall.Flock_t{
+		Type:   syscall.F_WRLCK,
+		Whence: io.SeekStart,
+		Start:  0,
+		Len:    0,
+		Pid:    int32(pid),
+	}
+	if pidFile, err = os.OpenFile(agent.Options.PidFile, os.O_WRONLY|os.O_CREATE|syscall.O_CLOEXEC, 0644); nil != err {
+		return fmt.Errorf("cannot open PID file [%s]: %s", agent.Options.PidFile, err.Error())
+	}
+	if err = syscall.FcntlFlock(pidFile.Fd(), syscall.F_SETLK, &flockT); nil != err {
+		pidFile.Close()
+		return fmt.Errorf("Is this process already running? Could not lock PID file [%s]: %s",
+			agent.Options.PidFile, err.Error())
+	}
+	pidFile.Truncate(0)
+	pidFile.WriteString(strconv.Itoa(pid))
+	pidFile.Sync()
+
+	return nil
+}
+
+func deletePidFile() {
+	if nil == pidFile {
+		return
+	}
+	pidFile.Close()
+	os.Remove(pidFile.Name())
 }
 
 func run() (err error) {
@@ -182,6 +232,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
+			client.Close()
 		}
 	}
 	control.Stop()
@@ -233,7 +284,7 @@ func main() {
 	var remoteCommand string
 	const (
 		remoteDefault     = ""
-		remoteDescription = "Test specified item and exit"
+		remoteDescription = "Perform administrative functions (send 'help' for available commands)"
 	)
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
@@ -277,7 +328,7 @@ func main() {
 			conf.Unmarshal([]byte{}, &agent.Options)
 		}
 
-		if err := log.Open(log.Console, log.Warning, ""); err != nil {
+		if err := log.Open(log.Console, log.Warning, "", 0); err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 			os.Exit(1)
 		}
@@ -329,7 +380,7 @@ func main() {
 		logLevel = log.Trace
 	}
 
-	if err := log.Open(logType, logLevel, agent.Options.LogFile); err != nil {
+	if err := log.Open(logType, logLevel, agent.Options.LogFile, agent.Options.LogFileSize); err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot initialize logger: %s\n", err.Error())
 		os.Exit(1)
 	}
@@ -341,6 +392,24 @@ func main() {
 		log.Critf("%s", err)
 		os.Exit(1)
 	}
+
+	if tlsConfig, err := agent.GetTLSConfig(&agent.Options); err != nil {
+		log.Critf("cannot use encryption configuration: %s", err)
+		os.Exit(1)
+	} else {
+		if tlsConfig != nil {
+			if err := tls.Init(tlsConfig); err != nil {
+				log.Critf("cannot configure encryption: %s", err)
+				os.Exit(1)
+			}
+		}
+	}
+
+	if err = writePidFile(); err != nil {
+		log.Critf(err.Error())
+		os.Exit(1)
+	}
+	defer deletePidFile()
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
 	log.Infof(greeting)
@@ -356,7 +425,19 @@ func main() {
 
 	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
 	manager, err = scheduler.NewManager(agent.Options)
-	listener = serverlistener.New(manager)
+
+	// replacement of deprecated StartAgents
+	if 0 != len(agent.Options.Server) {
+		var listenIPs []string
+		if listenIPs, err = serverlistener.ParseListenIP(&agent.Options); nil != err {
+			log.Critf(err.Error())
+			os.Exit(1)
+		}
+		for i := 0; i < len(listenIPs); i++ {
+			listener := serverlistener.New(i, manager, listenIPs[i], &agent.Options)
+			listeners = append(listeners, listener)
+		}
+	}
 
 	manager.Start()
 
@@ -368,11 +449,18 @@ func main() {
 		serverConnectors = make([]*serverconnector.Connector, len(addresses))
 
 		for i := 0; i < len(serverConnectors); i++ {
-			serverConnectors[i] = serverconnector.New(manager, addresses[i])
+			if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
+				log.Critf("cannot create server connector: %s", err)
+				os.Exit(1)
+			}
 			serverConnectors[i].Start()
 		}
 
-		err = listener.Start()
+		for _, listener := range listeners {
+			if err = listener.Start(); nil != err {
+				break
+			}
+		}
 	}
 
 	if err == nil {
@@ -382,7 +470,9 @@ func main() {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
 
-	listener.Stop()
+	for _, listener := range listeners {
+		listener.Stop()
+	}
 
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].Stop()

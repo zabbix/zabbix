@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0alpha1])
+AC_INIT([Zabbix],[4.4.0beta1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1815,7 +1815,7 @@ AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
 CGO_LDFLAGS="-Wl,--start-group \
-	\${abs_top_builddir}/src/zabbix_agent/logs/libzbxlogs.a \
+	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -1954,7 +1954,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
-	src/zabbix_agent/logs/Makefile
+	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
@@ -1998,7 +1998,9 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/log/Makefile
+	go/src/zabbix/pkg/plugin/Makefile
 	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/tls/Makefile
 	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/pkg/watch/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
@@ -2012,7 +2014,6 @@ AC_OUTPUT([
 	go/src/zabbix/internal/agent/serverconnector/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
@@ -2030,9 +2031,7 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/filecksum/Makefile
-	go/src/zabbix/plugins/vfs/filecontents/Makefile
-	go/src/zabbix/plugins/vfs/fileexists/Makefile
+	go/src/zabbix/plugins/vfs/file/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
 	go/src/zabbix/plugins/zabbix/stats/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile

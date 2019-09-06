@@ -25,7 +25,7 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
 #cgo LDFLAGS: -Wl,--start-group
-#cgo LDFLAGS: ${SRCDIR}/../../../../../src/zabbix_agent/logs/libzbxlogs.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/zabbix_agent/logfiles/libzbxlogfiles.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcomms/libzbxcomms.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcrypto/libzbxcrypto.a
@@ -50,7 +50,7 @@ package zbxlib
 #include "sysinfo.h"
 #include "comms.h"
 #include "../src/zabbix_agent/metrics.h"
-#include "../src/zabbix_agent/logs/logfiles.h"
+#include "../src/zabbix_agent/logfiles/logfiles.h"
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;

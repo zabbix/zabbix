@@ -20,7 +20,7 @@
 package zabbixsync
 
 import (
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -36,7 +36,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetrics(&impl, "zabbixsync",
+	plugin.RegisterMetrics(&impl, "ZabbixSync",
 		"net.dns", "Checks if DNS service is up.",
 		"net.dns.record", "Performs DNS query.",
 		"proc.mem", "Memory used by process in bytes.",
@@ -53,13 +53,9 @@ func init() {
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
 		"net.udp.service.perf", "Checks performance of UDP service.",
 		"system.users.num", "Number of users logged in.",
-		"system.swap.in", "Swap in (from device into memory) statistics.",
-		"system.swap.out", "Swap out (from memory onto device) statistics.",
 		"system.swap.size", "Swap space size in bytes or in percentage from total.",
 		"vfs.dir.count", "Directory entry count.",
 		"vfs.dir.size", "Directory size (in bytes).",
-		"vfs.file.size", "File size (in bytes).",
-		"vfs.file.time", "File time information.",
 		"vfs.fs.inode", "Number or percentage of inodes.",
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 		"vm.memory.size", "Memory size in bytes or in percentage from total.")

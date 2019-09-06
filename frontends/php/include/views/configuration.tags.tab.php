@@ -30,6 +30,7 @@ $tags_form_list = new CFormList('tagsFormList');
 
 $table = (new CTable())
 	->setId('tags-table')
+	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setHeader([
 		_('Name'),
 		_('Value'),
@@ -45,7 +46,7 @@ foreach ($data['tags'] as $i => $tag) {
 
 	$readonly = ($data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED));
 
-	$tag_input = (new CTextBox('tags['.$i.'][tag]', $tag['tag'], $readonly))
+	$tag_input = (new CTextAreaFlexible('tags['.$i.'][tag]', $tag['tag'], ['readonly' => $readonly]))
 		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 		->setAttribute('placeholder', _('tag'));
 
@@ -55,11 +56,14 @@ foreach ($data['tags'] as $i => $tag) {
 		$tag_cell[] = new CVar('tags['.$i.'][type]', $tag['type']);
 	}
 
-	$value_input = (new CTextBox('tags['.$i.'][value]', $tag['value'], $readonly))
-		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+	$value_input = (new CTextAreaFlexible('tags['.$i.'][value]', $tag['value'], ['readonly' => $readonly]))
+		->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
-	$row = [$tag_cell, $value_input];
+	$row = [
+		(new CCol($tag_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+	];
 
 	$row[] = (new CCol(
 		($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED))

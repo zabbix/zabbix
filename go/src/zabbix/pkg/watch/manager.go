@@ -22,7 +22,7 @@ package watch
 import (
 	"sync"
 	"time"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 // describes single event source - listen port for traps, file name for file content monitoring etc

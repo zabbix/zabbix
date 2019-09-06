@@ -690,29 +690,29 @@ class CHttpTestManager {
 	/**
 	 * Create items required for web scenario.
 	 *
-	 * @param array $httpTest
+	 * @param array $http_test
 	 *
 	 * @throws Exception
 	 */
-	protected function createHttpTestItems(array $httpTest) {
+	protected function createHttpTestItems(array $http_test) {
 		$checkitems = [
 			[
 				'name'				=> 'Download speed for scenario "$1".',
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name']),
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
 			],
 			[
 				'name'				=> 'Failed step of scenario "$1".',
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $httpTest['name']),
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
 			],
 			[
 				'name'				=> 'Last error message of scenario "$1".',
-				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $httpTest['name']),
+				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $http_test['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
@@ -720,23 +720,22 @@ class CHttpTestManager {
 		];
 
 		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parentItems = [];
-		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
-			$parentItems = DBfetchArrayAssoc(DBselect(
+		$parent_items = [];
+		if (isset($http_test['templateid']) && $http_test['templateid']) {
+			$parent_items = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.key_'.
 					' FROM items i,httptestitem hti'.
 					' WHERE i.itemid=hti.itemid'.
-					' AND hti.httptestid='.zbx_dbstr($httpTest['templateid'])
+					' AND hti.httptestid='.zbx_dbstr($http_test['templateid'])
 			), 'key_');
 		}
 
-		$insertItems = [];
+		$delay = array_key_exists('delay', $http_test) ? $http_test['delay'] : DB::getDefault('httptest', 'delay');
+		$status = array_key_exists('status', $http_test) ? $http_test['status'] : DB::getDefault('httptest', 'status');
 
-		$delay = array_key_exists('delay', $httpTest) ? $httpTest['delay'] : DB::getDefault('httptest', 'delay');
-		$status = array_key_exists('status', $httpTest) ? $httpTest['status'] : DB::getDefault('httptest', 'status');
-
+		$ins_items = [];
 		foreach ($checkitems as $item) {
-			$item['hostid'] = $httpTest['hostid'];
+			$item['hostid'] = $http_test['hostid'];
 			$item['delay'] = $delay;
 			$item['type'] = ITEM_TYPE_HTTPTEST;
 			$item['history'] = self::ITEM_HISTORY;
@@ -745,28 +744,33 @@ class CHttpTestManager {
 				? ITEM_STATUS_ACTIVE
 				: ITEM_STATUS_DISABLED;
 
-			if (isset($parentItems[$item['key_']])) {
-				$item['templateid'] = $parentItems[$item['key_']]['itemid'];
+			if (isset($parent_items[$item['key_']])) {
+				$item['templateid'] = $parent_items[$item['key_']]['itemid'];
 			}
 
-			$insertItems[] = $item;
+			$ins_items[] = $item;
+		}
+		$itemids = DB::insert('items', $ins_items);
+
+		if (array_key_exists('applicationid', $http_test)) {
+			$this->createItemsApplications($itemids, $http_test['applicationid']);
 		}
 
-		$newTestItemIds = DB::insert('items', $insertItems);
-
-		if (array_key_exists('applicationid', $httpTest)) {
-			$this->createItemsApplications($newTestItemIds, $httpTest['applicationid']);
+		$ins_item_rtdata = [];
+		foreach ($itemids as $itemid) {
+			$ins_item_rtdata[] = ['itemid' => $itemid];
 		}
+		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
 
-		$httpTestItems = [];
+		$ins_httptestitem = [];
 		foreach ($checkitems as $inum => $item) {
-			$httpTestItems[] = [
-				'httptestid' => $httpTest['httptestid'],
-				'itemid' => $newTestItemIds[$inum],
+			$ins_httptestitem[] = [
+				'httptestid' => $http_test['httptestid'],
+				'itemid' => $itemids[$inum],
 				'type' => $item['httptestitemtype']
 			];
 		}
-		DB::insert('httptestitem', $httpTestItems);
+		DB::insertBatch('httptestitem', $ins_httptestitem);
 	}
 
 	/**
@@ -964,14 +968,14 @@ class CHttpTestManager {
 	/**
 	 * Create web scenario steps with items.
 	 *
-	 * @param $httpTest
+	 * @param $http_test
 	 * @param $websteps
 	 *
 	 * @throws Exception
 	 */
-	protected function createStepsReal($httpTest, $websteps) {
+	protected function createStepsReal($http_test, $websteps) {
 		foreach ($websteps as &$webstep) {
-			$webstep['httptestid'] = $httpTest['httptestid'];
+			$webstep['httptestid'] = $http_test['httptestid'];
 
 			if (array_key_exists('posts', $webstep)) {
 				if (is_array($webstep['posts'])) {
@@ -990,16 +994,19 @@ class CHttpTestManager {
 		$webstepids = DB::insert('httpstep', $websteps);
 
 		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parentStepItems = [];
-		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
-			$parentStepItems = DBfetchArrayAssoc(DBselect(
+		$parent_step_items = [];
+		if (isset($http_test['templateid']) && $http_test['templateid']) {
+			$parent_step_items = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.key_,hsi.httpstepid'.
 				' FROM items i,httpstepitem hsi,httpstep hs'.
 				' WHERE i.itemid=hsi.itemid'.
 					' AND hsi.httpstepid=hs.httpstepid'.
-					' AND hs.httptestid='.zbx_dbstr($httpTest['templateid'])
+					' AND hs.httptestid='.zbx_dbstr($http_test['templateid'])
 			), 'key_');
 		}
+
+		$ins_httpstepitem = [];
+		$ins_item_rtdata = [];
 
 		foreach ($websteps as $snum => &$webstep) {
 			$webstep['httpstepid'] = $webstepids[$snum];
@@ -1007,74 +1014,78 @@ class CHttpTestManager {
 			$stepitems = [
 				[
 					'name' => 'Download speed for step "$2" of scenario "$1".',
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name'], $webstep['name']),
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
 				],
 				[
 					'name' => 'Response time for step "$2" of scenario "$1".',
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $httpTest['name'], $webstep['name']),
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
 				],
 				[
 					'name' => 'Response code for step "$2" of scenario "$1".',
-					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $httpTest['name'], $webstep['name']),
+					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $http_test['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
 				]
 			];
 
-			if (!isset($httpTest['delay']) || !isset($httpTest['status'])) {
-				$dbTest = DBfetch(DBselect('SELECT ht.delay,ht.status FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
-				$delay = $dbTest['delay'];
-				$status = $dbTest['status'];
+			if (!isset($http_test['delay']) || !isset($http_test['status'])) {
+				$db_httptest = DBfetch(DBselect(
+					'SELECT ht.delay,ht.status'.
+					' FROM httptest ht'.
+					' WHERE ht.httptestid='.zbx_dbstr($http_test['httptestid'])
+				));
+				$delay = $db_httptest['delay'];
+				$status = $db_httptest['status'];
 			}
 			else {
-				$delay = $httpTest['delay'];
-				$status = $httpTest['status'];
+				$delay = $http_test['delay'];
+				$status = $http_test['status'];
 			}
 
-			$insertItems = [];
-			$stepItemids = [];
-
+			$ins_items = [];
 			foreach ($stepitems as $item) {
-				$item['hostid'] = $httpTest['hostid'];
+				$item['hostid'] = $http_test['hostid'];
 				$item['delay'] = $delay;
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['history'] = self::ITEM_HISTORY;
 				$item['trends'] = self::ITEM_TRENDS;
 				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $status) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-				if (isset($parentStepItems[$item['key_']])) {
-					$item['templateid'] = $parentStepItems[$item['key_']]['itemid'];
+				if (isset($parent_step_items[$item['key_']])) {
+					$item['templateid'] = $parent_step_items[$item['key_']]['itemid'];
 				}
 
-				$insertItems[] = $item;
+				$ins_items[] = $item;
+			}
+			$itemids = DB::insert('items', $ins_items);
+
+			if (array_key_exists('applicationid', $http_test)) {
+				$this->createItemsApplications($itemids, $http_test['applicationid']);
 			}
 
-			if ($insertItems) {
-				$stepItemids = DB::insert('items', $insertItems);
-
-				if (array_key_exists('applicationid', $httpTest)) {
-					$this->createItemsApplications($stepItemids, $httpTest['applicationid']);
-				}
-			}
-
-			$webstepitems = [];
 			foreach ($stepitems as $inum => $item) {
-				$webstepitems[] = [
+				$ins_httpstepitem[] = [
 					'httpstepid' => $webstep['httpstepid'],
-					'itemid' => $stepItemids[$inum],
+					'itemid' => $itemids[$inum],
 					'type' => $item['httpstepitemtype']
 				];
 			}
-			DB::insert('httpstepitem', $webstepitems);
+
+			foreach ($itemids as $itemid) {
+				$ins_item_rtdata[] = ['itemid' => $itemid];
+			}
 		}
 		unset($webstep);
+
+		DB::insertBatch('httpstepitem', $ins_httpstepitem);
+		DB::insertBatch('item_rtdata', $ins_item_rtdata, false);
 
 		$this->updateHttpStepFields($websteps, 'create');
 	}

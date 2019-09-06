@@ -21,7 +21,7 @@ package netif
 
 import (
 	"fmt"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/std"
 )
 
@@ -68,7 +68,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		direction = dirIn | dirOut
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return nil, fmt.Errorf("Invalid key.")
+		return nil, fmt.Errorf("Unsupported metric.")
 	}
 
 	if len(params) < 1 || params[0] == "" {
@@ -91,7 +91,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func init() {
 	stdOs = std.NewOs()
 
-	plugin.RegisterMetrics(&impl, "netif",
+	plugin.RegisterMetrics(&impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
 		"net.if.in", "Returns incoming traffic statistics on network interface.",
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",

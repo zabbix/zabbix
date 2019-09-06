@@ -25,9 +25,9 @@ import (
 	"time"
 	"unsafe"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -74,6 +74,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	}
 
+	if ctx.Output().PersistSlotsAvailable() == 0 {
+		p.Warningf("buffer is full, cannot store persistent value")
+		return nil, nil
+	}
+
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
@@ -107,9 +112,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var impl Plugin
 
 func init() {
-	plugin.RegisterMetric(&impl, "log", "log", "Log file monitoring.")
-	plugin.RegisterMetric(&impl, "log", "logrt", "Log file monitoring with log rotation support.")
-	plugin.RegisterMetric(&impl, "log", "log.count", "Count of matched lines in log file monitoring.")
-	plugin.RegisterMetric(&impl, "log", "logrt.count",
-		"Count of matched lines in log file monitoring with log rotation support.")
+	plugin.RegisterMetrics(&impl, "Log",
+		"log", "Log file monitoring.",
+		"logrt", "Log file monitoring with log rotation support.",
+		"log.count", "Count of matched lines in log file monitoring.",
+		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.")
 }

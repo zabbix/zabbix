@@ -21,6 +21,7 @@ package remotecontrol
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
@@ -42,6 +43,7 @@ type Client struct {
 type Exchanger interface {
 	Request() string
 	Reply(response string) error
+	Close()
 }
 
 func (c *Client) Request() (cmmand string) {
@@ -49,9 +51,12 @@ func (c *Client) Request() (cmmand string) {
 }
 
 func (c *Client) Reply(response string) (err error) {
-	_, err = c.conn.Write([]byte(response + "\n"))
-	c.conn.Close()
+	_, err = c.conn.Write([]byte(response))
 	return
+}
+
+func (c *Client) Close() {
+	c.conn.Close()
 }
 
 func (c *Conn) Stop() {
@@ -69,6 +74,8 @@ func (c *Conn) run() {
 			if scanner.Scan() {
 				// accept single command line, the connection will be closed after sending reply
 				c.sink <- &Client{request: scanner.Text(), conn: conn}
+			} else {
+				conn.Close()
 			}
 		}
 	}
@@ -88,6 +95,9 @@ func New(path string) (conn *Conn, err error) {
 	c := Conn{}
 	if path != "" {
 		if _, tmperr := os.Stat(path); !os.IsNotExist(tmperr) {
+			if _, err = SendCommand(path, "version"); err == nil {
+				return nil, fmt.Errorf("An agent is already using control socket %s", path)
+			}
 			if err = os.Remove(path); err != nil {
 				return
 			}

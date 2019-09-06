@@ -21,7 +21,6 @@ package serverconnector
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -31,9 +30,10 @@ import (
 	"zabbix/internal/agent/resultcache"
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
+	"zabbix/pkg/tls"
 	"zabbix/pkg/version"
 	"zabbix/pkg/zbxcomms"
 )
@@ -42,14 +42,15 @@ const hostMetadataLen = 255
 const defaultAgentPort = 10050
 
 type Connector struct {
-	clientID             uint64
-	input                chan interface{}
-	address              string
-	lastError            error
-	maxUploadInterval    time.Duration
-	activeChecksInterval time.Duration
-	resultCache          *resultcache.ResultCache
-	taskManager          scheduler.Scheduler
+	clientID    uint64
+	input       chan interface{}
+	address     string
+	localAddr   net.Addr
+	lastError   error
+	resultCache *resultcache.ResultCache
+	taskManager scheduler.Scheduler
+	options     *agent.AgentOptions
+	tlsConfig   *tls.Config
 }
 
 type activeChecksRequest struct {
@@ -99,28 +100,22 @@ func ParseServerActive() ([]string, error) {
 	return addresses, nil
 }
 
-// Write function is used by ResultCache to print diagnostic information. It will be callled from
-// different goroutine.
-func (c *Connector) Addr() (s string) {
-	return c.address
-}
-
 func (c *Connector) refreshActiveChecks() {
 	var err error
 
-	a := activeChecksRequest{Request: "active checks", Host: agent.Options.Hostname, Version: version.Short()}
+	a := activeChecksRequest{Request: "active checks", Host: c.options.Hostname, Version: version.Short()}
 
 	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
 
-	if len(agent.Options.HostMetadata) > 0 {
-		if len(agent.Options.HostMetadataItem) > 0 {
+	if len(c.options.HostMetadata) > 0 {
+		if len(c.options.HostMetadataItem) > 0 {
 			log.Warningf("both \"HostMetadata\" and \"HostMetadataItem\" configuration parameter defined, using \"HostMetadata\"")
 		}
 
-		a.HostMetadata = agent.Options.HostMetadata
-	} else if len(agent.Options.HostMetadataItem) > 0 {
-		a.HostMetadata, err = c.taskManager.PerformTask(agent.Options.HostMetadataItem, time.Duration(agent.Options.Timeout)*time.Second)
+		a.HostMetadata = c.options.HostMetadata
+	} else if len(c.options.HostMetadataItem) > 0 {
+		a.HostMetadata, err = c.taskManager.PerformTask(c.options.HostMetadataItem, time.Duration(c.options.Timeout)*time.Second)
 		if err != nil {
 			log.Errf("cannot get host metadata: %s", err)
 			return
@@ -134,20 +129,21 @@ func (c *Connector) refreshActiveChecks() {
 		var n int
 
 		if a.HostMetadata, n = agent.CutAfterN(a.HostMetadata, hostMetadataLen); n != hostMetadataLen {
-			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter is too long, using first %d characters", agent.Options.HostMetadataItem, n)
+			log.Warningf("the returned value of \"%s\" item specified by \"HostMetadataItem\" configuration parameter"+
+				" is too long, using first %d characters", c.options.HostMetadataItem, n)
 		}
 	}
 
-	if len(agent.Options.ListenIP) > 0 {
-		if i := strings.IndexByte(agent.Options.ListenIP, ','); i != -1 {
-			a.ListenIP = agent.Options.ListenIP[:i]
+	if len(c.options.ListenIP) > 0 {
+		if i := strings.IndexByte(c.options.ListenIP, ','); i != -1 {
+			a.ListenIP = c.options.ListenIP[:i]
 		} else {
-			a.ListenIP = agent.Options.ListenIP
+			a.ListenIP = c.options.ListenIP
 		}
 	}
 
-	if agent.Options.ListenPort != defaultAgentPort {
-		a.ListenPort = agent.Options.ListenPort
+	if c.options.ListenPort != defaultAgentPort {
+		a.ListenPort = c.options.ListenPort
 	}
 
 	request, err := json.Marshal(&a)
@@ -156,7 +152,7 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	data, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), request)
+	data, err := zbxcomms.Exchange(c.address, &c.localAddr, time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
@@ -275,31 +271,6 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache, *response.RefreshUnsupported, response.Expressions, response.Data)
 }
 
-// Write function is used by ResultCache to upload cached history. It will be callled from
-// different goroutine.
-func (c *Connector) Write(data []byte) (n int, err error) {
-	b, err := zbxcomms.Exchange(c.address, time.Second*time.Duration(agent.Options.Timeout), data)
-	if err != nil {
-		return 0, err
-	}
-
-	var response agentDataResponse
-
-	err = json.Unmarshal(b, &response)
-	if err != nil {
-		return 0, err
-	}
-
-	if response.Response != "success" {
-		if len(response.Info) != 0 {
-			return 0, fmt.Errorf("%s", response.Info)
-		}
-		return 0, errors.New("unsuccessful response")
-	}
-
-	return len(data), nil
-}
-
 func (c *Connector) run() {
 	var lastRefresh time.Time
 	var lastFlush time.Time
@@ -313,11 +284,11 @@ run:
 		select {
 		case <-ticker.C:
 			now := time.Now()
-			if now.Sub(lastFlush) >= c.maxUploadInterval {
+			if now.Sub(lastFlush) >= time.Second*time.Duration(c.options.BufferSend) {
 				c.resultCache.Flush()
 				lastFlush = now
 			}
-			if now.Sub(lastRefresh) > c.activeChecksInterval {
+			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
 				c.refreshActiveChecks()
 				lastRefresh = time.Now()
 			}
@@ -328,29 +299,41 @@ run:
 			switch v.(type) {
 			case *agent.AgentOptions:
 				c.updateOptions(v.(*agent.AgentOptions))
+				// TODO: when runtime configuration reload is implemented the result cache active
+				// connection properties must be updated too
 			}
 		}
 	}
-	close(c.input)
 	log.Debugf("[%d] server connector has been stopped", c.clientID)
 	monitor.Unregister()
 }
 
 func (c *Connector) updateOptions(options *agent.AgentOptions) {
-	c.maxUploadInterval = time.Duration(options.BufferSend) * time.Second
-	c.activeChecksInterval = time.Duration(agent.Options.RefreshActiveChecks) * time.Second
+	c.options = options
+	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
-func New(taskManager scheduler.Scheduler, address string) *Connector {
+func New(taskManager scheduler.Scheduler, address string, options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
 		taskManager: taskManager,
 		address:     address,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
 	}
-	c.updateOptions(&agent.Options)
-	c.resultCache = resultcache.NewActive(c.clientID, c)
-	return c
+
+	c.updateOptions(options)
+	if c.tlsConfig, err = agent.GetTLSConfig(c.options); err != nil {
+		return
+	}
+
+	ac := &activeConnection{
+		address:   address,
+		localAddr: c.localAddr,
+		tlsConfig: c.tlsConfig,
+	}
+	c.resultCache = resultcache.NewActive(c.clientID, ac)
+
+	return c, nil
 }
 
 func (c *Connector) Start() {

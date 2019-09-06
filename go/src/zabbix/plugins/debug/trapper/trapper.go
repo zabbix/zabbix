@@ -25,8 +25,8 @@ import (
 	"net"
 	"regexp"
 	"strconv"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/watch"
 )
 
@@ -149,5 +149,5 @@ func init() {
 	impl.manager = watch.NewManager(&impl)
 	impl.listeners = make(map[int]*trapListener)
 
-	plugin.RegisterMetric(&impl, "trapper", "debug.trap", "Listen on port for incoming TCP data.")
+	plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
 }

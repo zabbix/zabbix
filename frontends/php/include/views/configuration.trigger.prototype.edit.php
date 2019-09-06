@@ -44,6 +44,7 @@ if ($data['triggerid'] !== null) {
 
 if ($data['limited']) {
 	$triggersForm
+		->addVar('opdata', $data['opdata'])
 		->addVar('recovery_mode', $data['recovery_mode'])
 		->addVar('type', $data['type'])
 		->addVar('correlation_mode', $data['correlation_mode'])
@@ -55,14 +56,22 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
-$triggersFormList->addRow(
-	(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
-	(new CTextBox('description', $data['description'], $data['limited']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autofocus', 'autofocus')
+$triggersFormList
+	->addRow(
+		(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
+		(new CTextBox('description', $data['description'], $data['limited']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
+	->addRow(
+		new CLabel(_('Operational data'), 'opdata'),
+		(new CTextBox('opdata', $data['opdata'], $data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(
+		_('Severity'),
+		new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']])
+	);
 
 // append expression to form list
 if ($data['expression_field_readonly']) {
@@ -100,6 +109,7 @@ $expression_row = [
 		$data['expression_field_value'],
 		['readonly' => $data['expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -301,6 +311,7 @@ $recovery_expression_row = [
 		$data['recovery_expression_field_value'],
 		['readonly' => $data['recovery_expression_field_readonly']]
 	))
+		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

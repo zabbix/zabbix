@@ -22,7 +22,7 @@ package kernel
 import (
 	"errors"
 	"fmt"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/std"
 )
 
@@ -49,7 +49,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		proc = false
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return 0, fmt.Errorf("Invalid key.")
+		return 0, fmt.Errorf("Unsupported metric.")
 	}
 
 	return getMax(proc)
@@ -57,6 +57,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "kernel", "kernel.maxproc", "Returns maximum number of processes supported by OS.")
-	plugin.RegisterMetric(&impl, "kernel", "kernel.maxfiles", "Returns maximum number of opened files supported by OS.")
+	plugin.RegisterMetrics(&impl, "Kernel",
+		"kernel.maxproc", "Returns maximum number of processes supported by OS.",
+		"kernel.maxfiles", "Returns maximum number of opened files supported by OS.")
 }

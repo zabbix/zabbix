@@ -20,15 +20,15 @@
 package scheduler
 
 import (
+	"errors"
 	"hash/fnv"
-	"strings"
 	"sync/atomic"
 	"time"
 	"unsafe"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -46,7 +46,7 @@ type pluginInfo struct {
 type client struct {
 	id                 uint64
 	exporters          map[uint64]exporterTaskAccessor
-	plugins            map[*pluginAgent]*pluginInfo
+	pluginsInfo        map[*pluginAgent]*pluginInfo
 	refreshUnsupported int
 	globalRegexp       unsafe.Pointer
 	output             plugin.ResultWriter
@@ -87,7 +87,10 @@ func (c *client) Output() plugin.ResultWriter {
 func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time) (err error) {
 	var info *pluginInfo
 	var ok bool
-	if info, ok = c.plugins[p]; !ok {
+
+	log.Debugf("[%d] adding new request for key: '%s'", c.id, r.Key)
+
+	if info, ok = c.pluginsInfo[p]; !ok {
 		info = &pluginInfo{}
 	}
 
@@ -112,15 +115,31 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if r.Itemid != 0 {
+		var task *exporterTask
+		var tacc exporterTaskAccessor
+
+		if c.id != 0 {
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
+			if tacc, ok = c.exporters[r.Itemid]; ok {
+				task = tacc.task()
+				if task.updated.Equal(now) {
+					return errors.New("duplicate itemid found")
+				}
+				if task.plugin != p {
+					// create new task if item key has been changed and now is handled by other plugin
+					task.deactivate()
+					ok = false
+				}
+			}
+		} else {
+			ok = false
 		}
-		var task *exporterTask
-		if tacc, ok := c.exporters[r.Itemid]; !ok {
+
+		if !ok {
 			task = &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
+				taskBase: taskBase{plugin: p, active: true, recurring: c.id != 0},
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
 				updated:  now,
 				client:   c,
@@ -130,11 +149,14 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if err = task.reschedule(now); err != nil {
 				return
 			}
-			if r.Itemid != 0 {
+
+			if c.id != 0 {
 				c.exporters[r.Itemid] = task
 			}
+
 			tasks = append(tasks, task)
-			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
+			log.Debugf("[%d] created exporter task for plugin '%s' itemid:%d key '%s'",
+				c.id, p.name(), task.item.itemid, task.item.key)
 		} else {
 			task = tacc.task()
 			task.updated = now
@@ -142,11 +164,11 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if task.item.delay != r.Delay {
 				task.item.delay = r.Delay
 				if err = task.reschedule(now); err != nil {
-					task.deactivate()
 					return
 				}
 				p.tasks.Update(task)
-				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
+				log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
+					c.id, p.name(), task.item.itemid, task.item.key)
 			}
 		}
 		task.meta.SetLastLogsize(*r.LastLogsize)
@@ -193,10 +215,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if p.refcount == 0 {
 			task := &configuratorTask{
 				taskBase: taskBase{plugin: p, active: true},
-				options:  agent.Options.Plugins[strings.Title(p.impl.Name())]}
-			if err = task.reschedule(now); err != nil {
-				return
-			}
+				options:  agent.Options.Plugins[p.impl.Name()]}
+			_ = task.reschedule(now)
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
 		}
@@ -207,7 +227,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	if info.used.IsZero() {
 		p.refcount++
-		c.plugins[p] = info
+		c.pluginsInfo[p] = info
 	}
 	info.used = now
 
@@ -215,9 +235,9 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 }
 
 func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
-	released = make([]*pluginAgent, 0, len(c.plugins))
+	released = make([]*pluginAgent, 0, len(c.pluginsInfo))
 	// remover references to temporary watcher tasks
-	for _, p := range c.plugins {
+	for _, p := range c.pluginsInfo {
 		p.watcher = nil
 	}
 
@@ -226,6 +246,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 		task := tacc.task()
 		if task.updated.Before(now) {
 			delete(c.exporters, task.item.itemid)
+			log.Debugf("[%d] released unused exporter for itemid:%d", c.id, task.item.itemid)
 			task.deactivate()
 		}
 	}
@@ -242,7 +263,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 	// deactivate plugins
 	for _, p := range plugins {
-		if info, ok := c.plugins[p]; ok {
+		if info, ok := c.pluginsInfo[p]; ok {
 			if info.used.Before(expiry) {
 				// perform empty watch task before closing
 				if c.id != 0 {
@@ -264,7 +285,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 				}
 
 				released = append(released, p)
-				delete(c.plugins, p)
+				delete(c.pluginsInfo, p)
 				p.refcount--
 				// TODO: define uniform time format
 				if c.id != 0 {
@@ -297,10 +318,10 @@ func (c *client) updateExpressions(expressions []*glexpr.Expression) {
 
 func newClient(id uint64, output plugin.ResultWriter) (b *client) {
 	b = &client{
-		id:        id,
-		exporters: make(map[uint64]exporterTaskAccessor),
-		plugins:   make(map[*pluginAgent]*pluginInfo),
-		output:    output,
+		id:          id,
+		exporters:   make(map[uint64]exporterTaskAccessor),
+		pluginsInfo: make(map[*pluginAgent]*pluginInfo),
+		output:      output,
 	}
 
 	return

@@ -162,10 +162,10 @@ $item_form_list
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					'&rArr;',
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 1000))
-						->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setAttribute('data-row-action', 'remove_row')

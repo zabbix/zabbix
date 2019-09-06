@@ -22,7 +22,7 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/version"
 )
 
@@ -52,7 +52,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "agent", "agent.hostname", "Returns Hostname from agent configuration.")
-	plugin.RegisterMetric(&impl, "agent", "agent.ping", "Returns agent availability check result.")
-	plugin.RegisterMetric(&impl, "agent", "agent.version", "Version of Zabbix agent.")
+	plugin.RegisterMetrics(&impl, "Agent",
+		"agent.hostname", "Returns Hostname from agent configuration.",
+		"agent.ping", "Returns agent availability check result.",
+		"agent.version", "Version of Zabbix agent.")
 }

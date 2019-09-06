@@ -66,6 +66,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Discovery')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Web')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Interface')]");
+		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Proxy')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Templates')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[contains(text(),'Status')]");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Availability')]");
@@ -253,7 +254,9 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_2 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
 		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
 		$this->zbxTestLaunchOverlayDialog('Proxies');

@@ -15,7 +15,7 @@ body {
 	color: $font-color;
 	background-color: $body-bg-color;
 	margin-bottom: 60px;
-	min-width: 950px;
+	min-width: 1200px;
 
 	font: {
 		family: $font-stack;
@@ -221,6 +221,10 @@ pre {
 	[disabled] {
 		opacity: 1 !important;
 	}
+}
+
+.monospace-font {
+	font-family: $font-stack-mono;
 }
 
 %space-pre-wrap {
@@ -1108,9 +1112,6 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		&.latest-value {
-			max-width: 300px;
-		}
 	}
 
 	tbody th {
@@ -1126,6 +1127,11 @@ output {
 		border-bottom: none;
 		color: $font-alt-color;
 		text-align: right;
+	}
+
+	.latest-values,
+	.opdata {
+		max-width: 300px;
 	}
 }
 
@@ -1626,6 +1632,15 @@ output {
 			.subfilter-enabled {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
+			}
+
+			&.selected {
+
+				.subfilter-enabled,
+				.subfilter-disable-btn,
+				.subfilter-disable-btn:active {
+					background-color: $multiselect-selected-bg-color;
+				}
 			}
 		}
 	}
@@ -2248,7 +2263,8 @@ select {
 	}
 
 	+ label.label-pos-left span {
-		margin-left: 4px;
+		margin-left: 6px;
+		margin-right: 1px;
 	}
 
 	&:focus + label span {
@@ -3438,7 +3454,9 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
 	}
 }
@@ -3453,6 +3471,15 @@ $form-icon-btn: (
 	}
 }
 
+.layout-kioskmode {
+	transition: padding-top .3s 2s;
+
+	&.widget-mouseenter {
+		padding-top: 40px;
+		transition: padding-top .3s;
+	}
+}
+
 .dashbrd-grid-container {
 
 	&.dashbrd-mode-edit .dashbrd-grid-widget,
@@ -3461,6 +3488,23 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
+		}
+	}
+
+	.dashbrd-grid-widget-focus,
+	.dashbrd-grid-widget:hover {
+
+		&.dashbrd-grid-widget-hidden-header {
+
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				transform: translate3d(0, -94%, 0);
+				z-index: 5;
+			}
+
+			.dashbrd-grid-widget-content {
+				z-index: 6;
+			}
 		}
 	}
 }
@@ -3477,6 +3521,9 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-head {
+	border: 1px solid $ui-border-color;
+	border-bottom: none;
+	margin: -1px -1px 0 -1px;
 	position: relative;
 	padding: 8px 65px 8px 10px;
 	min-height: 17px;
@@ -3500,6 +3547,35 @@ $form-icon-btn: (
 			select {
 				margin: 4px 0;
 			}
+		}
+	}
+}
+
+.dashbrd-grid-widget {
+
+	&.dashbrd-grid-widget-hidden-header {
+
+		.dashbrd-grid-widget-container {
+			padding: 8px 0;
+			position: relative;
+		}
+
+		.dashbrd-grid-widget-head {
+			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
+			background-color: $ui-bg-color;
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			transform: translate3d(0, 0, 0);
+			transition: transform .3s, box-shadow .3s, z-index .3s;
+			z-index: 2;
+		}
+
+		.dashbrd-grid-widget-content {
+			background-color: $ui-bg-color;
+			transition: z-index .3s;
+			z-index: 3;
 		}
 	}
 }
@@ -3755,7 +3831,9 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
 	}
 
@@ -4017,7 +4095,8 @@ $form-icon-btn: (
 	}
 
 	.msg-bad,
-	.msg-good {
+	.msg-good,
+	.msg-warning {
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
@@ -4063,6 +4142,11 @@ $form-icon-btn: (
 		margin-left: -10px;
 		@extend %webkit-scrollbar;
 	}
+
+	.table-forms-second-column {
+		float: right;
+		line-height: 24px;
+	}
 }
 
 // Multiline input control.
@@ -4085,7 +4169,6 @@ $form-icon-btn: (
 		}
 
 		&.monospace-font {
-			font-family: $font-stack-mono;
 			padding-top: 1px;
 		}
 	}
@@ -4166,7 +4249,6 @@ $form-icon-btn: (
 
 		li {
 			color: $font-alt-color;
-			font-family: $font-stack-mono;
 			line-height: $line-height;
 			text-align: right;
 			min-width: 24px;
@@ -4202,14 +4284,31 @@ $form-icon-btn: (
 		float: left;
 		line-height: 24px;
 	}
+}
 
-	&.monospace-font {
+// Flexible textarea.
+.textarea-flexible-container {
 
-		.multilineinput-textarea,
-		.multilineinput-label {
-			font-family: $font-stack-mono;
+	td {
+		line-height: 22px;
+
+		&.textarea-flexible-parent {
+			vertical-align: top;
+		}
+
+		button {
+			line-height: normal;
 		}
 	}
+}
+
+.textarea-flexible {
+	display: block;
+	min-height: 24px;
+	overflow: hidden;
+	resize: none;
+	word-break: break-all;
+	white-space: normal;
 }
 
 // Map widget back to parent button.
@@ -4459,6 +4558,15 @@ $form-icon-btn: (
 	float: left;
 	margin: 2px 0 0 -19px;
 	@include border-radius(2px);
+
+	.notif-indic-snooze {
+		width: 14px;
+		height: 14px;
+		float: left;
+		margin-top: 20px;
+		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+	}
+
 }
 
 .notif-indic-container {
@@ -4559,7 +4667,7 @@ $form-icon-btn: (
 }
 
 .no-padding {
-	padding: 0;
+	padding: 0 !important;
 }
 
 .graph-selection {
@@ -5104,6 +5212,7 @@ a.link-action {
 ) {
 	.#{$severity-type} {
 		color: darken($color, 45%);
+		position: relative;
 
 		@if $severity-type == normal-bg {
 			background-color: $color;
@@ -5170,122 +5279,161 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.msg-good {
-	color: $font-color;
-	border: 2px solid $light-green;
+.msg-bad,
+.msg-good,
+.msg-warning {
 	background-color: $ui-bg-color;
+	color: $font-color;
+	border: 2px solid;
+	font-size: $font-top-nav-size;
+	margin-bottom: 10px;
+	padding: 6px 10px 6px 75px;
 	text-align: left;
+	vertical-align: middle;
+	position: relative;
+	@include border-radius(2px);
 
-	@extend %msg;
+	.overlay-close-btn {
+		color: $font-alt-color;
+		font-size: $font-top-nav-size;
+	}
 
 	.link-action {
-		color: darken(desaturate($green, 10%), 20%);
 		margin-right: 10px;
 		font-size: $font-msg-reset-size;
 
 		.arrow-up {
 			border-bottom-color: darken(desaturate($green, 10%), 20%);
 		}
+
 		.arrow-down {
 			border-top-color: darken(desaturate($green, 10%), 20%);
 		}
 	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
-	}
-
-	ul {
-		border-top-color: $light-green;
-	}
-
 	button {
 		background-color: $white;
-		color: darken(desaturate($green, 10%), 20%);
-		border-color: $light-green;
 	}
-}
 
-.msg-good:before {
-	content: "";
-	background-color: $light-green;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
+	&:before {
+		content: "";
+		width: 61px;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+	}
 
-.msg-good:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+	&:after {
+		content: "";
+		background: url(../img/icon-sprite.svg) no-repeat;
+		margin-top: 2px;
+		margin-left: 16px;
+		width: 27px;
+		height: 25px;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
 }
 
 .msg-bad {
-	color: $font-color;
-	border: 2px solid $light-red;
-	background-color: $ui-bg-color;
-	text-align: left;
-
-	@extend %msg;
+	border-color: $msg-bad-border-color;
 
 	.link-action {
-		color: darken(desaturate($red, 10%), 20%);
-		margin-right: 10px;
-		font-size: $font-msg-reset-size;
+		color: $msg-bad-color;
 
 		.arrow-up {
-			border-bottom-color: darken(desaturate($red, 10%), 20%);
+			border-bottom-color: $msg-bad-color;
 		}
-		.arrow-down {
-			border-top-color: darken(desaturate($red, 10%), 20%);
-		}
-	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
+		.arrow-down {
+			border-top-color: $msg-bad-color;
+		}
 	}
 
 	ul {
-		border-top-color: $light-red;
+		border-top-color: $msg-bad-border-color;
 	}
 
 	button {
-		background-color: $white;
-		color: darken(desaturate($red, 10%), 20%);
-		border-color: $light-red;
+		color: $msg-bad-color;
+		border-color: $msg-bad-border-color;
+	}
+
+	&:before {
+		background-color: $msg-bad-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
 	}
 }
 
-.msg-bad:before {
-	content: "";
-	background-color: $light-red;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
+.msg-good {
+	border-color: $msg-good-border-color;
+
+	.link-action {
+		color: $msg-good-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-good-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-good-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-good-border-color;
+	}
+
+	button {
+		color: $msg-good-color;
+		border-color: $msg-good-border-color;
+	}
+
+	&:before {
+		background-color: $msg-good-border-color;
+	}
+
+	&:after {
+		background-position: -122px -244px;
+	}
 }
 
-.msg-bad:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+.msg-warning {
+	border-color: $msg-warning-border-color;
+
+	.link-action {
+		color: $msg-warning-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-warning-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-warning-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-warning-border-color;
+	}
+
+	button {
+		color: $msg-warning-color;
+		border-color: $msg-warning-border-color;
+	}
+
+	&:before {
+		background-color: $msg-warning-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
+	}
 }
 
 .msg-details {
@@ -5339,58 +5487,14 @@ td.inactive-bg {
 	}
 }
 
-%msg {
-	font-size: $font-top-nav-size;
-	padding: 6px 10px 6px 75px;
-	text-align: left;
-	vertical-align: middle;
-	position: relative;
-	margin-bottom: 10px;
-	@include border-radius(2px);
-
-	.overlay-close-btn {
-		font-size: $font-top-nav-size;
-	}
-}
-
-.msg-bad-global {
+.msg-global-footer {
 	display: none;
 	position: fixed;
 	z-index: 10000;
-	text-align: left;
 	right: 0;
 	left: 0;
 	bottom: 0;
-	vertical-align: middle;
-	font-size: $font-top-nav-size;
-	color: $font-color;
-	border: 2px solid $alt-yellow;
-	background-color: $ui-bg-color;
 	margin: 0 10px 0 10px;
-	padding: 6px 10px 6px 75px;
-}
-
-.msg-bad-global:before {
-	content: "";
-	background-color: $alt-yellow;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
-
-.msg-bad-global:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
 }
 
 .msg-global {
@@ -6841,7 +6945,7 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET HOST AVAILABILITY
+// WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 	width: 100%;
@@ -6849,6 +6953,8 @@ table.preprocessing-test-results {
 	table-layout: fixed;
 
 	td {
+		line-height: 18px;
+		overflow: hidden;
 		padding: 0 10px;
 		vertical-align: middle;
 	}
@@ -6861,6 +6967,7 @@ table.preprocessing-test-results {
 		min-width: 305px;
 
 		td {
+			height: 100%;
 			text-align: center;
 		}
 
@@ -6894,6 +7001,61 @@ table.preprocessing-test-results {
 
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
+	}
+}
+
+// WIDGET "PROBLEMS BY SEVERITY"
+
+.by-severity-widget {
+	height: 100%;
+	display: flex;
+
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
+		line-height: 18px;
+		overflow: hidden;
+		padding: 0 10px;
+		position: relative;
+	}
+
+	.by-severity-count {
+		font-size: 16px;
+	}
+
+	&.by-severity-layout-horizontal {
+
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
+		}
+	}
+
+	&.by-severity-layout-vertical {
+		flex-direction: column;
+
+		> div {
+			min-height: 26px;
+			padding-top: 3px;
+		}
+
+		.by-severity-count {
+			margin-right: 5px;
+		}
+	}
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+
+	/* for IE11 only. Fixed cell height if table has 100% height */
+	.host-avail-widget {
+
+		td {
+			height: 100%;
+		}
 	}
 }
 
@@ -7516,7 +7678,7 @@ Error notification appears after an action has been completed with errors or an 
 Global notification.
 
 ```html_example
-<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+<div class="msg-global-footer msg-warning">Zabbix server is not running: the information displayed may not be current.</div>
 ```
 */
 
