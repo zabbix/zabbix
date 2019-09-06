@@ -141,21 +141,21 @@ class CAutoregistration extends CApiService {
 		foreach (['tls_psk_identity', 'tls_psk'] as $field_name) {
 			if ($tls_accept & HOST_ENCRYPTION_PSK) {
 				if (!array_key_exists($field_name, $autoreg) && $db_autoreg[$field_name] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', '/',
-						_s('the parameter "%1$s" is missing', $field_name)
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/', _s('the parameter "%1$s" is missing', $field_name))
+					);
 				}
 
 				if (array_key_exists($field_name, $autoreg) && $autoreg[$field_name] === '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', '/'.$field_name, _('cannot be empty'))
+						_s('Invalid parameter "%1$s": %2$s.', '/'.$field_name, _('cannot be empty'))
 					);
 				}
 			}
 			else {
 				if (array_key_exists($field_name, $autoreg) && $autoreg[$field_name] !== '') {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', '/'.$field_name, _('should be empty'))
+						_s('Invalid parameter "%1$s": %2$s.', '/'.$field_name, _('should be empty'))
 					);
 				}
 
