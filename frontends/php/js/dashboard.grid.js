@@ -2617,8 +2617,7 @@
 	/**
 	 * Remove widget actions added by addAction.
 	 */
-	function removeWidgetActions($obj, data, widget)
-	{
+	function removeWidgetActions($obj, data, widget) {
 		for (var hook_name in data['triggers']) {
 			for (var index = 0; index < data['triggers'][hook_name].length; index++) {
 				if (widget['uniqueid'] === data['triggers'][hook_name][index]['uniqueid']) {
