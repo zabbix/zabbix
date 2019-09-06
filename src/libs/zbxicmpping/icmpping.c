@@ -97,7 +97,7 @@ static int	get_interval_option(const char * fping, const char *dst)
 	int	value, ret;
 	char	tmp[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -r0 -t50 -i0 %s", fping, dst);
+	zbx_snprintf(tmp, sizeof(tmp), "%s -c1 -t50 -i0 %s", fping, dst);
 
 	if (SUCCEED == (ret = zbx_execute(tmp, NULL, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_ENABLED)) ||
 			TIMEOUT_ERROR == ret || NULL != strstr(error, dst))
