@@ -64,9 +64,9 @@ class CConfigurationExportBuilder {
 			'graphs' => 'graphs',
 			'groups' => 'groups',
 			'hosts' => 'hosts',
-			'valueMaps' => 'value_maps',
 			'templates' => 'templates',
-			'triggers' => 'triggers'
+			'triggers' => 'triggers',
+			'valueMaps' => 'value_maps'
 		];
 
 		foreach ($tags as $key => $tag) {
@@ -98,6 +98,8 @@ class CConfigurationExportBuilder {
 		if ($schema['type'] & XML_INDEXED_ARRAY) {
 			$rules = $schema['rules'][$schema['prefix']]['rules'];
 		}
+
+		$rules = $this->normalizeExportRules($rules);
 
 		foreach ($data as $row) {
 			$store = [];
@@ -159,6 +161,25 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Sort by require and by alphabetical fields.
+	 *
+	 * @param array $rules
+	 *
+	 * @return array
+	 */
+	protected function normalizeExportRules(array $rules) {
+		ksort($rules);
+
+		foreach (array_reverse($rules) as $key => $val) {
+			if ($val['type'] & XML_REQUIRED) {
+				$rules = [$key => $val] + $rules;
+			}
+		}
+
+		return $rules;
 	}
 
 	/**
