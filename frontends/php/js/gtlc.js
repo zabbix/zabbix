@@ -463,6 +463,8 @@ var timeControl = {
 
 	// options
 	refreshPage: true,
+	timeRefreshInterval: 0,
+	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
 		if (typeof this.objectList[id] !== 'undefined' && objData['reloadOnAdd'] !== 1) {
@@ -650,6 +652,23 @@ var timeControl = {
 		this.objectList[id].processed = 0;
 		this.objectList[id].refresh = true;
 		this.processObjects();
+
+		if (this.timeRefreshInterval > 0) {
+			this.refreshTime();
+		}
+	},
+
+	useTimeRefresh: function(timeRefreshInterval) {
+		if (!empty(timeRefreshInterval) && timeRefreshInterval > 0) {
+			this.timeRefreshInterval = timeRefreshInterval * 1000;
+		}
+	},
+
+	refreshTime: function() {
+		if (this.timeRefreshInterval > 0) {
+			// plan next time update
+			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
+		}
 	},
 
 	disableAllSBox: function() {

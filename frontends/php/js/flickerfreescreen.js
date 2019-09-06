@@ -224,6 +224,10 @@
 					},
 					screen.interval
 				);
+
+				// refresh time control actual time
+				clearTimeout(timeControl.timeRefreshTimeoutHandler);
+				timeControl.refreshTime();
 			}
 		},
 
