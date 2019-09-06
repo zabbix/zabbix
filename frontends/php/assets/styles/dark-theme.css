@@ -2432,6 +2432,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashbrd-grid-widget-content .msg-good, .dashbrd-grid-widget-content .msg-bad {
     margin: 0 10px; }
 
+.dashbrd-grid-widget-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none; }
+
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   height: 0;
   transition: height .3s, margin-top .3s, box-shadow .3s; }
@@ -2514,10 +2520,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-iterator-placeholder {
   position: absolute;
-  display: flex;
-  transition: opacity .3s;
-  opacity: 0; }
-  .dashbrd-grid-iterator-placeholder div {
+  display: flex; }
+  .dashbrd-grid-iterator-placeholder > div {
     margin: .25rem;
     display: flex;
     flex-grow: 1;
@@ -2537,10 +2541,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   justify-content: center;
   border: 1px solid #303030;
   background-color: #2b2b2b; }
-  .dashbrd-grid-iterator-too-small div {
+  .dashbrd-grid-iterator-too-small > div {
     padding: 0 10px;
     text-align: center;
     color: #737373; }
+
+.dashbrd-grid-iterator-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none; }
 
 .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-too-small {
   display: flex; }
@@ -2552,8 +2562,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: 1;
   transition: margin-top .3s, height .3s, box-shadow .3s; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-placeholder, .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-placeholder {
-  opacity: 1; }
 .dashbrd-grid-iterator.dashbrd-grid-iterator-hidden-header.iterator-first-row-mouseenter .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
@@ -2563,8 +2571,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-iterator.ui-resizable-resizing.resizing-left .dashbrd-grid-iterator-container {
   left: auto;
   right: 0; }
-.dashbrd-grid-iterator.iterator-loading .dashbrd-grid-iterator-placeholder {
-  opacity: 1; }
 .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
   position: absolute;
   top: .25rem;
@@ -2584,22 +2590,20 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-good, .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content > div .msg-bad {
       margin: 0 10px; }
 
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .dashbrd-grid-widget-actions {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-actions {
   opacity: 1;
   filter: alpha(opacity=100); }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing {
   background-color: #010101; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-head {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-head {
   margin-top: 0;
   height: 2rem;
   border-bottom: 1px solid #303030;
   box-shadow: 0 6px 8px -2px rgba(128, 128, 128, 0.15);
   transition: none;
   z-index: 7; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-content {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-content {
   background-color: #0e1012; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .dashbrd-grid-iterator-placeholder {
-  opacity: 1; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
   opacity: 0; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing {
@@ -2611,6 +2615,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
   padding-top: 2rem;
   background-color: #2b2b2b; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-widget-mask {
+  display: block; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-iterator-mask {
+  display: block; }
 .dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
   opacity: 1; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {

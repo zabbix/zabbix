@@ -3512,6 +3512,13 @@ $form-icon-btn: (
 	}
 }
 
+.dashbrd-grid-widget-mask {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: none;
+}
+
 .dashbrd-grid-widget {
 
 	&.dashbrd-grid-widget-hidden-header {
@@ -3644,10 +3651,8 @@ $form-icon-btn: (
 .dashbrd-grid-iterator-placeholder {
 	position: absolute;
 	display: flex;
-	transition: opacity .3s;
-	opacity: 0;
 
-	div {
+	& > div {
 		margin: .25rem;
 		display: flex;
 		flex-grow: 1;
@@ -3670,11 +3675,18 @@ $form-icon-btn: (
 	border: 1px solid $ui-border-color;
 	background-color: $ui-bg-color;
 
-	div {
+	& > div {
 		padding: 0 10px;
 		text-align: center;
 		color: $font-alt-color;
 	}
+}
+
+.dashbrd-grid-iterator-mask {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: none;
 }
 
 .dashbrd-grid-iterator {
@@ -3701,10 +3713,6 @@ $form-icon-btn: (
 			// Not inheriting opacity transition here.
 			transition: margin-top .3s, height .3s, box-shadow .3s;
 		}
-
-		.dashbrd-grid-iterator-placeholder {
-			opacity: 1;
-		}
 	}
 
 	&.dashbrd-grid-iterator-hidden-header.iterator-first-row-mouseenter {
@@ -3728,13 +3736,6 @@ $form-icon-btn: (
 		.dashbrd-grid-iterator-container {
 			left: auto;
 			right: 0;
-		}
-	}
-
-	&.iterator-loading {
-
-		.dashbrd-grid-iterator-placeholder {
-			opacity: 1;
 		}
 	}
 
@@ -3787,37 +3788,31 @@ $form-icon-btn: (
 
 	$resizing_background_color: darken($body-bg-color, 6%);
 
-	.dashbrd-grid-widget {
+	.dashbrd-grid-widget-actions {
+		@include opacity(1);
+	}
 
-		.dashbrd-grid-widget-actions {
-			@include opacity(1);
-		}
+	.dashbrd-grid-widget.ui-resizable-resizing {
+		background-color: $resizing_background_color;
+	}
 
-		&.ui-resizable-resizing {
-			background-color: $resizing_background_color;
-		}
+
+	.dashbrd-grid-iterator-head {
+		margin-top: 0;
+		height: 2rem;
+		border-bottom: 1px solid $ui-border-color;
+		box-shadow: 0 6px 8px -2px rgba(128,128,128,0.15);
+		transition: none;
+		z-index: 7;
+	}
+
+	.dashbrd-grid-iterator-content {
+		// Not to see the placeholder through while dragging the iterator.
+		// Will conflict with floating headers, if moved outside the dashbrd-mode-edit section.
+		background-color: $body-bg-color;
 	}
 
 	.dashbrd-grid-iterator {
-
-		.dashbrd-grid-iterator-head {
-			margin-top: 0;
-			height: 2rem;
-			border-bottom: 1px solid $ui-border-color;
-			box-shadow: 0 6px 8px -2px rgba(128,128,128,0.15);
-			transition: none;
-			z-index: 7;
-		}
-
-		.dashbrd-grid-iterator-content {
-			// Not to see the placeholder through while dragging the iterator.
-			// Will conflict with floating headers, if moved outside the dashbrd-mode-edit section.
-			background-color: $body-bg-color;
-		}
-
-		.dashbrd-grid-iterator-placeholder {
-			opacity: 1;
-		}
 
 		&.dashbrd-grid-iterator-focus, &:hover {
 
@@ -3845,6 +3840,17 @@ $form-icon-btn: (
 				padding-top: 2rem;
 				background-color: $ui-bg-color;
 			}
+		}
+	}
+
+	&.dashbrd-resizing {
+
+		.dashbrd-grid-widget-mask {
+			display: block;
+		}
+
+		.dashbrd-grid-iterator-mask {
+			display: block;
 		}
 	}
 

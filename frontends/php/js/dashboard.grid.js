@@ -32,6 +32,7 @@
 				'content': 'dashbrd-grid-iterator-content',
 				'focus': 'dashbrd-grid-iterator-focus',
 				'actions': 'dashbrd-grid-iterator-actions',
+				'mask': 'dashbrd-grid-iterator-mask',
 				'hidden_header': 'dashbrd-grid-iterator-hidden-header'
 
 			},
@@ -42,6 +43,7 @@
 				'content': 'dashbrd-grid-widget-content',
 				'focus': 'dashbrd-grid-widget-focus',
 				'actions': 'dashbrd-grid-widget-actions',
+				'mask': 'dashbrd-grid-widget-mask',
 				'hidden_header': 'dashbrd-grid-widget-hidden-header'
 			},
 			classes = widget['iterator'] ? iterator_classes : widget_classes;
@@ -185,7 +187,10 @@
 			});
 		}
 
-		$div.append(widget['container']);
+		// For disabling widget interactivity in edit mode while resizing.
+		widget['mask'] = $('<div>', {'class': classes['mask']});
+
+		$div.append(widget['container'], widget['mask']);
 
 		if (widget['parent']) {
 			// For child widgets of iterators.
