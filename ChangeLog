@@ -5,6 +5,7 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
 ..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
 ........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
 .........T [ZBX-16539] fixed "Template Net Juniper SNMPv2" (afayantsev)
