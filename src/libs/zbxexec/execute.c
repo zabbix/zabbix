@@ -406,7 +406,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 
 			ret = FAIL;
 		}
-		else if (ZBX_EXIT_CODE_CHECKS_DISABLED != flag && 0 != code)
+		else if (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != code)
 		{
 			if ('\0' != *buffer)
 				zbx_strlcpy(error, buffer, max_error_len);
@@ -472,7 +472,7 @@ close:
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 		}
-		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_DISABLED != flag && 0 != WEXITSTATUS(status)))
+		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
 			if ('\0' == *buffer)
 			{
@@ -504,7 +504,7 @@ close:
 
 	if (TIMEOUT_ERROR == ret)
 		zbx_strlcpy(error, "Timeout while executing a shell script.", max_error_len);
-	else if ('\0' != *error && ZBX_EXIT_CODE_CHECKS_ENABLED_SILENCE != flag)
+	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to execute command \"%s\": %s", command, error);
 
 	if (SUCCEED != ret || NULL == output)
