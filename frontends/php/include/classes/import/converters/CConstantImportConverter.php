@@ -36,6 +36,17 @@ class CConstantImportConverter extends CConverter {
 		return $data;
 	}
 
+	/**
+	 * Convert human readable import constants to values Zabbix API can work with.
+	 *
+	 * @param mixed  $data  Import data.
+	 * @param array  $rules XML rules.
+	 * @param string $path  XML path (for error reporting).
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return mixed
+	 */
 	protected function replaceConstant($data, array $rules, $path = '') {
 		if ($rules['type'] & XML_STRING) {
 			if (!array_key_exists('in', $rules)) {
@@ -45,7 +56,9 @@ class CConstantImportConverter extends CConverter {
 			$flip = array_flip($rules['in']);
 
 			if (!array_key_exists($data, $flip)) {
-				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant value "%1$s"', $data)));
+				throw new Exception(
+					_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant value "%1$s"', $data))
+				);
 			}
 
 			$data = (string) $flip[$data];

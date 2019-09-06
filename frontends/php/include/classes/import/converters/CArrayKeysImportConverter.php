@@ -31,12 +31,20 @@ class CArrayKeysImportConverter extends CConverter {
 	}
 
 	public function convert($data) {
-		$data['zabbix_export'] = $this->normilizeArrayKeys($data['zabbix_export'], $this->rules);
+		$data['zabbix_export'] = $this->normalizeArrayKeys($data['zabbix_export'], $this->rules);
 
 		return $data;
 	}
 
-	protected function normilizeArrayKeys($data, $rules) {
+	/**
+	 * Convert array keys to numeric.
+	 *
+	 * @param mixed $data  Import data.
+	 * @param array $rules XML rules.
+	 *
+	 * @return array
+	 */
+	protected function normalizeArrayKeys($data, $rules) {
 		if (!is_array($data)) {
 			return $data;
 		}
@@ -44,7 +52,7 @@ class CArrayKeysImportConverter extends CConverter {
 		if ($rules['type'] & XML_ARRAY) {
 			foreach ($rules['rules'] as $tag => $tag_rules) {
 				if (array_key_exists($tag, $data)) {
-					$data[$tag] = $this->normilizeArrayKeys($data[$tag], $tag_rules);
+					$data[$tag] = $this->normalizeArrayKeys($data[$tag], $tag_rules);
 				}
 			}
 		}
@@ -52,7 +60,7 @@ class CArrayKeysImportConverter extends CConverter {
 			$prefix = $rules['prefix'];
 
 			foreach ($data as $tag => $value) {
-				$data[$tag] = $this->normilizeArrayKeys($value, $rules['rules'][$prefix]);
+				$data[$tag] = $this->normalizeArrayKeys($value, $rules['rules'][$prefix]);
 			}
 
 			$data = array_values($data);

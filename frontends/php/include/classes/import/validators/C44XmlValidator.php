@@ -1987,9 +1987,11 @@ class C44XmlValidator {
 	/**
 	 * Validate authtype.
 	 *
-	 * @param string $data
-	 * @param array  $parent_data
-	 * @param string $path
+	 * @param string $data        Import data.
+	 * @param array  $parent_data Data's parent array.
+	 * @param string $path        XML path.
+	 *
+	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
@@ -2002,7 +2004,7 @@ class C44XmlValidator {
 	/**
 	 * Get extended validation rules.
 	 *
-	 * @param array $data
+	 * @param array $data Import data.
 	 *
 	 * @return array
 	 */
@@ -2020,12 +2022,12 @@ class C44XmlValidator {
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
-	 * @param array $data
-	 * @param array $parent_data
+	 * @param array $data        Import data.
+	 * @param array $parent_data Data's parent array.
 	 *
 	 * @return string
 	 */
-	public function tlsAcceptConstantPreprocessor($data, array $parent_data = null) {
+	public function tlsAcceptConstantPreprocessor(array $data, array $parent_data = null) {
 		$result = 0;
 		$rules = [
 			CXmlConstantName::NO_ENCRYPTION => CXmlConstantValue::NO_ENCRYPTION,
@@ -2040,6 +2042,15 @@ class C44XmlValidator {
 		return (string) $result;
 	}
 
+	/**
+	 * Export check for ymax_item_1 if ymax_type_1 === ITEM.
+	 *
+	 * @param array $data Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
 	public function graphMaxItemExport(array $data) {
 		if ($data['ymax_type_1'] == CXmlConstantValue::ITEM
 				&& array_key_exists('ymax_item_1', $data)
@@ -2051,6 +2062,15 @@ class C44XmlValidator {
 		return $data['ymax_item_1'];
 	}
 
+	/**
+	 * Export check for ymin_item_1 if ymin_type_1 === ITEM.
+	 *
+	 * @param array $data Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
 	public function graphMinItemExport(array $data) {
 		if ($data['ymin_type_1'] == CXmlConstantValue::ITEM
 				&& array_key_exists('ymin_item_1', $data)
@@ -2062,6 +2082,15 @@ class C44XmlValidator {
 		return $data['ymin_item_1'];
 	}
 
+	/**
+	 * Export check for authtype tag.
+	 *
+	 * @param array $data Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return string Tag constant.
+	 */
 	public function itemAuthtypeExport(array $data) {
 		if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
 				&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
@@ -2079,18 +2108,15 @@ class C44XmlValidator {
 		return $rules['in'][$data['authtype']];
 	}
 
-	public function itemFilterImport(array $data) {
-		if (!array_key_exists('filter', $data)) {
-			return [
-				'conditions' => '',
-				'evaltype' => CXmlConstantName::AND_OR,
-				'formula' => ''
-			];
-		}
-
-		return $data['filter'];
-	}
-
+	/**
+	 * Export transformation for tls_accept tag.
+	 *
+	 * @param array $data Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
 	public function hostTlsAcceptExport(array $data) {
 		$consts = [
 			CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION,
@@ -2109,5 +2135,25 @@ class C44XmlValidator {
 		}
 
 		return is_array($consts[$data['tls_accept']]) ? $consts[$data['tls_accept']] : [$consts[$data['tls_accept']]];
+	}
+
+	/**
+	 * Import check for filter tag.
+	 * API validation throw error when filter tag is empty array.
+	 *
+	 * @param array $data Import data.
+	 *
+	 * @return array
+	 */
+	public function itemFilterImport(array $data) {
+		if (!array_key_exists('filter', $data)) {
+			return [
+				'conditions' => '',
+				'evaltype' => CXmlConstantName::AND_OR,
+				'formula' => ''
+			];
+		}
+
+		return $data['filter'];
 	}
 }
