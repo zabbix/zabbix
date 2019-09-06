@@ -279,7 +279,7 @@ func ParseKey(text string) (key string, params []string, err error) {
 }
 
 func mustQuote(param string) bool {
-	if len(param) > 0 && param[0] == '"' {
+	if len(param) > 0 && (param[0] == '"' || param[0] == ' ') {
 		return true
 	}
 	for _, b := range param {
