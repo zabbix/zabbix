@@ -24,7 +24,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	/**
 	 * Is selecting multiple objects or a single one?
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	protected $multiple = true;
 
