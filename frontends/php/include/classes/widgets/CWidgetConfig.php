@@ -202,27 +202,6 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Is it allowed for the widget to have scrollable content.
-	 *
-	 * @static
-	 *
-	 * @param string $type  Widget type
-	 *
-	 * @return bool
-	 */
-	private static function isScrollable($type) {
-		switch ($type) {
-			case WIDGET_GRAPH:
-			case WIDGET_GRAPH_PROTOTYPE:
-			case WIDGET_SVG_GRAPH:
-				return false;
-
-			default:
-				return true;
-		}
-	}
-
-	/**
 	 * Detect if widget has padding or not
 	 *
 	 * @static
@@ -275,7 +254,6 @@ class CWidgetConfig {
 	public static function getConfiguration($type, $fields, $view_mode)
 	{
 		return [
-			'scrollable' => self::isScrollable($type),
 			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];
 	}

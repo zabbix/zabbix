@@ -2377,11 +2377,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   flex-grow: 1;
   margin-top: 2rem;
   padding-bottom: 8px;
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid #9f9f9f;
   background-color: #fff; }
-  .dashbrd-grid-widget-content.scrollable {
-    overflow: auto; }
   .dashbrd-grid-widget-content .list-table {
     border: none; }
     .dashbrd-grid-widget-content .list-table tbody tr:last-child th, .dashbrd-grid-widget-content .list-table tbody tr:last-child td {

@@ -153,13 +153,8 @@
 			});
 		}
 
-		widget['content_body'] = $('<div>', {'class': classes['content']});
-
-		if (!widget['iterator']) {
-			widget['content_body']
-				.toggleClass('no-padding', !widget['configuration']['padding'])
-				.toggleClass('scrollable', widget['configuration']['scrollable']);
-		}
+		widget['content_body'] = $('<div>', {'class': classes['content']})
+			.toggleClass('no-padding', !widget['iterator'] && !widget['configuration']['padding']);
 
 		widget['container'] = $('<div>', {'class': classes['container']})
 			.append(widget['content_header'])
@@ -187,7 +182,7 @@
 			});
 		}
 
-		// For disabling widget interactivity in edit mode while resizing.
+		// Used for disabling widget interactivity in edit mode while resizing.
 		widget['mask'] = $('<div>', {'class': classes['mask']});
 
 		$div.append(widget['container'], widget['mask']);
@@ -289,8 +284,9 @@
 		iterator['content_header'].toggleClass('pager-visible', pager_visible);
 	}
 
-	// Note: used only for widgets and not iterators.
 	function addWidgetInfoButtons($content_header, buttons) {
+		// Note: this function is used only for widgets and not iterators.
+
 		var $widget_actions = $('.dashbrd-grid-widget-actions', $content_header);
 
 		buttons.each(function(button) {
@@ -314,12 +310,15 @@
 		});
 	}
 
-	// Note: used only for widgets and not iterators.
 	function removeWidgetInfoButtons($content_header) {
+		// Note: this function is used only for widgets and not iterators.
+
 		$('.dashbrd-grid-widget-actions', $content_header).find('.widget-info-button').remove();
 	}
 
 	function setWidgetPadding($obj, data, widget, padding) {
+		// Note: this function is used only for widgets and not iterators.
+
 		if (!widget['iterator'] && widget['configuration']['padding'] !== padding) {
 			widget['configuration']['padding'] = padding;
 			widget['content_body'].toggleClass('no-padding', !padding);
@@ -327,21 +326,9 @@
 		}
 	}
 
-	function setWidgetScrollable($obj, data, widget, scrollable) {
-		if (!widget['iterator'] && widget['configuration']['scrollable'] !== scrollable) {
-			widget['configuration']['scrollable'] = scrollable;
-			widget['content_body'].toggleClass('scrollable', scrollable);
-			resizeWidget($obj, data, widget);
-		}
-	}
-
 	function applyWidgetConfiguration($obj, data, widget, configuration) {
 		if ('padding' in configuration) {
 			setWidgetPadding($obj, data, widget, configuration['padding']);
-		}
-
-		if ('scrollable' in configuration) {
-			setWidgetScrollable($obj, data, widget, configuration['scrollable']);
 		}
 	}
 
@@ -1266,7 +1253,7 @@
 			start: function(event) {
 				$obj.addClass('dashbrd-resizing');
 
-				// Hide all other widgets resize handles which may appear on fast mouse movement.
+				// Hide all other widget resize handles which may appear on fast mouse movement.
 				$obj.find('.ui-resizable-handle').not(widget['div'].find('.ui-resizable-handle')).hide();
 
 				data.widgets.each(function(box) {
