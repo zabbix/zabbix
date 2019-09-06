@@ -10,6 +10,7 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 A.F.....S. [ZBXNEXT-4942] implemented support of displaying operational data in the list of problems (agriscenko, asestakovs)
 
 Bug fixes:
+.......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
 ..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
 ........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
 A......... [ZBX-16550] fixed web monitoring items has no real-time data entry in "item_rtdata" (talbergs)
