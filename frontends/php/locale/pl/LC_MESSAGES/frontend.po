@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-03 14:30+0300\n"
+"POT-Creation-Date: 2019-09-08 01:44+0300\n"
 "PO-Revision-Date: 2017-02-20 08:08+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -335,7 +335,7 @@ msgstr ""
 msgid "<sub-menu/sub-menu/...>script"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:694
+#: include/classes/widgets/CWidgetHelper.php:695
 msgid "ADD OVERRIDE"
 msgstr ""
 
@@ -748,7 +748,7 @@ msgstr "Dodaj host"
 msgid "Add multiple maps"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1101
+#: include/classes/widgets/CWidgetHelper.php:1104
 msgid "Add new data set"
 msgstr ""
 
@@ -1412,12 +1412,18 @@ msgstr ""
 msgid "Background image"
 msgstr "Obraz tła"
 
+#: include/classes/widgets/CWidgetHelper.php:671
+#: include/classes/widgets/CWidgetHelper.php:714
+#: include/classes/widgets/CWidgetHelper.php:978
+msgid "Bar"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "Bazowa DN"
 
-#: include/classes/widgets/CWidgetHelper.php:696
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:697
+#: include/classes/widgets/CWidgetHelper.php:969
 msgid "Base colour"
 msgstr ""
 
@@ -1529,7 +1535,7 @@ msgid "CERT"
 msgstr "CERTYFIKAT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:977
+#: include/classes/graph/CSvgGraph.php:1050
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:996
 #: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
@@ -3324,7 +3330,7 @@ msgid "Close problem"
 msgstr "Zakończ problem"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:901 jsLoader.php:223
+#: include/classes/widgets/CWidgetHelper.php:903 jsLoader.php:223
 #: jsLoader.php:228
 msgid "Collapse"
 msgstr "Zwiń"
@@ -3645,9 +3651,9 @@ msgstr "Gratulacje! Poprawnie zainstalowano interfejs użytkownika Zabbix."
 msgid "Connect to"
 msgstr "Połącz z"
 
-#: include/classes/widgets/CWidgetHelper.php:676
-#: include/classes/widgets/CWidgetHelper.php:750
-#: include/classes/widgets/CWidgetHelper.php:1024
+#: include/classes/widgets/CWidgetHelper.php:677
+#: include/classes/widgets/CWidgetHelper.php:752
+#: include/classes/widgets/CWidgetHelper.php:1027
 msgctxt "missing data function"
 msgid "Connected"
 msgstr ""
@@ -4517,7 +4523,7 @@ msgstr "Opóźniony o"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:587
-#: include/classes/widgets/CWidgetHelper.php:954 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:956 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -5329,10 +5335,11 @@ msgid "Downtime"
 msgstr "Czas przerwy w pracy"
 
 #: include/classes/widgets/CWidgetHelper.php:667
-#: include/classes/widgets/CWidgetHelper.php:710
 #: include/classes/widgets/CWidgetHelper.php:711
 #: include/classes/widgets/CWidgetHelper.php:712
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:713
+#: include/classes/widgets/CWidgetHelper.php:714
+#: include/classes/widgets/CWidgetHelper.php:973
 msgid "Draw"
 msgstr ""
 
@@ -6012,7 +6019,7 @@ msgid "Execution confirmation"
 msgstr "Potwierdzenie wykonania"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:901 jsLoader.php:224
+#: include/classes/widgets/CWidgetHelper.php:903 jsLoader.php:224
 #: jsLoader.php:227
 msgid "Expand"
 msgstr "Rozwiń"
@@ -6286,9 +6293,7 @@ msgstr "Rozmiar pliku (w bajtach). Zwraca liczbę całkowitą"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Informacja o czasie pliku. Zwraca liczbę całkowitą (znacznik czasu Unix)"
 
-#: include/classes/widgets/CWidgetHelper.php:672
-#: include/classes/widgets/CWidgetHelper.php:726
-#: include/classes/widgets/CWidgetHelper.php:727
+#: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:728
 #: include/classes/widgets/CWidgetHelper.php:729
 #: include/classes/widgets/CWidgetHelper.php:730
@@ -6298,7 +6303,9 @@ msgstr "Informacja o czasie pliku. Zwraca liczbę całkowitą (znacznik czasu Un
 #: include/classes/widgets/CWidgetHelper.php:734
 #: include/classes/widgets/CWidgetHelper.php:735
 #: include/classes/widgets/CWidgetHelper.php:736
-#: include/classes/widgets/CWidgetHelper.php:1004
+#: include/classes/widgets/CWidgetHelper.php:737
+#: include/classes/widgets/CWidgetHelper.php:738
+#: include/classes/widgets/CWidgetHelper.php:1007
 msgid "Fill"
 msgstr ""
 
@@ -10057,9 +10064,9 @@ msgstr "Łotewski (lv_LV)"
 msgid "Layout"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:679
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:1035
+#: include/classes/widgets/CWidgetHelper.php:680
+#: include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:1038
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -10092,8 +10099,8 @@ msgid "Limit for search and filter results"
 msgstr "Ograniczenie wyszukiwania/filtrowania elementów"
 
 #: include/classes/widgets/CWidgetHelper.php:668
-#: include/classes/widgets/CWidgetHelper.php:710
-#: include/classes/widgets/CWidgetHelper.php:973 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:711
+#: include/classes/widgets/CWidgetHelper.php:975 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:301
 #: include/views/js/monitoring.sysmaps.js.php:350
 #: include/views/js/monitoring.sysmaps.js.php:694
@@ -10927,11 +10934,11 @@ msgstr "Brakujące pole \"name\" dla prototypu wykresu."
 msgid "Missing \"name\" field for graph."
 msgstr "Brakujące pole \"name\" dla wykresu."
 
-#: include/classes/widgets/CWidgetHelper.php:674
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:750
+#: include/classes/widgets/CWidgetHelper.php:675
 #: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:752
+#: include/classes/widgets/CWidgetHelper.php:753
+#: include/classes/widgets/CWidgetHelper.php:1022
 msgid "Missing data"
 msgstr ""
 
@@ -11886,9 +11893,9 @@ msgstr ""
 #: app/views/administration.proxy.list.php:126
 #: app/views/monitoring.problem.view.php:265
 #: app/views/monitoring.problem.view.php:276
-#: include/classes/widgets/CWidgetHelper.php:675
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:1023
+#: include/classes/widgets/CWidgetHelper.php:676
+#: include/classes/widgets/CWidgetHelper.php:751
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -12824,7 +12831,7 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:972
+#: include/classes/graph/CSvgGraph.php:1045
 #: include/classes/screens/CScreenEvents.php:116
 #: include/classes/screens/CScreenProblem.php:996
 #: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
@@ -13106,9 +13113,7 @@ msgstr "Proszę wprowadzić nazwę hosta lub adres IP hosta oraz numer portu ser
 msgid "Please select two elements"
 msgstr "Proszę wybrać dwa elementy"
 
-#: include/classes/widgets/CWidgetHelper.php:673
-#: include/classes/widgets/CWidgetHelper.php:738
-#: include/classes/widgets/CWidgetHelper.php:739
+#: include/classes/widgets/CWidgetHelper.php:674
 #: include/classes/widgets/CWidgetHelper.php:740
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
@@ -13117,13 +13122,15 @@ msgstr "Proszę wybrać dwa elementy"
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
 #: include/classes/widgets/CWidgetHelper.php:747
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:748
+#: include/classes/widgets/CWidgetHelper.php:749
+#: include/classes/widgets/CWidgetHelper.php:990
 msgid "Point size"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:669
-#: include/classes/widgets/CWidgetHelper.php:711
-#: include/classes/widgets/CWidgetHelper.php:974
+#: include/classes/widgets/CWidgetHelper.php:712
+#: include/classes/widgets/CWidgetHelper.php:976
 #: include/views/js/monitoring.sysmaps.js.php:370
 msgid "Points"
 msgstr ""
@@ -13544,7 +13551,7 @@ msgid "Queue of items to be updated"
 msgstr "Kolejka pozycji do zaktualizowania"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:968
+#: include/classes/graph/CSvgGraph.php:1041
 #: include/classes/screens/CScreenEvents.php:121
 #: include/classes/screens/CScreenProblem.php:982
 #: include/classes/screens/CScreenProblem.php:1163 include/events.inc.php:351
@@ -14161,9 +14168,9 @@ msgstr "Zwraca informacje związane z bramą Java Zabbixa. Poprawne parametry to
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Zwraca procent utraconych pakietów ping ICMP."
 
-#: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:1036
+#: include/classes/widgets/CWidgetHelper.php:681
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:1039
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14722,8 +14729,8 @@ msgstr "Nazwa ochrony"
 #: include/classes/widgets/CWidgetHelper.php:493
 #: include/classes/widgets/CWidgetHelper.php:541
 #: include/classes/widgets/CWidgetHelper.php:563
-#: include/classes/widgets/CWidgetHelper.php:910
-#: include/classes/widgets/CWidgetHelper.php:931 include/forms.inc.php:257
+#: include/classes/widgets/CWidgetHelper.php:912
+#: include/classes/widgets/CWidgetHelper.php:933 include/forms.inc.php:257
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -15471,8 +15478,8 @@ msgid "Stacked"
 msgstr "Warstwowy"
 
 #: include/classes/widgets/CWidgetHelper.php:670
-#: include/classes/widgets/CWidgetHelper.php:712
-#: include/classes/widgets/CWidgetHelper.php:975
+#: include/classes/widgets/CWidgetHelper.php:713
+#: include/classes/widgets/CWidgetHelper.php:977
 msgid "Staircase"
 msgstr ""
 
@@ -16338,9 +16345,9 @@ msgstr "Okres"
 #: app/controllers/CControllerPopupTriggerExpr.php:155
 #: app/controllers/CControllerPopupTriggerExpr.php:169
 #: app/controllers/CControllerPopupTriggerExpr.php:198
-#: include/classes/widgets/CWidgetHelper.php:681
-#: include/classes/widgets/CWidgetHelper.php:756
-#: include/classes/widgets/CWidgetHelper.php:1039
+#: include/classes/widgets/CWidgetHelper.php:682
+#: include/classes/widgets/CWidgetHelper.php:758
+#: include/classes/widgets/CWidgetHelper.php:1042
 msgid "Time shift"
 msgstr "Przesunięcie czasu"
 
@@ -16437,9 +16444,7 @@ msgstr "Transakcja nie została zamknięta. Przerywanie..."
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Przekształca rezultat zapytania SQL na obiekt JSON dla niskopoziomowych reguł wykrywania."
 
-#: include/classes/widgets/CWidgetHelper.php:671
-#: include/classes/widgets/CWidgetHelper.php:714
-#: include/classes/widgets/CWidgetHelper.php:715
+#: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:716
 #: include/classes/widgets/CWidgetHelper.php:717
 #: include/classes/widgets/CWidgetHelper.php:718
@@ -16449,7 +16454,9 @@ msgstr "Przekształca rezultat zapytania SQL na obiekt JSON dla niskopoziomowych
 #: include/classes/widgets/CWidgetHelper.php:722
 #: include/classes/widgets/CWidgetHelper.php:723
 #: include/classes/widgets/CWidgetHelper.php:724
-#: include/classes/widgets/CWidgetHelper.php:995
+#: include/classes/widgets/CWidgetHelper.php:725
+#: include/classes/widgets/CWidgetHelper.php:726
+#: include/classes/widgets/CWidgetHelper.php:998
 msgid "Transparency"
 msgstr ""
 
@@ -16457,9 +16464,9 @@ msgstr ""
 msgid "Transport error."
 msgstr "Błąd przesyłu."
 
-#: include/classes/widgets/CWidgetHelper.php:677
-#: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:678
+#: include/classes/widgets/CWidgetHelper.php:753
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
@@ -18162,7 +18169,6 @@ msgid "When active"
 msgstr "Kiedy włączone"
 
 #: graphs.php:45 include/classes/widgets/CWidgetHelper.php:666
-#: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
 #: include/classes/widgets/CWidgetHelper.php:701
@@ -18173,7 +18179,8 @@ msgstr "Kiedy włączone"
 #: include/classes/widgets/CWidgetHelper.php:706
 #: include/classes/widgets/CWidgetHelper.php:707
 #: include/classes/widgets/CWidgetHelper.php:708
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:709
+#: include/classes/widgets/CWidgetHelper.php:982
 #: include/views/configuration.graph.edit.php:87
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -18353,10 +18360,10 @@ msgstr "MIN wartość osi Y"
 msgid "Y axis side"
 msgstr "Strona osi Y"
 
-#: include/classes/widgets/CWidgetHelper.php:678
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:679
+#: include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:1036
 msgid "Y-axis"
 msgstr ""
 
@@ -19162,7 +19169,7 @@ msgid "host is not monitored"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:537
-#: include/classes/widgets/CWidgetHelper.php:906
+#: include/classes/widgets/CWidgetHelper.php:908
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
@@ -19277,7 +19284,7 @@ msgid "item is disabled"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:559
-#: include/classes/widgets/CWidgetHelper.php:927
+#: include/classes/widgets/CWidgetHelper.php:929
 msgid "item pattern"
 msgstr ""
 
@@ -19471,7 +19478,7 @@ msgstr "brak danych"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1041
+#: include/classes/widgets/CWidgetHelper.php:1044
 msgid "none"
 msgstr ""
 
