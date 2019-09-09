@@ -653,6 +653,26 @@ import (
 	"zabbix/pkg/log"
 )
 
+// TLS initialization
+var supported bool		// is TLS compiled in and successfully initialized
+var supportedMsg string		// reason why TLS is not supported
+
+func Supported() bool {
+	return supported
+}
+
+func SupportedErrMsg() string {
+	return supportedMsg
+}
+
+func init() {
+	supported = C.tls_init() != -1
+
+	if !supported {
+		supportedMsg = C.GoString(C.tls_crypto_init_msg)
+	}
+}
+
 type tlsConn struct {
 	conn    net.Conn
 	tls     unsafe.Pointer
@@ -1025,8 +1045,6 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 	return s, nil
 }
 
-var supported bool
-var supportedMsg string
 var pskContext, defaultContext unsafe.Pointer
 
 const (
@@ -1046,14 +1064,6 @@ type Config struct {
 	KeyFile           string
 	ServerCertIssuer  string
 	ServerCertSubject string
-}
-
-func Supported() bool {
-	return supported
-}
-
-func SupportedErrMsg() string {
-	return supportedMsg
 }
 
 func Init(config *Config) (err error) {
@@ -1093,12 +1103,4 @@ func Init(config *Config) (err error) {
 		return
 	}
 	return
-}
-
-func init() {
-	supported = C.tls_init() != -1
-
-	if !supported {
-		supportedMsg = C.GoString(C.tls_crypto_init_msg)
-	}
 }
