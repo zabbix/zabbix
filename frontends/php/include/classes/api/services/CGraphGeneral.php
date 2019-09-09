@@ -295,7 +295,7 @@ abstract class CGraphGeneral extends CApiService {
 		if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			$sumItems = 0;
 			foreach ($graph['gitems'] as $gitem) {
-				if ($gitem['type'] == GRAPH_ITEM_SUM) {
+				if (array_key_exists('type', $gitem) && $gitem['type'] == GRAPH_ITEM_SUM) {
 					$sumItems++;
 				}
 			}

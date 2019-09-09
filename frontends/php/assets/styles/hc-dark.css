@@ -1064,6 +1064,10 @@ output {
       .multiselect .multiselect-list li .subfilter-enabled {
         padding: 0 9px 0 4px;
         line-height: 18px; }
+      .multiselect .multiselect-list li.selected .subfilter-enabled,
+      .multiselect .multiselect-list li.selected .subfilter-disable-btn,
+      .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
+        background-color: #222; }
   .multiselect .disabled {
     opacity: 1;
     filter: alpha(opacity=100);
@@ -4959,8 +4963,8 @@ ul.top-nav-icons a:focus {
   filter: alpha(opacity=60); }
 
 .multiselect .multiselect-list li.selected .subfilter-enabled,
-.multiselect .multiselect-list li.selected .subfilter-disable-btn {
-  background-color: #222;
+.multiselect .multiselect-list li.selected .subfilter-disable-btn,
+.multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
   -webkit-box-shadow: 0 0 0 1px white;
   -moz-box-shadow: 0 0 0 1px white;
   box-shadow: 0 0 0 1px white; }

@@ -29,21 +29,6 @@ class CValueMap extends CApiService {
 	protected $sortColumns = ['valuemapid', 'name'];
 
 	/**
-	 * Set value map default options in addition to global options.
-	 */
-	public function __construct() {
-		parent::__construct();
-
-		$this->getOptions = array_merge($this->getOptions, [
-			'valuemapids'		=> null,
-			'editable'			=> false,
-			'selectMappings'	=> null,
-			'sortfield'			=> '',
-			'sortorder'			=> ''
-		]);
-	}
-
-	/**
 	 * Get value maps.
 	 *
 	 * @param array  $options
@@ -51,43 +36,62 @@ class CValueMap extends CApiService {
 	 * @return array
 	 */
 	public function get($options = []) {
-		$options = zbx_array_merge($this->getOptions, $options);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'valuemapids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'valuemapid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['valuemapid', 'name']), 'default' => API_OUTPUT_EXTEND],
+			'selectMappings' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['value', 'newvalue']), 'default' => null],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]), 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return ($options['countOutput'] && !$options['groupCount']) ? 0 : [];
+			return $options['countOutput'] ? 0 : [];
 		}
 
-		$res = DBselect($this->createSelectQuery($this->tableName(), $options), $options['limit']);
+		$db_valuemaps = [];
 
-		$result = [];
-		while ($row = DBfetch($res)) {
+		$result = DBselect($this->createSelectQuery($this->tableName(), $options), $options['limit']);
+
+		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {
-				if ($options['groupCount']) {
-					$result[] = $row;
-				}
-				else {
-					$result = $row['rowscount'];
-				}
+				return $row['rowscount'];
 			}
-			else {
-				$result[$row[$this->pk()]] = $row;
+
+			$db_valuemaps[$row['valuemapid']] = $row;
+		}
+
+		if ($db_valuemaps) {
+			$db_valuemaps = $this->addRelatedObjects($options, $db_valuemaps);
+			$db_valuemaps = $this->unsetExtraFields($db_valuemaps, ['valuemapid'], $options['output']);
+
+			if (!$options['preservekeys']) {
+				$db_valuemaps = zbx_cleanHashes($db_valuemaps);
 			}
 		}
 
-		if ($options['countOutput']) {
-			return $result;
-		}
-
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-		}
-
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
-		}
-
-		return $result;
+		return $db_valuemaps;
 	}
 
 	/**
@@ -349,47 +353,44 @@ class CValueMap extends CApiService {
 		}
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
+	protected function addRelatedObjects(array $options, array $db_valuemaps) {
+		$db_valuemaps = parent::addRelatedObjects($options, $db_valuemaps);
 
 		// Select mappings for value map.
 		if ($options['selectMappings'] !== null) {
+			$def_mappings = ($options['selectMappings'] == API_OUTPUT_COUNT) ? '0' : [];
+
+			foreach ($db_valuemaps as $valuemapid => $db_valuemap) {
+				$db_valuemaps[$valuemapid]['mappings'] = $def_mappings;
+			}
+
 			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
 				$db_mappings = DBselect(
 					'SELECT m.valuemapid,COUNT(*) AS cnt'.
 					' FROM mappings m'.
-					' WHERE '.dbConditionInt('m.valuemapid', array_keys($result)).
+					' WHERE '.dbConditionInt('m.valuemapid', array_keys($db_valuemaps)).
 					' GROUP BY m.valuemapid'
 				);
 
-				foreach ($result as $valuemapid => $valuemap) {
-					$result[$valuemapid]['mappings'] = '0';
-				}
-
 				while ($db_mapping = DBfetch($db_mappings)) {
-					$result[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
+					$db_valuemaps[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
 				}
 			}
 			else {
 				$db_mappings = API::getApiService()->select('mappings', [
 					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
-					'filter' => ['valuemapid' => array_keys($result)]
+					'filter' => ['valuemapid' => array_keys($db_valuemaps)]
 				]);
-
-				foreach ($result as &$valuemap) {
-					$valuemap['mappings'] = [];
-				}
-				unset($valuemap);
 
 				foreach ($db_mappings as $db_mapping) {
 					$valuemapid = $db_mapping['valuemapid'];
 					unset($db_mapping['mappingid'], $db_mapping['valuemapid']);
 
-					$result[$valuemapid]['mappings'][] = $db_mapping;
+					$db_valuemaps[$valuemapid]['mappings'][] = $db_mapping;
 				}
 			}
 		}
 
-		return $result;
+		return $db_valuemaps;
 	}
 }
