@@ -44,51 +44,77 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Build wrapper.
+	 * Format valuemaps.
 	 *
-	 * @param array $data
+	 * @param array $schema     Tag schema from validation class.
+	 * @param array $valuemaps  Export data.
 	 */
-	public function buildWrapper(array $data) {
-		$simple_triggers = [];
+	public function buildValueMaps(array $schema, array $valuemaps) {
+		$valuemaps = $this->formatValueMaps($valuemaps);
 
-		if ($data['images']) {
-			$this->buildImages($data['images']);
-		}
+		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
+	}
 
-		if ($data['screens']) {
-			$this->buildScreens($data['screens']);
-		}
+	/**
+	 * Format triggers.
+	 *
+	 * @param array $schema    Tag schema from validation class.
+	 * @param array $triggers  Export data.
+	 */
+	public function buildTriggers(array $schema, array $triggers) {
+		$triggers = $this->formatTriggers($triggers);
 
-		if ($data['maps']) {
-			$this->buildMaps($data['maps']);
-		}
+		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
+	}
 
-		if ($data['triggers']) {
-			$simple_triggers = $this->extractSimpleTriggers($data['triggers']);
-		}
+	/**
+	 * Format templates.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $templates        Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
+		$templates = $this->formatTemplates($templates, $simple_triggers);
 
-		$schema = (new CImportValidatorFactory('xml'))
-			->getObject(ZABBIX_EXPORT_VERSION)
-			->getSchema();
+		$this->data['templates'] = $this->build($schema, $templates, 'templates');
+	}
 
-		$tags = [
-			'graphs' => 'graphs',
-			'groups' => 'groups',
-			'hosts' => 'hosts',
-			'templates' => 'templates',
-			'triggers' => 'triggers',
-			'valueMaps' => 'value_maps'
-		];
+	/**
+	 * Format hosts.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $hosts            Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
+		$hosts = $this->formatHosts($hosts, $simple_triggers);
 
-		foreach ($tags as $key => $tag) {
-			if (!$data[$key]) {
-				continue;
-			}
+		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
+	}
 
-			$value = $this->{$schema['rules'][$tag]['formatter']}($data[$key], $simple_triggers);
+	/**
+	 * Format groups.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $groups  Export data.
+	 */
+	public function buildGroups(array $schema, array $groups) {
+		$groups = $this->formatGroups($groups);
 
-			$this->data[$tag] = $this->build($schema['rules'][$tag], $value, $tag);
-		}
+		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+	}
+
+	/**
+	 * Format graphs.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $graphs  Export data.
+	 */
+	public function buildGraphs(array $schema, array $graphs) {
+		$graphs = $this->formatGraphs($graphs);
+
+		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
 	}
 
 	/**
@@ -96,7 +122,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @param array  $schema    Tag schema from validation class.
 	 * @param array  $data      Export data.
-	 * @param string $main_tag  Tag name for error.
+	 * @param string $main_tag  XML tag (for error reporting).
 	 *
 	 * @return array
 	 */
@@ -109,8 +135,6 @@ class CConfigurationExportBuilder {
 		if ($schema['type'] & XML_INDEXED_ARRAY) {
 			$rules = $schema['rules'][$schema['prefix']]['rules'];
 		}
-
-		$rules = $this->normalizeExportRules($rules);
 
 		foreach ($data as $row) {
 			$store = [];
@@ -175,32 +199,13 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Sort by require and by alphabetical fields.
-	 *
-	 * @param array $rules
-	 *
-	 * @return array
-	 */
-	protected function normalizeExportRules(array $rules) {
-		ksort($rules);
-
-		foreach (array_reverse($rules) as $key => $val) {
-			if ($val['type'] & XML_REQUIRED) {
-				$rules = [$key => $val] + $rules;
-			}
-		}
-
-		return $rules;
-	}
-
-	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
 	 *
 	 * @return array
 	 */
-	protected function extractSimpleTriggers(array &$triggers) {
+	public function extractSimpleTriggers(array &$triggers) {
 		$simple_triggers = [];
 
 		foreach ($triggers as $triggerid => $trigger) {
@@ -229,7 +234,7 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	public function formatTemplates(array $templates, array $simple_triggers = null) {
+	protected function formatTemplates(array $templates, array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
@@ -260,7 +265,7 @@ class CConfigurationExportBuilder {
 	 * @param array $hosts
 	 * @param array $simple_triggers
 	 */
-	public function formatHosts(array $hosts, array $simple_triggers = null) {
+	protected function formatHosts(array $hosts, array $simple_triggers = null) {
 		$result = [];
 
 		CArrayHelper::sort($hosts, ['host']);
@@ -395,7 +400,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @param array $valuemaps
 	 */
-	public function formatValuemaps(array $valuemaps) {
+	protected function formatValueMaps(array $valuemaps) {
 		$result = [];
 
 		CArrayHelper::sort($valuemaps, ['name']);

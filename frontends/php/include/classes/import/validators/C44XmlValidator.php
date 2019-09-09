@@ -295,12 +295,12 @@ class C44XmlValidator {
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
-			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'formatter' => 'formatGroups', 'rules' => [
+			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
 				'group' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
-			'hosts' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'formatter' => 'formatHosts', 'rules' => [
+			'hosts' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => [
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
@@ -904,7 +904,7 @@ class C44XmlValidator {
 					'inventory_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::INV_MODE_MANUAL, 'in' => [CXmlConstantValue::INV_MODE_DISABLED => CXmlConstantName::DISABLED, CXmlConstantValue::INV_MODE_MANUAL => CXmlConstantName::MANUAL, CXmlConstantValue::INV_MODE_AUTOMATIC => CXmlConstantName::AUTOMATIC]]
 				]]
 			]],
-			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'formatter' => 'formatTemplates', 'rules' => [
+			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 				'template' =>				['type' => XML_ARRAY, 'rules' => [
 					'template' =>				['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
@@ -1436,7 +1436,7 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
-			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'formatter' => 'formatTriggers', 'rules' => [
+			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
 					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 					'recovery_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::TRIGGER_EXPRESSION, 'in' => $this->TRIGGER_RECOVERY_MODE],
@@ -1466,7 +1466,7 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
-			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'formatter' => 'formatGraphs', 'rules' => [
+			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [
 				'graph' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'width' =>					['type' => XML_STRING, 'default' => '900'],
@@ -1671,7 +1671,7 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
-			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'formatter' => 'formatValuemaps', 'rules' => [
+			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
 				'value_map' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [

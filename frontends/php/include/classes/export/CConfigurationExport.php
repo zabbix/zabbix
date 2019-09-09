@@ -140,7 +140,50 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			$this->builder->buildWrapper($this->data);
+			$schema = (new CImportValidatorFactory('xml'))
+				->getObject(ZABBIX_EXPORT_VERSION)
+				->getSchema();
+
+			$simple_triggers = [];
+			if ($this->data['triggers']) {
+				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers']);
+			}
+
+			if ($this->data['groups']) {
+				$this->builder->buildGroups($schema['rules']['groups'], $this->data['groups']);
+			}
+
+			if ($this->data['templates']) {
+				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'], $simple_triggers);
+			}
+
+			if ($this->data['hosts']) {
+				$this->builder->buildHosts($schema['rules']['hosts'], $this->data['hosts'], $simple_triggers);
+			}
+
+			if ($this->data['triggers']) {
+				$this->builder->buildTriggers($schema['rules']['triggers'], $this->data['triggers']);
+			}
+
+			if ($this->data['graphs']) {
+				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
+			}
+
+			if ($this->data['screens']) {
+				$this->builder->buildScreens($this->data['screens']);
+			}
+
+			if ($this->data['images']) {
+				$this->builder->buildImages($this->data['images']);
+			}
+
+			if ($this->data['maps']) {
+				$this->builder->buildMaps($this->data['maps']);
+			}
+
+			if ($this->data['valueMaps']) {
+				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
+			}
 
 			return $this->writer->write($this->builder->getExport());
 		}
