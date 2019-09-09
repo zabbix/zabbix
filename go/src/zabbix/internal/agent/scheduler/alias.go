@@ -26,15 +26,15 @@ import (
 	"zabbix/pkg/itemutil"
 )
 
-type alias struct {
+type keyAlias struct {
 	name string
 	key  string
 }
 
-var aliases []alias
+var aliases []keyAlias
 
 func loadAlias(options agent.AgentOptions) (err error) {
-	aliases = make([]alias, 0)
+	aliases = make([]keyAlias, 0)
 	for _, data := range options.Alias {
 		var name, key string
 		if name, key, err = itemutil.ParseAlias(data); err != nil {
@@ -45,7 +45,7 @@ func loadAlias(options agent.AgentOptions) (err error) {
 				return fmt.Errorf("failed to add Alias \"%s\": duplicate name", name)
 			}
 		}
-		var a alias
+		var a keyAlias
 		a.name = name
 		a.key = key
 		aliases = append(aliases, a)
