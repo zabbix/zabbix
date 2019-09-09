@@ -51,6 +51,18 @@ class CConfigurationExportBuilder {
 	public function buildWrapper(array $data) {
 		$simple_triggers = [];
 
+		if ($data['images']) {
+			$this->buildImages($data['images']);
+		}
+
+		if ($data['screens']) {
+			$this->buildScreens($data['screens']);
+		}
+
+		if ($data['maps']) {
+			$this->buildMaps($data['maps']);
+		}
+
 		if ($data['triggers']) {
 			$simple_triggers = $this->extractSimpleTriggers($data['triggers']);
 		}
@@ -73,9 +85,9 @@ class CConfigurationExportBuilder {
 				continue;
 			}
 
-			$data[$key] = call_user_func([$this, $schema['rules'][$tag]['formatter']], $data[$key], $simple_triggers);
+			$value = $this->{$schema['rules'][$tag]['formatter']}($data[$key], $simple_triggers);
 
-			$this->data[$tag] = $this->build($schema['rules'][$tag], $data[$key], $tag);
+			$this->data[$tag] = $this->build($schema['rules'][$tag], $value, $tag);
 		}
 	}
 

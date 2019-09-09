@@ -140,16 +140,6 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			if ($this->data['images']) {
-				$this->builder->buildImages($this->data['images']);
-			}
-			if ($this->data['screens']) {
-				$this->builder->buildScreens($this->data['screens']);
-			}
-			if ($this->data['maps']) {
-				$this->builder->buildMaps($this->data['maps']);
-			}
-
 			$this->builder->buildWrapper($this->data);
 
 			return $this->writer->write($this->builder->getExport());
