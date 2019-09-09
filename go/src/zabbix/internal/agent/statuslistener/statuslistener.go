@@ -43,9 +43,9 @@ func getConf(confFilePath string) (s string) {
 }
 
 func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
-	var ln net.Listener
+	var l net.Listener
 
-	if ln, err = net.Listen("tcp", fmt.Sprintf(":%d", agent.Options.StatusPort)); err != nil {
+	if l, err = net.Listen("tcp", fmt.Sprintf(":%d", agent.Options.StatusPort)); err != nil {
 		return err
 	}
 
@@ -58,7 +58,11 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 	}))
 
 	srv = http.Server{Addr: fmt.Sprintf(":%d", agent.Options.StatusPort), Handler: mux}
-	srv.Serve(ln)
+	go func() {
+		defer log.PanicHook()
+		err = srv.Serve(l)
+		log.Debugf("%s", err.Error())
+	}()
 
 	return nil
 }
