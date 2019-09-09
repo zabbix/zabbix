@@ -38,6 +38,8 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	ZBX_ACTIVE_METRIC *metric = malloc(sizeof(ZBX_ACTIVE_METRIC));
 	memset(metric, 0, sizeof(ZBX_ACTIVE_METRIC));
 	metric->key = key;
+	// key_orig is used in error messages, consider using "itemid: <itemid>" instead of the key
+	metric->key_orig = zbx_strdup(NULL, key);
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	metric->flags = flags;
