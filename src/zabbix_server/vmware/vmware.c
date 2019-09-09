@@ -2183,8 +2183,8 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
 
-			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber> */
-			/* where controller type is either ide or scsi depending on the controller type   */
+			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber>     */
+			/* where controller type is either ide, sata or scsi depending on the controller type */
 
 			dev->label = zbx_xml_read_node_value(details, nodeset->nodeTab[i],
 					"*[local-name()='deviceInfo']/*[local-name()='label']");
