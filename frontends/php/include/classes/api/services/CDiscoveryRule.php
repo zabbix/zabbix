@@ -269,8 +269,6 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-			// Fields lastlogsize, mtime should be removed from API response even for extend output requests.
-			$result = $this->unsetExtraFields($result, ['lastlogsize', 'mtime'], []);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -358,7 +356,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
-			'output' => ['hostid'],
+			'output' => [],
 			'hostids' => zbx_objectValues($items, 'hostid'),
 			'preservekeys' => true
 		]);
@@ -367,7 +365,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$item['rtdata'] = true;
 			}
 		}
-		unset($item, $hosts);
+		unset($item);
 
 		$this->validateCreateLLDMacroPaths($items);
 		$this->validateDependentItems($items);

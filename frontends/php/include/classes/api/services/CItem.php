@@ -412,8 +412,6 @@ class CItem extends CItemGeneral {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type'], $options['output']);
-			// Fields lastlogsize, mtime should be removed from API response even for extend output requests.
-			$result = $this->unsetExtraFields($result, ['lastlogsize', 'mtime'], []);
 		}
 
 		// removing keys (hash -> array)
@@ -485,7 +483,7 @@ class CItem extends CItemGeneral {
 
 		// Get only hosts not templates from items
 		$hosts = API::Host()->get([
-			'output' => ['hostid'],
+			'output' => [],
 			'hostids' => zbx_objectValues($items, 'hostid'),
 			'preservekeys' => true
 		]);
@@ -494,7 +492,7 @@ class CItem extends CItemGeneral {
 				$item['rtdata'] = true;
 			}
 		}
-		unset($item, $hosts);
+		unset($item);
 
 		$this->createReal($items);
 		$this->inherit($items);
