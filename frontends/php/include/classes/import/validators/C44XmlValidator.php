@@ -1987,9 +1987,9 @@ class C44XmlValidator {
 	/**
 	 * Validate authtype.
 	 *
-	 * @param string $data        Import data.
-	 * @param array  $parent_data Data's parent array.
-	 * @param string $path        XML path.
+	 * @param string $data         Import data.
+	 * @param array  $parent_data  Data's parent array.
+	 * @param string $path         XML path.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
@@ -2004,7 +2004,7 @@ class C44XmlValidator {
 	/**
 	 * Get extended validation rules.
 	 *
-	 * @param array $data Import data.
+	 * @param array $data  Import data.
 	 *
 	 * @return array
 	 */
@@ -2022,8 +2022,8 @@ class C44XmlValidator {
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
-	 * @param array $data        Import data.
-	 * @param array $parent_data Data's parent array.
+	 * @param array $data         Import data.
+	 * @param array $parent_data  Data's parent array.
 	 *
 	 * @return string
 	 */
@@ -2045,7 +2045,7 @@ class C44XmlValidator {
 	/**
 	 * Export check for ymax_item_1 if ymax_type_1 === ITEM.
 	 *
-	 * @param array $data Export data.
+	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
@@ -2065,7 +2065,7 @@ class C44XmlValidator {
 	/**
 	 * Export check for ymin_item_1 if ymin_type_1 === ITEM.
 	 *
-	 * @param array $data Export data.
+	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
@@ -2085,7 +2085,7 @@ class C44XmlValidator {
 	/**
 	 * Export check for authtype tag.
 	 *
-	 * @param array $data Export data.
+	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
@@ -2111,7 +2111,7 @@ class C44XmlValidator {
 	/**
 	 * Export transformation for tls_accept tag.
 	 *
-	 * @param array $data Export data.
+	 * @param array $data  Export data.
 	 *
 	 * @throws Exception if the element is invalid.
 	 *
@@ -2139,9 +2139,9 @@ class C44XmlValidator {
 
 	/**
 	 * Import check for filter tag.
-	 * API validation throw error when filter tag is empty array.
+	 * API validation throws an error when filter tag is an empty array.
 	 *
-	 * @param array $data Import data.
+	 * @param array $data  Import data.
 	 *
 	 * @return array
 	 */

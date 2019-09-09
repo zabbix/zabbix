@@ -224,7 +224,7 @@ class CXmlValidatorGeneral {
 	 * @param array  $rules XML rules.
 	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @return void
+	 * @throws Exception if this $value is not a character string.
 	 */
 	private function validateConstant($value, $rules, $path) {
 		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {

@@ -197,7 +197,7 @@ class C42ImportConverter extends CConverter {
 	 * @param array|string $data
 	 * @param array        $rules
 	 *
-	 * @return array
+	 * @return array|string
 	 */
 	protected function convertEmptyTags($data, $rules) {
 		if ($rules['type'] & XML_ARRAY) {

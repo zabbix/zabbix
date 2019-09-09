@@ -20,7 +20,7 @@
 
 
 /**
- * Convert constant on their values.
+ * Convert constants to their values.
  */
 class CConstantImportConverter extends CConverter {
 
