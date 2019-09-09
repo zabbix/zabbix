@@ -443,14 +443,15 @@ switch ($data['method']) {
 	case 'patternselect.get':
 		$config = select_config();
 		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
+		$wildcard_enabled = (strpos($search, '*') !== false);
 		$result = [];
 
 		switch ($data['objectName']) {
 			case 'hosts':
 				$options = [
 					'output' => ['name'],
-					'search' => ['name' => $search],
-					'searchWildcardsEnabled' => true,
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
 					'limit' => $config['search_limit']
 				];
@@ -461,8 +462,8 @@ switch ($data['method']) {
 			case 'items':
 				$options = [
 					'output' => ['name'],
-					'search' => ['name' => $search],
-					'searchWildcardsEnabled' => true,
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'searchWildcardsEnabled' => $wildcard_enabled,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
 						'flags' => ZBX_FLAG_DISCOVERY_NORMAL

@@ -923,57 +923,30 @@ jQuery(function($) {
 	}
 
 	function addAvailable(item, $obj, values, options) {
-		var li = $('<li>', {
-			'data-id': item.id,
-			'data-label': (item.prefix || '') + item.name
-		})
-		.on('click', function() {
-			select(item.id, $obj, values, options);
-		})
-		.on('mouseenter', function() {
-			$('.available li.suggest-hover', $obj).removeClass('suggest-hover');
-			li.addClass('suggest-hover');
-		});
+		var is_new = item.isNew || false,
+			search = values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
+			$li = $('<li>', {
+				'data-id': item.id,
+				'data-label': (item.prefix || '') + item.name
+			})
+			.on('click', function() {
+				select(item.id, $obj, values, options);
+			})
+			.on('mouseenter', function() {
+				$('.available li.suggest-hover', $obj).removeClass('suggest-hover');
+				$li.addClass('suggest-hover');
+			});
 
-		if (!empty(item.prefix)) {
-			li.append($('<span>', {
-				'class': 'grey',
-				text: item.prefix
-			}));
+		if (typeof item.prefix !== 'undefined') {
+			$li.append($('<span>', {'class': 'grey', text: item.prefix}));
 		}
 
 		// highlight matched
-		var text = item.name.toLowerCase(),
-			search = values.search.toLowerCase(),
-			is_new = item.isNew || false,
-			start = 0,
-			end = 0;
+		$li.append(item.name.replace(new RegExp(search, "gi"), function(match) {
+			return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
+		})).toggleClass('suggest-new', is_new);
 
-		while (text.indexOf(search, end) > -1) {
-			end = text.indexOf(search, end);
-
-			if (end > start) {
-				li.append($('<span>', {
-					text: item.name.substring(start, end)
-				}));
-			}
-
-			li.append($('<span>', {
-				'class': !is_new ? 'suggest-found' : null,
-				text: item.name.substring(end, end + search.length)
-			})).toggleClass('suggest-new', is_new);
-
-			end += search.length;
-			start = end;
-		}
-
-		if (end < item.name.length) {
-			li.append($('<span>', {
-				text: item.name.substring(end, item.name.length)
-			}));
-		}
-
-		$('.available ul', $obj).append(li);
+		$('.available ul', $obj).append($li);
 	}
 
 	function select(id, $obj, values, options) {
