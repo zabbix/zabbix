@@ -302,6 +302,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 func (c *client) updateExpressions(expressions []*glexpr.Expression) {
 	// reset expressions if changed
+	glexpr.SortExpressions(expressions)
 	var grxp *glexpr.Bundle
 	if c.globalRegexp != nil {
 		grxp = (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))
