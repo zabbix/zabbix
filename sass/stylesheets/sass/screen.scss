@@ -5164,27 +5164,6 @@ a.link-action {
 }
 
 // SEVERITY STATUSES
-
-.na-bg,
-.normal-bg,
-.info-bg,
-.average-bg,
-.warning-bg,
-.high-bg,
-.disaster-bg {
-
-	a {
-		transition: none;
-	}
-
-	&.blink-hidden {
-		background-color: transparent;
-
-		a {
-			color: $font-color;
-		}
-	}
-}
 @if $theme_name == 'blue' or $theme_name == 'dark' {
 	td[class] {
 		+ {
@@ -5230,13 +5209,34 @@ a.link-action {
 	}
 
 	.log-#{$severity-type} {
-		color: darken($color,45%);
+		color: darken($color, 45%);
 		background-color: $color;
 	}
 }
 
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg {
+
+	a {
+		transition: none;
+	}
+
+	&.blink-hidden {
+		background-color: transparent;
+
+		a {
+			color: $font-color;
+		}
+	}
+}
+
 .inactive-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 	background-color: $alt-red;
 }
 
