@@ -20,12 +20,13 @@
 package scheduler
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -92,6 +93,7 @@ type collectorTask struct {
 }
 
 func (t *collectorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing collector task", t.plugin.name())
 	go func() {
 		collector, _ := t.plugin.impl.(plugin.Collector)
 		if err := collector.Collect(); err != nil {
@@ -135,19 +137,27 @@ func (t *exporterTask) perform(s Scheduler) {
 		var key string
 		var params []string
 		var err error
+
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
+			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
+
 			if ret, err = exporter.Export(key, params, t); err == nil {
+				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
 					case reflect.Slice:
 						fallthrough
 					case reflect.Array:
-						s := reflect.ValueOf(ret)
-						for i := 0; i < s.Len(); i++ {
-							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-							t.output.Write(result)
+						if t.client.ID() == 0 {
+							err = errors.New("Multiple return values are not supported for single passive checks")
+						} else {
+							s := reflect.ValueOf(ret)
+							for i := 0; i < s.Len(); i++ {
+								result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+								t.output.Write(result)
+							}
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
@@ -160,6 +170,8 @@ func (t *exporterTask) perform(s Scheduler) {
 						t.output.Write(&plugin.Result{})
 					}
 				}
+			} else {
+				log.Debugf("failed to execute exporter task for itemid:%d key '%s' error: '%s'", t.item.itemid, itemkey, err.Error())
 			}
 		}
 		if err != nil {
@@ -178,7 +190,7 @@ func (t *exporterTask) perform(s Scheduler) {
 }
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
-	if t.item.itemid != 0 {
+	if t.client.ID() != 0 {
 		var nextcheck time.Time
 		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
 		if err != nil {
@@ -186,6 +198,7 @@ func (t *exporterTask) reschedule(now time.Time) (err error) {
 		}
 		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	} else {
+		// single passive check
 		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 	}
 	return
@@ -222,6 +235,7 @@ type starterTask struct {
 }
 
 func (t *starterTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing starter task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Start()
@@ -243,6 +257,7 @@ type stopperTask struct {
 }
 
 func (t *stopperTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing stopper task", t.plugin.name())
 	go func() {
 		runner, _ := t.plugin.impl.(plugin.Runner)
 		runner.Stop()
@@ -266,6 +281,7 @@ type watcherTask struct {
 }
 
 func (t *watcherTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
 		watcher.Watch(t.requests, t)
@@ -310,6 +326,7 @@ type configuratorTask struct {
 }
 
 func (t *configuratorTask) perform(s Scheduler) {
+	log.Tracef("plugin %s: executing configurator task", t.plugin.name())
 	go func() {
 		config, _ := t.plugin.impl.(plugin.Configurator)
 		config.Configure(t.options)

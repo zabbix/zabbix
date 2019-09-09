@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 type mockWriter struct {
@@ -35,7 +35,7 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte) (n int, err error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (err error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
 		err = errors.New("mock error")
@@ -59,9 +59,13 @@ func (w *mockWriter) Addr() string {
 	return ""
 }
 
+func (w *mockWriter) CanRetry() bool {
+	return false
+}
+
 func TestResultCache(t *testing.T) {
 	agent.Options.BufferSize = 10
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	writer := mockWriter{lastid: 1, t: t}
 	cache := NewActive(0, nil)
@@ -146,7 +150,7 @@ func TestBuffer(t *testing.T) {
 		&AgentData{Id: 10, Itemid: 10},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -184,7 +188,7 @@ func TestBufferFull5(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 15},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -222,7 +226,7 @@ func TestBufferFull5ReplaceFirst(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 5},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -260,7 +264,7 @@ func TestBufferFull5ReplaceLast(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 10},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -298,7 +302,7 @@ func TestBufferFull5ReplacInterleaved(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 9},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -336,7 +340,7 @@ func TestBufferFull5OneItem(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 1},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -373,7 +377,7 @@ func TestBufferFull4OneItemPersistent(t *testing.T) {
 		&AgentData{Id: 14, Itemid: 1, persistent: true},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -412,7 +416,7 @@ func TestBufferFull5OneItemPersistent(t *testing.T) {
 		&AgentData{Id: 15, Itemid: 1, persistent: true},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)
@@ -456,7 +460,7 @@ func TestBufferFull10PersistentAndNormal(t *testing.T) {
 		&AgentData{Id: 20, Itemid: 13},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 	agent.Options.BufferSize = 10
 	cache := NewActive(0, nil)
 	checkBuffer(t, cache, input, expected)

@@ -2,5 +2,5 @@
 
 SUBDIRS = \
 	dev \
-	filecksum
+	file
 

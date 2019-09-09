@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -330,7 +330,7 @@ func (m *mockManager) mockTasks() {
 			}
 			tasks[j].setIndex(-1)
 		}
-		m.queue.Update(p)
+		m.pluginQueue.Update(p)
 	}
 }
 
@@ -558,19 +558,19 @@ func (t *mockConfigerTask) getWeight() int {
 func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clientItem) {
 	lastCheck := time.Time{}
 	n := 0
-	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if task := p.peekTask(); task != nil {
 			if task.getScheduled().Before(lastCheck) {
 				t.Errorf("Out of order tasks detected")
 			}
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 			p.popTask()
 			n++
 			if p.peekTask() != nil {
-				heap.Push(&m.queue, p)
+				heap.Push(&m.pluginQueue, p)
 			}
 		} else {
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 		}
 	}
 	if len(items) != n {
@@ -604,14 +604,14 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 }
 
 func TestTaskCreate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -649,22 +649,22 @@ func TestTaskCreate(t *testing.T) {
 
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 3 {
-		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
+	if len(manager.pluginQueue) != 3 {
+		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
 	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -717,22 +717,22 @@ func TestTaskUpdate(t *testing.T) {
 	}
 	manager.processUpdateRequest(&update, time.Now())
 
-	if len(manager.queue) != 3 {
-		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.queue))
+	if len(manager.pluginQueue) != 3 {
+		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
 	}
 
 	checkExporterTasks(t, manager, 1, items)
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -781,14 +781,14 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 }
 
 func TestTaskDelete(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
 	for i := range plugins {
 		p := &plugins[i]
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(p, name, name, "")
+		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
 	manager := NewManager()
@@ -847,7 +847,7 @@ func TestTaskDelete(t *testing.T) {
 }
 
 func TestSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -855,7 +855,7 @@ func TestSchedule(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -897,7 +897,7 @@ func TestSchedule(t *testing.T) {
 }
 
 func TestScheduleCapacity(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -905,7 +905,7 @@ func TestScheduleCapacity(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -950,7 +950,7 @@ func TestScheduleCapacity(t *testing.T) {
 }
 
 func TestScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -958,7 +958,7 @@ func TestScheduleUpdate(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1017,7 +1017,7 @@ func TestScheduleUpdate(t *testing.T) {
 }
 
 func TestCollectorSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1025,7 +1025,7 @@ func TestCollectorSchedule(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockCollectorPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1062,7 +1062,7 @@ func TestCollectorSchedule(t *testing.T) {
 }
 
 func TestCollectorScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1070,7 +1070,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockCollectorPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1135,7 +1135,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 }
 
 func TestRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1143,7 +1143,7 @@ func TestRunner(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1242,7 +1242,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*plugin.Requ
 }
 
 func TestWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1250,7 +1250,7 @@ func TestWatcher(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1336,14 +1336,14 @@ func TestWatcher(t *testing.T) {
 }
 
 func TestCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetrics(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1383,7 +1383,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1391,7 +1391,7 @@ func TestRunnerWatcher(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1478,14 +1478,14 @@ func TestRunnerWatcher(t *testing.T) {
 }
 
 func TestMultiCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetrics(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1536,14 +1536,14 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestMultiRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
 		plugins[i] = &mockRunnerWatcherPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
-		plugin.RegisterMetric(plugins[i], "debug", "debug", "")
+		plugin.RegisterMetrics(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1612,7 +1612,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 }
 
 func TestPassiveRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	manager := mockManager{sink: make(chan performer, 10)}
 	plugin.ClearRegistry()
@@ -1620,7 +1620,7 @@ func TestPassiveRunner(t *testing.T) {
 	for i := range plugins {
 		plugins[i] = &mockRunnerPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}}
 		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
@@ -1685,7 +1685,7 @@ func TestPassiveRunner(t *testing.T) {
 }
 
 func TestConfigurator(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "")
+	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	options := map[string]map[string]string{
 		"Debug1": map[string]string{"delay": "5"},
@@ -1703,7 +1703,7 @@ func TestConfigurator(t *testing.T) {
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
 			options:    options[name]}
-		plugin.RegisterMetric(plugins[i], name, name, "")
+		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 

@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0alpha1])
+AC_INIT([Zabbix],[4.4.0beta1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1795,6 +1795,7 @@ AC_SUBST(RANLIB)
 SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
+XAGENT_CONFIG_FILE="${sysconfdir}/agent.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
 ALERT_SCRIPTS_PATH="${datadir}/zabbix/alertscripts"
@@ -1814,7 +1815,7 @@ AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
 CGO_LDFLAGS="-Wl,--start-group \
-	\${abs_top_builddir}/src/zabbix_agent/logs/libzbxlogs.a \
+	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -1826,7 +1827,9 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
@@ -1843,6 +1846,7 @@ AC_SUBST(SENDER_LIBS)
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
+AC_SUBST(XAGENT_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
 AC_SUBST(ALERT_SCRIPTS_PATH)
@@ -1950,7 +1954,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
-	src/zabbix_agent/logs/Makefile
+	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
@@ -1994,38 +1998,47 @@ AC_OUTPUT([
 	go/src/zabbix/pkg/glexpr/Makefile
 	go/src/zabbix/pkg/itemutil/Makefile
 	go/src/zabbix/pkg/log/Makefile
+	go/src/zabbix/pkg/plugin/Makefile
 	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/tls/Makefile
 	go/src/zabbix/pkg/version/Makefile
 	go/src/zabbix/pkg/watch/Makefile
 	go/src/zabbix/pkg/zbxcomms/Makefile
 	go/src/zabbix/pkg/zbxlib/Makefile
+	go/src/zabbix/pkg/zbxcmd/Makefile
 	go/src/zabbix/internal/Makefile
 	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/agent/remotecontrol/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/scheduler/Makefile
 	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
 	go/src/zabbix/internal/agent/statuslistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/internal/plugin/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
 	go/src/zabbix/plugins/system/Makefile
+	go/src/zabbix/plugins/system/cpucollector/Makefile
 	go/src/zabbix/plugins/system/uptime/Makefile
 	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
+	go/src/zabbix/plugins/systemrun/Makefile
 	go/src/zabbix/plugins/debug/Makefile
 	go/src/zabbix/plugins/debug/empty/Makefile
 	go/src/zabbix/plugins/debug/filewatcher/Makefile
 	go/src/zabbix/plugins/debug/log/Makefile
 	go/src/zabbix/plugins/debug/collector/Makefile
+	go/src/zabbix/plugins/kernel/Makefile
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
 	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/filecksum/Makefile
+	go/src/zabbix/plugins/vfs/file/Makefile
 	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/stats/Makefile
 	go/src/zabbix/plugins/zabbix/sync/Makefile
 	go/src/zabbix/plugins/zabbix/async/Makefile
+	go/src/zabbix/plugins/net/Makefile
+	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
@@ -2043,6 +2056,9 @@ PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
 
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
+
+XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
+XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
 
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`

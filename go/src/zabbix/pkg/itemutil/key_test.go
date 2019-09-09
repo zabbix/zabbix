@@ -96,6 +96,9 @@ func TestParseKey(t *testing.T) {
 		Result{input: `key[,`, failed: true},
 		Result{input: `key[, `, failed: true},
 		Result{input: `key["\1"]`, key: `key`, params: []string{`\1`}},
+		Result{input: ``, failed: true},
+		Result{input: ` `, failed: true},
+		Result{input: `[a]`, failed: true},
 	}
 
 	for _, result := range results {

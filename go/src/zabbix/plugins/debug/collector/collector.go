@@ -21,7 +21,7 @@ package empty
 
 import (
 	"strconv"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/std"
 )
 
@@ -52,15 +52,16 @@ func (p *Plugin) Period() int {
 
 func (p *Plugin) Configure(options map[string]string) {
 	p.Debugf("configure")
-	if val, ok := options["Interval"]; ok {
-		p.interval, _ = strconv.Atoi(val)
-	} else {
-		p.interval = 10
+	p.interval = 10
+	if options != nil {
+		if val, ok := options["Interval"]; ok {
+			p.interval, _ = strconv.Atoi(val)
+		}
 	}
 }
 
 func init() {
 	stdOs = std.NewOs()
 	impl.interval = 1
-	plugin.RegisterMetric(&impl, "debugcollector", "debug.collector", "Returns empty value")
+	plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
 }

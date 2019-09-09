@@ -44,15 +44,18 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
-	"io"
 	"sync/atomic"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/version"
+)
+
+const (
+	UploadRetryInterval = time.Second
 )
 
 type ResultCache struct {
@@ -66,6 +69,8 @@ type ResultCache struct {
 	maxBufferSize   int32
 	totalValueNum   int32
 	persistValueNum int32
+	retry           *time.Timer
+	timeout         int
 }
 
 type AgentData struct {
@@ -89,11 +94,12 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	io.Writer
+	Write(data []byte, timeout time.Duration) (err error)
 	Addr() (s string)
+	CanRetry() (enabled bool)
 }
 
-func (c *ResultCache) flushOutput(u Uploader) {
+func (c *ResultCache) upload(u Uploader) (err error) {
 	if len(c.results) == 0 {
 		return
 	}
@@ -108,7 +114,6 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		Version: version.Short(),
 	}
 
-	var err error
 	var data []byte
 
 	if data, err = json.Marshal(&request); err != nil {
@@ -116,10 +121,11 @@ func (c *ResultCache) flushOutput(u Uploader) {
 		return
 	}
 
-	if u == nil {
-		u = c.output
+	timeout := len(c.results) * c.timeout
+	if timeout > 60 {
+		timeout = 60
 	}
-	if _, err = u.Write(data); err != nil {
+	if err = u.Write(data, time.Duration(timeout)*time.Second); err != nil {
 		if c.lastError == nil || err.Error() != c.lastError.Error() {
 			log.Warningf("[%d] history upload to [%s] started to fail: %s", c.clientID, u.Addr(), err)
 			c.lastError = err
@@ -141,6 +147,18 @@ func (c *ResultCache) flushOutput(u Uploader) {
 
 	c.totalValueNum = 0
 	c.persistValueNum = 0
+	return
+}
+
+func (c *ResultCache) flushOutput(u Uploader) {
+	if c.retry != nil {
+		c.retry.Stop()
+		c.retry = nil
+	}
+
+	if c.upload(u) != nil && u.CanRetry() {
+		c.retry = time.AfterFunc(UploadRetryInterval, func() { c.FlushOutput(u) })
+	}
 }
 
 // addResult appends received result at the end of results slice
@@ -166,6 +184,7 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	if !result.persistent {
 		for i, r := range c.results {
 			if r.Itemid == result.Itemid {
+				log.Debugf("[%d] cache is full, replacing oldest value for itemid:%d", c.clientID, r.Itemid)
 				index = i
 				break
 			}
@@ -174,6 +193,10 @@ func (c *ResultCache) insertResult(result *AgentData) {
 	if index == -1 && (!result.persistent || c.persistValueNum < c.maxBufferSize/2) {
 		for i, r := range c.results {
 			if !r.persistent {
+				if result.persistent {
+					c.persistValueNum++
+				}
+				log.Debugf("[%d] cache is full, removing oldest value for itemid:%d", c.clientID, r.Itemid)
 				index = i
 				break
 			}
@@ -183,10 +206,6 @@ func (c *ResultCache) insertResult(result *AgentData) {
 		log.Warningf("[%d] cache is full and cannot cannot find a value to replace, adding new instead", c.clientID)
 		c.addResult(result)
 		return
-	}
-
-	if result.persistent {
-		c.persistValueNum++
 	}
 
 	copy(c.results[index:], c.results[index+1:])
@@ -244,13 +263,11 @@ func (c *ResultCache) run() {
 		case Uploader:
 			c.flushOutput(v.(Uploader))
 		case *plugin.Result:
-			r := v.(*plugin.Result)
-			c.write(r)
+			c.write(v.(*plugin.Result))
 		case *agent.AgentOptions:
 			c.updateOptions(v.(*agent.AgentOptions))
 		}
 	}
-	close(c.input)
 	log.Debugf("[%d] result cache has been stopped", c.clientID)
 	monitor.Unregister()
 }
@@ -263,6 +280,7 @@ func newToken() string {
 
 func (c *ResultCache) updateOptions(options *agent.AgentOptions) {
 	c.maxBufferSize = int32(options.BufferSize)
+	c.timeout = options.Timeout
 }
 
 func (c *ResultCache) init() {

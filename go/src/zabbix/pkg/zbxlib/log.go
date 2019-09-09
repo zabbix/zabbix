@@ -58,7 +58,7 @@ char	*zbx_strerror(int errnum)
 
 void	zbx_handle_log(void)
 {
-	// TODO: rotate?
+	// rotation is handled by go logger backend
 }
 
 char	*strerror_from_system(unsigned long error)

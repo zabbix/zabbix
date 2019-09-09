@@ -20,13 +20,14 @@
 package log
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 	"unsafe"
 	"zabbix/internal/agent"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/zbxlib"
 )
 
@@ -47,6 +48,9 @@ type metadata struct {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if ctx == nil || ctx.ClientID() == 0 {
+		return nil, fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, key)
+	}
 	meta := ctx.Meta()
 	var data *metadata
 	if meta.Data == nil {
@@ -68,6 +72,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				return nil, err
 			}
 		}
+	}
+
+	if ctx.Output().PersistSlotsAvailable() == 0 {
+		p.Warningf("buffer is full, cannot store persistent value")
+		return nil, nil
 	}
 
 	// with flexible checks there are no guaranteed refresh time,
@@ -103,9 +112,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 var impl Plugin
 
 func init() {
-	plugin.RegisterMetric(&impl, "log", "log", "Log file monitoring.")
-	plugin.RegisterMetric(&impl, "log", "logrt", "Log file monitoring with log rotation support.")
-	plugin.RegisterMetric(&impl, "log", "log.count", "Count of matched lines in log file monitoring.")
-	plugin.RegisterMetric(&impl, "log", "logrt.count",
-		"Count of matched lines in log file monitoring with log rotation support.")
+	plugin.RegisterMetrics(&impl, "Log",
+		"log", "Log file monitoring.",
+		"logrt", "Log file monitoring with log rotation support.",
+		"log.count", "Count of matched lines in log file monitoring.",
+		"logrt.count", "Count of matched lines in log file monitoring with log rotation support.")
 }

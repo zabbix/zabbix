@@ -2,10 +2,12 @@ package systemd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"sync"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 
 	"github.com/godbus/dbus"
 )
@@ -184,13 +186,27 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, fmt.Errorf("Cannot get unit property: %s", err)
 		}
 
-		return value, nil
-	}
+		switch reflect.TypeOf(value).Kind() {
+		case reflect.Slice:
+			fallthrough
+		case reflect.Array:
+			ret, err := json.Marshal(value)
 
-	return nil, fmt.Errorf("Not implemented: %s", key)
+			if nil != err {
+				return nil, fmt.Errorf("Cannot create JSON array: %s", err)
+			}
+
+			return string(ret), nil
+		}
+
+		return value, nil
+	default:
+		return nil, errors.New("Unsupported metric.")
+	}
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>]")
-	plugin.RegisterMetric(&impl, "systemd", "systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>]")
+	plugin.RegisterMetrics(&impl, "Systemd",
+		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
+		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].")
 }

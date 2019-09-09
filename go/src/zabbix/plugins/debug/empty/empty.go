@@ -20,7 +20,7 @@
 package empty
 
 import (
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/std"
 )
 
@@ -39,5 +39,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "debugempty", "debug.empty", "Returns empty value")
+	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.empty", "Returns empty value.")
 }

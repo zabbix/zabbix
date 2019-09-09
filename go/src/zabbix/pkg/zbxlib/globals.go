@@ -25,7 +25,7 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
 #cgo LDFLAGS: -Wl,--start-group
-#cgo LDFLAGS: ${SRCDIR}/../../../../../src/zabbix_agent/logs/libzbxlogs.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/zabbix_agent/logfiles/libzbxlogfiles.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcomms/libzbxcomms.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxcrypto/libzbxcrypto.a
@@ -37,18 +37,20 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxregexp/libzbxregexp.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/libzbxagentsysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/common/libcommonsysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/simple/libsimplesysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspecsysinfo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxexec/libzbxexec.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxalgo/libzbxalgo.a
 #cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxjson/libzbxjson.a
-#cgo LDFLAGS: -lz -lpcre -lresolv
+#cgo LDFLAGS: -lz -lpcre -lresolv -lcurl
 #cgo LDFLAGS: -Wl,--end-group
 
 #include "common.h"
 #include "sysinfo.h"
 #include "comms.h"
 #include "../src/zabbix_agent/metrics.h"
-#include "../src/zabbix_agent/logs/logfiles.h"
+#include "../src/zabbix_agent/logfiles/logfiles.h"
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
@@ -86,10 +88,25 @@ const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
-ZBX_METRIC	parameters_simple[] = {NULL};
 
 void zbx_on_exit(int ret)
 {
+}
+
+int	zbx_procstat_collector_started(void)
+{
+	return FAIL;
+}
+
+int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		int period, int type, double *value, char **errmsg)
+{
+	return FAIL;
+}
+
+int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
+{
+	return SYSINFO_RET_FAIL;
 }
 */
 import "C"

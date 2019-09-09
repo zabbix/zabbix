@@ -33,7 +33,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 const (
@@ -359,5 +359,5 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "proc", "proc.cpu.util", "Process CPU utilisation percentage")
+	plugin.RegisterMetrics(&impl, "Proc", "proc.cpu.util", "Process CPU utilisation percentage.")
 }

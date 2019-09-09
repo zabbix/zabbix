@@ -37,7 +37,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public static $supported_preprocessing_types = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_THROTTLE_TIMED_VALUE,
-		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON
+		ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_XPATH, ZBX_PREPROC_ERROR_FIELD_XML
 	];
 
 	/**
@@ -788,7 +788,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
-				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+				'opdata'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],

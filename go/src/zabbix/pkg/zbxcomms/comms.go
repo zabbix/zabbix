@@ -22,39 +22,64 @@ package zbxcomms
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"strings"
 	"time"
 	"zabbix/pkg/log"
+	"zabbix/pkg/tls"
 )
 
 const headerSize = 13
 
+const (
+	connStateAccept = iota + 1
+	connStateConnect
+	connStateEstabilished
+)
+
 type Connection struct {
-	conn net.Conn
+	conn      net.Conn
+	tlsConfig *tls.Config
+	state     int
 }
 
 type Listener struct {
-	listener net.Listener
+	listener  net.Listener
+	tlsconfig *tls.Config
 }
 
-func Open(address string, timeout time.Duration) (c *Connection, err error) {
-	c = &Connection{}
-	c.conn, err = net.DialTimeout("tcp", address, timeout)
+func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...interface{}) (c *Connection, err error) {
+	c = &Connection{state: connStateConnect}
+	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
+	c.conn, err = d.Dial("tcp", address)
 
 	if nil != err {
 		return
 	}
 
-	err = c.conn.SetReadDeadline(time.Now().Add(timeout))
-	if nil != err {
-		return
+	if timeout != 0 {
+		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
+
+		if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
 	}
 
-	err = c.conn.SetWriteDeadline(time.Now().Add(timeout))
-
+	var tlsconfig *tls.Config
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+		if tlsconfig != nil {
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout)
+		}
+	}
 	return
 }
 
@@ -87,12 +112,19 @@ func (c *Connection) WriteString(s string, timeout time.Duration) error {
 	return c.Write([]byte(s), timeout)
 }
 
-func read(r io.Reader) ([]byte, error) {
+func read(r io.Reader, pending []byte) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
 	var b [2048]byte
 
 	s := b[:]
+	if pending != nil {
+		total = len(pending)
+		if total > len(b) {
+			return nil, errors.New("pending data exceeds limit of 2KB bytes")
+		}
+		copy(s, pending)
+	}
 
 	for total < headerSize {
 		n, err := r.Read(s[total:])
@@ -163,14 +195,41 @@ func read(r io.Reader) ([]byte, error) {
 	return s[:total], nil
 }
 
-func (c *Connection) Read(timeout time.Duration) ([]byte, error) {
+func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 	if timeout != 0 {
-		err := c.conn.SetReadDeadline(time.Now().Add(timeout))
-		if nil != err {
-			return nil, err
+		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
+			return
 		}
 	}
-	return read(c.conn)
+	if c.state == connStateAccept && c.tlsConfig != nil {
+		c.state = connStateEstabilished
+
+		b := make([]byte, 1)
+		var n int
+		if n, err = c.conn.Read(b); err != nil {
+			return
+		}
+		if n == 0 {
+			return nil, errors.New("connection closed")
+		}
+		if b[0] != '\x16' {
+			// unencrypted connection
+			if c.tlsConfig.Accept&tls.ConnUnencrypted == 0 {
+				return nil, errors.New("cannot accept unencrypted connection")
+			}
+			return read(c.conn, b)
+		}
+		if c.tlsConfig.Accept&(tls.ConnPSK|tls.ConnCert) == 0 {
+			return nil, errors.New("cannot accept encrypted connection")
+		}
+		var tlsConn net.Conn
+		if tlsConn, err = tls.NewServer(c.conn, c.tlsConfig, b, timeout); err != nil {
+			return
+		}
+		c.conn = tlsConn
+	}
+
+	return read(c.conn, nil)
 }
 
 func (c *Connection) RemoteIP() string {
@@ -181,12 +240,19 @@ func (c *Connection) RemoteIP() string {
 	return addr
 }
 
-func Listen(address string) (c *Listener, err error) {
+func Listen(address string, args ...interface{}) (c *Listener, err error) {
+	var tlsconfig *tls.Config
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+	}
 	l, tmperr := net.Listen("tcp", address)
 	if tmperr != nil {
 		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
 	}
-	c = &Listener{listener: l.(*net.TCPListener)}
+	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
 	return
 }
 
@@ -195,23 +261,34 @@ func (l *Listener) Accept() (c *Connection, err error) {
 	if conn, err = l.listener.Accept(); err != nil {
 		return
 	} else {
-		c = &Connection{conn: conn}
+		c = &Connection{conn: conn, tlsConfig: l.tlsconfig, state: connStateAccept}
 	}
 	return
 }
 
 func (c *Connection) Close() (err error) {
-	return c.conn.Close()
+	if c.conn != nil {
+		err = c.conn.Close()
+	}
+	return
 }
 
 func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error) {
+func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
 	log.Tracef("connecting to [%s]", address)
 
-	c, err := Open(address, time.Second*time.Duration(timeout))
+	var tlsconfig *tls.Config
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+	}
+
+	c, err := Open(address, localAddr, timeout, tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err
@@ -234,8 +311,11 @@ func Exchange(address string, timeout time.Duration, data []byte) ([]byte, error
 		log.Tracef("cannot receive data from [%s]: %s", address, err)
 		return nil, err
 	}
-
 	log.Tracef("received [%s] from [%s]", string(b), address)
+
+	if len(b) == 0 {
+		return nil, errors.New("connection closed")
+	}
 
 	return b, nil
 }

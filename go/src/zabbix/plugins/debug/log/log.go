@@ -21,7 +21,7 @@ package log
 
 import (
 	"time"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 // Plugin -
@@ -93,5 +93,5 @@ func (p *Plugin) Configure(options map[string]string) {
 }
 
 func init() {
-	plugin.RegisterMetric(&impl, "debuglog", "debug.log", "Returns timestamp each second")
+	plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
 }

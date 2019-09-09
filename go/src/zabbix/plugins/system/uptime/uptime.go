@@ -21,7 +21,7 @@ package uptime
 
 import (
 	"errors"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 	"zabbix/pkg/std"
 )
 
@@ -36,12 +36,12 @@ var stdOs std.Os
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 {
-		return nil, errors.New("Too many parameters")
+		return nil, errors.New("Too many parameters.")
 	}
 	return getUptime()
 }
 
 func init() {
 	stdOs = std.NewOs()
-	plugin.RegisterMetric(&impl, "uptime", "system.uptime", "Returns system uptime in seconds")
+	plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
 }

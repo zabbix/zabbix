@@ -21,25 +21,25 @@ package scheduler
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 	"math"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 	"zabbix/internal/agent"
 	"zabbix/internal/monitor"
-	"zabbix/internal/plugin"
 	"zabbix/pkg/glexpr"
 	"zabbix/pkg/itemutil"
 	"zabbix/pkg/log"
+	"zabbix/pkg/plugin"
 )
 
 type Manager struct {
-	input   chan interface{}
-	plugins map[string]*pluginAgent
-	queue   pluginHeap
-	clients map[uint64]*client
+	input       chan interface{}
+	plugins     map[string]*pluginAgent
+	pluginQueue pluginHeap
+	clients     map[uint64]*client
 }
 
 type updateRequest struct {
@@ -50,8 +50,9 @@ type updateRequest struct {
 	expressions        []*glexpr.Expression
 }
 
-type statusRequest struct {
-	sink chan string
+type queryRequest struct {
+	command string
+	sink    chan string
 }
 
 type Scheduler interface {
@@ -59,7 +60,7 @@ type Scheduler interface {
 		requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration) (result string, err error)
-	GetStatus() (status string)
+	Query(command string) (status string)
 }
 
 func (m *Manager) cleanupClient(c *client, now time.Time) {
@@ -68,7 +69,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		if p.refcount != 0 {
 			continue
 		}
-		log.Debugf("deactivate unused plugin %s", p.name())
+		log.Debugf("[%d] deactivate unused plugin %s", c.id, p.name())
 
 		// deactivate recurring tasks
 		for deactivate := true; deactivate; {
@@ -89,39 +90,43 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err := task.reschedule(now); err != nil {
-				log.Debugf("cannot schedule stopper task for plugin %s", p.name())
+				log.Debugf("[%d] cannot schedule stopper task for plugin %s", c.id, p.name())
 				continue
 			}
 			p.enqueueTask(task)
-			log.Debugf("created stopper task for plugin %s", p.name())
+			log.Debugf("[%d] created stopper task for plugin %s", c.id, p.name())
 
 			if p.queued() {
-				m.queue.Update(p)
+				m.pluginQueue.Update(p)
 			}
 		}
 
 		// queue plugin if there are still some tasks left to be finished before deactivating
 		if len(p.tasks) != 0 {
 			if !p.queued() {
-				heap.Push(&m.queue, p)
+				heap.Push(&m.pluginQueue, p)
 			}
 		}
 	}
 }
 
 func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("processing update request (%d requests)", len(update.requests))
+	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
 
-	// TODO: client expiry - remove unused owners after timeout (day+?)
-	var requestClient *client
+	var c *client
 	var ok bool
-	if requestClient, ok = m.clients[update.clientID]; !ok {
-		requestClient = newClient(update.clientID, update.sink)
-		m.clients[update.clientID] = requestClient
+	if c, ok = m.clients[update.clientID]; !ok {
+		if len(update.requests) == 0 {
+			log.Debugf("[%d] skipping empty update for unregistered client", update.clientID)
+			return
+		}
+		log.Debugf("[%d] registering new client", update.clientID)
+		c = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = c
 	}
 
-	requestClient.refreshUnsupported = update.refreshUnsupported
-	requestClient.updateExpressions(update.expressions)
+	c.refreshUnsupported = update.refreshUnsupported
+	c.updateExpressions(update.expressions)
 
 	for _, r := range update.requests {
 		var key string
@@ -130,50 +135,58 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
+			} else {
+				err = c.addRequest(p, r, update.sink, now)
 			}
 		}
-		if err == nil {
-			err = requestClient.addRequest(p, r, update.sink, now)
-		}
+
 		if err != nil {
-			if tacc, ok := requestClient.exporters[r.Itemid]; ok {
-				log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
-				tacc.task().deactivate()
+			if c.id != 0 {
+				if tacc, ok := c.exporters[r.Itemid]; ok {
+					log.Debugf("deactivate exporter task for item %d because of error: %s", r.Itemid, err)
+					tacc.task().deactivate()
+				}
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
-			log.Warningf("cannot monitor metric \"%s\": %s", r.Key, err.Error())
+			log.Debugf("[%d] cannot monitor metric \"%s\": %s", update.clientID, r.Key, err.Error())
 			continue
 		}
 
 		if !p.queued() {
-			heap.Push(&m.queue, p)
+			heap.Push(&m.pluginQueue, p)
 		} else {
-			m.queue.Update(p)
+			m.pluginQueue.Update(p)
 		}
 	}
 
-	m.cleanupClient(requestClient, now)
+	m.cleanupClient(c, now)
 }
 
 func (m *Manager) processQueue(now time.Time) {
 	seconds := now.Unix()
-	for p := m.queue.Peek(); p != nil; p = m.queue.Peek() {
+	for p := m.pluginQueue.Peek(); p != nil; p = m.pluginQueue.Peek() {
 		if task := p.peekTask(); task != nil {
 			if task.getScheduled().Unix() > seconds {
 				break
 			}
-			heap.Pop(&m.queue)
-			if p.hasCapacity() {
-				p.popTask()
-				p.reserveCapacity(task)
-				task.perform(m)
-				if p.hasCapacity() {
-					heap.Push(&m.queue, p)
-				}
+
+			heap.Pop(&m.pluginQueue)
+
+			if !p.hasCapacity() {
+				continue
 			}
+
+			p.reserveCapacity(p.popTask())
+			task.perform(m)
+
+			if !p.hasCapacity() {
+				continue
+			}
+
+			heap.Push(&m.pluginQueue, p)
 		} else {
 			// plugins with empty task queue should not be in Manager queue
-			heap.Pop(&m.queue)
+			heap.Pop(&m.pluginQueue)
 		}
 	}
 }
@@ -189,7 +202,7 @@ func (m *Manager) processFinishRequest(task performer) {
 		}
 	}
 	if !p.queued() && p.hasCapacity() {
-		heap.Push(&m.queue, p)
+		heap.Push(&m.pluginQueue, p)
 	}
 }
 
@@ -197,8 +210,8 @@ func (m *Manager) processFinishRequest(task performer) {
 // difference between ticks exceeds limits (for example during daylight saving changes).
 func (m *Manager) rescheduleQueue(now time.Time) {
 	// easier to rebuild queues than update each element
-	queue := make(pluginHeap, 0, len(m.queue))
-	for _, p := range m.queue {
+	queue := make(pluginHeap, 0, len(m.pluginQueue))
+	for _, p := range m.pluginQueue {
 		tasks := p.tasks
 		p.tasks = make(performerHeap, 0, len(tasks))
 		for _, t := range tasks {
@@ -208,48 +221,7 @@ func (m *Manager) rescheduleQueue(now time.Time) {
 		}
 		heap.Push(&queue, p)
 	}
-	m.queue = queue
-}
-
-type pluginMetrics struct {
-	ref     *pluginAgent
-	metrics []*plugin.Metric
-}
-
-func (m *Manager) getStatus(r *statusRequest) {
-	var status strings.Builder
-	agents := make(map[plugin.Accessor]*pluginMetrics)
-	infos := make([]*pluginMetrics, 0, len(m.plugins))
-	for _, p := range m.plugins {
-		if _, ok := agents[p.impl]; !ok {
-			info := &pluginMetrics{ref: p, metrics: make([]*plugin.Metric, 0)}
-			infos = append(infos, info)
-			agents[p.impl] = info
-		}
-	}
-
-	for _, metric := range plugin.Metrics {
-		if info, ok := agents[metric.Plugin]; ok {
-			info.metrics = append(info.metrics, metric)
-		}
-	}
-	sort.Slice(infos, func(i, j int) bool {
-		return infos[i].ref.name() < infos[j].ref.name()
-	})
-
-	for _, info := range infos {
-		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\ncapacity: %d/%d\ntasks: %d\n",
-			info.ref.name(), info.ref.active(), info.ref.usedCapacity, info.ref.capacity, len(info.ref.tasks)))
-		for _, metric := range info.metrics {
-			status.WriteString(metric.Key)
-			status.WriteString(": ")
-			status.WriteString(metric.Description)
-			status.WriteString("\n")
-		}
-		status.WriteString("\n")
-	}
-	r.sink <- status.String()
-	close(r.sink)
+	m.pluginQueue = queue
 }
 
 func (m *Manager) run() {
@@ -281,6 +253,12 @@ run:
 				if passive, ok := m.clients[0]; ok {
 					m.cleanupClient(passive, now)
 				}
+				// remove inactive clients
+				for _, client := range m.clients {
+					if len(client.pluginsInfo) == 0 {
+						delete(m.clients, client.ID())
+					}
+				}
 				cleaned = now
 			}
 		case v := <-m.input:
@@ -294,19 +272,23 @@ run:
 			case performer:
 				m.processFinishRequest(v.(performer))
 				m.processQueue(time.Now())
-			case *statusRequest:
-				m.getStatus(v.(*statusRequest))
+			case *queryRequest:
+				r := v.(*queryRequest)
+				if response, err := m.processQuery(r); err != nil {
+					r.sink <- "cannot process request: " + err.Error()
+				} else {
+					r.sink <- response
+				}
 			}
 		}
 	}
-	close(m.input)
 	log.Debugf("manager has been stopped")
 	monitor.Unregister()
 }
 
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
-	m.queue = make(pluginHeap, 0, len(plugin.Metrics))
+	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
 	m.clients = make(map[uint64]*client)
 	m.plugins = make(map[string]*pluginAgent)
 
@@ -323,13 +305,12 @@ func (m *Manager) init() {
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
 			capacity := metric.Plugin.Capacity()
-			section := strings.Title(metric.Plugin.Name())
-			if options, ok := agent.Options.Plugins[section]; ok {
+			if options, ok := agent.Options.Plugins[metric.Plugin.Name()]; ok {
 				if cap, ok := options["Capacity"]; ok {
 					var err error
 					if capacity, err = strconv.Atoi(cap); err != nil {
 						log.Warningf("invalid configuration parameter Plugins.%s.Capacity value '%s', using default %d",
-							section, cap, plugin.DefaultCapacity)
+							metric.Plugin.Name(), cap, plugin.DefaultCapacity)
 					}
 				}
 			}
@@ -381,13 +362,13 @@ func (m *Manager) Stop() {
 
 func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, refreshUnsupported int,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
-	r := updateRequest{clientID: clientID,
+
+	m.input <- &updateRequest{clientID: clientID,
 		sink:               writer,
 		requests:           requests,
 		refreshUnsupported: refreshUnsupported,
 		expressions:        expressions,
 	}
-	m.input <- &r
 }
 
 type resultWriter chan *plugin.Result
@@ -420,7 +401,8 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 			if r.Value != nil {
 				result = *r.Value
 			} else {
-				// TODO: check what must be returned on empty result
+				// single metric requests do not support empty values, return error instead
+				err = errors.New("No values have been gathered yet.")
 			}
 		} else {
 			err = r.Error
@@ -435,8 +417,8 @@ func (m *Manager) FinishTask(task performer) {
 	m.input <- task
 }
 
-func (m *Manager) GetStatus() (status string) {
-	request := &statusRequest{sink: make(chan string)}
+func (m *Manager) Query(command string) (status string) {
+	request := &queryRequest{command: command, sink: make(chan string)}
 	m.input <- request
 	return <-request.sink
 }

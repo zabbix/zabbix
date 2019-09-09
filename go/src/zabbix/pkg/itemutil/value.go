@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"zabbix/internal/plugin"
+	"zabbix/pkg/plugin"
 )
 
 const StateNotSupported = 1
