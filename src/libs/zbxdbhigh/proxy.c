@@ -377,7 +377,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer,
+				zbx_socket_strerror());
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
@@ -387,10 +388,11 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
-		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
+		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" by proxy configuration parameter \"TLSAccept\"",
+				msg, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
@@ -400,14 +402,30 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock, &msg))
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, msg);
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg))
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
 
 		zbx_free(msg);
+		return FAIL;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (0 != (ZBX_PSK_FOR_PROXY & zbx_tls_get_psk_usage()))
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: it used PSK which is not"
+				" configured for proxy communication with server", req, sock->peer);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
+
 		return FAIL;
 	}
 #endif
