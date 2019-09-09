@@ -288,7 +288,7 @@ func ParseKey(text string) (key string, params []string, err error) {
 		return
 	}
 	if len(left) > 0 {
-		err = errors.New("detected characters after item key")
+		err = newKeyError()
 	}
 	return
 }
