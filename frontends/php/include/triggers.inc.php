@@ -771,20 +771,20 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 			$triggers[$triggerid]['problem']['eventid'] = $problem['eventid'];
 
-			if ($triggers[$triggerid]['priority'] < $problem['severity'] && $problem['r_eventid'] == 0) {
+			if ($triggers[$triggerid]['priority'] < $problem['severity']) {
 				$triggers[$triggerid]['priority'] = $problem['severity'];
 			}
 
-			if ($problem['r_eventid'] != 0) {
-				$problem_stats[$triggerid]['has_resolved'] = true;
-				if ($problem['acknowledged'] == 0) {
-					$problem_stats[$triggerid]['has_resolved_unacknowledged'] = true;
+			if ($problem['r_eventid'] == 0) {
+				$problem_stats[$triggerid]['has_unresolved'] = true;
+				if ($problem['acknowledged'] == 0 && $problem['severity'] >= $problem_options['min_severity']) {
+					$problem_stats[$triggerid]['has_unresolved_unacknowledged'] = true;
 				}
 			}
 			else {
-				$problem_stats[$triggerid]['has_unresolved'] = true;
-				if ($problem['acknowledged'] == 0) {
-					$problem_stats[$triggerid]['has_unresolved_unacknowledged'] = true;
+				$problem_stats[$triggerid]['has_resolved'] = true;
+				if ($problem['acknowledged'] == 0 && $problem['severity'] >= $problem_options['min_severity']) {
+					$problem_stats[$triggerid]['has_resolved_unacknowledged'] = true;
 				}
 			}
 		}
