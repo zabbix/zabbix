@@ -959,7 +959,7 @@ class C10ImportConverter extends CConverter {
 	/**
 	 * Convert old proxy format to new proxy format.
 	 *
-	 * @param array $host
+	 * @param array $host Import data.
 	 *
 	 * @return array
 	 */
@@ -974,6 +974,13 @@ class C10ImportConverter extends CConverter {
 		return $host;
 	}
 
+	/**
+	 * Convert valuemap for items.
+	 *
+	 * @param array $item Import data.
+	 *
+	 * @return array
+	 */
 	protected function convertItemValueMap(array $item) {
 		$item['valuemap'] = [];
 		if (array_key_exists('valuemapid', $item)) {
@@ -984,12 +991,18 @@ class C10ImportConverter extends CConverter {
 		return $item;
 	}
 
-	public function convertTemplateItem(array $template) {
+	/**
+	 * Add new tag port to templates for items.
+	 *
+	 * @param array $template Import data.
+	 *
+	 * @return array
+	 */
+	protected function convertTemplateItem(array $template) {
 		if (array_key_exists('items', $template)) {
 			foreach ($template['items'] as &$item) {
 				$item['port'] = '';
 				unset($item['snmp_port']);
-				unset($item['valuemapid']);
 			}
 		}
 
