@@ -274,14 +274,14 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 			err = errors.New(C.GoString(cvalue))
 		}
 
-		result := &LogResult{
+		r := &LogResult{
 			Value:       &value,
 			Ts:          time.Now(),
 			Error:       err,
 			LastLogsize: uint64(clastlogsize),
 			Mtime:       int(cmtime),
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 	}
 	C.free_log_result(result)
 
