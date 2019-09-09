@@ -34,7 +34,7 @@ import (
 var srv http.Server
 
 func getConf(confFilePath string) (s string) {
-	s = fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)\n"+
+	s = fmt.Sprintf("Zabbix Agent [%s]. (%s)\n"+
 		"using configuration file: %s\nServerActive: %s\nListenPort: %d\n\n",
 		agent.Options.Hostname, version.Long(),
 		confFilePath, agent.Options.ServerActive, agent.Options.ListenPort)
@@ -49,24 +49,23 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 		return err
 	}
 
-	defer log.PanicHook()
 	log.Debugf("starting status listener")
 
 	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, getConf(confFilePath))
 		fmt.Fprintf(w, taskManager.GetStatus())
 	}))
 
 	srv = http.Server{Addr: fmt.Sprintf(":%d", agent.Options.StatusPort), Handler: mux}
-	go srv.Serve(ln)
+	srv.Serve(ln)
 
 	return nil
 }
 
 func Stop() {
-	// shut down gracefully, but wait no longer than 5 seconds before halting
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// shut down gracefully, but wait no longer than time defined in configuration parameter Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(agent.Options.Timeout))
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
