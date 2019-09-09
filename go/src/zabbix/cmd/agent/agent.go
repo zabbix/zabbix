@@ -427,7 +427,7 @@ func main() {
 	manager, err = scheduler.NewManager(agent.Options)
 
 	// replacement of deprecated StartAgents
-	if 0 != len(agent.Options.Server) {
+	if err == nil && 0 != len(agent.Options.Server) {
 		var listenIPs []string
 		if listenIPs, err = serverlistener.ParseListenIP(&agent.Options); nil != err {
 			log.Critf(err.Error())
