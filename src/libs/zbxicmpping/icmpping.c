@@ -41,8 +41,7 @@ static unsigned char	source_ip6_checked = 0;
 static const char	*source_ip6_option = NULL;
 #endif
 
-/* starting with fping (4.x), the packets interval can be 0ms, otherwise minimum value is 10ms */
-#define 		FPING_UNINITIALIZED_INTERVAL	-1
+#define FPING_UNINITIALIZED_INTERVAL	-1
 static int		packet_interval = FPING_UNINITIALIZED_INTERVAL;
 #ifdef HAVE_IPV6
 static int		packet_interval6 = FPING_UNINITIALIZED_INTERVAL;
@@ -91,6 +90,9 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  *             dst   - [IN] the the ip address for test                       *
  *                                                                            *
  * Return value: interval between sending ping packets (in millisec)          *
+ *                                                                            *
+ * Comments: starting with fping (4.x), the packets interval can be 0ms,      *
+ *           otherwise minimum value is 10ms                                  *
  ******************************************************************************/
 static int	get_interval_option(const char * fping, const char *dst)
 {
