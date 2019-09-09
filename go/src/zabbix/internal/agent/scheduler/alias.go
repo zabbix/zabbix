@@ -45,10 +45,7 @@ func loadAlias(options agent.AgentOptions) (err error) {
 				return fmt.Errorf("failed to add Alias \"%s\": duplicate name", name)
 			}
 		}
-		var a keyAlias
-		a.name = name
-		a.key = key
-		aliases = append(aliases, a)
+		aliases = append(aliases, keyAlias{name: name, key: key})
 	}
 
 	return nil
