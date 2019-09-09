@@ -1129,7 +1129,7 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 				'units' => $db_item['units'],
 				'valuemapid' => $db_item['valuemapid'],
 				'item_place' => $item_place,
-				'acknowledged' => $db_item['acknowledged']
+				'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
 			];
 
 			if (array_key_exists('triggerid', $db_item)) {
