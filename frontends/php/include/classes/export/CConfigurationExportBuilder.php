@@ -49,7 +49,6 @@ class CConfigurationExportBuilder {
 	 * @param array $data
 	 */
 	public function buildWrapper(array $data) {
-		// Create triggers.
 		$simple_triggers = [];
 
 		if ($data['triggers']) {
@@ -83,9 +82,9 @@ class CConfigurationExportBuilder {
 	/**
 	 * Build XML data.
 	 *
-	 * @param array  $schema   tag schema from validation class
-	 * @param array  $data     export data
-	 * @param string $main_tag tag name for error
+	 * @param array  $schema    Tag schema from validation class.
+	 * @param array  $data      Export data.
+	 * @param string $main_tag  Tag name for error.
 	 *
 	 * @return array
 	 */
@@ -183,7 +182,7 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Create triggers.
+	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
 	 *
@@ -288,10 +287,6 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
-	}
-
-	protected function formatHostInventoryMode(array $data) {
-		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
 	}
 
 	/**
@@ -632,6 +627,17 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format host inventory mode.
+	 *
+	 * @param array $inventory
+	 *
+	 * @return string
+	 */
+	protected function formatHostInventoryMode(array $data) {
+		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
+	}
+
+	/**
 	 * Format host inventory.
 	 *
 	 * @param array $inventory
@@ -639,8 +645,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostInventory(array $inventory) {
-		unset($inventory['hostid']);
-		unset($inventory['inventory_mode']);
+		unset($inventory['hostid'], $inventory['inventory_mode']);
 
 		return $inventory;
 	}

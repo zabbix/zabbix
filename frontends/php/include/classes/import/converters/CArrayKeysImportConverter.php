@@ -39,8 +39,8 @@ class CArrayKeysImportConverter extends CConverter {
 	/**
 	 * Convert array keys to numeric.
 	 *
-	 * @param mixed $data  Import data.
-	 * @param array $rules XML rules.
+	 * @param mixed $data   Import data.
+	 * @param array $rules  XML rules.
 	 *
 	 * @return array
 	 */

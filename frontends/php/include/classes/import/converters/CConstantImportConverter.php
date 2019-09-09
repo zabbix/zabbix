@@ -39,9 +39,9 @@ class CConstantImportConverter extends CConverter {
 	/**
 	 * Convert human readable import constants to values Zabbix API can work with.
 	 *
-	 * @param mixed  $data  Import data.
-	 * @param array  $rules XML rules.
-	 * @param string $path  XML path (for error reporting).
+	 * @param mixed  $data   Import data.
+	 * @param array  $rules  XML rules.
+	 * @param string $path   XML path (for error reporting).
 	 *
 	 * @throws Exception if the element is invalid.
 	 *

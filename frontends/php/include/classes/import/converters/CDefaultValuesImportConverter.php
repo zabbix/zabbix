@@ -45,8 +45,8 @@ class CDefaultValuesImportConverter extends CConverter {
 	/**
 	 * Add default values in place of missed tags.
 	 *
-	 * @param mixed $data  Import data.
-	 * @param array $rules XML rules.
+	 * @param mixed $data   Import data.
+	 * @param array $rules  XML rules.
 	 *
 	 * @return mixed
 	 */
@@ -59,7 +59,7 @@ class CDefaultValuesImportConverter extends CConverter {
 				else {
 					$data[$tag] = array_key_exists('default', $tag_rules)
 						? (string) $tag_rules['default']
-						: ($tag_rules['type'] & XML_STRING ? '' : []);
+						: (($tag_rules['type'] & XML_STRING) ? '' : []);
 				}
 			}
 		}

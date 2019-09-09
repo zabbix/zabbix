@@ -959,7 +959,7 @@ class C10ImportConverter extends CConverter {
 	/**
 	 * Convert old proxy format to new proxy format.
 	 *
-	 * @param array $host Import data.
+	 * @param array $host  Import data.
 	 *
 	 * @return array
 	 */
@@ -977,7 +977,7 @@ class C10ImportConverter extends CConverter {
 	/**
 	 * Convert valuemap for items.
 	 *
-	 * @param array $item Import data.
+	 * @param array $item  Import data.
 	 *
 	 * @return array
 	 */
@@ -992,9 +992,9 @@ class C10ImportConverter extends CConverter {
 	}
 
 	/**
-	 * Add new tag port to templates for items.
+	 * Add new tag port to template items.
 	 *
-	 * @param array $template Import data.
+	 * @param array $template  Import data.
 	 *
 	 * @return array
 	 */

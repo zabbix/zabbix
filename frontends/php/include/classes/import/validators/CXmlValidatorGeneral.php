@@ -220,9 +220,9 @@ class CXmlValidatorGeneral {
 	/**
 	 * Constant validator.
 	 *
-	 * @param mixed  $value Value for validation.
-	 * @param array  $rules XML rules.
-	 * @param string $path  XML path (for error reporting).
+	 * @param mixed  $value  Value for validation.
+	 * @param array  $rules  XML rules.
+	 * @param string $path   XML path (for error reporting).
 	 *
 	 * @throws Exception if this $value is an invalid constant.
 	 */
