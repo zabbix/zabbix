@@ -215,4 +215,19 @@ class CWebTest extends CTest {
 	public function query($type, $locator = null) {
 		return $this->page->query($type, $locator);
 	}
+
+	/**
+	 * Check page title text.
+	 *
+	 * @param string $title		page title
+	 */
+	public function assertPageTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+		}
+
+		$this->assertEquals($title, $this->page->getTitle());
+	}
 }

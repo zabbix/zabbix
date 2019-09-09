@@ -48,14 +48,14 @@ class testTaskCreate extends CAPITest {
 					'type' => '',
 					'itemids' => ['40068']
 				],
-				'expected_error' => 'Invalid parameter "/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/type": an integer is expected.'
 			],
 			[
 				'task' => [
 					'type' => 'æų',
 					'itemids' => ['40068']
 				],
-				'expected_error' => 'Invalid parameter "/type": a number is expected.'
+				'expected_error' => 'Invalid parameter "/type": an integer is expected.'
 			],
 			[
 				'task' => [

@@ -31,6 +31,42 @@
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+static sigset_t		orig_mask;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: block_signals                                                    *
+ *                                                                            *
+ * Purpose: block signals to avoid interruption                               *
+ *                                                                            *
+ ******************************************************************************/
+static	void	block_signals(void)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set sigprocmask to block the signal");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: unblock_signals                                                  *
+ *                                                                            *
+ * Purpose: unblock signals after blocking                                    *
+ *                                                                            *
+ ******************************************************************************/
+static	void	unblock_signals(void)
+{
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+}
 
 /******************************************************************************
  *                                                                            *
@@ -67,7 +103,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	zbx_strcpy_alloc(&stats, &stats_alloc, &stats_offset, "started");
 
+	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
+	block_signals();
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	unblock_signals();
 
 	if (SUCCEED == zbx_is_export_enabled())
 	{
@@ -83,7 +122,18 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (0 != sleeptime)
 			zbx_setproctitle("%s #%d [%s, syncing history]", process_name, process_num, stats);
 
+		/* clear timer trigger queue to avoid processing time triggers at exit */
+		if (!ZBX_IS_RUNNING())
+		{
+			zbx_dc_clear_timer_queue();
+			zbx_log_sync_history_cache_progress();
+		}
+
+		/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
+		block_signals();
 		zbx_sync_history_cache(&values_num, &triggers_num, &more);
+		unblock_signals();
+
 		total_values_num += values_num;
 		total_triggers_num += triggers_num;
 		total_sec += zbx_time() - sec;
@@ -114,10 +164,19 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 			last_stat_time = time(NULL);
 		}
 
+		if (ZBX_SYNC_MORE == more)
+			continue;
+
+		if (!ZBX_IS_RUNNING())
+			break;
+
 		zbx_sleep_loop(sleeptime);
 	}
 
-	zbx_free(stats);
+	zbx_log_sync_history_cache_progress();
 
+	zbx_free(stats);
+	DBclose();
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

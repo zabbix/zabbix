@@ -22,20 +22,10 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'host.export' && hasRequest('hosts')) {
-	$page['file'] = 'zbx_export_hosts.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	$exportData = true;
-}
-else {
-	$page['title'] = _('Configuration of hosts');
-	$page['file'] = 'hosts.php';
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['scripts'] = ['multiselect.js'];
-
-	$exportData = false;
-}
+$page['title'] = _('Configuration of hosts');
+$page['file'] = 'hosts.php';
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -157,27 +147,6 @@ if (getRequest('hostid')) {
 	if (!$hosts) {
 		access_deny();
 	}
-}
-
-$hostIds = getRequest('hosts', []);
-
-/*
- * Export
- */
-if ($exportData) {
-	$export = new CConfigurationExport(['hosts' => $hostIds]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	$exportData = $export->export();
-
-	if (hasErrorMesssages()) {
-		show_messages();
-	}
-	else {
-		print($exportData);
-	}
-
-	exit;
 }
 
 /*

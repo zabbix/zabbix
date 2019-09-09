@@ -32,7 +32,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Group name', 'Users', 'Frontend access', 'Enabled', 'Debug mode']);
 		$this->zbxTestAssertAttribute('//input[@id=\'gname\']', 'maxlength', '64');
 
-		$this->zbxTestDropdownHasOptions('gui_access', ['System default', 'Internal', 'Disabled']);
+		$this->zbxTestDropdownHasOptions('gui_access', ['System default', 'Internal', 'LDAP', 'Disabled']);
 		$this->zbxTestDropdownAssertSelected('gui_access', 'System default');
 		$this->zbxTestCheckboxSelected('users_status');
 	}

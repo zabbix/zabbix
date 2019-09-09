@@ -21,18 +21,8 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
-	$page['file'] = 'zbx_export_valuemaps.xml';
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-
-	$export = true;
-}
-else {
-	$page['title'] = _('Configuration of value mapping');
-	$page['file'] = 'adm.valuemapping.php';
-
-	$export = false;
-}
+$page['title'] = _('Configuration of value mapping');
+$page['file'] = 'adm.valuemapping.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -59,33 +49,13 @@ check_fields($fields);
  */
 if (hasRequest('valuemapid')) {
 	$valuemaps = API::ValueMap()->get([
-		'output' => ['valuemapid'],
-		'valuemapids' => [getRequest('valuemapid')]
+		'output' => [],
+		'valuemapids' => getRequest('valuemapid')
 	]);
 
 	if (!$valuemaps) {
 		access_deny();
 	}
-}
-
-/*
- * Export
- */
-if ($export) {
-	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids')]);
-	$export->setBuilder(new CConfigurationExportBuilder());
-	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-
-	$export_data = $export->export();
-
-	if (hasErrorMesssages()) {
-		show_messages();
-	}
-	else {
-		print($export_data);
-	}
-
-	exit;
 }
 
 /*
@@ -125,8 +95,8 @@ elseif (getRequest('action') === 'valuemap.delete' && hasRequest('valuemapids'))
 	}
 	else {
 		$valuemaps = API::ValueMap()->get([
-			'valuemapids' => getRequest('valuemapids'),
-			'output' => []
+			'output' => ['valuemapid'],
+			'valuemapids' => getRequest('valuemapids')
 		]);
 		uncheckTableRows(null, zbx_objectValues($valuemaps, 'valuemapid'));
 	}
@@ -154,7 +124,7 @@ if (hasRequest('form')) {
 		$valuemaps = API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
 			'selectMappings' => ['value', 'newvalue'],
-			'valuemapids' => [$data['valuemapid']]
+			'valuemapids' => $data['valuemapid']
 		]);
 		$valuemap = reset($valuemaps);
 

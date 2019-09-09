@@ -176,8 +176,9 @@ char	**CONFIG_USER_PARAMETERS	= NULL;
 char	**CONFIG_PERF_COUNTERS		= NULL;
 #endif
 
-void	zbx_on_exit(void)
+void	zbx_on_exit(int ret)
 {
+	ZBX_UNUSED(ret);
 }
 
 /* test itself */

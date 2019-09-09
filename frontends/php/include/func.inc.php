@@ -691,7 +691,7 @@ function convert_units($options = []) {
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
 		if (preg_match('/\.\d+$/', $options['value'])) {
 			$format = (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
-				? '%.'.ZBX_UNITS_ROUNDOFF_UPPER_LIMIT.'f'
+				? '%.'.ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT.'f'
 				: '%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f';
 			$options['value'] = sprintf($format, $options['value']);
 		}
@@ -1854,7 +1854,12 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		$data['theme'] = getUserTheme(CWebUser::$data);
 
-		(new CView('general.warning', $data))->render();
+		if (detect_page_type() == PAGE_TYPE_JS) {
+			(new CView('layout.json', ['main_block' => json_encode(['error' => $data['header']])]))->render();
+		}
+		else {
+			(new CView('general.warning', $data))->render();
+		}
 		exit;
 	}
 }

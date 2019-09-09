@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
 	<target name="init-common">
+		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
+			<and>
+				<isset property="PHPUNIT_FILTER" />
+				<length string="${PHPUNIT_FILTER}" when="greater" length="0"/>
+			</and>
+		</condition>
+
 		<!-- Cleanup from the previous run -->
 		<delete dir="build/logs" failonerror="off"/>
 		<mkdir dir="build/logs"/>
@@ -281,25 +288,35 @@
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="frontends/php/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="${phpunit_filter}"/>
 			<arg line="include/"/>
 		</exec>
 	</target>
 
 	<target name="test-frontend">
 		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="${phpunit_filter}"/>
+			<arg line="frontend.php"/>
 		</exec>
 	</target>
 
 	<target name="test-api">
 		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php api_json/ApiJsonTests.php"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="${phpunit_filter}"/>
+			<arg line="api_json/ApiJsonTests.php"/>
 		</exec>
 	</target>
 
 	<target name="test-integration">
 		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php integration/IntegrationTests.php"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="${phpunit_filter}"/>
+			<arg line="integration/IntegrationTests.php"/>
 		</exec>
 	</target>
 

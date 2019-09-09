@@ -1,6 +1,106 @@
+Changes for 4.0.13rc1
+
+New features:
+A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+.......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
+
+Bug fixes:
+...G...PS. [ZBX-16545] Fixed shell script execution timeout log message (atumilovics)
+.......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
+..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
+........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
+.........T [ZBX-16539] fixed "Template Net Juniper SNMPv2" (afayantsev)
+A......... [ZBX-16349] fixed "Delete missing" checkbox does not work when importing template without checking "Update existing" (agriscenko)
+........S. [ZBX-16279] fixed trailing spaces handling in value mapping when using MySQL (akozlovs)
+...G...PS. [ZBX-16460] fixed Zabbix daemon termination on FreeBSD (vso)
+.......PS. [ZBX-16230] fixed unreachable host next check calculation uses both unreachable settings and flexible item interval (akozlovs)
+..F....... [ZBX-16449] fixed wrong order of the displayed latest values in problems (vasilijs)
+..F....... [ZBX-16435] fixed Zabbix graph spinning in preview tab in IE11 (talbergs)
+..F....... [ZBX-15766] fixed the ability to add an unlimited number of widgets in the Dashboard (vasilijs)
+A......... [ZBX-16398] fixed selection of discovered services by dservice.get "dcheckids" property (vasilijs)
+..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.12
+
+4.0.12rc1 was released as 4.0.12 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.12rc1
+
+New features:
+..F....... [ZBX-9522] improved frontend messaging usage across multiple browser tabs (miks, talbergs)
+
+Bug fixes:
+..F....... [ZBX-16501] fixed log out form being resubmitted when user is already logged back in another tab (Ivo)
+A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
+..F....... [ZBX-16128] fixed incorrect action ID in audit log (rlataria)
+..F....... [ZBX-16354] fixed incorrect sorting by name with capital letters (talbergs)
+..F....... [ZBX-16471] for consistency reason changed translation string 'Resolved by user.' to 'Resolved by Inaccessible user.' (miks)
+..F....... [ZBX-16469] fixed problem that caused impossibility to edit trigger description in problems screen (miks)
+..F....... [ZBX-16362] fixed keyboard event handling in graph widget hintbox (vasilijs)
+..F....... [ZBX-16474] fixed 'Request-URI too long' error in problems mass update page (miks)
+.D........ [ZBX-16184] updated Zabbix sender man page (viktors)
+A......... [ZBX-16462] fixed syntax error in SQL query used to calculate SLA in Monitoring->Services (agriscenko)
+..F....... [ZBX-16031] reworked event update controller, making partly closed set of events closable (miks)
+..F....... [ZBX-16283] fixed read-only shared dashboard without widgets missing placeholder label (gcalenko)
+..F....... [ZBX-16316] fixed dashboard widget and slideshow menu popup not updating current refresh rate and fixed a JS error in slideshows (Ivo)
+.......PS. [ZBX-16346] fixed compilation for Oracle Instant Client v18.5 and higher (asestakovs)
+..F....... [ZBX-16424] fixed unable to create/update web scenario from Internet Explorer/Edge (talbergs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.11
+
+4.0.11rc1 was released as 4.0.11 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.11rc1
+
+New features:
+.......PS. [ZBXNEXT-4502] added support of full JsonPath functionality (wiper)
+..F....PS. [ZBXNEXT-5176,ZBXNEXT-5205] blocked zero item history/trends period being overridden by global configuration (miks, wiper)
+
+Bug fixes:
+A......... [ZBX-16376] fixed preprocessing steps having incorrect order and duplicate step numbers (Ivo)
+..F....... [ZBX-16344] fixed possibility to add graph widget overrides (Ivo)
+........S. [ZBX-16388] fixed LLD to update preprocessing step number in case it is incorrectly generated (vso)
+........S. [ZBX-16337] fixed debug log message for suppressed escalations; thanks to Kotaro Miyashita for the patch (viktors)
+.......PS. [ZBX-16287] fixed compiler warnings in host.c; thanks to Glebs Ivanovskis for the patch (asestakovs)
+...G...PS. [ZBX-16103] reduced PCRE recursion limit (asestakovs)
+..F....... [ZBX-16289] fixed async dashboard widget update (miks)
+A......... [ZBX-13266] improved performance of the SQL queries with lot of IDs in the condition (Sasha)
+....I..... [ZBX-16277] fixed compilation Zabbix agent for Windows with options available for Windows Vista and newer (MVekslers)
+...G...PS. [ZBX-16239] fixed compilation warining related to prototypes of module API functions (viktors)
+.......PS. [ZBX-16256] eliminated possible infinite fetch loop with OracleDB (viktors)
+..F....... [ZBX-15343] fixed JS memory leak in hintboxes in graph widget (Ivo)
+..F....... [ZBX-16329] fixed duplicate value checking in trigger action conditions (Ivo)
+A......... [ZBX-15562] reworked history.get API method; fixed output as well as other known issues in history API (miks, Sasha)
+..F....... [ZBX-16135] fixed error messages in XML export files (averza)
+A......... [ZBX-16213] fixed PostgreSQL bad performance on history tables (averza)
+..F....... [ZBX-16176] preserve trailing spaces in history values (averza)
+..F....... [ZBX-16169] improved performance of map navigation tree widget (miks)
+..F....... [ZBX-16288] fixed when unknown resource logged in audit log when working with dashboards (vasilijs)
+A......... [ZBX-16134] fixed duplicate triggers can be created using API and XML import (agriscenko)
+..F....... [ZBX-15969] fixed displaying of very small values that are more than 2 decimal points in latest data (Ivo)
+..F....... [ZBX-16280] fixed when Plain Text Widgets do not display as HTML when option is selected (vasilijs)
+A.F....... [ZBX-16012] fixed confusing error message "Cannot read JSON." in HTTP agent item (vasilijs)
+.......PS. [ZBX-16270] fixed memory leak in IPC service when queueing multiple messages to client (akozlovs)
+..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
+...G...... [ZBX-15962] added mounted filesystems to vfs.fs.discovery of windows agent (asestakovs)
+........S. [ZBX-16315] fixed Zabbix server not to cause foreign key constraint failure on Zabbix proxy when changing and sending configuration at the same time (vso)
+..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
+...G...PS. [ZBX-9867] improved Zabbix daemon termination by not using signal unsafe functions in signal handler; improved Zabbix server and Zabbix proxy process termination by stopping data collection and waiting for history syncers to finish (vso)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.10
+
+4.0.10rc1 was released as 4.0.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-2880] added access to vmware datastore at vmware vCenter level (MVekslers)
 ..F....... [ZBXNEXT-5163] added display of maintenance information in Configuration section for hosts in maitenance (vasilijs)
 ..F....... [ZBXNEXT-5036] added preloader for popup menus (ashubin)
 ...G...... [ZBXNEXT-287] added SSL support for agent HTTP checks (asestakovs)

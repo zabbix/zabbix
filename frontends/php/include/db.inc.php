@@ -780,15 +780,12 @@ function check_db_fields($dbFields, &$args) {
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
- * @param bool   $sort			values mandatory must be sorted
- * @param bool   $quote
  * @param bool   $zero_to_null
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true, $quote = true, $zero_to_null = false) {
-	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
-	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null = false) {
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (<id1>,<id2>,...,<idN>)"
 
 	if (is_bool(reset($values))) {
 		return '1=0';
@@ -804,69 +801,34 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
 	}
 
 	$values = array_keys($values);
+	natsort($values);
+	$values = array_values($values);
 
-	if ($sort) {
-		natsort($values);
-
-		$values = array_values($values);
-	}
-
-	$betweens = [];
-	$data = [];
-
-	for ($i = 0, $size = count($values); $i < $size; $i++) {
-		// analyze by chunk
-		if ($i + $MIN_NUM_BETWEEN < $size && bcsub($values[$i + $MIN_NUM_BETWEEN], $values[$i]) == $MIN_NUM_BETWEEN) {
-			$between = array_slice($values, $i, $MIN_NUM_BETWEEN);
-
-			// analyze by one
-			for ($i += $MIN_NUM_BETWEEN; $i < $size && bcsub($values[$i], $values[$i - 1]) == 1; $i++) {
-				$between[] = $values[$i];
-			}
-
-			$betweens[] = $between;
-			$i--;
-		}
-		else {
-			$data[] = $values[$i];
+	foreach ($values as $i => $value) {
+		if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
+			$values[$i] = zbx_dbstr($value);
 		}
 	}
 
 	// concatenate conditions
-	$dataSize = count($data);
-
 	$condition = '';
 	$operatorAnd = $notIn ? ' AND ' : ' OR ';
 
-	if ($betweens) {
-		$operatorNot = $notIn ? 'NOT ' : '';
-
-		foreach ($betweens as $between) {
-			$between = $quote
-				? $operatorNot.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr(end($between))
-				: $operatorNot.$fieldName.' BETWEEN '.$between[0].' AND '.end($between);
-
-			$condition .= ($condition !== '') ? $operatorAnd.$between : $between;
-		}
-	}
-
 	$operatorNot = $notIn ? ' NOT' : '';
-	$chunks = array_chunk($data, $MAX_EXPRESSIONS);
-	$chunk_count = (int) $has_zero + count($betweens) + count($chunks);
+	$chunks = array_chunk($values, $MAX_EXPRESSIONS);
+	$chunk_count = (int) $has_zero + count($chunks);
 
 	foreach ($chunks as $chunk) {
 		if (count($chunk) == 1) {
 			$operator = $notIn ? '!=' : '=';
 
-			$condition .= $quote
-				? ($condition !== '' ? $operatorAnd : '').$fieldName.$operator.zbx_dbstr($chunk[0])
-				: ($condition !== '' ? $operatorAnd : '').$fieldName.$operator.$chunk[0];
+			$condition .= ($condition !== '' ? $operatorAnd : '').$fieldName.$operator.$chunk[0];
 		}
 		else {
 			$chunkIns = '';
 
 			foreach ($chunk as $value) {
-				$chunkIns .= $quote ? ','.zbx_dbstr($value) : ','.$value;
+				$chunkIns .= ','.$value;
 			}
 
 			$chunkIns = $fieldName.$operatorNot.' IN ('.substr($chunkIns, 1).')';
@@ -890,13 +852,11 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
- * @param bool   $sort			values mandatory must be sorted
- * @param bool   $quote
  *
  * @return string
  */
-function dbConditionId($fieldName, array $values, $notIn = false, $sort = true, $quote = true) {
-	return dbConditionInt($fieldName, $values, $notIn, $sort, $quote, true);
+function dbConditionId($fieldName, array $values, $notIn = false) {
+	return dbConditionInt($fieldName, $values, $notIn, true);
 }
 
 /**
