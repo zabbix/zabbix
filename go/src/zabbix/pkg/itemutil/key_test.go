@@ -140,6 +140,8 @@ func TestMakeKey(t *testing.T) {
 		&Result{key: "key", params: []string{`1,2`, `3`}, output: `key["1,2",3]`},
 		&Result{key: "key", params: []string{`1,2,"3"`}, output: `key["1,2,\"3\""]`},
 		&Result{key: "key", params: []string{`]`}, output: `key["]"]`},
+		&Result{key: "key", params: []string{`"`}, output: `key["\""]`},
+		&Result{key: "key", params: []string{` `}, output: `key[" "]`},
 	}
 
 	for _, r := range results {

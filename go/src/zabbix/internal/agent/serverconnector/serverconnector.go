@@ -238,31 +238,37 @@ func (c *Connector) refreshActiveChecks() {
 
 	for i := 0; i < len(response.Expressions); i++ {
 		if len(response.Expressions[i].Name) == 0 {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"name\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if response.Expressions[i].Type == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression_type\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if response.Expressions[i].Delimiter == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"exp_delimiter\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
 				c.clientID, c.address)
 			return
 		}
 
+		if len(*response.Expressions[i].Delimiter) != 1 {
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
+				c.clientID, c.address, *response.Expressions[i].Delimiter)
+			return
+		}
+
 		if response.Expressions[i].Mode == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"case_sensitive\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
 				c.clientID, c.address)
 			return
 		}
