@@ -47,18 +47,18 @@ type Bundle struct {
 func SortExpressions(expressions []*Expression) {
 	sort.Slice(expressions, func(i, j int) bool {
 		if expressions[i].Name != expressions[j].Name {
-			return expressions[i].Name > expressions[j].Name
+			return expressions[i].Name < expressions[j].Name
 		}
 		if expressions[i].Body != expressions[j].Body {
-			return expressions[i].Body > expressions[j].Body
+			return expressions[i].Body < expressions[j].Body
 		}
 		if *expressions[i].Type != *expressions[j].Type {
-			return *expressions[i].Type > *expressions[j].Type
+			return *expressions[i].Type < *expressions[j].Type
 		}
 		if *expressions[i].Mode != *expressions[j].Mode {
-			return *expressions[i].Mode > *expressions[j].Mode
+			return *expressions[i].Mode < *expressions[j].Mode
 		}
-		return *expressions[i].Delimiter > *expressions[j].Delimiter
+		return *expressions[i].Delimiter < *expressions[j].Delimiter
 	})
 }
 
