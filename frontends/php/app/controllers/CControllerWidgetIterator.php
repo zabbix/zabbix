@@ -56,7 +56,7 @@ abstract class CControllerWidgetIterator extends CControllerWidget {
 	 * @return int  Page number.
 	 */
 	protected function getIteratorPage($num_widgets) {
-		return max(1, min((int)$this->getInput('page'), $this->getIteratorPageCount($num_widgets)));
+		return max(1, min((int) $this->getInput('page'), $this->getIteratorPageCount($num_widgets)));
 	}
 
 	/**

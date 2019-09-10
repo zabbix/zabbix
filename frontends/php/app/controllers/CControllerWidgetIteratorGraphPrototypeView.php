@@ -60,7 +60,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	 *
 	 * @return array  Dashboard response data
 	 */
-	protected function doGraphPrototype($fields) {
+	protected function doGraphPrototype(array $fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['name'],
@@ -168,7 +168,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	 *
 	 * @return array  Dashboard response data
 	 */
-	protected function doSimpleGraphPrototype($fields) {
+	protected function doSimpleGraphPrototype(array $fields) {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
