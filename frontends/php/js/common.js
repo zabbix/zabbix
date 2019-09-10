@@ -612,7 +612,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 		}
 
 		// Remove dialogue from the stack.
-		result = overlays_stack.splice(index, 1);
+		result = overlays_stack.splice(index, 1)[0];
 	}
 
 	// Remove event listener.
@@ -621,7 +621,7 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 	}
 
 	// Return the removed layer.
-	return result[0];
+	return result;
 }
 
 /**
