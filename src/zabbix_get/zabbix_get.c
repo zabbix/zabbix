@@ -458,7 +458,7 @@ int	main(int argc, char **argv)
 	signal(SIGINT, get_signal_handler);
 	signal(SIGQUIT, get_signal_handler);
 	signal(SIGTERM, get_signal_handler);
-	signal(SIGABRT, get_signal_handler);
+	signal(SIGHUP, get_signal_handler);
 	signal(SIGALRM, get_signal_handler);
 	signal(SIGPIPE, get_signal_handler);
 #endif
