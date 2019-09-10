@@ -19,6 +19,11 @@
 
 package cpucollector
 
+/*
+#include <unistd.h>
+*/
+import "C"
+
 import (
 	"bufio"
 	"bytes"
@@ -66,12 +71,11 @@ func (p *Plugin) collect() (err error) {
 			status = cpuStatusSummary
 			index = -1
 		}
-		var cpu *cpuUnit
-		var ok bool
-		if cpu, ok = p.cpus[index+1]; !ok {
-			cpu = &cpuUnit{index: index}
-			p.cpus[index+1] = cpu
+		if index+1 >= len(p.cpus) {
+			p.Debugf("invalid CPU index %d", index)
+			continue
 		}
+		cpu := p.cpus[index+1]
 		cpu.status = status
 
 		slot := &cpu.history[cpu.tail]
@@ -94,4 +98,8 @@ func (p *Plugin) collect() (err error) {
 		}
 	}
 	return nil
+}
+
+func (p *Plugin) numCPU() int {
+	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }

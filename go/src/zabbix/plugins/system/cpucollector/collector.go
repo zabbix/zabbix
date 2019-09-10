@@ -30,7 +30,7 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus map[int]*cpuUnit
+	cpus []*cpuUnit
 }
 
 var impl Plugin
@@ -211,9 +211,11 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	var ok bool
-	var cpu *cpuUnit
-	if cpu, ok = p.cpus[index]; !ok || cpu.head == cpu.tail {
+	if index < 0 || index >= len(p.cpus) {
+		return nil, errors.New("Invalid first parameter.")
+	}
+	cpu := p.cpus[index]
+	if cpu.head == cpu.tail {
 		log.Debugf("no collected data for CPU %d", index-1)
 		return nil, nil
 	}
@@ -222,6 +224,10 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	totalnum := cpu.tail - cpu.head
 	if totalnum < 0 {
 		totalnum += maxHistory
+	}
+	if totalnum < 2 {
+		// need at least two samples to calculate utilization
+		return
 	}
 	if totalnum < statRange {
 		statRange = totalnum
@@ -251,8 +257,8 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	// collector has not yet been initialized
-	if len(p.cpus) == 0 {
+	if p.cpus[0].head == p.cpus[0].tail {
+		// no data gathered yet
 		return
 	}
 	switch key {
@@ -261,18 +267,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.cpu.num":
 		return p.getCpuNum(params)
 	case "system.cpu.util":
-		// need at least 2 samples to calculate cpu utilization
-		cpu := p.cpus[0]
-		if cpu == nil {
-			return
-		}
-		history := cpu.tail - cpu.head
-		if history < 0 {
-			history += maxHistory
-		}
-		if history < 2 {
-			return
-		}
 		return p.getCpuUtil(params)
 	default:
 		return nil, errors.New("Unsupported metric.")
@@ -280,7 +274,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func init() {
-	impl.cpus = make(map[int]*cpuUnit)
+	impl.cpus = make([]*cpuUnit, impl.numCPU()+1)
+	for i := 0; i < len(impl.cpus); i++ {
+		impl.cpus[i] = &cpuUnit{
+			index:  i,
+			status: cpuStatusOffline,
+		}
+	}
 	plugin.RegisterMetrics(&impl, "CpuCollector",
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.num", "Number of CPUs.",
