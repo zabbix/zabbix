@@ -989,6 +989,7 @@ define('GRAPH_TYPE_COLUMN_STACKED',	9);
 define('SVG_GRAPH_TYPE_LINE',		0);
 define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
+define('SVG_GRAPH_TYPE_BAR',		3);
 
 define('SVG_GRAPH_MISSING_DATA_NONE',			 0);
 define('SVG_GRAPH_MISSING_DATA_CONNECTED',		 1);
@@ -1642,7 +1643,8 @@ define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MONOSPACE_FONT', 'monospace-font');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
-define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
+define('ZBX_STYLE_MSG_WARNING', 'msg-warning');
+define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_MSG_DETAILS_BORDER', 'msg-details-border');
 define('ZBX_STYLE_NA_BG', 'na-bg');
