@@ -76,7 +76,7 @@ func (p *Plugin) collect() (err error) {
 
 		slot := &cpu.history[cpu.tail]
 		num := len(slot.counters)
-		if num < len(fields)-1 {
+		if num > len(fields)-1 {
 			num = len(fields) - 1
 		}
 		for i := 0; i < num; i++ {
