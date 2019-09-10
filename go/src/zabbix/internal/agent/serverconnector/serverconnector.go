@@ -82,6 +82,7 @@ func ParseServerActive() ([]string, error) {
 		return []string{}, nil
 	}
 
+	var checkAddr string
 	addresses := strings.Split(agent.Options.ServerActive, ",")
 
 	for i := 0; i < len(addresses); i++ {
@@ -91,25 +92,21 @@ func ParseServerActive() ([]string, error) {
 		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
 			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": empty value", addresses[i])
 		}
+
 		if nil != ip {
-			a := net.JoinHostPort(addresses[i], "10051")
-			if _, _, err := net.SplitHostPort(a); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
-			addresses[i] = a
+			checkAddr = net.JoinHostPort(addresses[i], "10051")
 		} else if 0 == len(u.Port()) {
-			a := net.JoinHostPort(u.Hostname(), "10051")
-			if _, _, err := net.SplitHostPort(a); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
-			addresses[i] = a
+			checkAddr = net.JoinHostPort(u.Hostname(), "10051")
 		} else {
-			if h, p, err := net.SplitHostPort(addresses[i]); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			} else {
-				addresses[i] = net.JoinHostPort(h, p)
-			}
+			checkAddr = addresses[i]
 		}
+
+		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
+			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+		} else {
+			addresses[i] = net.JoinHostPort(h, p)
+		}
+
 		for j := 0; j < i; j++ {
 			if addresses[j] == addresses[i] {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than once", addresses[i])
