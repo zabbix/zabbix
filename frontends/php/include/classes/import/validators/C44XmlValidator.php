@@ -443,14 +443,14 @@ class C44XmlValidator {
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -601,14 +601,14 @@ class C44XmlValidator {
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-												'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 													'name' =>					['type' => XML_STRING | XML_REQUIRED],
 													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 													'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 												]]
 											]],
 											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
 													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 													'value' =>					['type' => XML_STRING, 'default' => '']
 												]]
@@ -633,14 +633,14 @@ class C44XmlValidator {
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -1020,14 +1020,14 @@ class C44XmlValidator {
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -1176,14 +1176,14 @@ class C44XmlValidator {
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 											'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-												'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 													'name' =>					['type' => XML_STRING | XML_REQUIRED],
 													'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 													'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 												]]
 											]],
 											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-												'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
 													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 													'value' =>					['type' => XML_STRING, 'default' => '']
 												]]
@@ -1208,14 +1208,14 @@ class C44XmlValidator {
 									'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 									'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-										'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-										'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
 											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 											'value' =>					['type' => XML_STRING, 'default' => '']
 										]]
@@ -1452,14 +1452,14 @@ class C44XmlValidator {
 					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::SINGLE, 'in' => [CXmlConstantValue::SINGLE => CXmlConstantName::SINGLE, CXmlConstantValue::MULTIPLE => CXmlConstantName::MULTIPLE]],
 					'manual_close' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
-						'dependency' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 							'recovery_expression' =>	['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-						'tag' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
 							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
 							'value' =>					['type' => XML_STRING, 'default' => '']
 						]]
@@ -1672,10 +1672,10 @@ class C44XmlValidator {
 				]]
 			]],
 			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
-				'value_map' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
-						'mapping' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
 							'value' =>					['type' => XML_STRING, 'default' => ''],
 							'newvalue' =>				['type' => XML_STRING, 'default' => '']
 						]]
