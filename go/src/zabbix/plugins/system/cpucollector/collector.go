@@ -261,6 +261,18 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.cpu.num":
 		return p.getCpuNum(params)
 	case "system.cpu.util":
+		// need at least 2 samples to calculate cpu utilization
+		cpu := p.cpus[0]
+		if cpu == nil {
+			return
+		}
+		history := cpu.tail - cpu.head
+		if history < 0 {
+			history += maxHistory
+		}
+		if history < 2 {
+			return
+		}
 		return p.getCpuUtil(params)
 	default:
 		return nil, errors.New("Unsupported metric.")
