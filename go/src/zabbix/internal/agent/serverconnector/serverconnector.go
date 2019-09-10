@@ -87,10 +87,11 @@ func ParseServerActive() ([]string, error) {
 	for i := 0; i < len(addresses); i++ {
 		addresses[i] = strings.TrimSpace(addresses[i])
 		u := url.URL{Host: addresses[i]}
-		if 0 == len(strings.TrimSpace(u.Hostname())) {
+		ip := net.ParseIP(addresses[i])
+		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
 			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": empty value", addresses[i])
 		}
-		if nil != net.ParseIP(addresses[i]) {
+		if nil != ip {
 			a := net.JoinHostPort(addresses[i], "10051")
 			if _, _, err := net.SplitHostPort(a); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
