@@ -103,8 +103,10 @@ func ParseServerActive() ([]string, error) {
 			}
 			addresses[i] = a
 		} else {
-			if _, _, err := net.SplitHostPort(addresses[i]); err != nil {
+			if h, p, err := net.SplitHostPort(addresses[i]); err != nil {
 				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+			} else {
+				addresses[i] = net.JoinHostPort(h, p)
 			}
 		}
 		for j := 0; j < i; j++ {
