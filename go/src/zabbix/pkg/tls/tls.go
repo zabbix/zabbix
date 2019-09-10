@@ -29,6 +29,8 @@ package tls
 #include <ctype.h>
 #include "config.h"
 
+#define TLS_UNUSED(var)	(void)(var)
+
 const char	*tls_crypto_init_msg;
 
 #ifdef HAVE_OPENSSL
@@ -548,7 +550,7 @@ typedef void * SSL_CTX_LP;
 typedef struct {
 } tls_t, *tls_lp_t;
 
-static int tls_init()
+static int tls_init(void)
 {
 	tls_crypto_init_msg = "encryption support was not compiled in";
 	return -1;
@@ -557,85 +559,121 @@ static int tls_init()
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
 		 char **error)
 {
+	TLS_UNUSED(ca_file);
+	TLS_UNUSED(crl_file);
+	TLS_UNUSED(cert_file);
+	TLS_UNUSED(key_file);
 	*error = strdup("built without OpenSSL");
 	return NULL;
 }
 
 static void tls_free_context(SSL_CTX_LP ctx)
 {
+	TLS_UNUSED(ctx);
 }
 
 static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
 {
+	TLS_UNUSED(ctx);
+	TLS_UNUSED(psk_identity);
+	TLS_UNUSED(psk_key);
 	return NULL;
 }
 
 static tls_t *tls_new_server(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
 {
+	TLS_UNUSED(ctx);
+	TLS_UNUSED(psk_identity);
+	TLS_UNUSED(psk_key);
 	return NULL;
 }
 
 static int tls_recv(tls_t *tls, char *buf, int size)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(size);
 	return 0;
 }
 
 static int tls_send(tls_t *tls, char *buf, int size)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(size);
 	return 0;
 }
 
 static int tls_connected(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_write(tls_t *tls, char *buf, int len)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(len);
 	return 0;
 }
 
 static int tls_read(tls_t *tls, char *buf, int len)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(len);
 	return 0;
 }
 
 static int tls_handshake(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_accept(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static size_t tls_error(tls_t *tls, char **buf)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
 	return 0;
 }
 
 static int tls_ready(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_close(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static void tls_free(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 }
 
 static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(issuer);
+	TLS_UNUSED(subject);
 	return 0;
 }
 
 static void tls_description(tls_t *tls, char **desc)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(desc);
 }
 
 #endif
