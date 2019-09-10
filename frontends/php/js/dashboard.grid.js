@@ -204,6 +204,9 @@
 
 					var classes = other_widget['iterator'] ? iterator_classes : widget_classes;
 					other_widget['div'].removeClass(classes['focus']);
+					if (!other_widget['div'].is(':hover')) {
+						other_widget['div'].removeClass('iterator-double-header');
+					}
 				});
 			});
 		}
