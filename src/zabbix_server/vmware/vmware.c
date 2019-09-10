@@ -2216,6 +2216,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		if (NULL != xpathObjController)
 			xmlXPathFreeObject(xpathObjController);
 
+		zbx_free(controllerLabel);
 		zbx_free(scsiCtlrUnitNumber);
 		zbx_free(busNumber);
 		zbx_free(unitNumber);
