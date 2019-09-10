@@ -1354,7 +1354,7 @@
 						data['cell-width'] * data['options']['max-columns'] - ui.position.left
 					),
 					'max-height': Math.min(ui.size.height,
-						data.options['widget-max-rows'] * data.options['widget-height'] - ui.position.top
+						data.options['max-rows'] * data.options['widget-height'] - ui.position.top
 					)
 				});
 
