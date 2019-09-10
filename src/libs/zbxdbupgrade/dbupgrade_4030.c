@@ -124,26 +124,6 @@ static int	DBpatch_4030010(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_4030011(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.filter.usrgrpid'"
-				" where idx='web.users.filter.usrgrpid'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sort'"
-				" where idx='web.users.php.sort'"))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.user.sortorder'"
-				" where idx='web.users.php.sortorder'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 static int	DBpatch_4030012(void)
 {
 	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -189,7 +169,7 @@ static int	DBpatch_4030016(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; i < ARRSIZE(values); i++)
+	for (i = 0; i < (int)ARRSIZE(values); i++)
 	{
 		if (ZBX_DB_OK > DBexecute(
 				"update profiles"
@@ -213,12 +193,22 @@ static int	DBpatch_4030017(void)
 
 static int	DBpatch_4030018(void)
 {
+	int		i;
+	const char      *values[] = {
+			"web.users.filter.usrgrpid", "web.user.filter.usrgrpid",
+			"web.users.php.sort", "web.user.sort",
+			"web.users.php.sortorder", "web.user.sortorder",
+			"web.problem.filter.show_latest_values", "web.problem.filter.show_opdata"
+		};
+
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.problem.filter.show_opdata'"
-				" where idx='web.problem.filter.show_latest_values'"))
-		return FAIL;
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -228,14 +218,19 @@ static int	DBpatch_4030019(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update widget_field"
-				" set name='show_opdata'"
-				" where name='show_latest_values'"
-					" and exists (select null"
-						" from widget"
-						" where widget.widgetid=widget_field.widgetid"
-							" and widget.type in ('problems','problemsbysv'))"))
+	if (ZBX_DB_OK > DBexecute(
+			"update widget_field"
+			" set name='show_opdata'"
+			" where name='show_latest_values'"
+				" and exists ("
+					"select null"
+					" from widget"
+					" where widget.widgetid=widget_field.widgetid"
+						" and widget.type in ('problems','problemsbysv')"
+				")"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -257,7 +252,6 @@ DBPATCH_ADD(4030007, 0, 1)
 DBPATCH_ADD(4030008, 0, 1)
 DBPATCH_ADD(4030009, 0, 1)
 DBPATCH_ADD(4030010, 0, 1)
-DBPATCH_ADD(4030011, 0, 1)
 DBPATCH_ADD(4030012, 0, 1)
 DBPATCH_ADD(4030013, 0, 1)
 DBPATCH_ADD(4030014, 0, 1)
