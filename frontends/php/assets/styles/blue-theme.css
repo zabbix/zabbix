@@ -4993,7 +4993,6 @@ table.preprocessing-test-results .rel-container {
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 
-<<<<<<< HEAD
 .host-avail-widget {
   width: 100%;
   height: 100%;
@@ -5051,12 +5050,11 @@ table.preprocessing-test-results .rel-container {
     .by-severity-widget.by-severity-layout-vertical .by-severity-count {
       margin-right: 5px; }
 
+#preprocessing_div {
+  display: block;
+  max-width: 940px; }
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {
     height: 100%; } }
-=======
-#preprocessing_div {
-  display: block;
-  max-width: 940px; }
->>>>>>> 9e7fa6884e... ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox
