@@ -34,7 +34,6 @@
 				'actions': 'dashbrd-grid-iterator-actions',
 				'mask': 'dashbrd-grid-iterator-mask',
 				'hidden_header': 'dashbrd-grid-iterator-hidden-header'
-
 			},
 			widget_classes = {
 				'root': 'dashbrd-grid-widget',
@@ -138,18 +137,11 @@
 		if (!widget['parent']) {
 			// Do not subscribe on focus change, since child widgets do not receive focus.
 			widget['content_header'].on('focusin focusout', function(event) {
-				widget['div'].toggleClass(classes['focus'], event.type === 'focusin');
-
-				if ($div.position().top === 0) {
-					if (widget['iterator']) {
-						slideKiosk($obj, data, event.type === 'focusin'
-							? ($div.hasClass('iterator-first-row-mouseenter') ? 2 : 1) : 0
-						);
-					}
-					else if (widget['div'].hasClass(classes['hidden_header'])) {
-						slideKiosk($obj, data, event.type === 'focusin' ? 1 : 0);
-					}
+				if (event.type === 'focusout' && widget['content_header'].find('[data-expanded]').length) {
+					// Prevent hiding widget header, while it's popup menu is active.
+					return;
 				}
+				widget['div'].toggleClass(classes['focus'], event.type === 'focusin');
 			});
 		}
 
@@ -192,49 +184,107 @@
 			$div
 				.on('mouseenter', function() {
 					if (widget['parent']['div'].hasClass(iterator_classes['hidden_header'])) {
-						widget['parent']['div'].toggleClass('iterator-first-row-mouseenter', $div.position().top === 0);
-
-						if (widget['parent']['div'].position().top === 0) {
-							slideKiosk($obj, data, $div.position().top === 0 ? 2 : 1);
+						if ($div.position().top === 0) {
+							widget['parent']['div'].addClass('iterator-double-header');
 						}
-					}
-					else {
-						if (widget['parent']['div'].position().top === 0) {
-							slideKiosk($obj, data, 1);
+						// Prevent hiding double-header of iterator while it's popup menu is active.
+						else if (!widget['parent']['content_header'].find('[data-expanded]').length) {
+							widget['parent']['div'].removeClass('iterator-double-header');
 						}
 					}
 				});
 		}
-		else {
-			// For iterators and widgets, except for child widgets of iterators.
-			$div.on('mouseenter mouseleave', function(event) {
-				if ($div.position().top === 0) {
-					if (widget['iterator']) {
-						slideKiosk($obj, data, event.type === 'mouseenter'
-							? ($div.hasClass('iterator-first-row-mouseenter') ? 2 : 1)
-							: ($div.hasClass(classes['focus']) ? 1 : 0)
-						);
+
+		if (!widget['parent']) {
+			$div.on('focusin', function(event) {
+				data['widgets'].forEach(function(other_widget) {
+					if (other_widget['uniqueid'] === widget['uniqueid']) {
+						return;
 					}
-					else if (widget['div'].hasClass(classes['hidden_header'])) {
-						slideKiosk($obj, data, event.type === 'mouseenter'
-							? 1
-							: ($div.hasClass(classes['focus']) ? 1 : 0)
-						);
+
+					var classes = other_widget['iterator'] ? iterator_classes : widget_classes;
+					other_widget['div'].removeClass(classes['focus']);
+				});
+			});
+		}
+
+		if (widget['iterator']) {
+			$div.on('mouseleave focusout', function(event) {
+				// Prevent hiding double-header of iterator while it's popup menu is active.
+				if (!widget['content_header'].find('[data-expanded]').length) {
+					if (event.type === 'mouseleave' || !isIteratorFirstRowHovered(widget)) {
+						$div.removeClass('iterator-double-header');
 					}
 				}
 			});
 		}
 
-		if (widget['iterator']) {
-			$div.on('mouseleave', function() {
-				$div.removeClass('iterator-first-row-mouseenter');
+		if (data['options']['kioskmode']) {
+			$div.on('mouseenter mouseleave focusin focusout', function() {
+				slideKiosk($obj, data);
 			});
 		}
 
 		return $div;
 	}
 
-	function slideKiosk($obj, data, slide_lines) {
+	function isIteratorFirstRowHovered(iterator) {
+		for (var i = 0; i < iterator['children'].length; i++) {
+			if (iterator['children'][i]['div'].is(':hover') && iterator['children'][i]['div'].position().top === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Update dashboard sliding effect if in kiosk mode.
+	 */
+	function slideKiosk($obj, data) {
+		var iterator_classes = {
+				'focus': 'dashbrd-grid-iterator-focus',
+				'hidden_header': 'dashbrd-grid-iterator-hidden-header'
+			},
+			widget_classes = {
+				'focus': 'dashbrd-grid-widget-focus',
+				'hidden_header': 'dashbrd-grid-widget-hidden-header'
+			};
+
+		// Calculate the dashboard offset (0, 1 or 2 lines) based on currenntly shown widget headers.
+
+		var slide_lines = 0;
+
+		data['widgets'].each(function(widget) {
+			if (widget['div'].position().top !== 0) {
+				return;
+			}
+
+			var classes = widget['iterator'] ? iterator_classes : widget_classes,
+				hover = widget['div'].is(':hover'),
+				focus = widget['div'].hasClass(classes['focus']),
+				popup = widget['content_header'].find('[data-expanded]').length > 0;
+
+			if (!hover && !focus && !popup) {
+				return;
+			}
+
+			if (widget['iterator']) {
+				slide_lines = Math.max(1, slide_lines);
+
+				if (widget['div'].hasClass('iterator-double-header')) {
+					slide_lines = Math.max(2, slide_lines);
+				}
+			}
+			else {
+				if (widget['div'].hasClass(classes['hidden_header'])) {
+					slide_lines = Math.max(1, slide_lines);
+				}
+			}
+		});
+
+		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
+
 		var $main = $obj.closest('main.layout-kioskmode');
 		if (!$main.length) {
 			return;
@@ -1489,10 +1539,10 @@
 				.append('<div>')
 				.on('mouseenter', function() {
 					// Set single-line header for the iterator.
-					iterator['div'].removeClass('iterator-first-row-mouseenter');
+					iterator['div'].removeClass('iterator-double-header');
 
-					if (iterator['div'].position().top === 0) {
-						slideKiosk($obj, data, 1);
+					if (data['options']['kioskmode'] && iterator['div'].position().top === 0) {
+						slideKiosk($obj, data);
 					}
 				})
 			);

@@ -3435,7 +3435,7 @@ $form-icon-btn: (
 
 	// For floating headers to appear over other widgets.
 	// Cannot rely on DOM order here, since widgets of iterators can be suffled on refresh.
-	z-index: 1;
+	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
@@ -3593,6 +3593,9 @@ $form-icon-btn: (
 	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 	opacity: 0;
 
+	// Not to loose hovered header while widget underneath is updating.
+	z-index: 3;
+
 	h4 {
 		flex-grow: 1;
 		margin-top: .5rem;
@@ -3711,7 +3714,7 @@ $form-icon-btn: (
 		}
 	}
 
-	&.dashbrd-grid-iterator-hidden-header.iterator-first-row-mouseenter {
+	&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 
 		.dashbrd-grid-iterator-head {
 			margin-top: -4rem;
