@@ -238,7 +238,8 @@ jQuery(function($) {
 			},
 			dataType: 'json',
 			beforeSend: function() {
-				$('.menu-popup-top').menuPopup('close');
+				// Close other action menus and prevent focus jumping before opening a new popup.
+				$('.menu-popup-top').menuPopup('close', null, false);
 				setTimeout(function(){
 					$preloader
 						.fadeIn(200)
