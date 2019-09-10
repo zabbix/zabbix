@@ -6262,6 +6262,7 @@ ul.checkbox-list {
 	input[type=text],
 	select {
 		width: 100%;
+		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
 	input[type=text],
@@ -6945,6 +6946,7 @@ table.preprocessing-test-results {
 	}
 }
 
+<<<<<<< HEAD
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
@@ -7057,6 +7059,11 @@ table.preprocessing-test-results {
 			height: 100%;
 		}
 	}
+=======
+#preprocessing_div {
+	display: block;
+	max-width: 940px;
+>>>>>>> 9e7fa6884e... ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox
 }
 
 @if $theme_name == 'dev' {
