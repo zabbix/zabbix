@@ -137,7 +137,7 @@
 		if (!widget['parent']) {
 			// Do not subscribe on focus change, since child widgets do not receive focus.
 			widget['content_header'].on('focusin focusout', function(event) {
-				if (event.type === 'focusout' && widget['content_header'].find('[data-expanded]').length) {
+				if (event.type === 'focusout' && widget['content_header'].find('[data-expanded="true"]').length) {
 					// Prevent hiding widget header, while it's popup menu is active.
 					return;
 				}
@@ -188,7 +188,7 @@
 							widget['parent']['div'].addClass('iterator-double-header');
 						}
 						// Prevent hiding double-header of iterator while it's popup menu is active.
-						else if (!widget['parent']['content_header'].find('[data-expanded]').length) {
+						else if (!widget['parent']['content_header'].find('[data-expanded="true"]').length) {
 							widget['parent']['div'].removeClass('iterator-double-header');
 						}
 					}
@@ -214,7 +214,7 @@
 		if (widget['iterator']) {
 			$div.on('mouseleave focusout', function(event) {
 				// Prevent hiding double-header of iterator while it's popup menu is active.
-				if (!widget['content_header'].find('[data-expanded]').length) {
+				if (!widget['content_header'].find('[data-expanded="true"]').length) {
 					if (event.type === 'mouseleave' || !isIteratorFirstRowHovered(widget)) {
 						$div.removeClass('iterator-double-header');
 					}
@@ -266,7 +266,7 @@
 			var classes = widget['iterator'] ? iterator_classes : widget_classes,
 				hover = widget['div'].is(':hover'),
 				focus = widget['div'].hasClass(classes['focus']),
-				popup = widget['content_header'].find('[data-expanded]').length > 0;
+				popup = widget['content_header'].find('[data-expanded="true"]').length > 0;
 
 			if (!hover && !focus && !popup) {
 				return;
