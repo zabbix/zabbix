@@ -78,11 +78,12 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *coun
 	/* pointer type to PdhAddEnglishCounterW() */
 	typedef PDH_STATUS (WINAPI *ADD_ENG_COUNTER)(PDH_HQUERY, LPCWSTR, DWORD_PTR, PDH_HCOUNTER);
 
-	PDH_STATUS		pdh_status = ERROR_SUCCESS;
-	wchar_t			*wcounterPath = NULL;
+	PDH_STATUS	pdh_status = ERROR_SUCCESS;
+	wchar_t		*wcounterPath = NULL;
+	int		need_english;
+
 	ZBX_THREAD_LOCAL static ADD_ENG_COUNTER add_eng_counter;
-	ZBX_THREAD_LOCAL static first_call = 1;
-	int			need_english;
+	ZBX_THREAD_LOCAL static int		first_call = 1;
 
 	need_english = PERF_COUNTER_LANG_DEFAULT != lang ||
 			(NULL != counter && PERF_COUNTER_LANG_DEFAULT != counter->lang);
@@ -283,12 +284,11 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 	return counterName->name;
 }
 
-int	check_counter_path(char *counterPath, int convert_from_numeric)
+int	check_counter_path(char *counterPath)
 {
-	const char			*__function_name = "check_counter_path";
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
-	int				is_numeric, ret = FAIL;
+	int				ret = FAIL;
 	DWORD				dwSize = 0;
 	wchar_t				*wcounterPath;
 
@@ -311,25 +311,6 @@ int	check_counter_path(char *counterPath, int convert_from_numeric)
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path '%s': %s",
 				counterPath, strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
-	}
-
-	if (0 != convert_from_numeric)
-	{
-		is_numeric = (SUCCEED == _wis_uint(cpe->szObjectName) ? 0x01 : 0);
-		is_numeric |= (SUCCEED == _wis_uint(cpe->szCounterName) ? 0x02 : 0);
-
-		if (0 != is_numeric)
-		{
-			if (0x01 & is_numeric)
-				cpe->szObjectName = get_counter_name(_wtoi(cpe->szObjectName));
-			if (0x02 & is_numeric)
-				cpe->szCounterName = get_counter_name(_wtoi(cpe->szCounterName));
-
-			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, cpe, counterPath))
-				goto clean;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to '%s'", counterPath);
-		}
 	}
 
 	ret = SUCCEED;
