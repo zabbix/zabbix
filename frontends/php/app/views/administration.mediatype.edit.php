@@ -46,20 +46,7 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Type'), 'type')), (new CHorList())
-		->addItem((new CComboBox('type', $data['type'], null, [
-				MEDIA_TYPE_EMAIL => _('Email'),
-				MEDIA_TYPE_EXEC => _('Script'),
-				MEDIA_TYPE_SMS => _('SMS'),
-				MEDIA_TYPE_JABBER => _('Jabber')
-			]))
-			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
-		)
-		->addItem((new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
-			->setId('eztext_link')
-			->setTarget('_blank')
-		)
-	)
+	->addRow(new CLabel(_('Type'), 'type'), new CComboBox('type', $data['type'], null, media_type2str()))
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -78,7 +65,7 @@ $mediatype_formlist = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Connection security'), 'smtp_security')),
+	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
 			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
 			->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
@@ -87,7 +74,7 @@ $mediatype_formlist = (new CFormList())
 	)
 	->addRow(_('SSL verify peer'), (new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']))
 	->addRow(_('SSL verify host'), (new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']))
-	->addRow((new CLabel(_('Authentication'), 'smtp_authentication')),
+	->addRow(new CLabel(_('Authentication'), 'smtp_authentication'),
 		(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
 			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
 			->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
@@ -152,25 +139,8 @@ else {
 
 // append password field to form list
 $mediatype_formlist
-	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
-		(new CTextBox('jabber_username', $data['jabber_username']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Username'), 'eztext_username'))->setAsteriskMark(),
-		(new CTextBox('eztext_username', $data['eztext_username']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Password'), 'passwd'))
-		->setAsteriskMark($data['type'] == MEDIA_TYPE_JABBER || $data['type'] == MEDIA_TYPE_EZ_TEXTING),
-		$passwd_field
-	)
-	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
-		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
-	]))
-	->addRow((new CLabel(_('Message format'), 'content_type')),
+	->addRow(new CLabel(_('Password'), 'passwd'), $passwd_field)
+	->addRow(new CLabel(_('Message format'), 'content_type'),
 		(new CRadioButtonList('content_type', (int) $data['content_type']))
 			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
@@ -199,7 +169,7 @@ switch ($data['maxsessions']) {
 }
 
 $mediaOptionsForm = (new CFormList('options'))
-	->addRow((new CLabel(_('Concurrent sessions'), 'maxsessions_type')),
+	->addRow(new CLabel(_('Concurrent sessions'), 'maxsessions_type'),
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([

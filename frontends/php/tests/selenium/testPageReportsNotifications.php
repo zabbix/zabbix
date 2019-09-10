@@ -28,7 +28,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Notifications');
 
 		// Check dropdown elements
-		$this->zbxTestDropdownHasOptions('media_type', ['all', 'Email', 'Jabber', 'SMS', 'SMS via IP']);
+		$this->zbxTestDropdownHasOptions('media_type', ['all', 'Email', 'SMS']);
 		$this->zbxTestDropdownHasOptions('period', ['Daily', 'Weekly', 'Monthly', 'Yearly']);
 		$this->zbxTestDropdownHasOptions('year', ['2012', '2013', '2014', '2015', '2016', '2017']);
 		// Check default selected dropdown values

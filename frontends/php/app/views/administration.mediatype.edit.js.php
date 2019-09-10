@@ -16,10 +16,9 @@
 		$('#type').change(function() {
 			var media_type = $(this).val();
 
-			$('#eztext_link').hide();
-			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username,' +
-					'#eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security,' +
-					'#smtp_authentication, #exec_path, #exec_params_table, #content_type')
+			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
+					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
+					'#exec_params_table, #content_type')
 				.closest('li')
 				.hide();
 
@@ -44,21 +43,6 @@
 				case '<?= MEDIA_TYPE_SMS ?>':
 					$('#gsm_modem').closest('li').show();
 					setMaxSessionsType(media_type);
-					break;
-
-				case '<?= MEDIA_TYPE_JABBER ?>':
-					$('#jabber_username, #passwd').closest('li').show();
-					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-					break;
-
-				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
-					$('#eztext_username, #eztext_limit, #passwd').closest('li').show();
-					$('#eztext_link').show();
-					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 			}
 		});
@@ -92,7 +76,7 @@
 
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
+				'#smtp_username', '#maxsessions'
 			]);
 		});
 

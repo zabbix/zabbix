@@ -1078,8 +1078,8 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Function: zbx_check_user_permissions                                       *
  *                                                                            *
- * Purpose: check if user has access rights to information - full name, alias,*
- *          Email, SMS, Jabber, etc                                           *
+ * Purpose: check if user has access rights to information - full name,       *
+ *          alias, Email, SMS, etc                                            *
  *                                                                            *
  * Parameters: userid           - [IN] user who owns the information          *
  *             recipient_userid - [IN] user who will receive the information  *

@@ -81,18 +81,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'SMS',
 					'gsm_modem' => '/dev/ttyS0',
 				]
-			],
-			[
-				[
-					'type' => 'Jabber',
-					'jabber_username' => 'user@server',
-				]
-			],
-			[
-				[
-					'type' => 'Ez Texting',
-					'eztext_limit' => 'USA (160 characters)',
-				]
 			]
 		];
 	}
@@ -117,16 +105,12 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownAssertSelected('type', 'Email');
-		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Jabber']);
-		$this->zbxTestAssertElementPresentXpath("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
+		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS']);
 
 		$this->zbxTestAssertNotVisibleId('exec_path');
 		$this->zbxTestAssertNotVisibleId('exec_params_table');
 		$this->zbxTestAssertNotVisibleId('gsm_modem');
-		$this->zbxTestAssertNotVisibleId('jabber_username');
 		$this->zbxTestAssertNotVisibleId('passwd');
-		$this->zbxTestAssertNotVisibleId('eztext_username');
-		$this->zbxTestAssertNotVisibleId('eztext_limit');
 
 		if($data['type'] != 'Email') {
 			$this->zbxTestDropdownSelectWait('type', $data['type']);
@@ -197,16 +181,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('gsm_modem', $data['gsm_modem']);
 				$this->zbxTestAssertAttribute("//input[@id='gsm_modem']", "maxlength", 255);
 				break;
-			case 'Jabber':
-				$this->zbxTestAssertElementValue('jabber_username', $data['jabber_username']);
-				$this->zbxTestAssertAttribute("//input[@id='jabber_username']", "maxlength", 255);
-				$this->zbxTestAssertVisibleId('passwd');
-				break;
-			case 'Ez Texting':
-				$this->zbxTestAssertVisibleId('eztext_username');
-				$this->zbxTestAssertVisibleId('passwd');
-				$this->zbxTestDropdownAssertSelected('eztext_limit', $data['eztext_limit']);
-				break;
 		}
 
 		$this->zbxTestTabSwitch('Options');
@@ -274,14 +248,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			],
 			[
 				'SMS', ['Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']
-			],
-			[
-				'Jabber',
-				[
-					'Description' => 'Jabber messages',
-					'Jabber identifier' => 'zabbix@jabber.com',
-					'Password' => 'Secret password'
-				]
 			]
 		];
 		return $data;
@@ -315,18 +281,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				$this->zbxTestDropdownSelectWait('type', $type);
 				$this->zbxTestInputType('description', $data['Description']);
 				$this->zbxTestInputType('gsm_modem', $data['GSM modem']);
-				break;
-			case 'Jabber':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
-				$this->zbxTestInputType('jabber_username', $data['Jabber identifier']);
-				$this->zbxTestInputType('passwd', $data['Password']);
-				break;
-			case 'Ez Texting':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
-				$this->zbxTestInputType('eztext_username', $data['Username']);
-				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 		}
 
@@ -529,16 +483,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'type' => 'Jabber',
-					'passwd' => 'Secret password',
-					'name' => 'Jabber with custom concurrent sessions and default options',
-					'sessions' => 'Custom',
-					'maxsessions' => 0
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
 					'type' => 'Script',
 					'name' => 'Script media type',
 					'script_name' => 'test',
@@ -556,20 +500,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'SMS',
 					'attempts' => 1,
 					'interval' => '6s'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Ez Texting media type',
-					'type' => 'Ez Texting',
-					'username' => 'test',
-					'passwd' => 'Secret password',
-					'sessions' => 'Custom',
-					'maxsessions' => 10,
-					'attempts' => 5,
-					'interval' => '50s',
-					'dbCheck' => true
 				]
 			]
 		];
@@ -590,10 +520,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		if ($data['type'] == 'Script' ) {
 			$this->zbxTestInputType('exec_path', $data['script_name']);
 		}
-		elseif ($data['type'] == 'Ez Texting') {
-			$this->zbxTestInputType('eztext_username', $data['username']);
-		}
-
 		if (array_key_exists('passwd', $data)){
 			$this->zbxTestInputType('passwd', $data['passwd']);
 		}
