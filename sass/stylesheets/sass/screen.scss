@@ -3433,8 +3433,10 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	// For floating headers to appear over other widgets.
-	// Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
+	/**
+	 * For floating headers to appear over other widgets.
+	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
+	 */
 	z-index: 3;
 
 	h4 {
