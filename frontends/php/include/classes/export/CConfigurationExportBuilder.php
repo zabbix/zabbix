@@ -44,80 +44,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format valuemaps.
-	 *
-	 * @param array $schema     Tag schema from validation class.
-	 * @param array $valuemaps  Export data.
-	 */
-	public function buildValueMaps(array $schema, array $valuemaps) {
-		$valuemaps = $this->formatValueMaps($valuemaps);
-
-		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
-	}
-
-	/**
-	 * Format triggers.
-	 *
-	 * @param array $schema    Tag schema from validation class.
-	 * @param array $triggers  Export data.
-	 */
-	public function buildTriggers(array $schema, array $triggers) {
-		$triggers = $this->formatTriggers($triggers);
-
-		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
-	}
-
-	/**
-	 * Format templates.
-	 *
-	 * @param array $schema           Tag schema from validation class.
-	 * @param array $templates        Export data.
-	 * @param array $simple_triggers  Simple triggers.
-	 */
-	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
-		$templates = $this->formatTemplates($templates, $simple_triggers);
-
-		$this->data['templates'] = $this->build($schema, $templates, 'templates');
-	}
-
-	/**
-	 * Format hosts.
-	 *
-	 * @param array $schema           Tag schema from validation class.
-	 * @param array $hosts            Export data.
-	 * @param array $simple_triggers  Simple triggers.
-	 */
-	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
-		$hosts = $this->formatHosts($hosts, $simple_triggers);
-
-		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
-	}
-
-	/**
-	 * Format groups.
-	 *
-	 * @param array $schema  Tag schema from validation class.
-	 * @param array $groups  Export data.
-	 */
-	public function buildGroups(array $schema, array $groups) {
-		$groups = $this->formatGroups($groups);
-
-		$this->data['groups'] = $this->build($schema, $groups, 'groups');
-	}
-
-	/**
-	 * Format graphs.
-	 *
-	 * @param array $schema  Tag schema from validation class.
-	 * @param array $graphs  Export data.
-	 */
-	public function buildGraphs(array $schema, array $graphs) {
-		$graphs = $this->formatGraphs($graphs);
-
-		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
-	}
-
-	/**
 	 * Build XML data.
 	 *
 	 * @param array  $schema    Tag schema from validation class.
@@ -199,6 +125,89 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format groups.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $groups  Export data.
+	 */
+	public function buildGroups(array $schema, array $groups) {
+		$groups = $this->formatGroups($groups);
+
+		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+	}
+
+	/**
+	 * Format templates.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $templates        Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
+		$templates = $this->formatTemplates($templates, $simple_triggers);
+
+		$this->data['templates'] = $this->build($schema, $templates, 'templates');
+	}
+
+	/**
+	 * Format hosts.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $hosts            Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
+		$hosts = $this->formatHosts($hosts, $simple_triggers);
+
+		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
+	}
+
+	/**
+	 * Format triggers.
+	 *
+	 * @param array $schema    Tag schema from validation class.
+	 * @param array $triggers  Export data.
+	 */
+	public function buildTriggers(array $schema, array $triggers) {
+		$triggers = $this->formatTriggers($triggers);
+
+		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
+	}
+
+	/**
+	 * Format graphs.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $graphs  Export data.
+	 */
+	public function buildGraphs(array $schema, array $graphs) {
+		$graphs = $this->formatGraphs($graphs);
+
+		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
+	}
+
+	/**
+	 * Format screens.
+	 *
+	 * @param array $screens
+	 */
+	public function buildScreens(array $screens) {
+		$this->data['screens'] = $this->formatScreens($screens);
+	}
+
+	/**
+	 * Format valuemaps.
+	 *
+	 * @param array $schema     Tag schema from validation class.
+	 * @param array $valuemaps  Export data.
+	 */
+	public function buildValueMaps(array $schema, array $valuemaps) {
+		$valuemaps = $this->formatValueMaps($valuemaps);
+
+		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
+	}
+
+	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
@@ -217,15 +226,6 @@ class CConfigurationExportBuilder {
 		}
 
 		return $simple_triggers;
-	}
-
-	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
 	}
 
 	/**
