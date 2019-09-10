@@ -168,7 +168,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 			zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 			zbx_free(wcounterPath);
 
-			if (FAIL == check_counter_path(counterpath))
+			if (FAIL == check_counter_path(counterpath, lang == PERF_COUNTER_LANG_DEFAULT))
 			{
 				error = zbx_strdup(error, "Invalid counter path.");
 				goto pc_fail;
