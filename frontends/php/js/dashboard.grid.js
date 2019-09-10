@@ -1317,7 +1317,6 @@
 				startWidgetPositioning($obj, data, widget, 'resize');
 				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				widget.prev_pos.axis_correction = {};
-				doWidgetResize($obj, data, widget);
 
 				var handle_class = event.currentTarget.className;
 				widget['div']
