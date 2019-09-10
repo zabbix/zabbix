@@ -21,8 +21,6 @@
 #include "db.h"
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
 /*
  * 4.4 development database patches
  */
@@ -176,7 +174,7 @@ static int	DBpatch_4030015(void)
 static int	DBpatch_4030016(void)
 {
 	int		i;
-	const char      *values[] = {
+	const char	*values[] = {
 			"alarm_ok",
 			"no_sound",
 			"alarm_information",
@@ -189,7 +187,7 @@ static int	DBpatch_4030016(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; i < ARRSIZE(values); i++)
+	for (i = 0; i < (int)ARRSIZE(values); i++)
 	{
 		if (ZBX_DB_OK > DBexecute(
 				"update profiles"
@@ -216,9 +214,13 @@ static int	DBpatch_4030018(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.problem.filter.show_opdata'"
-				" where idx='web.problem.filter.show_latest_values'"))
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set idx='web.problem.filter.show_opdata'"
+			" where idx='web.problem.filter.show_latest_values'"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -228,14 +230,19 @@ static int	DBpatch_4030019(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update widget_field"
-				" set name='show_opdata'"
-				" where name='show_latest_values'"
-					" and exists (select null"
-						" from widget"
-						" where widget.widgetid=widget_field.widgetid"
-							" and widget.type in ('problems','problemsbysv'))"))
+	if (ZBX_DB_OK > DBexecute(
+			"update widget_field"
+			" set name='show_opdata'"
+			" where name='show_latest_values'"
+				" and exists ("
+					"select null"
+					" from widget"
+					" where widget.widgetid=widget_field.widgetid"
+						" and widget.type in ('problems','problemsbysv')"
+				")"))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

@@ -91,7 +91,7 @@ zbx_ibm_db2_handle_t;
 
 static zbx_ibm_db2_handle_t	ibm_db2;
 
-static int	IBM_DB2server_status();
+static int	IBM_DB2server_status(void);
 static int	zbx_ibm_db2_success(SQLRETURN ret);
 static int	zbx_ibm_db2_success_ext(SQLRETURN ret);
 static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
@@ -2239,7 +2239,7 @@ void	DBfree_result(DB_RESULT result)
 
 #ifdef HAVE_IBM_DB2
 /* server status: SQL_CD_TRUE or SQL_CD_FALSE */
-static int	IBM_DB2server_status()
+static int	IBM_DB2server_status(void)
 {
 	int	server_status = SQL_CD_TRUE;
 

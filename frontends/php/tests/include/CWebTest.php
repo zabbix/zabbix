@@ -252,7 +252,7 @@ class CWebTest extends CTest {
 	 *
 	 * @return array
 	 */
-	protected static function getNormalizedRegions($element, $regions) {
+	protected function getNormalizedRegions($element, $regions) {
 		if (!is_array($regions) || CTestArrayHelper::isAssociative($regions)) {
 			$regions = [$regions];
 		}
@@ -366,7 +366,7 @@ class CWebTest extends CTest {
 
 		$name = md5($function.$id).'.png';
 		$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
-				self::getNormalizedRegions($element, $regions)
+				$this->getNormalizedRegions($element, $regions)
 		);
 
 		if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
