@@ -180,6 +180,7 @@ func TestParseAlias(t *testing.T) {
 		Result{input: `alias.name[*]:key`, name: `alias.name[*]`, key: `key`},
 		Result{input: `alias.name[*]:key[*]`, name: `alias.name[*]`, key: `key[*]`},
 		Result{input: `alias.name[ *]:key[ *]`, name: `alias.name[ *]`, key: `key[ *]`},
+		Result{input: `alias.name[ *]:key[a]`, name: `alias.name[ *]`, key: `key[a]`},
 		Result{input: `alias.name:key s`, failed: true},
 		Result{input: `a alias.name:key`, failed: true},
 		Result{input: `alias.name:key[param]a`, failed: true},
