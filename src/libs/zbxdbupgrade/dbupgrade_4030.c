@@ -235,6 +235,60 @@ static int	DBpatch_4030019(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4030020(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	char		*exec_params = NULL, *exec_params_esc;
+	size_t		exec_params_alloc = 0;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* type : 1 - MEDIA_TYPE_EXEC, 3 - MEDIA_TYPE_JABBER, 100 - MEDIA_TYPE_EZ_TEXTING */
+	result = DBselect("select mediatypeid,type,username,passwd,exec_path from media_type where type in (3,100)");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		size_t	exec_params_offset = 0;
+
+		if (3 == atoi(row[1])) {
+			zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset,
+				"Jabber identifier\n%s\nPassword\n%s\n", row[2], row[3]);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset,
+				"Username\n%s\nPassword\n%s\nMessage text limit\n%d\n", row[2], row[3],
+				0 == atoi(row[4]) ? 160 : 136);
+		}
+
+		exec_params_esc = DBdyn_escape_string_len(exec_params, 255);
+
+		if (ZBX_DB_OK > DBexecute("update media_type"
+				" set type=1,"
+					"exec_path='script.sh',"
+					"exec_params='%s',"
+					"username='',"
+					"passwd=''"
+				" where mediatypeid=%s", exec_params_esc, row[0]))
+		{
+			zbx_free(exec_params_esc);
+			goto out;
+		}
+
+		zbx_free(exec_params_esc);
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(exec_params);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -260,5 +314,6 @@ DBPATCH_ADD(4030016, 0, 1)
 DBPATCH_ADD(4030017, 0, 1)
 DBPATCH_ADD(4030018, 0, 1)
 DBPATCH_ADD(4030019, 0, 1)
+DBPATCH_ADD(4030020, 0, 1)
 
 DBPATCH_END()
