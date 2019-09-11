@@ -214,7 +214,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			totalnum += maxHistory
 		}
 		if totalnum < 2 {
-			p.Debugf("no device statistics have been gathered")
 			return
 		}
 		if totalnum < statRange {

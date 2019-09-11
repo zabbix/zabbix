@@ -19,6 +19,11 @@
 
 package cpucollector
 
+/*
+#include <unistd.h>
+*/
+import "C"
+
 import (
 	"bufio"
 	"bytes"
@@ -60,23 +65,22 @@ func (p *Plugin) collect() (err error) {
 			if i, err = strconv.ParseInt(fields[0][3:], 10, 32); err != nil {
 				return
 			}
-			index = int(i)
+			if index = int(i); index < 0 || index+1 >= len(p.cpus) {
+				p.Debugf("invalid CPU index %d", index)
+				continue
+			}
+
 			status = cpuStatusOnline
 		} else {
-			status = cpuStatusSummary
 			index = -1
 		}
-		var cpu *cpuUnit
-		var ok bool
-		if cpu, ok = p.cpus[index+1]; !ok {
-			cpu = &cpuUnit{index: index}
-			p.cpus[index+1] = cpu
-		}
+
+		cpu := p.cpus[index+1]
 		cpu.status = status
 
 		slot := &cpu.history[cpu.tail]
 		num := len(slot.counters)
-		if num < len(fields)-1 {
+		if num > len(fields)-1 {
 			num = len(fields) - 1
 		}
 		for i := 0; i < num; i++ {
@@ -94,4 +98,8 @@ func (p *Plugin) collect() (err error) {
 		}
 	}
 	return nil
+}
+
+func (p *Plugin) numCPU() int {
+	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }

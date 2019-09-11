@@ -320,12 +320,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, stats.err
 		}
 		if stats.tail == stats.head {
-			p.Debugf("empty CPU utilisation history")
 			return
 		}
 		totalnum := stats.tail - stats.head
 		if totalnum < 0 {
 			totalnum += maxHistory
+		}
+		if totalnum < 2 {
+			return
 		}
 		if totalnum < utilrange {
 			utilrange = totalnum
