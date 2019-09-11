@@ -2192,7 +2192,8 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			controllerLabel = zbx_xml_read_node_value(details, xpathObjController->nodesetval->nodeTab[0],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
 
-			if (NULL != scsiCtlrUnitNumber || (NULL != controllerLabel && NULL != strstr(controllerLabel, "SCSI")))
+			if (NULL != scsiCtlrUnitNumber ||
+				(NULL != controllerLabel && NULL != strstr(controllerLabel, "SCSI")))
 			{
 				controllerType = "scsi";
 			}
