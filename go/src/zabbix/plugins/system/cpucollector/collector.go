@@ -132,8 +132,8 @@ func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
 	switch len(params) {
 	case 1:
 		switch params[0] {
-		case "":
-		case "online":
+		case "", "online":
+			// default value, already initialized
 		case "max":
 			mask = cpuStatusOnline | cpuStatusOffline
 		default:
