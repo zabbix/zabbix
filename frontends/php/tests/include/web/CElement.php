@@ -537,4 +537,17 @@ class CElement extends CBaseElement implements IWaitable {
 	public static function onNotSupportedMethod($method) {
 		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
 	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function isEnabled($enabled = true) {
+		$classes = explode(' ', parent::getAttribute('class'));
+
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
+
+		return $is_enabled === $enabled;
+	}
 }

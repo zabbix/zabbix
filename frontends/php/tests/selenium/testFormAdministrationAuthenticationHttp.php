@@ -62,7 +62,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Login after logout.
 						[
-							'page' => 'index.php?reconnect=1&form=default',
+							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
 							'target' => 'Global view'
 						]
@@ -223,7 +223,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Sign in through zabbix login form after logout.
 						[
-							'page' => 'index.php?reconnect=1&form=default',
+							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
 							'target' => 'Global view'
 						],
@@ -331,7 +331,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Login after logout.
 						[
-							'page' => 'index.php?reconnect=1&form=default',
+							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
 							'target' => 'Global view'
 						]
@@ -387,7 +387,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 							'target' => 'Global view'
 						],
 						[
-							'page' => 'index.php?reconnect=1&form=default',
+							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
 							'target' => 'Global view'
 						]
@@ -549,6 +549,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			}
 
 			$this->page->logout();
+			$this->page->open('index.php?form=default');
 		}
 	}
 

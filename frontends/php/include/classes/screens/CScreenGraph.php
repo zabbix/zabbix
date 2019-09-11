@@ -36,9 +36,6 @@ class CScreenGraph extends CScreenBase {
 		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
 		$graphDims['width'] = (int) $this->screenitem['width'];
 		$graph = getGraphByGraphId($resourceId);
-		$graphId = $graph['graphid'];
-		$legend = $graph['show_legend'];
-		$graph3d = $graph['show_3d'];
 		$src = null;
 
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
@@ -95,29 +92,36 @@ class CScreenGraph extends CScreenBase {
 
 			// get url
 			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$src = new CUrl('chart7.php');
+				$src = (new CUrl('chart7.php'))
+					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+					->setArgument('graphtype', $graph['graphtype'])
+					->setArgument('graph3d', $graph['show_3d'])
+					->setArgument('legend', $graph['show_legend']);
 			}
 			else {
-				$src = new CUrl('chart3.php');
-			}
-
-			foreach ($graph as $name => $value) {
-				if ($name == 'width' || $name == 'height') {
-					continue;
-				}
-				$src->setArgument($name, $value);
+				$src = (new CUrl('chart3.php'))
+					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+					->setArgument('ymin_type', $graph['ymin_type'])
+					->setArgument('ymax_type', $graph['ymax_type'])
+					->setArgument('ymin_itemid', $graph['ymin_itemid'])
+					->setArgument('ymax_itemid', $graph['ymax_itemid'])
+					->setArgument('legend', $graph['show_legend'])
+					->setArgument('showworkperiod', $graph['show_work_period'])
+					->setArgument('showtriggers', $graph['show_triggers'])
+					->setArgument('graphtype', $graph['graphtype'])
+					->setArgument('yaxismin', $graph['yaxismin'])
+					->setArgument('yaxismax', $graph['yaxismax'])
+					->setArgument('percent_left', $graph['percent_left'])
+					->setArgument('percent_right', $graph['percent_right']);
 			}
 
 			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
-			foreach ($newGraphItems as $i => $newGraphItem) {
+			foreach ($newGraphItems as $i => &$newGraphItem) {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
-
-				foreach ($newGraphItem as $name => $value) {
-					$src->setArgument('items['.$i.']['.$name.']', $value);
-				}
 			}
+			unset($newGraphItem);
 
-			$src->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
+			$src->setArgument('items', $newGraphItems);
 		}
 
 		// get time control
@@ -139,7 +143,7 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			$src->setArgument('graph3d', $graph3d);
+			$src->setArgument('graph3d', $graph['show_3d']);
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
@@ -150,7 +154,7 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			if ($this->mode != SCREEN_MODE_EDIT && $graphId) {
+			if ($this->mode != SCREEN_MODE_EDIT && $graph['graphid']) {
 				if ($this->mode == SCREEN_MODE_PREVIEW) {
 					$timeControlData['loadSBox'] = 1;
 				}
@@ -160,7 +164,7 @@ class CScreenGraph extends CScreenBase {
 		$src
 			->setArgument('width', $this->screenitem['width'])
 			->setArgument('height', $this->screenitem['height'])
-			->setArgument('legend', $legend)
+			->setArgument('legend', $graph['show_legend'])
 			->setArgument('profileIdx', $this->profileIdx)
 			->setArgument('profileIdx2', $this->profileIdx2);
 
