@@ -247,13 +247,14 @@ func (t *directExporterTask) perform(s Scheduler) {
 
 		if now.After(t.expire) {
 			err = errors.New("No data available.")
+			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
 		} else {
 			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 				var ret interface{}
-				log.Debugf("executing direct exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
+				log.Debugf("executing direct exporter task for key '%s'", itemkey)
 
 				if ret, err = exporter.Export(key, params, t); err == nil {
-					log.Debugf("executed direct exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
+					log.Debugf("executed direct exporter task for key '%s'", itemkey)
 					if ret != nil {
 						rt := reflect.TypeOf(ret)
 						switch rt.Kind() {
@@ -266,7 +267,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 						}
 					}
 				} else {
-					log.Debugf("failed to execute diirect exporter task for itemid:%d key '%s' error: '%s'",
+					log.Debugf("failed to execute direct exporter task for key '%s' error: '%s'",
 						t.item.itemid, itemkey, err.Error())
 				}
 			}
