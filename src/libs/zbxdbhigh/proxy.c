@@ -2394,7 +2394,9 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	if (SUCCEED == in_maintenance_without_data_collection(item->host.maintenance_status,
 			item->host.maintenance_type, item->type) &&
 			item->host.maintenance_from <= value->ts.sec)
+	{
 		return SUCCEED;
+	}
 
 	/* empty values are only allowed for meta information update packets */
 	if (NULL == value->value)
