@@ -225,6 +225,15 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Take screenshot of the specific element.
+	 *
+	 * @return string
+	 */
+	public function takeScreenshot() {
+		return CElementQuery::getPage()->takeScreenshot($this);
+	}
+
+	/**
 	 * Get instance of specified element class from current element.
 	 *
 	 * @param string $class      class to be casted to
@@ -308,6 +317,30 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function fill($text) {
 		return $this->overwrite($text);
+	}
+
+	/**
+	 * Remove element from the page.
+	 */
+	public function delete() {
+		CElementQuery::getDriver()->executeScript('arguments[0].remove();', [$this]);
+	}
+
+	/**
+	 * Get element rectangle.
+	 *
+	 * @return array
+	 */
+	public function getRect() {
+		$location = $this->getLocation();
+		$size = $this->getSize();
+
+		return [
+			'x' => $location->getX(),
+			'y' => $location->getY(),
+			'width' => $size->getWidth(),
+			'height' => $size->getHeight()
+		];
 	}
 
 	/**
@@ -536,5 +569,18 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public static function onNotSupportedMethod($method) {
 		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function isEnabled($enabled = true) {
+		$classes = explode(' ', parent::getAttribute('class'));
+
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
+
+		return $is_enabled === $enabled;
 	}
 }

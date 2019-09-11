@@ -55,6 +55,7 @@ $readonly = ($data['limited'] || $discovered_trigger);
 
 if ($readonly) {
 	$triggersForm
+		->addVar('opdata', $data['opdata'])
 		->addVar('recovery_mode', $data['recovery_mode'])
 		->addVar('type', $data['type'])
 		->addVar('correlation_mode', $data['correlation_mode'])
@@ -76,13 +77,18 @@ if ($discovered_trigger) {
 	));
 }
 
-$triggersFormList->addRow(
-	(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
-	(new CTextBox('description', $data['description'], $readonly))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autofocus', 'autofocus')
-);
+$triggersFormList
+	->addRow(
+		(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
+		(new CTextBox('description', $data['description'], $readonly))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(
+		new CLabel(_('Operational data'), 'opdata'),
+		(new CTextBox('opdata', $data['opdata'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);

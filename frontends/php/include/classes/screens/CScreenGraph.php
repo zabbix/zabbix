@@ -36,9 +36,6 @@ class CScreenGraph extends CScreenBase {
 		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
 		$graphDims['width'] = (int) $this->screenitem['width'];
 		$graph = getGraphByGraphId($resourceId);
-		$graphId = $graph['graphid'];
-		$legend = $graph['show_legend'];
-		$graph3d = $graph['show_3d'];
 
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 			// get host
@@ -93,28 +90,37 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			// get url
-			$this->screenitem['url'] = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
-				? 'chart7.php'
-				: 'chart3.php';
-			$this->screenitem['url'] = new CUrl($this->screenitem['url']);
-
-			foreach ($graph as $name => $value) {
-				if ($name == 'width' || $name == 'height') {
-					continue;
-				}
-				$this->screenitem['url']->setArgument($name, $value);
+			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$this->screenitem['url'] = (new CUrl('chart7.php'))
+					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+					->setArgument('graphtype', $graph['graphtype'])
+					->setArgument('graph3d', $graph['show_3d'])
+					->setArgument('legend', $graph['show_legend']);
+			}
+			else {
+				$this->screenitem['url'] = (new CUrl('chart3.php'))
+					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
+					->setArgument('ymin_type', $graph['ymin_type'])
+					->setArgument('ymax_type', $graph['ymax_type'])
+					->setArgument('ymin_itemid', $graph['ymin_itemid'])
+					->setArgument('ymax_itemid', $graph['ymax_itemid'])
+					->setArgument('legend', $graph['show_legend'])
+					->setArgument('showworkperiod', $graph['show_work_period'])
+					->setArgument('showtriggers', $graph['show_triggers'])
+					->setArgument('graphtype', $graph['graphtype'])
+					->setArgument('yaxismin', $graph['yaxismin'])
+					->setArgument('yaxismax', $graph['yaxismax'])
+					->setArgument('percent_left', $graph['percent_left'])
+					->setArgument('percent_right', $graph['percent_right']);
 			}
 
 			$newGraphItems = getSameGraphItemsForHost($graph['gitems'], $this->hostid, false);
-			foreach ($newGraphItems as $i => $newGraphItem) {
+			foreach ($newGraphItems as $i => &$newGraphItem) {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
-
-				foreach ($newGraphItem as $name => $value) {
-					$this->screenitem['url']->setArgument('items['.$i.']['.$name.']', $value);
-				}
 			}
+			unset($newGraphItem);
 
-			$this->screenitem['url']->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
+			$this->screenitem['url']->setArgument('items', $newGraphItems);
 			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
 
@@ -135,8 +141,8 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$legend.
-				'&graph3d='.$graph3d.$this->getProfileUrlParams();
+				'&height='.$this->screenitem['height'].'&legend='.$graph['show_legend'].
+				'&graph3d='.$graph['show_3d'].$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
 				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
 				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
@@ -147,14 +153,14 @@ class CScreenGraph extends CScreenBase {
 				$isDefault = true;
 			}
 
-			if ($this->mode != SCREEN_MODE_EDIT && $graphId) {
+			if ($this->mode != SCREEN_MODE_EDIT && $graph['graphid']) {
 				if ($this->mode == SCREEN_MODE_PREVIEW) {
 					$timeControlData['loadSBox'] = 1;
 				}
 			}
 
 			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$legend.$this->getProfileUrlParams();
+				'&height='.$this->screenitem['height'].'&legend='.$graph['show_legend'].$this->getProfileUrlParams();
 			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
 				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
 				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];

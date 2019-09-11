@@ -612,7 +612,7 @@ class testFormUser extends CWebTest {
 
 			$this->page->logout();
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->page->logout();
 			throw $e;
 		}

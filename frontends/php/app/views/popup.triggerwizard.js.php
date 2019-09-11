@@ -66,12 +66,12 @@ ob_start(); ?>
 		disabled: data.length < 2,
 		items: 'tbody tr.sortable',
 		axis: 'y',
-		cursor: 'move',
+		cursor: IE ? 'move' : 'grabbing',
 		handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 		containment: '#expressions_list tbody',
 		tolerance: 'pointer',
 		opacity: 0.6
-	}).on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function () {
+	}).on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function() {
 		var row = $(this).closest('tr');
 
 		if (row.siblings().length == 1) {
