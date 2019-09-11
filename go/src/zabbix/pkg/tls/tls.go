@@ -543,6 +543,45 @@ static void tls_description(tls_t *tls, char **desc)
 	free(peer_subject);
 }
 
+//*****************************************************************************
+//                                                                           //
+// Function: tls_describe_ciphersuites                                       //
+//                                                                           //
+// Purpose: write names of enabled OpenSSL ciphersuites into dynamically     //
+//          allocated string                                                 //
+//                                                                           //
+//*****************************************************************************
+static void tls_describe_ciphersuites(SSL_CTX_LP ctx, char **desc)
+{
+#define TLS_CIPHERS_BUF_LEN	8192
+
+	int			i, num;
+	size_t			offset = 0;
+	STACK_OF(SSL_CIPHER)	*cipher_list;
+	char			buf[TLS_CIPHERS_BUF_LEN];
+
+	buf[0] = '\0';
+	cipher_list = SSL_CTX_get_ciphers(ctx);
+	num = sk_SSL_CIPHER_num(cipher_list);
+
+	for (i = 0; i < num; i++)
+	{
+		offset += (size_t)snprintf(buf + offset, sizeof(buf) - offset, " %s",
+				SSL_CIPHER_get_name(sk_SSL_CIPHER_value(cipher_list, i)));
+
+		if (sizeof(buf) - 2 <= offset)
+		{
+			const char	*msg = "...(truncated)";
+
+			snprintf(buf + sizeof(buf) - strlen(msg) - 1, strlen(msg) + 1, "%s", msg);
+			break;
+		}
+	}
+	*desc = strdup(buf);
+
+#undef TLS_CIPHERS_BUF_LEN
+}
+
 #else // HAVE_OPENSSL 0
 
 typedef void * SSL_CTX_LP;
@@ -676,6 +715,12 @@ static void tls_description(tls_t *tls, char **desc)
 	TLS_UNUSED(desc);
 }
 
+static void tls_describe_ciphersuites(SSL_CTX_LP ciphers, char **desc)
+{
+	TLS_UNUSED(ciphers);
+	TLS_UNUSED(desc);
+}
+
 #endif
 
 */
@@ -692,8 +737,8 @@ import (
 )
 
 // TLS initialization
-var supported bool		// is TLS compiled in and successfully initialized
-var supportedMsg string		// reason why TLS is not supported
+var supported bool      // is TLS compiled in and successfully initialized
+var supportedMsg string // reason why TLS is not supported
 
 func Supported() bool {
 	return supported
@@ -709,6 +754,14 @@ func init() {
 	if !supported {
 		supportedMsg = C.GoString(C.tls_crypto_init_msg)
 	}
+}
+
+func describeCiphersuites(context unsafe.Pointer) (desc string) {
+	var cDesc *C.char
+	C.tls_describe_ciphersuites(C.SSL_CTX_LP(context), &cDesc)
+	desc = C.GoString(cDesc)
+	C.free(unsafe.Pointer(cDesc))
+	return
 }
 
 type tlsConn struct {
@@ -1131,14 +1184,18 @@ func Init(config *Config) (err error) {
 	}
 
 	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
-		err = fmt.Errorf("cannot initialize global TLS context: %s", C.GoString(cErr))
+		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
+	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
+
 	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
+	log.Debugf("psk context ciphersuites:%s", describeCiphersuites(pskContext))
+
 	return
 }
