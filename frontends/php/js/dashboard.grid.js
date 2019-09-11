@@ -733,7 +733,7 @@
 			return box1.current_pos[axis_key] - box2.current_pos[axis_key];
 		});
 
-		/**
+		/*
 		 * Compact affected widgets removing empty space between them when possible. Additionaly built overlap array
 		 * which will contain maximal coordinate occupied by widgets on every opposite axis line.
 		 */
@@ -767,7 +767,7 @@
 
 		overlap = new_max - size_max;
 
-		/**
+		/*
 		 * When previous step could not fit affected widgets into visible area resize should be done.
 		 * Resize scan affected widgets line by line collapsing only widgets having size greater than minimal
 		 * allowed 'size_min' and position overlapped by dashboard visible area.
@@ -788,7 +788,7 @@
 
 			scanline[size_key] = 1;
 
-			/**
+			/*
 			 * Build affected boundaries object with minimum and maximum value on opposite axis for every widget.
 			 * Key in axis_boundaries object will be widget uniqueid and value boundaries object described above.
 			 */
@@ -920,7 +920,7 @@
 			}
 		}
 
-		/**
+		/*
 		 * When resize failed to fit affected widgets move them into visible area and decrease size of widget
 		 * which started resize operation, additionaly setting 'overflow' property to widget.
 		 */
@@ -933,7 +933,7 @@
 			});
 		}
 
-		/**
+		/*
 		 * Perform additional check on validity of collapsed size. Collapsing is done if there is collision between
 		 * box on axis_key and box on {axis_key+scanline[size_key]} therefore box can be collapsed on collision with
 		 * itself, such situation can lead to missdetection of ability to be collapsed.
@@ -1891,7 +1891,7 @@
 		}
 
 		if (ready_updated) {
-			/**
+			/*
 			 * The conception:
 			 *   - Hold 'registerDataExchangeCommit' until all widgets are loaded.
 			 *   - Call 'registerDataExchangeCommit' and 'onDashboardReady' once, as soon as all widgets are loaded.
@@ -2436,7 +2436,7 @@
 
 			var dimension = $.extend({}, data.add_widget_dimension);
 
-			/**
+			/*
 			 * Unset if dimension width/height is equal to size of placeholder.
 			 * Widget default size will be used.
 			 */
@@ -2574,7 +2574,7 @@
 						--pos.y;
 					}
 
-					/**
+					/*
 					 * If there is collision make additional check to ensure that mouse is not at the bottom of 1x2 free
 					 * slot.
 					 */
