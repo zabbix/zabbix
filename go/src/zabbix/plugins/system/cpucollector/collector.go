@@ -56,7 +56,7 @@ const (
 	stateGnice
 )
 
-var cpuStatuses [3]string = [3]string{"offline", "online"}
+var cpuStatuses [3]string = [3]string{"", "offline", "online"}
 
 type historyIndex int
 
@@ -255,7 +255,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.cpus[0].head == p.cpus[0].tail {
+	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
 		// no data gathered yet
 		return
 	}
@@ -271,14 +271,21 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 }
 
-func init() {
+func (p *Plugin) Start() {
 	impl.cpus = make([]*cpuUnit, impl.numCPU()+1)
 	for i := 0; i < len(impl.cpus); i++ {
 		impl.cpus[i] = &cpuUnit{
-			index:  i,
+			index:  i - 1,
 			status: cpuStatusOffline,
 		}
 	}
+}
+
+func (p *Plugin) Stop() {
+	impl.cpus = nil
+}
+
+func init() {
 	plugin.RegisterMetrics(&impl, "CpuCollector",
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.num", "Number of CPUs.",
