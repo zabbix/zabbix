@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strings"
 	"time"
 	"zabbix/pkg/log"
 	"zabbix/pkg/tls"
@@ -233,10 +232,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 }
 
 func (c *Connection) RemoteIP() string {
-	addr := c.conn.RemoteAddr().String()
-	if pos := strings.Index(addr, ":"); pos != -1 {
-		addr = addr[:pos]
-	}
+	addr, _, _ := net.SplitHostPort(c.conn.RemoteAddr().String())
 	return addr
 }
 

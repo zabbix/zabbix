@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/url"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -75,19 +76,35 @@ type agentDataResponse struct {
 	Info     string `json:"info"`
 }
 
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
 func ParseServerActive() ([]string, error) {
+	if 0 == len(strings.TrimSpace(agent.Options.ServerActive)) {
+		return []string{}, nil
+	}
+
+	var checkAddr string
 	addresses := strings.Split(agent.Options.ServerActive, ",")
 
 	for i := 0; i < len(addresses); i++ {
-		if strings.IndexByte(addresses[i], ':') == -1 {
-			if _, _, err := net.SplitHostPort(addresses[i] + ":10051"); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
-			addresses[i] += ":10051"
+		addresses[i] = strings.TrimSpace(addresses[i])
+		u := url.URL{Host: addresses[i]}
+		ip := net.ParseIP(addresses[i])
+		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": empty value", addresses[i])
+		}
+
+		if nil != ip {
+			checkAddr = net.JoinHostPort(addresses[i], "10051")
+		} else if 0 == len(u.Port()) {
+			checkAddr = net.JoinHostPort(u.Hostname(), "10051")
 		} else {
-			if _, _, err := net.SplitHostPort(addresses[i]); err != nil {
-				return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
-			}
+			checkAddr = addresses[i]
+		}
+
+		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
+			return nil, fmt.Errorf("error parsing the \"ServerActive\" parameter: address \"%s\": %s", addresses[i], err)
+		} else {
+			addresses[i] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 		}
 
 		for j := 0; j < i; j++ {
@@ -238,31 +255,37 @@ func (c *Connector) refreshActiveChecks() {
 
 	for i := 0; i < len(response.Expressions); i++ {
 		if len(response.Expressions[i].Name) == 0 {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"name\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if response.Expressions[i].Type == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"expression_type\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
 				c.clientID, c.address)
 			return
 		}
 
 		if response.Expressions[i].Delimiter == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"exp_delimiter\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
 				c.clientID, c.address)
 			return
 		}
 
+		if len(*response.Expressions[i].Delimiter) != 1 {
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
+				c.clientID, c.address, *response.Expressions[i].Delimiter)
+			return
+		}
+
 		if response.Expressions[i].Mode == nil {
-			log.Errf("[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag \"case_sensitive\"",
+			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
 				c.clientID, c.address)
 			return
 		}

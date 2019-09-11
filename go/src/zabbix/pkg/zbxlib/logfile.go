@@ -38,9 +38,12 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	ZBX_ACTIVE_METRIC *metric = malloc(sizeof(ZBX_ACTIVE_METRIC));
 	memset(metric, 0, sizeof(ZBX_ACTIVE_METRIC));
 	metric->key = key;
+	// key_orig is used in error messages, consider using "itemid: <itemid>" instead of the key
+	metric->key_orig = zbx_strdup(NULL, key);
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	metric->flags = flags;
+	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	return metric;
 }
 
@@ -271,14 +274,14 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 			err = errors.New(C.GoString(cvalue))
 		}
 
-		result := &LogResult{
+		r := &LogResult{
 			Value:       &value,
 			Ts:          time.Now(),
 			Error:       err,
 			LastLogsize: uint64(clastlogsize),
 			Mtime:       int(cmtime),
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 	}
 	C.free_log_result(result)
 

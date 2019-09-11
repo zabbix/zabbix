@@ -44,21 +44,21 @@ type Bundle struct {
 	Cblob       unsafe.Pointer
 }
 
-func sortExpressions(expressions []*Expression) {
+func SortExpressions(expressions []*Expression) {
 	sort.Slice(expressions, func(i, j int) bool {
-		if expressions[i].Name != expressions[i].Name {
-			return expressions[i].Name > expressions[i].Name
+		if expressions[i].Name != expressions[j].Name {
+			return expressions[i].Name < expressions[j].Name
 		}
-		if expressions[i].Body != expressions[i].Body {
-			return expressions[i].Body > expressions[i].Body
+		if expressions[i].Body != expressions[j].Body {
+			return expressions[i].Body < expressions[j].Body
 		}
-		if *expressions[i].Type != *expressions[i].Type {
-			return *expressions[i].Type > *expressions[i].Type
+		if *expressions[i].Type != *expressions[j].Type {
+			return *expressions[i].Type < *expressions[j].Type
 		}
-		if *expressions[i].Mode != *expressions[i].Mode {
-			return *expressions[i].Mode > *expressions[i].Mode
+		if *expressions[i].Mode != *expressions[j].Mode {
+			return *expressions[i].Mode < *expressions[j].Mode
 		}
-		return *expressions[i].Delimiter > *expressions[i].Delimiter
+		return *expressions[i].Delimiter < *expressions[j].Delimiter
 	})
 }
 
@@ -66,8 +66,6 @@ func (b *Bundle) CompareExpressions(expressions []*Expression) bool {
 	if len(expressions) != len(b.expressions) {
 		return false
 	}
-	sortExpressions(expressions)
-
 	for i := range expressions {
 		l := b.expressions[i]
 		r := expressions[i]

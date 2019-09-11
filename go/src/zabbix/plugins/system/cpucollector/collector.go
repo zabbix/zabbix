@@ -30,7 +30,7 @@ import (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus map[int]*cpuUnit
+	cpus []*cpuUnit
 }
 
 var impl Plugin
@@ -42,7 +42,6 @@ const (
 const (
 	cpuStatusOffline = 1 << iota
 	cpuStatusOnline
-	cpuStatusSummary
 )
 const (
 	stateUser = iota
@@ -114,11 +113,10 @@ func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error
 		return nil, errors.New("Too many parameters.")
 	}
 	cpus := make([]*cpuDiscovery, 0, len(p.cpus))
-	for _, cpu := range p.cpus {
-		// 0 index is for the overall stats, skip for discovery
-		if cpu.status&cpuStatusSummary == 0 {
-			cpus = append(cpus, &cpuDiscovery{Number: cpu.index, Status: cpuStatuses[cpu.status]})
-		}
+	// 0 index is for the overall stats, skip for discovery
+	for i := 1; i < len(p.cpus); i++ {
+		cpu := p.cpus[i]
+		cpus = append(cpus, &cpuDiscovery{Number: cpu.index, Status: cpuStatuses[cpu.status]})
 	}
 	var b []byte
 	if b, err = json.Marshal(&cpus); err != nil {
@@ -132,10 +130,8 @@ func (p *Plugin) getCpuNum(params []string) (result interface{}, err error) {
 	switch len(params) {
 	case 1:
 		switch params[0] {
-		case "":
-			mask = cpuStatusOnline
-		case "online":
-			mask = cpuStatusOnline
+		case "", "online":
+			// default value, already initialized
 		case "max":
 			mask = cpuStatusOnline | cpuStatusOffline
 		default:
@@ -213,9 +209,14 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	var ok bool
-	var cpu *cpuUnit
-	if cpu, ok = p.cpus[index]; !ok || cpu.head == cpu.tail {
+	if index < 0 || index >= len(p.cpus) {
+		return nil, errors.New("Invalid first parameter.")
+	}
+	cpu := p.cpus[index]
+	if cpu.status == cpuStatusOffline {
+		return nil, errors.New("CPU is offline.")
+	}
+	if cpu.head == cpu.tail {
 		log.Debugf("no collected data for CPU %d", index-1)
 		return nil, nil
 	}
@@ -224,6 +225,10 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 	totalnum := cpu.tail - cpu.head
 	if totalnum < 0 {
 		totalnum += maxHistory
+	}
+	if totalnum < 2 {
+		// need at least two samples to calculate utilization
+		return
 	}
 	if totalnum < statRange {
 		statRange = totalnum
@@ -253,8 +258,8 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	// collector has not yet been initialized
-	if len(p.cpus) == 0 {
+	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
+		// no data gathered yet
 		return
 	}
 	switch key {
@@ -269,8 +274,21 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 }
 
+func (p *Plugin) Start() {
+	impl.cpus = make([]*cpuUnit, impl.numCPU()+1)
+	for i := 0; i < len(impl.cpus); i++ {
+		impl.cpus[i] = &cpuUnit{
+			index:  i - 1,
+			status: cpuStatusOffline,
+		}
+	}
+}
+
+func (p *Plugin) Stop() {
+	impl.cpus = nil
+}
+
 func init() {
-	impl.cpus = make(map[int]*cpuUnit)
 	plugin.RegisterMetrics(&impl, "CpuCollector",
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
 		"system.cpu.num", "Number of CPUs.",
