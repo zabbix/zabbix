@@ -36,6 +36,7 @@ class CScreenGraph extends CScreenBase {
 		$graphDims['graphHeight'] = (int) $this->screenitem['height'];
 		$graphDims['width'] = (int) $this->screenitem['width'];
 		$graph = getGraphByGraphId($resourceId);
+		$src = null;
 
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 			// get host
@@ -91,14 +92,14 @@ class CScreenGraph extends CScreenBase {
 
 			// get url
 			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$this->screenitem['url'] = (new CUrl('chart7.php'))
+				$src = (new CUrl('chart7.php'))
 					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
 					->setArgument('graphtype', $graph['graphtype'])
 					->setArgument('graph3d', $graph['show_3d'])
 					->setArgument('legend', $graph['show_legend']);
 			}
 			else {
-				$this->screenitem['url'] = (new CUrl('chart3.php'))
+				$src = (new CUrl('chart3.php'))
 					->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
 					->setArgument('ymin_type', $graph['ymin_type'])
 					->setArgument('ymax_type', $graph['ymax_type'])
@@ -120,8 +121,7 @@ class CScreenGraph extends CScreenBase {
 			}
 			unset($newGraphItem);
 
-			$this->screenitem['url']->setArgument('items', $newGraphItems);
-			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
+			$src->setArgument('items', $newGraphItems);
 		}
 
 		// get time control
@@ -135,21 +135,22 @@ class CScreenGraph extends CScreenBase {
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
-				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
+				$src = (new CUrl('chart6.php'))
+					->setArgument('graphid', $resourceId)
+					->setArgument('screenid', $this->screenitem['screenid']);
+
 				$isDefault = true;
 			}
 
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$graph['show_legend'].
-				'&graph3d='.$graph['show_3d'].$this->getProfileUrlParams();
-			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
-				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
+			$src->setArgument('graph3d', $graph['show_3d']);
 		}
 		else {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $this->screenitem['url'] === '') {
-				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceId.'&screenid='.$this->screenitem['screenid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || $src === null) {
+				$src = (new CUrl('chart2.php'))
+					->setArgument('graphid', $resourceId)
+					->setArgument('screenid', $this->screenitem['screenid']);
+
 				$isDefault = true;
 			}
 
@@ -158,13 +159,27 @@ class CScreenGraph extends CScreenBase {
 					$timeControlData['loadSBox'] = 1;
 				}
 			}
-
-			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].
-				'&height='.$this->screenitem['height'].'&legend='.$graph['show_legend'].$this->getProfileUrlParams();
-			$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-				? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
-				: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
 		}
+
+		$src
+			->setArgument('width', $this->screenitem['width'])
+			->setArgument('height', $this->screenitem['height'])
+			->setArgument('legend', $graph['show_legend'])
+			->setArgument('profileIdx', $this->profileIdx)
+			->setArgument('profileIdx2', $this->profileIdx2);
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$src
+				->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
+				->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+		}
+		else {
+			$src
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to']);
+		}
+
+		$timeControlData['src'] = $src->getUrl();
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
