@@ -104,10 +104,10 @@
 			$('#tab_sysmap_tab').trigger('click');
 			$('#multiselect_userid_wrapper').show();
 
-			$('#userid').multiSelect('addData', {
+			$('#userid').multiSelect('addData', [{
 				'id': $('#current_user_userid').val(),
 				'name': $('#current_user_fullname').val()
-			});
+			}]);
 
 			$('#name').focus();
 		});

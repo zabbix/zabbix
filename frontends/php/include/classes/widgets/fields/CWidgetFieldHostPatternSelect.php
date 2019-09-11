@@ -19,7 +19,7 @@
 **/
 
 
-class CWidgetFieldTextArea extends CWidgetField {
+class CWidgetFieldHostPatternSelect extends CWidgetField {
 
 	private $placeholder;
 
@@ -35,19 +35,11 @@ class CWidgetFieldTextArea extends CWidgetField {
 		$this->setDefault([]);
 		$this->placeholder = null;
 
-		/**
+		/*
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.
 		 * Save type is set in self::toApi method for each string field separately.
 		 */
 		$this->setValidationRules(['type' => API_STRINGS_UTF8]);
-	}
-
-	public function setValue($value) {
-		// Values received from frontend are strings. Values received from database comes as arrays.
-		// TODO: remove hack with modifying of unvalidated data.
-		$this->value = is_array($value) ? $value : CWidgetHelper::splitPatternIntoParts($value);
-
-		return $this;
 	}
 
 	/**
@@ -55,7 +47,7 @@ class CWidgetFieldTextArea extends CWidgetField {
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.
 	 *
-	 * @param array $widget_fields   reference to Array of widget fields.
+	 * @param array $widget_fields   reference to array of widget fields.
 	 */
 	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
@@ -79,5 +71,11 @@ class CWidgetFieldTextArea extends CWidgetField {
 
 	public function getPlaceholder() {
 		return $this->placeholder;
+	}
+
+	public function getJavascript() {
+		$fieldid = zbx_formatDomId($this->getName().'[]');
+
+		return 'jQuery("#'.$fieldid.'").multiSelect(jQuery("#'.$fieldid.'").data("params"));';
 	}
 }

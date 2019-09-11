@@ -22,7 +22,7 @@
 class CWidgetFieldHost extends CWidgetField {
 
 	/**
-	 * Create widget field for Item selection
+	 * Create widget field for Host selection
 	 *
 	 * @param string      $name     field name in form
 	 * @param string      $label    label for the field in form

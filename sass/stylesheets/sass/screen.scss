@@ -1667,6 +1667,18 @@ output {
 	}
 }
 
+.multiselect-collapsed {
+	&.multiselect-control,
+	.multiselect {
+		overflow: hidden;
+		max-height: 24px;
+
+		input[type="text"] {
+			display: none;
+		}
+	}
+}
+
 .multiselect-button {
 	display: inline-block;
 	vertical-align: top;
@@ -6066,7 +6078,7 @@ svg {
 
 .overrides-options-list {
 	white-space: normal;
-	padding: 0px 0px 10px;
+	padding: 5px 0 8px 0;
 	margin-bottom: 10px;
 	border-bottom: 1px solid $table-border-color;
 
@@ -6140,25 +6152,19 @@ svg {
 		}
 	}
 
+	.list-accordion-item-head,
+	.list-accordion-item-body {
+		padding-bottom: 2px;
+	}
+
 	.list-accordion-item-closed {
+		@extend .multiselect-collapsed;
 		height: 30px;
 
 		.list-accordion-item-body {
 			display: none;
 		}
-
-		.patternselect {
-			overflow: hidden;
-			max-height: 24px;
-			line-height: 24px;
-			padding: 0 5px;
-			height: 24px;
-		}
 	}
-}
-
-.patternselect {
-	line-height: 14px;
 }
 
 ul.checkbox-list {
