@@ -387,6 +387,9 @@ func main() {
 
 	zbxlib.SetLogLevel(logLevel)
 
+	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
+	log.Infof(greeting)
+
 	addresses, err := serverconnector.ParseServerActive()
 	if err != nil {
 		log.Critf("%s", err)
@@ -410,9 +413,6 @@ func main() {
 		os.Exit(1)
 	}
 	defer deletePidFile()
-
-	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
-	log.Infof(greeting)
 
 	if foregroundFlag {
 		if agent.Options.LogType != "console" {
