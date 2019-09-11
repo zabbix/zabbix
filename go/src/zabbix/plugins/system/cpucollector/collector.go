@@ -213,6 +213,9 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid first parameter.")
 	}
 	cpu := p.cpus[index]
+	if cpu.status == cpuStatusOffline {
+		return nil, errors.New("CPU is offline.")
+	}
 	if cpu.head == cpu.tail {
 		log.Debugf("no collected data for CPU %d", index-1)
 		return nil, nil

@@ -408,7 +408,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration) (result string,
 			err = r.Error
 		}
 	case <-time.After(timeout):
-		err = fmt.Errorf("timeout occurred")
+		err = fmt.Errorf("Timeout occurred while gathering data.")
 	}
 	return
 }
