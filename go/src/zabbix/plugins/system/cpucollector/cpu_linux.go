@@ -68,7 +68,6 @@ func (p *Plugin) collect() (err error) {
 			index = int(i)
 			status = cpuStatusOnline
 		} else {
-			status = cpuStatusSummary
 			index = -1
 		}
 		if index+1 >= len(p.cpus) {

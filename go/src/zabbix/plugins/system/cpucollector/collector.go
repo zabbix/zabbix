@@ -40,9 +40,8 @@ const (
 )
 
 const (
-	cpuStatusOffline = 1 << iota
+	cpuStatusOffline = iota
 	cpuStatusOnline
-	cpuStatusSummary
 )
 const (
 	stateUser = iota
@@ -57,7 +56,7 @@ const (
 	stateGnice
 )
 
-var cpuStatuses [3]string = [3]string{"", "offline", "online"}
+var cpuStatuses [3]string = [3]string{"offline", "online"}
 
 type historyIndex int
 
@@ -114,11 +113,10 @@ func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error
 		return nil, errors.New("Too many parameters.")
 	}
 	cpus := make([]*cpuDiscovery, 0, len(p.cpus))
-	for _, cpu := range p.cpus {
-		// 0 index is for the overall stats, skip for discovery
-		if cpu.status&cpuStatusSummary == 0 {
-			cpus = append(cpus, &cpuDiscovery{Number: cpu.index, Status: cpuStatuses[cpu.status]})
-		}
+	// 0 index is for the overall stats, skip for discovery
+	for i := 1; i < len(p.cpus); i++ {
+		cpu := p.cpus[i]
+		cpus = append(cpus, &cpuDiscovery{Number: cpu.index, Status: cpuStatuses[cpu.status]})
 	}
 	var b []byte
 	if b, err = json.Marshal(&cpus); err != nil {
