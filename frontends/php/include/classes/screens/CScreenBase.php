@@ -373,15 +373,6 @@ class CScreenBase {
 	}
 
 	/**
-	 * Get profile url params.
-	 *
-	 * @return string
-	 */
-	public function getProfileUrlParams() {
-		return '&profileIdx='.$this->profileIdx.'&profileIdx2='.$this->profileIdx2;
-	}
-
-	/**
 	 * Get enveloped screen inside container.
 	 *
 	 * @param object	$item
