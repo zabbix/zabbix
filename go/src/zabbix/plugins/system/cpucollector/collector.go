@@ -40,7 +40,7 @@ const (
 )
 
 const (
-	cpuStatusOffline = iota
+	cpuStatusOffline = 1 << iota
 	cpuStatusOnline
 )
 const (
