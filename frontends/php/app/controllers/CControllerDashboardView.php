@@ -438,7 +438,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					: CWidgetConfig::getDefaultRfRate($widget['type']);
 
 				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
-				// We call form validation to transform corrupted data to default value.
+				// Transforms corrupted data to default values.
 				$widget_form->validate();
 				$fields = $widget_form->getFieldsData();
 
