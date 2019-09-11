@@ -268,7 +268,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 					}
 				} else {
 					log.Debugf("failed to execute direct exporter task for key '%s' error: '%s'",
-						t.item.itemid, itemkey, err.Error())
+						itemkey, err.Error())
 				}
 			}
 		}
