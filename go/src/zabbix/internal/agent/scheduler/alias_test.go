@@ -22,13 +22,14 @@ package scheduler
 import (
 	"testing"
 	"zabbix/internal/agent"
+	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
 )
 
 func TestGetAlias(t *testing.T) {
 	type Result struct {
-		alias, input, key string
-		fail              bool
+		input, key string
+		fail       bool
 	}
 
 	aliases := []string{
@@ -69,8 +70,8 @@ func TestGetAlias(t *testing.T) {
 	}
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
-
 	var options agent.AgentOptions
+	_ = conf.Unmarshal([]byte{}, &options)
 	options.Alias = aliases
 
 	if manager, err := NewManager(options); err == nil {
