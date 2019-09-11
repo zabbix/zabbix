@@ -65,15 +65,16 @@ func (p *Plugin) collect() (err error) {
 			if i, err = strconv.ParseInt(fields[0][3:], 10, 32); err != nil {
 				return
 			}
-			index = int(i)
+			if index = int(i); index < 0 || index+1 >= len(p.cpus) {
+				p.Debugf("invalid CPU index %d", index)
+				continue
+			}
+
 			status = cpuStatusOnline
 		} else {
 			index = -1
 		}
-		if index+1 >= len(p.cpus) {
-			p.Debugf("invalid CPU index %d", index)
-			continue
-		}
+
 		cpu := p.cpus[index+1]
 		cpu.status = status
 
