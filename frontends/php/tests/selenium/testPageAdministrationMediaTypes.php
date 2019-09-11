@@ -537,7 +537,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$this->assertTrue($message->isGood());
-			$this->assertEquals('Media types deleted', $message->getTitle());
+			$this->assertEquals((count($data['rows']) === 1) ? 'Media type deleted' : 'Media types deleted',
+				$message->getTitle()
+			);
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT NULL'.
 				' FROM media_type'.
