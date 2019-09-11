@@ -542,19 +542,12 @@ class CElement extends CBaseElement implements IWaitable {
 	* @inheritdoc
 	*/
 	public function isEnabled($enabled = true) {
-		if (parent::isEnabled() !== $enabled) {
-			return false;
-		}
-
 		$classes = explode(' ', parent::getAttribute('class'));
-		if ((!array_intersect(['disabled', 'readonly'], $classes)) !== $enabled) {
-			return false;
-		}
 
-		if ((parent::getAttribute('readonly') === null) !== $enabled) {
-			return false;
-		}
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
 
-		return true;
+		return $is_enabled === $enabled;
 	}
 }
