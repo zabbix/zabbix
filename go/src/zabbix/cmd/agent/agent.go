@@ -465,7 +465,7 @@ func main() {
 	}
 
 	if err == nil && agent.Options.StatusPort != 0 {
-		err = statuslistener.Start(taskManager, confFlag)
+		err = statuslistener.Start(manager, confFlag)
 	}
 
 	if err == nil {

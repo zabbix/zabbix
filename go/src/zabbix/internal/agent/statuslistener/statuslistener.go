@@ -53,8 +53,9 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/status", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debugf("received status request from %s", r.RemoteAddr)
 		fmt.Fprintf(w, getConf(confFilePath))
-		fmt.Fprintf(w, taskManager.GetStatus())
+		fmt.Fprintf(w, taskManager.Query("metrics"))
 	}))
 
 	srv = http.Server{Addr: fmt.Sprintf(":%d", agent.Options.StatusPort), Handler: mux}
@@ -69,7 +70,7 @@ func Start(taskManager scheduler.Scheduler, confFilePath string) (err error) {
 
 func Stop() {
 	// shut down gracefully, but wait no longer than time defined in configuration parameter Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(agent.Options.Timeout))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(agent.Options.Timeout))
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
