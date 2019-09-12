@@ -345,14 +345,12 @@ static int	DBpatch_4030021(void)
 	{
 		size_t	exec_params_offset = 0;
 
-		if (3 == atoi(row[1])) {
-			zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset,
-				"Jabber identifier\n%s\nPassword\n%s\n", row[2], row[3]);
-		}
-		else
+		zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset,
+			"-username\n%s\n-password\n%s\n", row[2], row[3]);
+
+		if (100 == atoi(row[1]))
 		{
-			zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset,
-				"Username\n%s\nPassword\n%s\nMessage text limit\n%d\n", row[2], row[3],
+			zbx_snprintf_alloc(&exec_params, &exec_params_alloc, &exec_params_offset, "-size\n%d\n",
 				0 == atoi(row[4]) ? 160 : 136);
 		}
 
