@@ -40,6 +40,7 @@ type Manager struct {
 	plugins     map[string]*pluginAgent
 	pluginQueue pluginHeap
 	clients     map[uint64]*client
+	aliases     []keyAlias
 }
 
 type updateRequest struct {
@@ -132,6 +133,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		var key string
 		var err error
 		var p *pluginAgent
+		r.Key = m.getAlias(r.Key)
 		if key, _, err = itemutil.ParseKey(r.Key); err == nil {
 			if p, ok = m.plugins[key]; !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
@@ -423,8 +425,13 @@ func (m *Manager) Query(command string) (status string) {
 	return <-request.sink
 }
 
-func NewManager() *Manager {
+func (m *Manager) configure(options agent.AgentOptions) error {
+	return m.loadAlias(options)
+}
+
+func NewManager(options agent.AgentOptions) (*Manager, error) {
 	var m Manager
 	m.init()
-	return &m
+	err := m.configure(options)
+	return &m, err
 }

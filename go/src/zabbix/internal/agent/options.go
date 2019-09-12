@@ -55,6 +55,7 @@ type AgentOptions struct {
 	LogRemoteCommands    int      `conf:",optional,0:1,0"`
 	EnableRemoteCommands int      `conf:",optional,0:1,0"`
 	ControlSocket        string   `conf:",optional"`
+	Alias                []string `conf:",optional"`
 	TLSConnect           string   `conf:",optional"`
 	TLSAccept            string   `conf:",optional"`
 	TLSPSKIdentity       string   `conf:",optional"`
