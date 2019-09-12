@@ -5,6 +5,7 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
 ..F....... [ZBX-16565] fixed incorrect sorting of triggers in "Trigger overview" widget (Ivo)
 ........S. [ZBX-7798] improved performance of icmpping* for fping v4.0 and more (MVekslers)
