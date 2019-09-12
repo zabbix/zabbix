@@ -112,6 +112,22 @@ class testUserMacro extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Description field.
+			[
+				'globalmacro' => [
+					[
+						'macro' => '{$ONE_MACRO_DESC}',
+						'value' => 'one',
+						'description' => 'one'
+					],
+					[
+						'macro' => '{$TWO.MACRO_DESC}',
+						'value' => 'æų',
+						'description' => 'æų'
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -128,6 +144,10 @@ class testUserMacro extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $globalmacro[$key]['macro']);
 				$this->assertEquals($dbRow['value'], $globalmacro[$key]['value']);
+
+				if (array_key_exists('description', $globalmacro[$key])) {
+					$this->assertEquals($dbRow['description'], $globalmacro[$key]['description']);
+				}
 			}
 		}
 	}
@@ -322,18 +342,44 @@ class testUserMacro extends CAPITest {
 					[
 						'globalmacroid' => '14',
 						'macro' => '{$MACRO_UPDATED2}',
-						'value' => 'updated2'
+						'value' => 'updated2',
+						'description' => 'æų'
 					]
 				],
-				'expected_error' => null
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'globalmacroid' => '13',
+						'macro' => '{$MACRO_UPDATED1}',
+						'value' => 'updated1',
+						'description' => 'desc'
+					],
+					[
+						'globalmacroid' => '14',
+						'macro' => '{$MACRO_UPDATED2}',
+						'value' => 'updated2',
+						'description' => 'æų'
+					]
+				]
+			],
+			[
+				'globalmacro' => [
+					[
+						'globalmacroid' => '13',
+						'macro' => '{$MACRO_UPDATED1}',
+						'value' => 'updated1',
+						'description' => ''
+					]
+				],
+				'expected_error' => null,
 			]
 		];
 	}
 
 	/**
-	* @dataProvider globalmacro_update
-	*/
-	public function testUserMacro_UpdateGlobal($globalmacros, $expected_error) {
+	 * @dataProvider globalmacro_update
+	 */
+	public function testUserMacro_UpdateGlobal($globalmacros, $expected_error, $expect = []) {
 		$result = $this->call('usermacro.updateglobal', $globalmacros, $expected_error);
 
 		if ($expected_error === null) {
@@ -342,6 +388,14 @@ class testUserMacro extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['macro'], $globalmacros[$key]['macro']);
 				$this->assertEquals($dbRow['value'], $globalmacros[$key]['value']);
+
+				if (array_key_exists('description', $globalmacros[$key])) {
+					$this->assertEquals($dbRow['description'], $globalmacros[$key]['description']);
+				}
+
+				if ($expect) {
+					$this->assertEquals($dbRow, $expect[$key]);
+				}
 			}
 		}
 		else {

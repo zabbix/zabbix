@@ -176,7 +176,7 @@ INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,descript
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
 
 -- global macro
-INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update','desc');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (15,'{$API_MACRO_FOR_DELETE}','abc','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1','');
