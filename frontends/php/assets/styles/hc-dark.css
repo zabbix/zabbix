@@ -2261,12 +2261,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
-/*
- * Dashboard, widgets and iterators.
- *
- * Please do not mix rules for dashboard view mode and edit mode.
- * Please do not mix rules for widgets and iterators.
- */
 .dashbrd-grid-container {
   position: relative;
   margin: -4px;
@@ -2358,10 +2352,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #444;
   border-bottom: 0;
   background-color: #000;
-  /**
-   * For floating headers to appear over other widgets.
-   * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
-   */
   z-index: 3; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
@@ -2414,8 +2404,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   transition: height .3s, margin-top .3s, box-shadow .3s; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
-  padding-top: 8px;
-  transition: margin-top .3s; }
+  padding-top: 8px; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head, .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
   height: 2rem;
   margin-top: -2rem;
@@ -2455,8 +2444,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #444;
   border-bottom: 0;
   background-color: #000;
-  opacity: 0;
   transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
+  opacity: 0;
   z-index: 3; }
   .dashbrd-grid-iterator-head h4 {
     flex-grow: 1;
@@ -2535,7 +2524,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: 1;
   transition: margin-top .3s, height .3s, box-shadow .3s; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd-grid-iterator.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
 .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
@@ -2566,86 +2555,34 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-actions {
   opacity: 1;
   filter: alpha(opacity=100); }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-content {
-  /*
-   * Not to see the placeholder through while dragging the iterator.
-   * Will conflict with floating headers, if moved outside the dashbrd-mode-edit section.
-   */
-  background-color: #111; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
-  transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
-  transition: none; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget-mask {
-  display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator-mask {
-  display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
-  margin-top: 0;
-  height: 0;
-  box-shadow: none; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing {
   background-color: #020202; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
-    margin-top: 0;
-    height: 0;
-    box-shadow: none; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
-  margin-top: -2rem;
-  height: 2rem;
-  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-  opacity: 0.5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging {
-  border-color: #666 !important;
-  border-bottom-color: #636363 !important;
-  -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  z-index: 1000; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-head {
   margin-top: 0;
-  height: 0;
-  box-shadow: none;
+  height: 2rem;
+  border-bottom: 1px solid #444;
+  box-shadow: 0 6px 8px -2px rgba(128, 128, 128, 0.15);
+  transition: none;
+  z-index: 7; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-content {
+  background-color: #111; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
   opacity: 0; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing {
   background-color: #020202; }
   .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
-    margin-top: 0;
-    height: 0;
-    box-shadow: none;
-    opacity: 0; }
+    opacity: 1; }
   .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content {
     background-color: #020202; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
-  margin-top: -2rem;
-  height: 2rem;
-  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
-  opacity: 0.5; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-  margin-top: -4rem;
-  height: 4rem; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging {
-  border-color: #666 !important;
-  border-bottom-color: #636363 !important;
-  -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  z-index: 1000; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
   padding-top: 2rem;
   background-color: #000; }
-.dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-positioning) .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
-  height: 2rem;
-  margin-top: -2rem;
-  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
-.dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-positioning) .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
-  margin-top: -2rem;
-  height: 2rem;
-  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-widget-mask {
+  display: block; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-iterator-mask {
+  display: block; }
+.dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
   opacity: 1; }
-.dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-positioning) .dashbrd-grid-iterator:hover.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
-  margin-top: -4rem;
-  height: 4rem; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {
   border-color: #020202 !important;
   background-color: #020202 !important;
@@ -2653,6 +2590,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 999; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
   background: url(../img/icon-sprite.svg) no-repeat -345px -888px; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-draggable {
+  border-color: #666 !important;
+  border-bottom-color: #636363 !important;
+  -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  z-index: 1000; }
 
 @-webkit-keyframes zoom-in-out {
   0% {
@@ -4350,8 +4294,8 @@ a.link-action {
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
-.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
+.ui-draggable .dashbrd-grid-widget-head,
+.ui-draggable .dashbrd-grid-iterator-head {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab; }
