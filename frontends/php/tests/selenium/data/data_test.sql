@@ -399,14 +399,14 @@ INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, stat
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
 
 -- Global macros
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (6,'{$DEFAULT_DELAY}','30');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (7,'{$LOCALIP}','127.0.0.1');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (8,'{$DEFAULT_LINUX_IF}','eth0');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (9,'{$0123456789012345678901234567890123456789012345678901234567890}','012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (10,'{$A}','Some text');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (11,'{$1}','Numeric macro');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (12,'{$_}','Underscore');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (6,'{$DEFAULT_DELAY}','30','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (7,'{$LOCALIP}','127.0.0.1','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (8,'{$DEFAULT_LINUX_IF}','eth0','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (9,'{$0123456789012345678901234567890123456789012345678901234567890}','012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (10,'{$A}','Some text','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (11,'{$1}','Numeric macro','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (12,'{$_}','Underscore','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$WORKING_HOURS}','1-5,09:00-18:00','');
 
 -- Adding records into Auditlog
 
