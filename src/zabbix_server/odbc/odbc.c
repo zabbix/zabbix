@@ -645,30 +645,29 @@ out:
  *                                                                            *
  * Function: zbx_odbc_query_result_to_json                                    *
  *                                                                            *
- * Purpose: convert ODBC SQL query result into lJSON format                   *
+ * Purpose: convert ODBC SQL query result into JSON format                    *
  *                                                                            *
  * Parameters: query_result - [IN] result of SQL query                        *
- *             out_jso      - [OUT] JSON data                                 *
+ *             out_json     - [OUT] JSON data                                 *
  *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - conversion was successful and allocated JSON       *
  *                         is returned in out_json parameter, error remains   *
  *                         untouched in this case                             *
  *               FAIL    - otherwise, allocated error message is returned in  *
- *                         error parameter, lld_json remains untouched        *
+ *                         error parameter, out_json remains untouched        *
  *                                                                            *
  * Comments: It is caller's responsibility to free allocated buffers!         *
  *                                                                            *
  ******************************************************************************/
 int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **out_json, char **error)
 {
-	const char		*__function_name = "zbx_odbc_query_result_to_json";
 	const char		*const *row;
 	struct zbx_json		json;
 	zbx_vector_str_t	columns;
 	int			ret = FAIL, i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_str_create(&columns);
 	zbx_vector_str_reserve(&columns, query_result->col_num);
@@ -726,7 +725,7 @@ out:
 	zbx_vector_str_clear_ext(&columns, zbx_str_free);
 	zbx_vector_str_destroy(&columns);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
