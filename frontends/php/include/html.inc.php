@@ -888,6 +888,20 @@ function makeActionIcon(array $icon_data) {
 }
 
 /**
+ * Renders an icon for a description.
+ *
+ * @param string $description
+ *
+ * @return CSpan
+ */
+function makeDescriptionIcon($description) {
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
+		->addStyle('margin-left: 2px;')
+		->setHint($description, '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+}
+
+/**
  * Renders an error icon like red [i] with error message
  *
  * @param string $error

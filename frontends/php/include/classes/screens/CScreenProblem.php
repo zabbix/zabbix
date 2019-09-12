@@ -779,12 +779,12 @@ class CScreenProblem extends CScreenBase {
 
 		$url = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view');
 
-		$data = self::getData($this->data['filter'], $this->config);
+		$data = self::getData($this->data['filter'], $this->config, true);
 		$data = self::sortData($data, $this->config, $this->data['sort'], $this->data['sortorder']);
 
 		$paging = getPagingLine($data['problems'], ZBX_SORT_UP, clone $url);
 
-		$data = self::makeData($data, $this->data['filter']);
+		$data = self::makeData($data, $this->data['filter'], true);
 
 		if ($data['triggers']) {
 			$triggerids = array_keys($data['triggers']);
@@ -1044,6 +1044,7 @@ class CScreenProblem extends CScreenBase {
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
+				$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();

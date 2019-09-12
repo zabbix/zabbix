@@ -23,9 +23,8 @@ class CDiv extends CTag {
 
 	public function __construct($items = null) {
 		parent::__construct('div', true);
-		$this->addItem($items);
 
-		return $this;
+		$this->addItem($items);
 	}
 
 	public function setWidth($value) {
