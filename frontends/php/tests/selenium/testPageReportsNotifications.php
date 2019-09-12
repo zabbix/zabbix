@@ -36,9 +36,9 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('period', 'Weekly');
 		$this->zbxTestDropdownAssertSelected('year', date('Y'));
 		// Check media type links
-		$media_types = CDBHelper::getAll('SELECT mediatypeid, description FROM media_type');
+		$media_types = CDBHelper::getAll('SELECT mediatypeid,name FROM media_type');
 		foreach ($media_types as $media) {
-			$this->zbxTestAssertElementText("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]", $media['description']);
+			$this->zbxTestAssertElementText("//a[contains(@href, 'mediatypeid=".$media['mediatypeid']."')]", $media['name']);
 		}
 
 		// Get users from DB

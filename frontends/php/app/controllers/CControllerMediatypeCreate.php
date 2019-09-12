@@ -24,7 +24,7 @@ class CControllerMediatypeCreate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
-			'description' =>			'db media_type.description|not_empty',
+			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -84,7 +84,7 @@ class CControllerMediatypeCreate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['type', 'description', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
+		$this->getInputs($mediatype, ['type', 'name', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
@@ -122,7 +122,7 @@ class CControllerMediatypeCreate extends CController {
 		$result = API::Mediatype()->create($mediatype);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['description'].']');
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['name'].']');
 		}
 
 		$result = DBend($result);

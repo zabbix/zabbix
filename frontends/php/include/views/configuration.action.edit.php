@@ -766,12 +766,12 @@ if (!empty($data['new_operation'])) {
 			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $data['new_operation']['opmessage']['mediatypeid']))
 				->addItem(0, '- '._('All').' -');
 
-			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.name FROM media_type mt'));
 
-			order_result($dbMediaTypes, 'description');
+			order_result($dbMediaTypes, 'name');
 
 			foreach ($dbMediaTypes as $dbMediaType) {
-				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
+				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['name']);
 			}
 
 			$new_operation_formlist
@@ -1520,12 +1520,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage']['mediatypeid'])
 				)->addItem(0, '- '._('All').' -');
 
-				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
+				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.name FROM media_type mt'));
 
-				order_result($dbMediaTypes, 'description');
+				order_result($dbMediaTypes, 'name');
 
 				foreach ($dbMediaTypes as $dbMediaType) {
-					$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
+					$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['name']);
 				}
 
 				$new_operation_formlist
@@ -2289,7 +2289,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 			)->addItem(0, '- '._('All').' -');
 
 			foreach ($data['available_mediatypes'] as $mediatype) {
-				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['description']);
+				$mediatype_cbox->addItem($mediatype['mediatypeid'], $mediatype['name']);
 			}
 			$is_default_msg = (array_key_exists('default_msg', $data['new_ack_operation']['opmessage'])
 				&& $data['new_ack_operation']['opmessage']['default_msg'] == 1);
