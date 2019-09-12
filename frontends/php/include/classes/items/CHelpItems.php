@@ -1063,10 +1063,6 @@ class CHelpItems {
 				[
 					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
 					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
-				],
-				[
-					'key' => 'db.odbc.get[<unique short description>,dsn]',
-					'description' => _('Transform SQL query result into a JSON object.')
 				]
 			],
 			ITEM_TYPE_JMX => [
