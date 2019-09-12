@@ -289,6 +289,31 @@ out:
 	return ret;
 }
 
+static int	DBpatch_4030021(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_index("media_type", "media_type_1");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_4030022(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("media_type", "description", &field);
+}
+
+static int	DBpatch_4030023(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBcreate_index("media_type", "media_type_1", "name", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -315,5 +340,8 @@ DBPATCH_ADD(4030017, 0, 1)
 DBPATCH_ADD(4030018, 0, 1)
 DBPATCH_ADD(4030019, 0, 1)
 DBPATCH_ADD(4030020, 0, 1)
+DBPATCH_ADD(4030021, 0, 1)
+DBPATCH_ADD(4030022, 0, 1)
+DBPATCH_ADD(4030023, 0, 1)
 
 DBPATCH_END()
