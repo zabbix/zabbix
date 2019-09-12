@@ -261,7 +261,6 @@ $tranStrings = [
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
-		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
 		'Insert expression' => _('Insert expression'),
