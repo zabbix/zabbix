@@ -1177,7 +1177,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 	else {
 		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valemapid', 'name']
+			'output' => ['valuemapid', 'name']
 		]);
 
 		CArrayHelper::sort($data['valuemaps'], ['name']);

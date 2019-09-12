@@ -348,6 +348,7 @@ class CControllerPopupGeneric extends CController {
 			'templates' =>					'string|not_empty',
 			'host_templates' =>				'string|not_empty',
 			'multiselect' =>				'in 1',
+			'patternselect' =>				'in 1',
 			'submit' =>						'string',
 			'excludeids' =>					'array',
 			'disableids' =>					'array',
@@ -585,6 +586,7 @@ class CControllerPopupGeneric extends CController {
 			'dstact' => $this->getInput('dstact', ''),
 			'itemtype' => $this->getInput('itemtype', 0),
 			'multiselect' => $this->getInput('multiselect', 0),
+			'patternselect' => $this->getInput('patternselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
@@ -845,7 +847,7 @@ class CControllerPopupGeneric extends CController {
 
 				// Resolve item names by default.
 				$records = array_key_exists('orig_names', $page_options)
-					? CArrayHelper::renameObjectsKeys($records, ['name' => 'name_expanded'])
+					? CArrayHelper::copyObjectsKeys($records, ['name' => 'name_expanded'])
 					: CMacrosResolverHelper::resolveItemNames($records);
 
 				CArrayHelper::sort($records, ['name_expanded']);
@@ -1019,6 +1021,29 @@ class CControllerPopupGeneric extends CController {
 		foreach ($disableids as $disableid) {
 			if (array_key_exists($disableid, $records)) {
 				$records[$disableid]['_disabled'] = true;
+			}
+		}
+
+		// Pattern selector uses names as ids so they need to be rewritten.
+		if ($page_options['patternselect']) {
+			switch ($this->source_table) {
+				case 'hosts':
+					foreach ($records as $hostid => $row) {
+						$records[$row['name']] = [
+							'host' => $row['name'],
+							'name' => $row['name'],
+							'id' => $row['name']
+						];
+						unset($records[$hostid]);
+					}
+					break;
+
+				case 'items':
+					foreach ($records as $itmeid => $row) {
+						$records[$row['name_expanded']] = ['itemid' => $row['name_expanded']] + $row;
+						unset($records[$itmeid]);
+					}
+				break;
 			}
 		}
 

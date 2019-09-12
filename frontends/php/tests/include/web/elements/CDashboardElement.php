@@ -77,8 +77,8 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		if (($widget = $query->asWidget()->one($should_exist)) !== null) {
-			$widget->waitUntilReady();
+		if (($widget = $query->asWidget()->one($should_exist)) !== null && $should_exist) {
+				$widget->waitUntilReady();
 		}
 
 		return $widget;

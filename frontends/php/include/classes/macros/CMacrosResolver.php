@@ -2541,7 +2541,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	public function sortItemsByExpressionOrder(array $triggers) {
 		$functionids = [];
-		$num = 0;
 
 		$types = [
 			'macros' => [
@@ -2557,6 +2556,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				continue;
 			}
 
+			$num = 0;
 			$matched_macros = $this->extractMacros([$trigger['expression'].$trigger['recovery_expression']], $types);
 
 			foreach (array_keys($matched_macros['functionids']) as $macro) {
@@ -2583,7 +2583,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		while ($row = DBfetch($result)) {
 			$key = $functionids[$row['functionid']]['key'];
 			$num = $functionids[$row['functionid']]['num'];
-			$item_order[$key][$row['itemid']] = $num;
+			if (!array_key_exists($key, $item_order) || !array_key_exists($row['itemid'], $item_order[$key])) {
+				$item_order[$key][$row['itemid']] = $num;
+			}
 		}
 
 		foreach ($triggers as $key => &$trigger) {

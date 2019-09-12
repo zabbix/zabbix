@@ -21,8 +21,6 @@
 #include "db.h"
 #include "dbupgrade.h"
 
-extern unsigned char	program_type;
-
 /*
  * 4.4 development database patches
  */
@@ -156,7 +154,7 @@ static int	DBpatch_4030015(void)
 static int	DBpatch_4030016(void)
 {
 	int		i;
-	const char      *values[] = {
+	const char	*values[] = {
 			"alarm_ok",
 			"no_sound",
 			"alarm_information",
@@ -237,6 +235,100 @@ static int	DBpatch_4030019(void)
 
 static int	DBpatch_4030020(void)
 {
+#define FIELD_LEN	32
+
+	const char	*tmp_token;
+	char		*pos, *token = NULL, *token_esc = NULL, *value = NULL, field[FIELD_LEN];
+	int		ret = SUCCEED;
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint32_t	id, next_id = 0;
+	zbx_uint64_t	last_widgetid = 0, widgetid, fieldid;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect("SELECT widgetid,widget_fieldid,name,value_str"
+			" FROM widget_field"
+			" WHERE widgetid IN (SELECT widgetid FROM widget WHERE type='svggraph') AND type=1"
+			" AND (name LIKE 'ds.hosts.%%' OR name LIKE 'ds.items.%%' OR name LIKE 'or.hosts.%%'"
+				" OR name LIKE 'or.items.%%' OR name LIKE 'problemhosts.%%')"
+			" ORDER BY widgetid, name");
+
+	if (NULL == result)
+		return FAIL;
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(widgetid, row[0]);
+		ZBX_DBROW2UINT64(fieldid, row[1]);
+
+		if (NULL == (pos = strrchr(row[2], '.')) || FIELD_LEN <= pos - row[2])
+		{
+			ret = FAIL;
+
+			break;
+		}
+
+		if (last_widgetid != widgetid || 0 != strncmp(field, row[2], pos - row[2]))
+		{
+			last_widgetid = widgetid;
+			next_id = 0;
+
+			zbx_strlcpy(field, row[2], (pos + 1) - row[2]);
+		}
+
+		id = atoi(pos + 1);
+		value = zbx_strdup(value, row[3]);
+		tmp_token = strtok(value, ",\n");
+
+		while (NULL != tmp_token)
+		{
+			token = zbx_strdup(token, tmp_token);
+			zbx_lrtrim(token, " \t\r");
+
+			if ('\0' == token[0])
+			{
+				tmp_token = strtok(NULL, ",\n");
+
+				continue;
+			}
+
+			if (id != next_id || 0 != strcmp(row[3], token))
+			{
+				token_esc = DBdyn_escape_string(token);
+
+				if (ZBX_DB_OK > DBexecute("insert into widget_field (widgetid,widget_fieldid,type,name,"
+						"value_str) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",1,'%s.%u','%s')",
+						widgetid, DBget_maxid_num("widget_field", 1), field, next_id,
+						token_esc) ||
+						ZBX_DB_OK > DBexecute("delete from widget_field where widget_fieldid="
+								ZBX_FS_UI64, fieldid))
+				{
+					zbx_free(token_esc);
+					ret = FAIL;
+
+					break;
+				}
+
+				zbx_free(token_esc);
+			}
+
+			next_id++;
+			tmp_token = strtok(NULL, ",\n");
+		}
+	}
+
+	zbx_free(token);
+	zbx_free(value);
+	DBfree_result(result);
+
+#undef FIELD_LEN
+	return ret;
+}
+
+static int	DBpatch_4030021(void)
+{
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
@@ -315,5 +407,6 @@ DBPATCH_ADD(4030017, 0, 1)
 DBPATCH_ADD(4030018, 0, 1)
 DBPATCH_ADD(4030019, 0, 1)
 DBPATCH_ADD(4030020, 0, 1)
+DBPATCH_ADD(4030021, 0, 1)
 
 DBPATCH_END()

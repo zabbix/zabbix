@@ -31,10 +31,9 @@
 #include "preproc.h"
 #include "../../../src/zabbix_server/preprocessor/item_preproc.h"
 #include "../../../src/zabbix_server/preprocessor/preproc_history.h"
+#include "trapper_preproc_test_run.h"
 
 zbx_es_t	es_engine;
-
-int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
