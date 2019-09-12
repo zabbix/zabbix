@@ -23,8 +23,62 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup globalmacro
+ * @backup hostmacro
  */
 class testUserMacro extends CAPITest {
+
+	public static function hostmacro_create() {
+		return [
+			[
+				'hostmacro' => [
+					'macro' => '{$ADD_1}',
+					'value' => 'test',
+					'hostid' => '90020',
+					'description' => 'text'
+				],
+				'expected_error' => null
+			],
+			[
+				'hostmacro' => [
+					'macro' => '{$ADD_2}',
+					'value' => 'test',
+					'hostid' => '90020'
+				],
+				'expected_error' => null,
+				'expect_db_row' => [
+					'macro' => '{$ADD_2}',
+					'value' => 'test',
+					'hostid' => '90020',
+					'description' => ''
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostmacro_create
+	 */
+	public function testUserMacro_Create($hostmacro, $expected_error, $expect = []) {
+		$result = $this->call('usermacro.create', $hostmacro, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['hostmacroids'] as $key => $id) {
+				$dbResult = DBSelect('select * from hostmacro where hostmacroid='.zbx_dbstr($id));
+				$dbRow = DBFetch($dbResult);
+				$this->assertEquals($dbRow['macro'], $hostmacro['macro']);
+				$this->assertEquals($dbRow['value'], $hostmacro['value']);
+
+				if (array_key_exists('description', $hostmacro)) {
+					$this->assertEquals($dbRow['description'], $hostmacro['description']);
+				}
+
+				if ($expect) {
+					$expect['hostmacroid'] = $id;
+					$this->assertEquals($dbRow, $expect);
+				}
+			}
+		}
+	}
 
 	public static function globalmacro_create() {
 		return [
@@ -266,6 +320,55 @@ class testUserMacro extends CAPITest {
 			if (array_key_exists('macro', $globalmacro)) {
 				$dbResult = 'select * from globalmacro where macro='.zbx_dbstr($globalmacro['macro']);
 				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+			}
+		}
+	}
+
+	public static function hostmacro_update() {
+		return [
+			[
+				'hostmacro' => [
+					[
+						'hostmacroid' => '1',
+						'value' => 'test',
+					],
+					[
+						'hostmacroid' => '2',
+						'value' => 'test',
+						'description' => 'notes'
+					]
+				],
+				'expected_error' => null,
+				'expect_db_rows' => [
+					[
+						'hostmacroid' => '1',
+						'value' => 'test',
+						'description' => 'description'
+					],
+					[
+						'hostmacroid' => '2',
+						'value' => 'test',
+						'description' => 'notes'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostmacro_update
+	 */
+	public function testUserMacro_Update($hostmacros, $expected_error, $expect) {
+		$result = $this->call('usermacro.update', $hostmacros, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['hostmacroids'] as $key => $id) {
+				$dbResult = DBSelect('select * from hostmacro where hostmacroid='.zbx_dbstr($id));
+				$dbRow = DBFetch($dbResult);
+
+				foreach ($expect[$key] as $field => $value) {
+					$this->assertEquals($dbRow[$field], $expect[$key][$field]);
+				}
 			}
 		}
 	}

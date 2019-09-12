@@ -182,6 +182,10 @@ INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (15,'{
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1','');
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (17,'{$API_MACRO_FOR_DELETE2}','2','');
 
+-- host macro
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1,90020,'{$HOST_MACRO_1}','value','description');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (2,90020,'{$HOST_MACRO_2}','value','');
+
 -- icon map
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (1,'API icon map',2);
 INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expression, sortorder) VALUES (1,1,2,1,'api icon map expression',0);
