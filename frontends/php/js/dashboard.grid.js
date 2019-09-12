@@ -137,8 +137,7 @@
 		if (!widget['parent']) {
 			// Do not subscribe on focus change, since child widgets do not receive focus.
 			widget['content_header'].on('focusin focusout', function(event) {
-				if (event.type === 'focusout' && widget['content_header'].find('[data-expanded="true"]').length) {
-					// Prevent hiding widget header, while it's popup menu is active.
+				if (event.type === 'focusout' && isWidgetPopupActive($obj, data, widget)) {
 					return;
 				}
 				widget['div'].toggleClass(classes['focus'], event.type === 'focusin');
@@ -187,8 +186,8 @@
 						if ($div.position().top === 0) {
 							widget['parent']['div'].addClass('iterator-double-header');
 						}
-						// Prevent hiding double-header of iterator while it's popup menu is active.
-						else if (!widget['parent']['content_header'].find('[data-expanded="true"]').length) {
+						else if (!isWidgetPopupActive($obj, data, widget['parent'])
+								&& !isWidgetDragging(widget['parent'])) {
 							widget['parent']['div'].removeClass('iterator-double-header');
 						}
 					}
@@ -213,8 +212,7 @@
 
 		if (widget['iterator']) {
 			$div.on('mouseleave focusout', function(event) {
-				// Prevent hiding double-header of iterator while it's popup menu is active.
-				if (!widget['content_header'].find('[data-expanded="true"]').length) {
+				if (!isWidgetPopupActive($obj, data, widget) && !isWidgetDragging(widget)) {
 					if (event.type === 'mouseleave' || !isIteratorFirstRowHovered(widget)) {
 						$div.removeClass('iterator-double-header');
 					}
@@ -239,6 +237,15 @@
 		}
 
 		return false;
+	}
+
+	function isWidgetDragging(widget) {
+		return widget['div'].hasClass('ui-draggable-dragging');
+	}
+
+	function isWidgetPopupActive($obj, data, widget) {
+		return widget['content_header'].find('[data-expanded="true"]').length
+			|| data['options']['config_dialogue_active'];
 	}
 
 	/**
@@ -266,7 +273,7 @@
 			var classes = widget['iterator'] ? iterator_classes : widget_classes,
 				hover = widget['div'].is(':hover'),
 				focus = widget['div'].hasClass(classes['focus']),
-				popup = widget['content_header'].find('[data-expanded="true"]').length > 0;
+				popup = isWidgetPopupActive($obj, data, widget);
 
 			if (!hover && !focus && !popup) {
 				return;
@@ -321,6 +328,30 @@
 				delete data['options']['kiosk_slide_timeout'];
 			}, 2000);
 		}
+	}
+
+	function setWidgetViewMode(widget, view_mode) {
+		if (widget['view_mode'] == view_mode) {
+			return;
+		}
+
+		widget['view_mode'] = view_mode;
+
+		var hidden_header_class = widget['iterator']
+				? 'dashbrd-grid-iterator-hidden-header'
+				: 'dashbrd-grid-widget-hidden-header';
+
+		if (widget['iterator']) {
+			if (view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL) {
+				widget['div'].removeClass('iterator-double-header');
+			}
+
+			widget['children'].forEach(function(child) {
+				setWidgetViewMode(child, view_mode);
+			});
+		}
+
+		widget['div'].toggleClass(hidden_header_class, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 	}
 
 	function updateIteratorPager(iterator) {
@@ -509,7 +540,6 @@
 		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
 		data['placeholder'].css('visibility', (action === 'resize') ? 'hidden' : 'visible').show();
-		widget['div'].addClass('dashbrd-grid-widget-draggable');
 		data.new_widget_placeholder.container.hide();
 		resetCurrentPositions(data['widgets']);
 	}
@@ -1197,13 +1227,9 @@
 		setDivPosition(data['placeholder'], data, pos);
 	}
 
-	function stopWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div);
-
+	function stopWidgetPositioning($obj, data, widget) {
 		data['placeholder'].hide();
 		data['pos-action'] = '';
-
-		$div.removeClass('dashbrd-grid-widget-draggable');
 
 		$.each(data['widgets'], function() {
 			// Check if position of widget changed
@@ -1226,7 +1252,7 @@
 			// should be present only while dragging
 			delete this['current_pos'];
 		});
-		setDivPosition($div, data, widget['pos']);
+		setDivPosition(widget['div'], data, widget['pos']);
 		resizeDashboardGrid($obj, data);
 	}
 
@@ -1237,6 +1263,8 @@
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
 			start: function() {
+				$obj.addClass('dashbrd-positioning');
+
 				data.calculated = {
 					'left-max': $obj.width() - widget['div'].width(),
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - widget['div'].height()
@@ -1273,10 +1301,16 @@
 				});
 
 				setResizableState('enable', data.widgets, '');
-				stopWidgetPositioning($obj, widget['div'], data);
+				stopWidgetPositioning($obj, data, widget);
+
+				if (widget['iterator'] && !widget['div'].is(':hover')) {
+					widget['div'].removeClass('iterator-double-header');
+				}
 
 				data['options']['rows'] = data['options']['rows_actual'];
 				resizeDashboardGrid($obj, data, data['options']['rows_actual']);
+
+				$obj.removeClass('dashbrd-positioning');
 			}
 		});
 	}
@@ -1304,7 +1338,7 @@
 			minWidth: getCurrentCellWidth(data),
 			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height'],
 			start: function(event) {
-				$obj.addClass('dashbrd-resizing');
+				$obj.addClass('dashbrd-positioning');
 
 				// Hide all other widget resize handles which may appear on fast mouse movement.
 				$obj.find('.ui-resizable-handle').not(widget['div'].find('.ui-resizable-handle')).hide();
@@ -1370,7 +1404,7 @@
 				delete widget.prev_pos;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
-				stopWidgetPositioning($obj, widget['div'], data);
+				stopWidgetPositioning($obj, data, widget);
 
 				widget['container'].removeAttr('style');
 
@@ -1405,7 +1439,7 @@
 					}
 				});
 
-				$obj.removeClass('dashbrd-resizing');
+				$obj.removeClass('dashbrd-positioning');
 			}
 		});
 	}
@@ -1624,14 +1658,11 @@
 			child['configuration'] = {};
 		}
 
-		// New child widgets will have mormal headers, if in edit mode.
-		var view_mode = data['options']['edit_mode'] ? ZBX_WIDGET_VIEW_MODE_NORMAL : iterator['view_mode'];
-
 		child = $.extend({
 			'widgetid': '',
 			'type': '',
 			'header': '',
-			'view_mode': view_mode,
+			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
 			'preloader_fadespeed': 500,
 			'update_paused': false,
@@ -2110,6 +2141,11 @@
 				else {
 					// No errors, proceed with update.
 					overlayDialogueDestroy('widgetConfg');
+
+					// Set view mode of the reusable widget to escape flickering.
+					if (widget !== null && widget['type'] === type) {
+						setWidgetViewMode(widget, view_mode);
+					}
 				}
 			})
 			.then(function() {
@@ -2140,7 +2176,7 @@
 					configuration = response['configuration'];
 				}
 
-				if (widget === null || ('type' in widget) === false) {
+				if (widget === null || !('type' in widget)) {
 					// In case of ADD widget, create and add widget to the dashboard.
 
 					var pos;
@@ -2198,8 +2234,6 @@
 
 							// New widget is last element in data['widgets'] array.
 							widget = data['widgets'].slice(-1)[0];
-
-							// Edit mode may change size of the widget, so it comes before the update.
 							setWidgetModeEdit($obj, data, widget);
 							updateWidgetContent($obj, data, widget);
 
@@ -2211,8 +2245,8 @@
 					// In case of EDIT widget, if type has not changed, update the widget.
 
 					widget['header'] = name;
-					widget['view_mode'] = view_mode;
 					widget['fields'] = fields;
+
 					applyWidgetConfiguration($obj, data, widget, configuration);
 					doAction('afterUpdateWidgetConfig', $obj, data, null);
 					updateWidgetDynamic($obj, data, widget);
@@ -2233,6 +2267,7 @@
 					var widget_data = {
 							'type': type,
 							'header': name,
+							'view_mode': view_mode,
 							'pos': widget['pos'],
 							'fields': fields,
 							'configuration': configuration,
@@ -2246,8 +2281,6 @@
 
 					// New widget is last element in data['widgets'] array.
 					widget = data['widgets'].slice(-1)[0];
-
-					// Edit mode may change size of the widget, so it comes before the update.
 					setWidgetModeEdit($obj, data, widget);
 					updateWidgetContent($obj, data, widget);
 				}
@@ -2297,6 +2330,14 @@
 	}
 
 	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
+		data['options']['config_dialogue_active'] = true;
+
+		var config_dialogue_close = function() {
+			delete data['options']['config_dialogue_active'];
+			$.unsubscribe('overlay.close', config_dialogue_close);
+		};
+		$.subscribe('overlay.close', config_dialogue_close);
+
 		var edit_mode = (widget !== null && 'type' in widget);
 
 		data.dialogue = {};
@@ -2409,8 +2450,8 @@
 		data['add_widget_dimension'] = {};
 
 		// Add new widget user interaction handlers.
-		$.subscribe('overlay.close', function(e, widget) {
-			if (data['pos-action'] === 'addmodal' && widget.dialogueid === 'widgetConfg') {
+		$.subscribe('overlay.close', function(e, dialogue) {
+			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 				data.add_widget_dimension = {};
 				data.new_widget_placeholder.setDefault(function(e) {
@@ -2630,6 +2671,9 @@
 
 				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
+				// Hide widget headers, not to interfere with the new widget placeholder.
+				document.activeElement.blur();
+
 				data.new_widget_placeholder.container
 					.css({
 						position: 'absolute',
@@ -2652,14 +2696,7 @@
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 
-		if (widget['iterator']) {
-			widget['div'].removeClass('dashbrd-grid-iterator-hidden-header');
-			widget['children'].forEach(function(child) {
-				child['div'].removeClass('dashbrd-grid-widget-hidden-header');
-			});
-		}
-		else {
-			widget['div'].removeClass('dashbrd-grid-widget-hidden-header');
+		if (!widget['iterator']) {
 			removeWidgetInfoButtons(widget['content_header']);
 		}
 
