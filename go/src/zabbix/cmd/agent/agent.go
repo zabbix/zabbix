@@ -424,8 +424,15 @@ func main() {
 
 	log.Infof("using configuration file: %s", confFlag)
 
-	err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters)
-	manager = scheduler.NewManager()
+	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters); err != nil {
+		log.Critf("cannot initialize user parameters: %s", err)
+		os.Exit(1)
+	}
+
+	if manager, err = scheduler.NewManager(agent.Options); err != nil {
+		log.Critf("cannot create scheduling manager: %s", err)
+		os.Exit(1)
+	}
 
 	// replacement of deprecated StartAgents
 	if 0 != len(agent.Options.Server) {
@@ -442,30 +449,33 @@ func main() {
 
 	manager.Start()
 
-	if err == nil {
-		err = configDefault(manager, &agent.Options)
+	if err = configDefault(manager, &agent.Options); err != nil {
+		log.Critf("cannot process configuration: %s", err)
+		os.Exit(1)
 	}
 
-	if err == nil {
-		serverConnectors = make([]*serverconnector.Connector, len(addresses))
+	serverConnectors = make([]*serverconnector.Connector, len(addresses))
 
-		for i := 0; i < len(serverConnectors); i++ {
-			if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
-				log.Critf("cannot create server connector: %s", err)
-				os.Exit(1)
-			}
-			serverConnectors[i].Start()
+	for i := 0; i < len(serverConnectors); i++ {
+		if serverConnectors[i], err = serverconnector.New(manager, addresses[i], &agent.Options); err != nil {
+			log.Critf("cannot create server connector: %s", err)
+			os.Exit(1)
 		}
+		serverConnectors[i].Start()
+	}
 
-		for _, listener := range listeners {
-			if err = listener.Start(); nil != err {
-				break
-			}
+	for _, listener := range listeners {
+		if err = listener.Start(); nil != err {
+			log.Critf("cannot start server listener: %s", err)
+			os.Exit(1)
 		}
 	}
 
-	if err == nil && agent.Options.StatusPort != 0 {
-		err = statuslistener.Start(manager, confFlag)
+	if agent.Options.StatusPort != 0 {
+		if err = statuslistener.Start(manager, confFlag); err != nil {
+			log.Critf("cannot start HTTP listener: %s", err)
+			os.Exit(1)
+		}
 	}
 
 	if err == nil {
@@ -482,12 +492,11 @@ func main() {
 	for _, listener := range listeners {
 		listener.Stop()
 	}
-
 	for i := 0; i < len(serverConnectors); i++ {
 		serverConnectors[i].Stop()
 	}
-
 	manager.Stop()
+
 	monitor.Wait()
 
 	farewell := fmt.Sprintf("Zabbix Agent stopped. (%s)", version.Long())
