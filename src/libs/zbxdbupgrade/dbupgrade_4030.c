@@ -268,7 +268,7 @@ static int	DBpatch_4030020(void)
 
 		if (ZBX_DB_OK > DBexecute("update media_type"
 				" set type=1,"
-					"exec_path='script.sh',"
+					"exec_path='dummy.sh',"
 					"exec_params='%s',"
 					"username='',"
 					"passwd=''"
