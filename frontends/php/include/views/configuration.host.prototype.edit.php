@@ -291,7 +291,7 @@ else {
 					'srcfld1' => 'hostid',
 					'templated_hosts' => '1',
 					'popup_type' => 'templates',
-					'disableids' => $disableids,
+					'disableids' => $disableids
 				]).', null, this);')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);

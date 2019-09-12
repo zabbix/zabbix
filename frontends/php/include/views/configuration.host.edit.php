@@ -594,7 +594,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 					'srcfld1' => 'hostid',
 					'templated_hosts' => '1',
 					'popup_type' => 'templates',
-					'disableids' => $disableids,
+					'disableids' => $disableids
 				]).', null, this);')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);

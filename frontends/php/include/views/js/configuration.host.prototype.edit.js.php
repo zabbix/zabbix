@@ -48,7 +48,7 @@
 		<?php endif ?>
 	});
 
-		/**
+	/**
 	 * @see init.js add.popup event
 	 */
 	function addPopupValues(data) {
