@@ -35,6 +35,7 @@ import (
 	"zabbix/internal/agent/scheduler"
 	"zabbix/internal/agent/serverconnector"
 	"zabbix/internal/agent/serverlistener"
+	"zabbix/internal/agent/statuslistener"
 	"zabbix/internal/monitor"
 	"zabbix/pkg/conf"
 	"zabbix/pkg/log"
@@ -470,10 +471,22 @@ func main() {
 		}
 	}
 
-	err = run()
+	if agent.Options.StatusPort != 0 {
+		if err = statuslistener.Start(manager, confFlag); err != nil {
+			log.Critf("cannot start HTTP listener: %s", err)
+			os.Exit(1)
+		}
+	}
 
+	if err == nil {
+		err = run()
+	}
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
+	}
+
+	if agent.Options.StatusPort != 0 {
+		statuslistener.Stop()
 	}
 
 	for _, listener := range listeners {
