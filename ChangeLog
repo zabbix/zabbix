@@ -103,6 +103,7 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
 .......PS. [ZBX-16511] Added source IP address to unknown request log warning message (atumilovics)
