@@ -314,6 +314,23 @@ static int	DBpatch_4030023(void)
 #endif
 }
 
+static int	DBpatch_4030024(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set value_str='name'"
+			" where value_str='description'"
+				" and idx='web.media_types.php.sort'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -343,5 +360,6 @@ DBPATCH_ADD(4030020, 0, 1)
 DBPATCH_ADD(4030021, 0, 1)
 DBPATCH_ADD(4030022, 0, 1)
 DBPATCH_ADD(4030023, 0, 1)
+DBPATCH_ADD(4030024, 0, 1)
 
 DBPATCH_END()
