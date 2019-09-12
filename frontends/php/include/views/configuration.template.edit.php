@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
@@ -43,6 +45,7 @@ if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
+	->setId('templatesForm')
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
@@ -379,39 +382,23 @@ foreach ($data['linkedTemplates'] as $template) {
 	$disableids[] = $template['templateid'];
 }
 
+$linkedTemplateTable->addRow([
+	(new CSimpleButton(_('Add')))
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' =>  $frmHost->getName(),
+				'srctbl' => 'templates',
+				'srcfld1' => 'hostid',
+				'templated_hosts' => '1',
+				'popup_type' => 'templates',
+				'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
+				'disableids' => $disableids,
+			]).', null, this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
+
 $tmplList->addRow(_('Linked templates'),
 	(new CDiv($linkedTemplateTable))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-// create new linked template table
-$newTemplateTable = (new CTable())
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'add_templates[]',
-			'object_name' => 'templates',
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $frmHost->getName(),
-					'dstfld1' => 'add_templates_',
-					'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
-					'disableids' => $disableids
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "add_template", "1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
-	(new CDiv($newTemplateTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );

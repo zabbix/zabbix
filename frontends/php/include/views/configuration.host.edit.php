@@ -31,14 +31,14 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
+	->setId('hostsForm')
 	->setName('hostsForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
 	->addItem((new CVar('tls_connect', $data['tls_connect']))->removeId())
-	->addVar('tls_accept', $data['tls_accept'])
-	->setAttribute('id', 'hostForm');
+	->addVar('tls_accept', $data['tls_accept']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -549,8 +549,9 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
+	$n = 0;
 	foreach ($data['linked_templates'] as $template) {
-		$tmplList->addVar('templates[]', $template['templateid']);
+		$tmplList->addVar('templates['.$n++.']', $template['templateid']);
 
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name'],
@@ -584,38 +585,22 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$disableids[] = $template['templateid'];
 	}
 
+	$linkedTemplateTable->addRow([
+		(new CSimpleButton(_('Add')))
+			->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
+					'dstfrm' => $frmHost->getName(),
+					'dstfld1' => $frmHost->getName(),
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'templated_hosts' => '1',
+					'popup_type' => 'templates',
+					'disableids' => $disableids,
+				]).', null, this);')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
+
 	$tmplList->addRow(_('Linked templates'),
 		(new CDiv($linkedTemplateTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-	// create new linked template table
-	$new_template_table = (new CTable())
-		->addRow([
-			(new CMultiSelect([
-				'name' => 'add_templates[]',
-				'object_name' => 'templates',
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'templates',
-						'srcfld1' => 'hostid',
-						'srcfld2' => 'host',
-						'dstfrm' => $frmHost->getName(),
-						'dstfld1' => 'add_templates_',
-						'disableids' => $disableids
-					]
-				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		])
-		->addRow([
-			(new CSimpleButton(_('Add')))
-				->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "add_template", "1");')
-				->addClass(ZBX_STYLE_BTN_LINK)
-		]);
-
-	$tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
-		(new CDiv($new_template_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);

@@ -481,7 +481,7 @@
 		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
-		jQuery('#hostForm').submit(function() {
+		jQuery('#hostsForm').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {
@@ -518,5 +518,18 @@
 				throw new Error('Unknown host interface type name.');
 		}
 		return typeNum;
+	}
+
+	/**
+	 * @see init.js add.popup event
+	 */
+	function addPopupValues(data) {
+		if (!isset('object', data) || data.object != 'hostid') {
+			return false;
+		}
+
+		create_var(data.parentId, 'add_templates[]', data.values[0].id, false);
+
+		submitFormWithParam(data.parentId, "add_template", "1");
 	}
 </script>
