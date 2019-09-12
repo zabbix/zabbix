@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0alpha3');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030020);
+define('ZABBIX_DB_VERSION',		4030026);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -245,6 +245,7 @@ define('AUDIT_RESOURCE_CORRELATION',		34);
 define('AUDIT_RESOURCE_GRAPH_PROTOTYPE',	35);
 define('AUDIT_RESOURCE_ITEM_PROTOTYPE',		36);
 define('AUDIT_RESOURCE_HOST_PROTOTYPE',		37);
+define('AUDIT_RESOURCE_AUTOREGISTRATION',	38);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -1255,6 +1256,7 @@ define('API_RANGE_TIME',		26);
 define('API_COLOR',				27);
 define('API_NUMERIC',			28);
 define('API_LLD_MACRO',			29);
+define('API_PSK',				30);
 
 // flags
 define('API_REQUIRED',				0x0001);

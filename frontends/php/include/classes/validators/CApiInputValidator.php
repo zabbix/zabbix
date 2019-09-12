@@ -118,6 +118,9 @@ class CApiInputValidator {
 			case API_OUTPUT:
 				return self::validateOutput($rule, $data, $path, $error);
 
+			case API_PSK:
+				return self::validatePSK($rule, $data, $path, $error);
+
 			case API_IDS:
 				return self::validateIds($rule, $data, $path, $error);
 
@@ -194,6 +197,7 @@ class CApiInputValidator {
 			case API_BOOLEAN:
 			case API_FLAG:
 			case API_OUTPUT:
+			case API_PSK:
 			case API_HG_NAME:
 			case API_H_NAME:
 			case API_NUMERIC:
@@ -433,7 +437,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if ((!is_int($data) && !is_string($data)) || 1 != preg_match('/^\-?[0-9]+$/', strval($data))) {
+		if ((!is_int($data) && !is_string($data)) || preg_match('/^\-?[0-9]+$/', strval($data)) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an integer is expected'));
 			return false;
 		}
@@ -560,7 +564,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (is_int($data) || (is_string($data) && 1 == preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data))) {
+		if (is_int($data) || (is_string($data) && preg_match('/^-?[0-9]*\.?[0-9]+([eE][+-]?[0-9]+)?$/', $data) === 1)) {
 			$data = (float) $data;
 		}
 		elseif (!is_float($data)) {
@@ -914,6 +918,47 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * PSK key validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validatePSK($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		$mb_len = mb_strlen($data);
+
+		if ($mb_len != 0 && $mb_len < PSK_MIN_LEN) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('minimum length is %1$s characters', PSK_MIN_LEN));
+			return false;
+		}
+
+		if (preg_match('/^([0-9a-f]{2})*$/i', $data) !== 1) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('an even number of hexadecimal characters is expected')
+			);
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && $mb_len > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Array of ids validator.
 	 *
 	 * @param array  $rule
@@ -1132,7 +1177,7 @@ class CApiInputValidator {
 
 		$pattern = '/^(-?)0*(0|[1-9][0-9]*)(\.?[0-9]+)?(['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.'])?$/';
 
-		if (1 != preg_match($pattern, strval($data))) {
+		if (preg_match($pattern, strval($data)) !== 1) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
 			return false;
 		}
