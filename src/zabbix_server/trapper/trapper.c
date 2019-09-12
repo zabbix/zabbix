@@ -1163,7 +1163,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts)
 					ret = zbx_trapper_preproc_test(sock, &jp);
 			}
 			else
-				zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
+				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer, value);
 		}
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */

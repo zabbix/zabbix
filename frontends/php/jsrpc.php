@@ -66,108 +66,6 @@ switch ($data['method']) {
 		]);
 		break;
 
-	case 'message.mute':
-		$msgsettings = getMessageSettings();
-		$msgsettings['sounds.mute'] = 1;
-		updateMessageSettings($msgsettings);
-		break;
-
-	case 'message.unmute':
-		$msgsettings = getMessageSettings();
-		$msgsettings['sounds.mute'] = 0;
-		updateMessageSettings($msgsettings);
-		break;
-
-	case 'message.settings':
-		$msgsettings = getMessageSettings();
-		$msgsettings['timeout'] = timeUnitToSeconds($msgsettings['timeout']);
-		$result = $msgsettings;
-		break;
-
-	case 'message.get':
-		$msgsettings = getMessageSettings();
-
-		if (empty($msgsettings['triggers.severities'])) {
-			break;
-		}
-
-		$timeout = time() - timeUnitToSeconds($msgsettings['timeout']);
-		$lastMsgTime = 0;
-		if (isset($data['params']['messageLast']['events'])) {
-			$lastMsgTime = $data['params']['messageLast']['events']['time'];
-		}
-
-		$problems = getLastProblems([
-			'time_from'       => max([$lastMsgTime, $msgsettings['last.clock'], $timeout]),
-			'show_recovered'  => $msgsettings['triggers.recovery'],
-			'show_suppressed' => $msgsettings['show_suppressed'],
-			'severities'      => array_keys($msgsettings['triggers.severities']),
-			'limit'           => 15
-		]);
-
-		$used_triggers = [];
-		foreach ($problems as $problem) {
-			if (array_key_exists($problem['triggerid'], $used_triggers)) {
-				continue;
-			}
-			$used_triggers[$problem['triggerid']] = true;
-
-			$url_problems = (new CUrl('zabbix.php'))
-				->setArgument('action', 'problem.view')
-				->setArgument('filter_hostids[]', $problem['host']['hostid'])
-				->setArgument('filter_set', '1')
-				->getUrl();
-			$url_events = (new CUrl('zabbix.php'))
-				->setArgument('action', 'problem.view')
-				->setArgument('filter_triggerids[]', $problem['objectid'])
-				->setArgument('filter_set', '1')
-				->getUrl();
-			$url_tr_events = 'tr_events.php?eventid='.$problem['eventid'].'&triggerid='.$problem['objectid'];
-
-			if ($problem['resolved']) {
-				$severity = 0;
-				$title = _('Resolved');
-				$sound = $msgsettings['sounds.recovery'];
-			}
-			else {
-				$severity = $problem['severity'];
-				$title = _('Problem on');
-				$sound = $msgsettings['sounds.'.$problem['severity']];
-			}
-
-			$result[] = [
-				'type' => 3,
-				'caption' => 'events',
-				'sourceid' => $problem['eventid'],
-				'time' => $problem['clock'],
-				'priority' => $severity,
-				'sound' => $sound,
-				'severity_style' => getSeverityStyle($severity, !$problem['resolved']),
-				'title' => $title.' [url='.$url_problems.']'.CHtml::encode($problem['host']['name']).'[/url]',
-				'body' => [
-					'[url='.$url_events.']'.CHtml::encode($problem['description']).'[/url]',
-					'[url='.$url_tr_events.']'.
-					zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']).'[/url]',
-				],
-				'timeout' => $msgsettings['timeout']
-			];
-		}
-
-		CArrayHelper::sort($result, ['time', 'priority']);
-		$result = array_values($result);
-
-		break;
-
-	case 'message.closeAll':
-		$msgsettings = getMessageSettings();
-		switch (strtolower($data['params']['caption'])) {
-			case 'events':
-				$msgsettings['last.clock'] = (int) $data['params']['time'] + 1;
-				updateMessageSettings($msgsettings);
-				break;
-		}
-		break;
-
 	case 'zabbix.status':
 		CSession::start();
 		if (!CSession::keyExists('serverCheckResult')
@@ -539,6 +437,68 @@ switch ($data['method']) {
 				}
 				break;
 
+		}
+		break;
+
+	case 'patternselect.get':
+		$config = select_config();
+		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
+		$wildcard_enabled = (strpos($search, '*') !== false);
+		$result = [];
+
+		switch ($data['objectName']) {
+			case 'hosts':
+				$options = [
+					'output' => ['name'],
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'searchWildcardsEnabled' => $wildcard_enabled,
+					'preservekeys' => true,
+					'limit' => $config['search_limit']
+				];
+
+				$db_result = API::Host()->get($options);
+				break;
+
+			case 'items':
+				$options = [
+					'output' => ['name'],
+					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
+					'searchWildcardsEnabled' => $wildcard_enabled,
+					'filter' => [
+						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT],
+						'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+					],
+					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
+					'limit' => $config['search_limit']
+				];
+
+				$db_result = API::Item()->get($options);
+				break;
+		}
+
+		$result[] = [
+			'name' => $search,
+			'id' => $search
+		];
+
+		if ($db_result) {
+			$db_result = array_flip(zbx_objectValues($db_result, 'name'));
+
+			if (array_key_exists($search, $db_result)) {
+				unset($db_result[$search]);
+			}
+
+			if (array_key_exists('limit', $data)) {
+				$db_result = array_slice($db_result, 0, $data['limit']);
+			}
+
+			foreach ($db_result as $name => $id) {
+				$result[] = [
+					'name' => $name,
+					'id' => $name
+				];
+			}
 		}
 		break;
 

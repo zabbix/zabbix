@@ -1071,13 +1071,7 @@ abstract class CItemGeneral extends CApiService {
 
 					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
 						if (!array_key_exists('itemid', $new_item)) {
-							$new_item['rtdata'] = DB::getDefaults($this->getSecondaryTableName());
-							foreach ($this->secondary_table_fields as $field) {
-								if (array_key_exists($field, $new_item)) {
-									$new_item['rtdata'][$field] = $new_item[$field];
-									unset($new_item[$field]);
-								}
-							}
+							$new_item['rtdata'] = true;
 						}
 					}
 				}
@@ -1557,9 +1551,6 @@ abstract class CItemGeneral extends CApiService {
 					case ZBX_PREPROC_RTRIM:
 					case ZBX_PREPROC_LTRIM:
 					case ZBX_PREPROC_TRIM:
-					case ZBX_PREPROC_ERROR_FIELD_JSON:
-					case ZBX_PREPROC_ERROR_FIELD_XML:
-					case ZBX_PREPROC_ERROR_FIELD_REGEX:
 					case ZBX_PREPROC_THROTTLE_VALUE:
 					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 					case ZBX_PREPROC_SCRIPT:

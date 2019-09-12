@@ -173,26 +173,197 @@ static int	DBpatch_4030015(void)
 
 static int	DBpatch_4030016(void)
 {
+	int		i;
+	const char	*values[] = {
+			"alarm_ok",
+			"no_sound",
+			"alarm_information",
+			"alarm_warning",
+			"alarm_average",
+			"alarm_high",
+			"alarm_disaster"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i++)
+	{
+		if (ZBX_DB_OK > DBexecute(
+				"update profiles"
+				" set value_str='%s.mp3'"
+				" where value_str='%s.wav'"
+					" and idx='web.messages'", values[i], values[i]))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030017(void)
+{
+	const ZBX_FIELD	field = {"opdata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("triggers", "details", &field);
+}
+
+static int	DBpatch_4030018(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set idx='web.problem.filter.show_opdata'"
+			" where idx='web.problem.filter.show_latest_values'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030019(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update widget_field"
+			" set name='show_opdata'"
+			" where name='show_latest_values'"
+				" and exists ("
+					"select null"
+					" from widget"
+					" where widget.widgetid=widget_field.widgetid"
+						" and widget.type in ('problems','problemsbysv')"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_4030020(void)
+{
+#define FIELD_LEN	32
+
+	const char	*tmp_token;
+	char		*pos, *token = NULL, *token_esc = NULL, *value = NULL, field[FIELD_LEN];
+	int		ret = SUCCEED;
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint32_t	id, next_id = 0;
+	zbx_uint64_t	last_widgetid = 0, widgetid, fieldid;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = DBselect("SELECT widgetid,widget_fieldid,name,value_str"
+			" FROM widget_field"
+			" WHERE widgetid IN (SELECT widgetid FROM widget WHERE type='svggraph') AND type=1"
+			" AND (name LIKE 'ds.hosts.%%' OR name LIKE 'ds.items.%%' OR name LIKE 'or.hosts.%%'"
+				" OR name LIKE 'or.items.%%' OR name LIKE 'problemhosts.%%')"
+			" ORDER BY widgetid, name");
+
+	if (NULL == result)
+		return FAIL;
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(widgetid, row[0]);
+		ZBX_DBROW2UINT64(fieldid, row[1]);
+
+		if (NULL == (pos = strrchr(row[2], '.')) || FIELD_LEN <= pos - row[2])
+		{
+			ret = FAIL;
+
+			break;
+		}
+
+		if (last_widgetid != widgetid || 0 != strncmp(field, row[2], pos - row[2]))
+		{
+			last_widgetid = widgetid;
+			next_id = 0;
+
+			zbx_strlcpy(field, row[2], (pos + 1) - row[2]);
+		}
+
+		id = atoi(pos + 1);
+		value = zbx_strdup(value, row[3]);
+		tmp_token = strtok(value, ",\n");
+
+		while (NULL != tmp_token)
+		{
+			token = zbx_strdup(token, tmp_token);
+			zbx_lrtrim(token, " \t\r");
+
+			if ('\0' == token[0])
+			{
+				tmp_token = strtok(NULL, ",\n");
+
+				continue;
+			}
+
+			if (id != next_id || 0 != strcmp(row[3], token))
+			{
+				token_esc = DBdyn_escape_string(token);
+
+				if (ZBX_DB_OK > DBexecute("insert into widget_field (widgetid,widget_fieldid,type,name,"
+						"value_str) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",1,'%s.%u','%s')",
+						widgetid, DBget_maxid_num("widget_field", 1), field, next_id,
+						token_esc) ||
+						ZBX_DB_OK > DBexecute("delete from widget_field where widget_fieldid="
+								ZBX_FS_UI64, fieldid))
+				{
+					zbx_free(token_esc);
+					ret = FAIL;
+
+					break;
+				}
+
+				zbx_free(token_esc);
+			}
+
+			next_id++;
+			tmp_token = strtok(NULL, ",\n");
+		}
+	}
+
+	zbx_free(token);
+	zbx_free(value);
+	DBfree_result(result);
+
+#undef FIELD_LEN
+	return ret;
+}
+
+static int	DBpatch_4030021(void)
+{
 	const ZBX_FIELD	field = {"autoreg_tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_4030017(void)
+static int	DBpatch_4030022(void)
 {
 	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("autoreg_host", &field);
 }
 
-static int	DBpatch_4030018(void)
+static int	DBpatch_4030023(void)
 {
 	const ZBX_FIELD	field = {"tls_accepted", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy_autoreg_host", &field);
 }
 
-static int	DBpatch_4030019(void)
+static int	DBpatch_4030024(void)
 {
 	const ZBX_TABLE table =
 		{"config_autoreg_tls", "autoreg_tlsid", 0,
@@ -208,12 +379,12 @@ static int	DBpatch_4030019(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4030020(void)
+static int	DBpatch_4030025(void)
 {
 	return DBcreate_index("config_autoreg_tls", "config_autoreg_tls_1", "tls_psk_identity", 1);
 }
 
-static int	DBpatch_4030021(void)
+static int	DBpatch_4030026(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -252,5 +423,10 @@ DBPATCH_ADD(4030018, 0, 1)
 DBPATCH_ADD(4030019, 0, 1)
 DBPATCH_ADD(4030020, 0, 1)
 DBPATCH_ADD(4030021, 0, 1)
+DBPATCH_ADD(4030022, 0, 1)
+DBPATCH_ADD(4030023, 0, 1)
+DBPATCH_ADD(4030024, 0, 1)
+DBPATCH_ADD(4030025, 0, 1)
+DBPATCH_ADD(4030026, 0, 1)
 
 DBPATCH_END()

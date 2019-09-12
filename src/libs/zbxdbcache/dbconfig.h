@@ -32,6 +32,7 @@ typedef struct
 	const char		*recovery_expression;
 	const char		*error;
 	const char		*correlation_tag;
+	const char		*opdata;
 	int			lastchange;
 	int			nextcheck;		/* time of next trigger recalculation,    */
 							/* valid for triggers with time functions */

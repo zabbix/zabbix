@@ -69,6 +69,7 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
+#define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
@@ -237,8 +238,11 @@ struct	_DC_TRIGGER;
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 
 #	define	ZBX_SQL_EXEC_FROM	0
-
-#	define	ZBX_SQL_STRCMP		"%s'%s'"
+#	ifdef HAVE_MYSQL
+#		define	ZBX_SQL_STRCMP		"%s binary '%s'"
+#	else
+#		define	ZBX_SQL_STRCMP		"%s'%s'"
+#	endif
 #	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
@@ -306,6 +310,7 @@ typedef struct
 	char		*url;
 	char		*comments;
 	char		*correlation_tag;
+	char		*opdata;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
