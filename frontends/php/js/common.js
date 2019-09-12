@@ -581,11 +581,13 @@ function closeDialogHandler(event) {
 	}
 }
 
-/*
+/**
  * Removed overlay from overlays stack and sets focus to source element.
  *
  * @param {string} dialogueid		Id of dialogue, that is being closed.
  * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ *
+ * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
 	var overlay = null,
