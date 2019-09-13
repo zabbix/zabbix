@@ -136,7 +136,7 @@ static int	check_ipv6(const char * fping)
 	zbx_snprintf(tmp, sizeof(tmp), "%s ::", fping);
 
 	if (SUCCEED == zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED) &&
-			 NULL != strstr(out, "alive"))
+			NULL != strstr(out, "alive"))
 	{
 		ret = SUCCEED;
 	}
