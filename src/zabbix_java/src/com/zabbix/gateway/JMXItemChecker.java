@@ -195,8 +195,15 @@ class JMXItemChecker extends ItemChecker
 
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-			DiscoveryMode mode = (0 < argumentCount) ? DiscoveryMode.valueOf(item.getArgument(1).toUpperCase()) :
-				DiscoveryMode.ATTRIBUTES;
+			DiscoveryMode mode = DiscoveryMode.ATTRIBUTES;
+			if (0 < argumentCount)
+			{
+				String modeName = item.getArgument(1);
+				if (modeName.equals("beans"))
+					mode = DiscoveryMode.BEANS;
+				else if (!modeName.equals("attributes"))
+					throw new ZabbixException("invalid discovery mode: " + modeName);
+			}
 
 			switch(mode)
 			{
@@ -221,8 +228,15 @@ class JMXItemChecker extends ItemChecker
 
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-			DiscoveryMode mode = (0 < argumentCount) ? DiscoveryMode.valueOf(item.getArgument(1).toUpperCase()) :
-				DiscoveryMode.ATTRIBUTES;
+			DiscoveryMode mode = DiscoveryMode.ATTRIBUTES;
+			if (0 < argumentCount)
+			{
+				String modeName = item.getArgument(1);
+				if (modeName.equals("beans"))
+					mode = DiscoveryMode.BEANS;
+				else if (!modeName.equals("attributes"))
+					throw new ZabbixException("invalid discovery mode: " + modeName);
+			}
 
 			switch(mode)
 			{
