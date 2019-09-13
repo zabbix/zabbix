@@ -2013,6 +2013,7 @@ AC_OUTPUT([
 	go/src/zabbix/internal/agent/scheduler/Makefile
 	go/src/zabbix/internal/agent/serverconnector/Makefile
 	go/src/zabbix/internal/agent/serverlistener/Makefile
+	go/src/zabbix/internal/agent/statuslistener/Makefile
 	go/src/zabbix/internal/monitor/Makefile
 	go/src/zabbix/plugins/Makefile
 	go/src/zabbix/plugins/log/Makefile
