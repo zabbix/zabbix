@@ -207,14 +207,12 @@ class JMXItemChecker extends ItemChecker
 
 			switch(mode)
 			{
-			case ATTRIBUTES:
-				discoverAttributes(counters, filter, true);
-				break;
-			case BEANS:
-				discoverBeans(counters, filter, true);
-				break;
-			default:
-				throw new ZabbixException("invalid discovery mode: %s", item.getArgument(1));
+				case ATTRIBUTES:
+					discoverAttributes(counters, filter, true);
+					break;
+				case BEANS:
+					discoverBeans(counters, filter, true);
+					break;
 			}
 
 			JSONObject mapping = new JSONObject();
@@ -240,14 +238,12 @@ class JMXItemChecker extends ItemChecker
 
 			switch(mode)
 			{
-			case ATTRIBUTES:
-				discoverAttributes(counters, filter, false);
-				break;
-			case BEANS:
-				discoverBeans(counters, filter, false);
-				break;
-			default:
-				throw new ZabbixException("invalid discovery mode: %s", item.getArgument(1));
+				case ATTRIBUTES:
+					discoverAttributes(counters, filter, false);
+					break;
+				case BEANS:
+					discoverBeans(counters, filter, false);
+					break;
 			}
 
 			return counters.toString();
