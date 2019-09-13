@@ -2389,6 +2389,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #303030;
   border-bottom: 0;
   background-color: #2b2b2b;
+  /*
+   * For floating headers to appear over other widgets.
+   * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
+   */
   z-index: 3; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
@@ -2561,7 +2565,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: 1;
   transition: margin-top .3s, height .3s, box-shadow .3s; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
 .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
@@ -3537,8 +3541,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 3px 0 7px; }
 
 .overlay-descr {
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), transparent), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), transparent) 0 100%;
-  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), transparent), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), transparent) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
+  background: linear-gradient(#2b2b2b 30%, rgba(43, 43, 43, 0)), linear-gradient(rgba(43, 43, 43, 0), #2b2b2b 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)) 0 100%;
   background-repeat: no-repeat;
   background-color: #2b2b2b;
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
@@ -4340,8 +4344,8 @@ td[class] + td.disaster-bg {
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.ui-draggable .dashbrd-grid-widget-head,
-.ui-draggable .dashbrd-grid-iterator-head {
+.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
+.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab; }
@@ -5134,8 +5138,8 @@ ul.checkbox-list.col-3 > li {
     border-radius: 50%;
     background: #4796c4; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
+    margin-top: -6.6666666667px;
+    margin-left: -6.6666666667px;
     background: #4796c4;
     border: 2px solid #8599a4; }
   .range-control.range-control-focus .range-control-progress {

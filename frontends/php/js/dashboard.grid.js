@@ -137,8 +137,7 @@
 		if (!widget['parent']) {
 			// Do not subscribe on focus change, since child widgets do not receive focus.
 			widget['content_header'].on('focusin focusout', function(event) {
-				if (event.type === 'focusout' && widget['content_header'].find('[data-expanded="true"]').length) {
-					// Prevent hiding widget header, while it's popup menu is active.
+				if (event.type === 'focusout' && isWidgetPopupActive($obj, data, widget)) {
 					return;
 				}
 				widget['div'].toggleClass(classes['focus'], event.type === 'focusin');
@@ -187,8 +186,7 @@
 						if ($div.position().top === 0) {
 							widget['parent']['div'].addClass('iterator-double-header');
 						}
-						// Prevent hiding double-header of iterator while it's popup menu is active.
-						else if (!widget['parent']['content_header'].find('[data-expanded="true"]').length) {
+						else if (!isWidgetPopupActive($obj, data, widget['parent'])) {
 							widget['parent']['div'].removeClass('iterator-double-header');
 						}
 					}
@@ -213,8 +211,7 @@
 
 		if (widget['iterator']) {
 			$div.on('mouseleave focusout', function(event) {
-				// Prevent hiding double-header of iterator while it's popup menu is active.
-				if (!widget['content_header'].find('[data-expanded="true"]').length) {
+				if (!isWidgetPopupActive($obj, data, widget)) {
 					if (event.type === 'mouseleave' || !isIteratorFirstRowHovered(widget)) {
 						$div.removeClass('iterator-double-header');
 					}
@@ -239,6 +236,11 @@
 		}
 
 		return false;
+	}
+
+	function isWidgetPopupActive($obj, data, widget) {
+		return widget['content_header'].find('[data-expanded="true"]').length
+			|| data['options']['config_dialogue_active'];
 	}
 
 	/**
@@ -266,7 +268,7 @@
 			var classes = widget['iterator'] ? iterator_classes : widget_classes,
 				hover = widget['div'].is(':hover'),
 				focus = widget['div'].hasClass(classes['focus']),
-				popup = widget['content_header'].find('[data-expanded="true"]').length > 0;
+				popup = isWidgetPopupActive($obj, data, widget);
 
 			if (!hover && !focus && !popup) {
 				return;
@@ -2233,6 +2235,7 @@
 					var widget_data = {
 							'type': type,
 							'header': name,
+							'view_mode': view_mode,
 							'pos': widget['pos'],
 							'fields': fields,
 							'configuration': configuration,
@@ -2297,6 +2300,14 @@
 	}
 
 	function openConfigDialogue($obj, data, widget, trigger_elmnt) {
+		data['options']['config_dialogue_active'] = true;
+
+		var config_dialogue_close = function() {
+			delete data['options']['config_dialogue_active'];
+			$.unsubscribe('overlay.close', config_dialogue_close);
+		};
+		$.subscribe('overlay.close', config_dialogue_close);
+
 		var edit_mode = (widget !== null && 'type' in widget);
 
 		data.dialogue = {};
@@ -2409,8 +2420,8 @@
 		data['add_widget_dimension'] = {};
 
 		// Add new widget user interaction handlers.
-		$.subscribe('overlay.close', function(e, widget) {
-			if (data['pos-action'] === 'addmodal' && widget.dialogueid === 'widgetConfg') {
+		$.subscribe('overlay.close', function(e, dialogue) {
+			if (data['pos-action'] === 'addmodal' && dialogue.dialogueid === 'widgetConfg') {
 				data['pos-action'] = '';
 				data.add_widget_dimension = {};
 				data.new_widget_placeholder.setDefault(function(e) {

@@ -3104,8 +3104,8 @@ $form-icon-btn: (
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.ui-draggable .dashbrd-grid-widget-head,
-.ui-draggable .dashbrd-grid-iterator-head {
+.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
+.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
 	@extend %cursor-drag;
 }
 
@@ -3433,7 +3433,7 @@ $form-icon-btn: (
 	border-bottom: 0;
 	background-color: $ui-bg-color;
 
-	/**
+	/*
 	 * For floating headers to appear over other widgets.
 	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	 */
@@ -3714,13 +3714,13 @@ $form-icon-btn: (
 			// Not inheriting opacity transition here.
 			transition: margin-top .3s, height .3s, box-shadow .3s;
 		}
-	}
 
-	&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
+		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
 
-		.dashbrd-grid-iterator-head {
-			margin-top: -4rem;
-			height: 4rem;
+			.dashbrd-grid-iterator-head {
+				margin-top: -4rem;
+				height: 4rem;
+			}
 		}
 	}
 

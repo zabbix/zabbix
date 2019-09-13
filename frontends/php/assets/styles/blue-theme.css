@@ -2365,6 +2365,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #dfe4e7;
   border-bottom: 0;
   background-color: #fff;
+  /*
+   * For floating headers to appear over other widgets.
+   * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
+   */
   z-index: 3; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
@@ -2537,7 +2541,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: 1;
   transition: margin-top .3s, height .3s, box-shadow .3s; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
 .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
@@ -4316,8 +4320,8 @@ td[class] + td.disaster-bg {
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.ui-draggable .dashbrd-grid-widget-head,
-.ui-draggable .dashbrd-grid-iterator-head {
+.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
+.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab; }
@@ -5110,8 +5114,8 @@ ul.checkbox-list.col-3 > li {
     border-radius: 50%;
     background: #0275b8; }
   .range-control.range-control-focus .range-control-thumb {
-    margin-top: -6.66667px;
-    margin-left: -6.66667px;
+    margin-top: -6.6666666667px;
+    margin-left: -6.6666666667px;
     background: #0275b8;
     border: 2px solid #0395ea; }
   .range-control.range-control-focus .range-control-progress {
