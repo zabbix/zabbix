@@ -212,48 +212,7 @@ class CMediatype extends CApiService {
 
 		$simple_interval_parser = new CSimpleIntervalParser();
 
-		$mediatype_rules = [
-			MEDIA_TYPE_WEBHOOK => [
-				'webhook' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'webhook')
-				],
-				'timeout' => [
-					'type' => API_TIME_UNIT,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'timeout')
-				],
-				'receive_tags' => [
-					'type' => API_INT32,
-					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
-				],
-				'url' => [
-					// Should be checked as string because it can contain maros tags.
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url')
-				],
-				'url_name' => [
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url_name')
-				],
-				'params' => [
-					'type' => API_OBJECTS,
-					'fields' => [
-						'name' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
-							'length' => DB::getFieldLength('media_type_param', 'name')
-						],
-						'value' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
-							'length' => DB::getFieldLength('media_type_param', 'value')
-						]
-					]
-				]
-			]
-		];
+		$mediatype_rules = $this->getValidationRules();
 
 		foreach ($mediatypes as $mediatype) {
 			// Check if media type already exists.
@@ -406,6 +365,17 @@ class CMediatype extends CApiService {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
+					if (array_key_exists('timeout', $validated_data)) {
+						$seconds = timeUnitToSeconds($validated_data['timeout']);
+
+						if ($seconds < 1 || $seconds > 60) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+								$validated_data['timeout'], 'timeout', '1s', '60s'
+							));
+						}
+					}
+
 					if (array_key_exists('receive_tags', $validated_data)
 							&& $validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 						unset($validation_rules['url'], $validation_rules['url_name']);
@@ -598,48 +568,7 @@ class CMediatype extends CApiService {
 			);
 		}
 
-		$mediatype_rules = [
-			MEDIA_TYPE_WEBHOOK => [
-				'webhook' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'webhook')
-				],
-				'timeout' => [
-					'type' => API_TIME_UNIT,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'timeout')
-				],
-				'receive_tags' => [
-					'type' => API_INT32,
-					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
-				],
-				'url' => [
-					// Should be checked as string because it can contain maros tags.
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url')
-				],
-				'url_name' => [
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url_name')
-				],
-				'params' => [
-					'type' => API_OBJECTS,
-					'fields' => [
-						'name' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
-							'length' => DB::getFieldLength('media_type_param', 'name')
-						],
-						'value' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
-							'length' => DB::getFieldLength('media_type_param', 'value')
-						]
-					]
-				]
-			]
-		];
+		$mediatype_rules = $this->getValidationRules();
 
 		foreach ($mediatypes as $mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
@@ -675,7 +604,8 @@ class CMediatype extends CApiService {
 			$validation_rules = array_key_exists($mediatype['type'], $mediatype_rules)
 				? $mediatype_rules[$mediatype['type']]
 				: [];
-			$validated_data = array_intersect_key($mediatype + $db_mediatype, $validation_rules);
+			$validated_data = array_intersect_key($mediatype, $validation_rules);
+			unset($validated_data['mediatypeid']);
 
 			switch ($mediatype['type']) {
 				case MEDIA_TYPE_EZ_TEXTING:
@@ -814,8 +744,22 @@ class CMediatype extends CApiService {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
-					if (array_key_exists('receive_tags', $validated_data)
-							&& $validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
+					$validated_data += [
+						'webhook' => $db_mediatype['webhook'],
+						'timeout' => $db_mediatype['timeout'],
+						'receive_tags' => $db_mediatype['receive_tags']
+					];
+
+					$seconds = timeUnitToSeconds($validated_data['timeout']);
+
+					if ($seconds < 1 || $seconds > 60) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+							$validated_data['timeout'], 'timeout', '1s', '60s'
+						));
+					}
+
+					if ($validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 						unset($validation_rules['url'], $validation_rules['url_name']);
 					}
 
@@ -1031,11 +975,41 @@ class CMediatype extends CApiService {
 		$this->validateUpdate($mediatypes);
 
 		$update = [];
+		$db_types = [];
+		$db_typesids = [];
 		$webhooks_params = [];
+		$defaults = DB::getDefaults('media_type');
+
+		foreach ($mediatypes as $mediatype) {
+			if (!array_key_exists('type', $mediatype)) {
+				continue;
+			}
+
+			$db_typeids[] = $mediatype['mediatypeid'];
+		}
+
+		if ($db_typeids) {
+			$db_types = DB::select('media_type', [
+				'output' => ['type'],
+				'filter' => ['mediatypeid' => $db_typeids],
+				'preservekeys' => true
+			]);
+		}
 
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeid = $mediatype['mediatypeid'];
 			unset($mediatype['mediatypeid']);
+
+			if (array_key_exists('type', $mediatype) && $db_types[$mediatypeid]['type'] == MEDIA_TYPE_WEBHOOK) {
+				$mediatype = [
+					'webhook' => $defaults['webhook'],
+					'timeout' => $defaults['timeout'],
+					'receive_tags' => $defaults['receive_tags'],
+					'url' => $defaults['url'],
+					'url_name' => $defaults['url_name'],
+					'params' => []
+				] + $mediatype;
+			}
 
 			if (array_key_exists('params', $mediatype)) {
 				$webhooks_params[$mediatypeid] = $mediatype['params'];
@@ -1196,5 +1170,55 @@ class CMediatype extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Get media type validation rules.
+	 *
+	 * @return array
+	 */
+	protected function getValidationRules() {
+		return [
+			MEDIA_TYPE_WEBHOOK => [
+				'webhook' => [
+					'type' => API_STRING_UTF8,
+					'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('media_type', 'webhook')
+				],
+				'timeout' => [
+					'type' => API_TIME_UNIT,
+					'flags' => API_REQUIRED | API_NOT_EMPTY,
+					'length' => DB::getFieldLength('media_type', 'timeout')
+				],
+				'receive_tags' => [
+					'type' => API_INT32,
+					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
+				],
+				'url' => [
+					// Should be checked as string because it can contain maros tags.
+					'type' => API_STRING_UTF8,
+					'length' => DB::getFieldLength('media_type', 'url')
+				],
+				'url_name' => [
+					'type' => API_STRING_UTF8,
+					'length' => DB::getFieldLength('media_type', 'url_name')
+				],
+				'params' => [
+					'type' => API_OBJECTS,
+					'fields' => [
+						'name' => [
+							'type' => API_STRING_UTF8,
+							'flags' => API_NOT_EMPTY,
+							'length' => DB::getFieldLength('media_type_param', 'name')
+						],
+						'value' => [
+							'type' => API_STRING_UTF8,
+							'flags' => API_NOT_EMPTY,
+							'length' => DB::getFieldLength('media_type_param', 'value')
+						]
+					]
+				]
+			]
+		];
 	}
 }
