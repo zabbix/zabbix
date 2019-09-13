@@ -128,6 +128,10 @@ func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters 
 			return fmt.Errorf("cannot add user parameter \"%s\": %s", userParameterConfig[i], err)
 		}
 
+		if acc, _ := plugin.Get(key); acc != nil {
+			return fmt.Errorf(`cannot register user parameter "%s": key already used`, userParameterConfig[i])
+		}
+
 		if len(strings.TrimSpace(s[1])) == 0 {
 			return fmt.Errorf("cannot add user parameter \"%s\": command is missing", userParameterConfig[i])
 		}
