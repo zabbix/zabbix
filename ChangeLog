@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha3
 
 New features:
+A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in autoregistration (Andris, Sasha, vasilijs)
 ..F....... [ZBXNEXT-5328] replaced graph widget hosts and items selector (ashubin, miks)
 ..F....... [ZBXNEXT-5219] Separate configuration and realtime fields in items table (PoC) (rlataria)
 .........T [ZBXNEXT-5141] added "Template App Apache" (afayantsev)
