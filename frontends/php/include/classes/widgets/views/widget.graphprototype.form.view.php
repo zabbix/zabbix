@@ -20,7 +20,7 @@
 
 
 /**
- * Graph widget form view.
+ * Graph prototype widget form view.
  */
 $fields = $data['dialogue']['fields'];
 
@@ -38,19 +38,19 @@ $form_list->addRow(
 	CWidgetHelper::getRadioButtonList($fields['source_type'])
 );
 
-// Graph.
+// Graph prototype.
 if (array_key_exists('graphid', $fields)) {
-	$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['ms']['graphs']['graphid'],
-		$form->getName()
+	$field_graphid = CWidgetHelper::getGraphPrototype($fields['graphid'],
+		$data['captions']['ms']['graph_prototypes']['graphid'], $form->getName()
 	);
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid);
 	$scripts[] = $field_graphid->getPostJS();
 }
 
-// Item.
+// Item prototype.
 if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
+	$field_itemid = CWidgetHelper::getItemPrototype($fields['itemid'],
+		$data['captions']['ms']['item_prototypes']['itemid'], $form->getName()
 	);
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 	$scripts[] = $field_itemid->getPostJS();
@@ -61,6 +61,9 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelpe
 
 // Dynamic item.
 $form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+
+// Columns and Rows.
+CWidgetHelper::addIteratorFields($form_list, $fields['columns'], $fields['rows']);
 
 $form->addItem($form_list);
 

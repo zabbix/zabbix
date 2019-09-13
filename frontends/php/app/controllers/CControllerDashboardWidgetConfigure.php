@@ -25,7 +25,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 		$fields = [
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'fields' => 'json',
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
 		];
 
 		$ret = $this->validateInput($fields);

@@ -20,19 +20,19 @@
 
 
 /**
- * Graph widget form.
+ * Graph prototype widget form.
  */
-class CWidgetFormGraph extends CWidgetForm {
+class CWidgetFormGraphPrototype extends CWidgetForm {
 
 	public function __construct($data) {
-		parent::__construct($data, WIDGET_GRAPH);
+		parent::__construct($data, WIDGET_GRAPH_PROTOTYPE);
 
 		// Select graph type field.
 		$field_source = (new CWidgetFieldRadioButtonList('source_type', _('Source'), [
-			ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
-			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph'),
+			ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype'),
 		]))
-			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
+			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
 			->setAction('updateWidgetConfigDialogue()')
 			->setModern(true);
 
@@ -43,31 +43,31 @@ class CWidgetFormGraph extends CWidgetForm {
 		$this->fields[$field_source->getName()] = $field_source;
 
 		if (array_key_exists('source_type', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			// Select simple graph field.
-			$field_item = (new CWidgetFieldMultiselectItem('itemid', _('Item')))
+				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			// Select simple graph prototype field.
+			$field_item_prototype = (new CWidgetFieldMultiselectItemPrototype('itemid', _('Item prototype')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
-				->setFilterParameter('numeric', true) // For filtering items.
-				->setFilterParameter('with_simple_graph_items', true); // For groups and hosts selection.
+				->setFilterParameter('numeric', true) // For filtering item prototypes.
+				->setFilterParameter('with_simple_graph_item_prototypes', true); // For groups and hosts selection.
 
 			if (array_key_exists('itemid', $this->data)) {
-				$field_item->setValue($this->data['itemid']);
+				$field_item_prototype->setValue($this->data['itemid']);
 			}
 
-			$this->fields[$field_item->getName()] = $field_item;
+			$this->fields[$field_item_prototype->getName()] = $field_item_prototype;
 		}
 		else {
-			// Select graph field.
-			$field_graph = (new CWidgetFieldMultiselectGraph('graphid', _('Graph')))
+			// Select graph prototype field.
+			$field_graph_prototype = (new CWidgetFieldMultiselectGraphPrototype('graphid', _('Graph prototype')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 
 			if (array_key_exists('graphid', $this->data)) {
-				$field_graph->setValue($this->data['graphid']);
+				$field_graph_prototype->setValue($this->data['graphid']);
 			}
 
-			$this->fields[$field_graph->getName()] = $field_graph;
+			$this->fields[$field_graph_prototype->getName()] = $field_graph_prototype;
 		}
 
 		// Show legend checkbox.
