@@ -206,7 +206,6 @@ if ($type == SHOW_TRIGGERS) {
 		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
 			$host_options, $trigger_options, $problem_options
 		);
-		CArrayHelper::sort($triggers, ['description']);
 	}
 	else {
 		$hosts = [];

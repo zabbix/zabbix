@@ -2197,8 +2197,8 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 
 -- testHostAvailabilityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (101, 'Dashboard for Host availability widget', 1, 1);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (101, 101, 'hostavail', 'Reference widget', 0, 0, 3, 2);
-INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (102, 101, 'hostavail', 'Reference widget to delete', 0, 2, 3, 2);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (101, 101, 'hostavail', 'Reference widget', 0, 0, 6, 2);
+INSERT INTO widget (widgetid, dashboardid, type, name, x, y, width, height) VALUES (102, 101, 'hostavail', 'Reference widget to delete', 0, 2, 6, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (134, 102, 2, 'groupids', 0, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (135, 102, 0, 'layout', 1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50015,'Group for Host availability widget',0);

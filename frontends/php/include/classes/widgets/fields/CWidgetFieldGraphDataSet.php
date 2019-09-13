@@ -44,7 +44,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE])],
+			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 			'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
 			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
@@ -54,24 +54,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'timeshift'			=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
 		]]);
 		$this->setDefault([]);
-	}
-
-	public function setValue($value) {
-		foreach ($value as &$val) {
-			// Values received from frontend are strings. Values received from database comes as arrays.
-			// TODO: remove hack with modifying of unvalidated data.
-			if (array_key_exists('hosts', $val)) {
-				$val['hosts'] = CWidgetHelper::splitPatternIntoParts($val['hosts']);
-			}
-			if (array_key_exists('items', $val)) {
-				$val['items'] = CWidgetHelper::splitPatternIntoParts($val['items']);
-			}
-		}
-		unset($val);
-
-		$this->value = $value;
-
-		return $this;
 	}
 
 	/**

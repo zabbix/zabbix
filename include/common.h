@@ -1023,6 +1023,8 @@ int	zbx_validate_interval(const char *str, char **error);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, int *res);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
@@ -1054,7 +1056,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
+#define ZBX_MAX_RECV_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
@@ -1285,6 +1287,10 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 #define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
+
+#define ZBX_PSK_FOR_HOST		0x01				/* PSK can be used for a known host */
+#define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
+#define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);

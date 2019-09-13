@@ -177,6 +177,8 @@ $table = (new CTableInfo())
 		_('Discovery'),
 		_('Web'),
 		_('Interface'),
+		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY) ? _('Proxy') : null,
 		_('Templates'),
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder'], 'hosts.php'),
 		_('Availability'),
@@ -202,10 +204,6 @@ foreach ($data['hosts'] as $host) {
 
 	$description = [];
 
-	if ($host['proxy_hostid'] != 0) {
-		$description[] = $data['proxies'][$host['proxy_hostid']]['host'];
-		$description[] = NAME_DELIMITER;
-	}
 	if ($host['discoveryRule']) {
 		$description[] = (new CLink(CHtml::encode($host['discoveryRule']['name']),
 			(new CUrl('host_prototypes.php'))->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
@@ -416,6 +414,12 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['httpTests'])
 		],
 		$hostInterface,
+		($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+				|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY)
+			? ($host['proxy_hostid'] != 0)
+				? $data['proxies'][$host['proxy_hostid']]['host']
+				: ''
+			: null,
 		$hostTemplates,
 		$status,
 		getHostAvailabilityTable($host),

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-26 17:02+0300\n"
+"POT-Creation-Date: 2019-09-08 01:44+0300\n"
 "PO-Revision-Date: 2019-03-28 07:26+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: none\n"
@@ -71,7 +71,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d dag"
 msgstr[1] "%1$d dager"
 
-#: jsLoader.php:245
+#: jsLoader.php:250
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -138,8 +138,8 @@ msgstr[1] ""
 #: include/classes/widgets/CWidgetConfig.php:158
 #: include/classes/widgets/CWidgetConfig.php:159
 #: include/classes/widgets/CWidgetConfig.php:160
-#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:287
-#: jsLoader.php:288 jsLoader.php:289 jsLoader.php:290
+#: include/classes/widgets/CWidgetConfig.php:161 jsLoader.php:292
+#: jsLoader.php:293 jsLoader.php:294 jsLoader.php:295
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -153,7 +153,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:246
+#: jsLoader.php:251
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -184,15 +184,15 @@ msgstr[1] "%1$s forsøk gjenstår"
 
 #: app/views/administration.user.edit.php:365
 #: include/classes/widgets/CWidgetConfig.php:156
-#: include/classes/widgets/CWidgetConfig.php:157 jsLoader.php:285
-#: jsLoader.php:286
+#: include/classes/widgets/CWidgetConfig.php:157 jsLoader.php:290
+#: jsLoader.php:291
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s sekund"
 msgstr[1] "%1$s sekunder"
 
-#: jsLoader.php:227
+#: jsLoader.php:232
 #, c-format
 msgid "%1$s symbols remaining"
 msgstr ""
@@ -210,13 +210,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:240
+#: jsLoader.php:245
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:291
+#: jsLoader.php:296
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -324,7 +324,7 @@ msgstr ""
 msgid "<sub-menu/sub-menu/...>script"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:694
+#: include/classes/widgets/CWidgetHelper.php:695
 msgid "ADD OVERRIDE"
 msgstr ""
 
@@ -368,14 +368,14 @@ msgstr[1] "Konto er blokkert for %1$s sekunder."
 #: include/actions.inc.php:157 include/actions.inc.php:337
 #: include/blocks.inc.php:737
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:895
-#: include/classes/screens/CScreenProblem.php:918
-#: include/classes/screens/CScreenProblem.php:1149 include/events.inc.php:256
+#: include/classes/screens/CScreenProblem.php:898
+#: include/classes/screens/CScreenProblem.php:921
+#: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:256
 #: include/events.inc.php:468 include/views/configuration.action.edit.php:1215
 msgid "Ack"
 msgstr "Ack"
 
-#: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:250
+#: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:255
 msgid "Acknowledge"
 msgstr "Bekrefte"
 
@@ -522,16 +522,16 @@ msgstr "Handling oppdatert"
 #: app/views/monitoring.dashboard.view.php:86
 #: app/views/monitoring.widget.problems.view.php:63 include/blocks.inc.php:738
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:896
-#: include/classes/screens/CScreenProblem.php:919
-#: include/classes/screens/CScreenProblem.php:1150
-#: include/classes/screens/CScreenProblem.php:1206 include/events.inc.php:257
+#: include/classes/screens/CScreenProblem.php:899
+#: include/classes/screens/CScreenProblem.php:922
+#: include/classes/screens/CScreenProblem.php:1153
+#: include/classes/screens/CScreenProblem.php:1209 include/events.inc.php:257
 #: include/forms.inc.php:1249 include/menu.inc.php:217
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:66
-#: include/views/monitoring.sysmap.list.php:61 jsLoader.php:249
+#: include/views/monitoring.sysmap.list.php:61 jsLoader.php:254
 #: tr_events.php:172
 msgid "Actions"
 msgstr "Handlinger"
@@ -710,7 +710,7 @@ msgstr "Aktiv til"
 #: include/views/monitoring.sysmap.edit.php:294
 #: include/views/monitoring.sysmap.edit.php:330
 #: include/views/monitoring.sysmap.edit.php:398 jsLoader.php:117
-#: jsLoader.php:303
+#: jsLoader.php:308
 msgid "Add"
 msgstr "Legg til"
 
@@ -722,7 +722,7 @@ msgstr "Legg til ny widget"
 msgid "Add child"
 msgstr "Legg til barn"
 
-#: jsLoader.php:305
+#: jsLoader.php:310
 msgid "Add child element"
 msgstr "Legg til barnelement"
 
@@ -730,11 +730,11 @@ msgstr "Legg til barnelement"
 msgid "Add host"
 msgstr "Legg til vert"
 
-#: jsLoader.php:306
+#: jsLoader.php:311
 msgid "Add multiple maps"
 msgstr "Legg til flere kart"
 
-#: include/classes/widgets/CWidgetHelper.php:1101
+#: include/classes/widgets/CWidgetHelper.php:1104
 msgid "Add new data set"
 msgstr ""
 
@@ -772,7 +772,7 @@ msgstr "Legg til widget"
 msgid "Added"
 msgstr "Lagt til"
 
-#: jsLoader.php:238
+#: jsLoader.php:243
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -819,7 +819,7 @@ msgstr "Agent"
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
 msgstr "Agent tilgjengelighet sjekk. Returnerer ingenting - utilgjengelig; 1 - tilgjengelig"
 
-#: include/views/configuration.host.list.php:183
+#: include/views/configuration.host.list.php:185
 msgid "Agent encryption"
 msgstr "Agent kryptering"
 
@@ -889,7 +889,7 @@ msgstr "Alle grupper"
 msgid "All hosts"
 msgstr "Alle verter"
 
-#: jsLoader.php:195
+#: jsLoader.php:200
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Alle koblinger skal ha \"Name\" og \"URL\" angitt"
 
@@ -977,7 +977,7 @@ msgstr "Og/Eller"
 #: include/views/common.filter.trigger.php:43
 #: include/views/configuration.action.list.php:54
 #: include/views/configuration.correlation.list.php:44
-#: include/views/configuration.discovery.list.php:43
+#: include/views/configuration.discovery.list.php:44
 #: include/views/configuration.host.list.php:136
 #: include/views/configuration.maintenance.list.php:52
 msgid "Any"
@@ -1051,7 +1051,7 @@ msgstr "Applikasjon med applikasjonsid \"%1$s\" eksisterer ikke."
 #: include/views/configuration.application.list.php:23
 #: include/views/configuration.host.edit.php:308
 #: include/views/configuration.host.list.php:173
-#: include/views/configuration.host.list.php:387
+#: include/views/configuration.host.list.php:385
 #: include/views/configuration.item.edit.php:895
 #: include/views/configuration.item.list.php:69
 #: include/views/configuration.item.massupdate.php:543
@@ -1072,7 +1072,7 @@ msgstr "Applikasjoner"
 #: include/views/js/monitoring.sysmaps.js.php:534
 #: include/views/js/monitoring.sysmaps.js.php:629
 #: include/views/js/monitoring.sysmaps.js.php:729 jsLoader.php:116
-#: jsLoader.php:229 jsLoader.php:302
+#: jsLoader.php:234 jsLoader.php:307
 msgid "Apply"
 msgstr "Bruk"
 
@@ -1091,7 +1091,7 @@ msgid "Apr"
 msgstr "Apr"
 
 #: include/forms.inc.php:2164 include/func.inc.php:119
-#: include/func.inc.php:256 jsLoader.php:147
+#: include/func.inc.php:256 jsLoader.php:152
 msgid "April"
 msgstr "April"
 
@@ -1242,7 +1242,7 @@ msgid "Aug"
 msgstr "Aug"
 
 #: include/forms.inc.php:2151 include/func.inc.php:123
-#: include/func.inc.php:260 jsLoader.php:151
+#: include/func.inc.php:260 jsLoader.php:156
 msgid "August"
 msgstr "August"
 
@@ -1356,7 +1356,7 @@ msgstr "Automatisk ikon kartlegging"
 msgid "Automatic icon selection"
 msgstr "Automatisk ikonvalg"
 
-#: include/views/configuration.host.list.php:182
+#: include/views/configuration.host.list.php:184
 msgid "Availability"
 msgstr "Tilgjengelighet"
 
@@ -1397,12 +1397,18 @@ msgstr "Bakgrunnsfarge"
 msgid "Background image"
 msgstr "Bakgrunnsbilde"
 
+#: include/classes/widgets/CWidgetHelper.php:671
+#: include/classes/widgets/CWidgetHelper.php:714
+#: include/classes/widgets/CWidgetHelper.php:978
+msgid "Bar"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:98
 msgid "Base DN"
 msgstr "Base DN"
 
-#: include/classes/widgets/CWidgetHelper.php:696
-#: include/classes/widgets/CWidgetHelper.php:967
+#: include/classes/widgets/CWidgetHelper.php:697
+#: include/classes/widgets/CWidgetHelper.php:969
 msgid "Base colour"
 msgstr ""
 
@@ -1485,11 +1491,11 @@ msgstr ""
 msgid "Bottom"
 msgstr "Bunn"
 
-#: jsLoader.php:187
+#: jsLoader.php:192
 msgid "Bring forward"
 msgstr "Ta med deg fremover"
 
-#: jsLoader.php:186
+#: jsLoader.php:191
 msgid "Bring to front"
 msgstr "Ta med til fronten"
 
@@ -1507,17 +1513,17 @@ msgstr "Ved utløsermalen"
 
 #: app/views/administration.proxy.list.php:119
 #: app/views/administration.proxy.list.php:132
-#: include/views/configuration.host.list.php:354
-#: include/views/configuration.host.list.php:374
-#: include/views/configuration.host.list.php:377
+#: include/views/configuration.host.list.php:352
+#: include/views/configuration.host.list.php:372
+#: include/views/configuration.host.list.php:375
 msgid "CERT"
 msgstr "CERT"
 
 #: app/views/monitoring.widget.problems.view.php:93
-#: include/classes/graph/CSvgGraph.php:977
+#: include/classes/graph/CSvgGraph.php:1050
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:993
-#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:346
+#: include/classes/screens/CScreenProblem.php:996
+#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
 #: include/events.inc.php:548
 msgid "CLOSING"
 msgstr "LUKKER"
@@ -1550,7 +1556,7 @@ msgstr "Beregn SLA, akseptabel SLA (i%)"
 msgid "Calculated"
 msgstr "Kalkulert"
 
-#: jsLoader.php:143
+#: jsLoader.php:148
 msgid "Calendar"
 msgstr ""
 
@@ -1558,7 +1564,7 @@ msgstr ""
 msgid "Callback"
 msgstr "Ring tilbake"
 
-#: jsLoader.php:241
+#: jsLoader.php:246
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
@@ -1594,7 +1600,7 @@ msgstr "Canada (136 tegn)"
 #: include/views/js/configuration.discovery.edit.js.php:709
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:119
-#: jsLoader.php:131 jsLoader.php:230 jsLoader.php:304 jsLoader.php:316
+#: jsLoader.php:133 jsLoader.php:235 jsLoader.php:309 jsLoader.php:321
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1784,6 +1790,10 @@ msgstr "Kan ikke legge til verdikart"
 #: httpconf.php:205
 msgid "Cannot add web scenario"
 msgstr "Kan ikke legge til webscenario"
+
+#: jsLoader.php:130
+msgid "Cannot add widget: not enough free space on the dashboard."
+msgstr ""
 
 #: jsLoader.php:123
 msgid "Cannot add widgets in kiosk mode"
@@ -2289,7 +2299,7 @@ msgstr[1] "Kan ikke aktivere webscenarier"
 msgid "Cannot execute script"
 msgstr "Kan ikke utføre script"
 
-#: jsLoader.php:198
+#: jsLoader.php:203
 msgid "Cannot expand macros."
 msgstr "Kan ikke utvide makroer."
 
@@ -2323,7 +2333,7 @@ msgstr "Kan ikke finne verten \"%1$s\" brukt i kart \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kan ikke finne verten \"%1$s\" brukt på skjermen \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1096
+#: include/classes/import/CConfigurationImport.php:1132
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne vertsgruppe \"%1$s\" for vertsprototype \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
@@ -2346,32 +2356,32 @@ msgstr "Kan ikke finne ikon \"%1$s\" brukt i kart \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne ikon kart \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1480
+#: include/classes/import/CConfigurationImport.php:1516
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksens MAX-verdi for grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1249
+#: include/classes/import/CConfigurationImport.php:1285
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksens MAX-verdi for grafprototypen \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1464
+#: include/classes/import/CConfigurationImport.php:1500
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksen MIN-verdien for grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1229
+#: include/classes/import/CConfigurationImport.php:1265
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt som Y-aksen MIN-verdien for grafprototypen \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1499
+#: include/classes/import/CConfigurationImport.php:1535
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt i grafen \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1269
+#: include/classes/import/CConfigurationImport.php:1305
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Kan ikke finne elementet \"%1$s\" på \"%2$s\" brukt i graf prototype \"%3$s\" av funnregelen \"%4$s\" på \"%5$s\"."
@@ -2391,7 +2401,7 @@ msgstr "Kan ikke finne kart \"%1$s\" brukt i kart \"%2$s\"."
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kan ikke finne kart \"%1$s\" brukt på skjermen \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1119
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne mal \"%1$s\" for vertsprototypen \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
@@ -2402,12 +2412,12 @@ msgstr "Kan ikke finne mal \"%1$s\" for vertsprototypen \"%2$s\" av oppdagelsesr
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan ikke finne utløseren \"%1$s\" brukt i kart \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:712
+#: include/classes/import/CConfigurationImport.php:744
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Kan ikke finne verdikart \"%1$s\" brukt for elementet \"%2$s\" på \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1024
+#: include/classes/import/CConfigurationImport.php:1060
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kan ikke finne verdikart \"%1$s\" brukt til elementprototype \"%2$s\" av oppdagelsesregelen \"%3$s\" på \"%4$s\"."
@@ -2424,7 +2434,7 @@ msgstr "Kan ikke formatere tre."
 msgid "Cannot have empty visible template name."
 msgstr "Kan ikke ha tomt synlig malnavn."
 
-#: include/classes/import/importers/CTemplateImporter.php:121
+#: include/classes/import/importers/CTemplateImporter.php:123
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
@@ -3100,7 +3110,7 @@ msgid "Check type"
 msgstr "Sjekk type"
 
 #: include/views/configuration.discovery.edit.php:66
-#: include/views/configuration.discovery.list.php:63
+#: include/views/configuration.discovery.list.php:65
 msgid "Checks"
 msgstr "sjekker"
 
@@ -3169,7 +3179,7 @@ msgstr "Kinesisk (zh_CN)"
 msgid "Chinese (zh_TW)"
 msgstr "Kinesisk (zh_TW)"
 
-#: include/classes/import/importers/CTemplateImporter.php:153
+#: include/classes/import/importers/CTemplateImporter.php:155
 #, c-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Sirkulær referanse i maler: %1$s."
@@ -3179,7 +3189,7 @@ msgstr "Sirkulær referanse i maler: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Sirkulær malkobling er ikke tillatt."
 
-#: jsLoader.php:207
+#: jsLoader.php:212
 #, fuzzy
 msgid "Clear"
 msgstr "T"
@@ -3203,7 +3213,7 @@ msgstr "Fjern når du kobler fra"
 msgid "Click and drag to desired size."
 msgstr ""
 
-#: jsLoader.php:228
+#: jsLoader.php:233
 msgid "Click to view or edit"
 msgstr ""
 
@@ -3235,7 +3245,7 @@ msgstr "Klokke"
 #: include/views/configuration.triggers.edit.php:628
 #: include/views/monitoring.screen.edit.php:222
 #: include/views/monitoring.slideconf.edit.php:275
-#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:252
+#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:257
 msgid "Clone"
 msgstr "Klon"
 
@@ -3243,8 +3253,8 @@ msgstr "Klon"
 #: include/views/js/monitoring.sysmaps.js.php:421
 #: include/views/js/monitoring.sysmaps.js.php:541
 #: include/views/js/monitoring.sysmaps.js.php:636
-#: include/views/js/monitoring.sysmaps.js.php:733 jsLoader.php:132
-#: jsLoader.php:224 jsLoader.php:309
+#: include/views/js/monitoring.sysmaps.js.php:733 jsLoader.php:134
+#: jsLoader.php:229 jsLoader.php:314
 msgid "Close"
 msgstr "Lukk"
 
@@ -3268,8 +3278,8 @@ msgid "Close problem"
 msgstr "Lukk problem"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
-#: include/classes/widgets/CWidgetHelper.php:901 jsLoader.php:218
-#: jsLoader.php:223
+#: include/classes/widgets/CWidgetHelper.php:903 jsLoader.php:223
+#: jsLoader.php:228
 msgid "Collapse"
 msgstr "Kollaps"
 
@@ -3282,7 +3292,7 @@ msgid "Colour"
 msgstr "Farge"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:208 jsLoader.php:200
+#: include/validate.inc.php:208 jsLoader.php:205
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farge \"%1$s\" er ikke riktig: forventer heksadesimale fargekoder (6 symboler)."
@@ -3396,7 +3406,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Forhold duplikater for korrelasjon \"%1$s\"."
 
 #: include/menu.inc.php:177 include/views/inventory.host.view.php:181
-#: jsLoader.php:251
+#: jsLoader.php:256
 msgid "Configuration"
 msgstr "Konfigurasjon"
 
@@ -3544,7 +3554,7 @@ msgstr "Konfigurasjon av utløsere"
 msgid "Configuration of user groups"
 msgstr "Konfigurering av brukergrupper"
 
-#: app/controllers/CControllerUserEdit.php:183
+#: app/controllers/CControllerUserEdit.php:185
 #: app/controllers/CControllerUserList.php:152
 msgid "Configuration of users"
 msgstr "Konfigurasjon av brukere"
@@ -3589,9 +3599,9 @@ msgstr "Gratulerer! Du har installert Zabbix frontend."
 msgid "Connect to"
 msgstr "Koble til"
 
-#: include/classes/widgets/CWidgetHelper.php:676
-#: include/classes/widgets/CWidgetHelper.php:750
-#: include/classes/widgets/CWidgetHelper.php:1024
+#: include/classes/widgets/CWidgetHelper.php:677
+#: include/classes/widgets/CWidgetHelper.php:752
+#: include/classes/widgets/CWidgetHelper.php:1027
 msgctxt "missing data function"
 msgid "Connected"
 msgstr ""
@@ -3721,7 +3731,7 @@ msgstr ""
 #: include/views/configuration.action.list.php:41
 #: include/views/configuration.application.list.php:48
 #: include/views/configuration.correlation.list.php:31
-#: include/views/configuration.discovery.list.php:30
+#: include/views/configuration.discovery.list.php:31
 #: include/views/configuration.graph.list.php:33
 #: include/views/configuration.graph.list.php:64
 #: include/views/configuration.host.discovery.list.php:32
@@ -3779,7 +3789,7 @@ msgstr "Koordinater"
 #: include/views/configuration.copy.elements.php:73
 #: include/views/configuration.graph.list.php:150
 #: include/views/configuration.item.list.php:248
-#: include/views/configuration.triggers.list.php:334 jsLoader.php:192
+#: include/views/configuration.triggers.list.php:334 jsLoader.php:197
 msgid "Copy"
 msgstr "Kopier"
 
@@ -3882,11 +3892,11 @@ msgstr "Lag korrelasjon"
 msgid "Create dashboard"
 msgstr "Opprett dashbord"
 
-#: jsLoader.php:256
+#: jsLoader.php:261
 msgid "Create dependent discovery rule"
 msgstr ""
 
-#: jsLoader.php:255
+#: jsLoader.php:260
 msgid "Create dependent item"
 msgstr "Opprett avhengig element"
 
@@ -3896,7 +3906,7 @@ msgstr "Opprett avhengig element"
 msgid "Create disabled"
 msgstr "Opprett deaktivert"
 
-#: include/views/configuration.discovery.list.php:27
+#: include/views/configuration.discovery.list.php:28
 #: include/views/configuration.host.discovery.list.php:26
 msgid "Create discovery rule"
 msgstr "Lag oppdagelsesregel"
@@ -3987,7 +3997,7 @@ msgstr "Opprett kart"
 msgid "Create media type"
 msgstr "Opprett medietype"
 
-#: include/views/conf.import.php:25 jsLoader.php:253
+#: include/views/conf.import.php:25 jsLoader.php:258
 msgid "Create new"
 msgstr "Lag ny"
 
@@ -4011,7 +4021,7 @@ msgstr "Opprett lysbildefremvisning"
 msgid "Create template"
 msgstr "Opprett mal"
 
-#: include/views/configuration.triggers.list.php:167 jsLoader.php:254
+#: include/views/configuration.triggers.list.php:167 jsLoader.php:259
 msgid "Create trigger"
 msgstr "Lag utløseren"
 
@@ -4370,7 +4380,7 @@ msgid "Dec"
 msgstr "Des"
 
 #: include/forms.inc.php:2183 include/func.inc.php:127
-#: include/func.inc.php:264 jsLoader.php:155
+#: include/func.inc.php:264 jsLoader.php:160
 msgid "December"
 msgstr "Desember"
 
@@ -4383,7 +4393,7 @@ msgstr "Desember"
 #: include/views/inventory.host.view.php:75
 #: include/views/js/monitoring.sysmaps.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:219
-#: include/views/js/monitoring.sysmaps.js.php:588 jsLoader.php:181
+#: include/views/js/monitoring.sysmaps.js.php:588 jsLoader.php:186
 msgid "Default"
 msgstr "Forvalg"
 
@@ -4443,7 +4453,7 @@ msgstr "Standard tema \"%1$s\"."
 msgid "Delay"
 msgstr "Forsinkelse"
 
-#: queue.php:262
+#: queue.php:264
 msgid "Delayed by"
 msgstr "Forsinket av"
 
@@ -4458,7 +4468,7 @@ msgstr "Forsinket av"
 #: app/views/monitoring.dashboard.list.php:76
 #: include/classes/html/CButtonDelete.php:25
 #: include/classes/widgets/CWidgetHelper.php:587
-#: include/classes/widgets/CWidgetHelper.php:954 include/services.inc.php:118
+#: include/classes/widgets/CWidgetHelper.php:956 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:48
 #: include/views/administration.general.regularexpressions.list.php:79
 #: include/views/administration.general.valuemapping.list.php:81
@@ -4466,11 +4476,11 @@ msgstr "Forsinket av"
 #: include/views/configuration.action.list.php:135
 #: include/views/configuration.application.list.php:128
 #: include/views/configuration.correlation.list.php:128
-#: include/views/configuration.discovery.list.php:98
+#: include/views/configuration.discovery.list.php:99
 #: include/views/configuration.graph.list.php:152
 #: include/views/configuration.host.discovery.list.php:176
 #: include/views/configuration.hostgroups.list.php:156
-#: include/views/configuration.host.list.php:445
+#: include/views/configuration.host.list.php:449
 #: include/views/configuration.host.prototype.list.php:158
 #: include/views/configuration.httpconf.list.php:170
 #: include/views/configuration.item.list.php:250
@@ -4482,7 +4492,7 @@ msgstr "Forsinket av"
 #: include/views/monitoring.screen.list.php:126
 #: include/views/monitoring.slideconf.list.php:97
 #: include/views/monitoring.sysmap.list.php:99 jsLoader.php:120
-#: jsLoader.php:257
+#: jsLoader.php:262
 msgid "Delete"
 msgstr "Slett"
 
@@ -4515,7 +4525,7 @@ msgstr "Slett nåværende handling?"
 msgid "Delete current correlation?"
 msgstr "Slett nåværende korrelasjon?"
 
-#: jsLoader.php:258
+#: jsLoader.php:263
 msgid "Delete dashboard?"
 msgstr "Slett dashbord?"
 
@@ -4559,7 +4569,7 @@ msgstr "Slett element prototype?"
 msgid "Delete item?"
 msgstr "Slett element?"
 
-#: jsLoader.php:197
+#: jsLoader.php:202
 msgid "Delete links between selected elements?"
 msgstr "Slett koblinger mellom utvalgte elementer?"
 
@@ -4607,12 +4617,12 @@ msgstr "Slett utvalgte korrelasjoner?"
 msgid "Delete selected dashboards?"
 msgstr "Slett valgte dashboards?"
 
-#: include/views/configuration.discovery.list.php:98
+#: include/views/configuration.discovery.list.php:99
 #: include/views/configuration.host.discovery.list.php:177
 msgid "Delete selected discovery rules?"
 msgstr "Slett valgte registreringsregler?"
 
-#: jsLoader.php:184
+#: jsLoader.php:189
 msgid "Delete selected elements?"
 msgstr "Slett valgte elementer?"
 
@@ -4649,7 +4659,7 @@ msgstr "Slett utvalgte vertsprototyper?"
 msgid "Delete selected host?"
 msgstr "Slett valgt vert?"
 
-#: include/views/configuration.host.list.php:445
+#: include/views/configuration.host.list.php:449
 msgid "Delete selected hosts?"
 msgstr "Slett valgte verter?"
 
@@ -4697,7 +4707,7 @@ msgstr "Slett valgte skjermbilder?"
 msgid "Delete selected scripts?"
 msgstr "Slett utvalgte skript?"
 
-#: jsLoader.php:185
+#: jsLoader.php:190
 msgid "Delete selected shapes?"
 msgstr "Slett valgte former?"
 
@@ -4847,7 +4857,7 @@ msgstr "Distribusjonsstatus"
 #: include/views/configuration.template.massupdate.php:82
 #: include/views/configuration.trigger.prototype.edit.php:516
 #: include/views/configuration.triggers.edit.php:543
-#: include/views/inventory.host.view.php:116 jsLoader.php:259
+#: include/views/inventory.host.view.php:116 jsLoader.php:264
 msgid "Description"
 msgstr "Beskrivelse"
 
@@ -4899,9 +4909,9 @@ msgstr ""
 #: include/views/configuration.action.list.php:134
 #: include/views/configuration.application.list.php:127
 #: include/views/configuration.correlation.list.php:127
-#: include/views/configuration.discovery.list.php:97
+#: include/views/configuration.discovery.list.php:98
 #: include/views/configuration.host.discovery.list.php:172
-#: include/views/configuration.host.list.php:434
+#: include/views/configuration.host.list.php:438
 #: include/views/configuration.httpconf.list.php:166
 #: include/views/configuration.item.list.php:243
 #: include/views/configuration.triggers.list.php:333
@@ -4920,7 +4930,7 @@ msgstr "Deaktiver feilsøkingsmodus i utvalgte grupper?"
 msgid "Disable host"
 msgstr "Deaktiver verten"
 
-#: include/views/configuration.host.list.php:246
+#: include/views/configuration.host.list.php:244
 msgid "Disable host?"
 msgstr "Deaktiver verten?"
 
@@ -4949,7 +4959,7 @@ msgstr "Deaktiver valgte programmer?"
 msgid "Disable selected correlations?"
 msgstr "Deaktiver valgte korrelasjoner?"
 
-#: include/views/configuration.discovery.list.php:97
+#: include/views/configuration.discovery.list.php:98
 #: include/views/configuration.host.discovery.list.php:173
 msgid "Disable selected discovery rules?"
 msgstr "Deaktivere utvalgte oppdagelsesregler?"
@@ -4958,7 +4968,7 @@ msgstr "Deaktivere utvalgte oppdagelsesregler?"
 msgid "Disable selected groups?"
 msgstr "Deaktivere valgte grupper?"
 
-#: include/views/configuration.host.list.php:434
+#: include/views/configuration.host.list.php:438
 msgid "Disable selected hosts?"
 msgstr "Deaktivere valgte verter?"
 
@@ -4997,9 +5007,9 @@ msgstr "Deaktiver valgte webscenarier?"
 #: include/views/configuration.action.list.php:102
 #: include/views/configuration.correlation.list.php:46
 #: include/views/configuration.correlation.list.php:96
-#: include/views/configuration.discovery.list.php:45
+#: include/views/configuration.discovery.list.php:46
 #: include/views/configuration.host.edit.php:716
-#: include/views/configuration.host.list.php:250
+#: include/views/configuration.host.list.php:248
 #: include/views/configuration.host.massupdate.php:107
 #: include/views/configuration.host.massupdate.php:194
 #: include/views/configuration.host.prototype.edit.php:366
@@ -5050,7 +5060,7 @@ msgstr ""
 #: include/forms.inc.php:322 include/forms.inc.php:713 include/menu.inc.php:98
 #: include/menu.inc.php:226 include/views/configuration.action.list.php:33
 #: include/views/configuration.host.list.php:177
-#: include/views/configuration.host.list.php:411
+#: include/views/configuration.host.list.php:409
 #: include/views/configuration.template.list.php:141
 #: include/views/configuration.template.list.php:263
 #: include/views/inventory.host.view.php:166
@@ -5147,7 +5157,7 @@ msgstr "Oppdagelsesregel oppdatert"
 
 #: app/controllers/CControllerPopupGeneric.php:291 include/html.inc.php:428
 #: include/views/configuration.discovery.edit.php:24
-#: include/views/configuration.discovery.list.php:22
+#: include/views/configuration.discovery.list.php:23
 #: include/views/configuration.host.discovery.edit.php:23
 #: include/views/configuration.host.discovery.list.php:23
 #: include/views/configuration.host.edit.php:417
@@ -5198,8 +5208,8 @@ msgstr "Vis stablet graf"
 
 #: app/views/search.php:124 app/views/search.php:180 app/views/search.php:254
 #: include/actions.inc.php:1798 include/actions.inc.php:1870
-#: include/actions.inc.php:1961 include/func.inc.php:1667 jsLoader.php:312
-#: queue.php:298
+#: include/actions.inc.php:1961 include/func.inc.php:1667 jsLoader.php:317
+#: queue.php:302
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "Viser %1$s av %2$s funnet"
@@ -5231,7 +5241,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:140 jsLoader.php:260
+#: jsLoader.php:142 jsLoader.php:265
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Ønsker du å erstatte det betingede uttrykket?"
 
@@ -5267,10 +5277,11 @@ msgid "Downtime"
 msgstr "nedetid"
 
 #: include/classes/widgets/CWidgetHelper.php:667
-#: include/classes/widgets/CWidgetHelper.php:710
 #: include/classes/widgets/CWidgetHelper.php:711
 #: include/classes/widgets/CWidgetHelper.php:712
-#: include/classes/widgets/CWidgetHelper.php:971
+#: include/classes/widgets/CWidgetHelper.php:713
+#: include/classes/widgets/CWidgetHelper.php:714
+#: include/classes/widgets/CWidgetHelper.php:973
 msgid "Draw"
 msgstr ""
 
@@ -5389,9 +5400,9 @@ msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr "Dupliser usrgrpid \"%1$s\" i brukergrupper for skjermbildet \"%2$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:61 include/blocks.inc.php:736
-#: include/classes/screens/CScreenProblem.php:894
-#: include/classes/screens/CScreenProblem.php:917
-#: include/classes/screens/CScreenProblem.php:1148 include/events.inc.php:255
+#: include/classes/screens/CScreenProblem.php:897
+#: include/classes/screens/CScreenProblem.php:920
+#: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:255
 #: include/events.inc.php:467 include/views/configuration.action.edit.php:435
 msgid "Duration"
 msgstr "Varighet"
@@ -5410,7 +5421,7 @@ msgstr "Dynamisk element"
 msgid "Dynamic items"
 msgstr ""
 
-#: jsLoader.php:196
+#: jsLoader.php:201
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Hver nettadresse skal ha et unikt navn. Vennligst kontroller at det bare er en nettadresse som heter"
 
@@ -5428,7 +5439,7 @@ msgstr "Hver nettadresse skal ha et unikt navn. Vennligst kontroller at det bare
 #: include/views/js/configuration.discovery.edit.js.php:7
 #: include/views/js/monitoring.sysmaps.js.php:750
 #: include/views/js/monitoring.sysmaps.js.php:765 jsLoader.php:118
-#: jsLoader.php:298
+#: jsLoader.php:303
 msgid "Edit"
 msgstr "Redigerer"
 
@@ -5448,11 +5459,11 @@ msgstr "Rediger skjerm"
 msgid "Edit slide show"
 msgstr "Rediger lysbildefremvisning"
 
-#: jsLoader.php:301
+#: jsLoader.php:306
 msgid "Edit tree element"
 msgstr "Rediger treelement"
 
-#: jsLoader.php:261
+#: jsLoader.php:266
 msgid "Edit trigger"
 msgstr "Rediger utløseren"
 
@@ -5632,9 +5643,9 @@ msgstr "Tom skjerm-ID."
 #: include/views/configuration.action.list.php:133
 #: include/views/configuration.application.list.php:126
 #: include/views/configuration.correlation.list.php:126
-#: include/views/configuration.discovery.list.php:96
+#: include/views/configuration.discovery.list.php:97
 #: include/views/configuration.host.discovery.list.php:169
-#: include/views/configuration.host.list.php:433
+#: include/views/configuration.host.list.php:437
 #: include/views/configuration.httpconf.list.php:165
 #: include/views/configuration.item.list.php:242
 #: include/views/configuration.triggers.list.php:332
@@ -5665,7 +5676,7 @@ msgstr "Aktiver feilsøkingsmodus i utvalgte grupper?"
 msgid "Enable host"
 msgstr "Aktiver verten"
 
-#: include/views/configuration.host.list.php:252
+#: include/views/configuration.host.list.php:250
 msgid "Enable host?"
 msgstr "Aktiver verten?"
 
@@ -5701,7 +5712,7 @@ msgstr "Aktiver valgte programmer?"
 msgid "Enable selected correlations?"
 msgstr "Aktiver valgte korrelasjoner?"
 
-#: include/views/configuration.discovery.list.php:96
+#: include/views/configuration.discovery.list.php:97
 #: include/views/configuration.host.discovery.list.php:170
 msgid "Enable selected discovery rules?"
 msgstr "Aktiver valgte registreringsregler?"
@@ -5711,7 +5722,7 @@ msgid "Enable selected groups?"
 msgstr "Aktiver valgte grupper?"
 
 #: include/views/configuration.hostgroups.list.php:152
-#: include/views/configuration.host.list.php:433
+#: include/views/configuration.host.list.php:437
 msgid "Enable selected hosts?"
 msgstr "Aktiver valgte verter?"
 
@@ -5764,10 +5775,10 @@ msgstr ""
 #: include/views/configuration.correlation.list.php:45
 #: include/views/configuration.correlation.list.php:104
 #: include/views/configuration.discovery.edit.php:124
-#: include/views/configuration.discovery.list.php:44
+#: include/views/configuration.discovery.list.php:45
 #: include/views/configuration.host.discovery.edit.php:608
 #: include/views/configuration.host.edit.php:284
-#: include/views/configuration.host.list.php:244
+#: include/views/configuration.host.list.php:242
 #: include/views/configuration.host.massupdate.php:106
 #: include/views/configuration.httpconf.edit.php:150
 #: include/views/configuration.item.edit.php:934
@@ -5821,7 +5832,7 @@ msgstr "Feil"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "Feil i søkeforespørsel for tabell \"%1$s\"."
 
-#: include/func.inc.php:1902
+#: include/func.inc.php:1902 jsLoader.php:144
 msgid "Error message"
 msgstr ""
 
@@ -5910,7 +5921,7 @@ msgstr "Eksluder"
 msgid "Exclude host groups"
 msgstr "Ekskluder vertsgrupper"
 
-#: jsLoader.php:133
+#: jsLoader.php:135
 msgid "Execute"
 msgstr "Kj"
 
@@ -5945,13 +5956,13 @@ msgstr "utført"
 msgid "Executed script"
 msgstr "Utført script"
 
-#: jsLoader.php:134
+#: jsLoader.php:136
 msgid "Execution confirmation"
 msgstr "Utførelsesbekreftelse"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
-#: include/classes/widgets/CWidgetHelper.php:901 jsLoader.php:219
-#: jsLoader.php:222
+#: include/classes/widgets/CWidgetHelper.php:903 jsLoader.php:224
+#: jsLoader.php:227
 msgid "Expand"
 msgstr "Utvide"
 
@@ -5979,7 +5990,7 @@ msgid "Exploded"
 msgstr "eksploderte"
 
 #: include/views/administration.general.valuemapping.list.php:73
-#: include/views/configuration.host.list.php:435
+#: include/views/configuration.host.list.php:439
 #: include/views/configuration.template.list.php:281
 #: include/views/monitoring.screen.list.php:116
 #: include/views/monitoring.sysmap.list.php:91
@@ -6052,7 +6063,7 @@ msgstr "Ekstern sjekk"
 msgid "Ez Texting"
 msgstr "Ez Teksting"
 
-#: jsLoader.php:167
+#: jsLoader.php:172
 msgctxt "Friday short"
 msgid "F"
 msgstr "F"
@@ -6118,7 +6129,7 @@ msgid "Feb"
 msgstr "Feb"
 
 #: include/forms.inc.php:2148 include/func.inc.php:117
-#: include/func.inc.php:254 jsLoader.php:145
+#: include/func.inc.php:254 jsLoader.php:150
 msgid "February"
 msgstr "Februar"
 
@@ -6224,9 +6235,7 @@ msgstr "Filstørrelse (i byte). Returnerer heltall"
 msgid "File time information. Returns integer (Unix timestamp)"
 msgstr "Fil tid informasjon. Returnerer heltall (Unix tidsstempel)"
 
-#: include/classes/widgets/CWidgetHelper.php:672
-#: include/classes/widgets/CWidgetHelper.php:726
-#: include/classes/widgets/CWidgetHelper.php:727
+#: include/classes/widgets/CWidgetHelper.php:673
 #: include/classes/widgets/CWidgetHelper.php:728
 #: include/classes/widgets/CWidgetHelper.php:729
 #: include/classes/widgets/CWidgetHelper.php:730
@@ -6236,7 +6245,9 @@ msgstr "Fil tid informasjon. Returnerer heltall (Unix tidsstempel)"
 #: include/classes/widgets/CWidgetHelper.php:734
 #: include/classes/widgets/CWidgetHelper.php:735
 #: include/classes/widgets/CWidgetHelper.php:736
-#: include/classes/widgets/CWidgetHelper.php:1004
+#: include/classes/widgets/CWidgetHelper.php:737
+#: include/classes/widgets/CWidgetHelper.php:738
+#: include/classes/widgets/CWidgetHelper.php:1007
 msgid "Fill"
 msgstr ""
 
@@ -6260,7 +6271,7 @@ msgstr "Fylt område"
 #: include/views/common.filter.trigger.php:133
 #: include/views/configuration.action.list.php:46
 #: include/views/configuration.correlation.list.php:36
-#: include/views/configuration.discovery.list.php:35
+#: include/views/configuration.discovery.list.php:36
 #: include/views/configuration.hostgroups.list.php:38
 #: include/views/configuration.host.list.php:100
 #: include/views/configuration.httpconf.list.php:25
@@ -6374,7 +6385,7 @@ msgid "Fri"
 msgstr "Fre"
 
 #: include/forms.inc.php:2116 include/forms.inc.php:2231
-#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:160
+#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:165
 msgid "Friday"
 msgstr "Fredag"
 
@@ -6497,7 +6508,7 @@ msgstr "Global verdi"
 msgid "Go back to %1$s"
 msgstr "Gå tilbake til %1$s"
 
-#: jsLoader.php:266
+#: jsLoader.php:271
 msgid "Go to"
 msgstr "Gå til"
 
@@ -6515,7 +6526,7 @@ msgstr "Gradient linje"
 
 #: charts.php:99 include/audit.inc.php:30
 #: include/classes/macros/CMacrosResolverGeneral.php:804
-#: include/classes/screens/CScreenProblem.php:1278
+#: include/classes/screens/CScreenProblem.php:1281
 #: include/classes/widgets/CWidgetConfig.php:48
 #: include/classes/widgets/forms/CWidgetFormGraph.php:32
 #: include/classes/widgets/forms/CWidgetFormGraph.php:62
@@ -6696,14 +6707,14 @@ msgstr "Graf med samme navn, men det finnes annen type."
 #: include/views/configuration.host.discovery.list.php:54
 #: include/views/configuration.host.edit.php:391
 #: include/views/configuration.host.list.php:176
-#: include/views/configuration.host.list.php:407
+#: include/views/configuration.host.list.php:405
 #: include/views/configuration.template.edit.php:196
 #: include/views/configuration.template.list.php:139
 #: include/views/configuration.template.list.php:255
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:165
 #: include/views/inventory.host.view.php:176
-#: include/views/monitoring.charts.php:63 jsLoader.php:267
+#: include/views/monitoring.charts.php:63 jsLoader.php:272
 msgid "Graphs"
 msgstr "Grafer"
 
@@ -6759,12 +6770,12 @@ msgstr "Gruppe \"%1$s\" kan ikke slettes fordi den brukes av en vert prototype."
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "Gruppe \"%1$s\" kan ikke slettes fordi den brukes i en korrelasjonsbetingelse."
 
-#: include/classes/import/importers/CTemplateImporter.php:249
+#: include/classes/import/importers/CTemplateImporter.php:251
 #, c-format
 msgid "Group \"%1$s\" does not exist."
 msgstr "Gruppe \"%1$s\" eksisterer ikke."
 
-#: include/classes/import/importers/CHostImporter.php:156
+#: include/classes/import/importers/CHostImporter.php:161
 #, c-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Gruppe \"%1$s\" for verten \"%2$s\" eksisterer ikke."
@@ -6924,7 +6935,7 @@ msgstr "Hjelp"
 msgid "Hexadecimal to decimal"
 msgstr "Hexadecimal til desimal"
 
-#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:174
+#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:179
 msgid "Hidden"
 msgstr "Skjult"
 
@@ -6968,14 +6979,14 @@ msgstr ""
 #: app/views/monitoring.acknowledge.edit.php:34
 #: app/views/monitoring.problem.view.php:93 history.php:27
 #: include/classes/macros/CMacrosResolverGeneral.php:809
-#: include/classes/screens/CScreenProblem.php:1283
+#: include/classes/screens/CScreenProblem.php:1286
 #: include/classes/widgets/forms/CWidgetFormProblems.php:36
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:56
 #: include/forms.inc.php:284 include/forms.inc.php:718
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.item.prototype.list.php:55 items.php:312
-#: jsLoader.php:268 latest.php:407 latest.php:544 latest.php:696
+#: jsLoader.php:273 latest.php:407 latest.php:544 latest.php:696
 msgid "History"
 msgstr "Historikk"
 
@@ -7037,9 +7048,9 @@ msgstr "Horisontal justering"
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:185
 #: include/classes/screens/CScreenHttpTest.php:115
-#: include/classes/screens/CScreenProblem.php:890
-#: include/classes/screens/CScreenProblem.php:914
-#: include/classes/screens/CScreenProblem.php:1145
+#: include/classes/screens/CScreenProblem.php:893
+#: include/classes/screens/CScreenProblem.php:917
+#: include/classes/screens/CScreenProblem.php:1148
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:274
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
@@ -7068,7 +7079,7 @@ msgstr "Horisontal justering"
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
 #: include/views/reports.toptriggers.php:79 items.php:990 items.php:1397
-#: jsLoader.php:176 latest.php:404 latest.php:421 queue.php:263
+#: jsLoader.php:181 latest.php:404 latest.php:421 queue.php:265
 #: report2.php:408 report2.php:430
 msgid "Host"
 msgid_plural "Hosts"
@@ -7077,7 +7088,7 @@ msgstr[1] "Verter"
 
 #: include/classes/api/services/CHost.php:877
 #: include/classes/api/services/CTemplate.php:458
-#: include/classes/import/importers/CHostImporter.php:60
+#: include/classes/import/importers/CHostImporter.php:62
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "Verten \"%1$s\" eksisterer allerede."
@@ -7156,7 +7167,7 @@ msgstr[1] "Verter aktivert"
 #: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:77
-#: include/views/js/monitoring.sysmaps.js.php:125 jsLoader.php:179
+#: include/views/js/monitoring.sysmaps.js.php:125 jsLoader.php:184
 #: report2.php:356 report2.php:378
 msgid "Host group"
 msgstr "Vertsgruppe"
@@ -7237,7 +7248,7 @@ msgstr "Vertsgrensesnitt"
 #: app/views/monitoring.problem.view.php:282 hostinventories.php:26
 #: include/views/common.filter.trigger.php:123
 #: include/views/inventory.host.list.php:23
-#: include/views/inventory.host.view.php:223 jsLoader.php:269
+#: include/views/inventory.host.view.php:223 jsLoader.php:274
 msgid "Host inventory"
 msgstr "Vert inventar"
 
@@ -7330,7 +7341,7 @@ msgstr "Vertsprototyper slettet"
 msgid "Host router"
 msgstr "Vertsrouter"
 
-#: host_screen.php:27 jsLoader.php:270
+#: host_screen.php:27 jsLoader.php:275
 msgid "Host screens"
 msgstr "Vertsskjermbilder"
 
@@ -7475,7 +7486,7 @@ msgid "IP and DNS cannot be empty for host interface."
 msgstr "IP og DNS kan ikke være tom for vertsgrensesnittet."
 
 #: include/views/configuration.discovery.edit.php:54
-#: include/views/configuration.discovery.list.php:61
+#: include/views/configuration.discovery.list.php:62
 msgid "IP range"
 msgstr "IP-område"
 
@@ -7600,7 +7611,7 @@ msgstr "Hvis du mener at denne meldingen er feil, vennligst kontakt administrato
 #: include/maps.inc.php:622
 #: include/views/administration.general.image.edit.php:56
 #: include/views/administration.general.image.edit.php:62
-#: include/views/js/monitoring.sysmaps.js.php:72 jsLoader.php:180
+#: include/views/js/monitoring.sysmaps.js.php:72 jsLoader.php:185
 msgid "Image"
 msgstr "bilde"
 
@@ -7695,7 +7706,7 @@ msgid "In range"
 msgstr ""
 
 #: include/views/configuration.host.edit.php:61
-#: include/views/configuration.host.list.php:219
+#: include/views/configuration.host.list.php:217
 msgid "Inaccessible discovery rule"
 msgstr ""
 
@@ -7718,7 +7729,7 @@ msgstr "Utilgjengelig gjenstand"
 
 #: include/classes/screens/CScreenProblem.php:414
 #: include/hostgroups.inc.php:288 include/triggers.inc.php:2329
-#: include/views/configuration.host.list.php:240
+#: include/views/configuration.host.list.php:238
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr ""
@@ -8810,14 +8821,14 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:803
-#: include/classes/import/CConfigurationImport.php:841
-#: include/classes/import/CConfigurationImport.php:2470
-#: include/classes/import/CConfigurationImport.php:2574
-#: include/classes/import/CConfigurationImport.php:2584
-#: include/classes/import/CConfigurationImport.php:2620
-#: include/classes/import/CConfigurationImport.php:2629
-#: include/classes/import/CConfigurationImport.php:2635
+#: include/classes/import/CConfigurationImport.php:835
+#: include/classes/import/CConfigurationImport.php:873
+#: include/classes/import/CConfigurationImport.php:2514
+#: include/classes/import/CConfigurationImport.php:2618
+#: include/classes/import/CConfigurationImport.php:2628
+#: include/classes/import/CConfigurationImport.php:2664
+#: include/classes/import/CConfigurationImport.php:2673
+#: include/classes/import/CConfigurationImport.php:2679
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -8849,13 +8860,13 @@ msgstr "Indonesisk (id_ID)"
 #: include/actions.inc.php:1910 include/actions.inc.php:1994
 #: include/blocks.inc.php:732 include/classes/screens/CScreenActions.php:117
 #: include/classes/screens/CScreenHostTriggers.php:223
-#: include/classes/screens/CScreenProblem.php:889
-#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:892
+#: include/classes/screens/CScreenProblem.php:916
 #: include/views/administration.auditacts.list.php:62
 #: include/views/configuration.application.list.php:65
 #: include/views/configuration.host.discovery.list.php:60
 #: include/views/configuration.hostgroups.list.php:61
-#: include/views/configuration.host.list.php:184
+#: include/views/configuration.host.list.php:186
 #: include/views/configuration.httpconf.list.php:96
 #: include/views/configuration.item.list.php:71
 #: include/views/configuration.trigger.prototype.edit.php:185
@@ -8902,7 +8913,7 @@ msgid "Insert"
 msgstr "Sett inn"
 
 #: include/views/configuration.trigger.prototype.edit.php:121
-#: include/views/configuration.triggers.edit.php:146 jsLoader.php:262
+#: include/views/configuration.triggers.edit.php:146 jsLoader.php:267
 msgid "Insert expression"
 msgstr "Sett inn uttrykk"
 
@@ -9002,7 +9013,7 @@ msgstr "Intern hendelse og varsling for datalagring \"%1$s\"."
 msgid "Internet Explorer"
 msgstr "Internet Explorer"
 
-#: include/forms.inc.php:728 include/views/configuration.discovery.list.php:62
+#: include/forms.inc.php:728 include/views/configuration.discovery.list.php:64
 #: include/views/configuration.host.discovery.edit.php:542
 #: include/views/configuration.host.discovery.list.php:57
 #: include/views/configuration.httpconf.list.php:90
@@ -9420,7 +9431,7 @@ msgstr "Element \"%1$s\" finnes ikke på mal \"%2$s\"."
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
 msgstr "Elementet \"%1$s\" eksisterer ikke, eller du har ingen tilgang til dette elementet"
 
-#: include/classes/import/CConfigurationImport.php:695
+#: include/classes/import/CConfigurationImport.php:727
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Element \"%1$s\" på \"%2$s\": Programmet \"%3$s\" eksisterer ikke."
@@ -9605,7 +9616,7 @@ msgstr "Element med nøkkel \"%1$s\" eksisterer allerede på \"%2$s\"."
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:331
 #: include/views/configuration.host.list.php:174
-#: include/views/configuration.host.list.php:391
+#: include/views/configuration.host.list.php:389
 #: include/views/configuration.item.edit.php:22
 #: include/views/configuration.item.list.php:25
 #: include/views/configuration.item.massupdate.php:22
@@ -9709,7 +9720,7 @@ msgid "Jan"
 msgstr "jan"
 
 #: include/forms.inc.php:2140 include/func.inc.php:116
-#: include/func.inc.php:253 jsLoader.php:144
+#: include/func.inc.php:253 jsLoader.php:149
 msgid "January"
 msgstr "januar"
 
@@ -9727,7 +9738,7 @@ msgid "Jul"
 msgstr "juli"
 
 #: include/forms.inc.php:2143 include/func.inc.php:122
-#: include/func.inc.php:259 jsLoader.php:150
+#: include/func.inc.php:259 jsLoader.php:155
 msgid "July"
 msgstr "juli"
 
@@ -9736,7 +9747,7 @@ msgid "Jun"
 msgstr "juni"
 
 #: include/forms.inc.php:2180 include/func.inc.php:121
-#: include/func.inc.php:258 jsLoader.php:149
+#: include/func.inc.php:258 jsLoader.php:154
 msgid "June"
 msgstr "juni"
 
@@ -9929,11 +9940,11 @@ msgstr "Siste endring (synkende)"
 msgid "Last check"
 msgstr "Siste sjekk"
 
-#: jsLoader.php:273
+#: jsLoader.php:278
 msgid "Last hour graph"
 msgstr "Siste timepr"
 
-#: jsLoader.php:274
+#: jsLoader.php:279
 msgid "Last month graph"
 msgstr "Forrige måned graf"
 
@@ -9956,18 +9967,18 @@ msgstr "Sist sett (alder)"
 msgid "Last value"
 msgstr "Siste verdi"
 
-#: jsLoader.php:275
+#: jsLoader.php:280
 msgid "Last week graph"
 msgstr "Forrige uke graf"
 
 #: app/views/search.php:29 app/views/search.php:100 app/views/search.php:130
 #: app/views/search.php:162 include/menu.inc.php:68
-#: include/views/inventory.host.view.php:127 jsLoader.php:271 latest.php:26
+#: include/views/inventory.host.view.php:127 jsLoader.php:276 latest.php:26
 #: latest.php:306
 msgid "Latest data"
 msgstr "Siste data"
 
-#: jsLoader.php:272
+#: jsLoader.php:277
 msgid "Latest values"
 msgstr "Siste verdier"
 
@@ -9980,9 +9991,9 @@ msgstr "Latvisk (lv_LV)"
 msgid "Layout"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:679
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:1035
+#: include/classes/widgets/CWidgetHelper.php:680
+#: include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:1038
 #: include/classes/widgets/forms/CWidgetFormDataOver.php:59
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:42
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:75
@@ -10015,8 +10026,8 @@ msgid "Limit for search and filter results"
 msgstr "Grense for søk og filter resultater"
 
 #: include/classes/widgets/CWidgetHelper.php:668
-#: include/classes/widgets/CWidgetHelper.php:710
-#: include/classes/widgets/CWidgetHelper.php:973 include/graphs.inc.php:55
+#: include/classes/widgets/CWidgetHelper.php:711
+#: include/classes/widgets/CWidgetHelper.php:975 include/graphs.inc.php:55
 #: include/views/js/monitoring.sysmaps.js.php:301
 #: include/views/js/monitoring.sysmaps.js.php:350
 #: include/views/js/monitoring.sysmaps.js.php:694
@@ -10235,7 +10246,7 @@ msgstr "Lavnivåregistreringsregel i \"ikke støttet\" tilstand"
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:163
+#: jsLoader.php:168
 msgctxt "Monday short"
 msgid "M"
 msgstr "M"
@@ -10422,7 +10433,7 @@ msgstr ""
 #: include/screens.inc.php:34 include/views/js/monitoring.sysmaps.js.php:69
 #: include/views/js/monitoring.sysmaps.js.php:181
 #: include/views/monitoring.screen.constructor.edit.php:385
-#: include/views/monitoring.sysmap.edit.php:287 jsLoader.php:177 map.php:25
+#: include/views/monitoring.sysmap.edit.php:287 jsLoader.php:182 map.php:25
 msgid "Map"
 msgstr "Kart"
 
@@ -10517,7 +10528,7 @@ msgid "Mar"
 msgstr "mar"
 
 #: include/forms.inc.php:2156 include/func.inc.php:118
-#: include/func.inc.php:255 jsLoader.php:146
+#: include/func.inc.php:255 jsLoader.php:151
 msgid "March"
 msgstr "Mars"
 
@@ -10537,8 +10548,8 @@ msgstr "Marker valgt"
 msgid "Mask"
 msgstr "Maske"
 
-#: include/classes/screens/CScreenProblem.php:1132
-#: include/views/configuration.host.list.php:444
+#: include/classes/screens/CScreenProblem.php:1135
+#: include/views/configuration.host.list.php:448
 #: include/views/configuration.item.list.php:249
 #: include/views/configuration.item.prototype.list.php:174
 #: include/views/configuration.template.list.php:290
@@ -10617,7 +10628,7 @@ msgid "Maximum total length of email address exceeded for media type with ID \"%
 msgstr ""
 
 #: include/forms.inc.php:2172 include/func.inc.php:120
-#: include/func.inc.php:257 jsLoader.php:148
+#: include/func.inc.php:257 jsLoader.php:153
 msgid "May"
 msgstr "Kan"
 
@@ -10749,7 +10760,7 @@ msgstr "Melding timeout"
 msgid "Message/Command"
 msgstr ""
 
-#: include/classes/screens/CScreenProblem.php:1199
+#: include/classes/screens/CScreenProblem.php:1202
 msgid "Messages"
 msgstr "meldinger"
 
@@ -10846,11 +10857,11 @@ msgstr "Mangler \"navn\" -felt for grafprototype."
 msgid "Missing \"name\" field for graph."
 msgstr "Mangler \"navn\" -felt for graf."
 
-#: include/classes/widgets/CWidgetHelper.php:674
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:750
+#: include/classes/widgets/CWidgetHelper.php:675
 #: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:1019
+#: include/classes/widgets/CWidgetHelper.php:752
+#: include/classes/widgets/CWidgetHelper.php:753
+#: include/classes/widgets/CWidgetHelper.php:1022
 msgid "Missing data"
 msgstr ""
 
@@ -10884,7 +10895,7 @@ msgid "Mon"
 msgstr "Man"
 
 #: include/forms.inc.php:2096 include/forms.inc.php:2211
-#: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:156
+#: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:161
 msgid "Monday"
 msgstr "Mandag"
 
@@ -10919,11 +10930,11 @@ msgstr "Måned"
 msgid "Monthly"
 msgstr "Månedlig"
 
-#: include/classes/html/CMultiSelect.php:71 jsLoader.php:234
+#: include/classes/html/CMultiSelect.php:71 jsLoader.php:239
 msgid "More matches found..."
 msgstr "Flere treff funnet ..."
 
-#: jsLoader.php:244
+#: jsLoader.php:249
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -10951,7 +10962,7 @@ msgstr "Flere"
 msgid "Multiple PROBLEM events"
 msgstr "Flere PROBLEM-hendelser"
 
-#: jsLoader.php:205
+#: jsLoader.php:210
 msgid "Mute"
 msgstr "Stum"
 
@@ -11033,8 +11044,8 @@ msgstr "NTLM"
 #: include/views/configuration.correlation.list.php:37
 #: include/views/configuration.correlation.list.php:60
 #: include/views/configuration.discovery.edit.php:38
-#: include/views/configuration.discovery.list.php:36
-#: include/views/configuration.discovery.list.php:60
+#: include/views/configuration.discovery.list.php:37
+#: include/views/configuration.discovery.list.php:61
 #: include/views/configuration.graph.edit.php:81
 #: include/views/configuration.graph.edit.php:335
 #: include/views/configuration.graph.list.php:87
@@ -11102,7 +11113,7 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.edit.php:230
 #: include/views/monitoring.sysmap.list.php:41
 #: include/views/monitoring.sysmap.list.php:58 items.php:46 latest.php:371
-#: latest.php:405 latest.php:422 maintenance.php:41 queue.php:264
+#: latest.php:405 latest.php:422 maintenance.php:41 queue.php:266
 #: report2.php:430 screenconf.php:42 services.php:36 slideconf.php:36
 #: sysmaps.php:40 trigger_prototypes.php:38 triggers.php:45
 msgid "Name"
@@ -11190,7 +11201,7 @@ msgstr "Ny tilstand"
 msgid "New dashboard"
 msgstr "Nytt dashbord"
 
-#: jsLoader.php:191
+#: jsLoader.php:196
 msgid "New element"
 msgstr "Nytt element"
 
@@ -11235,8 +11246,8 @@ msgstr "Neste steg"
 #: include/actions.inc.php:33 include/blocks.inc.php:618
 #: include/blocks.inc.php:833
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1082
-#: include/classes/screens/CScreenProblem.php:1222 include/events.inc.php:182
+#: include/classes/screens/CScreenProblem.php:1085
+#: include/classes/screens/CScreenProblem.php:1225 include/events.inc.php:182
 #: include/events.inc.php:382 include/events.inc.php:607
 #: include/triggers.inc.php:1246 include/triggers.inc.php:1251
 #: include/views/configuration.host.prototype.list.php:126
@@ -11509,7 +11520,7 @@ msgstr "Ikke noe bilde"
 #: include/views/configuration.item.massupdate.php:77
 #: include/views/configuration.item.prototype.edit.php:443
 #: include/views/configuration.item.prototype.massupdate.php:74
-#: jsLoader.php:295
+#: jsLoader.php:300
 msgid "No interface found"
 msgstr "Ingen grensesnitt funnet"
 
@@ -11563,7 +11574,7 @@ msgstr "Ingen kart-ID angitt for skjermelement."
 msgid "No maps added."
 msgstr "Ingen kart lagt til."
 
-#: include/classes/html/CMultiSelect.php:70 jsLoader.php:233
+#: include/classes/html/CMultiSelect.php:70 jsLoader.php:238
 msgid "No matches found"
 msgstr "Ingen treff funnet"
 
@@ -11727,8 +11738,8 @@ msgstr "Ingen tillatelser for systemtilgang."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:979
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11762,7 +11773,7 @@ msgstr "Ingen offentlig nøkkelfil spesifisert."
 msgid "No recipients for action operation message."
 msgstr "Ingen mottakere for meldingshandling."
 
-#: include/classes/widgets/CWidgetConfig.php:155 jsLoader.php:284
+#: include/classes/widgets/CWidgetConfig.php:155 jsLoader.php:289
 msgid "No refresh"
 msgstr "Ingen oppdatering"
 
@@ -11805,9 +11816,9 @@ msgstr "Ikke-boolske flagg er foreldet."
 #: app/views/administration.proxy.list.php:126
 #: app/views/monitoring.problem.view.php:265
 #: app/views/monitoring.problem.view.php:276
-#: include/classes/widgets/CWidgetHelper.php:675
-#: include/classes/widgets/CWidgetHelper.php:749
-#: include/classes/widgets/CWidgetHelper.php:1023
+#: include/classes/widgets/CWidgetHelper.php:676
+#: include/classes/widgets/CWidgetHelper.php:751
+#: include/classes/widgets/CWidgetHelper.php:1026
 #: include/classes/widgets/forms/CWidgetFormProblems.php:117
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 #: include/hosts.inc.php:32 include/httptest.inc.php:27
@@ -11817,10 +11828,10 @@ msgstr "Ikke-boolske flagg er foreldet."
 #: include/views/administration.usergroups.edit.php:127
 #: include/views/administration.usergroups.edit.php:159
 #: include/views/configuration.host.discovery.edit.php:275
-#: include/views/configuration.host.list.php:342
-#: include/views/configuration.host.list.php:348
-#: include/views/configuration.host.list.php:360
-#: include/views/configuration.host.list.php:363
+#: include/views/configuration.host.list.php:340
+#: include/views/configuration.host.list.php:346
+#: include/views/configuration.host.list.php:358
+#: include/views/configuration.host.list.php:361
 #: include/views/configuration.item.edit.php:321
 #: include/views/configuration.item.edit.php:889
 #: include/views/configuration.item.edit.php:903
@@ -11922,7 +11933,7 @@ msgid "Nov"
 msgstr "Nov"
 
 #: include/forms.inc.php:2175 include/func.inc.php:126
-#: include/func.inc.php:263 jsLoader.php:154
+#: include/func.inc.php:263 jsLoader.php:159
 msgid "November"
 msgstr "November"
 
@@ -12156,13 +12167,13 @@ msgid "Octal to decimal"
 msgstr "Oktal til desimal"
 
 #: include/forms.inc.php:2167 include/func.inc.php:125
-#: include/func.inc.php:262 jsLoader.php:153
+#: include/func.inc.php:262 jsLoader.php:158
 msgid "October"
 msgstr "Oktober"
 
 #: app/views/administration.proxy.list.php:145
 #: include/views/monitoring.sysmap.constructor.php:48
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:173
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:178
 msgid "Off"
 msgstr "Av"
 
@@ -12189,7 +12200,7 @@ msgstr "Gamle hendelse tag verdi"
 
 #: app/views/administration.proxy.list.php:144
 #: include/views/monitoring.sysmap.constructor.php:48
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:172
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:177
 msgid "On"
 msgstr "På"
 
@@ -12296,11 +12307,11 @@ msgstr[1] "Kun valgte problemer"
 msgid "Only super admins can create correlations."
 msgstr "Bare superadministratorer kan skape korrelasjoner."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Bare superadministratorer kan skape verdikart."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Bare superadministratorer kan slette verdikart."
 
@@ -12312,7 +12323,7 @@ msgstr ""
 msgid "Only super admins can update correlations."
 msgstr "Bare superadministratorer kan oppdatere korrelasjoner."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Bare superadministratorer kan oppdatere verdikart."
 
@@ -12371,8 +12382,8 @@ msgstr "Operasjonstype"
 
 #: app/views/monitoring.widget.problems.view.php:60
 #: app/views/popup.triggerwizard.php:74 include/blocks.inc.php:735
-#: include/classes/screens/CScreenProblem.php:916
-#: include/classes/screens/CScreenProblem.php:1147 include/events.inc.php:169
+#: include/classes/screens/CScreenProblem.php:919
+#: include/classes/screens/CScreenProblem.php:1150 include/events.inc.php:169
 #: include/views/configuration.trigger.prototype.edit.php:68
 #: include/views/configuration.trigger.prototype.list.php:52
 #: include/views/configuration.triggers.edit.php:89
@@ -12742,10 +12753,10 @@ msgid "POP"
 msgstr "POP"
 
 #: app/views/monitoring.widget.problems.view.php:93 chart5.php:199
-#: include/classes/graph/CSvgGraph.php:972
+#: include/classes/graph/CSvgGraph.php:1045
 #: include/classes/screens/CScreenEvents.php:116
-#: include/classes/screens/CScreenProblem.php:993
-#: include/classes/screens/CScreenProblem.php:1172 include/events.inc.php:346
+#: include/classes/screens/CScreenProblem.php:996
+#: include/classes/screens/CScreenProblem.php:1175 include/events.inc.php:346
 #: include/events.inc.php:548 include/maps.inc.php:290
 #: include/maps.inc.php:374 include/maps.inc.php:467 include/maps.inc.php:555
 #: include/triggers.inc.php:234 include/views/monitoring.overview.items.php:32
@@ -12766,9 +12777,9 @@ msgstr "PROBLEM hendelsesgenereringsmodus"
 #: include/views/configuration.host.edit.php:783
 #: include/views/configuration.host.edit.php:796
 #: include/views/configuration.host.edit.php:811
-#: include/views/configuration.host.list.php:351
-#: include/views/configuration.host.list.php:367
-#: include/views/configuration.host.list.php:370
+#: include/views/configuration.host.list.php:349
+#: include/views/configuration.host.list.php:365
+#: include/views/configuration.host.list.php:368
 #: include/views/configuration.host.massupdate.php:252
 #: include/views/configuration.host.massupdate.php:260
 #: include/views/configuration.host.massupdate.php:270
@@ -12902,11 +12913,11 @@ msgstr "Passord (igjen)"
 msgid "Password is not mandatory for non internal authentication type."
 msgstr ""
 
-#: jsLoader.php:193
+#: jsLoader.php:198
 msgid "Paste"
 msgstr "Lim inn"
 
-#: jsLoader.php:194
+#: jsLoader.php:199
 msgid "Paste without external links"
 msgstr "Lim inn uten eksterne lenker"
 
@@ -13020,13 +13031,11 @@ msgstr "Vennligst opprett database manuelt, og sett konfigurasjonsparametrene fo
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Vennligst skriv inn vertsnavnet eller verts IP-adressen og portnummeret til Zabbix-serveren, samt navnet på installasjonen (valgfritt)."
 
-#: jsLoader.php:182
+#: jsLoader.php:187
 msgid "Please select two elements"
 msgstr "Vennligst velg to elementer"
 
-#: include/classes/widgets/CWidgetHelper.php:673
-#: include/classes/widgets/CWidgetHelper.php:738
-#: include/classes/widgets/CWidgetHelper.php:739
+#: include/classes/widgets/CWidgetHelper.php:674
 #: include/classes/widgets/CWidgetHelper.php:740
 #: include/classes/widgets/CWidgetHelper.php:741
 #: include/classes/widgets/CWidgetHelper.php:742
@@ -13035,13 +13044,15 @@ msgstr "Vennligst velg to elementer"
 #: include/classes/widgets/CWidgetHelper.php:745
 #: include/classes/widgets/CWidgetHelper.php:746
 #: include/classes/widgets/CWidgetHelper.php:747
-#: include/classes/widgets/CWidgetHelper.php:987
+#: include/classes/widgets/CWidgetHelper.php:748
+#: include/classes/widgets/CWidgetHelper.php:749
+#: include/classes/widgets/CWidgetHelper.php:990
 msgid "Point size"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:669
-#: include/classes/widgets/CWidgetHelper.php:711
-#: include/classes/widgets/CWidgetHelper.php:974
+#: include/classes/widgets/CWidgetHelper.php:712
+#: include/classes/widgets/CWidgetHelper.php:976
 #: include/views/js/monitoring.sysmaps.js.php:370
 msgid "Points"
 msgstr "Poeng"
@@ -13225,10 +13236,10 @@ msgstr "Privilege nivå"
 
 #: app/views/monitoring.problem.view.php:163
 #: app/views/monitoring.widget.problems.view.php:56 include/blocks.inc.php:734
-#: include/classes/screens/CScreenProblem.php:892
-#: include/classes/screens/CScreenProblem.php:915
-#: include/classes/screens/CScreenProblem.php:1049
-#: include/classes/screens/CScreenProblem.php:1146
+#: include/classes/screens/CScreenProblem.php:895
+#: include/classes/screens/CScreenProblem.php:918
+#: include/classes/screens/CScreenProblem.php:1052
+#: include/classes/screens/CScreenProblem.php:1149
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:58
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:58
 #: include/classes/widgets/forms/CWidgetFormProblems.php:75
@@ -13271,7 +13282,7 @@ msgstr ""
 msgid "Problem is suppressed"
 msgstr ""
 
-#: jsLoader.php:203
+#: jsLoader.php:208
 msgid "Problem on"
 msgstr "Problem på"
 
@@ -13305,7 +13316,7 @@ msgstr "Problem, hvis minst ett barn har et problem"
 #: include/maps.inc.php:389 include/maps.inc.php:470 include/maps.inc.php:482
 #: include/maps.inc.php:558 include/maps.inc.php:570 include/menu.inc.php:52
 #: include/views/common.filter.trigger.php:42
-#: include/views/inventory.host.view.php:135 jsLoader.php:276 report2.php:430
+#: include/views/inventory.host.view.php:135 jsLoader.php:281 report2.php:430
 msgid "Problems"
 msgstr "problemer"
 
@@ -13354,12 +13365,14 @@ msgstr "fullmakter"
 
 #: app/views/administration.proxy.edit.php:83
 #: app/views/administration.proxy.edit.php:118 include/actions.inc.php:63
-#: include/audit.inc.php:48 include/views/configuration.host.list.php:138
-#: include/views/configuration.host.list.php:142 queue.php:170
+#: include/audit.inc.php:48 include/views/configuration.discovery.list.php:63
+#: include/views/configuration.host.list.php:138
+#: include/views/configuration.host.list.php:142
+#: include/views/configuration.host.list.php:181 queue.php:170 queue.php:267
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/classes/import/importers/CHostImporter.php:168
+#: include/classes/import/importers/CHostImporter.php:173
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Proxy \"%1$s\" for verten \"%2$s\" eksisterer ikke."
@@ -13459,10 +13472,10 @@ msgid "Queue of items to be updated"
 msgstr "Kø av elementer som skal oppdateres"
 
 #: app/views/monitoring.widget.problems.view.php:79
-#: include/classes/graph/CSvgGraph.php:968
+#: include/classes/graph/CSvgGraph.php:1041
 #: include/classes/screens/CScreenEvents.php:121
-#: include/classes/screens/CScreenProblem.php:979
-#: include/classes/screens/CScreenProblem.php:1160 include/events.inc.php:351
+#: include/classes/screens/CScreenProblem.php:982
+#: include/classes/screens/CScreenProblem.php:1163 include/events.inc.php:351
 #: include/events.inc.php:534
 msgid "RESOLVED"
 msgstr "LØST"
@@ -13553,7 +13566,7 @@ msgid "Recipient (descending)"
 msgstr "Mottaker (synkende)"
 
 #: app/views/administration.user.edit.php:376
-#: include/classes/screens/CScreenProblem.php:1050
+#: include/classes/screens/CScreenProblem.php:1053
 #: include/views/configuration.item.list.php:169
 #: include/views/configuration.trigger.prototype.list.php:131
 #: include/views/configuration.triggers.list.php:298
@@ -13580,9 +13593,9 @@ msgstr "Gjenopprettingsoperasjoner"
 
 #: app/views/monitoring.widget.problems.view.php:51
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:887
-#: include/classes/screens/CScreenProblem.php:910
-#: include/classes/screens/CScreenProblem.php:1143 include/events.inc.php:252
+#: include/classes/screens/CScreenProblem.php:890
+#: include/classes/screens/CScreenProblem.php:913
+#: include/classes/screens/CScreenProblem.php:1146 include/events.inc.php:252
 #: include/events.inc.php:465
 msgid "Recovery time"
 msgstr "Restitusjonstid"
@@ -13597,11 +13610,11 @@ msgid "Refresh"
 msgstr "Oppdater"
 
 #: include/classes/widgets/forms/CWidgetForm.php:53 include/html.inc.php:192
-#: jsLoader.php:277
+#: jsLoader.php:282
 msgid "Refresh interval"
 msgstr ""
 
-#: jsLoader.php:278
+#: jsLoader.php:283
 msgid "Refresh interval multiplier"
 msgstr ""
 
@@ -13791,8 +13804,8 @@ msgstr "Fjernkommando"
 #: include/views/monitoring.sysmap.constructor.php:37
 #: include/views/monitoring.sysmap.constructor.php:43
 #: include/views/monitoring.sysmap.edit.php:242
-#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:190
-#: jsLoader.php:299
+#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:195
+#: jsLoader.php:304
 msgid "Remove"
 msgstr "Fjern"
 
@@ -13824,7 +13837,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr ""
 
-#: jsLoader.php:239
+#: jsLoader.php:244
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -13940,7 +13953,7 @@ msgstr "Tilbakestill bekreftelse"
 msgid "Reset defaults"
 msgstr "Tilbakestill standardinnstillinger"
 
-#: jsLoader.php:204
+#: jsLoader.php:209
 msgid "Resolved"
 msgstr "Løst"
 
@@ -13952,26 +13965,26 @@ msgstr "Løst av"
 
 #: app/views/monitoring.widget.problems.view.php:133
 #: include/classes/screens/CScreenHostTriggers.php:239
-#: include/classes/screens/CScreenProblem.php:1010
+#: include/classes/screens/CScreenProblem.php:1013
 #, c-format
 msgid "Resolved by correlation rule \"%1$s\"."
 msgstr "Løst av korrelasjonsregel \"%1$s\"."
 
 #: app/views/monitoring.widget.problems.view.php:136
 #: include/classes/screens/CScreenHostTriggers.php:242
-#: include/classes/screens/CScreenProblem.php:1013
+#: include/classes/screens/CScreenProblem.php:1016
 msgid "Resolved by correlation rule."
 msgstr "Løst av korrelasjonsregel."
 
 #: app/views/monitoring.widget.problems.view.php:143
 #: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1020
+#: include/classes/screens/CScreenProblem.php:1023
 msgid "Resolved by inaccessible user."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:248
-#: include/classes/screens/CScreenProblem.php:1019
+#: include/classes/screens/CScreenProblem.php:1022
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "Løst av bruker \"%1$s\"."
@@ -14075,9 +14088,9 @@ msgstr "Returnerer informasjon knyttet til Zabbix Java gateway. Gyldige paramete
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Returnerer prosentandelen av tapte ICMP pingpakker."
 
-#: include/classes/widgets/CWidgetHelper.php:680
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:1036
+#: include/classes/widgets/CWidgetHelper.php:681
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:1039
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:12
 #: include/views/js/monitoring.sysmaps.js.php:121
@@ -14170,12 +14183,12 @@ msgstr "Kjør angitt kommando på verten. Returnerer tekstresultatet av kommando
 msgid "Russian (ru_RU)"
 msgstr "Russisk (ru_RU)"
 
-#: jsLoader.php:168
+#: jsLoader.php:173
 msgctxt "Saturday short"
 msgid "S"
 msgstr "S"
 
-#: jsLoader.php:169
+#: jsLoader.php:174
 msgctxt "Sunday short"
 msgid "S"
 msgstr "S"
@@ -14369,7 +14382,7 @@ msgid "Sat"
 msgstr "Lør"
 
 #: include/forms.inc.php:2121 include/forms.inc.php:2236
-#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:161
+#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:166
 msgid "Saturday"
 msgstr "Lørdag"
 
@@ -14390,7 +14403,7 @@ msgstr "Scenario"
 msgid "Schedule"
 msgstr "Rute"
 
-#: queue.php:261
+#: queue.php:263
 msgid "Scheduled check"
 msgstr "Planlagt sjekk"
 
@@ -14561,7 +14574,7 @@ msgstr "Skript oppdatert"
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:25
 #: app/views/administration.script.list.php:27 include/menu.inc.php:287
-#: jsLoader.php:279
+#: jsLoader.php:284
 msgid "Scripts"
 msgstr "Skript"
 
@@ -14635,8 +14648,8 @@ msgstr "Sikkerhetsnavn"
 #: include/classes/widgets/CWidgetHelper.php:493
 #: include/classes/widgets/CWidgetHelper.php:541
 #: include/classes/widgets/CWidgetHelper.php:563
-#: include/classes/widgets/CWidgetHelper.php:910
-#: include/classes/widgets/CWidgetHelper.php:931 include/forms.inc.php:257
+#: include/classes/widgets/CWidgetHelper.php:912
+#: include/classes/widgets/CWidgetHelper.php:933 include/forms.inc.php:257
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
@@ -14661,7 +14674,7 @@ msgstr "Sikkerhetsnavn"
 #: include/views/monitoring.screen.constructor.edit.php:315
 #: include/views/monitoring.screen.constructor.edit.php:332
 #: include/views/monitoring.screen.constructor.edit.php:390
-#: include/views/monitoring.screen.constructor.edit.php:651 jsLoader.php:237
+#: include/views/monitoring.screen.constructor.edit.php:651 jsLoader.php:242
 #: latest.php:357
 msgid "Select"
 msgstr "Valgt"
@@ -14703,19 +14716,19 @@ msgstr "Valgte elementer"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:242
+#: jsLoader.php:247
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:243
+#: jsLoader.php:248
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:188
+#: jsLoader.php:193
 msgid "Send backward"
 msgstr "Send bakover"
 
@@ -14754,7 +14767,7 @@ msgstr "Send til Brukergruppe"
 msgid "Send to Users"
 msgstr "Send til brukere"
 
-#: jsLoader.php:189
+#: jsLoader.php:194
 msgid "Send to back"
 msgstr "Plasser i bakgrunnen"
 
@@ -14774,7 +14787,7 @@ msgid "Separated"
 msgstr "Separert"
 
 #: include/forms.inc.php:2159 include/func.inc.php:124
-#: include/func.inc.php:261 jsLoader.php:152
+#: include/func.inc.php:261 jsLoader.php:157
 msgid "September"
 msgstr "September"
 
@@ -14944,9 +14957,9 @@ msgstr ""
 #: app/views/popup.triggerwizard.php:95
 #: include/classes/screens/CScreenEvents.php:33
 #: include/classes/screens/CScreenHistory.php:258
-#: include/classes/screens/CScreenProblem.php:884
-#: include/classes/screens/CScreenProblem.php:906
-#: include/classes/screens/CScreenProblem.php:1141
+#: include/classes/screens/CScreenProblem.php:887
+#: include/classes/screens/CScreenProblem.php:909
+#: include/classes/screens/CScreenProblem.php:1144
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:67
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:67
 #: include/classes/widgets/forms/CWidgetFormProblems.php:84
@@ -14977,7 +14990,7 @@ msgid "Severity changed"
 msgstr ""
 
 #: include/actions.inc.php:1829
-#: include/classes/screens/CScreenProblem.php:1203
+#: include/classes/screens/CScreenProblem.php:1206
 msgid "Severity changes"
 msgstr ""
 
@@ -14999,7 +15012,7 @@ msgstr "Form"
 
 #: include/views/monitoring.screen.edit.php:215
 #: include/views/monitoring.slideconf.edit.php:268
-#: include/views/monitoring.sysmap.edit.php:382 jsLoader.php:263
+#: include/views/monitoring.sysmap.edit.php:382 jsLoader.php:268
 msgid "Sharing"
 msgstr "Deling"
 
@@ -15139,7 +15152,7 @@ msgstr "Vis advarsel hvis Zabbix-serveren er nede"
 msgid "Show working time"
 msgstr "Vis arbeidstid"
 
-#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:175
+#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:180
 msgid "Shown"
 msgstr "Vist"
 
@@ -15293,7 +15306,7 @@ msgstr "lysbilder"
 msgid "Slovak (sk_SK)"
 msgstr "Slovakisk (sk_SK)"
 
-#: jsLoader.php:208
+#: jsLoader.php:213
 msgid "Snooze"
 msgstr "Utsett"
 
@@ -15384,8 +15397,8 @@ msgid "Stacked"
 msgstr "Stablet"
 
 #: include/classes/widgets/CWidgetHelper.php:670
-#: include/classes/widgets/CWidgetHelper.php:712
-#: include/classes/widgets/CWidgetHelper.php:975
+#: include/classes/widgets/CWidgetHelper.php:713
+#: include/classes/widgets/CWidgetHelper.php:977
 msgid "Staircase"
 msgstr ""
 
@@ -15430,9 +15443,9 @@ msgstr ""
 #: include/classes/screens/CScreenActions.php:116
 #: include/classes/screens/CScreenHttpTestDetails.php:86
 #: include/classes/screens/CScreenHttpTest.php:119
-#: include/classes/screens/CScreenProblem.php:888
-#: include/classes/screens/CScreenProblem.php:912
-#: include/classes/screens/CScreenProblem.php:1144
+#: include/classes/screens/CScreenProblem.php:891
+#: include/classes/screens/CScreenProblem.php:915
+#: include/classes/screens/CScreenProblem.php:1147
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:35
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:36
 #: include/events.inc.php:253 include/events.inc.php:466
@@ -15444,10 +15457,10 @@ msgstr ""
 #: include/views/configuration.action.list.php:75
 #: include/views/configuration.correlation.list.php:42
 #: include/views/configuration.correlation.list.php:63
-#: include/views/configuration.discovery.list.php:41
-#: include/views/configuration.discovery.list.php:64
+#: include/views/configuration.discovery.list.php:42
+#: include/views/configuration.discovery.list.php:66
 #: include/views/configuration.host.discovery.list.php:59
-#: include/views/configuration.host.list.php:181
+#: include/views/configuration.host.list.php:183
 #: include/views/configuration.host.massupdate.php:103
 #: include/views/configuration.httpconf.list.php:27
 #: include/views/configuration.httpconf.list.php:95
@@ -15589,7 +15602,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Emne"
 
-#: jsLoader.php:280
+#: jsLoader.php:285
 msgid "Submap"
 msgstr "Submap"
 
@@ -15597,7 +15610,7 @@ msgstr "Submap"
 msgid "Success Audit"
 msgstr "Suksess revisjon"
 
-#: include/func.inc.php:1902
+#: include/func.inc.php:1902 jsLoader.php:143
 msgid "Success message"
 msgstr ""
 
@@ -15611,7 +15624,7 @@ msgid "Sun"
 msgstr "Søn"
 
 #: include/forms.inc.php:2126 include/forms.inc.php:2241
-#: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:162
+#: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:167
 msgid "Sunday"
 msgstr "Søndag"
 
@@ -15699,12 +15712,12 @@ msgstr "System tid. Returnerer heltall med type som utc; streng - med type som l
 msgid "System uptime in seconds. Returns integer"
 msgstr "System oppetid på sekunder. Returnerer heltall"
 
-#: jsLoader.php:166
+#: jsLoader.php:171
 msgctxt "Thursday short"
 msgid "T"
 msgstr "T"
 
-#: jsLoader.php:164
+#: jsLoader.php:169
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "T"
@@ -15773,16 +15786,16 @@ msgstr "Merkverdien"
 
 #: app/views/monitoring.problem.view.php:283
 #: app/views/monitoring.widget.problems.view.php:64 include/blocks.inc.php:739
-#: include/classes/screens/CScreenProblem.php:866
-#: include/classes/screens/CScreenProblem.php:920
-#: include/classes/screens/CScreenProblem.php:1151
+#: include/classes/screens/CScreenProblem.php:869
+#: include/classes/screens/CScreenProblem.php:923
+#: include/classes/screens/CScreenProblem.php:1154
 #: include/classes/widgets/forms/CWidgetFormProblems.php:93
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:377
 #: include/events.inc.php:241 include/events.inc.php:469
 #: include/views/administration.usergroups.edit.php:184
 #: include/views/configuration.host.edit.php:698
 #: include/views/configuration.host.list.php:159
-#: include/views/configuration.host.list.php:185
+#: include/views/configuration.host.list.php:187
 #: include/views/configuration.host.massupdate.php:206
 #: include/views/configuration.host.massupdate.php:297
 #: include/views/configuration.maintenance.edit.php:267
@@ -15857,7 +15870,7 @@ msgstr "Mal \"%1$s\" eksisterer allerede."
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "Mal \"%1$s\" kan ikke være uten vertsgruppe."
 
-#: include/classes/import/importers/CHostImporter.php:46
+#: include/classes/import/importers/CHostImporter.php:47
 #, c-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "Mal \"%1$s\" for verten \"%2$s\" eksisterer ikke."
@@ -15944,7 +15957,7 @@ msgstr "Mal med det samme synlige navnet \"%s\" eksisterer allerede."
 #: include/views/configuration.hostgroups.list.php:59
 #: include/views/configuration.hostgroups.list.php:139
 #: include/views/configuration.host.list.php:108
-#: include/views/configuration.host.list.php:180
+#: include/views/configuration.host.list.php:182
 #: include/views/configuration.host.massupdate.php:295
 #: include/views/configuration.host.prototype.edit.php:321
 #: include/views/configuration.host.prototype.list.php:54
@@ -16184,7 +16197,7 @@ msgid "Thu"
 msgstr "Tor"
 
 #: include/forms.inc.php:2111 include/forms.inc.php:2226
-#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:159
+#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:164
 msgid "Thursday"
 msgstr "Torsdag"
 
@@ -16206,8 +16219,8 @@ msgstr "Inntil"
 #: include/actions.inc.php:2044 include/blocks.inc.php:714
 #: include/classes/screens/CScreenActions.php:111
 #: include/classes/screens/CScreenEvents.php:32
-#: include/classes/screens/CScreenProblem.php:843
-#: include/classes/screens/CScreenProblem.php:1142
+#: include/classes/screens/CScreenProblem.php:846
+#: include/classes/screens/CScreenProblem.php:1145
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:32
 #: include/classes/widgets/forms/CWidgetFormProblems.php:194
@@ -16249,9 +16262,9 @@ msgstr "Tidsperiode"
 #: app/controllers/CControllerPopupTriggerExpr.php:155
 #: app/controllers/CControllerPopupTriggerExpr.php:169
 #: app/controllers/CControllerPopupTriggerExpr.php:198
-#: include/classes/widgets/CWidgetHelper.php:681
-#: include/classes/widgets/CWidgetHelper.php:756
-#: include/classes/widgets/CWidgetHelper.php:1039
+#: include/classes/widgets/CWidgetHelper.php:682
+#: include/classes/widgets/CWidgetHelper.php:758
+#: include/classes/widgets/CWidgetHelper.php:1042
 msgid "Time shift"
 msgstr "Time shift"
 
@@ -16288,11 +16301,11 @@ msgstr "Tidsstempel"
 msgid "To"
 msgstr "Til"
 
-#: jsLoader.php:294
+#: jsLoader.php:299
 msgid "To set a host interface select a single item type for all items"
 msgstr "For å angi et vertsgrensesnitt, velg en enkelt gjenstandstype for alle elementer"
 
-#: include/classes/screens/CScreenProblem.php:739 include/func.inc.php:2678
+#: include/classes/screens/CScreenProblem.php:742 include/func.inc.php:2678
 #: srv_status.php:39
 msgid "Today"
 msgstr "I dag"
@@ -16317,7 +16330,7 @@ msgstr "Topp"
 
 #: app/views/monitoring.widget.hostavail.view.php:37
 #: app/views/monitoring.widget.problemhosts.view.php:30
-#: include/classes/screens/CScreenHostsInfo.php:90 queue.php:295
+#: include/classes/screens/CScreenHostsInfo.php:90 queue.php:299
 msgid "Total"
 msgstr "Total"
 
@@ -16348,9 +16361,7 @@ msgstr "Transaksjonen er ikke stengt. Avbryter ..."
 msgid "Transform SQL query result into a JSON object for low-level discovery."
 msgstr "Transform SQL-spørresultatet til et JSON-objekt for lavnivåoppdagelse."
 
-#: include/classes/widgets/CWidgetHelper.php:671
-#: include/classes/widgets/CWidgetHelper.php:714
-#: include/classes/widgets/CWidgetHelper.php:715
+#: include/classes/widgets/CWidgetHelper.php:672
 #: include/classes/widgets/CWidgetHelper.php:716
 #: include/classes/widgets/CWidgetHelper.php:717
 #: include/classes/widgets/CWidgetHelper.php:718
@@ -16360,7 +16371,9 @@ msgstr "Transform SQL-spørresultatet til et JSON-objekt for lavnivåoppdagelse.
 #: include/classes/widgets/CWidgetHelper.php:722
 #: include/classes/widgets/CWidgetHelper.php:723
 #: include/classes/widgets/CWidgetHelper.php:724
-#: include/classes/widgets/CWidgetHelper.php:995
+#: include/classes/widgets/CWidgetHelper.php:725
+#: include/classes/widgets/CWidgetHelper.php:726
+#: include/classes/widgets/CWidgetHelper.php:998
 msgid "Transparency"
 msgstr ""
 
@@ -16368,9 +16381,9 @@ msgstr ""
 msgid "Transport error."
 msgstr "Transportfeil."
 
-#: include/classes/widgets/CWidgetHelper.php:677
-#: include/classes/widgets/CWidgetHelper.php:751
-#: include/classes/widgets/CWidgetHelper.php:1027
+#: include/classes/widgets/CWidgetHelper.php:678
+#: include/classes/widgets/CWidgetHelper.php:753
+#: include/classes/widgets/CWidgetHelper.php:1030
 msgctxt "missing data function"
 msgid "Treat as 0"
 msgstr ""
@@ -16413,7 +16426,7 @@ msgstr "Trender"
 #: include/views/configuration.triggers.massupdate.php:159
 #: include/views/js/monitoring.sysmaps.js.php:70
 #: include/views/js/monitoring.sysmaps.js.php:706
-#: include/views/reports.toptriggers.php:79 jsLoader.php:178 jsLoader.php:281
+#: include/views/reports.toptriggers.php:79 jsLoader.php:183 jsLoader.php:286
 #: services.php:357
 msgid "Trigger"
 msgstr "Utløser"
@@ -16428,7 +16441,7 @@ msgstr "Trigger \"%1$s\" eksisterer allerede på \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Trigger \"%1$s\" tilhører maler med forskjellige koblinger."
 
-#: include/classes/import/CConfigurationImport.php:1620
+#: include/classes/import/CConfigurationImport.php:1656
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
@@ -16547,7 +16560,7 @@ msgstr "Trigger prototype \"%1$s\" tilhører maler med forskjellige koblinger."
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Trigger prototype \"%1$s\" inneholder element prototyper fra flere funn regler."
 
-#: include/classes/import/CConfigurationImport.php:1342
+#: include/classes/import/CConfigurationImport.php:1378
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Trigger prototype \"%1$s\" avhenger av utløseren \"%2$s\", som ikke eksisterer."
@@ -16607,11 +16620,11 @@ msgstr "Trigger alvorlighetsgrader"
 msgid "Trigger severity"
 msgstr "Trigger alvorlighet"
 
-#: jsLoader.php:264
+#: jsLoader.php:269
 msgid "Trigger status \"OK\""
 msgstr "Trigger status \"OK\""
 
-#: jsLoader.php:265
+#: jsLoader.php:270
 msgid "Trigger status \"Problem\""
 msgstr "Trigger status \"Problem\""
 
@@ -16632,7 +16645,7 @@ msgstr "Utløser oppdatert"
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:359
 #: include/views/configuration.host.list.php:175
-#: include/views/configuration.host.list.php:399
+#: include/views/configuration.host.list.php:397
 #: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.list.php:187
 #: include/views/configuration.template.edit.php:175
@@ -16671,7 +16684,7 @@ msgid "Tue"
 msgstr "Tir"
 
 #: include/forms.inc.php:2101 include/forms.inc.php:2216
-#: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:157
+#: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:162
 msgid "Tuesday"
 msgstr "Tirsdag"
 
@@ -16684,7 +16697,7 @@ msgstr "Tyrkisk (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "To elementer (\"%1$s\" og \"%2$s\") kan ikke fylle ut et vertsinventarfelt \"%3$s\", dette vil føre til konflikt."
 
-#: jsLoader.php:183
+#: jsLoader.php:188
 msgid "Two map elements should be selected"
 msgstr ""
 
@@ -16803,7 +16816,7 @@ msgstr "UKJENT"
 #: include/views/configuration.triggers.edit.php:542
 #: include/views/js/monitoring.sysmaps.js.php:253
 #: include/views/monitoring.screen.constructor.edit.php:794
-#: include/views/monitoring.sysmap.edit.php:230 items.php:210 jsLoader.php:282
+#: include/views/monitoring.sysmap.edit.php:230 items.php:210 jsLoader.php:287
 msgid "URL"
 msgstr "URL"
 
@@ -16849,7 +16862,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "Nettadressen skal ha både \"navn\" og \"url\" -felt for kart \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:250
-#: include/views/monitoring.sysmap.edit.php:281 jsLoader.php:283
+#: include/views/monitoring.sysmap.edit.php:281 jsLoader.php:288
 msgid "URLs"
 msgstr "webadresser"
 
@@ -17035,7 +17048,7 @@ msgstr "Ukoblet: Vare prototype \"%1$s\" på \"%2$s\"."
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Ukoblet: Webscenario \"%1$s\" på \"%2$s\"."
 
-#: jsLoader.php:206
+#: jsLoader.php:211
 msgid "Unmute"
 msgstr "Mikrofon"
 
@@ -17821,7 +17834,7 @@ msgstr "Verdi cachestatistikk. Gyldige moduser er: totalt, gratis, pfree, brukt 
 msgid "Value map"
 msgstr "Verdikart"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "Verdikart \"%1$s\" eksisterer allerede."
@@ -17937,7 +17950,7 @@ msgstr "Synlig navn"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Synlig navn kan ikke være tomt hvis vertsnavnet mangler."
 
-#: jsLoader.php:165
+#: jsLoader.php:170
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "O"
@@ -17954,7 +17967,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Advarsel"
 
-#: jsLoader.php:211
+#: jsLoader.php:145
+msgid "Warning message"
+msgstr ""
+
+#: jsLoader.php:216
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Vi beklager, det maksimalt antall elementer som skal huskes, er nådd."
 
@@ -17963,7 +17980,7 @@ msgstr "Vi beklager, det maksimalt antall elementer som skal huskes, er nådd."
 #: app/views/search.php:169 app/views/search.php:185 app/views/search.php:234
 #: app/views/search.php:235 include/menu.inc.php:63
 #: include/views/configuration.host.list.php:178
-#: include/views/configuration.host.list.php:415
+#: include/views/configuration.host.list.php:413
 #: include/views/configuration.template.list.php:142
 #: include/views/configuration.template.list.php:267
 #: include/views/inventory.host.view.php:124
@@ -17995,7 +18012,7 @@ msgstr "Nettscenario \"%1$s\" eksisterer allerede på verten \"%2$s\"."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "Nettscenario \"%1$s\" eksisterer allerede."
 
-#: include/classes/import/CConfigurationImport.php:1392
+#: include/classes/import/CConfigurationImport.php:1428
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Nettscenario \"%1$s\" på \"%2$s\": Programmet \"%3$s\" eksisterer ikke."
@@ -18035,7 +18052,7 @@ msgid "Wed"
 msgstr "Ons"
 
 #: include/forms.inc.php:2106 include/forms.inc.php:2221
-#: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:158
+#: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:163
 msgid "Wednesday"
 msgstr "Onsdag"
 
@@ -18058,7 +18075,6 @@ msgid "When active"
 msgstr "Når aktiv"
 
 #: graphs.php:45 include/classes/widgets/CWidgetHelper.php:666
-#: include/classes/widgets/CWidgetHelper.php:698
 #: include/classes/widgets/CWidgetHelper.php:699
 #: include/classes/widgets/CWidgetHelper.php:700
 #: include/classes/widgets/CWidgetHelper.php:701
@@ -18069,7 +18085,8 @@ msgstr "Når aktiv"
 #: include/classes/widgets/CWidgetHelper.php:706
 #: include/classes/widgets/CWidgetHelper.php:707
 #: include/classes/widgets/CWidgetHelper.php:708
-#: include/classes/widgets/CWidgetHelper.php:979
+#: include/classes/widgets/CWidgetHelper.php:709
+#: include/classes/widgets/CWidgetHelper.php:982
 #: include/views/configuration.graph.edit.php:87
 #: include/views/configuration.graph.list.php:88
 #: include/views/js/monitoring.sysmaps.js.php:92
@@ -18249,10 +18266,10 @@ msgstr "Y-aksen MIN-verdi"
 msgid "Y axis side"
 msgstr "Y-akseside"
 
-#: include/classes/widgets/CWidgetHelper.php:678
-#: include/classes/widgets/CWidgetHelper.php:753
-#: include/classes/widgets/CWidgetHelper.php:754
-#: include/classes/widgets/CWidgetHelper.php:1033
+#: include/classes/widgets/CWidgetHelper.php:679
+#: include/classes/widgets/CWidgetHelper.php:755
+#: include/classes/widgets/CWidgetHelper.php:756
+#: include/classes/widgets/CWidgetHelper.php:1036
 msgid "Y-axis"
 msgstr ""
 
@@ -18309,8 +18326,8 @@ msgstr "Årlig"
 #: include/actions.inc.php:32 include/blocks.inc.php:618
 #: include/blocks.inc.php:833
 #: include/classes/screens/CScreenHostTriggers.php:273
-#: include/classes/screens/CScreenProblem.php:1082
-#: include/classes/screens/CScreenProblem.php:1222 include/events.inc.php:182
+#: include/classes/screens/CScreenProblem.php:1085
+#: include/classes/screens/CScreenProblem.php:1225 include/events.inc.php:182
 #: include/events.inc.php:382 include/events.inc.php:607
 #: include/triggers.inc.php:1245 include/triggers.inc.php:1250
 #: include/views/administration.general.valuemapping.list.php:65
@@ -18326,7 +18343,7 @@ msgstr "Årlig"
 msgid "Yes"
 msgstr "Ja"
 
-#: include/classes/screens/CScreenProblem.php:747 include/func.inc.php:2672
+#: include/classes/screens/CScreenProblem.php:750 include/func.inc.php:2672
 msgid "Yesterday"
 msgstr "I går"
 
@@ -18865,11 +18882,11 @@ msgid "check expression starting from \"%1$s\""
 msgstr "sjekk uttrykk som starter fra \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1935
-#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2665
 msgid "circular item dependency is not allowed"
 msgstr "Sirkulær elementavhengighet er ikke tillatt"
 
-#: jsLoader.php:214
+#: jsLoader.php:219
 msgid "colour"
 msgstr ""
 
@@ -18891,7 +18908,7 @@ msgstr ""
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: include/func.inc.php:622 jsLoader.php:137
+#: include/func.inc.php:622 jsLoader.php:139
 msgctxt "day short"
 msgid "d"
 msgstr "d"
@@ -19028,7 +19045,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globale housekeeping innstillinger"
 
-#: include/func.inc.php:623 jsLoader.php:138
+#: include/func.inc.php:623 jsLoader.php:140
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -19058,7 +19075,7 @@ msgid "host is not monitored"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:537
-#: include/classes/widgets/CWidgetHelper.php:906
+#: include/classes/widgets/CWidgetHelper.php:908
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:339
 msgid "host pattern"
 msgstr ""
@@ -19174,7 +19191,7 @@ msgid "item is disabled"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:559
-#: include/classes/widgets/CWidgetHelper.php:927
+#: include/classes/widgets/CWidgetHelper.php:929
 msgid "item pattern"
 msgstr ""
 
@@ -19217,12 +19234,12 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "lavnivå oppdagelsesregel"
 
-#: include/func.inc.php:624 jsLoader.php:111 jsLoader.php:139 jsLoader.php:313
+#: include/func.inc.php:624 jsLoader.php:111 jsLoader.php:141 jsLoader.php:318
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:621 jsLoader.php:136
+#: include/func.inc.php:621 jsLoader.php:138
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -19276,8 +19293,8 @@ msgid "maximum dependent items count reached"
 msgstr "Maksimalt avhengige gjenstandstall nås"
 
 #: include/classes/api/services/CItemGeneral.php:2015
-#: include/classes/import/CConfigurationImport.php:2575
-#: include/classes/import/CConfigurationImport.php:2636
+#: include/classes/import/CConfigurationImport.php:2619
+#: include/classes/import/CConfigurationImport.php:2680
 msgid "maximum number of dependency levels reached"
 msgstr "maksimalt antall avhengighetsnivåer nådd"
 
@@ -19344,7 +19361,7 @@ msgstr ""
 msgid "name"
 msgstr "navn"
 
-#: include/classes/html/CMultiSelect.php:73 jsLoader.php:236
+#: include/classes/html/CMultiSelect.php:73 jsLoader.php:241
 msgid "new"
 msgstr "ny"
 
@@ -19368,7 +19385,7 @@ msgstr "ingen data"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false)"
 msgstr ""
 
-#: include/classes/widgets/CWidgetHelper.php:1041
+#: include/classes/widgets/CWidgetHelper.php:1044
 msgid "none"
 msgstr ""
 
@@ -19510,7 +19527,7 @@ msgstr "Ikke sant"
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:45
 #: include/views/configuration.services.parent.list.php:47
-#: include/views/configuration.services.parent.list.php:48 jsLoader.php:300
+#: include/views/configuration.services.parent.list.php:48 jsLoader.php:305
 msgid "root"
 msgstr "root"
 
@@ -19660,7 +19677,7 @@ msgstr "taggen \"%1$s\" mangler"
 msgid "third"
 msgstr ""
 
-#: jsLoader.php:215
+#: jsLoader.php:220
 msgid "time shift"
 msgstr ""
 
@@ -19698,7 +19715,7 @@ msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "Utløseren med koblinger kan ikke flyttes til en annen mal eller vert"
 
 #: app/views/layout.htmlpage.menu.php:32
-#: include/classes/html/CMultiSelect.php:72 jsLoader.php:235
+#: include/classes/html/CMultiSelect.php:72 jsLoader.php:240
 msgid "type here to search"
 msgstr "skriv her for å søke"
 
@@ -19810,11 +19827,11 @@ msgstr "verdi"
 msgid "value \"%1$s\" already exists"
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:804
-#: include/classes/import/CConfigurationImport.php:842
-#: include/classes/import/CConfigurationImport.php:2471
-#: include/classes/import/CConfigurationImport.php:2585
-#: include/classes/import/CConfigurationImport.php:2630
+#: include/classes/import/CConfigurationImport.php:836
+#: include/classes/import/CConfigurationImport.php:874
+#: include/classes/import/CConfigurationImport.php:2515
+#: include/classes/import/CConfigurationImport.php:2629
+#: include/classes/import/CConfigurationImport.php:2674
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "verdien \"%1$s\" ble ikke funnet"
@@ -19868,7 +19885,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:620 jsLoader.php:135
+#: include/func.inc.php:620 jsLoader.php:137
 msgctxt "year short"
 msgid "y"
 msgstr "å"
