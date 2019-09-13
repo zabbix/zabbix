@@ -1072,7 +1072,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'jmx.discovery[<discovery mode>,<object name>]',
-					'description' => _('Return a JSON object describing the MBean objects or their attributes. Can be used for LLD.')
+					'description' => _('Return a JSON object with LLD macros describing the MBean objects or their attributes. Can be used for LLD.')
 				],
 				[
 					'key' => 'jmx.get[<discovery mode>,<object name>]',
