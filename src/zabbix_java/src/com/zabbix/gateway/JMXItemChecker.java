@@ -48,6 +48,11 @@ class JMXItemChecker extends ItemChecker
 	private String username;
 	private String password;
 
+	private enum DiscoveryMode {
+		ATTRIBUTES,
+		BEANS
+	}
+
 	JMXItemChecker(JSONObject request) throws ZabbixException
 	{
 		super(request);
@@ -190,19 +195,19 @@ class JMXItemChecker extends ItemChecker
 
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+			DiscoveryMode mode = (0 < argumentCount) ? DiscoveryMode.valueOf(item.getArgument(1).toUpperCase()) :
+				DiscoveryMode.ATTRIBUTES;
 
-			String modeName = item.getArgument(1);
-
-			switch(modeName)
+			switch(mode)
 			{
-			case "attributes":
+			case ATTRIBUTES:
 				discoverAttributes(counters, filter, true);
 				break;
-			case "beans":
+			case BEANS:
 				discoverBeans(counters, filter, true);
 				break;
 			default:
-				throw new ZabbixException("invalid discovery mode: " + modeName);
+				throw new ZabbixException("invalid discovery mode: %s", item.getArgument(1));
 			}
 
 			JSONObject mapping = new JSONObject();
@@ -211,24 +216,24 @@ class JMXItemChecker extends ItemChecker
 		}
 		else if (item.getKeyId().equals("jmx.get"))
 		{
-			if (2 != argumentCount)
+			if (2 < argumentCount)
 				throw new ZabbixException("required key format: jmx.get[<discovery mode>,<object name>]");
 
-			ObjectName filter = new ObjectName(item.getArgument(2));
-
 			JSONArray counters = new JSONArray();
-			String modeName = item.getArgument(1);
+			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
+			DiscoveryMode mode = (0 < argumentCount) ? DiscoveryMode.valueOf(item.getArgument(1).toUpperCase()) :
+				DiscoveryMode.ATTRIBUTES;
 
-			switch(modeName)
+			switch(mode)
 			{
-			case "attributes":
+			case ATTRIBUTES:
 				discoverAttributes(counters, filter, false);
 				break;
-			case "beans":
+			case BEANS:
 				discoverBeans(counters, filter, false);
 				break;
 			default:
-				throw new ZabbixException("invalid discovery mode: " + modeName);
+				throw new ZabbixException("invalid discovery mode: %s", item.getArgument(1));
 			}
 
 			return counters.toString();
