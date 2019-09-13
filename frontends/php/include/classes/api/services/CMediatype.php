@@ -605,7 +605,6 @@ class CMediatype extends CApiService {
 				? $mediatype_rules[$mediatype['type']]
 				: [];
 			$validated_data = array_intersect_key($mediatype, $validation_rules);
-			unset($validated_data['mediatypeid']);
 
 			switch ($mediatype['type']) {
 				case MEDIA_TYPE_EZ_TEXTING:
@@ -1000,7 +999,8 @@ class CMediatype extends CApiService {
 			$mediatypeid = $mediatype['mediatypeid'];
 			unset($mediatype['mediatypeid']);
 
-			if (array_key_exists('type', $mediatype) && $db_types[$mediatypeid]['type'] == MEDIA_TYPE_WEBHOOK) {
+			if (array_key_exists('type', $mediatype) && $mediatype['type'] != $db_types[$mediatypeid]['type']
+					&& $db_types[$mediatypeid]['type'] == MEDIA_TYPE_WEBHOOK) {
 				$mediatype = [
 					'webhook' => $defaults['webhook'],
 					'timeout' => $defaults['timeout'],
