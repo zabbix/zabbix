@@ -2426,6 +2426,9 @@
 	function setModeEditDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
 
+		// Expand to the whole screen in edit mode.
+		resizeDashboardGrid($obj, data);
+
 		data['widgets'].forEach(function(widget) {
 			widget['rf_rate'] = 0;
 			setWidgetModeEdit($obj, data, widget);
@@ -2669,8 +2672,6 @@
 
 				data.new_widget_placeholder.updateLabelVisibility();
 			});
-
-		return;
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {
