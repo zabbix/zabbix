@@ -116,6 +116,37 @@ static int	get_interval_option(const char * fping, const char *dst)
 	return value;
 }
 
+#ifdef HAVE_IPV6
+/******************************************************************************
+ *                                                                            *
+ * Function: check_ipv6                                                       *
+ *                                                                            *
+ * Purpose: check fping supports IPv6                                         *
+ *                                                                            *
+ * Parameters: fping - [IN] the the location of fping program                 *
+ *                                                                            *
+ * Return value: SUCCEED - IPv6 is supported                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_ipv6(const char * fping)
+{
+	int	ret = FAIL;
+	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
+
+	zbx_snprintf(tmp, sizeof(tmp), "%s ::", fping);
+
+	if (SUCCEED == zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED) &&
+			 NULL != strstr(out, "alive"))
+	{
+		ret = SUCCEED;
+	}
+
+	zbx_free(out);
+
+	return ret;
+}
+#endif	/* HAVE_IPV6 */
+
 static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
 		char *error, int max_error_len)
 {
@@ -287,7 +318,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
 
-		if (0 != (fping_existence & FPING6_EXISTS))
+		if (0 != (fping_existence & FPING6_EXISTS) && FAIL == check_ipv6(CONFIG_FPING_LOCATION))
 			zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
 	}
