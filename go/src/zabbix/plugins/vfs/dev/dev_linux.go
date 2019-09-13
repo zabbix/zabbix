@@ -251,7 +251,7 @@ func (p *Plugin) collectDeviceStats(devices map[string]*devUnit) (err error) {
 	now := time.Now()
 
 	for _, dev := range devices {
-		if stats, tmperr := p.getDeviceStats(dev.name); tmperr == nil {
+		if stats, tmperr := p.getDeviceStats(dev.name); tmperr == nil && stats != nil {
 			stats.clock = now.UnixNano()
 			dev.history[dev.tail] = *stats
 			if dev.tail = dev.tail.inc(); dev.tail == dev.head {
