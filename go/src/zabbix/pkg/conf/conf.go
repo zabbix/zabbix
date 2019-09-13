@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -407,26 +408,40 @@ func newIncludeError(root *Node, filename *string, errmsg string) (err error) {
 	}
 	root.includeFail = true
 	if filename != nil {
-		return fmt.Errorf(`cannot load file "%s": %s`, *filename, errmsg)
+		return fmt.Errorf(`cannot include "%s": %s`, *filename, errmsg)
 	}
 	return fmt.Errorf(`cannot load file: %s`, errmsg)
 }
 
+func hasMeta(path string) bool {
+	var metaChars string
+	if runtime.GOOS != "windows" {
+		metaChars = `*?[\`
+	} else {
+		metaChars = `*?[`
+	}
+	return strings.ContainsAny(path, metaChars)
+}
+
 func loadInclude(root *Node, path string) (err error) {
-	if !strings.ContainsRune(path, '*') {
+	if hasMeta(filepath.Dir(path)) {
+		return newIncludeError(root, &path, "glob pattern is supported only in file names")
+	}
+	if !hasMeta(path) {
 		var fi os.FileInfo
 		if fi, err = os.Stat(path); err != nil {
-			return newIncludeError(root, nil, err.Error())
+			return newIncludeError(root, &path, err.Error())
 		}
 		if fi.IsDir() {
-			if path[len(path)-1] != filepath.Separator {
-				path += string(filepath.Separator)
-			}
-			path += "*"
+			path = filepath.Join(path, "*")
 		}
 	} else {
-		if _, err = os.Stat(filepath.Dir(path)); err != nil {
-			return newIncludeError(root, nil, err.Error())
+		var fi os.FileInfo
+		if fi, err = os.Stat(filepath.Dir(path)); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+		if !fi.IsDir() {
+			return newIncludeError(root, &path, "base path is not a directory")
 		}
 	}
 
