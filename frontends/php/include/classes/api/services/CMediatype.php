@@ -1169,6 +1169,17 @@ class CMediatype extends CApiService {
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
+		if ($this->outputIsRequested('params', $options['output'])) {
+			$mediatype_params = DB::select('media_type_param', [
+				'output' => ['mediatypeid', 'name', 'value'],
+				'filter' => ['mediatypeid' => array_keys($result)]
+			]);
+
+			foreach ($mediatype_params as $param) {
+				$result[$param['mediatypeid']]['params'][$param['name']] = $param['value'];
+			}
+		}
+
 		return $result;
 	}
 
