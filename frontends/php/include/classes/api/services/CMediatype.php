@@ -976,7 +976,7 @@ class CMediatype extends CApiService {
 
 		$update = [];
 		$db_types = [];
-		$db_typesids = [];
+		$db_typeids = [];
 		$webhooks_params = [];
 		$defaults = DB::getDefaults('media_type');
 
@@ -1187,7 +1187,6 @@ class CMediatype extends CApiService {
 				],
 				'timeout' => [
 					'type' => API_TIME_UNIT,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'timeout')
 				],
 				'receive_tags' => [
