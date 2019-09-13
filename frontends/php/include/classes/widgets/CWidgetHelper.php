@@ -141,34 +141,30 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldTextArea $field      Widget field object.
-	 * @param string               $form_name  HTML form element name.
+	 * @param CWidgetFieldHostPatternSelect  $field      Widget field object.
+	 * @param string                         $form_name  HTML form element name.
 	 *
 	 * @return CDiv
 	 */
-	public static function getHostsPatternTextBox($field, $form_name) {
-		return (new CDiv([
-			(new CTextArea($field->getName(), self::makeStringFromChunks($field->getValue()), ['rows' => 1]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field))
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->setAttribute('placeholder', $field->getPlaceholder())
-				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-				->addClass(ZBX_STYLE_PATTERNSELECT),
-			(new CButton($field->getName().'_select', _('Select')))
-				->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.
-					CJs::encodeJson([
-						'srctbl' => 'hosts',
-						'srcfld1' => 'host',
-						'reference' => 'name',
-						'multiselect' => 1,
-						'dstfrm' => $form_name,
-						'dstfld1' => $field->getName()
-					]).', null, this);'
-				)
-		]))->addClass(CMultiSelect::ZBX_STYLE_CLASS);
+	public static function getHostPatternSelect($field, $form_name) {
+		return (new CPatternSelect([
+			'name' => $field->getName().'[]',
+			'object_name' => 'hosts',
+			'data' => $field->getValue(),
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
+					'dstfrm' => $form_name,
+					'dstfld1' => zbx_formatDomId($field->getName().'[]')
+				]
+			],
+			'add_post_js' => false
+		]))
+			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+			->setAttribute('placeholder', $field->getPlaceholder())
+			->setAriaRequired(self::isAriaRequired($field))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	/**
@@ -545,21 +541,21 @@ class CWidgetHelper {
 	 * Function returns array containing HTML objects filled with given values. Used to generate HTML in widget
 	 * overrides field.
 	 *
-	 * @param string     $field_name
-	 * @param array      $value      Values to fill in particular data set row. See self::setValue() for detailed
-	 *                               description.
-	 * @param string     $form_name  Name of form in which data set fields resides.
-	 * @param int|string $row_num    Unique data set numeric identifier. Used to make unique field names.
+	 * @param CWidgetFieldGraphOverride  $field
+	 * @param array                      $value      Values to fill in particular data set row. See self::setValue() for
+	 *                                               detailed description.
+	 * @param string                     $form_name  Name of form in which data set fields resides.
+	 * @param int|string                 $row_num    Unique data set numeric identifier. Used to make unique field names.
 	 *
 	 * @return array
 	 */
-	public static function getGraphOverrideLayout($field_name, array $value, $form_name, $row_num) {
+	public static function getGraphOverrideLayout($field, array $value, $form_name, $row_num) {
 		$inputs = [];
 
 		// Create override optins list.
 		foreach (CWidgetFieldGraphOverride::getOverrideOptions() as $option) {
 			if (array_key_exists($option, $value)) {
-				$inputs[] = (new CVar($field_name.'['.$row_num.']['.$option.']', $value[$option]));
+				$inputs[] = (new CVar($field->getName().'['.$row_num.']['.$option.']', $value[$option]));
 			}
 		}
 
@@ -573,54 +569,51 @@ class CWidgetHelper {
 					->addClass(ZBX_STYLE_DRAG_ICON)
 					->addStyle('position: absolute; margin-left: -25px;'),
 				(new CDiv([
-					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][hosts]', self::makeStringFromChunks($value['hosts']),
-								['rows' => 1]
-							))
-							->setAttribute('placeholder', _('host pattern'))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-							->addClass(ZBX_STYLE_PATTERNSELECT),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", jQuery.extend('.
-								CJs::encodeJson([
+					(new CDiv(
+						(new CPatternSelect([
+							'name' => $field->getName().'['.$row_num.'][hosts][]',
+							'object_name' => 'hosts',
+							'data' => $value['hosts'],
+							'popup' => [
+								'parameters' => [
 									'srctbl' => 'hosts',
-									'srcfld1' => 'host',
-									'reference' => 'name',
-									'multiselect' => 1,
-									'dstfrm' => $form_name
-								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
-							)
-					]))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50),
-					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]', self::makeStringFromChunks($value['items']),
-								['rows' => 1]
-							))
-							->setAttribute('placeholder', _('item pattern'))
+									'srcfld1' => 'hostid',
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field->getName().'['.$row_num.'][hosts][]')
+								]
+							],
+							'add_post_js' => false
+						]))
+							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+							->setAttribute('placeholder', _('host pattern'))
+							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-							->addClass(ZBX_STYLE_PATTERNSELECT),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", jQuery.extend('.
-								CJs::encodeJson([
+					))->addClass(ZBX_STYLE_COLUMN_50),
+					(new CDiv(
+						(new CPatternSelect([
+							'name' => $field->getName().'['.$row_num.'][items][]',
+							'object_name' => 'items',
+							'data' => $value['items'],
+							'multiple' => true,
+							'popup' => [
+								'parameters' => [
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
-									'reference' => 'name_expanded',
-									'multiselect' => 1,
 									'real_hosts' => 1,
 									'numeric' => 1,
-									'with_webitems' => 1,
+									'webitems' => 1,
 									'orig_names' => 1,
-									'dstfrm' => $form_name
-								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
-							)
-					]))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50)
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field->getName().'['.$row_num.'][items][]')
+								]
+							],
+							'add_post_js' => false
+						]))
+							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
+							->setAttribute('placeholder', _('host pattern'))
+							->setAriaRequired(self::isAriaRequired($field))
+							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					))->addClass(ZBX_STYLE_COLUMN_50)
 				]))
 					->addClass(ZBX_STYLE_COLUMN_95)
 					->addClass(ZBX_STYLE_COLUMNS),
@@ -659,7 +652,7 @@ class CWidgetHelper {
 	public static function getGraphOverrideTemplate($field, $form_name) {
 		$value = CWidgetFieldGraphOverride::getDefaults();
 
-		return self::getGraphOverrideLayout($field->getName(), $value, $form_name, '#{rowNum}')->toString();
+		return self::getGraphOverrideLayout($field, $value, $form_name, '#{rowNum}')->toString();
 	}
 
 	/**
@@ -681,7 +674,7 @@ class CWidgetHelper {
 		$i = 0;
 
 		foreach ($values as $override) {
-			$list->addItem(self::getGraphOverrideLayout($field->getName(), $override, $form_name, $i));
+			$list->addItem(self::getGraphOverrideLayout($field, $override, $form_name, $i));
 
 			$i++;
 		}
@@ -711,6 +704,7 @@ class CWidgetHelper {
 			'type'.SVG_GRAPH_TYPE_LINE => _('Line'),
 			'type'.SVG_GRAPH_TYPE_POINTS => _('Points'),
 			'type'.SVG_GRAPH_TYPE_STAIRCASE => _('Staircase'),
+			'type'.SVG_GRAPH_TYPE_BAR => _('Bar'),
 			'transparency' => _('Transparency'),
 			'fill' => _('Fill'),
 			'pointsize' => _('Point size'),
@@ -753,6 +747,7 @@ class CWidgetHelper {
 						['name' => _('Draw').'/'._('Line'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_LINE]],
 						['name' => _('Draw').'/'._('Points'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_POINTS]],
 						['name' => _('Draw').'/'._('Staircase'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_STAIRCASE]],
+						['name' => _('Draw').'/'._('Bar'), 'callback' => 'addOverride', 'args' => ['type', SVG_GRAPH_TYPE_BAR]],
 
 						['name' => _('Transparency').'/0', 'callback' => 'addOverride', 'args' => ['transparency', 0]],
 						['name' => _('Transparency').'/1', 'callback' => 'addOverride', 'args' => ['transparency', 1]],
@@ -847,15 +842,11 @@ class CWidgetHelper {
 					'var container = jQuery(".overlay-dialogue-body");'.
 					'container.scrollTop(container[0].scrollHeight);'.
 
-					// Initialize textarea autogrow.
-					'jQuery("textarea", jQuery("#overrides"))'.
-						'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
-						'.each(function() {'.
-							'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
-								'hostsId = jQuery(this).attr("id");'.
-							'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
-							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
-						'});'.
+					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
+						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
+					'});'.
+					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
@@ -877,15 +868,10 @@ class CWidgetHelper {
 			// Initialize overrides UI control.
 			'initializeOverrides();',
 
-			// Initialize textarea autogrow.
-			'jQuery("textarea", jQuery("#overrides"))'.
-				'.filter(function() {return this.id.match(/or_\d+_hosts/);})'.
-				'.each(function() {'.
-					'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
-						'hostsId = jQuery(this).attr("id");'.
-					'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
-					'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
-				'});',
+			// Initialize override pattern-selectors.
+			'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
+				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
+			'});',
 
 			// Make overrides sortable.
 			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.
@@ -942,53 +928,41 @@ class CWidgetHelper {
 							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
 							->addStyle('background-color: #'.$value['color'].';')
 							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand')),
-						(new CDiv([
-							(new CTextArea($field_name.'['.$row_num.'][hosts]',
-								self::makeStringFromChunks($value['hosts']), ['rows' => 1])
-							)
-								->setAttribute('placeholder', _('host pattern'))
-								->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-								->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-								->addClass(ZBX_STYLE_PATTERNSELECT),
-							(new CButton(null, _('Select')))
-								->addClass(ZBX_STYLE_BTN_GREY)
-								->onClick('return PopUp("popup.generic", jQuery.extend('.
-									CJs::encodeJson([
-										'srctbl' => 'hosts',
-										'srcfld1' => 'host',
-										'reference' => 'name',
-										'multiselect' => 1,
-										'dstfrm' => $form_name
-									]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
-								)
-						]))->addClass(CMultiSelect::ZBX_STYLE_CLASS)
+						(new CPatternSelect([
+							'name' => $field_name.'['.$row_num.'][hosts][]',
+							'object_name' => 'hosts',
+							'data' => $value['hosts'],
+							'popup' => [
+								'parameters' => [
+									'srctbl' => 'hosts',
+									'srcfld1' => 'host',
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+								]
+							],
+							'add_post_js' => false
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					]))->addClass(ZBX_STYLE_COLUMN_50),
-					(new CDiv([
-						(new CTextArea($field_name.'['.$row_num.'][items]',
-							self::makeStringFromChunks($value['items']), ['rows' => 1])
-						)
-							->setAttribute('placeholder', _('item pattern'))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-							->addClass(ZBX_STYLE_PATTERNSELECT),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('return PopUp("popup.generic", jQuery.extend('.
-								CJs::encodeJson([
+					(new CDiv(
+						(new CPatternSelect([
+							'name' => $field_name.'['.$row_num.'][items][]',
+							'object_name' => 'items',
+							'data' => $value['items'],
+							'popup' => [
+								'parameters' => [
 									'srctbl' => 'items',
-									'srcfld1' => 'itemid',
-									'reference' => 'name_expanded',
-									'multiselect' => 1,
+									'srcfld1' => 'name',
 									'real_hosts' => 1,
 									'numeric' => 1,
-									'with_webitems' => 1,
+									'webitems' => 1,
 									'orig_names' => 1,
-									'dstfrm' => $form_name
-								]).', {dstfld1: jQuery(this).siblings("textarea").attr("name")}), null, this);'
-							)
-					]))
-						->addClass(CMultiSelect::ZBX_STYLE_CLASS)
-						->addClass(ZBX_STYLE_COLUMN_50),
+									'dstfrm' => $form_name,
+									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+								]
+							],
+							'add_post_js' => false
+						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					))->addClass(ZBX_STYLE_COLUMN_50),
 				]))
 					->addClass(ZBX_STYLE_COLUMN_95)
 					->addClass(ZBX_STYLE_COLUMNS),
@@ -1016,12 +990,13 @@ class CWidgetHelper {
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
+									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
 									->onChange('changeDataSetDrawType(this)')
 									->setModern(true)
 							)
 							->addRow(_('Width'),
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
@@ -1046,7 +1021,7 @@ class CWidgetHelper {
 							)
 							->addRow(_('Fill'),
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
@@ -1070,7 +1045,7 @@ class CWidgetHelper {
 									->addValue(_x('Treat as 0', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
 									)
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern(true)
 							)
 							->addRow(_('Y-axis'),
@@ -1160,21 +1135,34 @@ class CWidgetHelper {
 		$scripts = [
 			'function changeDataSetDrawType(obj) {'.
 				'var row_num = obj.id.replace("ds_", "").replace("_type", "");'.
-				'if (jQuery(":checked", jQuery(obj)).val() == '.SVG_GRAPH_TYPE_POINTS.') {'.
-					'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-				'}'.
-				'else {'.
-					'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
-					'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
-					'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
+				'switch (jQuery(":checked", jQuery(obj)).val()) {'.
+					'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
+						'break;'.
+					'case "'.SVG_GRAPH_TYPE_BAR.'":'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
+						'break;'.
+					'default:'.
+						'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
+						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
+						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
+						'break;'.
 				'}'.
 			'};',
 
@@ -1206,14 +1194,11 @@ class CWidgetHelper {
 						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
 					'}, appendTo: "#overlay_dialogue"});'.
 
-					'jQuery("textarea", jQuery("#data_sets"))'.
-						'.filter(function() {return this.id.match(/ds_\d+_hosts/);})'.
-						'.each(function() {'.
-							'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
-								'hostsId = jQuery(this).attr("id");'.
-							'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
-							'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
-						'});'.
+					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
+						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
+					'});'.
+					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
+					'onGraphConfigChange();'.
 				'})'.
 				'.bind("afterremove.dynamicRows", function(event, options) {'.
 					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
@@ -1242,22 +1227,17 @@ class CWidgetHelper {
 
 			// Expand dataset when click in pattern fields.
 			'jQuery("#data_sets").on("click", "'.implode(', ', [
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_PATTERNSELECT,
+				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
 				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
 			]).'", function() {'.
 				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
 				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
 			'});',
 
-			// Initialize textarea autogrow.
-			'jQuery("textarea", jQuery("#data_sets"))'.
-				'.filter(function() {return this.id.match(/ds_\d+_hosts/);})'.
-				'.each(function() {'.
-					'var itemsId = jQuery(this).attr("id").replace("_hosts", "_items"),'.
-						'hostsId = jQuery(this).attr("id");'.
-					'jQuery(this).autoGrowTextarea({pair: "#"+itemsId, maxHeight: 100});'.
-					'jQuery("#"+itemsId).autoGrowTextarea({pair: "#"+hostsId, maxHeight: 100});'.
-				'});',
+			// Initialize pattern fields.
+			'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
+				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
+			'});',
 
 			// Initialize color-picker UI elements.
 			'jQuery(".input-color-picker input").colorpicker({onUpdate: function(color){'.
@@ -1301,29 +1281,5 @@ class CWidgetHelper {
 	 */
 	public static function isAriaRequired($field) {
 		return ($field->getFlags() & CWidgetField::FLAG_LABEL_ASTERISK);
-	}
-
-	/**
-	 * Make string from chunks.
-	 *
-	 * @param array  $chunks          Array of strings.
-	 *
-	 * @return string
-	 */
-	public static function makeStringFromChunks(array $chunks) {
-		ksort($chunks);
-		return implode('', $chunks);
-	}
-
-	/**
-	 * Make array of patterns.
-	 *
-	 * @param array|string $patterns  Comma separated string of patterns or array containing multiple patterns.
-	 *
-	 * @return array  Returns array of unique patterns.
-	 */
-	public static function splitPatternIntoParts($patterns) {
-		$patterns = is_array($patterns) ? $patterns : str_split(str_replace("\r", '', trim($patterns)), 255);
-		return array_filter($patterns, 'strlen');
 	}
 }

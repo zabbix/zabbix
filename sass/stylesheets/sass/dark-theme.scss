@@ -31,7 +31,6 @@ $font-alt-color: #737373;
 $body-bg-color: #0e1012;
 $overlay-bg-color: #000;
 
-
 // UI
 $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
@@ -50,7 +49,6 @@ $table-border-color: #383838;
 
 $ui-tab-bg-selected-color: #69808d;
 
-
 // FORMS
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
@@ -64,6 +62,11 @@ $form-disabled-border-color: #3d3d3d;
 $scrollbar-track-color: #1f1f1f;
 $scrollbar-thumb-color: #383838;
 
+// ERROR MESSAGES
+$msg-bad-color: darken(desaturate($red, 10%), 20%);
+$msg-good-color: darken(desaturate($green, 10%), 20%);
+$msg-warning-color: #a97d38;
+$msg-warning-border-color: #614f32;
 
 // BUTTONS
 $btn-font-color: #f2f2f2;
@@ -114,6 +117,9 @@ $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
+
+// MULTISELECT
+$multiselect-selected-bg-color: #696969;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;

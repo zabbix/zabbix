@@ -49,7 +49,7 @@ $options = [
 			'show_timeline' => $data['filter']['show_timeline'],
 			'details' => $data['filter']['details'],
 			'highlight_row' => $data['filter']['highlight_row'],
-			'show_latest_values' => $data['filter']['show_latest_values']
+			'show_opdata' => $data['filter']['show_opdata']
 		]
 	]
 ];
@@ -320,9 +320,9 @@ if ($data['action'] == 'problem.view') {
 				->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 				->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
 		])
-		->addRow(_('Show latest values'), [
-			(new CCheckBox('filter_show_latest_values'))
-				->setChecked($data['filter']['show_latest_values'] == 1)
+		->addRow(_('Show operational data'), [
+			(new CCheckBox('filter_show_opdata'))
+				->setChecked($data['filter']['show_opdata'] == 1)
 				->setEnabled($data['filter']['compact_view'] == 0)
 		]);
 

@@ -29,6 +29,25 @@ class CArrayHelper {
 	private function __construct() {}
 
 	/**
+	 * Copies keys according to given map for given array of the objects.
+	 *
+	 * @param array $array
+	 * @param array $field_map
+	 *
+	 * @return array
+	 */
+	public static function copyObjectsKeys(array $array, array $field_map) {
+		foreach ($array as &$object) {
+			foreach ($field_map as $old_key => $new_key) {
+				$object[$new_key] = $object[$old_key];
+			}
+		}
+		unset($object);
+
+		return $array;
+	}
+
+	/**
 	 * Get from array only values with given keys.
 	 * If requested key is not in given array exception is thrown.
 	 *

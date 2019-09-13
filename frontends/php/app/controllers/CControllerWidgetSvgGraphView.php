@@ -55,18 +55,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$initial_load = $this->getInput('initial_load', 1);
 		$script_inline = '';
 
-		foreach ($fields['ds'] as &$ds) {
-			$ds['hosts'] = CWidgetHelper::makeStringFromChunks($ds['hosts']);
-			$ds['items'] = CWidgetHelper::makeStringFromChunks($ds['items']);
-		}
-		unset($ds);
-
-		foreach ($fields['or'] as &$or) {
-			$or['hosts'] = CWidgetHelper::makeStringFromChunks($or['hosts']);
-			$or['items'] = CWidgetHelper::makeStringFromChunks($or['items']);
-		}
-		unset($or);
-
 		$graph_data = [
 			'data_sets' => array_values($fields['ds']),
 			'data_source' => $fields['source'],
@@ -107,7 +95,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'problems' => [
 				'show_problems' => ($fields['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW),
 				'graph_item_problems' => $fields['graph_item_problems'],
-				'problemhosts' => CWidgetHelper::makeStringFromChunks($fields['problemhosts']),
+				'problemhosts' => $fields['problemhosts'],
 				'severities' => $fields['severities'],
 				'problem_name' => $fields['problem_name'],
 				'evaltype' => $fields['evaltype'],

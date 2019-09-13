@@ -2075,16 +2075,25 @@
 			return;
 		}
 
-		data['options']['updating_config'] = true;
-
 		var	fields = $('form', data.dialogue['body']).serializeJSON(),
 			type = fields['type'],
 			name = fields['name'],
-			view_mode = (fields['show_header'] == 1) ? ZBX_WIDGET_VIEW_MODE_NORMAL : ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+			view_mode = (fields['show_header'] == 1) ? ZBX_WIDGET_VIEW_MODE_NORMAL : ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
+			pos;
 
 		delete fields['type'];
 		delete fields['name'];
 		delete fields['show_header'];
+
+		if (widget === null || !('type' in widget) && !('pos' in widget)) {
+			pos = findEmptyPosition($obj, data, type);
+			if (!pos) {
+				showMessageExhausted(data);
+				return;
+			}
+		}
+
+		data['options']['updating_config'] = true;
 
 		// Prepare to call dashboard.widget.check.
 
@@ -2149,10 +2158,8 @@
 					configuration = response['configuration'];
 				}
 
-				if (widget === null || ('type' in widget) === false) {
+				if (widget === null || !('type' in widget)) {
 					// In case of ADD widget, create and add widget to the dashboard.
-
-					var pos;
 
 					if (widget && 'pos' in widget) {
 						pos = $.extend({}, data.widget_defaults[type].size, widget.pos);
@@ -2174,9 +2181,6 @@
 
 						pos.width = Math.min(data.options['max-columns'] - pos.x, pos.width);
 						pos.height = Math.min(data.options['max-rows'] - pos.y, pos.height);
-					}
-					else {
-						pos = findEmptyPosition($obj, data, type);
 					}
 
 					var widget_data = {
@@ -2271,19 +2275,24 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos = {
+		var pos_type = (typeof type === 'undefined') ? Object.keys(data.widget_defaults)[0] : type,
+			pos = {
 				'x': 0,
 				'y': 0,
-				'width': data['widget_defaults'][type]['size']['width'],
-				'height': data['widget_defaults'][type]['size']['height']
+				'width': data.widget_defaults[pos_type].size.width,
+				'height': data.widget_defaults[pos_type].size.height
 			};
 
 		// Go y by row and try to position widget in each space.
-		var	max_col = data['options']['max-columns'] - pos['width'],
+		var	max_col = data.options['max-columns'] - pos.width,
+			max_row = data.options['max-rows'] - pos.height,
 			found = false,
 			x, y;
 
 		for (y = 0; !found; y++) {
+			if (y > max_row) {
+				return false;
+			}
 			for (x = 0; x <= max_col && !found; x++) {
 				pos['x'] = x;
 				pos['y'] = y;
@@ -2883,6 +2892,19 @@
 	}
 
 	/**
+	 * Show message if dashboard free space exhausted.
+	 *
+	 * @param {object} data  Data from dashboard grid.
+	 */
+	function showMessageExhausted(data) {
+		data.dialogue.body.children('.msg-warning').remove();
+		data.dialogue.body.prepend(makeMessageBox(
+			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
+		));
+		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
+	}
+
+	/**
 	 * Performs action added by addAction function.
 	 *
 	 * @param {string} hook_name  Name of trigger that is currently being called.
@@ -3433,6 +3455,10 @@
 							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
+						if (data.dialogue.widget === null
+								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
+							showMessageExhausted(data);
+						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					});
 			});

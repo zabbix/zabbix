@@ -2847,6 +2847,12 @@ return [
 				'length' => 32,
 				'default' => '',
 			],
+			'autoreg_tls_accept' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 		],
 	],
 	'triggers' => [
@@ -2965,7 +2971,7 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'details' => [
+			'opdata' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -5251,6 +5257,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'tls_accepted' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 		],
 	],
 	'proxy_autoreg_host' => [
@@ -5302,6 +5314,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'tls_accepted' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
 			],
 		],
 	],
@@ -7662,6 +7680,28 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'config_autoreg_tls' => [
+		'key' => 'autoreg_tlsid',
+		'fields' => [
+			'autoreg_tlsid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'tls_psk_identity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => '',
+			],
+			'tls_psk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
 				'default' => '',
 			],
 		],

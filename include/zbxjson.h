@@ -43,6 +43,7 @@
 #define ZBX_PROTO_TAG_LOGSEVERITY		"severity"
 #define ZBX_PROTO_TAG_LOGEVENTID		"eventid"
 #define ZBX_PROTO_TAG_PORT			"port"
+#define ZBX_PROTO_TAG_TLS_ACCEPTED		"tls_accepted"
 #define ZBX_PROTO_TAG_PROXY			"proxy"
 #define ZBX_PROTO_TAG_REQUEST			"request"
 #define ZBX_PROTO_TAG_RESPONSE			"response"
