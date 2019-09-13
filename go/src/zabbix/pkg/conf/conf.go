@@ -435,29 +435,32 @@ func loadInclude(root *Node, path string) (err error) {
 		return newIncludeError(root, nil, err.Error())
 	}
 
-	for _, filepath := range paths {
+	for _, path := range paths {
 		// skip directories
 		var fi os.FileInfo
-		if fi, err = os.Stat(filepath); err != nil {
-			return newIncludeError(root, &filepath, err.Error())
+		if fi, err = os.Stat(path); err != nil {
+			return newIncludeError(root, &path, err.Error())
 		}
 		if fi.IsDir() {
 			continue
 		}
+		if !filepath.IsAbs(path) {
+			return newIncludeError(root, &path, "relative paths are not supported")
+		}
 
 		var file std.File
-		if file, err = stdOs.Open(filepath); err != nil {
-			return newIncludeError(root, &filepath, err.Error())
+		if file, err = stdOs.Open(path); err != nil {
+			return newIncludeError(root, &path, err.Error())
 		}
 		defer file.Close()
 
 		buf := bytes.Buffer{}
 		if _, err = buf.ReadFrom(file); err != nil {
-			return newIncludeError(root, &filepath, err.Error())
+			return newIncludeError(root, &path, err.Error())
 		}
 
 		if err = parseConfig(root, buf.Bytes()); err != nil {
-			return newIncludeError(root, &filepath, err.Error())
+			return newIncludeError(root, &path, err.Error())
 		}
 	}
 	return
