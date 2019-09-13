@@ -188,11 +188,12 @@ class JMXItemChecker extends ItemChecker
 				throw new ZabbixException("Object or attribute not found.");
 			}
 		}
-		else if (item.getKeyId().equals("jmx.discovery"))
+		else if (item.getKeyId().equals("jmx.discovery") || item.getKeyId().equals("jmx.get"))
 		{
 			if (2 < argumentCount)
-				throw new ZabbixException("required key format: jmx.discovery[<discovery mode>,<object name>]");
+				throw new ZabbixException("required key format: " + item.getKeyId() + "[<discovery mode>,<object name>]");
 
+			boolean mapped = item.getKeyId().equals("jmx.discovery");
 			JSONArray counters = new JSONArray();
 			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
 			DiscoveryMode mode = DiscoveryMode.ATTRIBUTES;
@@ -208,45 +209,23 @@ class JMXItemChecker extends ItemChecker
 			switch(mode)
 			{
 				case ATTRIBUTES:
-					discoverAttributes(counters, filter, true);
+					discoverAttributes(counters, filter, mapped);
 					break;
 				case BEANS:
-					discoverBeans(counters, filter, true);
+					discoverBeans(counters, filter, mapped);
 					break;
 			}
 
-			JSONObject mapping = new JSONObject();
-			mapping.put(ItemChecker.JSON_TAG_DATA, counters);
-			return mapping.toString();
-		}
-		else if (item.getKeyId().equals("jmx.get"))
-		{
-			if (2 < argumentCount)
-				throw new ZabbixException("required key format: jmx.get[<discovery mode>,<object name>]");
-
-			JSONArray counters = new JSONArray();
-			ObjectName filter = (2 == argumentCount) ? new ObjectName(item.getArgument(2)) : null;
-			DiscoveryMode mode = DiscoveryMode.ATTRIBUTES;
-			if (0 < argumentCount)
+			if (mapped)
 			{
-				String modeName = item.getArgument(1);
-				if (modeName.equals("beans"))
-					mode = DiscoveryMode.BEANS;
-				else if (!modeName.equals("attributes"))
-					throw new ZabbixException("invalid discovery mode: " + modeName);
+				JSONObject mapping = new JSONObject();
+				mapping.put(ItemChecker.JSON_TAG_DATA, counters);
+				return mapping.toString();
 			}
-
-			switch(mode)
+			else
 			{
-				case ATTRIBUTES:
-					discoverAttributes(counters, filter, false);
-					break;
-				case BEANS:
-					discoverBeans(counters, filter, false);
-					break;
+				return counters.toString();
 			}
-
-			return counters.toString();
 		}
 		else
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
@@ -319,7 +298,7 @@ class JMXItemChecker extends ItemChecker
 				{
 					logger.trace("looking for attributes of primitive types");
 					String descr = (attrInfo.getName().equals(attrInfo.getDescription()) ? null : attrInfo.getDescription());
-					getAllAttributes(counters, name, descr, attrInfo.getName(),
+					getAttributeFields(counters, name, descr, attrInfo.getName(),
 							mbsc.getAttribute(name, attrInfo.getName()), propertiesAsMacros);
 				}
 				catch (Exception e)
@@ -390,8 +369,8 @@ class JMXItemChecker extends ItemChecker
 		}
 	}
 
-	private void getAllAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute,
-			boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
+	private void getAttributeFields(JSONArray counters, ObjectName name, String descr, String attrPath,
+			Object attribute, boolean propertiesAsMacros) throws NoSuchMethodException, JSONException
 	{
 		if (isPrimitiveAttributeType(attribute))
 		{
@@ -427,7 +406,7 @@ class JMXItemChecker extends ItemChecker
 			for (String key : comp.getCompositeType().keySet())
 			{
 				logger.trace("drilling down with attribute path '{}'", attrPath + "." + key);
-				getAllAttributes(counters, name, comp.getCompositeType().getDescription(key),
+				getAttributeFields(counters, name, comp.getCompositeType().getDescription(key),
 						attrPath + "." + key, comp.get(key), propertiesAsMacros);
 			}
 		}
