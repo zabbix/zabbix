@@ -1308,6 +1308,10 @@
 			start: function(event) {
 				$obj.addClass('dashbrd-resizing');
 
+				var handle_class = event.currentTarget.className;
+				data['resizing_top'] = handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null;
+				data['resizing_left'] = handle_class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null;
+
 				// Hide all other widget resize handles which may appear on fast mouse movement.
 				$obj.find('.ui-resizable-handle').not(widget['div'].find('.ui-resizable-handle')).hide();
 
@@ -1319,13 +1323,13 @@
 				startWidgetPositioning($obj, data, widget, 'resize');
 				widget.prev_pos = $.extend({mirrored: {}}, widget.pos);
 				widget.prev_pos.axis_correction = {};
-
-				var handle_class = event.currentTarget.className;
-				widget['div']
-					.toggleClass('resizing-top', handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null)
-					.toggleClass('resizing-left', handle_class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null);
 			},
 			resize: function(event, ui) {
+				// Will break fast-resizing widget-top past minimum height, if moved to start section (jQuery UI bug?)
+				widget['div']
+					.toggleClass('resizing-top', data['resizing_top'])
+					.toggleClass('resizing-left', data['resizing_left']);
+
 				// Hack for Safari to manually accept parent container height in pixels on widget resize.
 				if (SF) {
 					$.each(data['widgets'], function() {
@@ -1391,6 +1395,9 @@
 				if (widget['iterator']) {
 					alignIteratorContents($obj, data, widget, widget['pos']);
 				}
+
+				delete data['resizing_top'];
+				delete data['resizing_left'];
 
 				widget['div']
 					.removeClass('resizing-top')
