@@ -37,6 +37,7 @@ const char	*tls_crypto_init_msg;
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
+#include <openssl/rand.h>
 
 #define TLS_EX_DATA_ERRBIO	0
 #define TLS_EX_DATA_IDENTITY	1
@@ -58,14 +59,20 @@ static int tls_init(void)
 {
 #if OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)
 // OpenSSL 1.1.0 or newer, not LibreSSL
-	if (1 == OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
+	if (1 != OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
 	{
-		tls_crypto_init_msg = "OpenSSL library successfully initialized";
-		return 0;
+		tls_crypto_init_msg = "cannot initialize OpenSSL library";
+		return -1;
 	}
 
-	tls_crypto_init_msg = "cannot initialize OpenSSL library";
-	return -1;
+	if (1 != RAND_status())		// protect against not properly seeded PRNG
+	{
+		tls_crypto_init_msg = "cannot initialize PRNG";
+		return -1;
+	}
+
+	tls_crypto_init_msg = "OpenSSL library successfully initialized";
+	return 0;
 #elif	// OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL - currently not supported
 	zbx_crypto_lib_init_msg = "OpenSSL older than 1.1.0 and LibreSSL currently are not supported";
 	return -1;
