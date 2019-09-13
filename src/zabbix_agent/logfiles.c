@@ -749,7 +749,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	if (0 < old_file->md5size && 0 < new_file->md5size)
 	{
-		/* MD5 sums have been calculated from initial blocks of diferent sizes */
+		/* MD5 sums have been calculated from initial blocks of different sizes */
 
 		const struct st_logfile	*p_smaller, *p_larger;
 		int			f, ret;

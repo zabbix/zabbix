@@ -56,6 +56,6 @@ class CTestArrayHelper {
 	 * @return boolean
 	 */
 	public static function isAssociative($array) {
-		return array_keys($array) !== range(0, count($array) - 1);
+		return $array && array_keys($array) !== range(0, count($array) - 1);
 	}
 }

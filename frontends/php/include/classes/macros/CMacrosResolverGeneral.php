@@ -688,31 +688,52 @@ class CMacrosResolverGeneral {
 	 * @param array $macros[<functionid>][<macro>]  An array of the tokens.
 	 * @param array $macro_values
 	 * @param array $triggers
-	 * @param bool  $events                         Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param array $options
+	 * @param bool  $options['events]               Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool  $options['html]
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], $events = false) {
+	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], array $options = []) {
 		if (!$macros) {
 			return $macro_values;
 		}
 
+		$options += [
+			'events' => false,
+			'html' => false
+		];
+
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
+		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				$clock = null;
+				$value = null;
+
 				switch ($m) {
 					case 'ITEM.VALUE':
-						if ($events) {
+						if ($options['events']) {
 							$trigger = $triggers[$function['triggerid']];
-							$value = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+
+							if (is_array($history)) {
+								if (array_key_exists('clock', $history)) {
+									$clock = $history['clock'];
+								}
+								if (array_key_exists('value', $history)) {
+									$value = $history['value'];
+								}
+							}
 							break;
 						}
 						// break; is not missing here
@@ -720,14 +741,17 @@ class CMacrosResolverGeneral {
 					case 'ITEM.LASTVALUE':
 						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
 
-						$value = array_key_exists($function['itemid'], $history)
-							? $history[$function['itemid']][0]['value']
-							: null;
+						if (array_key_exists($function['itemid'], $history)) {
+							$clock = $history[$function['itemid']][0]['clock'];
+							$value = $history[$function['itemid']][0]['value'];
+						}
 						break;
 				}
 
-				if ($value !== null) {
-					foreach ($tokens as $token) {
+				foreach ($tokens as $token) {
+					$macro_value = UNRESOLVED_MACRO_STRING;
+
+					if ($value !== null) {
 						if (array_key_exists('function', $token)) {
 							if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
 								continue;
@@ -760,9 +784,46 @@ class CMacrosResolverGeneral {
 						else {
 							$macro_value = formatHistoryValue($value, $function);
 						}
-
-						$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 					}
+
+					if ($options['html']) {
+						$macro_value = str_replace(["\r\n", "\n"], [" "], $macro_value);
+						$hint_table = (new CTable())
+							->addClass('list-table')
+							->addRow([
+								new CCol($function['name_expanded']),
+								new CCol(
+									($clock !== null)
+										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
+										: UNRESOLVED_MACRO_STRING
+								),
+								new CCol($macro_value),
+								new CCol(
+									($function['value_type'] == ITEM_VALUE_TYPE_FLOAT
+											|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
+										? new CLink(_('Graph'), (new CUrl('history.php'))
+											->setArgument('action', HISTORY_GRAPH)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
+										)
+										: new CLink(_('History'), (new CUrl('history.php'))
+											->setArgument('action', HISTORY_VALUES)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
+										)
+								)
+							]);
+						$macro_value = new CSpan([
+							(new CSpan())
+								->addClass('main-hint')
+								->setHint($hint_table),
+							(new CLinkAction($macro_value))
+								->addClass('hint-item')
+								->setAttribute('data-hintbox', '1')
+						]);
+					}
+
+					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 				}
 			}
 		}

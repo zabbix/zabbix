@@ -238,7 +238,8 @@ jQuery(function($) {
 			},
 			dataType: 'json',
 			beforeSend: function() {
-				$('.menu-popup-top').menuPopup('close');
+				// Close other action menus and prevent focus jumping before opening a new popup.
+				$('.menu-popup-top').menuPopup('close', null, false);
 				setTimeout(function(){
 					$preloader
 						.fadeIn(200)
@@ -280,6 +281,7 @@ jQuery(function($) {
 	$(document).on('add.popup', function(e, data) {
 		// multiselect check
 		if ($('#' + data.parentId).hasClass('multiselect')) {
+			var items = [];
 			for (var i = 0; i < data.values.length; i++) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
@@ -290,34 +292,11 @@ jQuery(function($) {
 					if (typeof data.values[i].prefix !== 'undefined') {
 						item.prefix = data.values[i].prefix;
 					}
-
-					$('#' + data.parentId).multiSelect('addData', item);
+					items.push(item);
 				}
 			}
-		}
-		else if ($('[name="' + data.parentId + '"]').hasClass('patternselect')) {
-			/**
-			 * Pattern select allows to enter multiple comma or newline separated values in same editable field. Values
-			 * passed to add.popup should be appended at the end of existing value string.
-			 *
-			 * values_arr is used to catch duplicates.
-			 * values_str is used to store user's original syntax.
-			 */
-			var values_str = $('[name="' + data.parentId + '"]').val(),
-				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
 
-			data.values.forEach(function(val) {
-				if (values_arr.indexOf(val[data.object]) == -1) {
-					if (values_str !== '') {
-						values_str += ', ';
-					}
-					values_str += val[data.object];
-				}
-			});
-
-			$('[name="' + data.parentId + '"]')
-				.val(values_str)
-				.trigger('change');
+			$('#' + data.parentId).multiSelect('addData', items);
 		}
 		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
 				&& typeof addPopupValues !== 'undefined') {

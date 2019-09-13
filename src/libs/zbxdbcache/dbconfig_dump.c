@@ -36,9 +36,10 @@ static void	DCdump_config(void)
 
 	zabbix_log(LOG_LEVEL_TRACE, "refresh_unsupported:%d", config->config->refresh_unsupported);
 	zabbix_log(LOG_LEVEL_TRACE, "discovery_groupid:" ZBX_FS_UI64, config->config->discovery_groupid);
-	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%u", config->config->snmptrap_logging);
+	zabbix_log(LOG_LEVEL_TRACE, "snmptrap_logging:%hhu", config->config->snmptrap_logging);
 	zabbix_log(LOG_LEVEL_TRACE, "default_inventory_mode:%d", config->config->default_inventory_mode);
 	zabbix_log(LOG_LEVEL_TRACE, "db_extension: %s", config->config->db_extension);
+	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%hhu", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
 	for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
@@ -816,6 +817,7 @@ static void	DCdump_triggers(void)
 				trigger->correlation_tag, trigger->recovery_mode, trigger->correlation_mode);
 		zabbix_log(LOG_LEVEL_TRACE, "  topoindex:%u functional:%u locked:%u", trigger->topoindex,
 				trigger->functional, trigger->locked);
+		zabbix_log(LOG_LEVEL_TRACE, "  opdata:'%s'", trigger->opdata);
 
 		if (0 != trigger->tags.values_num)
 			DCdump_trigger_tags(trigger);

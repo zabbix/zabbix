@@ -66,6 +66,8 @@ class CTest extends PHPUnit_Framework_TestCase {
 		'after-each' => [],
 		'after' => []
 	];
+	// Instances counter to keep track of test count.
+	protected static $instances = 0;
 
 	/**
 	 * Overriden constructor for collecting data on data sets from dataProvider annotations.
@@ -81,6 +83,19 @@ class CTest extends PHPUnit_Framework_TestCase {
 		if (defined('PHPUNIT_ENABLE_DATA_LIMITS') && PHPUNIT_ENABLE_DATA_LIMITS && $data) {
 			$this->data_key = $data_name;
 			self::$test_data_sets[$name][] = $data_name;
+		}
+
+		self::$instances++;
+	}
+
+	/**
+	 * Destructor to run callback when all tests are executed.
+	 */
+	public function __destruct() {
+		self::$instances--;
+
+		if (self::$instances === 0) {
+			static::onAfterAllTests();
 		}
 	}
 
@@ -377,5 +392,12 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	public static function markTestSuiteSkipped() {
 		self::$skip_suite = true;
+	}
+
+	/**
+	 * Callback to be executed after all test cases.
+	 */
+	public static function onAfterAllTests() {
+		// Code is not missing here.
 	}
 }

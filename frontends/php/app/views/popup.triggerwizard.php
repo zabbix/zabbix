@@ -70,6 +70,10 @@ $form->addItem(
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
+		->addRow(
+			new CLabel(_('Operational data'), 'opdata'),
+			(new CTextBox('opdata', $options['opdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 		->addRow(_('Item'), [
 			(new CTextBox('item', $options['item_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

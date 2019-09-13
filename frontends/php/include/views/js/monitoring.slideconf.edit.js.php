@@ -107,10 +107,10 @@
 			$('#multiselect_userid_wrapper').show();
 
 			// Set current user as owner.
-			$('#userid').multiSelect('addData', {
+			$('#userid').multiSelect('addData', [{
 				'id': $('#current_user_userid').val(),
 				'name': $('#current_user_fullname').val()
-			});
+			}]);
 
 			$('#name').focus();
 		});

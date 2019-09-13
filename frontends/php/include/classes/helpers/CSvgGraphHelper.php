@@ -571,27 +571,13 @@ class CSvgGraphHelper {
 	/**
 	 * Prepare an array to be used for hosts/items filtering.
 	 *
-	 * @param string   $patterns  String containing hosts/items patterns.
+	 * @param array  $patterns  Array of strings containing hosts/items patterns.
 	 *
-	 * @return mixed|array  Returns array of patterns or NULL if all tested hosts/items are valid.
+	 * @return array|mixed  Returns array of patterns.
+	 *                      Returns NULL if array contains '*' (so any possible host/item search matches).
 	 */
-	protected static function processPattern($patterns) {
-		$patterns = array_keys(array_flip(preg_split('/(\r\n|\n|,)/', $patterns)));
-
-		foreach ($patterns as &$pattern) {
-			$pattern = trim($pattern);
-			if ($pattern === '*') {
-				$patterns = null;
-				break;
-			}
-		}
-		unset($pattern);
-
-		if ($patterns !== null) {
-			$patterns = array_filter($patterns, 'strlen');
-		}
-
-		return $patterns;
+	protected static function processPattern(array $patterns) {
+		return in_array('*', $patterns) ? null : $patterns;
 	}
 
 	/*

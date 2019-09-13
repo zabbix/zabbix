@@ -69,6 +69,7 @@ struct	_DC_TRIGGER;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
+#define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
 #define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
@@ -237,8 +238,11 @@ struct	_DC_TRIGGER;
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 
 #	define	ZBX_SQL_EXEC_FROM	0
-
-#	define	ZBX_SQL_STRCMP		"%s'%s'"
+#	ifdef HAVE_MYSQL
+#		define	ZBX_SQL_STRCMP		"%s binary '%s'"
+#	else
+#		define	ZBX_SQL_STRCMP		"%s'%s'"
+#	endif
 #	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
@@ -306,6 +310,7 @@ typedef struct
 	char		*url;
 	char		*comments;
 	char		*correlation_tag;
+	char		*opdata;
 	unsigned char	value;
 	unsigned char	priority;
 	unsigned char	type;
@@ -599,14 +604,16 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now);
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now);
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now);
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now);
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid);
 void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts);
 
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		const char *host_metadata, unsigned short flag);
+		unsigned int connection_type, const char *host_metadata, unsigned short flag);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
