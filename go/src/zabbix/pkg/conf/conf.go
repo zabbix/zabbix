@@ -429,7 +429,7 @@ func loadInclude(root *Node, path string) (err error) {
 	}
 	if !hasMeta(path) {
 		var fi os.FileInfo
-		if fi, err = os.Stat(path); err != nil {
+		if fi, err = stdOs.Stat(path); err != nil {
 			return newIncludeError(root, &path, err.Error())
 		}
 		if fi.IsDir() {
@@ -437,7 +437,7 @@ func loadInclude(root *Node, path string) (err error) {
 		}
 	} else {
 		var fi os.FileInfo
-		if fi, err = os.Stat(filepath.Dir(path)); err != nil {
+		if fi, err = stdOs.Stat(filepath.Dir(path)); err != nil {
 			return newIncludeError(root, &path, err.Error())
 		}
 		if !fi.IsDir() {
@@ -446,14 +446,18 @@ func loadInclude(root *Node, path string) (err error) {
 	}
 
 	var paths []string
-	if paths, err = filepath.Glob(path); err != nil {
-		return newIncludeError(root, nil, err.Error())
+	if hasMeta(path) {
+		if paths, err = filepath.Glob(path); err != nil {
+			return newIncludeError(root, nil, err.Error())
+		}
+	} else {
+		paths = append(paths, path)
 	}
 
 	for _, path := range paths {
 		// skip directories
 		var fi os.FileInfo
-		if fi, err = os.Stat(path); err != nil {
+		if fi, err = stdOs.Stat(path); err != nil {
 			return newIncludeError(root, &path, err.Error())
 		}
 		if fi.IsDir() {

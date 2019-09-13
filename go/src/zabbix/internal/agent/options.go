@@ -68,7 +68,7 @@ type AgentOptions struct {
 	TLSServerCertIssuer  string   `conf:",optional"`
 	TLSServerCertSubject string   `conf:",optional"`
 
-	Plugins map[string]map[string]string
+	Plugins map[string]map[string]string `conf:",optional"`
 }
 
 var Options AgentOptions
