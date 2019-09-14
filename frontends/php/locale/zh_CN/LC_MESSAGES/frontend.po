@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-03 14:28+0300\n"
+"POT-Creation-Date: 2019-09-15 01:42+0300\n"
 "PO-Revision-Date: 2019-01-29 07:38+0300\n"
 "Last-Translator: YunXi <tech@gootoo.top>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -232,7 +232,7 @@ msgstr "(无agent代理程序)"
 msgid "0 - use default port"
 msgstr "0 - 使用默认端口"
 
-#: include/triggers.inc.php:1846
+#: include/triggers.inc.php:1847
 msgid "0 or 1"
 msgstr "0 或 1"
 
@@ -865,7 +865,7 @@ msgstr "所有标签"
 msgid "All templates"
 msgstr "所有模板"
 
-#: include/triggers.inc.php:1241
+#: include/triggers.inc.php:1242
 #: include/views/configuration.trigger.prototype.edit.php:520
 #: include/views/configuration.trigger.prototype.massupdate.php:173
 #: include/views/configuration.triggers.edit.php:554
@@ -884,7 +884,7 @@ msgstr "允许的主机"
 msgid "Alternatively, you can install it manually:"
 msgstr "另外，您也可以手动安装:"
 
-#: include/triggers.inc.php:1309
+#: include/triggers.inc.php:1310
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1146
 #: include/views/configuration.correlation.edit.php:94
@@ -2887,7 +2887,7 @@ msgctxt "noun"
 msgid "Change"
 msgstr "更改"
 
-#: include/classes/screens/CScreenBase.php:406
+#: include/classes/screens/CScreenBase.php:397
 #: include/classes/screens/CScreenBuilder.php:502
 #: include/classes/screens/CScreenMap.php:45
 #: include/views/configuration.services.edit.php:62
@@ -4643,7 +4643,7 @@ msgstr "拒绝"
 msgid "Dependencies"
 msgstr "依赖关系"
 
-#: include/triggers.inc.php:2724
+#: include/triggers.inc.php:2725
 msgid "Dependent"
 msgstr "依赖"
 
@@ -4651,7 +4651,7 @@ msgstr "依赖"
 msgid "Dependent item"
 msgstr "相关项目"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2724
+#: app/views/popup.generic.php:288 include/triggers.inc.php:2725
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4816,7 +4816,7 @@ msgstr "禁用所选定的web场景？"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
-#: include/items.inc.php:189 include/triggers.inc.php:2174
+#: include/items.inc.php:189 include/triggers.inc.php:2175
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5549,7 +5549,7 @@ msgstr "启用trapping"
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
-#: include/triggers.inc.php:1246 include/triggers.inc.php:2171
+#: include/triggers.inc.php:1247 include/triggers.inc.php:2172
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5651,7 +5651,7 @@ msgstr "关联项事件规则"
 msgid "Event details"
 msgstr "事件细节"
 
-#: include/triggers.inc.php:1236
+#: include/triggers.inc.php:1237
 msgid "Event generation"
 msgstr "事件生成"
 
@@ -6044,7 +6044,6 @@ msgstr "填满的区域"
 #: app/views/monitoring.problem.view.php:339
 #: include/classes/html/CFilter.php:402
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
-#: include/classes/widgets/forms/CWidgetFormMap.php:101
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
 #: include/views/administration.auditlogs.list.php:61
@@ -6266,7 +6265,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr "获取网页。返回信息为网页源码或者TXT"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1392
+#: include/triggers.inc.php:1393
 msgid "Given expression is not a macro"
 msgstr "此表达式不是宏"
 
@@ -6832,7 +6831,7 @@ msgstr "横向对齐"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/forms.inc.php:375 include/hostgroups.inc.php:251
-#: include/maps.inc.php:24 include/triggers.inc.php:1204
+#: include/maps.inc.php:24 include/triggers.inc.php:1205
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.graph.list.php:51
@@ -7161,7 +7160,7 @@ msgstr "可视名称同样为 \"%s\" 的主机已存在."
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:827 include/items.inc.php:1181
 #: include/menu.inc.php:132 include/menu.inc.php:196
-#: include/triggers.inc.php:901
+#: include/triggers.inc.php:902
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:86
 #: include/views/configuration.host.discovery.list.php:55
@@ -7474,42 +7473,42 @@ msgstr "维修中"
 msgid "In progress"
 msgstr "启用中"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:107
+#: app/controllers/CControllerDashboardWidgetEdit.php:109
 msgid "Inaccessible graph"
 msgstr "不能访问的图表"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:239
+#: app/controllers/CControllerDashboardWidgetEdit.php:241
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "不能访问的组"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:240
+#: app/controllers/CControllerDashboardWidgetEdit.php:242
 msgid "Inaccessible host"
 msgstr "无法访问的主机"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:243
 msgid "Inaccessible item"
 msgstr "无法访问的项"
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:291 include/triggers.inc.php:2326
+#: include/hostgroups.inc.php:291 include/triggers.inc.php:2327
 #: include/views/configuration.host.list.php:190
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr "无法访问的维护"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:103
+#: app/controllers/CControllerDashboardWidgetEdit.php:105
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "无法访问的拓扑图"
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:898 include/triggers.inc.php:2465
+#: include/items.inc.php:898 include/triggers.inc.php:2466
 msgid "Inaccessible template"
 msgstr "无法访问的模板"
 
-#: include/triggers.inc.php:2694 include/triggers.inc.php:2702
+#: include/triggers.inc.php:2695 include/triggers.inc.php:2703
 msgid "Inaccessible trigger"
 msgstr "无法访问的触发器"
 
@@ -7945,7 +7944,7 @@ msgstr "动作\"%1$s\"的过滤器条件类型不正确"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1393
+#: include/triggers.inc.php:1394
 msgid "Incorrect function is used"
 msgstr "使用了错误的函数"
 
@@ -8036,7 +8035,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "图表元素应用了不正确的监控项目模板ID\"%1$s\" "
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1394
+#: include/triggers.inc.php:1395
 msgid "Incorrect item value type"
 msgstr "项目的数据类型不正确"
 
@@ -8970,7 +8969,6 @@ msgstr "无效的参数个数."
 #: include/classes/validators/CApiInputValidator.php:1572
 #: include/classes/validators/CApiInputValidator.php:1577
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
-#: include/classes/widgets/forms/CWidgetFormMap.php:101
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
@@ -10596,7 +10594,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr "多重"
 
-#: include/triggers.inc.php:1237
+#: include/triggers.inc.php:1238
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
 
@@ -10884,7 +10882,7 @@ msgstr "下一步"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
+#: include/triggers.inc.php:1244 include/triggers.inc.php:1249
 #: include/views/administration.users.list.php:111
 #: include/views/administration.users.list.php:115
 #: include/views/configuration.host.prototype.list.php:126
@@ -11473,7 +11471,7 @@ msgid "None"
 msgstr "无"
 
 #: app/views/popup.generic.php:533 include/graphs.inc.php:24
-#: include/items.inc.php:160 include/triggers.inc.php:1236
+#: include/items.inc.php:160 include/triggers.inc.php:1237
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -11712,13 +11710,13 @@ msgid "Numeral systems"
 msgstr "数字系统"
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:676
+#: include/triggers.inc.php:1845 include/views/configuration.item.edit.php:676
 #: include/views/configuration.item.massupdate.php:278
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Numeric (float)"
 msgstr "浮点数"
 
-#: include/triggers.inc.php:1845
+#: include/triggers.inc.php:1846
 msgid "Numeric (integer)"
 msgstr "数字（整数）"
 
@@ -12017,7 +12015,7 @@ msgstr "选项"
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
-#: include/triggers.inc.php:1309
+#: include/triggers.inc.php:1310
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1147
 #: include/views/configuration.correlation.edit.php:95
@@ -12792,7 +12790,7 @@ msgstr "问题已创建"
 msgid "Problem display"
 msgstr "问题显示"
 
-#: include/triggers.inc.php:1229
+#: include/triggers.inc.php:1230
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
 msgstr "问题表现形式"
@@ -13082,7 +13080,7 @@ msgstr "接收者(降序)"
 msgid "Recovery"
 msgstr "恢复"
 
-#: include/triggers.inc.php:1233
+#: include/triggers.inc.php:1234
 #: include/views/configuration.trigger.prototype.edit.php:273
 #: include/views/configuration.trigger.prototype.edit.php:355
 #: include/views/configuration.triggers.edit.php:297
@@ -14186,7 +14184,7 @@ msgstr "选择"
 msgid "Select prototype"
 msgstr "选择原型"
 
-#: include/classes/widgets/fields/CWidgetFieldWidgetListComboBox.php:53
+#: include/classes/widgets/fields/CWidgetFieldWidgetListComboBox.php:75
 msgid "Select widget"
 msgstr "选择构件"
 
@@ -14454,7 +14452,7 @@ msgstr "将 LDAP 引用设置为「关闭」失败。"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:167 include/triggers.inc.php:1214
+#: include/events.inc.php:167 include/triggers.inc.php:1215
 #: include/views/configuration.item.list.php:145
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -15846,7 +15844,7 @@ msgstr "趋势"
 #: app/views/popup.services.php:44 include/actions.inc.php:44
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
-#: include/triggers.inc.php:1208
+#: include/triggers.inc.php:1209
 #: include/views/configuration.services.edit.php:87
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.parent.list.php:35
@@ -16056,7 +16054,7 @@ msgstr "触发器已更新"
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
-#: include/html.inc.php:388 include/triggers.inc.php:875
+#: include/html.inc.php:388 include/triggers.inc.php:876
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
@@ -16354,7 +16352,7 @@ msgstr "单位"
 #: include/items.inc.php:171 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2171
+#: include/triggers.inc.php:242 include/triggers.inc.php:2172
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
@@ -16380,12 +16378,12 @@ msgstr "未知的函数."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:535
-#: include/triggers.inc.php:1391
+#: include/triggers.inc.php:1392
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主机监控项, 在所选的主机中没有这样的监控项"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1390
+#: include/triggers.inc.php:1391
 msgid "Unknown host, no such host present in system"
 msgstr "未知的主机, 在系统中没有出现这样的主机."
 
@@ -17176,15 +17174,10 @@ msgstr "参数 \"grid_show \"的值 \"%1$s \"是无效的. 可用的是: \"%2$s 
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "参数 \"grid_show \"的值 \"%1$s\"是无效的. 可用的是: \"%2$s\""
 
-#: include/classes/db/DB.php:359
+#: include/classes/db/DB.php:359 include/classes/db/DB.php:388
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "栏位\"%2$s\"的值\"%1$s\"太长 - %3$d字元. 容许的长度是%4$d字符."
-
-#: include/classes/db/DB.php:388
-#, c-format
-msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
-msgstr "栏位\"%2$s\"的值\"%1$s\"太长 - %3$d 字元. 容许的长度是2048字符."
 
 #: include/validate.inc.php:149 include/validate.inc.php:173
 #: include/validate.inc.php:188
@@ -17695,7 +17688,7 @@ msgstr "每年"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1242 include/triggers.inc.php:1247
+#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/administration.users.list.php:109
 #: include/views/configuration.host.prototype.list.php:126
@@ -18195,8 +18188,7 @@ msgstr "不能变更"
 #: include/classes/validators/CApiInputValidator.php:739
 #: include/classes/validators/CApiInputValidator.php:941
 #: include/classes/validators/CApiInputValidator.php:983
-#: include/classes/validators/CNewValidator.php:91
-#: include/classes/widgets/forms/CWidgetFormMap.php:101 usergrps.php:318
+#: include/classes/validators/CNewValidator.php:91 usergrps.php:318
 #: usergrps.php:358 usergrps.php:361
 msgid "cannot be empty"
 msgstr "不能为空"
