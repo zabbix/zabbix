@@ -230,21 +230,6 @@ class CMediatype extends CApiService {
 			$this->checkRequiredFieldsByType($mediatype);
 
 			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EZ_TEXTING:
-					$message_text_limit_validator = new CLimitedSetValidator([
-						'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
-					]);
-
-					if (!$message_text_limit_validator->validate($mediatype['exec_path'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['exec_path'],
-							'exec_path',
-							$mediatype['description']
-						));
-					}
-					break;
-
 				case MEDIA_TYPE_EMAIL:
 					if (array_key_exists('smtp_authentication', $mediatype)) {
 						$smtp_authentication_validator = new CLimitedSetValidator([
@@ -537,9 +522,7 @@ class CMediatype extends CApiService {
 				$optional_fields_by_type = [
 					MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
 					MEDIA_TYPE_EXEC => ['exec_path'],
-					MEDIA_TYPE_SMS => ['gsm_modem'],
-					MEDIA_TYPE_JABBER => ['username', 'passwd'],
-					MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
+					MEDIA_TYPE_SMS => ['gsm_modem']
 				];
 
 				foreach ($optional_fields_by_type[$db_mediatype['type']] as $field) {
@@ -558,24 +541,6 @@ class CMediatype extends CApiService {
 			}
 
 			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EZ_TEXTING:
-					if (array_key_exists('exec_path', $mediatype)) {
-						$message_text_limit_validator = new CLimitedSetValidator([
-							'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
-						]);
-
-						if ($db_mediatype['exec_path'] !== $mediatype['exec_path']
-								&& !$message_text_limit_validator->validate($mediatype['exec_path'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['exec_path'],
-								'exec_path',
-								$mediatype['description']
-							));
-						}
-					}
-					break;
-
 				case MEDIA_TYPE_EMAIL:
 					if (array_key_exists('smtp_authentication', $mediatype)) {
 						$smtp_authentication_validator = new CLimitedSetValidator([
@@ -901,7 +866,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @param array		$mediatype							An array of media type data.
 	 * @param string	$mediatype['description']			Name of the media type.
-	 * @param string	$mediatype['type']					E-mail, Script, SMS, Jabber and Ez Texting.
+	 * @param string	$mediatype['type']					E-mail, Script and SMS.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -922,9 +887,7 @@ class CMediatype extends CApiService {
 		$required_fields_by_type = [
 			MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
 			MEDIA_TYPE_EXEC => ['exec_path'],
-			MEDIA_TYPE_SMS => ['gsm_modem'],
-			MEDIA_TYPE_JABBER => ['username', 'passwd'],
-			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
+			MEDIA_TYPE_SMS => ['gsm_modem']
 		];
 
 		foreach ($required_fields_by_type[$mediatype['type']] as $field) {

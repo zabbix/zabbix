@@ -86,14 +86,6 @@ foreach ($data['mediatypes'] as $mediaType) {
 			$details = _('GSM modem').NAME_DELIMITER.'"'.$mediaType['gsm_modem'].'"';
 			break;
 
-		case MEDIA_TYPE_JABBER:
-			$details = _('Jabber identifier').NAME_DELIMITER.'"'.$mediaType['username'].'"';
-			break;
-
-		case MEDIA_TYPE_EZ_TEXTING:
-			$details = _('Username').NAME_DELIMITER.'"'.$mediaType['username'].'"';
-			break;
-
 		default:
 			$details = '';
 			break;

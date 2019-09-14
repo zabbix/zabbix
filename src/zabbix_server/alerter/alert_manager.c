@@ -1792,20 +1792,10 @@ static int	am_process_alert(zbx_am_t *manager, const zbx_ipc_service_t *alerter_
 					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
 					mediatype->content_type);
 			break;
-		case MEDIA_TYPE_JABBER:
-			command = ZBX_IPC_ALERTER_JABBER;
-			data_len = zbx_alerter_serialize_jabber(&data, alert->alertid, alert->sendto, alert->subject,
-					alert->message, mediatype->username, mediatype->passwd);
-			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;
 			data_len = zbx_alerter_serialize_sms(&data, alert->alertid, alert->sendto, alert->message,
 					mediatype->gsm_modem);
-			break;
-		case MEDIA_TYPE_EZ_TEXTING:
-			command = ZBX_IPC_ALERTER_EZTEXTING;
-			data_len = zbx_alerter_serialize_eztexting(&data, alert->alertid, alert->sendto, alert->message,
-					mediatype->username, mediatype->passwd, mediatype->exec_path);
 			break;
 		case MEDIA_TYPE_EXEC:
 			command = ZBX_IPC_ALERTER_EXEC;
