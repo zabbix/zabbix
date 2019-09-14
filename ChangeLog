@@ -1,6 +1,7 @@
 Changes for 4.4.0alpha3
 
 New features:
+A.F....... [ZBXNEXT-5252] added new dashboard widget "Graph prototype" (averza)
 A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in autoregistration (Andris, Sasha, vasilijs)
 ..F....... [ZBXNEXT-5328] replaced graph widget hosts and items selector (ashubin, miks)
 ..F....... [ZBXNEXT-5219] Separate configuration and realtime fields in items table (PoC) (rlataria)
@@ -13,6 +14,7 @@ A......... [ZBX-3783] add strict validation of input parameters in valuemap.get(
 A.F.....S. [ZBXNEXT-4942] implemented support of displaying operational data in the list of problems (agriscenko, asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
