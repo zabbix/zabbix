@@ -7,7 +7,7 @@ A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in 
 ..F....... [ZBXNEXT-5328] replaced graph widget hosts and items selector (ashubin, miks)
 .......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
 .........T [ZBXNEXT-5141] added "Template App Apache" (afayantsev)
-..F....... [ZBXNEXT-854] Support Bar Graphs (ashubin, rlataria)
+..F....... [ZBXNEXT-854] added support of bar graphs (ashubin, rlataria)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .........T [ZBXNEXT-5142] added "Template App Nginx" (mchudinov)
 ..F....... [ZBXNEXT-1657] split proxy and host names in separate columns in Configuration->Hosts list, Configuration->Discovery rules list and Administration->Queue pages (Ivo)
