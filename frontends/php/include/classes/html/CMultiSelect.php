@@ -26,6 +26,11 @@ class CMultiSelect extends CTag {
 	const ZBX_STYLE_CLASS = 'multiselect-control';
 
 	/**
+	 * Search method used for autocomplete requests.
+	 */
+	const SEARCH_METHOD = 'multiselect.get';
+
+	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
 	 * @param bool  $options['multiple']       Allows multiple selections.
 	 * @param bool  $options['add_post_js']
@@ -54,7 +59,7 @@ class CMultiSelect extends CTag {
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
-			->setArgument('method', 'multiselect.get')
+			->setArgument('method', static::SEARCH_METHOD)
 			->setArgument('objectName', $options['objectName']);
 
 		if (array_key_exists('objectOptions', $options)) {
@@ -126,7 +131,7 @@ class CMultiSelect extends CTag {
 	 *
 	 * @return array
 	 */
-	private function mapOptions(array $options) {
+	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiple', 'disabled', 'default_value', 'data', 'add_new',
 			'add_post_js', 'styles', 'popup'
 		];
@@ -177,8 +182,9 @@ class CMultiSelect extends CTag {
 
 				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
-					'webitems', 'normal_only', 'numeric', 'with_simple_graph_items', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups'
+					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
+					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
+					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -243,12 +249,11 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['templated_hosts'] = true;
 				}
 
-				if (array_key_exists('with_simple_graph_items', $parameters) && $parameters['with_simple_graph_items']) {
-					$popup_parameters['with_simple_graph_items'] = '1';
-				}
-
-				if (array_key_exists('with_triggers', $parameters) && $parameters['with_triggers']) {
-					$popup_parameters['with_triggers'] = '1';
+				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
+						'with_simple_graph_item_prototypes', 'with_triggers'] as $name) {
+					if (array_key_exists($name, $parameters) && $parameters[$name]) {
+						$popup_parameters[$name] = '1';
+					}
 				}
 
 				if (array_key_exists('webitems', $parameters) && $parameters['webitems']) {
@@ -282,6 +287,10 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('enrich_parent_groups', $parameters) && $parameters['enrich_parent_groups']) {
 					$popup_parameters['enrich_parent_groups'] = '1';
 					$autocomplete_parameters['enrich_parent_groups'] = '1';
+				}
+
+				if (array_key_exists('orig_names', $parameters) && $parameters['orig_names']) {
+					$popup_parameters['orig_names'] = '1';
 				}
 			}
 		}

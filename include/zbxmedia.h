@@ -39,12 +39,6 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
 		unsigned char content_type, int timeout, char *error, size_t max_error_len);
-int	send_ez_texting(const char *username, const char *password, const char *sendto,
-		const char *message, const char *limit, char *error, int max_error_len);
-#ifdef HAVE_JABBER
-int	send_jabber(const char *username, const char *password, const char *sendto,
-		const char *subject, const char *message, char *error, int max_error_len);
-#endif
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
 #endif

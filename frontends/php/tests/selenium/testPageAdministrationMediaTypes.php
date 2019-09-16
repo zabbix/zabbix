@@ -56,7 +56,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'SMS'
 					],
-					'result' => ['SMS', 'SMS via IP']
+					'result' => ['SMS']
 				]
 			],
 			[
@@ -72,7 +72,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Email', 'Jabber', 'SMS', 'SMS via IP']
+					'result' => ['Email', 'SMS']
 				]
 			],
 			[
@@ -203,10 +203,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'rows' => [
-						['Name' => 'Jabber'],
 						['Name' => 'SMS']
 					],
-					'db_description' => ['Jabber', 'SMS']
+					'db_description' => ['SMS']
 				]
 			],
 			// Select all.
@@ -409,25 +408,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'error' => 'Incorrect value for field "message": cannot be empty.'
 				]
 			],
-			// Jabber media type.
-			[
-				[
-					'name' => 'Jabber',
-					'form' => [
-						'Send to' => '0',
-						'Subject' => 'new subject',
-						'Message' => 'new message'
-					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
-				]
-			],
 			// SMS media type.
 			[
 				[
@@ -435,23 +415,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'abcd',
 						'Message' => 'new message'
-					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
-				]
-			],
-			// 	Ez Texting media type.
-			[
-				[
-					'name' => 'SMS via IP',
-					'form' => [
-						'Send to' => '12345'
 					],
 					'error' => [
 						'Connection to Zabbix server "localhost" refused. Possible reasons:',
@@ -574,7 +537,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$this->assertTrue($message->isGood());
-			$this->assertEquals('Media types deleted', $message->getTitle());
+			$this->assertEquals((count($data['rows']) === 1) ? 'Media type deleted' : 'Media types deleted',
+				$message->getTitle()
+			);
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT NULL'.
 				' FROM media_type'.

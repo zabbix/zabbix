@@ -53,7 +53,8 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true]
+			'users' => ['passwd' => true],
+			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
 		];
 
 		switch ($resourcetype) {
@@ -67,6 +68,12 @@ class CAudit {
 				$field_name_resourceid = 'applicationid';
 				$field_name_resourcename = 'name';
 				$table_name = 'applications';
+				break;
+
+			case AUDIT_RESOURCE_AUTOREGISTRATION:
+				$field_name_resourceid = 'configid';
+				$field_name_resourcename = null;
+				$table_name = 'config';
 				break;
 
 			case AUDIT_RESOURCE_CORRELATION:
@@ -218,10 +225,10 @@ class CAudit {
 
 				$objects_diff[] = $object_diff;
 
-				$resourcename = $object_old[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
 			}
 			else {
-				$resourcename = $object[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object[$field_name_resourcename] : '';
 			}
 
 			if (mb_strlen($resourcename) > 255) {

@@ -19,34 +19,41 @@
 **/
 
 
-class CWidgetFieldItem extends CWidgetField {
-
-	private $multiple = true;
-
-	private $filter_parameters = [
-		'real_hosts' => true,
-		'webitems' => true
-	];
+class CWidgetFieldMultiselect extends CWidgetField {
 
 	/**
-	 * Create widget field for Items selection.
+	 * Is selecting multiple objects or a single one?
 	 *
-	 * @param string $name   Field name in form.
-	 * @param string $label  Label for the field in form.
+	 * @var bool
+	 */
+	protected $multiple = true;
+
+	/**
+	 * Additional filter parameters used for data selection.
+	 *
+	 * @var array
+	 */
+	protected $filter_parameters = [];
+
+	/**
+	 * Multiselect widget field.
+	 * Will create text box field with select button, that will allow to select specified resource.
+	 *
+	 * @param string $name  Field name in form.
+	 * @param string $label Label for the field in form.
 	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 		$this->setDefault([]);
 	}
 
 	/**
-	 * Set additional flags, which can be used in configuration form.
+	 * Set additional validation flags.
 	 *
 	 * @param int $flags
 	 *
-	 * @return $this
+	 * @return CWidgetFieldMultiselect
 	 */
 	public function setFlags($flags) {
 		parent::setFlags($flags);
@@ -63,6 +70,9 @@ class CWidgetFieldItem extends CWidgetField {
 		return $this;
 	}
 
+	/**
+	 * @return CWidgetFieldMultiselect
+	 */
 	public function setValue($value) {
 		$this->value = (array) $value;
 
@@ -70,7 +80,7 @@ class CWidgetFieldItem extends CWidgetField {
 	}
 
 	/**
-	 * Is field with multiple items or single.
+	 * Is selecting multiple values or a single value?
 	 *
 	 * @return bool
 	 */
@@ -79,11 +89,11 @@ class CWidgetFieldItem extends CWidgetField {
 	}
 
 	/**
-	 * Set field to multiple items mode.
+	 * Set field to multiple objects mode.
 	 *
 	 * @param bool $multiple
 	 *
-	 * @return CWidgetFieldItem
+	 * @return CWidgetFieldMultiselect
 	 */
 	public function setMultiple($multiple) {
 		$this->multiple = $multiple;
@@ -92,6 +102,8 @@ class CWidgetFieldItem extends CWidgetField {
 	}
 
 	/**
+	 * Get additional filter parameters.
+	 *
 	 * @return array
 	 */
 	public function getFilterParameters() {
@@ -99,10 +111,12 @@ class CWidgetFieldItem extends CWidgetField {
 	}
 
 	/**
+	 * Set an additional filter parameter for data selection.
+	 *
 	 * @param string $name
 	 * @param mixed $value
 	 *
-	 * @return CWidgetFieldItem
+	 * @return CWidgetFieldMultiselect
 	 */
 	public function setFilterParameter($name, $value) {
 		$this->filter_parameters[$name] = $value;

@@ -874,7 +874,15 @@ function executeScript(hostid, scriptid, confirmation, trigger_elmnt) {
 						l = n['name'].indexOf('[', r + 1);
 						r = n['name'].indexOf(']', r + 1);
 
-						if (l == -1 || r == -1 || r <= l) {
+						if (l + 1 == r) {
+							if (typeof curr_json[key] === 'undefined') {
+								curr_json[key] = [];
+							}
+
+							curr_json[key].push(n['value']);
+							break;
+						}
+						else if (l == -1 || r == -1 || r <= l) {
 							curr_json[key] = n['value']
 							break;
 						}

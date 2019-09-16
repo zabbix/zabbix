@@ -123,6 +123,13 @@ class API {
 	}
 
 	/**
+	 * @return CAutoregistration
+	 */
+	public static function Autoregistration() {
+		return self::getApi('autoregistration');
+	}
+
+	/**
 	 * @return CConfiguration
 	 */
 	public static function Configuration() {

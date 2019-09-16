@@ -199,7 +199,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Purpose: add discovered host if it was not added already                   *
  *                                                                            *
- * Parameters: dhostid - discovered host id                                   *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
@@ -443,7 +443,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
 		result = DBselect(
-				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags"
+				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags,tls_accepted"
 				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
@@ -455,6 +455,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			zbx_conn_flags_t	flags;
 			int			flags_int;
 			unsigned char		useip = 1;
+			int			tls_accepted;
 
 			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 			host_esc = DBdyn_escape_field("hosts", "host", row[1]);
@@ -476,6 +477,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 			if (ZBX_CONN_DNS == flags)
 				useip = 0;
+
+			tls_accepted = atoi(row[6]);
 
 			result2 = DBselect(
 					"select null"
@@ -511,9 +514,27 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts");
 
-				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
-						NULL);
-				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1]);
+				if (ZBX_TCP_SEC_TLS_PSK == tls_accepted)
+				{
+					char	psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+					char	psk[HOST_TLS_PSK_LEN_MAX];
+
+					DCget_autoregistration_psk(psk_identity, sizeof(psk_identity),
+							(unsigned char *)psk, sizeof(psk));
+
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",
+							"host", "name", "tls_connect", "tls_accept",
+							"tls_psk_identity", "tls_psk", NULL);
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1],
+						tls_accepted, tls_accepted, psk_identity, psk);
+				}
+				else
+				{
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host",
+							"name", NULL);
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1]);
+				}
+
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
