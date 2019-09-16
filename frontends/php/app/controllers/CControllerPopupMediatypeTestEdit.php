@@ -48,7 +48,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 
 	protected function doAction() {
 		$mediatype = API::MediaType()->get([
-			'output' => ['type', 'status'],
+			'output' => ['type', 'status', 'params'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
 		]);
 
@@ -78,6 +78,7 @@ class CControllerPopupMediatypeTestEdit extends CController {
 			'sendto' => '',
 			'subject' => _('Test subject'),
 			'message' => _('This is the test message from Zabbix'),
+			'webhook_params' => $mediatype[0]['params'],
 			'type' => $mediatype[0]['type'],
 			'enabled' => ($mediatype[0]['status'] == MEDIA_STATUS_ACTIVE),
 			'user' => ['debug_mode' => $this->getDebugMode()]

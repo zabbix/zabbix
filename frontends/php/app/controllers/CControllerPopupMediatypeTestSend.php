@@ -24,9 +24,11 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
+			'type' =>			'int32',
 			'sendto' =>			'string|not_empty',
 			'subject' =>		'string',
-			'message' =>		'string'
+			'message' =>		'string',
+			'webhook_params' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateMediaType();
@@ -75,7 +77,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 		$ret = true;
 
-		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC) {
+		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC && $mediatype[0]['type'] != MEDIA_TYPE_WEBHOOK) {
 			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
 				'message' =>	'string|not_empty'
 			]);
@@ -102,15 +104,26 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
-		$result = $server->testMediaType([
-				'mediatypeid' => $this->getInput('mediatypeid'),
+		if ($this->getInput('type') == MEDIA_TYPE_WEBHOOK ) {
+			$params = [];
+
+			foreach ($this->getInput('webhook_params', []) as $param) {
+				$params[$param['name']] = $param['value'];
+			}
+
+			$params = compact('params');
+		}
+		else {
+			$params = [
 				'sendto' =>	$this->getInput('sendto'),
 				'subject' => $this->getInput('subject'),
 				'message' => $this->getInput('message')
-			],
-			CWebUser::getSessionCookie()
-		);
+			];
+		}
+
+		$params['mediatypeid'] = $this->getInput('mediatypeid');
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		$result = $server->testMediaType($params, CWebUser::getSessionCookie());
 
 		if ($result) {
 			$msg_title = null;
