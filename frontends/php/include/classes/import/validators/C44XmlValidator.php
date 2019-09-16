@@ -590,7 +590,8 @@ class C44XmlValidator {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>				['type' => XML_ARRAY, 'rules' => [
 							'macro' =>				['type' => XML_STRING | XML_REQUIRED],
-							'value' =>				['type' => XML_STRING | XML_REQUIRED]
+							'value' =>				['type' => XML_STRING | XML_REQUIRED],
+							'description' =>		['type' => XML_STRING]
 						]]
 					]],
 					'inventory' =>				['type' => XML_ARRAY, 'rules' => [
@@ -1171,7 +1172,8 @@ class C44XmlValidator {
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>				['type' => XML_ARRAY, 'rules' => [
 							'macro' =>				['type' => XML_STRING | XML_REQUIRED],
-							'value' =>				['type' => XML_STRING | XML_REQUIRED]
+							'value' =>				['type' => XML_STRING | XML_REQUIRED],
+							'description' =>		['type' => XML_STRING]
 						]]
 					]],
 					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
