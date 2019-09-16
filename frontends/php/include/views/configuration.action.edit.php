@@ -766,12 +766,14 @@ if (!empty($data['new_operation'])) {
 			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $data['new_operation']['opmessage']['mediatypeid']))
 				->addItem(0, '- '._('All').' -');
 
-			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.name FROM media_type mt'));
+			$db_mediatypes = API::MediaType()->get([
+				'output' => ['name'],
+				'preservekeys' => true
+			]);
+			order_result($db_mediatypes, 'name');
 
-			order_result($dbMediaTypes, 'name');
-
-			foreach ($dbMediaTypes as $dbMediaType) {
-				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['name']);
+			foreach ($db_mediatypes as $mediatypeid => $db_mediatype) {
+				$mediaTypeComboBox->addItem($mediatypeid, $db_mediatype['name']);
 			}
 
 			$new_operation_formlist
@@ -1520,12 +1522,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					$data['new_recovery_operation']['opmessage']['mediatypeid'])
 				)->addItem(0, '- '._('All').' -');
 
-				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.name FROM media_type mt'));
+				$db_mediatypes = API::MediaType()->get([
+					'output' => ['name'],
+					'preservekeys' => true
+				]);
+				order_result($db_mediatypes, 'name');
 
-				order_result($dbMediaTypes, 'name');
-
-				foreach ($dbMediaTypes as $dbMediaType) {
-					$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['name']);
+				foreach ($db_mediatypes as $mediatypeid => $db_mediatype) {
+					$mediaTypeComboBox->addItem($mediatypeid, $db_mediatype['name']);
 				}
 
 				$new_operation_formlist
