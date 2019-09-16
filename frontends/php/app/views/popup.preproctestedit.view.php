@@ -67,7 +67,7 @@ foreach ($data['steps'] as $i => $step) {
 		->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
 		->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
-	// Temporary solition to fix "\n\n1" converion to "\n1" in the hidden textarea field after jQuery.append().
+	// Temporary solition to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
 	if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
 		$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
 	}
