@@ -583,6 +583,7 @@ class CMediatype extends CApiService {
 					MEDIA_TYPE_EXEC => ['exec_path'],
 					MEDIA_TYPE_SMS => ['gsm_modem'],
 					MEDIA_TYPE_JABBER => ['username', 'passwd'],
+					MEDIA_TYPE_WEBHOOK => [],
 					MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
 				];
 
@@ -766,7 +767,7 @@ class CMediatype extends CApiService {
 						$webhook_params = [];
 						$db_webhook_params = DB::select('media_type_param', [
 							'output' => ['name', 'value'],
-							'filter' => ['mediatypeid' => $validated_data['mediatypeid']]
+							'filter' => ['mediatypeid' => $mediatype['mediatypeid']]
 						]);
 
 						foreach ($db_webhook_params as $db_webhook_param) {
@@ -1005,9 +1006,15 @@ class CMediatype extends CApiService {
 					'webhook' => $defaults['webhook'],
 					'timeout' => $defaults['timeout'],
 					'receive_tags' => $defaults['receive_tags'],
+					'params' => []
+				] + $mediatype;
+			}
+
+			if (array_key_exists('receive_tags', $mediatype)
+					&& $mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
+				$mediatype = [
 					'url' => $defaults['url'],
 					'url_name' => $defaults['url_name'],
-					'params' => []
 				] + $mediatype;
 			}
 
@@ -1136,6 +1143,7 @@ class CMediatype extends CApiService {
 			MEDIA_TYPE_EXEC => ['exec_path'],
 			MEDIA_TYPE_SMS => ['gsm_modem'],
 			MEDIA_TYPE_JABBER => ['username', 'passwd'],
+			MEDIA_TYPE_WEBHOOK => [],
 			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
 		];
 
@@ -1170,6 +1178,11 @@ class CMediatype extends CApiService {
 		}
 
 		if ($this->outputIsRequested('params', $options['output'])) {
+			foreach ($result as &$mediatype) {
+				$mediatype['params'] = [];
+			}
+			unset($mediatype);
+
 			$mediatype_params = DB::select('media_type_param', [
 				'output' => ['mediatypeid', 'name', 'value'],
 				'filter' => ['mediatypeid' => array_keys($result)]
@@ -1207,10 +1220,12 @@ class CMediatype extends CApiService {
 				'url' => [
 					// Should be checked as string because it can contain maros tags.
 					'type' => API_STRING_UTF8,
+					'flags' => API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'url')
 				],
 				'url_name' => [
 					'type' => API_STRING_UTF8,
+					'flags' => API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'url_name')
 				],
 				'params' => [
@@ -1223,7 +1238,6 @@ class CMediatype extends CApiService {
 						],
 						'value' => [
 							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
 							'length' => DB::getFieldLength('media_type_param', 'value')
 						]
 					]
