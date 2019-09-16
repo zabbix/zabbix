@@ -61,6 +61,8 @@ frontends/php/local/conf/brand.conf.php
 frontends/php/locale/POTFILES.in
 frontends/php/locale/frontend.pot
 frontends/php/tests/bootstrap.php
+frontends/php/tests/vendor
+frontends/php/tests/composer.*
 include/config.h
 include/config.h.in
 include/stamp-h1
@@ -99,6 +101,7 @@ src/zabbix_server/zabbix_server
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/queue
 tests/libs/zbxcommon/calculate_item_nextcheck
+tests/libs/zbxcommon/calculate_item_nextcheck_unreachable
 tests/libs/zbxcommon/is_double
 tests/libs/zbxcommon/is_double_suffix
 tests/libs/zbxcommon/parse_key
@@ -187,3 +190,4 @@ bin/mock_server
 bin/zabbix_get
 bin/zabbix_sender
 .cproject
+etc/agent.conf

@@ -2211,7 +2211,58 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 	return nextcheck;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_item_nextcheck_unreachable                             *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for item on unreachable host        *
+ *                                                                            *
+ * Parameters: simple_interval  - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] preprocessed custom intervals          *
+ *             disable_until    - [IN] timestamp for next check               *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until)
+{
+	int	nextcheck = 0;
+	time_t	next_interval, tmax, scheduled_check = 0;
 
+	/* first try to parse out and calculate scheduled intervals */
+	if (NULL != custom_intervals)
+		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
+
+	/* Try to find the nearest 'nextcheck' value with condition */
+	/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
+	/* possible to check the item within a year, fail. */
+
+	nextcheck = disable_until;
+	tmax = disable_until + SEC_PER_YEAR;
+
+	if (NULL != custom_intervals)
+	{
+		while (nextcheck < tmax)
+		{
+			if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
+				break;
+
+			/* find the flexible interval change */
+			if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+			{
+				nextcheck = ZBX_JAN_2038;
+				break;
+			}
+			nextcheck = next_interval;
+		}
+	}
+
+	if (0 != scheduled_check && scheduled_check < nextcheck)
+		nextcheck = (int)scheduled_check;
+
+	return nextcheck;
+}
 /******************************************************************************
  *                                                                            *
  * Function: calculate_proxy_nextcheck                                        *
@@ -3723,7 +3774,6 @@ void	zbx_update_env(double time_now)
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
 		int refresh_unsupported, int *nextcheck, char **error)
 {
-
 	if (ITEM_STATE_NORMAL == state)
 	{
 		int			simple_interval;

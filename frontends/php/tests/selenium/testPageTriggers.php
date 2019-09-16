@@ -56,7 +56,7 @@ class testPageTriggers extends CLegacyWebTest {
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('All hosts');
 			// Check table headers.
-			$this->assertEquals(['', 'Severity', 'Value', 'Name', 'Expression', 'Status', 'Info', 'Tags'], $result);
+			$this->assertEquals(['', 'Severity', 'Value', 'Name', 'Operational data', 'Expression', 'Status', 'Info', 'Tags'], $result);
 
 			// Check the filter options text.
 			foreach (['Severity', 'State', 'Status', 'Value', 'Tags'] as $label) {
@@ -67,7 +67,7 @@ class testPageTriggers extends CLegacyWebTest {
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('All templates');
 			// Check table headers.
-			$this->assertEquals(['', 'Severity', 'Name', 'Expression', 'Status', 'Tags'], $result);
+			$this->assertEquals(['', 'Severity', 'Name', 'Operational data', 'Expression', 'Status', 'Tags'], $result);
 
 			// Check the filter options text.
 			foreach (['Severity', 'State', 'Status','Tags'] as $label) {

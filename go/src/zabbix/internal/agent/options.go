@@ -47,6 +47,7 @@ type AgentOptions struct {
 	BufferSize           int      `conf:",optional,2:65535,100"`
 	ListenIP             string   `conf:",optional"`
 	ListenPort           int      `conf:",,1024:32767,10050"`
+	StatusPort           int      `conf:",optional,1024:32767"`
 	SourceIP             string   `conf:",optional"`
 	Server               string   `conf:",optional"`
 	MaxLinesPerSecond    int      `conf:",,1:1000,20"`
@@ -55,6 +56,7 @@ type AgentOptions struct {
 	LogRemoteCommands    int      `conf:",optional,0:1,0"`
 	EnableRemoteCommands int      `conf:",optional,0:1,0"`
 	ControlSocket        string   `conf:",optional"`
+	Alias                []string `conf:",optional"`
 	TLSConnect           string   `conf:",optional"`
 	TLSAccept            string   `conf:",optional"`
 	TLSPSKIdentity       string   `conf:",optional"`
@@ -66,7 +68,7 @@ type AgentOptions struct {
 	TLSServerCertIssuer  string   `conf:",optional"`
 	TLSServerCertSubject string   `conf:",optional"`
 
-	Plugins map[string]map[string]string
+	Plugins map[string]map[string]string `conf:",optional"`
 }
 
 var Options AgentOptions

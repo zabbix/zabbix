@@ -74,6 +74,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	}
 
+	if ctx.Output().PersistSlotsAvailable() == 0 {
+		p.Warningf("buffer is full, cannot store persistent value")
+		return nil, nil
+	}
+
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()

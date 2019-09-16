@@ -21,6 +21,7 @@ package conf
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 	"zabbix/pkg/std"
 )
@@ -359,7 +360,7 @@ func TestRecursiveInclude(t *testing.T) {
 
 	var options Options
 	if err := Unmarshal([]byte(input), &options); err != nil {
-		if err.Error() != "Recursion detected! Skipped processing of configuration file" {
+		if !strings.Contains(err.Error(), "include depth exceeded limits") {
 			t.Errorf("Expected recursion error message while got: %s", err.Error())
 		}
 	} else {

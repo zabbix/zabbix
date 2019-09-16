@@ -24,7 +24,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -33,13 +36,14 @@ import (
 
 // Node structure is used to store parsed conf file parameters or parameter components.
 type Node struct {
-	name   string
-	used   bool
-	values [][]byte
-	nodes  []*Node
-	parent *Node
-	line   int
-	level  int
+	name        string
+	used        bool
+	values      [][]byte
+	nodes       []*Node
+	parent      *Node
+	line        int
+	level       int
+	includeFail bool
 }
 
 // Meta structure is used to stroe the 'conf' tag metadata.
@@ -398,14 +402,94 @@ func assignValues(v interface{}, root *Node) (err error) {
 	return root.checkUsage()
 }
 
+func newIncludeError(root *Node, filename *string, errmsg string) (err error) {
+	if root.includeFail {
+		return errors.New(errmsg)
+	}
+	root.includeFail = true
+	if filename != nil {
+		return fmt.Errorf(`cannot include "%s": %s`, *filename, errmsg)
+	}
+	return fmt.Errorf(`cannot load file: %s`, errmsg)
+}
+
+func hasMeta(path string) bool {
+	var metaChars string
+	if runtime.GOOS != "windows" {
+		metaChars = `*?[\`
+	} else {
+		metaChars = `*?[`
+	}
+	return strings.ContainsAny(path, metaChars)
+}
+
+func loadInclude(root *Node, path string) (err error) {
+	if hasMeta(filepath.Dir(path)) {
+		return newIncludeError(root, &path, "glob pattern is supported only in file names")
+	}
+	if !hasMeta(path) {
+		var fi os.FileInfo
+		if fi, err = stdOs.Stat(path); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+		if fi.IsDir() {
+			path = filepath.Join(path, "*")
+		}
+	} else {
+		var fi os.FileInfo
+		if fi, err = stdOs.Stat(filepath.Dir(path)); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+		if !fi.IsDir() {
+			return newIncludeError(root, &path, "base path is not a directory")
+		}
+	}
+
+	var paths []string
+	if hasMeta(path) {
+		if paths, err = filepath.Glob(path); err != nil {
+			return newIncludeError(root, nil, err.Error())
+		}
+	} else {
+		paths = append(paths, path)
+	}
+
+	for _, path := range paths {
+		// skip directories
+		var fi os.FileInfo
+		if fi, err = stdOs.Stat(path); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+		if fi.IsDir() {
+			continue
+		}
+		if !filepath.IsAbs(path) {
+			return newIncludeError(root, &path, "relative paths are not supported")
+		}
+
+		var file std.File
+		if file, err = stdOs.Open(path); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+		defer file.Close()
+
+		buf := bytes.Buffer{}
+		if _, err = buf.ReadFrom(file); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+
+		if err = parseConfig(root, buf.Bytes()); err != nil {
+			return newIncludeError(root, &path, err.Error())
+		}
+	}
+	return
+}
+
 func parseConfig(root *Node, data []byte) (err error) {
 	const maxStringLen = 2048
 	var line []byte
 
 	root.level++
-	if root.level > 10 {
-		return fmt.Errorf("Recursion detected! Skipped processing of configuration file")
-	}
 
 	for offset, end, num := 0, 0, 1; end != -1; offset, num = offset+end+1, num+1 {
 		if end = bytes.IndexByte(data[offset:], '\n'); end != -1 {
@@ -415,7 +499,7 @@ func parseConfig(root *Node, data []byte) (err error) {
 		}
 
 		if len(line) > maxStringLen {
-			return fmt.Errorf("Cannot parse configuration at line %d: limit of %d bytes is exceeded", num, maxStringLen)
+			return fmt.Errorf("cannot parse configuration at line %d: limit of %d bytes is exceeded", num, maxStringLen)
 		}
 
 		if len(line) == 0 || line[0] == '#' {
@@ -423,33 +507,26 @@ func parseConfig(root *Node, data []byte) (err error) {
 		}
 
 		if !utf8.ValidString(string(line)) {
-			return fmt.Errorf("Cannot parse configuration at line %d: not a valid UTF-8 character found", num)
+			return fmt.Errorf("cannot parse configuration at line %d: not a valid UTF-8 character found", num)
 		}
 
 		var key, value []byte
 		if key, value, err = parseLine(line); err != nil {
-			return fmt.Errorf("Cannot parse configuration at line %d: %s", num, err.Error())
+			return fmt.Errorf("cannot parse configuration at line %d: %s", num, err.Error())
 		}
 		if string(key) == "Include" {
-			filename := string(value)
-			var file std.File
-			if file, err = stdOs.Open(filename); err != nil {
-				return fmt.Errorf("Cannot read include file: %s", err.Error())
-			}
-			defer file.Close()
-
-			buf := bytes.Buffer{}
-			if _, err = buf.ReadFrom(file); err != nil {
-				return fmt.Errorf("Cannot read include file: %s", err.Error())
+			if root.level == 10 {
+				return fmt.Errorf("include depth exceeded limits")
 			}
 
-			if err = parseConfig(root, buf.Bytes()); err != nil {
-				return err
+			if err = loadInclude(root, string(value)); err != nil {
+				return
 			}
 		} else {
 			root.add(key, value, num)
 		}
 	}
+	root.level--
 	return nil
 }
 
@@ -468,7 +545,7 @@ func Unmarshal(data []byte, v interface{}) (err error) {
 		line:   0}
 
 	if err = parseConfig(root, data); err != nil {
-		return err
+		return fmt.Errorf("Cannot read configuration: %s", err.Error())
 	}
 
 	if err = assignValues(v, root); err != nil {

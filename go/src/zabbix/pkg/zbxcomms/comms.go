@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"strings"
 	"time"
 	"zabbix/pkg/log"
 	"zabbix/pkg/tls"
@@ -60,12 +59,14 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 		return
 	}
 
-	if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
-		return
-	}
+	if timeout != 0 {
+		if err = c.conn.SetReadDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
 
-	if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
-		return
+		if err = c.conn.SetWriteDeadline(time.Now().Add(timeout)); nil != err {
+			return
+		}
 	}
 
 	var tlsconfig *tls.Config
@@ -231,10 +232,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 }
 
 func (c *Connection) RemoteIP() string {
-	addr := c.conn.RemoteAddr().String()
-	if pos := strings.Index(addr, ":"); pos != -1 {
-		addr = addr[:pos]
-	}
+	addr, _, _ := net.SplitHostPort(c.conn.RemoteAddr().String())
 	return addr
 }
 
@@ -286,7 +284,7 @@ func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data [
 		}
 	}
 
-	c, err := Open(address, localAddr, time.Second*time.Duration(timeout), tlsconfig)
+	c, err := Open(address, localAddr, timeout, tlsconfig)
 	if err != nil {
 		log.Tracef("cannot connect to [%s]: %s", address, err)
 		return nil, err

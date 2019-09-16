@@ -21,7 +21,6 @@ package vfsdev
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 	"zabbix/pkg/plugin"
@@ -179,7 +178,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return
 		} else {
 			if stats == nil {
-				return nil, errors.New("Device not found.")
+				return nil, errors.New("Cannot obtain disk information.")
 			}
 			var devio *devIO
 			if mode == ioModeRead {
@@ -200,7 +199,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	var devName string
 	if devName, err = p.getDeviceName(devParam); err != nil {
-		return nil, fmt.Errorf("Cannot obtain device name: %s", err)
+		p.Debugf("cannot find device name: %s", err)
+		return nil, errors.New("Cannot obtain device name used internally by the kernel.")
 	}
 
 	now := time.Now()
@@ -214,7 +214,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			totalnum += maxHistory
 		}
 		if totalnum < 2 {
-			p.Debugf("no device statistics have been gathered")
 			return
 		}
 		if totalnum < statRange {

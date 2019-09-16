@@ -35,7 +35,7 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte) (n int, err error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (err error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
 		err = errors.New("mock error")
@@ -57,6 +57,10 @@ func (w *mockWriter) Write(data []byte) (n int, err error) {
 
 func (w *mockWriter) Addr() string {
 	return ""
+}
+
+func (w *mockWriter) CanRetry() bool {
+	return false
 }
 
 func TestResultCache(t *testing.T) {

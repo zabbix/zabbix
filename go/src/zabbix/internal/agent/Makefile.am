@@ -5,7 +5,8 @@ SUBDIRS = \
 	resultcache \
 	scheduler \
 	serverlistener \
-	serverconnector
+	serverconnector \
+	statuslistener
 
 clean:
 	go clean

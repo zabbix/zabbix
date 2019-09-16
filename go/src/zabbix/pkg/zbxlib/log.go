@@ -27,24 +27,29 @@ package zbxlib
 
 int zbx_log_level = LOG_LEVEL_WARNING;
 
+int	zbx_agent_pid;
+
 void handleZabbixLog(int level, const char *message);
 
 void __zbx_zabbix_log(int level, const char *format, ...)
 {
-	va_list	args;
-	char *message = NULL;
-	size_t size;
+	if (zbx_agent_pid == getpid())
+	{
+		va_list	args;
+		char *message = NULL;
+		size_t size;
 
-	va_start(args, format);
-	size = vsnprintf(NULL, 0, format, args) + 2;
-	va_end(args);
-	message = (char *)zbx_malloc(NULL, size);
-	va_start(args, format);
-	vsnprintf(message, size, format, args);
-	va_end(args);
+		va_start(args, format);
+		size = vsnprintf(NULL, 0, format, args) + 2;
+		va_end(args);
+		message = (char *)zbx_malloc(NULL, size);
+		va_start(args, format);
+		vsnprintf(message, size, format, args);
+		va_end(args);
 
-	handleZabbixLog(level, message);
-	zbx_free(message);
+		handleZabbixLog(level, message);
+		zbx_free(message);
+	}
 }
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
@@ -58,7 +63,7 @@ char	*zbx_strerror(int errnum)
 
 void	zbx_handle_log(void)
 {
-	// TODO: rotate?
+	// rotation is handled by go logger backend
 }
 
 char	*strerror_from_system(unsigned long error)
@@ -112,4 +117,8 @@ import "C"
 
 func SetLogLevel(level int) {
 	C.zbx_log_level = C.int(level)
+}
+
+func init() {
+	C.zbx_agent_pid = C.getpid()
 }

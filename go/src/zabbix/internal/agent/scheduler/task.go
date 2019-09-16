@@ -117,6 +117,8 @@ func (t *collectorTask) getWeight() int {
 	return t.plugin.capacity
 }
 
+// exporter task
+
 type exporterTask struct {
 	taskBase
 	item    clientItem
@@ -140,38 +142,29 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("plugin %s: executing exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
+			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
 			if ret, err = exporter.Export(key, params, t); err == nil {
-				log.Debugf("plugin %s: executed exporter task for itemid:%d key '%s'", t.plugin.name(), t.item.itemid, t.item.key)
+				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
 					switch rt.Kind() {
 					case reflect.Slice:
 						fallthrough
 					case reflect.Array:
-						if t.client.ID() == 0 {
-							err = errors.New("Multiple return values are not supported for single passive checks")
-						} else {
-							s := reflect.ValueOf(ret)
-							for i := 0; i < s.Len(); i++ {
-								result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
-								t.output.Write(result)
-							}
+						s := reflect.ValueOf(ret)
+						for i := 0; i < s.Len(); i++ {
+							result = itemutil.ValueToResult(t.item.itemid, now, s.Index(i).Interface())
+							t.output.Write(result)
 						}
 					default:
 						result = itemutil.ValueToResult(t.item.itemid, now, ret)
 						t.output.Write(result)
 					}
-				} else {
-					if t.client.ID() == 0 {
-						// for direct requests (internal/old passive checks) return empty result
-						// on nil value
-						t.output.Write(&plugin.Result{})
-					}
 				}
 			} else {
-				log.Debugf("plugin %s: failed to execute exporter task for itemid:%d key '%s' error: '%s'", t.plugin.name(), t.item.itemid, t.item.key, err.Error())
+				log.Debugf("failed to execute exporter task for itemid:%d key '%s' error: '%s'",
+					t.item.itemid, itemkey, err.Error())
 			}
 		}
 		if err != nil {
@@ -180,6 +173,7 @@ func (t *exporterTask) perform(s Scheduler) {
 		}
 		// set failed state based on last result
 		if result != nil && result.Error != nil {
+			log.Warningf(`check '%s' is not supported: %s`, itemkey, result.Error)
 			t.failed = true
 		} else {
 			t.failed = false
@@ -190,17 +184,12 @@ func (t *exporterTask) perform(s Scheduler) {
 }
 
 func (t *exporterTask) reschedule(now time.Time) (err error) {
-	if t.client.ID() != 0 {
-		var nextcheck time.Time
-		nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
-		if err != nil {
-			return
-		}
-		t.scheduled = nextcheck.Add(priorityExporterTaskNs)
-	} else {
-		// single passive check
-		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
+	var nextcheck time.Time
+	nextcheck, err = zbxlib.GetNextcheck(t.item.itemid, t.item.delay, now, t.failed, t.client.RefreshUnsupported())
+	if err != nil {
+		return
 	}
+	t.scheduled = nextcheck.Add(priorityExporterTaskNs)
 	return
 }
 
@@ -230,6 +219,101 @@ func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+// directExporterTask handles direct requests to plugin Exporter interface
+
+type directExporterTask struct {
+	taskBase
+	item   clientItem
+	done   bool
+	expire time.Time
+	client ClientAccessor
+	meta   plugin.Meta
+	output plugin.ResultWriter
+}
+
+func (t *directExporterTask) isRecurring() bool {
+	return !t.done
+}
+func (t *directExporterTask) perform(s Scheduler) {
+	// cache global regexp to avoid synchronization issues when using client.GlobalRegexp() directly
+	// from performer goroutine
+	go func(itemkey string) {
+		var result *plugin.Result
+		exporter, _ := t.plugin.impl.(plugin.Exporter)
+		now := time.Now()
+		var key string
+		var params []string
+		var err error
+
+		if now.After(t.expire) {
+			err = errors.New("No data available.")
+			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
+		} else {
+			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
+				var ret interface{}
+				log.Debugf("executing direct exporter task for key '%s'", itemkey)
+
+				if ret, err = exporter.Export(key, params, t); err == nil {
+					log.Debugf("executed direct exporter task for key '%s'", itemkey)
+					if ret != nil {
+						rt := reflect.TypeOf(ret)
+						switch rt.Kind() {
+						case reflect.Slice, reflect.Array:
+							err = errors.New("Multiple return values are not supported for single passive checks")
+						default:
+							result = itemutil.ValueToResult(t.item.itemid, now, ret)
+							t.output.Write(result)
+							t.done = true
+						}
+					}
+				} else {
+					log.Debugf("failed to execute direct exporter task for key '%s' error: '%s'",
+						itemkey, err.Error())
+				}
+			}
+		}
+		if err != nil {
+			result = &plugin.Result{Itemid: t.item.itemid, Error: err, Ts: now}
+			t.output.Write(result)
+			t.done = true
+		}
+
+		s.FinishTask(t)
+	}(t.item.key)
+}
+
+func (t *directExporterTask) reschedule(now time.Time) (err error) {
+	if t.scheduled.IsZero() {
+		t.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
+	} else {
+		t.scheduled = time.Unix(now.Unix()+1, priorityExporterTaskNs)
+	}
+	return
+}
+
+// plugin.ContextProvider interface
+
+func (t *directExporterTask) ClientID() (clientid uint64) {
+	return t.client.ID()
+}
+
+func (t *directExporterTask) Output() (output plugin.ResultWriter) {
+	return t.output
+}
+
+func (t *directExporterTask) ItemID() (itemid uint64) {
+	return t.item.itemid
+}
+
+func (t *directExporterTask) Meta() (meta *plugin.Meta) {
+	return &t.meta
+}
+
+func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
+	return t.client.GlobalRegexp()
+}
+
+// starterTask
 type starterTask struct {
 	taskBase
 }

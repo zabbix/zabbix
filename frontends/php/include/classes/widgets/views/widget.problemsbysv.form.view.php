@@ -27,7 +27,7 @@ $fields = $data['dialogue']['fields'];
 $form = CWidgetHelper::createForm();
 
 $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['known_widget_types'], $fields['rf_rate']
+	$data['dialogue']['view_mode'], $data['known_widget_types'], $fields['rf_rate']
 );
 
 $scripts = [];
@@ -65,6 +65,12 @@ $form_list->addRow(
 	CWidgetHelper::getSeverities($fields['severities'], $data['config'])
 );
 
+// Show type.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_type']), CWidgetHelper::getRadioButtonList($fields['show_type']));
+
+// Layout.
+$form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
+
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 	CWidgetHelper::getCheckBox($fields['show_suppressed'])
@@ -76,10 +82,8 @@ $form_list->addRow(
 	CWidgetHelper::getCheckBox($fields['hide_empty_groups'])
 );
 
-// Show latest values.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
-	CWidgetHelper::getCheckBox($fields['show_latest_values'])
-);
+// Show operational data.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_opdata']), CWidgetHelper::getCheckBox($fields['show_opdata']));
 
 // Problem display.
 $form_list->addRow(CWidgetHelper::getLabel($fields['ext_ack']), CWidgetHelper::getRadioButtonList($fields['ext_ack']));

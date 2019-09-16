@@ -72,6 +72,8 @@ func CheckMetric(metric string) (err error) {
 		fmt.Printf("%-46s[u|%v]\n", metric, v)
 	case float32, float64:
 		fmt.Printf("%-46s[f|%v]\n", metric, v)
+	default:
+		fmt.Printf("%-46s[?|%+v]\n", metric, v)
 	}
 
 	return nil

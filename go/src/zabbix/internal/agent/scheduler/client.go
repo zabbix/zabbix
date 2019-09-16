@@ -20,6 +20,7 @@
 package scheduler
 
 import (
+	"errors"
 	"hash/fnv"
 	"sync/atomic"
 	"time"
@@ -87,7 +88,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	var info *pluginInfo
 	var ok bool
 
-	log.Debugf("adding new request for key: '%s'", r.Key)
+	log.Debugf("[%d] adding new request for key: '%s'", c.id, r.Key)
 
 	if info, ok = c.pluginsInfo[p]; !ok {
 		info = &pluginInfo{}
@@ -114,17 +115,62 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 	// handle Exporter interface
 	if _, ok := p.impl.(plugin.Exporter); ok {
-		if r.Itemid != 0 {
+		var tacc exporterTaskAccessor
+
+		if c.id != 0 {
+			var task *exporterTask
 			if _, err = zbxlib.GetNextcheck(r.Itemid, r.Delay, now, false, c.refreshUnsupported); err != nil {
 				return err
 			}
-		}
-		var task *exporterTask
-		if tacc, ok := c.exporters[r.Itemid]; !ok {
-			task = &exporterTask{
-				taskBase: taskBase{plugin: p, active: true, recurring: r.Itemid != 0},
+			if tacc, ok = c.exporters[r.Itemid]; ok {
+				task = tacc.task()
+				if task.updated.Equal(now) {
+					return errors.New("duplicate itemid found")
+				}
+				if task.plugin != p {
+					// create new task if item key has been changed and now is handled by other plugin
+					task.deactivate()
+					ok = false
+				}
+			}
+
+			if !ok {
+				task = &exporterTask{
+					taskBase: taskBase{plugin: p, active: true, recurring: true},
+					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+					updated:  now,
+					client:   c,
+					output:   sink,
+				}
+				if err = task.reschedule(now); err != nil {
+					return
+				}
+				c.exporters[r.Itemid] = task
+				tasks = append(tasks, task)
+				log.Debugf("[%d] created exporter task for plugin '%s' itemid:%d key '%s'",
+					c.id, p.name(), task.item.itemid, task.item.key)
+			} else {
+				task = tacc.task()
+				task.updated = now
+				task.item.key = r.Key
+				if task.item.delay != r.Delay {
+					task.item.delay = r.Delay
+					if err = task.reschedule(now); err != nil {
+						return
+					}
+					p.tasks.Update(task)
+					log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
+						c.id, p.name(), task.item.itemid, task.item.key)
+				}
+			}
+			task.meta.SetLastLogsize(*r.LastLogsize)
+			task.meta.SetMtime(int32(*r.Mtime))
+
+		} else {
+			task := &directExporterTask{
+				taskBase: taskBase{plugin: p, active: true, recurring: true},
 				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
-				updated:  now,
+				expire:   now.Add(time.Duration(agent.Options.Timeout) * time.Second),
 				client:   c,
 				output:   sink,
 			}
@@ -132,27 +178,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			if err = task.reschedule(now); err != nil {
 				return
 			}
-			if r.Itemid != 0 {
-				c.exporters[r.Itemid] = task
-			}
 			tasks = append(tasks, task)
-			log.Debugf("[%d] created exporter task for plugin %s", c.id, p.name())
-		} else {
-			task = tacc.task()
-			task.updated = now
-			task.item.key = r.Key
-			if task.item.delay != r.Delay {
-				task.item.delay = r.Delay
-				if err = task.reschedule(now); err != nil {
-					task.deactivate()
-					return
-				}
-				p.tasks.Update(task)
-				log.Debugf("[%d] updated exporter task for item %d %s", c.id, task.item.itemid, task.item.key)
-			}
+			log.Debugf("[%d] created direct exporter task for plugin '%s' itemid:%d key '%s'",
+				c.id, p.name(), task.item.itemid, task.item.key)
 		}
-		task.meta.SetLastLogsize(*r.LastLogsize)
-		task.meta.SetMtime(int32(*r.Mtime))
 	}
 
 	// handle runner interface for inactive plugins
@@ -226,6 +255,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 		task := tacc.task()
 		if task.updated.Before(now) {
 			delete(c.exporters, task.item.itemid)
+			log.Debugf("[%d] released unused exporter for itemid:%d", c.id, task.item.itemid)
 			task.deactivate()
 		}
 	}
@@ -281,6 +311,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 
 func (c *client) updateExpressions(expressions []*glexpr.Expression) {
 	// reset expressions if changed
+	glexpr.SortExpressions(expressions)
 	var grxp *glexpr.Bundle
 	if c.globalRegexp != nil {
 		grxp = (*glexpr.Bundle)(atomic.LoadPointer(&c.globalRegexp))

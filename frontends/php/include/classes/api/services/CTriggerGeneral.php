@@ -145,7 +145,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
 				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag',
-				'manual_close'
+				'manual_close', 'opdata'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -687,7 +687,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
 				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'manual_close'
+				'manual_close', 'opdata'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1041,6 +1041,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($trigger['description'] !== $db_trigger['description']) {
 				$upd_trigger['values']['description'] = $trigger['description'];
+			}
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] !== $db_trigger['opdata']) {
+				$upd_trigger['values']['opdata'] = $trigger['opdata'];
 			}
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
 				$upd_trigger['values']['recovery_mode'] = $trigger['recovery_mode'];
@@ -1624,7 +1627,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Adds triggers and trigger prorotypes from template to hosts.
+	 * Adds triggers and trigger prototypes from template to hosts.
 	 *
 	 * @param array $data
 	 */
@@ -1635,7 +1638,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -43,6 +43,7 @@ $fields = [
 	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
+	'opdata' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Expression')],
 	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
 	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	null],
@@ -250,6 +251,7 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 	$description = getRequest('description', '');
+	$opdata = getRequest('opdata', '');
 	$expression = getRequest('expression', '');
 	$recovery_mode = getRequest('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION);
 	$recovery_expression = getRequest('recovery_expression', '');
@@ -265,6 +267,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('add')) {
 		$trigger = [
 			'description' => $description,
+			'opdata' => $opdata,
 			'expression' => $expression,
 			'recovery_mode' => $recovery_mode,
 			'type' => $type,
@@ -298,7 +301,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close'
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
+				'opdata'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -317,6 +321,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_trigger['templateid'] == 0) {
 				if ($db_trigger['description'] !== $description) {
 					$trigger['description'] = $description;
+				}
+				if ($db_trigger['opdata'] !== $opdata) {
+					$trigger['opdata'] = $opdata;
 				}
 				if ($db_trigger['expression'] !== $expression) {
 					$trigger['expression'] = $expression;
@@ -635,6 +642,7 @@ elseif (isset($_REQUEST['form'])) {
 		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
 		'recovery_mode' => getRequest('recovery_mode', 0),
 		'description' => getRequest('description', ''),
+		'opdata' => getRequest('opdata', ''),
 		'type' => getRequest('type', 0),
 		'priority' => getRequest('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'status' => getRequest('status', TRIGGER_STATUS_ENABLED),
@@ -835,7 +843,7 @@ else {
 	if ($prefetched_triggers) {
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
-				'recovery_mode', 'recovery_expression', 'value', $sort
+				'recovery_mode', 'recovery_expression', 'value', 'opdata', $sort
 			],
 			'selectHosts' => ['hostid', 'host', 'name', 'status'],
 			'selectDependencies' => ['triggerid', 'description'],

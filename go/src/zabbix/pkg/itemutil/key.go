@@ -62,7 +62,7 @@ func parseQuotedParam(data []byte) (param []byte, left []byte, err error) {
 }
 
 // parseParams parses item key normal parameter (any combination of any characters except ',' and ']',
-// including trailing whitespace)and returns the parsed parameter and the data after the parameter.
+// including trailing whitespace) and returns the parsed parameter and the data after the parameter.
 func parseUnquotedParam(data []byte) (param []byte, left []byte, err error) {
 	for i, c := range data {
 		if c == ',' || c == ']' {
@@ -209,7 +209,7 @@ func parseParam(data []byte) (param []byte, left []byte, err error) {
 }
 
 // parseParams parses item key parameters.
-func parseParams(data []byte) (params []string, err error) {
+func parseParams(data []byte) (params []string, left []byte, err error) {
 	if data[0] != '[' {
 		err = fmt.Errorf("key name must be followed by '['")
 		return
@@ -230,7 +230,7 @@ func parseParams(data []byte) (params []string, err error) {
 		}
 		if b[0] == ']' {
 			if len(b) > 1 {
-				err = errors.New("detected characters after item key")
+				left = b[1:]
 			}
 			break
 		}
@@ -252,21 +252,19 @@ func newKeyError() (err error) {
 	return errors.New("Invalid item key format.")
 }
 
-// ParseKey parses item key in format key[param1, param2, ...] and returns
-// the parsed key and parameteres.
-func ParseKey(text string) (key string, params []string, err error) {
-	if text == "" {
-		err = newKeyError()
-		return
-	}
-	data := []byte(text)
+func parseKey(data []byte) (key string, params []string, left []byte, err error) {
 	for i, c := range data {
 		if !isKeyChar(c) {
 			if i == 0 {
 				err = newKeyError()
 				return
 			}
-			if params, err = parseParams(data[i:]); err != nil {
+			if c != '[' {
+				key = string(data[:i])
+				left = data[i:]
+				return
+			}
+			if params, left, err = parseParams(data[i:]); err != nil {
 				err = newKeyError()
 				return
 			}
@@ -274,11 +272,54 @@ func ParseKey(text string) (key string, params []string, err error) {
 			return
 		}
 	}
-	key = text
+	key = string(data)
+	return
+}
+
+// ParseKey parses item key in format key[param1, param2, ...] and returns
+// the parsed key and parameteres.
+func ParseKey(text string) (key string, params []string, err error) {
+	if text == "" {
+		err = newKeyError()
+		return
+	}
+	var left []byte
+	if key, params, left, err = parseKey([]byte(text)); err != nil {
+		return
+	}
+	if len(left) > 0 {
+		err = newKeyError()
+	}
+	return
+}
+
+// ParseAlias parses Alias in format name:key and returns the name
+// and the key seperatly without changes
+func ParseAlias(text string) (key1, key2 string, err error) {
+	var left, left2 []byte
+	if _, _, left, err = parseKey([]byte(text)); err != nil {
+		return
+	}
+	if len(left) < 2 || left[0] != ':' {
+		err = fmt.Errorf("syntax error")
+		return
+	}
+	key1 = text[:len(text)-len(left)]
+	if _, _, left2, err = parseKey(left[1:]); err != nil {
+		return
+	}
+	if len(left2) != 0 {
+		err = fmt.Errorf("syntax error")
+		return
+	}
+	key2 = string(left[1:])
 	return
 }
 
 func mustQuote(param string) bool {
+	if len(param) > 0 && (param[0] == '"' || param[0] == ' ') {
+		return true
+	}
 	for _, b := range param {
 		switch b {
 		case ',', ']':
@@ -317,7 +358,6 @@ func MakeKey(key string, params []string) (text string) {
 		}
 		buf.WriteByte(']')
 	}
-
 	return buf.String()
 }
 

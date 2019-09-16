@@ -72,6 +72,43 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 
 		$this->fields[$field_severities->getName()] = $field_severities;
 
+		// Show type.
+		$field_show_type = (new CWidgetFieldRadioButtonList('show_type', _('Show'), [
+			WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS => _('Host groups'),
+			WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS => _('Totals')
+		]))
+			->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
+			->setModern(true)
+			->setAction('var disabled = jQuery(this).filter("[value=\''.WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS.'\']")'.
+				'.is(":checked");'.
+				'jQuery("#hide_empty_groups").prop("disabled", !disabled);'.
+				'jQuery("#layout input").prop("disabled", disabled)'
+			);
+
+		if (array_key_exists('show_type', $this->data)) {
+			$field_show_type->setValue($this->data['show_type']);
+		}
+
+		$this->fields[$field_show_type->getName()] = $field_show_type;
+
+		// Layout.
+		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+			STYLE_HORIZONTAL => _('Horizontal'),
+			STYLE_VERTICAL => _('Vertical')
+		]))
+			->setDefault(STYLE_HORIZONTAL)
+			->setModern(true);
+
+		if (array_key_exists('layout', $this->data)) {
+			$field_layout->setValue($this->data['layout']);
+		}
+
+		if ($field_show_type->getValue() == WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS) {
+			$field_layout->setFlags(CWidgetField::FLAG_DISABLED);
+		}
+
+		$this->fields[$field_layout->getName()] = $field_layout;
+
 		// Show suppressed problems.
 		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
 			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
@@ -89,17 +126,21 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 			$field_hide_empty_groups->setValue($this->data['hide_empty_groups']);
 		}
 
-		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
-
-		// Show last values.
-		$field_show_latest_values = (new CWidgetFieldCheckBox('show_latest_values', _('Show latest values')))
-			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
-
-		if (array_key_exists('show_latest_values', $this->data)) {
-			$field_show_latest_values->setValue($this->data['show_latest_values']);
+		if ($field_show_type->getValue() == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+			$field_hide_empty_groups->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 
-		$this->fields[$field_show_latest_values->getName()] = $field_show_latest_values;
+		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
+
+		// Show operational data.
+		$field_show_opdata = (new CWidgetFieldCheckBox('show_opdata', _('Show operational data')))
+			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
+
+		if (array_key_exists('show_opdata', $this->data)) {
+			$field_show_opdata->setValue($this->data['show_opdata']);
+		}
+
+		$this->fields[$field_show_opdata->getName()] = $field_show_opdata;
 
 		// Problem display.
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [
