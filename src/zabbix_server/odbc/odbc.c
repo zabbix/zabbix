@@ -533,11 +533,12 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_odbc_query_result_to_lld_json                                *
+ * Function: odbc_query_result_to_lld_json                                    *
  *                                                                            *
  * Purpose: convert ODBC SQL query result into low level discovery data       *
  *                                                                            *
  * Parameters: query_result - [IN] result of SQL query                        *
+ * *           lld_mode     - [IN] 1 - lld JSON, 0 - simple JSON              *
  *             lld_json     - [OUT] low level discovery data                  *
  *             error        - [OUT] error message                             *
  *                                                                            *
@@ -550,7 +551,8 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
  * Comments: It is caller's responsibility to free allocated buffers!         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
+static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, int lld_mode, char **lld_json,
+		char **error)
 {
 	const char		*const *row;
 	struct zbx_json		json;
@@ -578,27 +580,34 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 
 		zabbix_log(LOG_LEVEL_DEBUG, "column #%d name:'%s'", i + 1, str);
 
-		for (p = str; '\0' != *p; p++)
+		if (1 == lld_mode)
 		{
-			if (0 != isalpha((unsigned char)*p))
-				*p = toupper((unsigned char)*p);
-
-			if (SUCCEED != is_macro_char(*p))
+			for (p = str; '\0' != *p; p++)
 			{
-				*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
-				goto out;
+				if (0 != isalpha((unsigned char)*p))
+					*p = toupper((unsigned char)*p);
+
+				if (SUCCEED != is_macro_char(*p))
+				{
+					*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
+					goto out;
+				}
+			}
+
+			zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "{#%s}", str));
+
+			for (j = 0; j < i; j++)
+			{
+				if (0 == strcmp(macros.values[i], macros.values[j]))
+				{
+					*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", macros.values[i]);
+					goto out;
+				}
 			}
 		}
-
-		zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "{#%s}", str));
-
-		for (j = 0; j < i; j++)
+		else
 		{
-			if (0 == strcmp(macros.values[i], macros.values[j]))
-			{
-				*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", macros.values[i]);
-				goto out;
-			}
+			zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "%s", str));
 		}
 	}
 
@@ -643,6 +652,30 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_odbc_query_result_to_lld_json                                *
+ *                                                                            *
+ * Purpose: convert ODBC SQL query result into low level discovery data       *
+ *                                                                            *
+ * Parameters: query_result - [IN] result of SQL query                        *
+ *             lld_json     - [OUT] low level discovery data                  *
+ *             error        - [OUT] error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - conversion was successful and allocated LLD JSON   *
+ *                         is returned in lld_json parameter, error remains   *
+ *                         untouched in this case                             *
+ *               FAIL    - otherwise, allocated error message is returned in  *
+ *                         error parameter, lld_json remains untouched        *
+ *                                                                            *
+ * Comments: It is caller's responsibility to free allocated buffers!         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
+{
+	return odbc_query_result_to_lld_json(query_result, 1, lld_json, error);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_odbc_query_result_to_json                                    *
  *                                                                            *
  * Purpose: convert ODBC SQL query result into JSON format                    *
@@ -662,72 +695,7 @@ out:
  ******************************************************************************/
 int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **out_json, char **error)
 {
-	const char		*const *row;
-	struct zbx_json		json;
-	zbx_vector_str_t	columns;
-	int			ret = FAIL, i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_str_create(&columns);
-	zbx_vector_str_reserve(&columns, query_result->col_num);
-
-	for (i = 0; i < query_result->col_num; i++)
-	{
-		char		str[MAX_STRING_LEN];
-		SQLRETURN	rc;
-		SQLSMALLINT	len;
-
-		rc = SQLColAttribute(query_result->hstmt, i + 1, SQL_DESC_LABEL, str, sizeof(str), &len, NULL);
-
-		if (SQL_SUCCESS != rc || sizeof(str) <= (size_t)len || '\0' == *str)
-		{
-			*error = zbx_dsprintf(*error, "Cannot obtain column #%d name.", i + 1);
-			goto out;
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "column #%d name:'%s'", i + 1, str);
-
-		zbx_vector_str_append(&columns, zbx_dsprintf(NULL, "%s", str));
-	}
-
-	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
-
-	while (NULL != (row = zbx_odbc_fetch(query_result)))
-	{
-		zbx_json_addobject(&json, NULL);
-
-		for (i = 0; i < query_result->col_num; i++)
-		{
-			char	*value = NULL;
-
-			if (NULL != row[i])
-			{
-				value = zbx_strdup(value, row[i]);
-				zbx_replace_invalid_utf8(value);
-			}
-
-			zbx_json_addstring(&json, columns.values[i], value, ZBX_JSON_TYPE_STRING);
-			zbx_free(value);
-		}
-
-		zbx_json_close(&json);
-	}
-
-	zbx_json_close(&json);
-
-	*out_json = zbx_strdup(*out_json, json.buffer);
-
-	zbx_json_free(&json);
-
-	ret = SUCCEED;
-out:
-	zbx_vector_str_clear_ext(&columns, zbx_str_free);
-	zbx_vector_str_destroy(&columns);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
+	return odbc_query_result_to_lld_json(query_result, 0, out_json, error);
 }
 
 #endif	/* HAVE_UNIXODBC */
