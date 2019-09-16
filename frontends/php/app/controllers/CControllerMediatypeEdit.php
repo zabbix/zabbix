@@ -48,6 +48,12 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
+			'webhook_params' =>			'array',
+			'webhook' => 				'db media_type.webhook',
+			'timeout' => 				'db media_type.timeout',
+			'receive_tags' =>			'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
+			'url' =>					'db media_type.url',
+			'url_name' =>				'db media_type.url_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
@@ -85,7 +91,8 @@ class CControllerMediatypeEdit extends CController {
 				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
 					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
-					'maxattempts', 'attempt_interval', 'content_type'
+					'maxattempts', 'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url',
+					'url_name', 'params'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -130,8 +137,21 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
+			'webhook' => $db_defaults['webhook'],
+			'timeout' => $db_defaults['timeout'],
+			'receive_tags' => $db_defaults['receive_tags'],
+			'url' => $db_defaults['url'],
+			'url_name' => $db_defaults['url_name'],
+			'webhook_params' => [],
 			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type']
+			'content_type' => $db_defaults['content_type'],
+			'max_length' => [
+				'url' => DB::getFieldLength('media_type', 'url'),
+				'webhook' => DB::getFieldLength('media_type', 'webhook'),
+				'url_name' => DB::getFieldLength('media_type', 'url_name'),
+				'params_key' => DB::getFieldLength('media_type_param', 'name'),
+				'params_value' => DB::getFieldLength('media_type_param', 'value')
+			]
 		];
 
 		// get values from the dabatase
@@ -181,6 +201,31 @@ class CControllerMediatypeEdit extends CController {
 				case MEDIA_TYPE_SMS:
 					$data['maxsessions'] = 1;
 					break;
+
+				case MEDIA_TYPE_WEBHOOK:
+					$data['webhook'] = $this->mediatype['webhook'];
+					$data['timeout'] = $this->mediatype['timeout'];
+					$data['receive_tags'] = $this->mediatype['receive_tags'];
+					$data['url'] = $this->mediatype['url'];
+					$data['url_name'] = $this->mediatype['url_name'];
+
+					if ($this->hasInput('form_refresh')) {
+						$params = $this->getInput('webhook_params', ['name' => [], 'value' => []]);
+						$name = reset($params['name']);
+						$value = reset($params['value']);
+
+						while ($name !== false) {
+							$data['webhook_params'][] = compact('name', 'value');
+							$name = next($params['name']);
+							$value = next($params['value']);
+						}
+					}
+					else {
+						foreach ($this->mediatype['params'] as $name => $value) {
+							$data['webhook_params'][] = compact('name', 'value');
+						}
+					}
+					break;
 			}
 
 			$data['change_passwd'] = $this->hasInput('passwd');
@@ -206,6 +251,11 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username',
 			'smtp_username',
 			'passwd',
+			'webhook',
+			'timeout',
+			'receive_tags',
+			'url',
+			'url_name',
 			'status',
 			'maxsessions',
 			'maxattempts',
@@ -214,6 +264,15 @@ class CControllerMediatypeEdit extends CController {
 			'form_refresh',
 			'content_type'
 		]);
+
+		if (!$this->hasInput('mediatypeid') || $data['type'] != MEDIA_TYPE_WEBHOOK) {
+			$data['webhook_params'] = [
+				['name' => 'URL', 'value'=> ''],
+				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
+				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
+				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
+			];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

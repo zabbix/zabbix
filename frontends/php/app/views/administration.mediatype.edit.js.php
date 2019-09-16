@@ -19,7 +19,9 @@
 			$('#eztext_link').hide();
 			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username,' +
 					'#eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security,' +
-					'#smtp_authentication, #exec_path, #exec_params_table, #content_type')
+					'#smtp_authentication, #exec_path, #exec_params_table, #content_type, #row_webhook_params, ' +
+					'#row_webhook_webhook, #row_webhook_timeout, #row_webhook_tags, #row_webhook_url, ' +
+					'#row_webhook_url_name')
 				.closest('li')
 				.hide();
 
@@ -59,6 +61,13 @@
 					setMaxSessionsType(media_type);
 
 					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+					break;
+
+				case '<?= MEDIA_TYPE_WEBHOOK ?>':
+					$('#row_webhook_params, #row_webhook_webhook, #row_webhook_timeout, #row_webhook_tags, ' +
+						'#row_webhook_url, #row_webhook_url_name').show();
+					setMaxSessionsType(media_type);
+
 					break;
 			}
 		});
@@ -111,6 +120,13 @@
 		$('input[name=smtp_authentication]').change(function() {
 			toggleAuthenticationOptions();
 		});
+
+		$('#receive_tags').change(function() {
+			$('#url, #url_name').attr('disabled', !$(this).is(':checked'));
+			$('[for=url], [for=url_name]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
+		});
+
+		$('#web_params_table').dynamicRows({ template: '#webhook_params_row' });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.

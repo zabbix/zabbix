@@ -20,6 +20,7 @@
 
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
+$this->addJsFile('multilineinput.js');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 
@@ -51,7 +52,8 @@ $mediatype_formlist = (new CFormList())
 				MEDIA_TYPE_EMAIL => _('Email'),
 				MEDIA_TYPE_EXEC => _('Script'),
 				MEDIA_TYPE_SMS => _('SMS'),
-				MEDIA_TYPE_JABBER => _('Jabber')
+				MEDIA_TYPE_JABBER => _('Jabber'),
+				MEDIA_TYPE_WEBHOOK => _('Webhook')
 			]))
 			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
 		)
@@ -150,6 +152,57 @@ else {
 	$passwd_field = (new CPassBox('passwd', $data['passwd']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
+// MEDIA_TYPE_WEBHOOK
+$max_length = $data['max_length'];
+
+$web_params_table = (new CTable())
+	->setId('web_params_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+foreach ($data['webhook_params'] as $param) {
+	$web_params_table->addRow([
+		(new CTextBox('webhook_params[name][]', $param['name'], false, $max_length['params_key']))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('webhook_params[value][]', $param['value'], false, $max_length['params_value']))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]);
+}
+
+$row_template = (new CTag('script', true))
+	->setId('webhook_params_row')
+	->setAttribute('type', 'text/x-jquery-tmpl')
+	->addItem(new CRow([
+		(new CTextBox('webhook_params[name][]', '', false, $max_length['params_key']))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('webhook_params[value][]', '', false, $max_length['params_value']))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]));
+
+$widget->addItem($row_template);
+
+$web_params_table->addRow([(new CButton('webhook_param_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
 // append password field to form list
 $mediatype_formlist
 	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
@@ -175,6 +228,48 @@ $mediatype_formlist
 			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
+	)
+	->addRow(new CLabel(_('Webhook parameters'), 'row_webhook_params'),
+		(new CDiv($web_params_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'row_webhook_params'
+	)
+	->addRow((new CLabel(_('Webhook'), 'row_webhook_webhook'))->setAsteriskMark(),
+		(new CMultilineInput('webhook', $data['webhook'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => $max_length['webhook']
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'row_webhook_webhook'
+	)
+	->addRow(new CLabel(_('Timeout'), 'row_webhook_timeout'),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'row_webhook_timeout'
+	)
+	->addRow(new CLabel(_('Receive tags'), 'row_webhook_tags'),
+		(new CCheckBox('receive_tags', MEDIA_TYPE_TAGS_ENABLED))
+			->setChecked($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+		'row_webhook_tags'
+	)
+	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+		(new CTextBox('url', $data['url'], false, $max_length['url']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setEnabled($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED)
+			->setAriaRequired(),
+		'row_webhook_url'
+	)
+	->addRow((new CLabel(_('URL name'), 'url_name'))->setAsteriskMark($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+		(new CTextBox('url_name', $data['url_name'], false, $max_length['url_name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED)
+			->setAriaRequired(),
+		'row_webhook_url_name'
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)

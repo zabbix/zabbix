@@ -42,6 +42,12 @@ class CControllerMediatypeUpdate extends CController {
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
+			'webhook_params' =>			'array',
+			'webhook' => 				'db media_type.webhook',
+			'timeout' => 				'db media_type.timeout',
+			'receive_tags' =>			'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
+			'url' =>					'db media_type.url',
+			'url_name' =>				'db media_type.url_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
@@ -150,6 +156,17 @@ class CControllerMediatypeUpdate extends CController {
 
 				if ($this->hasInput('eztext_limit')) {
 					$mediatype['exec_path'] = $this->getInput('eztext_limit');
+				}
+				break;
+
+			case MEDIA_TYPE_WEBHOOK:
+				$mediatype['receive_tags'] = MEDIA_TYPE_TAGS_DISABLED;
+				$params = $this->getInput('webhook_params', []);
+				$mediatype['params'] = $params ? array_combine($params['name'], $params['value']) : [];
+				$this->getInputs($mediatype, ['webhook', 'timeout', 'receive_tags', 'url', 'url_name']);
+
+				if ($mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
+					unset($mediatype['url'], $mediatype['url_name']);
 				}
 				break;
 		}
