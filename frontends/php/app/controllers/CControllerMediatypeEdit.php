@@ -142,7 +142,12 @@ class CControllerMediatypeEdit extends CController {
 			'receive_tags' => $db_defaults['receive_tags'],
 			'url' => $db_defaults['url'],
 			'url_name' => $db_defaults['url_name'],
-			'webhook_params' => [],
+			'webhook_params' => [
+				['name' => 'URL', 'value'=> ''],
+				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
+				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
+				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
+			],
 			'form_refresh' => 0,
 			'content_type' => $db_defaults['content_type'],
 			'max_length' => [
@@ -208,23 +213,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['receive_tags'] = $this->mediatype['receive_tags'];
 					$data['url'] = $this->mediatype['url'];
 					$data['url_name'] = $this->mediatype['url_name'];
-
-					if ($this->hasInput('form_refresh')) {
-						$params = $this->getInput('webhook_params', ['name' => [], 'value' => []]);
-						$name = reset($params['name']);
-						$value = reset($params['value']);
-
-						while ($name !== false) {
-							$data['webhook_params'][] = compact('name', 'value');
-							$name = next($params['name']);
-							$value = next($params['value']);
-						}
-					}
-					else {
-						foreach ($this->mediatype['params'] as $name => $value) {
-							$data['webhook_params'][] = compact('name', 'value');
-						}
-					}
+					$data['webhook_params'] = $this->mediatype['params'];
 					break;
 			}
 
@@ -265,13 +254,17 @@ class CControllerMediatypeEdit extends CController {
 			'content_type'
 		]);
 
-		if (!$this->hasInput('mediatypeid') || $data['type'] != MEDIA_TYPE_WEBHOOK) {
-			$data['webhook_params'] = [
-				['name' => 'URL', 'value'=> ''],
-				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
-				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
-				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
-			];
+		if ($this->hasInput('form_refresh')) {
+			$data['webhook_params'] = [];
+			$params = $this->getInput('webhook_params', ['name' => [], 'value' => []]);
+			$name = reset($params['name']);
+			$value = reset($params['value']);
+
+			while ($name !== false) {
+				$data['webhook_params'][] = compact('name', 'value');
+				$name = next($params['name']);
+				$value = next($params['value']);
+			}
 		}
 
 		$response = new CControllerResponseData($data);

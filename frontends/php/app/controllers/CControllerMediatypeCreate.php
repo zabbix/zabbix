@@ -147,9 +147,15 @@ class CControllerMediatypeCreate extends CController {
 
 			case MEDIA_TYPE_WEBHOOK:
 				$mediatype['receive_tags'] = MEDIA_TYPE_TAGS_DISABLED;
-				$params = $this->getInput('webhook_params', []);
-				$mediatype['params'] = $params ? array_combine($params['name'], $params['value']) : [];
 				$this->getInputs($mediatype, ['webhook', 'timeout', 'receive_tags', 'url', 'url_name']);
+
+				$params = $this->getInput('webhook_params', []);
+				$mediatype['params'] = array_map(function ($name, $value) {
+						return compact('name', 'value');
+					},
+					$params['name'],
+					$params['value']
+				);
 
 				if ($mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					unset($mediatype['url'], $mediatype['url_name']);
