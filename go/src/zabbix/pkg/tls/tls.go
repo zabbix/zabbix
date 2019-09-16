@@ -486,7 +486,7 @@ static int	tls_get_x509_name(tls_t *tls, X509_NAME *dn, char **name)
 	return ret;
 }
 
-static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+static int tls_validate_issuer_and_subject(tls_t *tls, const char *issuer, const char *subject)
 {
 	X509	*cert;
 	char *peer_issuer = NULL, *peer_subject = NULL;
@@ -708,7 +708,7 @@ static void tls_free(tls_t *tls)
 	TLS_UNUSED(tls);
 }
 
-static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+static int tls_validate_issuer_and_subject(tls_t *tls, const char *issuer, const char *subject)
 {
 	TLS_UNUSED(tls);
 	TLS_UNUSED(issuer);
@@ -866,7 +866,7 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 			cSubject = C.CString(cfg.ServerCertSubject)
 			defer C.free(unsafe.Pointer(cSubject))
 		}
-		if 0 != C.tls_validate_issuer_and_subect(C.tls_lp_t(c.tls), cIssuer, cSubject) {
+		if 0 != C.tls_validate_issuer_and_subject(C.tls_lp_t(c.tls), cIssuer, cSubject) {
 			return c.Error()
 		}
 	}
