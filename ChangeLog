@@ -1,7 +1,7 @@
 Changes for 4.0.13rc1
 
 New features:
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
