@@ -253,7 +253,6 @@ class CWidgetConfig {
 	 */
 	public static function getConfiguration($type, $fields, $view_mode) {
 		return [
-			'scrollable' => self::isScrollable($type),
 			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];
 	}
