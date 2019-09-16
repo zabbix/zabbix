@@ -9,7 +9,7 @@ A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in 
 ..F....... [ZBXNEXT-5219] Separate configuration and realtime fields in items table (PoC) (rlataria)
 .........T [ZBXNEXT-5141] added "Template App Apache" (afayantsev)
 ..F....... [ZBXNEXT-854] Support Bar Graphs (ashubin, rlataria)
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .........T [ZBXNEXT-5142] added "Template App Nginx" (mchudinov)
 ..F....... [ZBXNEXT-1657] split proxy and host names in separate columns in Configuration->Hosts list, Configuration->Discovery rules list and Administration->Queue pages (Ivo)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
@@ -106,7 +106,7 @@ Changes for 4.2.7rc1
 
 New features:
 .......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
@@ -664,7 +664,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.13rc1
 
 New features:
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
