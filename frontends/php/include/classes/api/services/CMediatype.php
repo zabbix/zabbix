@@ -749,7 +749,8 @@ class CMediatype extends CApiService {
 					$validated_data += [
 						'webhook' => $db_mediatype['webhook'],
 						'timeout' => $db_mediatype['timeout'],
-						'receive_tags' => $db_mediatype['receive_tags']
+						'receive_tags' => $db_mediatype['receive_tags'],
+						'params' => []
 					];
 
 					$seconds = timeUnitToSeconds($validated_data['timeout']);
