@@ -344,9 +344,6 @@ static int	DBpatch_4030020(void)
 
 static int	DBpatch_4030021(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("globalmacro", &field);
@@ -354,9 +351,6 @@ static int	DBpatch_4030021(void)
 
 static int	DBpatch_4030022(void)
 {
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hostmacro", &field);
