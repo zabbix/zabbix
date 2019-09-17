@@ -4809,9 +4809,6 @@ ul.checkbox-list.col-3 > li {
   letter-spacing: -0.25px;
   width: 18px; }
 
-[data-count][class*='icon-']::after {
-  content: attr(data-count); }
-
 .icon-action-command::before {
   background-position: -249px -245px; }
 
@@ -4867,8 +4864,7 @@ ul.checkbox-list.col-3 > li {
 
 .icon-description {
   margin-left: 5px;
-  vertical-align: middle;
-  background-color: transparent !important; }
+  vertical-align: middle; }
   .icon-description::after {
     content: '?';
     color: #fff; }

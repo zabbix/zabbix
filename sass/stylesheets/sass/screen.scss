@@ -833,7 +833,7 @@ output {
 
 					&:not(.row-selected):not(:hover) {
 						td {
-							[class*='icon-'] {
+							[class*='icon-']:not(.icon-description) {
 								@include border-radius(2px);
 								background-color: $ui-bg-color;
 							}
@@ -6710,9 +6710,6 @@ ul.checkbox-list {
 	letter-spacing: -0.25px;
 	width: 18px;
 }
-[data-count][class*='icon-']::after {
-	content: attr(data-count);
-}
 
 .icon-action-command::before {
 	background-position: -249px -245px;
@@ -6782,7 +6779,6 @@ ul.checkbox-list {
 .icon-description {
 	margin-left: 5px;
 	vertical-align: middle;
-	background-color: transparent !important;
 
 	&::after {
 		content: '?';

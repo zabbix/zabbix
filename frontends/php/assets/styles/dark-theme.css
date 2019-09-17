@@ -587,7 +587,7 @@ output {
       background-position: -165px -624px; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-']:not(.icon-description) {
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
@@ -4855,9 +4855,6 @@ ul.checkbox-list.col-3 > li {
   letter-spacing: -0.25px;
   width: 18px; }
 
-[data-count][class*='icon-']::after {
-  content: attr(data-count); }
-
 .icon-action-command::before {
   background-position: -249px -245px; }
 
@@ -4913,8 +4910,7 @@ ul.checkbox-list.col-3 > li {
 
 .icon-description {
   margin-left: 5px;
-  vertical-align: middle;
-  background-color: transparent !important; }
+  vertical-align: middle; }
   .icon-description::after {
     content: '?';
     color: #2b2b2b; }
