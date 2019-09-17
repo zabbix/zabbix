@@ -52,7 +52,7 @@ func TestUptime(t *testing.T) {
 
 	time1 := time.Now()
 	if result, err := impl.Export("system.uptime", []string{}, nil); err != nil {
-		t.Errorf("sytem.uptime returned error %s", err.Error())
+		t.Errorf("system.uptime returned error %s", err.Error())
 	} else {
 		if uptime, ok := result.(int); !ok {
 			t.Errorf("system.uptime returned unexpected value type %s", reflect.TypeOf(result).Kind())

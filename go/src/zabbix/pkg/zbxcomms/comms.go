@@ -36,7 +36,7 @@ const headerSize = 13
 const (
 	connStateAccept = iota + 1
 	connStateConnect
-	connStateEstabilished
+	connStateEstablished
 )
 
 type Connection struct {
@@ -201,7 +201,7 @@ func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {
 		}
 	}
 	if c.state == connStateAccept && c.tlsConfig != nil {
-		c.state = connStateEstabilished
+		c.state = connStateEstablished
 
 		b := make([]byte, 1)
 		var n int
