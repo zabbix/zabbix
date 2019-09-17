@@ -1078,10 +1078,6 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
 	}
 
-	if cfg.Accept == ConnUnencrypted {
-		return nc, nil
-	}
-
 	var cUser, cSecret *C.char
 	if cfg.Accept&ConnPSK != 0 {
 		cUser = C.CString(cfg.PSKIdentity)
