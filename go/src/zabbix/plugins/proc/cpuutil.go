@@ -28,6 +28,7 @@ import "C"
 
 import (
 	"errors"
+	"math"
 	"os/user"
 	"regexp"
 	"strconv"
@@ -345,7 +346,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 		ticks *= 1e12
 		ticks /= uint64(tail.timestamp.Sub(head.timestamp))
-		return float64(ticks) / (10 * float64(C.sysconf(C._SC_CLK_TCK))), nil
+
+		return math.Round(float64(ticks)/float64(C.sysconf(C._SC_CLK_TCK))) / 10, nil
 	}
 	stats := &cpuUtilStats{accessed: now, history: make([]cpuUtilData, maxHistory)}
 	if cmdline != "" {
