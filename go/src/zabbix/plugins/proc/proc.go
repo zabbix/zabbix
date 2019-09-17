@@ -24,7 +24,6 @@ package proc
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -33,43 +32,40 @@ import (
 	"zabbix/pkg/log"
 )
 
-var buffer = make([]byte, 2048)
-
 func read2k(filename string) (data []byte, err error) {
-	var f *os.File
-	if f, err = os.Open(filename); err != nil {
-		return nil, err
+	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
+	if err != nil {
+		return
 	}
 	var n int
-	if n, err = f.Read(buffer); err == nil {
-		data = make([]byte, n)
-		copy(data, buffer[:n])
+	b := make([]byte, 2048)
+	if n, err = syscall.Read(fd, b); err == nil {
+		data = b[:n]
 	}
-	f.Close()
+	syscall.Close(fd)
 	return
 }
 
 func readAll(filename string) (data []byte, err error) {
-	var f *os.File
-	if f, err = os.Open(filename); err != nil {
-		return nil, err
+	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
+	if err != nil {
+		return
 	}
-	defer f.Close()
+	defer syscall.Close(fd)
 	var buf bytes.Buffer
+	b := make([]byte, 2048)
 	for {
 		var n int
-		var ferr error
-		if n, ferr = f.Read(buffer); ferr != nil {
-			if ferr == io.EOF {
-				break
-			}
-			return nil, ferr
+		if n, err = syscall.Read(fd, b); err != nil {
+			return
 		}
-		if _, err = buf.Write(buffer[:n]); err != nil {
+		if n == 0 {
+			return buf.Bytes(), nil
+		}
+		if _, err = buf.Write(b[:n]); err != nil {
 			return
 		}
 	}
-	return buf.Bytes(), nil
 }
 
 func (p *Plugin) getProcessName(pid int64) (name string, err error) {

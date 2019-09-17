@@ -38,6 +38,7 @@ func BenchmarkReadAll(b *testing.B) {
 
 func BenchmarkSyscallRead(b *testing.B) {
 	for i := 0; i < b.N; i++ {
+		buffer := make([]byte, 2048)
 		fd, err := syscall.Open("/proc/self/stat", syscall.O_RDONLY, 0)
 		if err != nil {
 			return
