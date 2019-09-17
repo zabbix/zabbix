@@ -259,7 +259,7 @@ class CMultiselectElement extends CElement {
 						$this->selectMultiple($label, $context);
 					}
 					else {
-						 $this->type($label);
+						$this->type($label);
 					}
 				}
 
