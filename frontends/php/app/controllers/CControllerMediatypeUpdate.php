@@ -177,15 +177,7 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 		}
 
-		DBstart();
-
 		$result = API::Mediatype()->update($mediatype);
-
-		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['description'].']');
-		}
-
-		$result = DBend($result);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');

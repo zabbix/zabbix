@@ -913,8 +913,9 @@ class CMediatype extends CApiService {
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 		$webhook_params = [];
 
-		foreach ($mediatypes as $i => $mediatype) {
+		foreach ($mediatypes as $i => &$mediatype) {
 			$mediatypeid = $mediatypeids[$i];
+			$mediatype['mediatypeid'] = $mediatypeid;
 
 			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('params', $mediatype)
 					&& is_array($mediatype['params'])) {
@@ -923,10 +924,13 @@ class CMediatype extends CApiService {
 				}
 			}
 		}
+		unset($mediatype);
 
 		if ($webhook_params) {
 			DB::insertBatch('media_type_param', $webhook_params);
 		}
+
+		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
@@ -974,7 +978,11 @@ class CMediatype extends CApiService {
 		$webhooks_params = [];
 		$defaults = DB::getDefaults('media_type');
 		$db_mediatypes = DB::select('media_type', [
-			'output' => ['type'],
+			'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
+				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
+				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
+				'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
+			],
 			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
 			'preservekeys' => true
 		]);
@@ -1076,6 +1084,8 @@ class CMediatype extends CApiService {
 			}
 		}
 
+		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
+
 		return ['mediatypeids' => $mediatypeids];
 	}
 
@@ -1101,7 +1111,14 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%s".', $action['name']));
 		}
 
+		$db_mediatypes = DB::select('media_type', [
+			'output' => ['mediatypeid', 'description'],
+			'filter' => ['mediatypeid' => $mediatypeids],
+			'preservekeys' => true
+		]);
+
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
+		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MEDIA_TYPE, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
 	}
