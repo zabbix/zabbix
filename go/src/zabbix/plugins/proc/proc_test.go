@@ -20,7 +20,7 @@
 package proc
 
 import (
-	"io/ioutil"
+	"syscall"
 	"testing"
 )
 
@@ -36,8 +36,14 @@ func BenchmarkReadAll(b *testing.B) {
 	}
 }
 
-func BenchmarkIOUtilRead(b *testing.B) {
+func BenchmarkSyscallRead(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = ioutil.ReadFile("/proc/self/stat")
+		fd, err := syscall.Open("/proc/self/stat", syscall.O_RDONLY, 0)
+		if err != nil {
+			return
+		}
+
+		syscall.Read(fd, buffer)
+		syscall.Close(fd)
 	}
 }
