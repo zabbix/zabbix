@@ -254,6 +254,10 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+.icon-description::after {
+	color: $font-selected-color;
+}
+
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {

@@ -635,6 +635,8 @@ output {
       min-height: 12px;
       margin: 0;
       position: relative; }
+    .list-table.compact-view td .icon-description {
+      margin-left: 2px; }
   .list-table thead th {
     color: #768d99;
     height: 100%;
@@ -4783,7 +4785,8 @@ ul.checkbox-list.col-3 > li {
 .icon-problem-recovery,
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
-.icon-actions-number-red {
+.icon-actions-number-red,
+.icon-description {
   display: inline-block;
   position: relative;
   height: 18px;
@@ -4806,7 +4809,8 @@ ul.checkbox-list.col-3 > li {
   .icon-problem-recovery::before,
   .icon-actions-number-gray::before,
   .icon-actions-number-yellow::before,
-  .icon-actions-number-red::before {
+  .icon-actions-number-red::before,
+  .icon-description::before {
     content: '';
     display: inline-block;
     position: absolute;
@@ -4817,7 +4821,8 @@ ul.checkbox-list.col-3 > li {
     background-image: url(../img/icon-sprite.svg);
     background-repeat: no-repeat; }
 
-[data-count][class*='icon-']::after {
+[data-count][class*='icon-']::after,
+.icon-description::after {
   position: absolute;
   content: attr(data-count);
   text-align: center;
@@ -4825,6 +4830,9 @@ ul.checkbox-list.col-3 > li {
   font-size: 9px;
   letter-spacing: -0.25px;
   width: 18px; }
+
+[data-count][class*='icon-']::after {
+  content: attr(data-count); }
 
 .icon-action-command::before {
   background-position: -249px -245px; }
@@ -4878,6 +4886,16 @@ ul.checkbox-list.col-3 > li {
   color: #1f2c33; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.icon-description {
+  margin-left: 5px;
+  vertical-align: middle;
+  background-color: transparent !important; }
+  .icon-description::after {
+    content: '?';
+    color: #fff; }
+  .icon-description::before {
+    background-position: -474px -245px; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
