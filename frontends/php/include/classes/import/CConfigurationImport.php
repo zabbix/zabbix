@@ -2194,6 +2194,8 @@ class CConfigurationImport {
 
 		if ($del_item_prototypes) {
 			API::ItemPrototype()->delete(array_keys($del_item_prototypes));
+
+			$this->referencer->refreshGraphs();
 		}
 	}
 
