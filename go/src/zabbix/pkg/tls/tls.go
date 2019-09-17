@@ -173,14 +173,44 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	return key_len;
 }
 
-#define TLS_1_3_CIPHERSUITES "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
-#define TLS_CIPHER_CERT	"RSA+aRSA+AES128"
-#define TLS_CIPHER_PSK	"kPSK+AES128"
+static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
+{
+	EC_KEY	*ecdh;
+	long	res;
+	int	ret = 0;
+
+	// use curve secp256r1/prime256v1/NIST P-256
+
+	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
+		return -1;
+
+	SSL_CTX_set_options(ctx, SSL_OP_SINGLE_ECDH_USE);
+
+	if (1 != (res = SSL_CTX_set_tmp_ecdh(ctx, ecdh)))
+		ret = -1;
+
+	EC_KEY_free(ecdh);
+
+	return ret;
+}
 
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
 		char **error)
 {
-	SSL_CTX	*ctx;
+#define TLS_CIPHER_CERT_ECDHE		"EECDH+aRSA+AES128:"
+#define TLS_CIPHER_CERT			"RSA+aRSA+AES128"
+
+#if defined(HAVE_OPENSSL_WITH_PSK)
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1 or newer
+	// TLS_AES_256_GCM_SHA384 is excluded from client ciphersuite list for PSK based connections.
+	// By default, in TLS 1.3 only *-SHA256 ciphersuites work with PSK.
+#	define TLS_1_3_CIPHERSUITES	"TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+#endif
+// OpenSSL 1.1.0 or newer
+#define TLS_CIPHER_PSK_ECDHE		"kECDHEPSK+AES128:"
+#define TLS_CIPHER_PSK			"kPSK+AES128"
+#endif
+	SSL_CTX		*ctx;
 	int		ret = -1;
 	const char	*ciphers;
 
@@ -194,8 +224,8 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	{
 		if (1 != SSL_CTX_load_verify_locations(ctx, ca_file, NULL))
 			goto out;
+
 		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-		ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
 
 		if (NULL != crl_file)
 		{
@@ -204,16 +234,17 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 			int		count_cert;
 
 			store_cert = SSL_CTX_get_cert_store(ctx);
+
 			if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 				goto out;
+
 			if (0 >= (count_cert = X509_load_crl_file(lookup_cert, crl_file, X509_FILETYPE_PEM)))
 				goto out;
+
 			if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 				goto out;
 		}
 	}
-	else
-		ciphers = TLS_CIPHER_PSK;
 
 	if (NULL != cert_file && 1 != SSL_CTX_use_certificate_chain_file(ctx, cert_file))
 		goto out;
@@ -226,12 +257,28 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	SSL_CTX_clear_options(ctx, SSL_OP_LEGACY_SERVER_CONNECT);
 	SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_OFF);
 
+	// try to enable ECDH ciphersuites
+	if (0 == zbx_set_ecdhe_parameters(ctx))
+	{
+		if (NULL != ca_file)
+			ciphers = TLS_CIPHER_CERT_ECDHE TLS_CIPHER_CERT ":" TLS_CIPHER_PSK_ECDHE TLS_CIPHER_PSK;
+		else
+			ciphers = TLS_CIPHER_PSK_ECDHE TLS_CIPHER_PSK;
+	}
+	else
+	{
+		if (NULL != ca_file)
+			ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
+		else
+			ciphers = TLS_CIPHER_PSK;
+	}
+
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1
 	if (1 != SSL_CTX_set_ciphersuites(ctx, TLS_1_3_CIPHERSUITES))
 		goto out;
 #endif
 
-	if (0 == SSL_CTX_set_cipher_list(ctx, ciphers))
+	if (1 != SSL_CTX_set_cipher_list(ctx, ciphers))
 		goto out;
 
 	ret = 0;
