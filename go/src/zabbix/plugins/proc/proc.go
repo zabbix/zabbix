@@ -74,11 +74,15 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 		return
 	}
 	var pos int
-	if pos = bytes.LastIndexByte(data, ')'); pos == -1 {
+	if pos = bytes.LastIndexByte(data, ')'); pos == -1 || len(data[pos:]) < 2 {
 		stat.err = fmt.Errorf("cannot find CPU statistic starting position in /proc/%d/stat", pid)
 		return
 	}
 	stats := bytes.Split(data[pos+2:], []byte{' '})
+	if len(stats) < 20 {
+		stat.err = fmt.Errorf("cannot parse CPU statistics in /proc/%d/stat", pid)
+		return
+	}
 	if stat.utime, stat.err = strconv.ParseUint(string(stats[11]), 10, 64); stat.err != nil {
 		return
 	}

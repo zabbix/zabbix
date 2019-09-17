@@ -107,7 +107,7 @@ type cpuUtilQuery struct {
 }
 
 func (q *cpuUtilQuery) match(p *procInfo) bool {
-	if q.name != "" && q.name != p.name {
+	if q.name != "" && q.name != p.name && q.name != p.arg0 {
 		return false
 	}
 	if q.user != "" && q.userid != p.userid {
@@ -154,7 +154,7 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 		queries = append(queries, query)
 		stats.scanid = p.scanid
 		if q.name != "" {
-			flags |= procInfoName
+			flags |= procInfoName | procInfoCmdline
 		}
 		if q.user != "" {
 			flags |= procInfoUser
