@@ -61,7 +61,7 @@ $mediaTypeTable = (new CTableInfo())
 			(new CCheckBox('all_media_types'))
 				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 		_('Status'),
 		_('Used in actions'),
@@ -130,7 +130,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 			'mediatypeid' => $mediaType['mediatypeid']
 		]).', "mediatypetest_edit", this);');
 
-	$name = new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
+	$name = new CLink($mediaType['name'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 
 	// append row
 	$mediaTypeTable->addRow([

@@ -40,8 +40,8 @@ $mediaTypeForm = (new CForm())
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
-	->addRow((new CLabel(_('Name'), 'description'))->setAsteriskMark(),
-		(new CTextBox('description', $data['description'], false, 100))
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['name'], false, 100))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')

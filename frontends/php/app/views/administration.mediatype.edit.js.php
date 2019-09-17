@@ -54,7 +54,7 @@
 			$('#passwd').prop('disabled', false).show();
 			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
-			$('#description').focus();
+			$('#name').focus();
 		});
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
@@ -75,7 +75,7 @@
 			}
 
 			$(this).trimValues([
-				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
+				'#name', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
 				'#smtp_username', '#maxsessions'
 			]);
 		});
