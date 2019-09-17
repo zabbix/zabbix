@@ -24,6 +24,7 @@ package proc
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -32,9 +33,48 @@ import (
 	"zabbix/pkg/log"
 )
 
+var buffer = make([]byte, 2048)
+
+func read2k(filename string) (data []byte, err error) {
+	var f *os.File
+	if f, err = os.Open(filename); err != nil {
+		return nil, err
+	}
+	var n int
+	if n, err = f.Read(buffer); err == nil {
+		data = make([]byte, n)
+		copy(data, buffer[:n])
+	}
+	f.Close()
+	return
+}
+
+func readAll(filename string) (data []byte, err error) {
+	var f *os.File
+	if f, err = os.Open(filename); err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var buf bytes.Buffer
+	for {
+		var n int
+		var ferr error
+		if n, ferr = f.Read(buffer); ferr != nil {
+			if ferr == io.EOF {
+				break
+			}
+			return nil, ferr
+		}
+		if _, err = buf.Write(buffer[:n]); err != nil {
+			return
+		}
+	}
+	return buf.Bytes(), nil
+}
+
 func (p *Plugin) getProcessName(pid int64) (name string, err error) {
 	var data []byte
-	if data, err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/stat", pid)); err != nil {
+	if data, err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); err != nil {
 		return
 	}
 	var left, right int
@@ -57,7 +97,7 @@ func (p *Plugin) getProcessUserID(pid int64) (userid int64, err error) {
 
 func (p *Plugin) getProcessCmdline(pid int64) (cmdline []string, err error) {
 	var data []byte
-	if data, err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid)); err != nil {
+	if data, err = readAll(fmt.Sprintf("/proc/%d/cmdline", pid)); err != nil {
 		return
 	}
 	params := bytes.Split(data, []byte{0})
@@ -70,7 +110,7 @@ func (p *Plugin) getProcessCmdline(pid int64) (cmdline []string, err error) {
 
 func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 	var data []byte
-	if data, stat.err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
+	if data, stat.err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
 		return
 	}
 	var pos int
