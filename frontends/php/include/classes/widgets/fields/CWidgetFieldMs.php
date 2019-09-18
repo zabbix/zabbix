@@ -19,7 +19,7 @@
 **/
 
 
-class CWidgetFieldMultiselect extends CWidgetField {
+class CWidgetFieldMs extends CWidgetField {
 
 	/**
 	 * Is selecting multiple objects or a single one?
@@ -53,7 +53,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	 *
 	 * @param int $flags
 	 *
-	 * @return CWidgetFieldMultiselect
+	 * @return CWidgetFieldMs
 	 */
 	public function setFlags($flags) {
 		parent::setFlags($flags);
@@ -71,7 +71,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	}
 
 	/**
-	 * @return CWidgetFieldMultiselect
+	 * @return CWidgetFieldMs
 	 */
 	public function setValue($value) {
 		$this->value = (array) $value;
@@ -93,7 +93,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	 *
 	 * @param bool $multiple
 	 *
-	 * @return CWidgetFieldMultiselect
+	 * @return CWidgetFieldMs
 	 */
 	public function setMultiple($multiple) {
 		$this->multiple = $multiple;
@@ -116,7 +116,7 @@ class CWidgetFieldMultiselect extends CWidgetField {
 	 * @param string $name
 	 * @param mixed $value
 	 *
-	 * @return CWidgetFieldMultiselect
+	 * @return CWidgetFieldMs
 	 */
 	public function setFilterParameter($name, $value) {
 		$this->filter_parameters[$name] = $value;

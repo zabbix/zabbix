@@ -142,27 +142,27 @@ class CControllerDashboardWidgetEdit extends CController {
 		$prototype_graphids = [];
 
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldMultiselectGroup) {
+			if ($field instanceof CWidgetFieldMsGroup) {
 				$key = 'groups';
 				$var = 'groupids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectHost) {
+			elseif ($field instanceof CWidgetFieldMsHost) {
 				$key = 'hosts';
 				$var = 'hostids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectItem) {
+			elseif ($field instanceof CWidgetFieldMsItem) {
 				$key = 'items';
 				$var = 'itemids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectGraph) {
+			elseif ($field instanceof CWidgetFieldMsGraph) {
 				$key = 'graphs';
 				$var = 'graphids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectItemPrototype) {
+			elseif ($field instanceof CWidgetFieldMsItemPrototype) {
 				$key = 'item_prototypes';
 				$var = 'prototype_itemids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectGraphPrototype) {
+			elseif ($field instanceof CWidgetFieldMsGraphPrototype) {
 				$key = 'graph_prototypes';
 				$var = 'prototype_graphids';
 			}
