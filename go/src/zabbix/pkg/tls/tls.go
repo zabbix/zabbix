@@ -583,13 +583,18 @@ static void tls_description(tls_t *tls, char **desc)
 
 	ptr += snprintf(ptr, sizeof(buf), "%s %s", SSL_get_version(tls->ssl), SSL_get_cipher(tls->ssl));
 
-	if (NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
+	if ((sizeof(buf) - 1 > (size_t)(ptr - buf)) && NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
 	{
 		if (0 == tls_get_x509_name(tls, X509_get_issuer_name(cert), &peer_issuer) &&
 			0 == tls_get_x509_name(tls, X509_get_subject_name(cert), &peer_subject))
 		{
-			ptr += snprintf(ptr, sizeof(buf) + ptr - buf, ", peer certificate issuer:\"%s\" subject:\"%s\"",
-			peer_issuer, peer_subject);
+			// ensure buffer length for writing at least ', peer certificate issuer:" " subject:" "'
+			if (sizeof(buf) - (size_t)(ptr - buf) > 41)
+			{
+				snprintf(ptr, sizeof(buf) - (size_t)(ptr - buf),
+						", peer certificate issuer:\"%s\" subject:\"%s\"",
+						peer_issuer, peer_subject);
+			}
 		}
 	}
 	*desc = strdup(buf);
