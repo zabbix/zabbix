@@ -24,10 +24,8 @@ package proc
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
-	"strings"
 	"syscall"
 	"zabbix/pkg/log"
 )
@@ -91,17 +89,33 @@ func (p *Plugin) getProcessUserID(pid int64) (userid int64, err error) {
 	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
 }
 
-func (p *Plugin) getProcessCmdline(pid int64) (cmdline []string, err error) {
+func (p *Plugin) getProcessCmdline(pid int64, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
 	if data, err = readAll(fmt.Sprintf("/proc/%d/cmdline", pid)); err != nil {
 		return
 	}
-	params := bytes.Split(data, []byte{0})
-	cmdline = make([]string, len(params))
-	for i := range params {
-		cmdline[i] = string(params[i])
+
+	if flags&procInfoName != 0 {
+		if end := bytes.IndexByte(data, 0); end != -1 {
+			if pos := bytes.LastIndexByte(data[:end], '/'); pos != -1 {
+				arg0 = string(data[pos+1 : end])
+			} else {
+				arg0 = string(data[:end])
+			}
+		}
 	}
-	return cmdline, nil
+
+	for i := 0; i < len(data); i++ {
+		if data[i] == 0 {
+			data[i] = ' '
+		}
+	}
+
+	if len(data) != 0 && data[len(data)-1] == ' ' {
+		data = data[:len(data)-1]
+	}
+
+	return arg0, string(data), nil
 }
 
 func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
@@ -132,8 +146,14 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 
 func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir("/proc"); err != nil {
-		return
+	f, err := os.Open("/proc")
+	if err != nil {
+		return nil, err
+	}
+	entries, err = f.Readdir(-1)
+	f.Close()
+	if err != nil {
+		return nil, err
 	}
 	processes = make([]*procInfo, 0, len(entries))
 
@@ -160,19 +180,11 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			var params []string
-			if params, tmperr = p.getProcessCmdline(pid); tmperr != nil {
+
+			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(pid, flags); tmperr != nil {
 				log.Debugf("cannot get process %d command line: %s", pid, tmperr)
 				continue
 			}
-			if flags&procInfoName != 0 && len(params) > 0 {
-				if pos := strings.IndexByte(params[0], '/'); pos != -1 {
-					info.arg0 = params[0][pos+1:]
-				} else {
-					info.arg0 = params[0]
-				}
-			}
-			info.cmdline = strings.Join(params, " ")
 		}
 		processes = append(processes, info)
 	}
