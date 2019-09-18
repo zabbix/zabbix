@@ -27,7 +27,6 @@ import (
 	"os"
 	"strconv"
 	"syscall"
-	"zabbix/pkg/log"
 )
 
 func read2k(filename string) (data []byte, err error) {
@@ -171,19 +170,19 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
 			if info.name, tmperr = p.getProcessName(entry.Name()); tmperr != nil {
-				log.Debugf("cannot get process %s name: %s", entry.Name(), tmperr)
+				p.Debugf("cannot get process %s name: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
 			if info.userid, tmperr = p.getProcessUserID(entry.Name()); tmperr != nil {
-				log.Debugf("cannot get process %s user id: %s", entry.Name(), tmperr)
+				p.Debugf("cannot get process %s user id: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
 			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entry.Name(), flags); tmperr != nil {
-				log.Debugf("cannot get process %s command line: %s", entry.Name(), tmperr)
+				p.Debugf("cannot get process %s command line: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
