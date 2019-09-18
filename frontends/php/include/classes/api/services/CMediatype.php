@@ -225,7 +225,8 @@ class CMediatype extends CApiService {
 			// Check additional fields and values depeding on type.
 			$this->checkRequiredFieldsByType($mediatype);
 
-			$validation_rules = array_key_exists($mediatype['type'], $mediatype_rules)
+			$validation_rules = $mediatype_rules['fields'];
+			$validation_rules += array_key_exists($mediatype['type'], $mediatype_rules)
 				? $mediatype_rules[$mediatype['type']]
 				: [];
 			$validated_data = array_intersect_key($mediatype, $validation_rules);
@@ -579,7 +580,8 @@ class CMediatype extends CApiService {
 				$mediatype['type'] = $db_mediatype['type'];
 			}
 
-			$validation_rules = array_key_exists($mediatype['type'], $mediatype_rules)
+			$validation_rules = $mediatype_rules['fields'];
+			$validation_rules += array_key_exists($mediatype['type'], $mediatype_rules)
 				? $mediatype_rules[$mediatype['type']]
 				: [];
 			$validated_data = array_intersect_key($mediatype, $validation_rules);
@@ -859,6 +861,7 @@ class CMediatype extends CApiService {
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
 	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
+	 * @param string    $mediatypes['description']          Media type description.
 	 *
 	 * @return array
 	 */
@@ -922,6 +925,7 @@ class CMediatype extends CApiService {
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
 	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
+	 * @param string    $mediatypes['description']          Media type description.
 	 *
 	 * @return array
 	 */
@@ -937,7 +941,8 @@ class CMediatype extends CApiService {
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
-				'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
+				'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
+				'description'
 			],
 			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
 			'preservekeys' => true
@@ -1162,12 +1167,19 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * Get media type validation rules.
+	 * Get media type validation rules, return array where validation rules are store in 'fields' key and media type
+	 * specific validation rules are stored in key having value of media type 'type' field.
 	 *
 	 * @return array
 	 */
 	protected function getValidationRules() {
 		return [
+			'fields' => [
+				'description' => [
+					'type' => API_STRING_UTF8,
+					'length' => DB::getFieldLength('media_type', 'description')
+				]
+			],
 			MEDIA_TYPE_WEBHOOK => [
 				'webhook' => [
 					'type' => API_STRING_UTF8,

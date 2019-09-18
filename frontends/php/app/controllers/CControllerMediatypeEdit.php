@@ -55,6 +55,7 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
+			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
 		];
@@ -89,7 +90,7 @@ class CControllerMediatypeEdit extends CController {
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
-					'params'
+					'params', 'description'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -142,6 +143,7 @@ class CControllerMediatypeEdit extends CController {
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
 			],
+			'description' => '',
 			'form_refresh' => 0,
 			'content_type' => $db_defaults['content_type'],
 			'max_length' => [
@@ -168,6 +170,7 @@ class CControllerMediatypeEdit extends CController {
 			$data['smtp_authentication'] = $this->mediatype['smtp_authentication'];
 			$data['exec_path'] = $this->mediatype['exec_path'];
 			$data['content_type'] = $this->mediatype['content_type'];
+			$data['description'] = $this->mediatype['description'];
 
 			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
@@ -209,7 +212,7 @@ class CControllerMediatypeEdit extends CController {
 		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
 			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
-			'form_refresh', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
+			'form_refresh', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'description'
 		]);
 
 		if ($this->hasInput('form_refresh')) {

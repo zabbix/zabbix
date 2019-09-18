@@ -48,6 +48,7 @@ class CControllerMediatypeCreate extends CController {
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
+			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
 		];
@@ -90,7 +91,9 @@ class CControllerMediatypeCreate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['type', 'name', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
+		$this->getInputs($mediatype, ['type', 'name', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
+			'description'
+		]);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:

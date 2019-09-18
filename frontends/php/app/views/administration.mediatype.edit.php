@@ -240,6 +240,9 @@ $mediatype_formlist
 			->setAriaRequired(),
 		'row_webhook_url_name'
 	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 	);
