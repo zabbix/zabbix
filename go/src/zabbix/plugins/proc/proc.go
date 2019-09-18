@@ -24,6 +24,7 @@ package proc
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"syscall"
@@ -151,14 +152,13 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	if err != nil {
 		return nil, err
 	}
-	entries, err = f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		return nil, err
-	}
-	processes = make([]*procInfo, 0, len(entries))
+	defer f.Close()
 
-	for _, entry := range entries {
+	for entries, err = f.Readdir(1); err != io.EOF; entries, err = f.Readdir(1) {
+		if err != nil {
+			return nil, err
+		}
+		entry := entries[0]
 		if !entry.IsDir() {
 			continue
 		}
