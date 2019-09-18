@@ -65,6 +65,19 @@ class CWidgetHelper {
 	}
 
 	/**
+	* Add Columns and Rows fields to the form of iterator.
+	*
+	* @param CFormList $form_list
+	* @param CWidgetFieldIntegerBox $field_columns
+	* @param CWidgetFieldIntegerBox $field_rows
+	*/
+	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
+		$form_list
+			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
+			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows));
+	}
+
+	/**
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
@@ -74,25 +87,6 @@ class CWidgetHelper {
 	public static function getLabel($field) {
 		return (new CLabel($field->getLabel(), $field->getName()))
 			->setAsteriskMark(self::isAriaRequired($field));
-	}
-
-	/**
-	 * Creates label linked to the multiselect field.
-	 *
-	 * @param CMultiSelect $field
-	 *
-	 * @return CLabel
-	 */
-	public static function getMultiselectLabel($field) {
-		$field_name = $field->getName();
-
-		if ($field instanceof CWidgetFieldItem) {
-			$field_name .= ($field->isMultiple() ? '[]' : '');
-		} else {
-			$field_name .= '[]';
-		}
-
-		return (new CLabel($field->getLabel(), $field_name.'_ms'))->setAsteriskMark(self::isAriaRequired($field));
 	}
 
 	/**
@@ -188,99 +182,148 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldGroup $field
+	 * Creates label linked to the multiselect field.
+	 *
+	 * @param CWidgetFieldMultiselect $field
+	 *
+	 * @return CLabel
+	 */
+	public static function getMultiselectLabel($field) {
+		$field_name = $field->getName();
+
+		if ($field instanceof CWidgetFieldMultiselect) {
+			$field_name .= ($field->isMultiple() ? '[]' : '');
+		}
+		else {
+			$field_name .= '[]';
+		}
+
+		return (new CLabel($field->getLabel(), $field_name.'_ms'))
+			->setAsteriskMark(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselect $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	private static function getMultiselectField($field, $captions, $form_name, $object_name, $popup_options) {
+		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
+
+		return (new CMultiSelect([
+			'name' => $field_name,
+			'object_name' => $object_name,
+			'multiple' => $field->isMultiple(),
+			'data' => $captions,
+			'popup' => [
+				'parameters' => [
+					'dstfrm' => $form_name,
+					'dstfld1' => zbx_formatDomId($field_name)
+				] + $popup_options
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(self::isAriaRequired($field));
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectGroup $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getGroup($field, $captions, $form_name) {
-		$field_name = $field->getName().'[]';
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'hostGroup',
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name),
-					'real_hosts' => true,
-					'enrich_parent_groups' => true
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'hostGroup', [
+			'srctbl' => 'host_groups',
+			'srcfld1' => 'groupid',
+			'real_hosts' => true,
+			'enrich_parent_groups' => true
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldHost $field
+	 * @param CWidgetFieldMultiselectHost $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getHost($field, $captions, $form_name) {
-		$field_name = $field->getName().'[]';
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'hosts',
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'hosts',
-					'srcfld1' => 'hostid',
-					'dstfrm' => $form_name,
-					'dstfld1' => zbx_formatDomId($field_name)
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'hosts', [
+			'srctbl' => 'hosts',
+			'srcfld1' => 'hostid'
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldItem $field
+	 * @param CWidgetFieldMultiselectItem $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
 	 * @return CMultiSelect
 	 */
 	public static function getItem($field, $captions, $form_name) {
-		$field_name = $field->getName().($field->isMultiple() ? '[]' : '');
-
-		return (new CMultiSelect([
-			'name' => $field_name,
-			'object_name' => 'items',
-			'multiple' => $field->isMultiple(),
-			'data' => $captions,
-			'popup' => [
-				'parameters' => [
-						'srctbl' => 'items',
-						'srcfld1' => 'itemid',
-						'dstfrm' => $form_name,
-						'dstfld1' => zbx_formatDomId($field_name)
-					] + $field->getFilterParameters()
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired(self::isAriaRequired($field));
+		return self::getMultiselectField($field, $captions, $form_name, 'items', [
+			'srctbl' => 'items',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true,
+			'webitems' => true
+		] + $field->getFilterParameters());
 	}
 
 	/**
-	 * @param CWidgetFieldSelectResource $field
-	 * @param array $caption
+	 * @param CWidgetFieldMultiselectGraph $field
+	 * @param array $captions
 	 * @param string $form_name
 	 *
-	 * @return array
+	 * @return CMultiSelect
 	 */
+	public static function getGraph($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graphs', [
+			'srctbl' => 'graphs',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graphs' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectItemPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getItemPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'item_prototypes', [
+			'srctbl' => 'item_prototypes',
+			'srcfld1' => 'itemid',
+			'real_hosts' => true
+		] + $field->getFilterParameters());
+	}
+
+	/**
+	 * @param CWidgetFieldMultiselectGraphPrototype $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getGraphPrototype($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'graph_prototypes', [
+			'srctbl' => 'graph_prototypes',
+			'srcfld1' => 'graphid',
+			'srcfld2' => 'name',
+			'real_hosts' => true,
+			'with_graph_prototypes' => true
+		] + $field->getFilterParameters());
+	}
+
 	public static function getSelectResource($field, $caption, $form_name) {
 		return [
 			(new CTextBox($field->getName().'_caption', $caption, true))

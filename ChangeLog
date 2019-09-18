@@ -1,24 +1,30 @@
-Changes for 4.4.0beta1
+Changes for 4.4.0alpha3
 
 New features:
-..F....... [ZBXNEXT-5219] Separate configuration and realtime fields in items table (PoC) (rlataria)
+A.F.I...S. [ZBXNEXT-5416] dropped support of "Jabber" and "Ez Texting" media types (Sasha)
+A.F....... [ZBXNEXT-5252] added new dashboard widget "Graph prototype" (averza)
+A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in autoregistration (Andris, Sasha, vasilijs)
+..F....... [ZBXNEXT-5328] replaced graph widget hosts and items selector (ashubin, miks)
+.......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
 .........T [ZBXNEXT-5141] added "Template App Apache" (afayantsev)
-..F....... [ZBXNEXT-854] Support Bar Graphs (ashubin, rlataria)
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+..F....... [ZBXNEXT-854] added support of bar graphs (ashubin, rlataria)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .........T [ZBXNEXT-5142] added "Template App Nginx" (mchudinov)
 ..F....... [ZBXNEXT-1657] split proxy and host names in separate columns in Configuration->Hosts list, Configuration->Discovery rules list and Administration->Queue pages (Ivo)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 A.F.....S. [ZBXNEXT-4942] implemented support of displaying operational data in the list of problems (agriscenko, asestakovs)
 
 Bug fixes:
+..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
+..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
+A......... [ZBXNEXT-5219] fixed possibility to create items and item prototypes with values in real time fields (rlataria)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
-.......PS. [ZBX-16511] Added source IP address to unknown request log warning message (atumilovics)
 ..F....... [ZBX-16565] fixed incorrect sorting of triggers in "Trigger overview" widget (Ivo)
 ..F....... [ZBX-16530] fixed color for blinked elements (ashubin)
 ........S. [ZBX-7798] improved performance of icmpping* for fping v4.0 and more (MVekslers)
 A......... [ZBX-16522] fixed undefined index "type" in pie and exploded graph creation (talbergs)
-...G...PS. [ZBX-16545] Fixed shell script execution timeout log message (atumilovics)
+...G...PS. [ZBX-16545] fixed shell script execution timeout log message (atumilovics)
 .......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
 ..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
 ........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
@@ -99,18 +105,20 @@ Bug fixes:
 Changes for 4.2.7rc1
 
 New features:
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+.......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
+..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
-.......PS. [ZBX-16511] Added source IP address to unknown request log warning message (atumilovics)
 ..F....... [ZBX-16565] fixed incorrect sorting of triggers in "Trigger overview" widget (Ivo)
 ..F....... [ZBX-16530] fixed color for blinked elements (ashubin)
 ........S. [ZBX-7798] improved performance of icmpping* for fping v4.0 and more (MVekslers)
 A......... [ZBX-16522] fixed undefined index "type" in pie and exploded graph creation (talbergs)
-...G...PS. [ZBX-16545] Fixed shell script execution timeout log message (atumilovics)
+...G...PS. [ZBX-16545] fixed shell script execution timeout log message (atumilovics)
 .......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
 ..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
 ........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)
@@ -655,15 +663,17 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.13rc1
 
 New features:
-A......... [ZBX-3783] add strict validation of input parameters in valuemap.get() method (Sasha)
+A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
+..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)
 ..F....... [ZBX-16565] fixed incorrect sorting of triggers in "Trigger overview" widget (Ivo)
 ........S. [ZBX-7798] improved performance of icmpping* for fping v4.0 and more (MVekslers)
 A......... [ZBX-16522] fixed undefined index "type" in pie and exploded graph creation (talbergs)
-...G...PS. [ZBX-16545] Fixed shell script execution timeout log message (atumilovics)
+...G...PS. [ZBX-16545] fixed shell script execution timeout log message (atumilovics)
 .......PS. [ZBX-16467] removed tables without auto-increment from DBget_maxid_num function (akozlovs)
 ..F....... [ZBX-16538] fixed color for the multiselect selected items (ashubin)
 ........S. [ZBX-16445] fixed possible duplicate key insertion during LLD (akozlovs)

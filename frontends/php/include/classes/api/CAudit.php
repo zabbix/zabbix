@@ -29,6 +29,7 @@ class CAudit {
 	static public $supported_type = [
 		AUDIT_RESOURCE_ACTION => 			['actionid', 'name', 'actions'],
 		AUDIT_RESOURCE_APPLICATION =>		['applicationid', 'name', 'applications'],
+		AUDIT_RESOURCE_AUTOREGISTRATION =>	['configid', null, 'config'],
 		AUDIT_RESOURCE_CORRELATION =>		['correlationid', 'name', 'correlation'],
 		AUDIT_RESOURCE_DASHBOARD =>			['dashboardid', 'name', 'dashboard'],
 		AUDIT_RESOURCE_DISCOVERY_RULE =>	['druleid', 'name', 'drules'],
@@ -48,7 +49,7 @@ class CAudit {
 		AUDIT_RESOURCE_USER =>				['userid', 'alias', 'users'],
 		AUDIT_RESOURCE_USER_GROUP =>		['usrgrpid', 'name', 'usrgrp'],
 		AUDIT_RESOURCE_VALUE_MAP =>			['valuemapid', 'name', 'valuemaps'],
-		AUDIT_RESOURCE_MEDIA_TYPE =>		['mediatypeid', 'description', 'media_type']
+		AUDIT_RESOURCE_MEDIA_TYPE =>		['mediatypeid', 'name', 'media_type']
 	];
 
 	/**
@@ -83,7 +84,8 @@ class CAudit {
 	 */
 	static public function addBulk($userid, $ip, $action, $resourcetype, array $objects, array $objects_old = null) {
 		$masked_fields = [
-			'users' => ['passwd' => true]
+			'users' => ['passwd' => true],
+			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
 		];
 
 		if (!array_key_exists($resourcetype, self::$supported_type)) {
@@ -138,10 +140,10 @@ class CAudit {
 
 				$objects_diff[] = $object_diff;
 
-				$resourcename = $object_old[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object_old[$field_name_resourcename] : '';
 			}
 			else {
-				$resourcename = $object[$field_name_resourcename];
+				$resourcename = ($field_name_resourcename !== null) ? $object[$field_name_resourcename] : '';
 			}
 
 			if (mb_strlen($resourcename) > 255) {

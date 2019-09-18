@@ -81,18 +81,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'SMS',
 					'gsm_modem' => '/dev/ttyS0',
 				]
-			],
-			[
-				[
-					'type' => 'Jabber',
-					'jabber_username' => 'user@server',
-				]
-			],
-			[
-				[
-					'type' => 'Ez Texting',
-					'eztext_limit' => 'USA (160 characters)',
-				]
 			]
 		];
 	}
@@ -111,22 +99,18 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
 			'Connection security', 'Authentication', 'Message format']);
 
-		$this->zbxTestAssertElementPresentId('description');
-		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
-		$this->zbxTestAssertAttribute("//input[@id='description']", "size", 20);
+		$this->zbxTestAssertElementPresentId('name');
+		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 100);
+		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
 		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownAssertSelected('type', 'Email');
-		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Jabber']);
-		$this->zbxTestAssertElementPresentXpath("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
+		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS']);
 
 		$this->zbxTestAssertNotVisibleId('exec_path');
 		$this->zbxTestAssertNotVisibleId('exec_params_table');
 		$this->zbxTestAssertNotVisibleId('gsm_modem');
-		$this->zbxTestAssertNotVisibleId('jabber_username');
 		$this->zbxTestAssertNotVisibleId('passwd');
-		$this->zbxTestAssertNotVisibleId('eztext_username');
-		$this->zbxTestAssertNotVisibleId('eztext_limit');
 
 		if($data['type'] != 'Email') {
 			$this->zbxTestDropdownSelectWait('type', $data['type']);
@@ -197,16 +181,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('gsm_modem', $data['gsm_modem']);
 				$this->zbxTestAssertAttribute("//input[@id='gsm_modem']", "maxlength", 255);
 				break;
-			case 'Jabber':
-				$this->zbxTestAssertElementValue('jabber_username', $data['jabber_username']);
-				$this->zbxTestAssertAttribute("//input[@id='jabber_username']", "maxlength", 255);
-				$this->zbxTestAssertVisibleId('passwd');
-				break;
-			case 'Ez Texting':
-				$this->zbxTestAssertVisibleId('eztext_username');
-				$this->zbxTestAssertVisibleId('passwd');
-				$this->zbxTestDropdownAssertSelected('eztext_limit', $data['eztext_limit']);
-				break;
 		}
 
 		$this->zbxTestTabSwitch('Options');
@@ -239,7 +213,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_SimpleCancel($mediatype) {
-		$name = $mediatype['description'];
+		$name = $mediatype['name'];
 
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 		$oldHashMediaType = CDBHelper::getHash($sql);
@@ -258,30 +232,22 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	public static function newMediaTypes() {
 		$data = [
 			[
-				'Email', ['Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
+				'Email', ['Name' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
 						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com',
 						'message_format' => 'Plain text']
 			],
 			[
-				'Email', ['Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
+				'Email', ['Name' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
 					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com']
 			],
 			[
-				'Script', ['Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']
+				'Script', ['Name' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']
 			],
 			[
-				'Script', ['Description' => 'Skype message2', 'Script' => '/usr/local/bin/skyp2.sh']
+				'Script', ['Name' => 'Skype message2', 'Script' => '/usr/local/bin/skyp2.sh']
 			],
 			[
-				'SMS', ['Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']
-			],
-			[
-				'Jabber',
-				[
-					'Description' => 'Jabber messages',
-					'Jabber identifier' => 'zabbix@jabber.com',
-					'Password' => 'Secret password'
-				]
+				'SMS', ['Name' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']
 			]
 		];
 		return $data;
@@ -298,7 +264,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		switch ($type) {
 			case 'Email':
 				$this->zbxTestDropdownSelect('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('name', $data['Name']);
 				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
 				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
 				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
@@ -308,25 +274,13 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 				break;
 			case 'Script':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('name', $data['Name']);
 				$this->zbxTestInputType('exec_path', $data['Script']);
 				break;
 			case 'SMS':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('name', $data['Name']);
 				$this->zbxTestInputType('gsm_modem', $data['GSM modem']);
-				break;
-			case 'Jabber':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
-				$this->zbxTestInputType('jabber_username', $data['Jabber identifier']);
-				$this->zbxTestInputType('passwd', $data['Password']);
-				break;
-			case 'Ez Texting':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('description', $data['Description']);
-				$this->zbxTestInputType('eztext_username', $data['Username']);
-				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 		}
 
@@ -336,15 +290,15 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestTextNotPresent('Cannot add media type');
 		$this->zbxTestTextPresent('Media type added');
-		$this->zbxTestTextPresent($data['Description']);
+		$this->zbxTestTextPresent($data['Name']);
 	}
 
 	/**
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
-		$name = $mediatype['description'];
-		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
+		$name = $mediatype['name'];
+		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY name';
 		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);
 
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
@@ -361,7 +315,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_SimpleDelete($mediatype) {
-		$name = $mediatype['description'];
+		$name = $mediatype['name'];
 		$id = $mediatype['mediatypeid'];
 
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid='.zbx_dbstr($id).''));
@@ -529,16 +483,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'type' => 'Jabber',
-					'passwd' => 'Secret password',
-					'name' => 'Jabber with custom concurrent sessions and default options',
-					'sessions' => 'Custom',
-					'maxsessions' => 0
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
 					'type' => 'Script',
 					'name' => 'Script media type',
 					'script_name' => 'test',
@@ -557,20 +501,6 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'attempts' => 1,
 					'interval' => '6s'
 				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Ez Texting media type',
-					'type' => 'Ez Texting',
-					'username' => 'test',
-					'passwd' => 'Secret password',
-					'sessions' => 'Custom',
-					'maxsessions' => 10,
-					'attempts' => 5,
-					'interval' => '50s',
-					'dbCheck' => true
-				]
 			]
 		];
 	}
@@ -585,15 +515,11 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestDropdownSelect('type', $data['type']);
-		$this->zbxTestInputType('description', $data['name']);
+		$this->zbxTestInputType('name', $data['name']);
 
 		if ($data['type'] == 'Script' ) {
 			$this->zbxTestInputType('exec_path', $data['script_name']);
 		}
-		elseif ($data['type'] == 'Ez Texting') {
-			$this->zbxTestInputType('eztext_username', $data['username']);
-		}
-
 		if (array_key_exists('passwd', $data)){
 			$this->zbxTestInputType('passwd', $data['passwd']);
 		}
@@ -636,13 +562,13 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					$this->zbxTestTextPresent($data['error']);
 				}
 
-				$sql = "SELECT * FROM media_type WHERE description = '".$data['name']."'";
+				$sql = "SELECT * FROM media_type WHERE name = '".$data['name']."'";
 				$this->assertEquals(0, CDBHelper::getCount($sql));
 				break;
 		}
 
 		if(array_key_exists('dbCheck', $data)) {
-			$result = DBselect("SELECT * FROM media_type WHERE description = '".$data['name']."'");
+			$result = DBselect("SELECT * FROM media_type WHERE name = '".$data['name']."'");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['maxattempts'], $data['attempts']);
 				$this->assertEquals($row['attempt_interval'], $data['interval']);

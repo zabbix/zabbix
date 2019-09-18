@@ -117,6 +117,7 @@ static zbx_history_table_t	areg = {
 		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
 		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
 };
@@ -376,7 +377,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer,
+				zbx_socket_strerror());
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
@@ -386,10 +388,11 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 
 	if (0 == (configured_tls_accept_modes & sock->connection_type))
 	{
-		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
+		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" by proxy configuration parameter \"TLSAccept\"",
+				msg, sock->peer);
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
@@ -399,14 +402,30 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock, &msg))
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, msg);
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg))
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
 
 		if (ZBX_SEND_RESPONSE == send_response)
 			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
 
 		zbx_free(msg);
+		return FAIL;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (0 != (ZBX_PSK_FOR_PROXY & zbx_tls_get_psk_usage()))
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: it used PSK which is not"
+				" configured for proxy communication with server", req, sock->peer);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
+
 		return FAIL;
 	}
 #endif
@@ -943,6 +962,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"httpstep",
 		"httpstepitem",
 		"httpstep_field",
+		"config_autoreg_tls",
 		NULL
 	};
 
@@ -3616,7 +3636,7 @@ int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp,
  *                                                                            *
  * Function: process_agent_history_data                                       *
  *                                                                            *
- * Purpose: process history data received form Zabbix active agent            *
+ * Purpose: process history data received from Zabbix active agent            *
  *                                                                            *
  * Parameters: sock         - [IN] the connection socket                      *
  *             jp           - [IN] the JSON with history data                 *
@@ -3639,7 +3659,7 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
  *                                                                            *
  * Function: process_sender_history_data                                      *
  *                                                                            *
- * Purpose: process history data received form Zabbix sender                  *
+ * Purpose: process history data received from Zabbix sender                  *
  *                                                                            *
  * Parameters: sock         - [IN] the connection socket                      *
  *             jp           - [IN] the JSON with history data                 *
@@ -4054,7 +4074,8 @@ json_parse_return:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid, char **error)
+static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxy_hostid,
+		char **error)
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = SUCCEED;
@@ -4074,6 +4095,8 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
+		unsigned int	connection_type;
+
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
@@ -4152,8 +4175,20 @@ static int	process_auto_registration_contents(struct zbx_json_parse *jp_data, zb
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid port", __func__, tmp);
 			continue;
 		}
+		else if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TLS_ACCEPTED, tmp, sizeof(tmp)))
+		{
+			connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+		}
+		else if (FAIL == is_uint32(tmp, &connection_type) || (ZBX_TCP_SEC_UNENCRYPTED != connection_type &&
+				ZBX_TCP_SEC_TLS_PSK != connection_type))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid value for \""
+					ZBX_PROTO_TAG_TLS_ACCEPTED "\"", __func__, tmp);
+			continue;
+		}
 
-		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, flags, itemtime);
+		DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
+				itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)

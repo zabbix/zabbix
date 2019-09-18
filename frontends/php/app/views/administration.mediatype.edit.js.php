@@ -16,12 +16,10 @@
 		$('#type').change(function() {
 			var media_type = $(this).val();
 
-			$('#eztext_link').hide();
-			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username,' +
-					'#eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security,' +
-					'#smtp_authentication, #exec_path, #exec_params_table, #content_type, #row_webhook_params, ' +
-					'#row_webhook_webhook, #row_webhook_timeout, #row_webhook_tags, #row_webhook_url, ' +
-					'#row_webhook_url_name')
+			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
+					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
+					'#exec_params_table, #content_type, #row_webhook_params, #row_webhook_webhook, ' +
+					'#row_webhook_timeout, #row_webhook_tags, #row_webhook_url, #row_webhook_url_name')
 				.closest('li')
 				.hide();
 
@@ -48,21 +46,6 @@
 					setMaxSessionsType(media_type);
 					break;
 
-				case '<?= MEDIA_TYPE_JABBER ?>':
-					$('#jabber_username, #passwd').closest('li').show();
-					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-					break;
-
-				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
-					$('#eztext_username, #eztext_limit, #passwd').closest('li').show();
-					$('#eztext_link').show();
-					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').addClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-					break;
-
 				case '<?= MEDIA_TYPE_WEBHOOK ?>':
 					$('#row_webhook_params, #row_webhook_webhook, #row_webhook_timeout, #row_webhook_tags, ' +
 						'#row_webhook_url, #row_webhook_url_name').show();
@@ -79,7 +62,7 @@
 			$('#passwd').prop('disabled', false).show();
 			$('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
 			$('#update').val('mediatype.create').attr({id: 'add'});
-			$('#description').focus();
+			$('#name').focus();
 		});
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
@@ -100,8 +83,8 @@
 			}
 
 			$(this).trimValues([
-				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
-				'#jabber_username', '#eztext_username', '#smtp_username', '#maxsessions'
+				'#name', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
+				'#smtp_username', '#maxsessions'
 			]);
 		});
 

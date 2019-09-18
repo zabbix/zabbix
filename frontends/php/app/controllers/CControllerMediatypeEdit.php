@@ -31,7 +31,7 @@ class CControllerMediatypeEdit extends CController {
 		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
 			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
-			'description' =>			'db media_type.description',
+			'name' =>					'db media_type.name',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -41,11 +41,8 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
-			'jabber_username' =>		'db media_type.username',
-			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'webhook_params' =>			'array',
@@ -88,11 +85,11 @@ class CControllerMediatypeEdit extends CController {
 
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
-				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
-					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
-					'maxattempts', 'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url',
-					'url_name', 'params'
+				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
+					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
+					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
+					'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
+					'params'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -115,7 +112,7 @@ class CControllerMediatypeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
-			'description' => '',
+			'name' => '',
 			'smtp_server' => 'mail.example.com',
 			'smtp_port' => $db_defaults['smtp_port'],
 			'smtp_helo' => 'example.com',
@@ -127,9 +124,6 @@ class CControllerMediatypeEdit extends CController {
 			'exec_params' => [],
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
-			'jabber_username' => 'user@server',
-			'eztext_username' => '',
-			'eztext_limit' => EZ_TEXTING_LIMIT_USA,
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
@@ -163,7 +157,7 @@ class CControllerMediatypeEdit extends CController {
 		if ($this->hasInput('mediatypeid')) {
 			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
 			$data['type'] = $this->mediatype['type'];
-			$data['description'] = $this->mediatype['description'];
+			$data['name'] = $this->mediatype['name'];
 			$data['smtp_server'] = $this->mediatype['smtp_server'];
 			$data['smtp_port'] = $this->mediatype['smtp_port'];
 			$data['smtp_helo'] = $this->mediatype['smtp_helo'];
@@ -194,15 +188,6 @@ class CControllerMediatypeEdit extends CController {
 					$data['smtp_username'] = $this->mediatype['username'];
 					break;
 
-				case MEDIA_TYPE_JABBER:
-					$data['jabber_username'] = $this->mediatype['username'];
-					break;
-
-				case MEDIA_TYPE_EZ_TEXTING:
-					$data['eztext_username'] = $this->mediatype['username'];
-					$data['eztext_limit'] = $this->mediatype['exec_path'];
-					break;
-
 				case MEDIA_TYPE_SMS:
 					$data['maxsessions'] = 1;
 					break;
@@ -221,37 +206,10 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		// overwrite with input variables
-		$this->getInputs($data, [
-			'type',
-			'description',
-			'smtp_server',
-			'smtp_port',
-			'smtp_helo',
-			'smtp_email',
-			'smtp_security',
-			'smtp_verify_peer',
-			'smtp_verify_host',
-			'smtp_authentication',
-			'exec_params',
-			'exec_path',
-			'eztext_limit',
-			'gsm_modem',
-			'jabber_username',
-			'eztext_username',
-			'smtp_username',
-			'passwd',
-			'webhook',
-			'timeout',
-			'receive_tags',
-			'url',
-			'url_name',
-			'status',
-			'maxsessions',
-			'maxattempts',
-			'attempt_interval',
-			'maxsessionsType',
-			'form_refresh',
-			'content_type'
+		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
+			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
+			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
+			'form_refresh', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
 		]);
 
 		if ($this->hasInput('form_refresh')) {

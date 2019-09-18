@@ -19,24 +19,11 @@
 **/
 
 
-class CWidgetFieldHost extends CWidgetField {
+class CWidgetFieldMultiselectGraphPrototype extends CWidgetFieldMultiselect {
 
-	/**
-	 * Create widget field for Host selection
-	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 */
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
 
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
-		$this->setDefault([]);
-	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE);
 	}
 }

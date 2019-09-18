@@ -174,7 +174,7 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$required_fields = ['type', 'description'];
+		$required_fields = ['type', 'name'];
 
 		foreach ($mediatypes as $mediatype) {
 			if (!is_array($mediatype)) {
@@ -192,22 +192,18 @@ class CMediatype extends CApiService {
 			else {
 				foreach ($required_fields as $field) {
 					if ($mediatype[$field] === '' || $mediatype[$field] === null) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Field "%1$s" is missing a value for media type "%2$s".',
-							$field,
-							$mediatype['description']
-						));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['name'])
+						);
 					}
 				}
 			}
 		}
 
 		// Check for duplicate names.
-		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'name');
 		if ($duplicate_name) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $duplicate_name['name']));
 		}
 
 		$simple_interval_parser = new CSimpleIntervalParser();
@@ -217,15 +213,13 @@ class CMediatype extends CApiService {
 		foreach ($mediatypes as $mediatype) {
 			// Check if media type already exists.
 			$db_mediatype = API::getApiService()->select('media_type', [
-				'output' => ['description'],
-				'filter' => ['description' => $mediatype['description']],
+				'output' => ['name'],
+				'filter' => ['name' => $mediatype['name']],
 				'limit' => 1
 			]);
 
 			if ($db_mediatype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Media type "%1$s" already exists.', $mediatype['description'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.', $mediatype['name']));
 			}
 
 			// Check additional fields and values depeding on type.
@@ -237,21 +231,6 @@ class CMediatype extends CApiService {
 			$validated_data = array_intersect_key($mediatype, $validation_rules);
 
 			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EZ_TEXTING:
-					$message_text_limit_validator = new CLimitedSetValidator([
-						'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
-					]);
-
-					if (!$message_text_limit_validator->validate($mediatype['exec_path'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-							$mediatype['exec_path'],
-							'exec_path',
-							$mediatype['description']
-						));
-					}
-					break;
-
 				case MEDIA_TYPE_EMAIL:
 					if (array_key_exists('smtp_authentication', $mediatype)) {
 						$smtp_authentication_validator = new CLimitedSetValidator([
@@ -263,7 +242,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_authentication'],
 								'smtp_authentication',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -274,7 +253,7 @@ class CMediatype extends CApiService {
 							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 							$mediatype['smtp_port'],
 							'smtp_port',
-							$mediatype['description']
+							$mediatype['name']
 						));
 					}
 
@@ -293,7 +272,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_security'],
 								'smtp_security',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -309,7 +288,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_verify_peer'],
 								'smtp_verify_peer',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -325,7 +304,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_verify_host'],
 								'smtp_verify_host',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -344,7 +323,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['content_type'],
 								'content_type',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -358,7 +337,7 @@ class CMediatype extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
 								$mediatype['exec_params'],
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -413,7 +392,7 @@ class CMediatype extends CApiService {
 						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 						$mediatype['status'],
 						'status',
-						$mediatype['description']
+						$mediatype['name']
 					));
 				}
 			}
@@ -506,9 +485,9 @@ class CMediatype extends CApiService {
 
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
-			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
+			'output' => ['mediatypeid', 'type', 'name', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'content_type', 'description', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
+				'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
 			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -525,48 +504,46 @@ class CMediatype extends CApiService {
 				);
 			}
 
-			// Validate "description" field.
-			if (array_key_exists('description', $mediatype)) {
-				if (is_array($mediatype['description'])) {
+			// Validate "name" field.
+			if (array_key_exists('name', $mediatype)) {
+				if (is_array($mediatype['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
-				elseif ($mediatype['description'] === '' || $mediatype['description'] === null
-						|| $mediatype['description'] === false) {
+				elseif ($mediatype['name'] === '' || $mediatype['name'] === null || $mediatype['name'] === false) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'description', _('cannot be empty'))
+						_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
 					);
 				}
 
-				$check_names[$mediatype['description']] = true;
+				$check_names[$mediatype['name']] = true;
 			}
 		}
 
 		if ($check_names) {
 			$db_mediatype_names = API::getApiService()->select('media_type', [
-				'output' => ['mediatypeid', 'description'],
+				'output' => ['mediatypeid', 'name'],
 				'filter' => ['name' => array_keys($check_names)]
 			]);
-			$db_mediatype_names = zbx_toHash($db_mediatype_names, 'description');
+			$db_mediatype_names = zbx_toHash($db_mediatype_names, 'name');
 
 			foreach ($mediatypes as $mediatype) {
-				if (array_key_exists('description', $mediatype)
-						&& array_key_exists($mediatype['description'], $db_mediatype_names)
-						&& !idcmp($db_mediatype_names[$mediatype['description']]['mediatypeid'],
-							$mediatype['mediatypeid'])) {
+				if (array_key_exists('name', $mediatype)
+						&& array_key_exists($mediatype['name'], $db_mediatype_names)
+						&& !idcmp($db_mediatype_names[$mediatype['name']]['mediatypeid'], $mediatype['mediatypeid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Media type "%1$s" already exists.', $mediatype['description'])
+						_s('Media type "%1$s" already exists.', $mediatype['name'])
 					);
 				}
 			}
 		}
 
-		// Populate "description" field, if not set. Type field should not be populated at this point.
-		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['description']);
+		// Populate "name" field, if not set. Type field should not be populated at this point.
+		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['name']);
 
-		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'name');
 		if ($duplicate_name) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
+				_s('Media type "%1$s" already exists.', $duplicate_name['name'])
 			);
 		}
 
@@ -583,10 +560,8 @@ class CMediatype extends CApiService {
 				$optional_fields_by_type = [
 					MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
 					MEDIA_TYPE_EXEC => ['exec_path'],
-					MEDIA_TYPE_SMS => ['gsm_modem'],
-					MEDIA_TYPE_JABBER => ['username', 'passwd'],
 					MEDIA_TYPE_WEBHOOK => [],
-					MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
+					MEDIA_TYPE_SMS => ['gsm_modem']
 				];
 
 				foreach ($optional_fields_by_type[$db_mediatype['type']] as $field) {
@@ -595,7 +570,7 @@ class CMediatype extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Field "%1$s" is missing a value for media type "%2$s".',
 							$field,
-							$mediatype['description']
+							$mediatype['name']
 						));
 					}
 				}
@@ -610,24 +585,6 @@ class CMediatype extends CApiService {
 			$validated_data = array_intersect_key($mediatype, $validation_rules);
 
 			switch ($mediatype['type']) {
-				case MEDIA_TYPE_EZ_TEXTING:
-					if (array_key_exists('exec_path', $mediatype)) {
-						$message_text_limit_validator = new CLimitedSetValidator([
-							'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
-						]);
-
-						if ($db_mediatype['exec_path'] !== $mediatype['exec_path']
-								&& !$message_text_limit_validator->validate($mediatype['exec_path'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
-								$mediatype['exec_path'],
-								'exec_path',
-								$mediatype['description']
-							));
-						}
-					}
-					break;
-
 				case MEDIA_TYPE_EMAIL:
 					if (array_key_exists('smtp_authentication', $mediatype)) {
 						$smtp_authentication_validator = new CLimitedSetValidator([
@@ -639,7 +596,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_authentication'],
 								'smtp_authentication',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -652,7 +609,7 @@ class CMediatype extends CApiService {
 							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 							$mediatype['smtp_port'],
 							'smtp_port',
-							$mediatype['description']
+							$mediatype['name']
 						));
 					}
 
@@ -671,7 +628,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_security'],
 								'smtp_security',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -688,7 +645,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_verify_peer'],
 								'smtp_verify_peer',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -705,7 +662,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_verify_host'],
 								'smtp_verify_host',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -725,7 +682,7 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['content_type'],
 								'content_type',
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -739,7 +696,7 @@ class CMediatype extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
 								$mediatype['exec_params'],
-								$mediatype['description']
+								$mediatype['name']
 							));
 						}
 					}
@@ -798,7 +755,7 @@ class CMediatype extends CApiService {
 						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 						$mediatype['status'],
 						'status',
-						$mediatype['description']
+						$mediatype['name']
 					));
 				}
 			}
@@ -878,7 +835,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @param array		$mediatypes							multidimensional array with media types data
 	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['description']			description
+	 * @param string	$mediatypes['name']
 	 * @param string	$mediatypes['smtp_server']			SMTP server
 	 * @param int		$mediatypes['smtp_port']			SMTP port
 	 * @param string	$mediatypes['smtp_helo']			SMTP hello
@@ -897,7 +854,6 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['description']          Media type description.
 	 * @param string    $mediatypes['webhook']              Webhook javascript body.
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
@@ -942,7 +898,7 @@ class CMediatype extends CApiService {
 	 * @param array		$mediatypes							multidimensional array with media types data
 	 * @param int		$mediatypes['mediatypeid']			id
 	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['description']			description
+	 * @param string	$mediatypes['name']
 	 * @param string	$mediatypes['smtp_server']			SMTP server
 	 * @param int		$mediatypes['smtp_port']			SMTP port
 	 * @param string	$mediatypes['smtp_helo']			SMTP hello
@@ -961,7 +917,6 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['description']          Media type description.
 	 * @param string    $mediatypes['webhook']              Webhook javascript body.
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
@@ -979,7 +934,7 @@ class CMediatype extends CApiService {
 		$webhooks_params = [];
 		$defaults = DB::getDefaults('media_type');
 		$db_mediatypes = DB::select('media_type', [
-			'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
+			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 				'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
@@ -1113,7 +1068,7 @@ class CMediatype extends CApiService {
 		}
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => ['mediatypeid', 'description'],
+			'output' => ['mediatypeid', 'name'],
 			'filter' => ['mediatypeid' => $mediatypeids],
 			'preservekeys' => true
 		]);
@@ -1128,8 +1083,8 @@ class CMediatype extends CApiService {
 	 * Check required fields by type. Values for fields must not be empty.
 	 *
 	 * @param array		$mediatype							An array of media type data.
-	 * @param string	$mediatype['description']			Name of the media type.
-	 * @param string	$mediatype['type']					E-mail, Script, SMS, Jabber and Ez Texting.
+	 * @param string	$mediatype['name']					Name of the media type.
+	 * @param string	$mediatype['type']					E-mail, Script and SMS.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -1143,30 +1098,28 @@ class CMediatype extends CApiService {
 				'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 				$mediatype['type'],
 				'type',
-				$mediatype['description']
+				$mediatype['name']
 			));
 		}
 
 		$required_fields_by_type = [
 			MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
 			MEDIA_TYPE_EXEC => ['exec_path'],
-			MEDIA_TYPE_SMS => ['gsm_modem'],
-			MEDIA_TYPE_JABBER => ['username', 'passwd'],
 			MEDIA_TYPE_WEBHOOK => [],
-			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username', 'passwd']
+			MEDIA_TYPE_SMS => ['gsm_modem']
 		];
 
 		foreach ($required_fields_by_type[$mediatype['type']] as $field) {
 			// Check if fields set on Create method. For update method they are checked when type is changed.
 			if (!array_key_exists($field, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Field "%1$s" is required for media type "%2$s".', $field, $mediatype['description'])
+					_s('Field "%1$s" is required for media type "%2$s".', $field, $mediatype['name'])
 				);
 			}
 			elseif (array_key_exists($field, $mediatype)
 					&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['description'])
+					_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['name'])
 				);
 			}
 		}
