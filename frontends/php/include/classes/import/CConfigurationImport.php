@@ -752,6 +752,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item[$xml_itemkey])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_itemid = $this->referencer->resolveItem($hostId, $item[$xml_itemkey]['key']);
 
 					if ($master_itemid !== false) {
@@ -957,6 +963,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item['master_item'])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
 				}
 
@@ -1069,6 +1081,12 @@ class CConfigurationImport {
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+						if (!array_key_exists('key', $prototype[$xml_item_key])) {
+							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+								_('cannot be empty')
+							));
+						}
+
 						$master_itemprototypeid = $this->referencer->resolveItem($hostId,
 							$prototype[$xml_item_key]['key']
 						);
@@ -2654,6 +2672,12 @@ class CConfigurationImport {
 				$traversal_path = [$entity['key_']];
 
 				while ($entity && $entity['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $entity[$master_key_identifier])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_key = $entity[$master_key_identifier]['key'];
 
 					if (array_key_exists($host_key, $resolved_masters_cache)
