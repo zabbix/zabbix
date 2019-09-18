@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-15 01:42+0300\n"
+"POT-Creation-Date: 2019-09-18 10:58+0300\n"
 "PO-Revision-Date: 2019-03-23 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -8688,12 +8688,12 @@ msgstr ""
 #: include/classes/helpers/CSvgGraphHelper.php:247
 #: include/classes/import/CConfigurationImport.php:839
 #: include/classes/import/CConfigurationImport.php:877
-#: include/classes/import/CConfigurationImport.php:2504
-#: include/classes/import/CConfigurationImport.php:2608
-#: include/classes/import/CConfigurationImport.php:2618
-#: include/classes/import/CConfigurationImport.php:2654
-#: include/classes/import/CConfigurationImport.php:2663
-#: include/classes/import/CConfigurationImport.php:2669
+#: include/classes/import/CConfigurationImport.php:2506
+#: include/classes/import/CConfigurationImport.php:2610
+#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:2656
+#: include/classes/import/CConfigurationImport.php:2665
+#: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -18401,7 +18401,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "skontroluj výraz začínajúci od \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2655
+#: include/classes/import/CConfigurationImport.php:2657
 msgid "circular item dependency is not allowed"
 msgstr ""
 
@@ -18796,8 +18796,8 @@ msgid "maximum dependent items count reached"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2609
-#: include/classes/import/CConfigurationImport.php:2670
+#: include/classes/import/CConfigurationImport.php:2611
+#: include/classes/import/CConfigurationImport.php:2672
 msgid "maximum number of dependency levels reached"
 msgstr ""
 
@@ -19309,9 +19309,9 @@ msgstr "hodnota"
 
 #: include/classes/import/CConfigurationImport.php:840
 #: include/classes/import/CConfigurationImport.php:878
-#: include/classes/import/CConfigurationImport.php:2505
-#: include/classes/import/CConfigurationImport.php:2619
-#: include/classes/import/CConfigurationImport.php:2664
+#: include/classes/import/CConfigurationImport.php:2507
+#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2666
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr ""
