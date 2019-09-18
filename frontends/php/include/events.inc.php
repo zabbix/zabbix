@@ -325,7 +325,7 @@ function make_small_eventlist($startEvent, $backurl) {
 		'preservekeys' => true
 	]);
 	$mediatypes = API::Mediatype()->get([
-		'output' => ['description', 'maxattempts'],
+		'output' => ['name', 'maxattempts'],
 		'mediatypeids' => array_keys($actions['mediatypeids']),
 		'preservekeys' => true
 	]);

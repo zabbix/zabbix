@@ -126,6 +126,10 @@ $tranStrings = [
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'Previous page' => _('Previous page'),
+		'Next page' => _('Next page'),
+		'Widget is too small for the specified number of columns and rows.' =>
+			_('Widget is too small for the specified number of columns and rows.'),
 		'Cannot add widget: not enough free space on the dashboard.' =>
 			_('Cannot add widget: not enough free space on the dashboard.')
 	],

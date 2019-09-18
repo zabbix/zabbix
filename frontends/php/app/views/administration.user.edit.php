@@ -260,7 +260,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['description'],
+				$media['name'],
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

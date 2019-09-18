@@ -121,45 +121,6 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	(void)zbx_deserialize_value(data, content_type);
 }
 
-zbx_uint32_t	zbx_alerter_serialize_jabber(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
-		const char *subject, const char *message, const char *username, const char *password)
-{
-	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, sendto_len, subject_len, message_len, username_len, password_len;
-
-	zbx_serialize_prepare_value(data_len, alertid);
-	zbx_serialize_prepare_str(data_len, sendto);
-	zbx_serialize_prepare_str(data_len, subject);
-	zbx_serialize_prepare_str(data_len, message);
-	zbx_serialize_prepare_str(data_len, username);
-	zbx_serialize_prepare_str(data_len, password);
-
-	*data = (unsigned char *)zbx_malloc(NULL, data_len);
-
-	ptr = *data;
-	ptr += zbx_serialize_value(ptr, alertid);
-	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
-	ptr += zbx_serialize_str(ptr, subject, subject_len);
-	ptr += zbx_serialize_str(ptr, message, message_len);
-	ptr += zbx_serialize_str(ptr, username, username_len);
-	(void)zbx_serialize_str(ptr, password, password_len);
-
-	return data_len;
-}
-
-void	zbx_alerter_deserialize_jabber(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **subject,
-		char **message, char **username, char **password)
-{
-	zbx_uint32_t	len;
-
-	data += zbx_deserialize_value(data, alertid);
-	data += zbx_deserialize_str(data, sendto, len);
-	data += zbx_deserialize_str(data, subject, len);
-	data += zbx_deserialize_str(data, message, len);
-	data += zbx_deserialize_str(data, username, len);
-	(void)zbx_deserialize_str(data, password, len);
-}
-
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
 		const char *message, const char *gsm_modem)
 {
@@ -191,45 +152,6 @@ void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alerti
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, message, len);
 	(void)zbx_deserialize_str(data, gsm_modem, len);
-}
-
-zbx_uint32_t	zbx_alerter_serialize_eztexting(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
-		const char *message, const char *username, const char *password, const char *exec_path)
-{
-	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, sendto_len, exec_path_len, message_len, username_len, password_len;
-
-	zbx_serialize_prepare_value(data_len, alertid);
-	zbx_serialize_prepare_str(data_len, sendto);
-	zbx_serialize_prepare_str(data_len, message);
-	zbx_serialize_prepare_str(data_len, username);
-	zbx_serialize_prepare_str(data_len, password);
-	zbx_serialize_prepare_str(data_len, exec_path);
-
-	*data = (unsigned char *)zbx_malloc(NULL, data_len);
-
-	ptr = *data;
-	ptr += zbx_serialize_value(ptr, alertid);
-	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
-	ptr += zbx_serialize_str(ptr, message, message_len);
-	ptr += zbx_serialize_str(ptr, username, username_len);
-	ptr += zbx_serialize_str(ptr, password, password_len);
-	(void)zbx_serialize_str(ptr, exec_path, exec_path_len);
-
-	return data_len;
-}
-
-void	zbx_alerter_deserialize_eztexting(const unsigned char *data, zbx_uint64_t *alertid, char **sendto,
-		char **message, char **username, char **password, char **exec_path)
-{
-	zbx_uint32_t	len;
-
-	data += zbx_deserialize_value(data, alertid);
-	data += zbx_deserialize_str(data, sendto, len);
-	data += zbx_deserialize_str(data, message, len);
-	data += zbx_deserialize_str(data, username, len);
-	data += zbx_deserialize_str(data, password, len);
-	(void)zbx_deserialize_str(data, exec_path, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alertid, const char *command)

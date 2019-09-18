@@ -25,7 +25,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 		$fields = [
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'fields' => 'json',
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,6 +44,8 @@ class CControllerDashboardWidgetConfigure extends CController {
 	protected function doAction() {
 		$type = $this->getInput('type');
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Transforms corrupted data to default values.
+		$form->validate();
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'configuration' => CWidgetConfig::getConfiguration(

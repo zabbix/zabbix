@@ -25,7 +25,7 @@ class CControllerMediatypeUpdate extends CController {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
-			'description' =>			'db media_type.description|not_empty',
+			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -35,11 +35,8 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array',
 			'gsm_modem' =>				'db media_type.gsm_modem',
-			'jabber_username' =>		'db media_type.username',
-			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
@@ -96,7 +93,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description', 'maxsessions', 'maxattempts', 'attempt_interval']);
+		$this->getInputs($mediatype, ['mediatypeid', 'type', 'name', 'maxsessions', 'maxattempts', 'attempt_interval']);
 		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_ACTIVE);
 
 		switch ($mediatype['type']) {
@@ -132,26 +129,6 @@ class CControllerMediatypeUpdate extends CController {
 				$this->getInputs($mediatype, ['gsm_modem']);
 				$mediatype['maxsessions'] = 1;
 				break;
-
-			case MEDIA_TYPE_JABBER:
-				$this->getInputs($mediatype, ['passwd']);
-
-				if ($this->hasInput('jabber_username')) {
-					$mediatype['username'] = $this->getInput('jabber_username');
-				}
-				break;
-
-			case MEDIA_TYPE_EZ_TEXTING:
-				$this->getInputs($mediatype, ['passwd']);
-
-				if ($this->hasInput('eztext_username')) {
-					$mediatype['username'] = $this->getInput('eztext_username');
-				}
-
-				if ($this->hasInput('eztext_limit')) {
-					$mediatype['exec_path'] = $this->getInput('eztext_limit');
-				}
-				break;
 		}
 
 		DBstart();
@@ -159,7 +136,7 @@ class CControllerMediatypeUpdate extends CController {
 		$result = API::Mediatype()->update($mediatype);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['description'].']');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['name'].']');
 		}
 
 		$result = DBend($result);

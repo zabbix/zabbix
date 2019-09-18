@@ -140,6 +140,32 @@ $multiselect-selected-bg-color: #222;
 @import 'screen.scss';
 
 // DASHBOARD
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus, &:hover {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 -6px 8px -2px #000;
+		}
+	}
+}
+
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		&.dashbrd-grid-widget-focus, &:hover {
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-iterator {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 6px 8px -2px #000;
+		}
+	}
+}
+
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -224,6 +250,8 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -397px -657px,
+	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -395px -623px,
 	widget-action: url(../img/icon-sprite.svg) no-repeat -318px -618px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -318px -654px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -318px -690px,

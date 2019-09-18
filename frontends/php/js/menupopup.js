@@ -941,8 +941,8 @@ jQuery(function($) {
 
 			opener.attr('data-expanded', 'true');
 
-			// Close other action menus.
-			$('.menu-popup-top').not('#' + id).menuPopup('close');
+			// Close other action menus and prevent focus jumping before opening a new popup.
+			$('.menu-popup-top').not('#' + id).menuPopup('close', null, false);
 
 			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
@@ -1062,8 +1062,10 @@ jQuery(function($) {
 		},
 		close: function(trigger_elmnt, return_focus) {
 			var menuPopup = $(this);
+
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
+
 				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
@@ -1074,7 +1076,13 @@ jQuery(function($) {
 					.off('click', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
-				removeFromOverlaysStack('menu-popup', return_focus);
+				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
+
+				if (overlay !== null && typeof overlay['element'] !== undefined) {
+					// Remove expanded attribute of the original opener.
+					$(overlay['element']).removeAttr('data-expanded');
+				}
+
 				menuPopup.remove();
 			}
 		}
