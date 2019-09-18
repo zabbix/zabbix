@@ -176,12 +176,12 @@
 		jQuery('#dashbrd-save', ul).click(dashbrd_save_changes),
 		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
-		// Update buttons on existing widgets to edit mode.
-		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
-
 		// Hide filter with timeline.
 		jQuery('.filter-btn-container, .filter-space').hide();
 		timeControl.disableAllSBox();
+
+		// Update buttons on existing widgets to edit mode.
+		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
 	};
 
 	// Method to fill data in dashboard sharing form.
