@@ -895,7 +895,6 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 func (c *tlsConn) Close() (err error) {
 	cr := C.tls_close(C.tls_lp_t(c.tls))
 	c.conn.Close()
-	c.tls = nil
 	if cr < 0 {
 		return c.Error()
 	}
