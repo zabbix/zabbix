@@ -71,42 +71,6 @@ class testPageDashboardWidgets extends CWebTest {
 	}
 
 	/**
-	 * Check "Problems by severity" widget.
-	 */
-	public function testPageDashboardWidgets_checkProblemsBySeverityWidget() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
-
-		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget('Problems by severity');
-		$table = $widget->getContent()->asTable();
-
-		$this->assertSame(['Host group', 'Disaster', 'High', 'Average', 'Warning', 'Information', 'Not classified'],
-				$table->getHeadersText()
-		);
-
-		// Expected table values.
-		$expected = [
-			'Host group for tag permissions' => [
-				'Not classified' => 2
-			],
-			'Zabbix servers' => [
-				'Average' => 1,
-				'Warning' => 5
-			]
-		];
-
-		$data = $table->index('Host group');
-
-		foreach ($expected as $group => $fields) {
-			$row = $data[$group];
-
-			foreach ($fields as $column => $value) {
-				$this->assertEquals($value, $row[$column]);
-			}
-		}
-	}
-
-	/**
 	 * Check empty dashboard.
 	 */
 	public function testPageDashboardWidgets_checkEmptyDashboard() {
@@ -211,6 +175,8 @@ class testPageDashboardWidgets extends CWebTest {
 
 		// Change the name of widget.
 		$form->getField('Name')->clear()->type('New widget name');
+		// Change show option.
+		$form->getField('Show')->select('Host groups');
 		// Submit the form.
 		$form->submit();
 
