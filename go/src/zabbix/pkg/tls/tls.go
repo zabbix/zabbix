@@ -319,7 +319,6 @@ static void tls_free_context(SSL_CTX_LP ctx)
 static int tls_new(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key, tls_t **ptls)
 {
 	tls_t	*tls;
-	int		ret;
 
 	*ptls = tls = malloc(sizeof(tls_t));
 	memset(tls, 0, sizeof(tls_t));
