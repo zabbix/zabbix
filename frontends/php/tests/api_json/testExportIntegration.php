@@ -26,9 +26,9 @@
  *   [ ] 2. delete ESC
  *   [ ] 3. import XML
  *   [ ] 4. Assert: ESC['select'] == ESC['expect']
- * 
+ *
  * No implicit assertions - all assertions are defined within this class for easy debug.
- * 
+ *
  * @backupStaticAttributes enabled
  * @backupGlobals disabled
  * @runTestsInSeparateProcesses
@@ -107,13 +107,13 @@ class Client {
 			throw new Exception($error);
 		}
 
- 		$this->auth = $result;
+		$this->auth = $result;
 	}
 
 	/**
 	 * @param string $method
 	 * @param array $params
-	 * 
+	 *
 	 * @return array
 	 */
 	public function call(string $method, array $params = []) {
@@ -534,7 +534,7 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 				['groupid' => &$hg3]
 			]
 		]);
-		
+
 		list($result, $error) = $template(self::$client);
 		if ($error) {
 			/*
@@ -593,9 +593,9 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 		 * The test developer, now manually inspects if export matches expectations (according with "creation" requests).
 		 *
 		 * If that is the case, this result then could be fixed into assertion.
-		 * ` var_dump($result); `
+		 * ` _var_dump($result); `
 		 * Obtain snapshot (copy it).
-		 * ` var_dump($this->getExportSignature($export_file)) `
+		 * ` _var_dump($this->getExportSignature($export_file)) `
 		 * Only when export is as expected, signature into assertion
 		 */
 		$this->assertEquals('1e7bc304d91ac215ed9870bb823e38ae', $this->getExportSignature($export_file),
@@ -641,7 +641,7 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 		 *
 		 * Expaded selection is obtained like so: ` $template->expand() `
 		 * Under the hood API will be queried for each object using its expanded state (may involve get parameters like "selectGroups", etc.).
- 		 * ` $data = $template->expand() ` $data will be formatted in the same structure as request object was build.
+		 * ` $data = $template->expand() ` $data will be formatted in the same structure as request object was build.
 		 *
 		 * Comparing signature in this level may be breaking very often (if any API method gets somewhat updated over time). Try to do explicit assertions where possible.
 		 */
@@ -683,7 +683,7 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 		list($result, $error) = $import(self::$client);
 
 		$template->delete(self::$client);
-		
+
 		$this->assertNotNull($error, 'Modded reimport had to return error.');
 		$this->assertEquals($error->data['data'], 'Group "hg1" does not exist.', 'Expecting precise API error message.'); // TODO: this must be streamlinded for API errors ->data['data'], what is this!?
 	}
