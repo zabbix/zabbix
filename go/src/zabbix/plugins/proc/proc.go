@@ -158,31 +158,31 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 		if err != nil {
 			return nil, err
 		}
-		entry := entries[0]
-		if !entry.IsDir() {
+
+		if !entries[0].IsDir() {
 			continue
 		}
 		var pid int64
 		var tmperr error
-		if pid, tmperr = strconv.ParseInt(entry.Name(), 10, 64); tmperr != nil {
+		if pid, tmperr = strconv.ParseInt(entries[0].Name(), 10, 64); tmperr != nil {
 			continue
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = p.getProcessName(entry.Name()); tmperr != nil {
-				p.Debugf("cannot get process %s name: %s", entry.Name(), tmperr)
+			if info.name, tmperr = p.getProcessName(entries[0].Name()); tmperr != nil {
+				p.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = p.getProcessUserID(entry.Name()); tmperr != nil {
-				p.Debugf("cannot get process %s user id: %s", entry.Name(), tmperr)
+			if info.userid, tmperr = p.getProcessUserID(entries[0].Name()); tmperr != nil {
+				p.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entry.Name(), flags); tmperr != nil {
-				p.Debugf("cannot get process %s command line: %s", entry.Name(), tmperr)
+			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
+				p.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
