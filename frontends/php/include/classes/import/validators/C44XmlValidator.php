@@ -963,6 +963,7 @@ class C44XmlValidator {
 							'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 								'name' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
+							'logtimefmt' =>				['type' => XML_STRING, 'default' => ''],
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
@@ -971,7 +972,6 @@ class C44XmlValidator {
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
-							'logtimefmt' =>				['type' => XML_STRING, 'default' => ''],
 							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
 							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
 								'key' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -1119,6 +1119,7 @@ class C44XmlValidator {
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
+									'logtimefmt' =>				['type' => XML_STRING, 'default' => ''],
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
@@ -1127,7 +1128,6 @@ class C44XmlValidator {
 											'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 										]]
 									]],
-									'logtimefmt' =>				['type' => XML_STRING, 'default' => ''],
 									'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
 									'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'],  'rules' => [
 										'key' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -2099,7 +2099,7 @@ class C44XmlValidator {
 
 		$rules = $this->getAuthTypeExtendedRules($data);
 
-		if (!array_key_exists($data['type'], $rules['in'])) {
+		if (!array_key_exists($data['authtype'], $rules['in'])) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
 				'authtype', _s('unexpected constant value "%1$s"', $data['type'])
 			));
