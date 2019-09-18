@@ -172,8 +172,10 @@
 			.on('focusin', function() {
 				enterWidget($obj, data, widget);
 			})
-			.on('focusout', function() {
-				leaveWidget($obj, data, widget);
+			.on('focusout', function(event) {
+				if (!widget['content_header'].has(event.relatedTarget).length) {
+					leaveWidget($obj, data, widget);
+				}
 			})
 			.on('focusin focusout', function() {
 				// Skip mouse events caused by animations which were caused by focus change.
