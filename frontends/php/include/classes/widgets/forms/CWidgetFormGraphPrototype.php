@@ -45,7 +45,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
 			// Select simple graph prototype field.
-			$field_item_prototype = (new CWidgetFieldMultiselectItemPrototype('itemid', _('Item prototype')))
+			$field_item_prototype = (new CWidgetFieldMsItemPrototype('itemid', _('Item prototype')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
 				->setFilterParameter('numeric', true) // For filtering item prototypes.
@@ -59,7 +59,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 		}
 		else {
 			// Select graph prototype field.
-			$field_graph_prototype = (new CWidgetFieldMultiselectGraphPrototype('graphid', _('Graph prototype')))
+			$field_graph_prototype = (new CWidgetFieldMsGraphPrototype('graphid', _('Graph prototype')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 

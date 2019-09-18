@@ -19,7 +19,7 @@
 **/
 
 
-class CWidgetFieldMultiselectItemPrototype extends CWidgetFieldMultiselect {
+class CWidgetFieldMsItemPrototype extends CWidgetFieldMs {
 
 	public function __construct($name, $label) {
 		parent::__construct($name, $label);
