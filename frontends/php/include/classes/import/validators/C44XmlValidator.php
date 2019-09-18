@@ -2099,7 +2099,7 @@ class C44XmlValidator {
 
 		$rules = $this->getAuthTypeExtendedRules($data);
 
-		if (!array_key_exists($data['type'], $rules['in'])) {
+		if (!array_key_exists($data['authtype'], $rules['in'])) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
 				'authtype', _s('unexpected constant value "%1$s"', $data['type'])
 			));

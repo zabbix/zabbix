@@ -100,7 +100,7 @@ class CConfigurationExportBuilder {
 				else {
 					if (array_key_exists('in', $val)) {
 						if (!array_key_exists($value, $val['in'])) {
-							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag,
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
 								_s('unexpected constant value "%1$s"', $value)
 							));
 						}

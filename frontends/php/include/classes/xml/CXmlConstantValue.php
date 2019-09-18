@@ -182,9 +182,9 @@ class CXmlConstantValue {
 	const URL_C = 37;
 	const VENDOR = 31;
 
-	const RAW = 0;
-	const JSON = 1; // ZBX_POSTTYPE_JSON === 2
-	const XML = 2;
+	const RAW = ZBX_POSTTYPE_RAW;
+	const JSON = ZBX_POSTTYPE_JSON;
+	const XML = ZBX_POSTTYPE_XML;
 
 	const GET = HTTPCHECK_REQUEST_GET;
 	const POST = HTTPCHECK_REQUEST_POST;
