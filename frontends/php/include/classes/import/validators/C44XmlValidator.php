@@ -690,7 +690,7 @@ class C44XmlValidator {
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
-											'group' =>					['type' => XML_ARRAY, 'rules' => [
+											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'name' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
@@ -1265,7 +1265,7 @@ class C44XmlValidator {
 									'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 									'group_links' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'group_link', 'rules' => [
 										'group_link' =>				['type' => XML_ARRAY, 'rules' => [
-											'group' =>					['type' => XML_ARRAY, 'rules' => [
+											'group' =>					['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 												'name' =>					['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
