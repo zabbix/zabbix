@@ -745,7 +745,6 @@ jQuery(function($) {
 				if (addNew) {
 					data[data.length] = {
 						id: value,
-						prefix: '',
 						name: value + ' (' + options.labels['new'] + ')',
 						isNew: true
 					};
