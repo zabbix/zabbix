@@ -34,7 +34,7 @@ import (
 var srv http.Server
 
 func getConf(confFilePath string) (s string) {
-	s = fmt.Sprintf("Zabbix Agent [%s]. (%s)\n"+
+	s = fmt.Sprintf("Zabbix Agent 2 [%s]. (%s)\n"+
 		"using configuration file: %s\nServerActive: %s\nListenPort: %d\n\n",
 		agent.Options.Hostname, version.Long(),
 		confFilePath, agent.Options.ServerActive, agent.Options.ListenPort)

@@ -11,7 +11,7 @@ GOLDFLAGS += -X ${PKG}.compileTime=${BUILD_TIME}
 GOLDFLAGS += -X ${PKG}.compileOs=${GOOS}
 GOLDFLAGS += -X ${PKG}.compileArch=${GOARCH}
 GOLDFLAGS += -X ${PKG}.compileMode=daemon
-GOLDFLAGS += -X main.confDefault=${XAGENT_CONFIG_FILE}
+GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
 
 all: build
 
@@ -23,7 +23,7 @@ clean:
 
 install:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go install -ldflags="${GOLDFLAGS}"
-	test -f "$(DESTDIR)@XAGENT_CONFIG_FILE@" || cp "../../conf/agent.conf" "$(DESTDIR)@XAGENT_CONFIG_FILE@"
+	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "../../conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
 
 check:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go test

@@ -412,7 +412,7 @@ func main() {
 	}
 	defer deletePidFile()
 
-	greeting := fmt.Sprintf("Starting Zabbix Agent [%s]. (%s)", agent.Options.Hostname, version.Long())
+	greeting := fmt.Sprintf("Starting Zabbix Agent 2 [%s]. (%s)", agent.Options.Hostname, version.Long())
 	log.Infof(greeting)
 
 	if foregroundFlag {
@@ -499,7 +499,7 @@ func main() {
 
 	monitor.Wait()
 
-	farewell := fmt.Sprintf("Zabbix Agent stopped. (%s)", version.Long())
+	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
 	if foregroundFlag {

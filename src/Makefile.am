@@ -18,7 +18,7 @@ else
 if PROXY
 COMMON_SUBDIRS = libs
 else
-if GO
+if AGENT2
 COMMON_SUBDIRS = libs
 endif
 endif
@@ -31,7 +31,7 @@ AGENT_SUBDIRS = \
 	zabbix_get \
 	zabbix_sender
 else
-if GO
+if AGENT2
 AGENT_SUBDIRS = \
 	zabbix_agent
 endif
@@ -71,11 +71,6 @@ endif
 if JAVA
 JAVA_SUBDIRS = \
 	zabbix_java
-endif
-
-if GO
-GO_SUBDIRS = \
-	go
 endif
 
 SUBDIRS = \

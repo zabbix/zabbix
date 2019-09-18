@@ -1268,14 +1268,14 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test "x$agent" = "xyes")
 
-AC_ARG_ENABLE(go,[  --enable-go           Turn on build of Zabbix Go agent],
+AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2],
 [case "${enableval}" in
-  yes) go=yes ;;
-  no)  go=no ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-go]) ;;
+  yes) agent2=yes ;;
+  no)  agent2=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
 esac],
-[go=no])
-AM_CONDITIONAL(GO, test "x$go" = "xyes")
+[agent2=no])
+AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
 
 AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java gateway],
 [case "${enableval}" in
@@ -1297,7 +1297,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$zabbix_agent2" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1698,7 +1698,7 @@ ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
-if test "x$go" = "xyes"; then
+if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
 	if test "x$go" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
@@ -1761,7 +1761,7 @@ AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 dnl Check for libpcre, used by Zabbix for regular expressions
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$go" = "xyes"; then
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1795,7 +1795,7 @@ AC_SUBST(RANLIB)
 SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
-XAGENT_CONFIG_FILE="${sysconfdir}/agent.conf"
+AGENT2_CONFIG_FILE="${sysconfdir}/zabbix_agent2.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
 ALERT_SCRIPTS_PATH="${datadir}/zabbix/alertscripts"
@@ -1846,7 +1846,7 @@ AC_SUBST(SENDER_LIBS)
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
-AC_SUBST(XAGENT_CONFIG_FILE)
+AC_SUBST(AGENT2_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
 AC_SUBST(ALERT_SCRIPTS_PATH)
@@ -1856,7 +1856,7 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 
 AC_SUBST(LOAD_MODULE_PATH)
 
-GOBIN=${bindir}
+GOBIN=${sbindir}
 GOPATH=$ac_abs_confdir/go
 GOCMD=go
 GOWORKDIR=$ac_abs_confdir/go/src/zabbix
@@ -1991,7 +1991,7 @@ AC_OUTPUT([
 	go/src/Makefile
 	go/src/zabbix/Makefile
 	go/src/zabbix/cmd/Makefile
-	go/src/zabbix/cmd/agent/Makefile
+	go/src/zabbix/cmd/zabbix_agent2/Makefile
 	go/src/zabbix/cmd/mock_server/Makefile
 	go/src/zabbix/pkg/Makefile
 	go/src/zabbix/pkg/conf/Makefile
@@ -2023,11 +2023,6 @@ AC_OUTPUT([
 	go/src/zabbix/plugins/system/uname/Makefile
 	go/src/zabbix/plugins/systemd/Makefile
 	go/src/zabbix/plugins/systemrun/Makefile
-	go/src/zabbix/plugins/debug/Makefile
-	go/src/zabbix/plugins/debug/empty/Makefile
-	go/src/zabbix/plugins/debug/filewatcher/Makefile
-	go/src/zabbix/plugins/debug/log/Makefile
-	go/src/zabbix/plugins/debug/collector/Makefile
 	go/src/zabbix/plugins/kernel/Makefile
 	go/src/zabbix/plugins/proc/Makefile
 	go/src/zabbix/plugins/vfs/Makefile
@@ -2057,8 +2052,8 @@ PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 
-XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
-XAGENT_CONFIG_FILE=`eval echo "${XAGENT_CONFIG_FILE}"`
+AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
+AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
 
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
@@ -2203,7 +2198,7 @@ echo "  Agent details:
 fi
 
 echo "
-  Enable Go agent:       ${go}"
+  Enable agent 2:        ${agent2}"
 
 echo "
   Enable Java gateway:   ${java}"

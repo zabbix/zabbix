@@ -2,8 +2,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-if GO
-GO_SUBDIRS = \
+if AGENT2
+AGENT2_SUBDIRS = \
 	go
 endif
 
@@ -13,7 +13,7 @@ SUBDIRS = \
 	database \
 	man \
 	misc \
-	$(GO_SUBDIRS)
+	$(AGENT2_SUBDIRS)
 
 EXTRA_DIST = \
 	bin \
