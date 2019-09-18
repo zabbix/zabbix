@@ -24,61 +24,117 @@ package proc
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strconv"
-	"strings"
 	"syscall"
-	"zabbix/pkg/log"
 )
 
-func (p *Plugin) getProcessName(pid int64) (name string, err error) {
+func read2k(filename string) (data []byte, err error) {
+	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
+	if err != nil {
+		return
+	}
+	var n int
+	b := make([]byte, 2048)
+	if n, err = syscall.Read(fd, b); err == nil {
+		data = b[:n]
+	}
+	syscall.Close(fd)
+	return
+}
+
+func readAll(filename string) (data []byte, err error) {
+	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
+	if err != nil {
+		return
+	}
+	defer syscall.Close(fd)
+	var buf bytes.Buffer
+	b := make([]byte, 2048)
+	for {
+		var n int
+		if n, err = syscall.Read(fd, b); err != nil {
+			return
+		}
+		if n == 0 {
+			return buf.Bytes(), nil
+		}
+		if _, err = buf.Write(b[:n]); err != nil {
+			return
+		}
+	}
+}
+
+func (p *Plugin) getProcessName(pid string) (name string, err error) {
 	var data []byte
-	if data, err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/stat", pid)); err != nil {
+	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
 		return
 	}
 	var left, right int
 	if right = bytes.LastIndexByte(data, ')'); right == -1 {
-		return "", fmt.Errorf("cannot find process name ending position in /proc/%d/stat", pid)
+		return "", fmt.Errorf("cannot find process name ending position in /proc/%s/stat", pid)
 	}
 	if left = bytes.IndexByte(data[:right], '('); left == -1 {
-		return "", fmt.Errorf("cannot find process name starting position in /proc/%d/stat", pid)
+		return "", fmt.Errorf("cannot find process name starting position in /proc/%s/stat", pid)
 	}
 	return string(data[left+1 : right]), nil
 }
 
-func (p *Plugin) getProcessUserID(pid int64) (userid int64, err error) {
+func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
 	var fi os.FileInfo
-	if fi, err = os.Stat(fmt.Sprintf("/proc/%d", pid)); err != nil {
+	if fi, err = os.Stat("/proc/" + pid); err != nil {
 		return
 	}
 	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
 }
 
-func (p *Plugin) getProcessCmdline(pid int64) (cmdline []string, err error) {
+func (p *Plugin) getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
-	if data, err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", pid)); err != nil {
+	if data, err = readAll("/proc/" + pid + "/cmdline"); err != nil {
 		return
 	}
-	params := bytes.Split(data, []byte{0})
-	cmdline = make([]string, len(params))
-	for i := range params {
-		cmdline[i] = string(params[i])
+
+	if flags&procInfoName != 0 {
+		if end := bytes.IndexByte(data, 0); end != -1 {
+			if pos := bytes.LastIndexByte(data[:end], '/'); pos != -1 {
+				arg0 = string(data[pos+1 : end])
+			} else {
+				arg0 = string(data[:end])
+			}
+		} else {
+			arg0 = string(data)
+		}
 	}
-	return cmdline, nil
+
+	for i := 0; i < len(data); i++ {
+		if data[i] == 0 {
+			data[i] = ' '
+		}
+	}
+
+	if len(data) != 0 && data[len(data)-1] == ' ' {
+		data = data[:len(data)-1]
+	}
+
+	return arg0, string(data), nil
 }
 
 func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 	var data []byte
-	if data, stat.err = ioutil.ReadFile(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
+	if data, stat.err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); stat.err != nil {
 		return
 	}
 	var pos int
-	if pos = bytes.LastIndexByte(data, ')'); pos == -1 {
+	if pos = bytes.LastIndexByte(data, ')'); pos == -1 || len(data[pos:]) < 2 {
 		stat.err = fmt.Errorf("cannot find CPU statistic starting position in /proc/%d/stat", pid)
 		return
 	}
 	stats := bytes.Split(data[pos+2:], []byte{' '})
+	if len(stats) < 20 {
+		stat.err = fmt.Errorf("cannot parse CPU statistics in /proc/%d/stat", pid)
+		return
+	}
 	if stat.utime, stat.err = strconv.ParseUint(string(stats[11]), 10, 64); stat.err != nil {
 		return
 	}
@@ -92,47 +148,43 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 
 func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir("/proc"); err != nil {
-		return
+	f, err := os.Open("/proc")
+	if err != nil {
+		return nil, err
 	}
-	processes = make([]*procInfo, 0, len(entries))
+	defer f.Close()
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
+	for entries, err = f.Readdir(1); err != io.EOF; entries, err = f.Readdir(1) {
+		if err != nil {
+			return nil, err
+		}
+
+		if !entries[0].IsDir() {
 			continue
 		}
 		var pid int64
 		var tmperr error
-		if pid, tmperr = strconv.ParseInt(entry.Name(), 10, 64); tmperr != nil {
+		if pid, tmperr = strconv.ParseInt(entries[0].Name(), 10, 64); tmperr != nil {
 			continue
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = p.getProcessName(pid); tmperr != nil {
-				log.Debugf("cannot get process %d name: %s", pid, tmperr)
+			if info.name, tmperr = p.getProcessName(entries[0].Name()); tmperr != nil {
+				p.Debugf("cannot get process %s name: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = p.getProcessUserID(pid); tmperr != nil {
-				log.Debugf("cannot get process %d user id: %s", pid, tmperr)
+			if info.userid, tmperr = p.getProcessUserID(entries[0].Name()); tmperr != nil {
+				p.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-			var params []string
-			if params, tmperr = p.getProcessCmdline(pid); tmperr != nil {
-				log.Debugf("cannot get process %d command line: %s", pid, tmperr)
+			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entries[0].Name(), flags); tmperr != nil {
+				p.Debugf("cannot get process %s command line: %s", entries[0].Name(), tmperr)
 				continue
 			}
-			if flags&procInfoName != 0 && len(params) > 0 {
-				if pos := strings.IndexByte(params[0], '/'); pos != -1 {
-					info.arg0 = params[0][pos+1:]
-				} else {
-					info.arg0 = params[0]
-				}
-			}
-			info.cmdline = strings.Join(params, " ")
 		}
 		processes = append(processes, info)
 	}

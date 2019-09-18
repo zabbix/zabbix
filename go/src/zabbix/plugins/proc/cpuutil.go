@@ -28,11 +28,13 @@ import "C"
 
 import (
 	"errors"
+	"math"
 	"os/user"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
+	"zabbix/pkg/log"
 	"zabbix/pkg/plugin"
 )
 
@@ -107,7 +109,7 @@ type cpuUtilQuery struct {
 }
 
 func (q *cpuUtilQuery) match(p *procInfo) bool {
-	if q.name != "" && q.name != p.name {
+	if q.name != "" && q.name != p.name && q.name != p.arg0 {
 		return false
 	}
 	if q.user != "" && q.userid != p.userid {
@@ -154,7 +156,7 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 		queries = append(queries, query)
 		stats.scanid = p.scanid
 		if q.name != "" {
-			flags |= procInfoName
+			flags |= procInfoName | procInfoCmdline
 		}
 		if q.user != "" {
 			flags |= procInfoUser
@@ -168,12 +170,17 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 }
 
 func (p *Plugin) Collect() (err error) {
+	if log.CheckLogLevel(log.Trace) {
+		p.Tracef("In %s() queries:%d", log.Caller(), len(p.queries))
+		defer p.Tracef("End of %s()", log.Caller())
+	}
 	p.scanid++
 	queries, flags := p.prepareQueries()
 	var processes []*procInfo
 	if processes, err = p.getProcesses(flags); err != nil {
 		return
 	}
+	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
 
 	stats := make(map[int64]*cpuUtil)
 	// find processes matching prepared queries
@@ -187,6 +194,12 @@ func (p *Plugin) Collect() (err error) {
 		}
 		if monitored {
 			stats[p.pid] = &cpuUtil{}
+		}
+	}
+
+	if log.CheckLogLevel(log.Trace) {
+		for _, q := range queries {
+			p.Tracef("%s() name:%s user:%s cmdline:%s pids:%v", log.Caller(), q.name, q.user, q.cmdline, q.pids)
 		}
 	}
 
@@ -219,6 +232,7 @@ func (p *Plugin) Collect() (err error) {
 	p.stats = stats
 
 	// update statistics
+	p.Tracef("%s() update statistics", log.Caller())
 	p.mutex.Lock()
 	for _, q := range queries {
 		if stat, ok := p.queries[q.procQuery]; ok {
@@ -345,7 +359,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 		ticks *= 1e12
 		ticks /= uint64(tail.timestamp.Sub(head.timestamp))
-		return float64(ticks) / (10 * float64(C.sysconf(C._SC_CLK_TCK))), nil
+
+		return math.Round(float64(ticks)/float64(C.sysconf(C._SC_CLK_TCK))) / 10, nil
 	}
 	stats := &cpuUtilStats{accessed: now, history: make([]cpuUtilData, maxHistory)}
 	if cmdline != "" {
