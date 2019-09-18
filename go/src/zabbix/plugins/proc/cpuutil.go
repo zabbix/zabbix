@@ -34,6 +34,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"zabbix/pkg/log"
 	"zabbix/pkg/plugin"
 )
 
@@ -169,12 +170,17 @@ func (p *Plugin) prepareQueries() (queries []*cpuUtilQuery, flags int) {
 }
 
 func (p *Plugin) Collect() (err error) {
+	if log.CheckLogLevel(log.Trace) {
+		p.Tracef("In %s() queries:%d", log.Caller(), len(p.queries))
+		defer p.Tracef("End of %s()", log.Caller())
+	}
 	p.scanid++
 	queries, flags := p.prepareQueries()
 	var processes []*procInfo
 	if processes, err = p.getProcesses(flags); err != nil {
 		return
 	}
+	p.Tracef("%s() queries:%d", log.Caller(), len(p.queries))
 
 	stats := make(map[int64]*cpuUtil)
 	// find processes matching prepared queries
@@ -188,6 +194,12 @@ func (p *Plugin) Collect() (err error) {
 		}
 		if monitored {
 			stats[p.pid] = &cpuUtil{}
+		}
+	}
+
+	if log.CheckLogLevel(log.Trace) {
+		for _, q := range queries {
+			p.Tracef("%s() name:%s user:%s cmdline:%s pids:%v", log.Caller(), q.name, q.user, q.cmdline, q.pids)
 		}
 	}
 
@@ -220,6 +232,7 @@ func (p *Plugin) Collect() (err error) {
 	p.stats = stats
 
 	// update statistics
+	p.Tracef("%s() update statistics", log.Caller())
 	p.mutex.Lock()
 	for _, q := range queries {
 		if stat, ok := p.queries[q.procQuery]; ok {

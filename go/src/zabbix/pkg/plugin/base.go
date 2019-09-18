@@ -53,6 +53,10 @@ func (b *Base) SetCapacity(capacity int) {
 	b.capacity = capacity
 }
 
+func (b *Base) Tracef(format string, args ...interface{}) {
+	log.Tracef("[%s] %s", b.name, fmt.Sprintf(format, args...))
+}
+
 func (b *Base) Debugf(format string, args ...interface{}) {
 	log.Debugf("[%s] %s", b.name, fmt.Sprintf(format, args...))
 }

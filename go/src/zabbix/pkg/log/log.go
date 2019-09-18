@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 	"runtime/debug"
 	"sync"
 )
@@ -223,4 +225,14 @@ func PanicHook() {
 		}
 		panic(r)
 	}
+}
+
+func Caller() (name string) {
+	pc := make([]uintptr, 2)
+	n := runtime.Callers(2, pc)
+	frames := runtime.CallersFrames(pc[:n])
+	if frame, ok := frames.Next(); ok {
+		return filepath.Base(frame.Func.Name())
+	}
+	return ""
 }
