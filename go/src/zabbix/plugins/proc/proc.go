@@ -102,6 +102,8 @@ func (p *Plugin) getProcessCmdline(pid int64, flags int) (arg0 string, cmdline s
 			} else {
 				arg0 = string(data[:end])
 			}
+		} else {
+			arg0 = string(data)
 		}
 	}
 
