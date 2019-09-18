@@ -66,32 +66,32 @@ func readAll(filename string) (data []byte, err error) {
 	}
 }
 
-func (p *Plugin) getProcessName(pid int64) (name string, err error) {
+func (p *Plugin) getProcessName(pid string) (name string, err error) {
 	var data []byte
-	if data, err = read2k(fmt.Sprintf("/proc/%d/stat", pid)); err != nil {
+	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
 		return
 	}
 	var left, right int
 	if right = bytes.LastIndexByte(data, ')'); right == -1 {
-		return "", fmt.Errorf("cannot find process name ending position in /proc/%d/stat", pid)
+		return "", fmt.Errorf("cannot find process name ending position in /proc/%s/stat", pid)
 	}
 	if left = bytes.IndexByte(data[:right], '('); left == -1 {
-		return "", fmt.Errorf("cannot find process name starting position in /proc/%d/stat", pid)
+		return "", fmt.Errorf("cannot find process name starting position in /proc/%s/stat", pid)
 	}
 	return string(data[left+1 : right]), nil
 }
 
-func (p *Plugin) getProcessUserID(pid int64) (userid int64, err error) {
+func (p *Plugin) getProcessUserID(pid string) (userid int64, err error) {
 	var fi os.FileInfo
-	if fi, err = os.Stat(fmt.Sprintf("/proc/%d", pid)); err != nil {
+	if fi, err = os.Stat("/proc/" + pid); err != nil {
 		return
 	}
 	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
 }
 
-func (p *Plugin) getProcessCmdline(pid int64, flags int) (arg0 string, cmdline string, err error) {
+func (p *Plugin) getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
 	var data []byte
-	if data, err = readAll(fmt.Sprintf("/proc/%d/cmdline", pid)); err != nil {
+	if data, err = readAll("/proc/" + pid + "/cmdline"); err != nil {
 		return
 	}
 
@@ -170,21 +170,20 @@ func (p *Plugin) getProcesses(flags int) (processes []*procInfo, err error) {
 		}
 		info := &procInfo{pid: pid}
 		if flags&procInfoName != 0 {
-			if info.name, tmperr = p.getProcessName(pid); tmperr != nil {
-				log.Debugf("cannot get process %d name: %s", pid, tmperr)
+			if info.name, tmperr = p.getProcessName(entry.Name()); tmperr != nil {
+				log.Debugf("cannot get process %s name: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = p.getProcessUserID(pid); tmperr != nil {
-				log.Debugf("cannot get process %d user id: %s", pid, tmperr)
+			if info.userid, tmperr = p.getProcessUserID(entry.Name()); tmperr != nil {
+				log.Debugf("cannot get process %s user id: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
 		if flags&procInfoCmdline != 0 {
-
-			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(pid, flags); tmperr != nil {
-				log.Debugf("cannot get process %d command line: %s", pid, tmperr)
+			if info.arg0, info.cmdline, tmperr = p.getProcessCmdline(entry.Name(), flags); tmperr != nil {
+				log.Debugf("cannot get process %s command line: %s", entry.Name(), tmperr)
 				continue
 			}
 		}
