@@ -2279,7 +2279,8 @@
 					if (widget !== null && widget['type'] === type) {
 						setWidgetViewMode(widget, view_mode);
 
-						doLeaveWidget($obj, data, widget);
+						doLeaveWidgetsExcept($obj, data, widget);
+						doEnterWidget($obj, data, widget);
 					}
 				}
 			})
