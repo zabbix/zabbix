@@ -422,7 +422,7 @@ out:
  ******************************************************************************/
 extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char				*wmi_namespace, *wmi_query;
+	char				*wmi_namespace, *wmi_query, *error = NULL;
 	VARIANT				*vtProp;
 	HRESULT				hres;
 	int				ret = SYSINFO_RET_FAIL;
@@ -447,14 +447,14 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get WMI result");
+		error = zbx_strdup(error, "Cannot obtain WMI information.");
 		goto out;
 	}
 
 	vtProp = wmi_values.values[0]->values[0].value;
 	if (V_ISARRAY(vtProp))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI array result");
+		error = zbx_strdup(error, "Cannot convert WMI array result.");
 		goto out;
 	}
 
@@ -477,7 +477,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (FAILED(hres))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_I8",
+				error = zbx_dsprintf(error, "Cannot convert WMI result of type %d to VT_I8",
 						V_VT(vtProp));
 				goto out;
 			}
@@ -492,7 +492,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (FAILED(hres))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_R8",
+				error = zbx_dsprintf(error, "Cannot convert WMI result of type %d to VT_R8",
 						V_VT(vtProp));
 				goto out;
 			}
@@ -506,7 +506,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (FAILED(hres))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR",
+				error = zbx_dsprintf(error, "Cannot convert WMI result of type %d to VT_BSTR",
 						V_VT(vtProp));
 				goto out;
 			}
@@ -521,7 +521,7 @@ out:
 	zbx_vector_wmi_instance_destroy(&wmi_values);
 
 	if (SYSINFO_RET_FAIL == ret)
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain WMI information."));
+		SET_MSG_RESULT(result, error);
 
 	return ret;
 }
@@ -556,7 +556,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 
 	if (FAILED(hres))
 	{
-		*error = zbx_dsprintf(*error, "cannot get element from WMI array '%s'", prop_err);
+		*error = zbx_dsprintf(*error, "Cannot get element from WMI array '%s'", prop_err);
 		zbx_free(pbData);
 		return SYSINFO_RET_FAIL;
 	}
@@ -565,7 +565,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 
 	if (FAILED(hres))
 	{
-		*error = zbx_dsprintf(*error, "cannot get element type from WMI array '%s'", prop_err);
+		*error = zbx_dsprintf(*error, "Cannot get element type from WMI array '%s'", prop_err);
 		zbx_free(pbData);
 		return SYSINFO_RET_FAIL;
 	}
@@ -614,7 +614,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot convert WMI property '%s' of "
+				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
 						"type %d to VT_BSTR", prop_err, pvt);
 				ret = SYSINFO_RET_FAIL;
 			}
@@ -626,7 +626,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot convert WMI property '%s' of "
+				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
 						"type %d to VT_BSTR", prop_err, pvt);
 				ret = SYSINFO_RET_FAIL;
 			}
@@ -640,14 +640,14 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot copy array element of WMI property '%s'",
+				*error = zbx_dsprintf(*error, "Cannot copy array element of WMI property '%s'",
 						prop_err);
 				ret = SYSINFO_RET_FAIL;
 			}
 
 			break;
 		default:
-			*error = zbx_dsprintf(*error, "unsupported type %d for array element of WMI property '%s'",
+			*error = zbx_dsprintf(*error, "Unsupported type %d for array element of WMI property '%s'",
 					pvt, prop_err);
 			ret = SYSINFO_RET_FAIL;
 			break;
@@ -702,7 +702,7 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
 
 	if (FAILED(hres))
 	{
-		*error = zbx_dsprintf(*error, "cannot get index of first element from WMI array '%s'", prop_name);
+		*error = zbx_dsprintf(*error, "Cannot get index of first element from WMI array '%s'", prop_name);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -710,7 +710,7 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
 
 	if (FAILED(hres))
 	{
-		*error = zbx_dsprintf(*error, "cannot get index of last element from WMI array '%s'", prop_name);
+		*error = zbx_dsprintf(*error, "Cannot get index of last element from WMI array '%s'", prop_name);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -771,7 +771,7 @@ extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, co
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot convert WMI property '%s' of "
+				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
 						"type %d to VT_I8", prop_err, V_VT(vtProp));
 				ret = SYSINFO_RET_FAIL;
 			}
@@ -785,7 +785,7 @@ extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, co
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot convert WMI property '%s' of "
+				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
 						"type %d to VT_R8", prop_err, V_VT(vtProp));
 				ret = SYSINFO_RET_FAIL;
 			}
@@ -808,7 +808,7 @@ extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, co
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "cannot convert WMI property '%s' of "
+				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
 						"type %d to VT_BSTR", prop_err, V_VT(vtProp));
 				ret = SYSINFO_RET_FAIL;
 			}
