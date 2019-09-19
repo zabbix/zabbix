@@ -610,7 +610,12 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 			}
 		}
 		else
-			zbx_vector_str_append(&names, zbx_strdup(NULL, str));
+		{
+			char	*name;
+
+			zbx_replace_invalid_utf8((name = zbx_strdup(NULL, str)));
+			zbx_vector_str_append(&names, name);
+		}
 	}
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
