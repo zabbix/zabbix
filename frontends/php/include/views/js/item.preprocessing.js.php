@@ -75,8 +75,9 @@
 			->setAttribute('placeholder', '#{placeholder_1}')
 			->setWidth('#{width_1}')
 			->setAttribute('maxlength', 1).
-		(new CCheckBox('preprocessing[#{rowNum}][params][2]', '#{chkbox_value}'))->setChecked('#{chkbox_default}').
-		(new CLabel('#{chkbox_label}', 'preprocessing_#{rowNum}_params_2'))
+		(new CCheckBox('preprocessing[#{rowNum}][params][2]', '#{chkbox_value}'))
+			->setLabel('#{chkbox_label}')
+			->setChecked('#{chkbox_default}')
 	?>
 </script>
 

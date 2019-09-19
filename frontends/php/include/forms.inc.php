@@ -1290,10 +1290,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 		$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
 			? $step['params'][2]
 			: ZBX_PREPROC_CSV_NO_HEADER;
-		$step_param_2 = [(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
-				->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
-				->setReadonly($readonly),
-			(new CLabel(_('With header row'), 'preprocessing_'.$i.'_params_2'))];
+		$step_param_2 = (new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
+			->setLabel(_('With header row'))
+			->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
+			->setReadonly($readonly);
 
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
