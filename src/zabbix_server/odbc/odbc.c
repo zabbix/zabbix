@@ -43,6 +43,9 @@ struct zbx_odbc_query_result
 	char		**row;
 };
 
+#define ZBX_FLAG_ODBC_NONE	0x00
+#define ZBX_FLAG_ODBC_LLD	0x01
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_odbc_rc_str                                                  *
@@ -533,13 +536,14 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: odbc_query_result_to_lld_json                                    *
+ * Function: odbc_query_result_to_json                                        *
  *                                                                            *
- * Purpose: convert ODBC SQL query result into low level discovery data       *
+ * Purpose: convert ODBC SQL query result into JSON                           *
  *                                                                            *
  * Parameters: query_result - [IN] result of SQL query                        *
- * *           lld_mode     - [IN] 1 - lld JSON, 0 - simple JSON              *
- *             lld_json     - [OUT] low level discovery data                  *
+ *             flags        - [IN] specify if column names must be converted  *
+ *                                 to LLD macros or preserved as they are     *
+ *             out_json     - [OUT] query result converted to JSON            *
  *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - conversion was successful and allocated LLD JSON   *
@@ -551,18 +555,18 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
  * Comments: It is caller's responsibility to free allocated buffers!         *
  *                                                                            *
  ******************************************************************************/
-static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, int lld_mode, char **lld_json,
+static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int flags, char **out_json,
 		char **error)
 {
 	const char		*const *row;
 	struct zbx_json		json;
-	zbx_vector_str_t	macros;
+	zbx_vector_str_t	names;
 	int			ret = FAIL, i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_str_create(&macros);
-	zbx_vector_str_reserve(&macros, query_result->col_num);
+	zbx_vector_str_create(&names);
+	zbx_vector_str_reserve(&names, query_result->col_num);
 
 	for (i = 0; i < query_result->col_num; i++)
 	{
@@ -580,7 +584,7 @@ static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, 
 
 		zabbix_log(LOG_LEVEL_DEBUG, "column #%d name:'%s'", i + 1, str);
 
-		if (1 == lld_mode)
+		if (flags & ZBX_FLAG_ODBC_LLD)
 		{
 			for (p = str; '\0' != *p; p++)
 			{
@@ -594,21 +598,19 @@ static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, 
 				}
 			}
 
-			zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "{#%s}", str));
+			zbx_vector_str_append(&names, zbx_dsprintf(NULL, "{#%s}", str));
 
 			for (j = 0; j < i; j++)
 			{
-				if (0 == strcmp(macros.values[i], macros.values[j]))
+				if (0 == strcmp(names.values[i], names.values[j]))
 				{
-					*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", macros.values[i]);
+					*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", names.values[i]);
 					goto out;
 				}
 			}
 		}
 		else
-		{
-			zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "%s", str));
-		}
+			zbx_vector_str_append(&names, zbx_strdup(NULL, str));
 	}
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -627,7 +629,7 @@ static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, 
 				zbx_replace_invalid_utf8(value);
 			}
 
-			zbx_json_addstring(&json, macros.values[i], value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, names.values[i], value, ZBX_JSON_TYPE_STRING);
 			zbx_free(value);
 		}
 
@@ -636,14 +638,14 @@ static int	odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, 
 
 	zbx_json_close(&json);
 
-	*lld_json = zbx_strdup(*lld_json, json.buffer);
+	*out_json = zbx_strdup(*out_json, json.buffer);
 
 	zbx_json_free(&json);
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clear_ext(&macros, zbx_str_free);
-	zbx_vector_str_destroy(&macros);
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -652,50 +654,26 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_odbc_query_result_to_lld_json                                *
+ * Function: zbx_odbc_query_result_to_json                                    *
  *                                                                            *
- * Purpose: convert ODBC SQL query result into low level discovery data       *
+ * Purpose: public wrapper for odbc_query_result_to_json                      *
  *                                                                            *
- * Parameters: query_result - [IN] result of SQL query                        *
- *             lld_json     - [OUT] low level discovery data                  *
- *             error        - [OUT] error message                             *
- *                                                                            *
- * Return value: SUCCEED - conversion was successful and allocated LLD JSON   *
- *                         is returned in lld_json parameter, error remains   *
- *                         untouched in this case                             *
- *               FAIL    - otherwise, allocated error message is returned in  *
- *                         error parameter, lld_json remains untouched        *
- *                                                                            *
- * Comments: It is caller's responsibility to free allocated buffers!         *
- *                                                                            *
- ******************************************************************************/
+ *****************************************************************************/
 int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
 {
-	return odbc_query_result_to_lld_json(query_result, 1, lld_json, error);
+	return odbc_query_result_to_json(query_result, ZBX_FLAG_ODBC_LLD, lld_json, error);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: zbx_odbc_query_result_to_json                                    *
  *                                                                            *
- * Purpose: convert ODBC SQL query result into JSON format                    *
+ * Purpose: public wrapper for odbc_query_result_to_json                      *
  *                                                                            *
- * Parameters: query_result - [IN] result of SQL query                        *
- *             out_json     - [OUT] JSON data                                 *
- *             error        - [OUT] error message                             *
- *                                                                            *
- * Return value: SUCCEED - conversion was successful and allocated JSON       *
- *                         is returned in out_json parameter, error remains   *
- *                         untouched in this case                             *
- *               FAIL    - otherwise, allocated error message is returned in  *
- *                         error parameter, out_json remains untouched        *
- *                                                                            *
- * Comments: It is caller's responsibility to free allocated buffers!         *
- *                                                                            *
- ******************************************************************************/
+ *****************************************************************************/
 int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **out_json, char **error)
 {
-	return odbc_query_result_to_lld_json(query_result, 0, out_json, error);
+	return odbc_query_result_to_json(query_result, ZBX_FLAG_ODBC_NONE, out_json, error);
 }
 
 #endif	/* HAVE_UNIXODBC */
