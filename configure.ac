@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0beta1])
+AC_INIT([Zabbix],[4.4.0alpha3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1302,7 +1302,6 @@ AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || te
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"
-have_jabber="no"
 have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
@@ -1457,20 +1456,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
-
-	dnl Checking for Jabber libraries
-	JABBER_CHECK_CONFIG()
-	if test "x$want_jabber" = "xyes"; then
-		if test "x$found_jabber" != "xyes"; then
-			AC_MSG_ERROR([Jabber library not found])
-		else
-			have_jabber="yes"
-		fi
-	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $JABBER_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $JABBER_LIBS"
-
-	AC_SUBST(JABBER_CPPFLAGS)
 
 	dnl Check for LIBXML2 [by default - skip]
 	LIBXML2_CHECK_CONFIG([no])
@@ -2087,10 +2072,6 @@ if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
 fi
 
-if test "x$JABBER_CPPFLAGS" != "x"; then
-	echo "    Jabber:                ${JABBER_CPPFLAGS}"
-fi
-
 if test "x$LIBXML2_CFLAGS" != "x"; then
 	echo "    libXML2:               ${LIBXML2_CFLAGS}"
 fi
@@ -2141,8 +2122,7 @@ echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
       SSL keys:              ${CURL_SSL_KEY_LOCATION}"
 fi
 
-echo "    Native Jabber:         ${have_jabber}
-    SNMP:                  ${have_snmp}
+echo "    SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}

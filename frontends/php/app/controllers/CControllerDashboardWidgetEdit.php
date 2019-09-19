@@ -54,6 +54,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Transforms corrupted data to default values.
+		$form->validate();
 
 		$config = select_config();
 
@@ -104,10 +106,6 @@ class CControllerDashboardWidgetEdit extends CController {
 						case WIDGET_FIELD_SELECT_RES_SYSMAP:
 							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
 							break;
-
-						case WIDGET_FIELD_SELECT_RES_GRAPH:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible graph');
-							break;
 					}
 				}
 			}
@@ -131,22 +129,6 @@ class CControllerDashboardWidgetEdit extends CController {
 						}
 					}
 					break;
-
-				case WIDGET_FIELD_SELECT_RES_GRAPH:
-					$graphs = API::Graph()->get([
-						'graphids' => array_keys($list),
-						'selectHosts' => ['name'],
-						'output' => ['graphid', 'name']
-					]);
-
-					if ($graphs) {
-						foreach ($graphs as $key => $graph) {
-							order_result($graph['hosts'], 'name');
-							$graph['host'] = reset($graph['hosts']);
-							$list[$graph['graphid']] = $graph['host']['name'].NAME_DELIMITER.$graph['name'];
-						}
-					}
-					break;
 			}
 		}
 		unset($list);
@@ -155,34 +137,46 @@ class CControllerDashboardWidgetEdit extends CController {
 		$groupids = [];
 		$hostids = [];
 		$itemids = [];
+		$graphids = [];
+		$prototype_itemids = [];
+		$prototype_graphids = [];
 
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldGroup) {
-				$field_name = $field->getName();
-				$captions['ms']['groups'][$field_name] = [];
-
-				foreach ($field->getValue() as $groupid) {
-					$captions['ms']['groups'][$field_name][$groupid] = ['id' => $groupid];
-					$groupids[$groupid][] = $field_name;
-				}
+			if ($field instanceof CWidgetFieldMsGroup) {
+				$key = 'groups';
+				$var = 'groupids';
 			}
-			elseif ($field instanceof CWidgetFieldHost) {
-				$field_name = $field->getName();
-				$captions['ms']['hosts'][$field_name] = [];
-
-				foreach ($field->getValue() as $hostid) {
-					$captions['ms']['hosts'][$field_name][$hostid] = ['id' => $hostid];
-					$hostids[$hostid][] = $field_name;
-				}
+			elseif ($field instanceof CWidgetFieldMsHost) {
+				$key = 'hosts';
+				$var = 'hostids';
 			}
-			elseif ($field instanceof CWidgetFieldItem) {
-				$field_name = $field->getName();
-				$captions['ms']['items'][$field_name] = [];
+			elseif ($field instanceof CWidgetFieldMsItem) {
+				$key = 'items';
+				$var = 'itemids';
+			}
+			elseif ($field instanceof CWidgetFieldMsGraph) {
+				$key = 'graphs';
+				$var = 'graphids';
+			}
+			elseif ($field instanceof CWidgetFieldMsItemPrototype) {
+				$key = 'item_prototypes';
+				$var = 'prototype_itemids';
+			}
+			elseif ($field instanceof CWidgetFieldMsGraphPrototype) {
+				$key = 'graph_prototypes';
+				$var = 'prototype_graphids';
+			}
+			else {
+				continue;
+			}
 
-				foreach ($field->getValue() as $itemid) {
-					$captions['ms']['items'][$field_name][$itemid] = ['id' => $itemid];
-					$itemids[$itemid][] = $field_name;
-				}
+			$field_name = $field->getName();
+			$captions['ms'][$key][$field_name] = [];
+
+			foreach ($field->getValue() as $id) {
+				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
+				$tmp = &$$var;
+				$tmp[$id][] = $field_name;
 			}
 		}
 
@@ -196,7 +190,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			foreach ($groups as $groupid => $group) {
 				foreach ($groupids[$groupid] as $field_name) {
 					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
-					unset($captions['ms']['groups'][$field_name][$groupid]['inaccessible']);
 				}
 			}
 		}
@@ -220,18 +213,73 @@ class CControllerDashboardWidgetEdit extends CController {
 				'output' => ['itemid', 'hostid', 'name', 'key_'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($itemids),
-				'preservekeys' => true,
-				'webitems' => true
+				'webitems' => true,
+				'preservekeys' => true
 			]);
 
 			$items = CMacrosResolverHelper::resolveItemNames($items);
 
 			foreach ($items as $itemid => $item) {
 				foreach ($itemids[$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] = [
-						'id' => $itemid,
+					$captions['ms']['items'][$field_name][$itemid] += [
 						'name' => $item['name_expanded'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($graphids) {
+			$graphs = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['name'],
+				'graphids' => array_keys($graphids),
+				'preservekeys' => true
+			]);
+
+			foreach ($graphs as $graphid => $graph) {
+				foreach ($graphids[$graphid] as $field_name) {
+					$captions['ms']['graphs'][$field_name][$graphid] += [
+						'name' => $graph['name'],
+						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($prototype_itemids) {
+			$item_prototypes = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_'],
+				'selectHosts' => ['name'],
+				'itemids' => array_keys($prototype_itemids),
+				'preservekeys' => true
+			]);
+
+			$item_prototypes = CMacrosResolverHelper::resolveItemNames($item_prototypes);
+
+			foreach ($item_prototypes as $itemid => $item) {
+				foreach ($prototype_itemids[$itemid] as $field_name) {
+					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
+						'name' => $item['name_expanded'],
+						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+					];
+				}
+			}
+		}
+
+		if ($prototype_graphids) {
+			$graph_prototypes = API::GraphPrototype()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['name'],
+				'graphids' => array_keys($prototype_graphids),
+				'preservekeys' => true
+			]);
+
+			foreach ($graph_prototypes as $graphid => $graph) {
+				foreach ($prototype_graphids[$graphid] as $field_name) {
+					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
+						'name' => $graph['name'],
+						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
 					];
 				}
 			}
@@ -240,7 +288,10 @@ class CControllerDashboardWidgetEdit extends CController {
 		$inaccessible_resources = [
 			'groups' => _('Inaccessible group'),
 			'hosts' => _('Inaccessible host'),
-			'items' => _('Inaccessible item')
+			'items' => _('Inaccessible item'),
+			'graphs' => _('Inaccessible graph'),
+			'item_prototypes' => _('Inaccessible item prototype'),
+			'graph_prototypes' => _('Inaccessible graph prototype')
 		];
 
 		foreach ($captions['ms'] as $resource_type => &$fields_captions) {

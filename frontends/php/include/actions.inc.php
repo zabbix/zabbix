@@ -512,7 +512,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 	if ($media_typeids) {
 		$media_types = API::Mediatype()->get([
-			'output' => ['description'],
+			'output' => ['name'],
 			'mediatypeids' => $media_typeids,
 			'preservekeys' => true
 		]);
@@ -573,7 +573,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 						$media_typeid = $operation['opmessage']['mediatypeid'];
 
 						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
-							$media_type = $media_types[$media_typeid]['description'];
+							$media_type = $media_types[$media_typeid]['name'];
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -736,7 +736,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 						$media_typeid = $operation['opmessage']['mediatypeid'];
 
 						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
-							$media_type = $media_types[$media_typeid]['description'];
+							$media_type = $media_types[$media_typeid]['name'];
 						}
 
 						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
@@ -1733,7 +1733,7 @@ function getEventUpdates(array $event) {
  * @param array  $actions['messages']    Messages icon data.
  * @param array  $actions['severities']  Severity change icon data.
  * @param array  $actions['actions']     Actions icon data.
- * @param array  $mediatypes             Mediatypes with maxattempts value and description.
+ * @param array  $mediatypes             Mediatypes with maxattempts value and name.
  * @param array  $users                  User name, surname and alias.
  * @param array  $config                 Zabbix config.
  *
@@ -1894,8 +1894,8 @@ function makeEventSeverityChangesIcon(array $data, array $users, array $config) 
  * @param bool   $data['has_uncomplete_action']     Does the event have at least one uncompleted alert action.
  * @param bool   $data['has_failed_action']         Does the event have at least one failed alert action.
  * @param array  $users                             User name, surname and alias.
- * @param array  $mediatypes                        Mediatypes with maxattempts value and description.
- * @param string $mediatypes[]['description']       Mediatype description.
+ * @param array  $mediatypes                        Mediatypes with maxattempts value and name.
+ * @param string $mediatypes[]['name']              Mediatype name.
  * @param array  $config                            Zabbix config.
  *
  * @return CSpan|null
@@ -1924,7 +1924,7 @@ function makeEventActionsIcon(array $data, array $users, array $mediatypes, arra
 			}
 			elseif ($action['alerttype'] == ALERT_TYPE_MESSAGE) {
 				$message = array_key_exists($action['mediatypeid'], $mediatypes)
-					? $mediatypes[$action['mediatypeid']]['description']
+					? $mediatypes[$action['mediatypeid']]['name']
 					: '';
 			}
 		}

@@ -467,27 +467,40 @@ var timeControl = {
 	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
-		if (typeof this.objectList[id] === 'undefined'
-				|| (typeof(objData['reloadOnAdd']) !== 'undefined' && objData['reloadOnAdd'] === 1)) {
-			this.objectList[id] = jQuery.extend({
-				id: id,
-				containerid: null,
-				refresh: false,
-				processed: 0,
-				timeline: time,
-				objDims: {},
-				src: location.href,
-				dynamic: 1,
-				loadSBox: 0,
-				loadImage: 0,
-				mainObject: 0, // object on changing will reflect on all others
-				onDashboard: 0 // object is on dashboard
-			}, objData);
+		if (typeof this.objectList[id] !== 'undefined' && objData['reloadOnAdd'] !== 1) {
+			// Do not reload object twice if not asked to.
+			return;
+		}
 
-			var objectUpdate = this.objectUpdate.bind(this.objectList[id]);
-			jQuery.subscribe('timeselector.rangeupdate', function(e, data) {
-				objectUpdate(data);
-			});
+		this.removeObject(id);
+
+		this.objectList[id] = jQuery.extend({
+			id: id,
+			containerid: null,
+			refresh: false,
+			processed: 0,
+			timeline: time,
+			objDims: {},
+			src: location.href,
+			dynamic: 1,
+			loadSBox: 0,
+			loadImage: 0,
+			mainObject: 0, // object on changing will reflect on all others
+			onDashboard: 0 // object is on dashboard
+		}, objData);
+
+		var _this = this;
+		this.objectList[id].objectUpdate = function(e, data) {
+			_this.objectUpdate.call(_this.objectList[id], data);
+		};
+		jQuery.subscribe('timeselector.rangeupdate', this.objectList[id].objectUpdate);
+	},
+
+	removeObject: function(id) {
+		if (typeof this.objectList[id] !== 'undefined') {
+			jQuery.unsubscribe('timeselector.rangeupdate', this.objectList[id].objectUpdate);
+
+			delete this.objectList[id];
 		}
 	},
 
@@ -514,9 +527,12 @@ var timeControl = {
 				}
 
 				// url
-				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
+				if (isset('graphtype', obj.objDims)) {
+					// graph size might have changed regardless of graph's type
+
 					var graphUrl = new Curl(obj.src, false);
 					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
+					graphUrl.setArgument('height', Math.floor(obj.objDims.graphHeight));
 
 					obj.src = graphUrl.getUrl();
 				}

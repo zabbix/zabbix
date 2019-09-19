@@ -144,7 +144,7 @@ typedef struct
 
 	/* media type data */
 	int			type;
-	char			*description;
+	char			*name;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;
@@ -344,7 +344,7 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
  *                                                                            *
  ******************************************************************************/
 static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int type,
-		const char *description, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
+		const char *name, const char *smtp_server, const char *smtp_helo, const char *smtp_email,
 		const char *exec_path, const char *gsm_modem, const char *username, const char *passwd,
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
@@ -368,7 +368,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 
 	mediatype->type = type;
 
-	ZBX_UPDATE_STR(mediatype->description, description);
+	ZBX_UPDATE_STR(mediatype->name, name);
 	ZBX_UPDATE_STR(mediatype->smtp_server, smtp_server);
 	ZBX_UPDATE_STR(mediatype->smtp_helo, smtp_helo);
 	ZBX_UPDATE_STR(mediatype->smtp_email, smtp_email);
@@ -471,7 +471,7 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	if (0 != --mediatype->refcount)
 		return FAIL;
 
-	zbx_free(mediatype->description);
+	zbx_free(mediatype->name);
 	zbx_free(mediatype->smtp_server);
 	zbx_free(mediatype->smtp_helo);
 	zbx_free(mediatype->smtp_email);
@@ -1308,9 +1308,9 @@ static int	am_db_update_mediatypes(zbx_am_t *manager, const zbx_uint64_t *mediat
 		goto out;
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,"
-				"username,passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
-				"smtp_authentication,exec_params,maxsessions,maxattempts,attempt_interval,content_type"
+			"select mediatypeid,type,name,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
+				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
+				"exec_params,maxsessions,maxattempts,attempt_interval,content_type"
 			" from media_type"
 			" where");
 
@@ -1792,20 +1792,10 @@ static int	am_process_alert(zbx_am_t *manager, const zbx_ipc_service_t *alerter_
 					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
 					mediatype->content_type);
 			break;
-		case MEDIA_TYPE_JABBER:
-			command = ZBX_IPC_ALERTER_JABBER;
-			data_len = zbx_alerter_serialize_jabber(&data, alert->alertid, alert->sendto, alert->subject,
-					alert->message, mediatype->username, mediatype->passwd);
-			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;
 			data_len = zbx_alerter_serialize_sms(&data, alert->alertid, alert->sendto, alert->message,
 					mediatype->gsm_modem);
-			break;
-		case MEDIA_TYPE_EZ_TEXTING:
-			command = ZBX_IPC_ALERTER_EZTEXTING;
-			data_len = zbx_alerter_serialize_eztexting(&data, alert->alertid, alert->sendto, alert->message,
-					mediatype->username, mediatype->passwd, mediatype->exec_path);
 			break;
 		case MEDIA_TYPE_EXEC:
 			command = ZBX_IPC_ALERTER_EXEC;

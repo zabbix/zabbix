@@ -37,6 +37,7 @@ typedef struct
 	int		now;
 	unsigned short	port;
 	unsigned short	flag;
+	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
 
@@ -716,9 +717,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "task_remote_command") ||
-			0 == strcmp(tablename, "task_remote_command_result"))
+			0 == strcmp(tablename, "autoreg_host"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -1078,8 +1077,8 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Function: zbx_check_user_permissions                                       *
  *                                                                            *
- * Purpose: check if user has access rights to information - full name, alias,*
- *          Email, SMS, Jabber, etc                                           *
+ * Purpose: check if user has access rights to information - full name,       *
+ *          alias, Email, SMS, etc                                            *
  *                                                                            *
  * Parameters: userid           - [IN] user who owns the information          *
  *             recipient_userid - [IN] user who will receive the information  *
@@ -1207,13 +1206,14 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
-	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, flag, now);
+	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
 	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 
 	DBregister_host_clean(&autoreg_hosts);
@@ -1255,7 +1255,8 @@ static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 }
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	int 			i;
@@ -1278,6 +1279,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 	autoreg_host->ip = zbx_strdup(NULL, ip);
 	autoreg_host->dns = zbx_strdup(NULL, dns);
 	autoreg_host->port = port;
+	autoreg_host->connection_type = connection_type;
 	autoreg_host->host_metadata = zbx_strdup(NULL, host_metadata);
 	autoreg_host->flag = flag;
 	autoreg_host->now = now;
@@ -1453,7 +1455,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_hostid = DBget_maxid_num("autoreg_host", create);
 
 		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
-				"listen_dns", "listen_port", "host_metadata", "flags", NULL);
+				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
 	}
 
 	if (0 != (update = autoreg_hosts->values_num - create))
@@ -1474,7 +1476,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
-					(int)autoreg_host->port, autoreg_host->host_metadata, autoreg_host->flag);
+					(int)autoreg_host->port, (int)autoreg_host->connection_type,
+					autoreg_host->host_metadata, autoreg_host->flag);
 		}
 		else
 		{
@@ -1488,11 +1491,12 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 						"listen_dns='%s',"
 						"listen_port=%hu,"
 						"host_metadata='%s',"
+						"tls_accepted='%u',"
 						"flags=%hu,"
 						"proxy_hostid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->flag,
-				DBsql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->connection_type,
+				autoreg_host->flag, DBsql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);
@@ -1547,7 +1551,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		const char *host_metadata, unsigned short flag)
+		unsigned int connection_type, const char *host_metadata, unsigned short flag)
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
@@ -1557,10 +1561,11 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 	host_metadata_esc = DBdyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata,flags)"
+			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
 			" values"
-			" (%d,'%s','%s','%s',%d,'%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc, (int)flag);
+			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
+			(int)flag);
 
 	zbx_free(host_metadata_esc);
 	zbx_free(dns_esc);

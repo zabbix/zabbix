@@ -1958,60 +1958,6 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_replace_utf8                                                 *
- *                                                                            *
- * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
- *                                                                            *
- * Parameters: text - [IN] pointer to the first char                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_replace_utf8(const char *text)
-{
-	int	n;
-	char	*out, *p;
-
-	out = p = (char *)zbx_malloc(NULL, strlen(text) + 1);
-
-	while ('\0' != *text)
-	{
-		if (0 == (*text & 0x80))		/* ASCII */
-			n = 1;
-		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
-			n = 2;
-		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
-			n = 3;
-		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
-			n = 4;
-		else
-			goto bad;
-
-		if (1 == n)
-			*p++ = *text++;
-		else
-		{
-			*p++ = ZBX_UTF8_REPLACE_CHAR;
-
-			while (0 != n)
-			{
-				if ('\0' == *text)
-					goto bad;
-				n--;
-				text++;
-			}
-		}
-	}
-
-	*p = '\0';
-	return out;
-bad:
-	zbx_free(out);
-	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_is_utf8                                                      *
  *                                                                            *
  * Purpose: check UTF-8 sequences                                             *

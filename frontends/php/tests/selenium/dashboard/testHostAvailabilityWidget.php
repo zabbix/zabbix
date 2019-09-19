@@ -364,15 +364,14 @@ class testHostAvailabilityWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=101');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget($name);
-		$widget->query("xpath:.//button[@title='Delete']")->one()->click();
+		$widget->delete();
 		$this->page->waitUntilReady();
 
 		$dashboard->save();
 		// Check that Dashboard has been saved
 		$this->checkDashboardUpdateMessage();
 		// Confirm that widget is not present on dashboard.
-		$this->assertTrue($dashboard->query('xpath:.//div[contains(@class,"dashbrd-grid-widget-head")]/h4[text()='.
-				CXPathHelper::escapeQuotes($name).']')->count() === 0);
+		$this->assertTrue($dashboard->getWidget($name, false) === null);
 	}
 
 	private function checkDashboardUpdateMessage() {

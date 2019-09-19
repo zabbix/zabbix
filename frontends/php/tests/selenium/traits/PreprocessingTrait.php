@@ -30,7 +30,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	private static function getPreprocessingFieldDescriptors() {
+	protected static function getPreprocessingFieldDescriptors() {
 		return [
 			[
 				'name'		=> 'type',
@@ -77,7 +77,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return Element|null
 	 */
-	private static function getPreprocessingField($container, $field) {
+	protected static function getPreprocessingField($container, $field) {
 		$query = $container->query($field['selector']);
 
 		if (array_key_exists('class', $field)) {
@@ -97,7 +97,7 @@ trait PreprocessingTrait {
 	 *
 	 * @param array $steps    preprocessing step values
 	 */
-	private function addPreprocessingSteps($steps) {
+	protected function addPreprocessingSteps($steps) {
 		$rows = $this->query('class:preprocessing-list-item')->count() + 1;
 		$add = $this->query('id:param_add')->one();
 		$fields = self::getPreprocessingFieldDescriptors();
@@ -124,7 +124,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	private function getPreprocessingSteps($extended = false) {
+	protected function getPreprocessingSteps($extended = false) {
 		$steps = [];
 
 		$fields = self::getPreprocessingFieldDescriptors();
@@ -155,7 +155,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	private function assertPreprocessingSteps($data) {
+	protected function assertPreprocessingSteps($data) {
 		$steps = $this->getPreprocessingSteps(true);
 		$this->assertEquals(count($data), count($steps), 'Preprocessing step count should match step count in data.');
 
@@ -196,7 +196,7 @@ trait PreprocessingTrait {
 	 *
 	 * @return array
 	 */
-	private function listPreprocessingSteps() {
+	protected function listPreprocessingSteps() {
 		$data = [];
 		foreach ($this->getPreprocessingSteps(true) as $i => $step) {
 			$values = [];

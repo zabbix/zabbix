@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,25 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trapper_preproc_test_run.h"
 
-class CWidgetFieldHost extends CWidgetField {
-
-	/**
-	 * Create widget field for Item selection
-	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 */
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
-		$this->setDefault([]);
-	}
-
-	public function setValue($value) {
-		$this->value = (array) $value;
-
-		return $this;
-	}
+int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+{
+	return trapper_preproc_test_run(jp, json, error);
 }
