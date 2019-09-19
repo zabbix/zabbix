@@ -82,11 +82,13 @@ static int tls_init(void)
 static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity,
 	unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len)
 {
-	size_t	sz;
+	size_t		sz;
 	const char	*psk_identity, *psk_key;
-	BIO	*err;
-	unsigned char *key;
-	long key_len;
+	BIO		*err;
+	unsigned char 	*key;
+	long		key_len;
+
+	TLS_UNUSED(hint);
 
 	if (NULL == (err = (BIO *)SSL_get_ex_data(ssl, TLS_EX_DATA_ERRBIO)))
 		return 0;
@@ -113,28 +115,30 @@ static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity
 	memcpy(identity, psk_identity, sz);
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-	if (key == NULL) {
+	if (key == NULL)
+	{
 		BIO_printf(err, "invalid PSK key");
 		return 0;
 	}
 
-	if (key_len > (long)max_psk_len) {
+	if (key_len > (long)max_psk_len)
+	{
 		BIO_printf(err, "PSK key is too large");
 		OPENSSL_free(key);
 		return 0;
 	}
 
-	memcpy(psk, key, key_len);
+	memcpy(psk, key, (size_t)key_len);
 	OPENSSL_free(key);
-	return key_len;
+	return (unsigned int)key_len;
 }
 
 static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk, unsigned int max_psk_len)
 {
 	const char	*psk_identity, *psk_key;
-	BIO	*err;
-	unsigned char *key;
-	long key_len;
+	BIO		*err;
+	unsigned char	*key;
+	long		key_len;
 
 	if (NULL == (err = (BIO *)SSL_get_ex_data(ssl, TLS_EX_DATA_ERRBIO)))
 		return 0;
@@ -158,19 +162,21 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	}
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-	if (key == NULL) {
+	if (key == NULL)
+	{
 		BIO_printf(err, "invalid PSK key");
 		return 0;
 	}
 
-	if (key_len > (long)max_psk_len) {
+	if (key_len > (long)max_psk_len)
+	{
 		BIO_printf(err, "PSK key is too large");
 		return 0;
 	}
 
-	memcpy(psk, key, key_len);
+	memcpy(psk, key, (size_t)key_len);
 	OPENSSL_free(key);
-	return key_len;
+	return (unsigned int)key_len;
 }
 
 static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
@@ -292,15 +298,16 @@ out:
 		BIO_set_nbio(err, 1);
 		ERR_print_errors(err);
 
-		sz = BIO_ctrl_pending(err);
+		sz = (int)BIO_ctrl_pending(err);
 		if (sz != 0)
 		{
-			*error = malloc(sz + 1);
+			*error = malloc((size_t)sz + 1);
 			BIO_read(err, *error, sz);
 			(*error)[sz] = '\0';
 		}
 		else
 			*error = strdup("unknown openssl error");
+
 		BIO_vfree(err);
 		if (NULL != ctx)
 		{
@@ -377,13 +384,14 @@ static tls_t *tls_new_server(SSL_CTX_LP ctx, const char *psk_identity, const cha
 	if (0 == tls_new(ctx, psk_identity, psk_key, &tls))
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1 or newer, or LibreSSL
-		if (1 != SSL_set_session_id_context(tls->ssl, "Zbx", sizeof("Zbx") - 1))
+		if (1 != SSL_set_session_id_context(tls->ssl, (const unsigned char *)"Zbx", sizeof("Zbx") - 1))
 			return tls;
 #endif
 		if (psk_identity != NULL && psk_key != NULL)
 			SSL_set_psk_server_callback(tls->ssl, tls_psk_server_cb);
 
 		SSL_set_accept_state(tls->ssl);
+
 		if (1 == (ret = SSL_accept(tls->ssl)) || SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 			tls->ready = 1;
 	}
@@ -451,11 +459,11 @@ static int tls_accept(tls_t *tls)
 static size_t tls_error(tls_t *tls, char **buf)
 {
 	size_t	sz;
+
 	sz = BIO_ctrl_pending(tls->err);
 	if (sz == 0)
 	{
 		long	verify_result;
-		int	result_code;
 
 		if (X509_V_OK != (verify_result = SSL_get_verify_result(tls->ssl)))
 			BIO_printf(tls->err, "%s: ", X509_verify_cert_error_string(verify_result));
@@ -463,10 +471,11 @@ static size_t tls_error(tls_t *tls, char **buf)
 		ERR_print_errors(tls->err);
 		sz = BIO_ctrl_pending(tls->err);
 	}
+
 	if (sz != 0)
 	{
 		*buf = malloc(sz + 1);
-		BIO_read(tls->err, *buf, sz);
+		BIO_read(tls->err, *buf, (int)sz);
 		(*buf)[sz] = '\0';
 	}
 	else
