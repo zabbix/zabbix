@@ -46,7 +46,7 @@
 					.trigger('input');
 			});
 		},
-		clean: function (options) {
+		clean: function() {
 			return this.each(function() {
 				var $textarea = $(this);
 

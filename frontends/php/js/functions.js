@@ -568,15 +568,7 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 	}
 
 	if (typeof params.script_inline !== 'undefined') {
-		if (Array.isArray(params.script_inline)) {
-			var len = params.script_inline.length;
-			for (let i = 0; i < len; i++) {
-				overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline[i]));
-			}
-		}
-		else {
-			overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline));
-		}
+		overlay_dialogue_footer.append(jQuery('<script>').text(params.script_inline));
 	}
 
 	headerid = 'dashbrd-widget-head-title-'+params.dialogueid;

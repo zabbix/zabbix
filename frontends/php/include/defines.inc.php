@@ -1474,6 +1474,9 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
+define('ZBX_POPUP_CONDITION_TYPE_CORRELATION', 0);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
+
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');

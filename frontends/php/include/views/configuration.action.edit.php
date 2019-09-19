@@ -126,7 +126,7 @@ $action_tab->addRow(_('Type of calculation'), [
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
 		->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
-				'condition_type' => 1,
+				'condition_type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
 				'allowed_conditions' => $data['allowedConditions'],
 				'severities' => [
 					'severity_name_0' => $data['config']['severity_name_0'],

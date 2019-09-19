@@ -1,5 +1,4 @@
 <?php
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -20,7 +19,7 @@
 **/
 
 
-$inline_js = '';
+$inline_js = 'jQuery(\'.condition-container .textarea-flexible\').textareaFlexible();';
 
 $form = (new CForm())
 	->cleanItems()
@@ -30,7 +29,7 @@ $form = (new CForm())
 	->addVar('action', 'popup.condition');
 
 switch($data['condition_type']) {
-	case '0':
+	case ZBX_POPUP_CONDITION_TYPE_CORRELATION:
 		require_once dirname(__FILE__).'/../../include/correlation.inc.php';
 
 		$popup_action = 'return conditionPopupSubmit(\'correlation.edit\');';
@@ -171,7 +170,7 @@ switch($data['condition_type']) {
 
 		$form->addItem($flex_container);
 		break;
-	case '1':
+	case ZBX_POPUP_CONDITION_TYPE_ACTION:
 		require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
 		$popup_action = 'return conditionPopupSubmit(\'action.edit\');';
@@ -833,7 +832,7 @@ switch($data['condition_type']) {
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => [require 'app/views/popup.condition.js.php', $inline_js],
+	'script_inline' => $inline_js,
 	'body' => $form->toString(),
 	'buttons' => [
 		[

@@ -91,7 +91,7 @@ if ($data['correlation']['filter']['conditions']) {
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
 		->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
-				'condition_type' => 0
+				'condition_type' => ZBX_POPUP_CONDITION_TYPE_CORRELATION
 			]).', null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
