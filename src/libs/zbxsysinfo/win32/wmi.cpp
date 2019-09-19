@@ -123,7 +123,7 @@ extern "C" void	zbx_co_uninitialize()
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
  *                                                                            *
  * Comments: one value is the value from the first property of the first      *
- *           instance from search result                   *
+ *           instance from search result                                      *
  *                                                                            *
  ******************************************************************************/
 extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values)
