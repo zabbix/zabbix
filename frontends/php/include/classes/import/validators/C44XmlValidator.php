@@ -2013,10 +2013,8 @@ class C44XmlValidator {
 	 * @return array
 	 */
 	public function validateGraphItems(array $data, array $parent_data = null, $path) {
-		if (count($data) === 0) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
-				_s('the tag "%1$s" is missing', 'graph_item')
-			));
+		if (!$data) {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('the tag "%1$s" is missing', 'graph_item')));
 		}
 
 		return $data;
