@@ -437,13 +437,13 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	wmi_namespace = get_rparam(request, 0);
 	wmi_query = get_rparam(request, 1);
 
-	zbx_vector_wmi_instance_create(&wmi_values);
-
 	if (SUCCEED != zbx_co_initialize())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize COM library."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	zbx_vector_wmi_instance_create(&wmi_values);
 
 	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values))
 	{
@@ -906,13 +906,13 @@ extern "C" int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	wmi_namespace = get_rparam(request, 0);
 	wmi_query = get_rparam(request, 1);
 
-	zbx_vector_wmi_instance_create(&wmi_values);
-
 	if (SUCCEED != zbx_co_initialize())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize COM library."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	zbx_vector_wmi_instance_create(&wmi_values);
 
 	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_all, &wmi_values))
 		error = zbx_strdup(error, "Cannot obtain WMI information.");
