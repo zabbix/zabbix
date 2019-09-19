@@ -1287,14 +1287,6 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 			->setTitle($step_param_1_value)
 			->setReadonly($readonly);
 
-		$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
-			? $step['params'][2]
-			: ZBX_PREPROC_CSV_NO_HEADER;
-		$step_param_2 = (new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
-			->setLabel(_('With header row'))
-			->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
-			->setReadonly($readonly);
-
 		// Add corresponding placeholders and show or hide text boxes.
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
@@ -1377,6 +1369,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				break;
 
 			case ZBX_PREPROC_CSV_TO_JSON:
+				$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
+					? $step['params'][2]
+					: ZBX_PREPROC_CSV_NO_HEADER;
+
 				$params = [
 					$step_param_0
 						->setAttribute('placeholder', ',')
@@ -1386,7 +1382,10 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 						->setAttribute('placeholder', '"')
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
-					$step_param_2
+					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
+						->setLabel(_('With header row'))
+						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
+						->setEnabled(!$readonly)
 				];
 				break;
 		}
