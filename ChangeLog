@@ -111,6 +111,7 @@ A......... [ZBX-3783] added strict validation of input parameters in valuemap.ge
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
