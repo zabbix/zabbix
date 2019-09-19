@@ -1312,34 +1312,32 @@ class CConfigurationImport {
 						$graph['ymax_itemid'] = $itemId;
 					}
 
-					if ($graph['gitems']) {
-						foreach ($graph['gitems'] as &$gitem) {
-							$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-							$gitem['itemid'] = $gitemHostId
-								? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
-								: false;
+					foreach ($graph['gitems'] as &$gitem) {
+						$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+						$gitem['itemid'] = $gitemHostId
+							? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+							: false;
 
-							if (!$gitem['itemid']) {
-								throw new Exception(_s(
-									'Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
-									$gitem['item']['key'],
-									$gitem['item']['host'],
-									$graph['name'],
-									$item['name'],
-									$host
-								));
-							}
+						if (!$gitem['itemid']) {
+							throw new Exception(_s(
+								'Cannot find item "%1$s" on "%2$s" used in graph prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
+								$gitem['item']['key'],
+								$gitem['item']['host'],
+								$graph['name'],
+								$item['name'],
+								$host
+							));
 						}
-						unset($gitem);
+					}
+					unset($gitem);
 
-						$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
-						if ($graphId) {
-							$graph['graphid'] = $graphId;
-							$graphsToUpdate[] = $graph;
-						}
-						else {
-							$graphsToCreate[] = $graph;
-						}
+					$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+					if ($graphId) {
+						$graph['graphid'] = $graphId;
+						$graphsToUpdate[] = $graph;
+					}
+					else {
+						$graphsToCreate[] = $graph;
 					}
 				}
 			}
@@ -1543,33 +1541,31 @@ class CConfigurationImport {
 				$graph['ymax_itemid'] = $itemId;
 			}
 
-			if ($graph['gitems']) {
-				foreach ($graph['gitems'] as &$gitem) {
-					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-					$gitem['itemid'] = $gitemHostId
-						? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
-						: false;
+			foreach ($graph['gitems'] as &$gitem) {
+				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				$gitem['itemid'] = $gitemHostId
+					? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+					: false;
 
-					if (!$gitem['itemid']) {
-						throw new Exception(_s(
-							'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
-							$gitem['item']['key'],
-							$gitem['item']['host'],
-							$graph['name']
-						));
-					}
+				if (!$gitem['itemid']) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
+						$gitem['item']['key'],
+						$gitem['item']['host'],
+						$graph['name']
+					));
 				}
-				unset($gitem);
+			}
+			unset($gitem);
 
-				$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+			$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
 
-				if ($graphId) {
-					$graph['graphid'] = $graphId;
-					$graphsToUpdate[] = $graph;
-				}
-				else {
-					$graphsToCreate[] = $graph;
-				}
+			if ($graphId) {
+				$graph['graphid'] = $graphId;
+				$graphsToUpdate[] = $graph;
+			}
+			else {
+				$graphsToCreate[] = $graph;
 			}
 		}
 
