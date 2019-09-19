@@ -45,8 +45,7 @@
 #	include <openssl/rand.h>
 #endif
 
-/* Currently use only TLS 1.2, which has number 3.3. In 2015 a new standard for TLS 1.3 is expected. */
-/* Then we might need to support both TLS 1.2 and 1.3 to work with older Zabbix agents. */
+/* use only TLS 1.2 (which has number 3.3) with PolarSSL */
 #if defined(HAVE_POLARSSL)
 #	define ZBX_TLS_MIN_MAJOR_VER	SSL_MAJOR_VERSION_3
 #	define ZBX_TLS_MIN_MINOR_VER	SSL_MINOR_VERSION_3

@@ -91,7 +91,7 @@ func registerMetric(plugin Accessor, name string, key string, description string
 
 	if p, ok := Plugins[name]; ok {
 		if p != plugin {
-			panic(fmt.Sprintf(`plugin name "%s" has been already registred by other plugin`, name))
+			panic(fmt.Sprintf(`plugin name "%s" has been already registered by other plugin`, name))
 		}
 	} else {
 		Plugins[name] = plugin

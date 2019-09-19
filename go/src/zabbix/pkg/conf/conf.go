@@ -211,7 +211,7 @@ func getNodeValue(node *Node, meta *Meta) (value *string, err error) {
 }
 
 // newNodeError creates error based on the specified node. The error message will
-// have full node name (parametere name up to the node, including it) and the line
+// have full node name (parameter name up to the node, including it) and the line
 // number where parameter was defined.
 func newNodeError(node *Node, format string, a ...interface{}) (err error) {
 	if node == nil {

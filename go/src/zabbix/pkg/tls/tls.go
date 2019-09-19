@@ -29,14 +29,19 @@ package tls
 #include <ctype.h>
 #include "config.h"
 
+#define TLS_UNUSED(var)	(void)(var)
+
+const char	*tls_crypto_init_msg;
+
 #ifdef HAVE_OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
+#include <openssl/rand.h>
 
-#define TLS_EX_DATA_ERRBIO		0
+#define TLS_EX_DATA_ERRBIO	0
 #define TLS_EX_DATA_IDENTITY	1
-#define TLS_EX_DATA_KEY			2
+#define TLS_EX_DATA_KEY		2
 
 typedef SSL_CTX * SSL_CTX_LP;
 
@@ -50,24 +55,40 @@ typedef struct {
 	char *psk_key;
 } tls_t, *tls_lp_t;
 
-static int tls_init()
+static int tls_init(void)
 {
-	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
-	ERR_load_crypto_strings();
-	ERR_load_SSL_strings();
-	OpenSSL_add_all_algorithms();
-	SSL_library_init();
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)
+// OpenSSL 1.1.0 or newer, not LibreSSL
+	if (1 != OPENSSL_init_ssl(OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL))
+	{
+		tls_crypto_init_msg = "cannot initialize OpenSSL library";
+		return -1;
+	}
+
+	if (1 != RAND_status())		// protect against not properly seeded PRNG
+	{
+		tls_crypto_init_msg = "cannot initialize PRNG";
+		return -1;
+	}
+
+	tls_crypto_init_msg = "OpenSSL library successfully initialized";
 	return 0;
+#elif	// OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL - currently not supported
+	zbx_crypto_lib_init_msg = "OpenSSL older than 1.1.0 and LibreSSL currently are not supported";
+	return -1;
+#endif
 }
 
 static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity,
 	unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len)
 {
-	size_t	sz;
+	size_t		sz;
 	const char	*psk_identity, *psk_key;
-	BIO	*err;
-	unsigned char *key;
-	long key_len;
+	BIO		*err;
+	unsigned char 	*key;
+	long		key_len;
+
+	TLS_UNUSED(hint);
 
 	if (NULL == (err = (BIO *)SSL_get_ex_data(ssl, TLS_EX_DATA_ERRBIO)))
 		return 0;
@@ -94,28 +115,30 @@ static unsigned int tls_psk_client_cb(SSL *ssl, const char *hint, char *identity
 	memcpy(identity, psk_identity, sz);
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-	if (key == NULL) {
+	if (key == NULL)
+	{
 		BIO_printf(err, "invalid PSK key");
 		return 0;
 	}
 
-	if (key_len > (long)max_psk_len) {
+	if (key_len > (long)max_psk_len)
+	{
 		BIO_printf(err, "PSK key is too large");
 		OPENSSL_free(key);
 		return 0;
 	}
 
-	memcpy(psk, key, key_len);
+	memcpy(psk, key, (size_t)key_len);
 	OPENSSL_free(key);
-	return key_len;
+	return (unsigned int)key_len;
 }
 
 static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk, unsigned int max_psk_len)
 {
 	const char	*psk_identity, *psk_key;
-	BIO	*err;
-	unsigned char *key;
-	long key_len;
+	BIO		*err;
+	unsigned char	*key;
+	long		key_len;
 
 	if (NULL == (err = (BIO *)SSL_get_ex_data(ssl, TLS_EX_DATA_ERRBIO)))
 		return 0;
@@ -139,29 +162,61 @@ static unsigned int tls_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	}
 
 	key = OPENSSL_hexstr2buf(psk_key, &key_len);
-	if (key == NULL) {
+	if (key == NULL)
+	{
 		BIO_printf(err, "invalid PSK key");
 		return 0;
 	}
 
-	if (key_len > (long)max_psk_len) {
+	if (key_len > (long)max_psk_len)
+	{
 		BIO_printf(err, "PSK key is too large");
 		return 0;
 	}
 
-	memcpy(psk, key, key_len);
+	memcpy(psk, key, (size_t)key_len);
 	OPENSSL_free(key);
-	return key_len;
+	return (unsigned int)key_len;
 }
 
-#define TLS_1_3_CIPHERSUITES "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
-#define TLS_CIPHER_CERT	"RSA+aRSA+AES128"
-#define TLS_CIPHER_PSK	"kPSK+AES128"
+static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
+{
+	EC_KEY	*ecdh;
+	long	res;
+	int	ret = 0;
+
+	// use curve secp256r1/prime256v1/NIST P-256
+
+	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
+		return -1;
+
+	SSL_CTX_set_options(ctx, SSL_OP_SINGLE_ECDH_USE);
+
+	if (1 != (res = SSL_CTX_set_tmp_ecdh(ctx, ecdh)))
+		ret = -1;
+
+	EC_KEY_free(ecdh);
+
+	return ret;
+}
 
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
 		char **error)
 {
-	SSL_CTX	*ctx;
+#define TLS_CIPHER_CERT_ECDHE		"EECDH+aRSA+AES128:"
+#define TLS_CIPHER_CERT			"RSA+aRSA+AES128"
+
+#if defined(HAVE_OPENSSL_WITH_PSK)
+#if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1 or newer
+	// TLS_AES_256_GCM_SHA384 is excluded from client ciphersuite list for PSK based connections.
+	// By default, in TLS 1.3 only *-SHA256 ciphersuites work with PSK.
+#	define TLS_1_3_CIPHERSUITES	"TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256"
+#endif
+// OpenSSL 1.1.0 or newer
+#define TLS_CIPHER_PSK_ECDHE		"kECDHEPSK+AES128:"
+#define TLS_CIPHER_PSK			"kPSK+AES128"
+#endif
+	SSL_CTX		*ctx;
 	int		ret = -1;
 	const char	*ciphers;
 
@@ -175,8 +230,8 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	{
 		if (1 != SSL_CTX_load_verify_locations(ctx, ca_file, NULL))
 			goto out;
+
 		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-		ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
 
 		if (NULL != crl_file)
 		{
@@ -185,16 +240,17 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 			int		count_cert;
 
 			store_cert = SSL_CTX_get_cert_store(ctx);
+
 			if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 				goto out;
+
 			if (0 >= (count_cert = X509_load_crl_file(lookup_cert, crl_file, X509_FILETYPE_PEM)))
 				goto out;
+
 			if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 				goto out;
 		}
 	}
-	else
-		ciphers = TLS_CIPHER_PSK;
 
 	if (NULL != cert_file && 1 != SSL_CTX_use_certificate_chain_file(ctx, cert_file))
 		goto out;
@@ -207,12 +263,28 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	SSL_CTX_clear_options(ctx, SSL_OP_LEGACY_SERVER_CONNECT);
 	SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_OFF);
 
+	// try to enable ECDH ciphersuites
+	if (0 == zbx_set_ecdhe_parameters(ctx))
+	{
+		if (NULL != ca_file)
+			ciphers = TLS_CIPHER_CERT_ECDHE TLS_CIPHER_CERT ":" TLS_CIPHER_PSK_ECDHE TLS_CIPHER_PSK;
+		else
+			ciphers = TLS_CIPHER_PSK_ECDHE TLS_CIPHER_PSK;
+	}
+	else
+	{
+		if (NULL != ca_file)
+			ciphers = TLS_CIPHER_CERT ":" TLS_CIPHER_PSK;
+		else
+			ciphers = TLS_CIPHER_PSK;
+	}
+
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1
 	if (1 != SSL_CTX_set_ciphersuites(ctx, TLS_1_3_CIPHERSUITES))
 		goto out;
 #endif
 
-	if (0 == SSL_CTX_set_cipher_list(ctx, ciphers))
+	if (1 != SSL_CTX_set_cipher_list(ctx, ciphers))
 		goto out;
 
 	ret = 0;
@@ -226,15 +298,16 @@ out:
 		BIO_set_nbio(err, 1);
 		ERR_print_errors(err);
 
-		sz = BIO_ctrl_pending(err);
+		sz = (int)BIO_ctrl_pending(err);
 		if (sz != 0)
 		{
-			*error = malloc(sz + 1);
+			*error = malloc((size_t)sz + 1);
 			BIO_read(err, *error, sz);
 			(*error)[sz] = '\0';
 		}
 		else
 			*error = strdup("unknown openssl error");
+
 		BIO_vfree(err);
 		if (NULL != ctx)
 		{
@@ -253,7 +326,6 @@ static void tls_free_context(SSL_CTX_LP ctx)
 static int tls_new(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key, tls_t **ptls)
 {
 	tls_t	*tls;
-	int		ret;
 
 	*ptls = tls = malloc(sizeof(tls_t));
 	memset(tls, 0, sizeof(tls_t));
@@ -312,13 +384,14 @@ static tls_t *tls_new_server(SSL_CTX_LP ctx, const char *psk_identity, const cha
 	if (0 == tls_new(ctx, psk_identity, psk_key, &tls))
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1 or newer, or LibreSSL
-		if (1 != SSL_set_session_id_context(tls->ssl, "Zbx", sizeof("Zbx") - 1))
+		if (1 != SSL_set_session_id_context(tls->ssl, (const unsigned char *)"Zbx", sizeof("Zbx") - 1))
 			return tls;
 #endif
 		if (psk_identity != NULL && psk_key != NULL)
 			SSL_set_psk_server_callback(tls->ssl, tls_psk_server_cb);
 
 		SSL_set_accept_state(tls->ssl);
+
 		if (1 == (ret = SSL_accept(tls->ssl)) || SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 			tls->ready = 1;
 	}
@@ -382,14 +455,15 @@ static int tls_accept(tls_t *tls)
 	}
 	return 0;
 }
+
 static size_t tls_error(tls_t *tls, char **buf)
 {
 	size_t	sz;
+
 	sz = BIO_ctrl_pending(tls->err);
 	if (sz == 0)
 	{
 		long	verify_result;
-		int	result_code;
 
 		if (X509_V_OK != (verify_result = SSL_get_verify_result(tls->ssl)))
 			BIO_printf(tls->err, "%s: ", X509_verify_cert_error_string(verify_result));
@@ -397,10 +471,11 @@ static size_t tls_error(tls_t *tls, char **buf)
 		ERR_print_errors(tls->err);
 		sz = BIO_ctrl_pending(tls->err);
 	}
+
 	if (sz != 0)
 	{
 		*buf = malloc(sz + 1);
-		BIO_read(tls->err, *buf, sz);
+		BIO_read(tls->err, *buf, (int)sz);
 		(*buf)[sz] = '\0';
 	}
 	else
@@ -466,7 +541,7 @@ static int	tls_get_x509_name(tls_t *tls, X509_NAME *dn, char **name)
 	return ret;
 }
 
-static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+static int tls_validate_issuer_and_subject(tls_t *tls, const char *issuer, const char *subject)
 {
 	X509	*cert;
 	char *peer_issuer = NULL, *peer_subject = NULL;
@@ -516,18 +591,62 @@ static void tls_description(tls_t *tls, char **desc)
 
 	ptr += snprintf(ptr, sizeof(buf), "%s %s", SSL_get_version(tls->ssl), SSL_get_cipher(tls->ssl));
 
-	if (NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
+	if ((sizeof(buf) - 1 > (size_t)(ptr - buf)) && NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
 	{
 		if (0 == tls_get_x509_name(tls, X509_get_issuer_name(cert), &peer_issuer) &&
 			0 == tls_get_x509_name(tls, X509_get_subject_name(cert), &peer_subject))
 		{
-			ptr += snprintf(ptr, sizeof(buf) + ptr - buf, ", peer certificate issuer:\"%s\" subject:\"%s\"",
-			peer_issuer, peer_subject);
+			// ensure buffer length for writing at least ', peer certificate issuer:" " subject:" "'
+			if (sizeof(buf) - (size_t)(ptr - buf) > 41)
+			{
+				snprintf(ptr, sizeof(buf) - (size_t)(ptr - buf),
+						", peer certificate issuer:\"%s\" subject:\"%s\"",
+						peer_issuer, peer_subject);
+			}
 		}
 	}
 	*desc = strdup(buf);
 	free(peer_issuer);
 	free(peer_subject);
+}
+
+//*****************************************************************************
+//                                                                           //
+// Function: tls_describe_ciphersuites                                       //
+//                                                                           //
+// Purpose: write names of enabled OpenSSL ciphersuites into dynamically     //
+//          allocated string                                                 //
+//                                                                           //
+//*****************************************************************************
+static void tls_describe_ciphersuites(SSL_CTX_LP ctx, char **desc)
+{
+#define TLS_CIPHERS_BUF_LEN	8192
+
+	int			i, num;
+	size_t			offset = 0;
+	STACK_OF(SSL_CIPHER)	*cipher_list;
+	char			buf[TLS_CIPHERS_BUF_LEN];
+
+	buf[0] = '\0';
+	cipher_list = SSL_CTX_get_ciphers(ctx);
+	num = sk_SSL_CIPHER_num(cipher_list);
+
+	for (i = 0; i < num; i++)
+	{
+		offset += (size_t)snprintf(buf + offset, sizeof(buf) - offset, " %s",
+				SSL_CIPHER_get_name(sk_SSL_CIPHER_value(cipher_list, i)));
+
+		if (sizeof(buf) - 2 <= offset)
+		{
+			const char	*msg = "...(truncated)";
+
+			snprintf(buf + sizeof(buf) - strlen(msg) - 1, strlen(msg) + 1, "%s", msg);
+			break;
+		}
+	}
+	*desc = strdup(buf);
+
+#undef TLS_CIPHERS_BUF_LEN
 }
 
 #else // HAVE_OPENSSL 0
@@ -537,93 +656,136 @@ typedef void * SSL_CTX_LP;
 typedef struct {
 } tls_t, *tls_lp_t;
 
-static int tls_init()
+static int tls_init(void)
 {
+	tls_crypto_init_msg = "encryption support was not compiled in";
 	return -1;
 }
 
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
 		 char **error)
 {
+	TLS_UNUSED(ca_file);
+	TLS_UNUSED(crl_file);
+	TLS_UNUSED(cert_file);
+	TLS_UNUSED(key_file);
 	*error = strdup("built without OpenSSL");
 	return NULL;
 }
 
 static void tls_free_context(SSL_CTX_LP ctx)
 {
+	TLS_UNUSED(ctx);
 }
 
 static tls_t *tls_new_client(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
 {
+	TLS_UNUSED(ctx);
+	TLS_UNUSED(psk_identity);
+	TLS_UNUSED(psk_key);
 	return NULL;
 }
 
 static tls_t *tls_new_server(SSL_CTX_LP ctx, const char *psk_identity, const char *psk_key)
 {
+	TLS_UNUSED(ctx);
+	TLS_UNUSED(psk_identity);
+	TLS_UNUSED(psk_key);
 	return NULL;
 }
 
 static int tls_recv(tls_t *tls, char *buf, int size)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(size);
 	return 0;
 }
 
 static int tls_send(tls_t *tls, char *buf, int size)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(size);
 	return 0;
 }
 
 static int tls_connected(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_write(tls_t *tls, char *buf, int len)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(len);
 	return 0;
 }
 
 static int tls_read(tls_t *tls, char *buf, int len)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
+	TLS_UNUSED(len);
 	return 0;
 }
 
 static int tls_handshake(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_accept(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static size_t tls_error(tls_t *tls, char **buf)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(buf);
 	return 0;
 }
 
 static int tls_ready(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static int tls_close(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 	return 0;
 }
 
 static void tls_free(tls_t *tls)
 {
+	TLS_UNUSED(tls);
 }
 
-static int tls_validate_issuer_and_subect(tls_t *tls, const char *issuer, const char *subject)
+static int tls_validate_issuer_and_subject(tls_t *tls, const char *issuer, const char *subject)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(issuer);
+	TLS_UNUSED(subject);
 	return 0;
 }
 
 static void tls_description(tls_t *tls, char **desc)
 {
+	TLS_UNUSED(tls);
+	TLS_UNUSED(desc);
+}
+
+static void tls_describe_ciphersuites(SSL_CTX_LP ciphers, char **desc)
+{
+	TLS_UNUSED(ciphers);
+	TLS_UNUSED(desc);
 }
 
 #endif
@@ -640,6 +802,34 @@ import (
 	"unsafe"
 	"zabbix/pkg/log"
 )
+
+// TLS initialization
+var supported bool      // is TLS compiled in and successfully initialized
+var supportedMsg string // reason why TLS is not supported
+
+func Supported() bool {
+	return supported
+}
+
+func SupportedErrMsg() string {
+	return supportedMsg
+}
+
+func init() {
+	supported = C.tls_init() != -1
+
+	if !supported {
+		supportedMsg = C.GoString(C.tls_crypto_init_msg)
+	}
+}
+
+func describeCiphersuites(context unsafe.Pointer) (desc string) {
+	var cDesc *C.char
+	C.tls_describe_ciphersuites(C.SSL_CTX_LP(context), &cDesc)
+	desc = C.GoString(cDesc)
+	C.free(unsafe.Pointer(cDesc))
+	return
+}
 
 type tlsConn struct {
 	conn    net.Conn
@@ -718,7 +908,6 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 func (c *tlsConn) Close() (err error) {
 	cr := C.tls_close(C.tls_lp_t(c.tls))
 	c.conn.Close()
-	c.tls = nil
 	if cr < 0 {
 		return c.Error()
 	}
@@ -736,7 +925,7 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 			cSubject = C.CString(cfg.ServerCertSubject)
 			defer C.free(unsafe.Pointer(cSubject))
 		}
-		if 0 != C.tls_validate_issuer_and_subect(C.tls_lp_t(c.tls), cIssuer, cSubject) {
+		if 0 != C.tls_validate_issuer_and_subject(C.tls_lp_t(c.tls), cIssuer, cSubject) {
 			return c.Error()
 		}
 	}
@@ -817,7 +1006,7 @@ func NewClient(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nc, nil
 	}
 	if !supported {
-		return nil, errors.New("built without TLS support")
+		return nil, errors.New(SupportedErrMsg())
 	}
 	var cfg *Config
 	var ok bool
@@ -940,16 +1129,12 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 		return nc, nil
 	}
 	if !supported {
-		return nil, errors.New("built without TLS support")
+		return nil, errors.New(SupportedErrMsg())
 	}
 	var cfg *Config
 	var ok bool
 	if cfg, ok = args[0].(*Config); !ok {
 		return nil, fmt.Errorf("invalid configuration parameter of type %T", args)
-	}
-
-	if cfg.Accept == ConnUnencrypted {
-		return nc, nil
 	}
 
 	var cUser, cSecret *C.char
@@ -1013,7 +1198,6 @@ func NewServer(nc net.Conn, args ...interface{}) (conn net.Conn, err error) {
 	return s, nil
 }
 
-var supported bool
 var pskContext, defaultContext unsafe.Pointer
 
 const (
@@ -1035,12 +1219,9 @@ type Config struct {
 	ServerCertSubject string
 }
 
-func Supported() bool {
-	return supported
-}
 func Init(config *Config) (err error) {
 	if !supported {
-		return errors.New("built without TLS support")
+		return errors.New(SupportedErrMsg())
 	}
 	if pskContext != nil {
 		C.tls_free_context(C.SSL_CTX_LP(pskContext))
@@ -1065,18 +1246,18 @@ func Init(config *Config) (err error) {
 	}
 
 	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
-		err = fmt.Errorf("cannot initialize global TLS context: %s", C.GoString(cErr))
+		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
+	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
+
 	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
-	return
-}
+	log.Debugf("psk context ciphersuites:%s", describeCiphersuites(pskContext))
 
-func init() {
-	supported = C.tls_init() != -1
+	return
 }

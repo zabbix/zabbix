@@ -294,7 +294,7 @@ func ParseKey(text string) (key string, params []string, err error) {
 }
 
 // ParseAlias parses Alias in format name:key and returns the name
-// and the key seperatly without changes
+// and the key separately without changes
 func ParseAlias(text string) (key1, key2 string, err error) {
 	var left, left2 []byte
 	if _, _, left, err = parseKey([]byte(text)); err != nil {
