@@ -148,6 +148,9 @@ class CRequest {
 		$primary = $this->primary();
 
 		if (!$primary) {
+			foreach ($this->call_stack as $commit) {
+				$commit->undo($client);
+			}
 			return null;
 		}
 
