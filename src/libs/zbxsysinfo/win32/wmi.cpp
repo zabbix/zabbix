@@ -69,7 +69,7 @@ typedef int	(*zbx_parse_wmi_t)(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi
 
 ZBX_THREAD_LOCAL static int	com_initialized = 0;
 
-extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, const char *prop_err, VARIANT *vtProp,
+extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VARIANT *vtProp, struct zbx_json *jdoc,
 		char **error);
 
 extern "C" int	zbx_co_initialize()
@@ -532,8 +532,8 @@ out:
  *                                                                            *
  * Purpose: take one element from array and put value to JSON document        *
  *                                                                            *
- * Parameters: sa       - [IN] - SafeArray from WMI property                  *
- *             aIndex   - [IN] - ID of element in array                       *
+ * Parameters: sa       - [IN]     - SafeArray from WMI property              *
+ *             index    - [IN]     - ID of element in array                   *
  *             prop_err - [IN]     - json attribute name                      *
  *             jdoc     - [IN/OUT] - JSON document                            *
  *             error    - [OUT]    - the error description                    *
@@ -542,7 +542,7 @@ out:
  *               SYSINFO_RET_FAIL - transformation of variant array failed    *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_err, struct zbx_json *jdoc,
+extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *index, const char *prop_err, struct zbx_json *jdoc,
 		char **error)
 {
 	HRESULT	hres;
@@ -552,7 +552,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 	VARIANT	arProp;
 
 	pbData = (BYTE*)zbx_malloc(NULL, (size_t)SafeArrayGetElemsize(sa));
-	hres = SafeArrayGetElement(sa, aIndex, pbData);
+	hres = SafeArrayGetElement(sa, index, pbData);
 
 	if (FAILED(hres))
 	{
@@ -654,7 +654,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
 	}
 
 	if (SYSINFO_RET_OK == ret)
-		ret = put_variant_json(jdoc, NULL, prop_err, &arProp, error);
+		ret = put_variant_json(NULL, prop_err, &arProp, jdoc, error);
 
 	VariantClear(&arProp);
 	zbx_free(pbData);
@@ -672,7 +672,7 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *aIndex, const char *prop_er
  *             prop_name  - [IN]     - json attribute name                    *
  *             dim        - [IN]     - dimension of array                     *
  *             offset_dim - [IN]     - index of dimension for processing      *
- *             aIndex     - [IN/OUT] - index of element in the array          *
+ *             index      - [IN/OUT] - index of element in the array          *
  *             jdoc       - [IN/OUT] - JSON document                          *
  *             error      - [OUT]    - the error description                  *
  *                                                                            *
@@ -749,7 +749,7 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
  *               SYSINFO_RET_FAIL - transformation of variant failed          *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, const char *prop_err, VARIANT *vtProp,
+extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VARIANT *vtProp, struct zbx_json *jdoc,
 		char **error)
 {
 	HRESULT	hres;
@@ -798,9 +798,9 @@ extern "C" int	put_variant_json(struct zbx_json *jdoc, const char *prop_json, co
 
 			if (V_ISARRAY(vtProp))
 			{
-				LONG *aIndex = NULL;
-				ret = convert_wmiarray_json(vtProp, prop_json, 0, 0, &aIndex, jdoc, error);
-				zbx_free(aIndex);
+				LONG *index = NULL;
+				ret = convert_wmiarray_json(vtProp, prop_json, 0, 0, &index, jdoc, error);
+				zbx_free(index);
 				break;
 			}
 
@@ -858,7 +858,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 					(wchar_t *)_bstr_t(wmi_values->values[inst_i]->values[prop_i].name));
 
 			zbx_json_escape(&prop_name);
-			ret = put_variant_json(&j, prop_name, prop_name, vtProp, error);
+			ret = put_variant_json(prop_name, prop_name, vtProp, &j, error);
 			zbx_free(prop_name);
 		}
 
