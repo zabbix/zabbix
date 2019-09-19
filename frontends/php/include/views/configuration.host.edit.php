@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
+require_once dirname(__FILE__).'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
@@ -588,14 +589,15 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$linkedTemplateTable->addRow([
 		(new CSimpleButton(_('Add')))
 			->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
-					'dstfrm' => $frmHost->getName(),
-					'dstfld1' => $frmHost->getName(),
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'templated_hosts' => '1',
-					'popup_type' => 'templates',
-					'disableids' => $disableids
-				]).', null, this);')
+				'dstfrm' => $frmHost->getName(),
+				'dstfld1' => $frmHost->getName(),
+				'srctbl' => 'templates',
+				'srcfld1' => 'hostid',
+				'templated_hosts' => '1',
+				'popup_type' => 'templates',
+				'multiselect' => 1,
+				'disableids' => $disableids
+			]).', null, this);')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 

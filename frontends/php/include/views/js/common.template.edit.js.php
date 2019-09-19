@@ -29,7 +29,9 @@
 			return false;
 		}
 
-		create_var(data.parentId, 'add_templates[]', data.values[0].id, false);
+		for (var i = 0, len = data.values.length; i < len; i++) {
+			create_var(data.parentId, 'add_templates[' + data.values[i].id + ']', data.values[i].id, false);
+		}
 
 		submitFormWithParam(data.parentId, "add_template", "1");
 	}
