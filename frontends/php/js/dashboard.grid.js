@@ -385,34 +385,32 @@
 				'hidden_header': 'dashbrd-grid-widget-hidden-header'
 			};
 
-		// Calculate the dashboard offset (0, 1 or 2 lines) based on currenntly shown widget headers.
+		// Calculate the dashboard offset (0, 1 or 2 lines) based on focused widget.
 
 		var slide_lines = 0;
 
-		data['widgets'].each(function(widget) {
-			if (widget['div'].position().top !== 0) {
-				return;
-			}
-
-			var classes = widget['iterator'] ? iterator_classes : widget_classes;
+		for (var index = 0; index < data['widgets'].length; index++) {
+			var widget = data['widgets'][index],
+				classes = widget['iterator'] ? iterator_classes : widget_classes;
 
 			if (!widget['div'].hasClass(classes['focus'])) {
-				return;
+				continue;
+			}
+
+			// Focused widget not on the first row of dashboard?
+			if (widget['div'].position().top !== 0) {
+				break;
 			}
 
 			if (widget['iterator']) {
-				slide_lines = Math.max(1, slide_lines);
+				slide_lines = widget['div'].hasClass('iterator-double-header') ? 2 : 1;
+			}
+			else if (widget['div'].hasClass(classes['hidden_header'])) {
+				slide_lines = 1;
+			}
 
-				if (widget['div'].hasClass('iterator-double-header')) {
-					slide_lines = Math.max(2, slide_lines);
-				}
-			}
-			else {
-				if (widget['div'].hasClass(classes['hidden_header'])) {
-					slide_lines = Math.max(1, slide_lines);
-				}
-			}
-		});
+			break;
+		}
 
 		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
 
