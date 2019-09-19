@@ -314,7 +314,7 @@
 		widget['div'].addClass('dashbrd-grid-widget-focus');
 
 		if (widget['parent']['div'].hasClass('dashbrd-grid-iterator-hidden-header')) {
-			widget['parent']['div'].toggleClass('iterator-double-header', widget['div'].position().top === 0);
+			widget['parent']['div'].toggleClass('iterator-double-header', widget['div'].position().top == 0);
 		}
 	}
 
@@ -398,7 +398,7 @@
 			}
 
 			// Focused widget not on the first row of dashboard?
-			if (widget['div'].position().top !== 0) {
+			if (widget['div'].position().top != 0) {
 				break;
 			}
 
@@ -1701,7 +1701,7 @@
 					// Set single-line header for the iterator.
 					iterator['div'].removeClass('iterator-double-header');
 
-					if (data['options']['kioskmode'] && iterator['div'].position().top === 0) {
+					if (data['options']['kioskmode'] && iterator['div'].position().top == 0) {
 						slideKiosk($obj, data);
 					}
 				})
