@@ -654,7 +654,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_odbc_query_result_to_json                                    *
+ * Function: zbx_odbc_query_result_to_lld_json                                *
  *                                                                            *
  * Purpose: public wrapper for odbc_query_result_to_json                      *
  *                                                                            *
