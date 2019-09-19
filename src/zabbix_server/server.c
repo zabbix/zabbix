@@ -939,11 +939,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define SMTP_AUTH_FEATURE_STATUS	" NO"
 #endif
-#ifdef HAVE_JABBER
-#	define JABBER_FEATURE_STATUS	"YES"
-#else
-#	define JABBER_FEATURE_STATUS	" NO"
-#endif
 #ifdef HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS	"YES"
 #else
@@ -974,8 +969,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Web monitoring:            " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "Jabber notifications:      " JABBER_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:              " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);

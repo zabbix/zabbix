@@ -335,44 +335,46 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$fields = [
-			'dstfrm' =>						'string|fatal',
-			'dstfld1' =>					'string|not_empty',
-			'srctbl' =>						'string',
-			'srcfld1' =>					'string|required|in '.$this->popup_properties[$this->source_table]['allowed_src_fields'],
-			'groupid' =>					'db hstgrp.groupid',
-			'group' =>						'string',
-			'hostid' =>						'db hosts.hostid',
-			'host' =>						'string',
-			'parent_discoveryid' =>			'db items.itemid',
-			'screenid' =>					'db screens.screenid',
-			'templates' =>					'string|not_empty',
-			'host_templates' =>				'string|not_empty',
-			'multiselect' =>				'in 1',
-			'patternselect' =>				'in 1',
-			'submit' =>						'string',
-			'excludeids' =>					'array',
-			'disableids' =>					'array',
-			'only_hostid' =>				'db hosts.hostid',
-			'monitored_hosts' =>			'in 1',
-			'templated_hosts' =>			'in 1',
-			'real_hosts' =>					'in 1',
-			'normal_only' =>				'in 1',
-			'with_applications' =>			'in 1',
-			'with_graphs' =>				'in 1',
-			'with_items' =>					'in 1',
-			'with_simple_graph_items' =>	'in 1',
-			'with_triggers' =>				'in 1',
-			'with_monitored_triggers' =>	'in 1',
-			'with_webitems' =>				'in 1',
-			'itemtype' =>					'in '.implode(',', $this->allowed_item_types),
-			'value_types' =>				'array',
-			'numeric' =>					'in 1',
-			'reference' =>					'string',
-			'orig_names' =>					'in 1',
-			'writeonly' =>					'in 1',
-			'noempty' =>					'in 1',
-			'submit_parent' =>				'in 1',
-			'enrich_parent_groups' =>		'in 1'
+			'dstfrm' =>								'string|fatal',
+			'dstfld1' =>							'string|not_empty',
+			'srctbl' =>								'string',
+			'srcfld1' =>							'string|required|in '.$this->popup_properties[$this->source_table]['allowed_src_fields'],
+			'groupid' =>							'db hstgrp.groupid',
+			'group' =>								'string',
+			'hostid' =>								'db hosts.hostid',
+			'host' =>								'string',
+			'parent_discoveryid' =>					'db items.itemid',
+			'screenid' =>							'db screens.screenid',
+			'templates' =>							'string|not_empty',
+			'host_templates' =>						'string|not_empty',
+			'multiselect' =>						'in 1',
+			'patternselect' =>						'in 1',
+			'submit' =>								'string',
+			'excludeids' =>							'array',
+			'disableids' =>							'array',
+			'only_hostid' =>						'db hosts.hostid',
+			'monitored_hosts' =>					'in 1',
+			'templated_hosts' =>					'in 1',
+			'real_hosts' =>							'in 1',
+			'normal_only' =>						'in 1',
+			'with_applications' =>					'in 1',
+			'with_graphs' =>						'in 1',
+			'with_graph_prototypes' =>				'in 1',
+			'with_items' =>							'in 1',
+			'with_simple_graph_items' =>			'in 1',
+			'with_simple_graph_item_prototypes' =>	'in 1',
+			'with_triggers' =>						'in 1',
+			'with_monitored_triggers' =>			'in 1',
+			'with_webitems' =>						'in 1',
+			'itemtype' =>							'in '.implode(',', $this->allowed_item_types),
+			'value_types' =>						'array',
+			'numeric' =>							'in 1',
+			'reference' =>							'string',
+			'orig_names' =>							'in 1',
+			'writeonly' =>							'in 1',
+			'noempty' =>							'in 1',
+			'submit_parent' =>						'in 1',
+			'enrich_parent_groups' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -538,25 +540,14 @@ class CControllerPopupGeneric extends CController {
 			$options['hosts']['templated_hosts'] = true;
 		}
 
-		if ($this->hasInput('with_applications')) {
-			$options['groups']['with_applications'] = true;
-			$options['hosts']['with_applications'] = true;
-		}
-		elseif ($this->hasInput('with_graphs')) {
-			$options['groups']['with_graphs'] = true;
-			$options['hosts']['with_graphs'] = true;
-		}
-		elseif ($this->hasInput('with_simple_graph_items')) {
-			$options['groups']['with_simple_graph_items'] = true;
-			$options['hosts']['with_simple_graph_items'] = true;
-		}
-		elseif ($this->hasInput('with_triggers')) {
-			$options['groups']['with_triggers'] = true;
-			$options['hosts']['with_triggers'] = true;
-		}
-		elseif ($this->hasInput('with_monitored_triggers')) {
-			$options['groups']['with_monitored_triggers'] = true;
-			$options['hosts']['with_monitored_triggers'] = true;
+		foreach (['with_applications', 'with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
+				'with_simple_graph_item_prototypes', 'with_triggers', 'with_monitored_triggers'] as $name) {
+			if ($this->hasInput($name)) {
+				$options['groups'][$name] = true;
+				$options['hosts'][$name] = true;
+
+				break;
+			}
 		}
 
 		$page_filter = new CPageFilter($options);
@@ -614,8 +605,9 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		$option_fields_binary = ['enrich_parent_groups', 'monitored_hosts', 'noempty', 'normal_only', 'numeric',
-			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs', 'with_items',
-			'with_monitored_triggers', 'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
+			'real_hosts', 'submit_parent', 'templated_hosts', 'with_applications', 'with_graphs',
+			'with_graph_prototypes', 'with_items', 'with_simple_graph_item_prototypes', 'with_monitored_triggers',
+			'with_simple_graph_items', 'with_triggers', 'with_webitems', 'writeonly'];
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
 				$page_options[$field] = true;

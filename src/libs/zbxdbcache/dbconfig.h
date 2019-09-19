@@ -508,6 +508,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	unsigned char	autoreg_tls_accept;
 	const char	*db_extension;
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
@@ -806,6 +807,8 @@ typedef struct
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
+	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
+	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 }
 ZBX_DC_CONFIG;
 

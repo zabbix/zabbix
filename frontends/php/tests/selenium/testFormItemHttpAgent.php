@@ -1354,7 +1354,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$old_hash = CDBHelper::getHash($sql_hash);
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID);
 
-		foreach (CDBHelper::getAll('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' LIMIT 1') as $item) {
+		foreach (CDBHelper::getRandom('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.
+				' AND hostid='.self::HOSTID , 1) as $item) {
 			$name = $item['name'];
 			$this->zbxTestClickLinkText($name);
 

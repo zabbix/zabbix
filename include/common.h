@@ -440,9 +440,7 @@ typedef enum
 {
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
-	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_JABBER,
-	MEDIA_TYPE_EZ_TEXTING = 100
+	MEDIA_TYPE_SMS
 }
 zbx_media_type_t;
 
@@ -938,7 +936,6 @@ int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
-int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
@@ -1202,7 +1199,6 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
-char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
@@ -1291,6 +1287,10 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 #define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
+
+#define ZBX_PSK_FOR_HOST		0x01				/* PSK can be used for a known host */
+#define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
+#define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
@@ -1536,6 +1536,8 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 int	zbx_validate_value_dbl(double value);
 
 void	zbx_update_env(double time_now);
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
+		int refresh_unsupported, int *nextcheck, char **error);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);

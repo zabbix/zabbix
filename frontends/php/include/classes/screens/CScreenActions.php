@@ -76,7 +76,7 @@ class CScreenActions extends CScreenBase {
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
 			],
-			'selectMediatypes' => ['description', 'maxattempts'],
+			'selectMediatypes' => ['name', 'maxattempts'],
 			'filter' => [
 				'alerttype' => ALERT_TYPE_MESSAGE
 			],
@@ -141,7 +141,7 @@ class CScreenActions extends CScreenBase {
 
 			$action_type = '';
 			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
-				$action_type = $alert['mediatypes'][0]['description'];
+				$action_type = $alert['mediatypes'][0]['name'];
 				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
 			}
 
