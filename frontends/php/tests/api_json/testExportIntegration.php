@@ -27,24 +27,42 @@ class testExportIntegration extends CBaseCase {
 	public function template() {
 		$sdk = new CSDK();
 
+		$data = $sdk->templateCreate([
+			'host' => 'h1',
+			'groups' => [
+				['groupid' => $sdk->hostgroupCreate([
+					'name' => 'hg1'
+				])],
+				['groupid' => $sdk->hostgroupCreate([
+					'name' => 'hg2'
+				])]
+			]
+		]);
+
 		return [
 			[
-				'template' => $sdk->templateCreate([
-					'host' => 'h1',
-					'groups' => [
-						['groupid' => $sdk->hostgroupCreate([
-							'name' => 'hg1'
-						])],
-						['groupid' => $sdk->hostgroupCreate([
-							'name' => 'hg2'
-						])]
-					]
-				]),
+				'template' => clone $data,
 				'unset' => function(&$export) {unset($export['zabbix_export']['templates'][0]['groups']);},
 				'assertions' => [
 					'expected' => 'fail',
 					'error_message' => 'Application error.',
 					'error_details' => 'Invalid tag "/zabbix_export/templates/template(1)": the tag "groups" is missing.'
+				]
+			],
+			[
+				'template' => clone $data,
+				'unset' => function(&$export) {unset($export['zabbix_export']['templates'][0]['groups']);},
+				'assertions' => [
+					'expected' => 'fail',
+					'error_message' => 'Application error.',
+					'error_details' => 'Invalid tag "/zabbix_export/templates/template(1)": the tag "groups" is missing.'
+				]
+			],
+			[
+				'template' => clone $data,
+				'unset' => function() {},
+				'assertions' => [
+					'expected' => 'success'
 				]
 			]
 		];
@@ -131,6 +149,7 @@ class testExportIntegration extends CBaseCase {
 			}
 		}
 		else {
+			$template->delete($this->client);
 			$this->assertNull($error);
 			$this->assertTrue($result);
 		}

@@ -235,6 +235,18 @@ class CRequest {
 		return $resolved_params;
 	}
 
+	public function __clone() {
+		foreach ($this->call_stack as &$value) {
+			$value = clone $value;
+		}
+
+		array_walk_recursive($this->params, function(&$value) {
+			if ($value instanceof CRequest) {
+				$value = clone $value;
+			}
+		});
+	}
+
 	public function __invoke(CClient &$client) {
 		if ($this->client_resp) {
 			return $this->client_resp;
