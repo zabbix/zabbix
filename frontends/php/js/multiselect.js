@@ -923,10 +923,11 @@ jQuery(function($) {
 
 	function addAvailable(item, $obj, values, options) {
 		var is_new = item.isNew || false,
+			prefix = item.prefix || '',
 			search = values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
 			$li = $('<li>', {
 				'data-id': item.id,
-				'data-label': (item.prefix || '') + item.name
+				'data-label': prefix + item.name
 			})
 			.on('click', function() {
 				select(item.id, $obj, values, options);
@@ -936,8 +937,8 @@ jQuery(function($) {
 				$li.addClass('suggest-hover');
 			});
 
-		if (typeof item.prefix !== 'undefined') {
-			$li.append($('<span>', {'class': 'grey', text: item.prefix}));
+		if (prefix !== '') {
+			$li.append($('<span>', {'class': 'grey', text: prefix}));
 		}
 
 		// highlight matched
