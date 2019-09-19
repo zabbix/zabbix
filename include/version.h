@@ -37,4 +37,6 @@
 				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
 #define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
 
+int	zbx_get_component_version(char *value);
+
 #endif

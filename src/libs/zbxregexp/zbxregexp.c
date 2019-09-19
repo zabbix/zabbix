@@ -147,9 +147,9 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags
  ****************************************************************************************************/
 static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, const char **err_msg_static)
 {
-	ZBX_THREAD_LOCAL static zbx_regexp_t	*curr_regexp = NULL;
-	ZBX_THREAD_LOCAL static char		*curr_pattern = NULL;
-	ZBX_THREAD_LOCAL static int		curr_flags = 0;
+	static ZBX_THREAD_LOCAL zbx_regexp_t	*curr_regexp = NULL;
+	static ZBX_THREAD_LOCAL char		*curr_pattern = NULL;
+	static ZBX_THREAD_LOCAL int		curr_flags = 0;
 	int					ret = SUCCEED;
 
 	if (NULL == curr_regexp || 0 != strcmp(curr_pattern, pattern) || curr_flags != flags)
@@ -203,7 +203,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
 
 	int				result, r;
-	ZBX_THREAD_LOCAL static int	matches_buff[MATCHES_BUFF_SIZE];
+	static ZBX_THREAD_LOCAL int	matches_buff[MATCHES_BUFF_SIZE];
 	int				*ovector = NULL;
 	int				ovecsize = 3 * count;		/* see pcre_exec() in "man pcreapi" why 3 */
 	struct pcre_extra		extra, *pextra;
