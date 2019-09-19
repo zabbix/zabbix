@@ -67,7 +67,7 @@ extern "C" static void	wmi_instance_clear(zbx_vector_wmi_prop_t *wmi_inst_value)
 
 typedef int	(*zbx_parse_wmi_t)(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values);
 
-ZBX_THREAD_LOCAL static int	com_initialized = 0;
+static ZBX_THREAD_LOCAL int	com_initialized = 0;
 
 extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VARIANT *vtProp, struct zbx_json *jdoc,
 		char **error);
