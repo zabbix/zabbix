@@ -24,10 +24,17 @@ class CEventTagsParserTest extends PHPUnit_Framework_TestCase {
 	public function testProvider() {
 		return [
 			[
-				'{EVENT.TAGS."Jira Id"}', 0, [
+				CEventTagsParser::TRIM_QUOTE_MARKS, '{EVENT.TAGS."Jira Id"}', 0, [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{EVENT.TAGS."Jira Id"}',
 					'parts' => ['EVENT', 'TAGS', 'Jira Id']
+				]
+			],
+			[
+				0, '{EVENT.TAGS."{} \"\\\}"}', 0, [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{EVENT.TAGS."{} \"\\\}"}',
+					'parts' => ['EVENT', 'TAGS', '"{} \"\\\}"']
 				]
 			]
 		];
@@ -40,8 +47,8 @@ class CEventTagsParserTest extends PHPUnit_Framework_TestCase {
 	 * @param int    $pos
 	 * @param array  $expected
 	*/
-	public function testParse($source, $pos, $expected) {
-		$parser = new CEventTagsParser();
+	public function testParse($options, $source, $pos, $expected) {
+		$parser = new CEventTagsParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),

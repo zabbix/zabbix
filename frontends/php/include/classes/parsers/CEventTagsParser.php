@@ -20,6 +20,11 @@
 
 
 class CEventTagsParser extends CParser {
+	// Option: Remove quote marks from every parsed part.
+	const TRIM_QUOTE_MARKS = 0x1;
+
+	private $options;
+
 	/**
 	 * Macro parts, for macro {EVENT.TAGS."Jira Id"} will contain array with entries:
 	 * ['EVENT', 'TAGS', 'Jira Id']
@@ -28,9 +33,14 @@ class CEventTagsParser extends CParser {
 	 */
 	private $parts;
 
+	public function __construct($options) {
+		$this->options = $options;
+	}
 	/**
 	 * Find one of the given strings at the given position.
 	 *
+	 * @param string $source    Source string.
+	 * @param int    $pos       Start position in string for parser.
 	 */
 	public function parse($source, $pos = 0) {
 		$p = $pos;
@@ -40,85 +50,21 @@ class CEventTagsParser extends CParser {
 		$this->match = '';
 		$this->parts = [];
 
-		if ($source[$p] != '{') {
-			return CParser::PARSE_FAIL;
-		}
-
-		$match = '{';
-		$p++;
-
-		while (isset($source[$p])) {
-			if ($this->parsePart($source, $p) === CParser::PARSE_FAIL) {
-				break;
-			}
-
-			$p = $source[$p] == '.'
-		}
-
-		if (!isset($source[$p]) || $source[$p] != '}') {
-			$this->parts = [];
-
-			return CParser::PARSE_FAIL
-		}
-
-		while (isset($source[$p])) {
-			$char = $source[$p];
-
-			if ($char == '{' && !($quoted || $escaped)) {
-				$this->length = 0;
-				$this->match = '';
-
-				return CParser::PARSE_FAIL;
-			}
-
-			$match .= $char;
-
-			if ($char == '}' && !($quoted || $escaped)) {
-				$p++;
-				break;
-			}
-
-			$escaped = ($char == '\\') && !$escaped;
-			$quoted = (!$escaped && $char == '"') ? !$quoted : $quoted;
+		if (isset($source[$p]) && $source[$p] == '{') {
 			$p++;
 		}
 
-		if ($escaped || $quoted) {
-			$this->length = 0;
-			$this->match = '';
+		while (isset($source[$p]) && $this->parsePart($source, $p) == CParser::PARSE_SUCCESS) {
+			$this->match[] = $source[$p];
+			$p += ($source[$p] == '.') ? 1 : 0;
+		}
 
+		if (isset($source[$p]) && $source[$p] != '}') {
 			return CParser::PARSE_FAIL;
 		}
 
-		$this->match = $match;
-		$this->length = $p - $pos;
-
-		$macro = substr($match, 1, -1);
-
-		$p = 0;
-		$quoted = false;
-		$escaped = false;
-		$part = '';
-
-		while (isset($macro[$p])) {
-			$char = $macro[$p];
-
-			if ($char == '.' && !$quoted && !$escaped) {
-				$this->parts[] = trim($part, '"');
-				$part = '';
-			}
-			else {
-				$part .= $char;
-				$escaped = ($char == '\\') && !$escaped;
-				$quoted = (!$escaped && $char == '"') ? !$quoted : $quoted;
-			}
-
-			$p++;
-		}
-
-		if ($part != '') {
-			$this->parts[] = trim($part, '"');
-		}
+		$this->length = 1 + $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
 
 		return CParser::PARSE_SUCCESS;
 	}
@@ -133,6 +79,13 @@ class CEventTagsParser extends CParser {
 		return $this->parts;
 	}
 
+	/**
+	 * Parse single part of macro, will add parsed part to $parts array and return PARSE_SUCCESS on success.
+	 *
+	 * @param string $source
+	 * @param int    $p
+	 * @return CParser::PARSE_SUCCESS|CParser::PARSE_FAIL
+	 */
 	private function parsePart($source, &$p) {
 		$pos = $p;
 		$match = '';
@@ -148,15 +101,15 @@ class CEventTagsParser extends CParser {
 
 			$p++;
 			$match .= $char;
-			$escaped = ($char == '\\') && !$escaped;
 			$quoted = (!$escaped && $char == '"') ? !$quoted : $quoted;
+			$escaped = ($char == '\\') && !$escaped;
 		}
 
 		if ($p == $pos || $quoted || $escaped) {
 			return CParser::PARSE_FAIL;
 		}
 
-		$this->parts[] = trim($match, '"');
+		$this->parts[] = $this->options & static::TRIM_QUOTE_MARKS ? trim($match, '"') : $match;
 
 		return CParser::PARSE_SUCCESS;
 	}
