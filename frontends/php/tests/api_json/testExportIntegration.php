@@ -46,7 +46,7 @@ class testExportIntegration extends CBaseCase {
 					'error_message' => 'Application error.',
 					'error_details' => 'Invalid tag "/zabbix_export/templates/template(1)": the tag "groups" is missing.'
 				]
-			],
+			]
 		];
 	}
 
@@ -58,7 +58,7 @@ class testExportIntegration extends CBaseCase {
 	 * @param CRequest $request
 	 * @param CClientError|null $error  Not null if any error happened during any of requests.
 	 *
-	 * @return array  Json formatted full export.
+	 * @return array  JSON formatted full export.
 	 */
 	public function createTemplateExportOnly(CRequest &$template, ?ClientError &$error) {
 		$sdk = new CSDK();
@@ -77,7 +77,7 @@ class testExportIntegration extends CBaseCase {
 	}
 
 	/**
-	 * Performs configuration imort request.
+	 * Performs configuration import request.
 	 *
 	 * @param array $configuration
 	 *
@@ -105,11 +105,11 @@ class testExportIntegration extends CBaseCase {
 	/**
 	 * @dataProvider template
 	 *
-	 * @param CRequest $template  Request that builds app state, to test export against.
+	 * @param CRequest $template  Request that builds APP state, to test export against.
 	 * @param callable $unset  Modifications to be applied to configuration object, before import.
 	 * @param array $assertions  Various assertions for how "reimport" should behave.
 	 */
-	public function testTemplateExportOptionAndMandatoryFields(CRequest $template, callable $unset, array $assertions) {
+	public function testTemplateExportOptionalAndMandatoryFields(CRequest $template, callable $unset, array $assertions) {
 		$export = $this->createTemplateExportOnly($template, $error);
 		$unset($export);
 
