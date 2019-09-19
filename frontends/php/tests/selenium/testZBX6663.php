@@ -185,7 +185,7 @@ class testZBX6663 extends CLegacyWebTest {
 		}
 
 		if (isset($zbx_data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('templates.php?page=2');
 			$this->zbxTestDropdownSelectWait('groupid', 'all');
 			$this->zbxTestClickLinkText($zbx_data['template']);
 		}
