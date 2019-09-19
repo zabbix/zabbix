@@ -226,7 +226,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 		if (0 == uReturn)
 			return ret;
 
-		pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 		if (FAILED(hres))
 		{
