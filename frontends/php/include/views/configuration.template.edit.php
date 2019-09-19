@@ -392,7 +392,7 @@ $linkedTemplateTable->addRow([
 			'templated_hosts' => '1',
 			'popup_type' => 'templates',
 			'multiselect' => 1,
-			'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
+			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
 			'disableids' => $disableids
 		]).', null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK)
