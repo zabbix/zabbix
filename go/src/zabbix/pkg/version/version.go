@@ -23,6 +23,7 @@ package version
 import (
 	"fmt"
 	"strings"
+	"zabbix/pkg/tls"
 )
 
 const (
@@ -97,7 +98,7 @@ func Revision() string {
 }
 
 func CopyrightMessage() string {
-	return copyrightMessage
+	return copyrightMessage + tls.CopyrightMessage()
 }
 
 func CompileDate() string {

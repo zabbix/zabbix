@@ -280,7 +280,7 @@ func main() {
 		versionDescription = "Print program version and exit"
 	)
 	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "v", versionDefault, versionDescription+" (shorthand)")
+	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
 
 	var remoteCommand string
 	const (
@@ -303,7 +303,7 @@ func main() {
 			argTest = true
 		case "p", "print":
 			argPrint = true
-		case "v", "version":
+		case "V", "version":
 			argVersion = true
 		}
 	})

@@ -649,6 +649,16 @@ static void tls_describe_ciphersuites(SSL_CTX_LP ctx, char **desc)
 #undef TLS_CIPHERS_BUF_LEN
 }
 
+static const char	*tls_version()
+{
+	return OpenSSL_version(OPENSSL_VERSION);
+}
+
+static const char	*tls_version_static()
+{
+	return OPENSSL_VERSION_TEXT;
+}
+
 #else // HAVE_OPENSSL 0
 
 typedef void * SSL_CTX_LP;
@@ -786,6 +796,16 @@ static void tls_describe_ciphersuites(SSL_CTX_LP ciphers, char **desc)
 {
 	TLS_UNUSED(ciphers);
 	TLS_UNUSED(desc);
+}
+
+static const char	*tls_version()
+{
+	return NULL;
+}
+
+static const char	*tls_version_static()
+{
+	return NULL;
 }
 
 #endif
@@ -1219,6 +1239,16 @@ type Config struct {
 	ServerCertSubject string
 }
 
+func CopyrightMessage() (message string) {
+	version := C.tls_version()
+	if version == nil {
+		return ""
+	}
+	return fmt.Sprintf("\n\nThis product includes software developed by the OpenSSL Project\n"+
+		"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n"+
+		"Compiled with %s\nRunning with %s\n", C.GoString(version), C.GoString(C.tls_version_static()))
+}
+
 func Init(config *Config) (err error) {
 	if !supported {
 		return errors.New(SupportedErrMsg())
@@ -1250,13 +1280,15 @@ func Init(config *Config) (err error) {
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
-	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
 
 	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
+
+	log.Infof("OpenSSL library (%s) initialized", C.GoString(C.tls_version()))
+	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
 	log.Debugf("psk context ciphersuites:%s", describeCiphersuites(pskContext))
 
 	return
