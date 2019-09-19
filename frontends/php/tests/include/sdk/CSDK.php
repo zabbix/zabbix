@@ -44,6 +44,15 @@ class CSDK {
 	 *
 	 * @return CRequest
 	 */
+	public function itemCreate(array $params) {
+		return $this->createRequest('item.create', $params);
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return CRequest
+	 */
 	public function templateCreate(array $params) {
 		return $this->createRequest('template.create', $params);
 	}
@@ -85,6 +94,14 @@ class CSDK {
 	 */
 	protected function createRequest(string $method, array $params) {
 		switch ($method) {
+			case 'item.create':
+				$required = ['delay', 'hostid', 'key_', 'name', 'type', 'value_type'];
+				if (array_key_exists('type', $params) && $params['type'] == ITEM_TYPE_HTTPAGENT) {
+					$required[] = 'url';
+				}
+				// TODO $required[] = 'interfaceid'
+				// Not required for template items. Optional for internal, active agent, trapper, aggregate, calculated, dependent and database monitor items.
+				break;
 			case 'template.create':
 				$required = ['groups'];
 				break;
