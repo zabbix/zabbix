@@ -156,6 +156,7 @@ class CRouter {
 		'popup.trigdesc.view'			=> ['CControllerPopupTrigDescView',			'layout.json',			'popup.trigdesc.view'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',	'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',	'layout.json',			null],
+		'popup.condition'				=> ['CControllerPopupCondition',			'layout.json',			'popup.condition'],
 		'trigdesc.update'				=> ['CControllerTrigDescUpdate',			'layout.json',			null],
 		'search'						=> ['CControllerSearch',					'layout.htmlpage',		'search']
 	];

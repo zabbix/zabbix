@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/js/configuration.correlation.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Event correlation rules'));
 
 $form = (new CForm())
+	->setId('correlation.edit')
 	->setName('correlation.edit')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
@@ -86,6 +87,14 @@ if ($data['correlation']['filter']['conditions']) {
 		$i++;
 	}
 }
+
+$condition_table->addRow([
+	(new CSimpleButton(_('Add')))
+		->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
+				'condition_type' => 0
+			]).', null, this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
 
 $correlation_tab
 	->addRow(_('Type of calculation'), [
@@ -176,32 +185,6 @@ else {
 }
 
 $correlation_tab
-	->addRow(_('New condition'),
-		(new CDiv(
-			(new CTable())
-				->setAttribute('style', 'width: 100%;')
-				->addRow(
-					new CCol([
-						new CComboBox('new_condition[type]', $data['new_condition']['type'], 'submit()',
-							$data['allowedConditions']
-						),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition2,
-						($condition2 === null) ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition_operator,
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						$condition
-					])
-				)
-				->addRow(
-					(new CSimpleButton(_('Add')))
-						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_condition", "1");')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['correlation']['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)

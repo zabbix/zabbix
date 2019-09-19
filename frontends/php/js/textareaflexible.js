@@ -45,6 +45,16 @@
 					})
 					.trigger('input');
 			});
+		},
+		clean: function (options) {
+			return this.each(function() {
+				var $textarea = $(this);
+
+				$textarea
+					.val('')
+					.height(0)
+					.innerHeight($textarea[0].scrollHeight);
+			});
 		}
 	};
 

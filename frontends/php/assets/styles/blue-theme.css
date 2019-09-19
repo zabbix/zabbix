@@ -5058,6 +5058,24 @@ table.preprocessing-test-results .rel-container {
   display: block;
   max-width: 940px; }
 
+.condition-container {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-items: flex-start;
+  justify-content: flex-start; }
+  .condition-container .condition-column {
+    display: none;
+    margin: 0 5px;
+    line-height: 22px; }
+  .condition-container .condition-column:first-of-type {
+    margin-left: 0; }
+  .condition-container .condition-column-active,
+  .condition-container .condition-column-select {
+    display: block; }
+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {

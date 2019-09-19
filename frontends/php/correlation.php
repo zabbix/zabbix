@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/correlation.inc.php';
 
 $page['title'] = _('Event correlation rules');
 $page['file'] = 'correlation.php';
-$page['scripts'] = ['multiselect.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR									TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
