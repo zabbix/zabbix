@@ -555,7 +555,7 @@ define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
 define('ZBX_PREPROC_SCRIPT',				21);
 define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
 define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
-define('ZBX_PREPROC_CSV_TO_JSON',	24);
+define('ZBX_PREPROC_CSV_TO_JSON',			24);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
