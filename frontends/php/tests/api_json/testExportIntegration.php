@@ -18,453 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * [ ] Admin user is added to debug group. To assert hidden undefined indexes etc..
- * [ ] ESC Easy setup case - "create lld such and such"
- * [ ] Autoassertions on given setup case.
- *   [ ] 1. export ESC -> XML
- *   [ ] 2. delete ESC
- *   [ ] 3. import XML
- *   [ ] 4. Assert: ESC['select'] == ESC['expect']
- *
- * No implicit assertions - all assertions are defined within this class for easy debug.
- *
- * @backupStaticAttributes enabled
- * @backupGlobals disabled
- * @runTestsInSeparateProcesses
- */
-
-class ClientError {
-
-	/**
-	 * @var string
-	 */
-	public $reason;
-
-	/**
-	 * @var array
-	 */
-	public $data;
-
-	protected function __construct(string $reason, array $data = []) {
-		$this->reason = $reason;
-		$this->data = $data;
-	}
-
-	/**
-	 * @param string $body
-	 *
-	 * @return ClientError
-	 */
-	public static function json(string $body) {
-		return new self('Server returned not json.', ['actual_response' => $body]);
-	}
-
-	/**
-	 * @param array $resp  Full actual server response.
-	 *
-	 * @return ClientError
-	 */
-	public static function from_resp(array $resp) {
-		return new self($resp['error']['message'], $resp['error']);
-	}
-
-	/**
-	 * @return ClientError
-	 */
-	public static function no_resp() {
-		return new self('Server returned no body.');
-	}
-
-	/**
-	 * @return string
-	 */
-	public function __toString() {
-		$details = '';
-		foreach ($this->data as $key => $value) {
-			$details .= $key.':'.$value.PHP_EOL;
-		}
-
-		return $this->reason.PHP_EOL.$details;
-	}
-}
-
-class Client {
-
-	/**
-	 * @var string
-	 */
-	public $auth;
-
-	/**
-	 * @param string $user
-	 * @param array $password
-	 */
-	public function __construct(string $user, string $password) {
-		list($result, $error) = $this->call('user.login', compact('user', 'password'));
-
-		if ($error) {
-			throw new Exception($error);
-		}
-
-		$this->auth = $result;
-	}
-
-	/**
-	 * @param string $method
-	 * @param array $params
-	 *
-	 * @return array
-	 */
-	public function call(string $method, array $params = []) {
-		$error = null;
-		$result = null;
-
-		$auth = $this->auth;
-		$http = [
-			'method' => 'POST',
-			'header' => 'Content-type: application/json',
-			'content' => json_encode(compact('method', 'params', 'auth') + ['id' => 1, 'jsonrpc' => '2.0'])
-		];
-
-		$resp = file_get_contents(PHPUNIT_URL.'api_jsonrpc.php', false, stream_context_create(compact('http')));
-
-		if (!$resp) {
-			$error = ClientError::no_resp();
-
-			return [$result, $error];
-		}
-
-		$resp_decoded = json_decode($resp, true);
-		if (!$resp_decoded) {
-			$error = ClientError::json($resp);
-
-			return [$result, $error];
-		}
-
-		if (array_key_exists('error', $resp_decoded)) {
-			$error = ClientError::from_resp($resp_decoded);
-
-			return [$result, $error];
-		}
-
-		$result = $resp_decoded['result'];
-
-		return [$result, $error];
-	}
-}
-
-class CommitPromise {
-
-	/**
-	 * If promise is resolved, here is client resopnse.
-	 *
-	 * @var array
-	 */
-	private $inner;
-
-	/**
-	 * @var array
-	 */
-	public $params;
-
-	/**
-	 * @var string
-	 */
-	public $method;
-
-	/**
-	 * @var array
-	 */
-	public $client_resp;
-
-	public function __construct(string $method, array $params) {
-		$this->method = $method;
-		$this->params = $params;
-		$this->inner = [];
-		$this->call_stack = [];
-	}
-
-	/**
-	 * WIP!!
-	 */
-	public function delete(Client &$client) {
-		$unique = $this->unique();
-
-		if (!$unique) {
-			return null;
-		}
-
-		switch ($this->method) {
-			case 'template.create':
-				list($result, $error) = $client->call('template.get', [
-					'output' => ['templateid'],
-					'filter' => ['host' => [$unique]]
-				]);
-				$primary = reset($result);
-				$primary = $primary['templateid'];
-				list($result, $error) = $client->call('template.delete', [$primary]);
-				break;
-			case 'hostgroup.create':
-				list($result, $error) = $client->call('hostgroup.get', [
-					'output' => ['groupid'],
-					'filter' => ['name' => [$unique]]
-				]);
-				$primary = reset($result);
-				$primary = $primary['groupid'];
-				list($result, $error) = $client->call('hostgroup.delete', [$primary]);
-				break;
-		}
-
-		foreach ($this->call_stack as $commit) {
-			$commit->delete($client);
-		}
-	}
-
-	/**
-	 * Designed to work both for reimport and just creation scenarios.
-	 * Thus always using "unique" field. No cashing - always values are API fetched.
-	 */
-	public function expand(Client &$client) {
-		$expanded = [];
-		$expanded['sdk'] = $this->method;
-		$expanded['result'] = [];
-		$expanded['call_stack'] = [];
-
-		$unique = $this->unique();
-
-		if (!$unique) {
-			return $expanded;
-		}
-
-		switch ($this->method) {
-			case 'template.create':
-				list($result, $error) = $client->call('template.get', [
-					'output' => API_OUTPUT_EXTEND,
-					'filter' => ['host' => [$unique]],
-					'selectGroups' => API_OUTPUT_EXTEND,
-					'selectTags' => API_OUTPUT_EXTEND,
-					'selectHosts' => API_OUTPUT_EXTEND,
-					'selectTemplates' => API_OUTPUT_EXTEND,
-					'selectParentTemplates' => API_OUTPUT_EXTEND,
-					'selectHttpTests' => API_OUTPUT_EXTEND,
-					'selectItems' => API_OUTPUT_EXTEND,
-					'selectDiscoveries' => API_OUTPUT_EXTEND,
-					'selectTriggers' => API_OUTPUT_EXTEND,
-					'selectGraphs' => API_OUTPUT_EXTEND,
-					'selectApplications' => API_OUTPUT_EXTEND,
-					'selectMacros' => API_OUTPUT_EXTEND,
-					'selectScreens' => API_OUTPUT_EXTEND
-				]);
-				$expanded['result'] = $result;
-				break;
-			case 'hostgroup.create':
-				list($result, $error) = $client->call('hostgroup.get', [
-					'output' => API_OUTPUT_EXTEND,
-					'filter' => ['name' => [$unique]],
-					'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-					'selectTemplates' => API_OUTPUT_EXTEND,
-					'selectHosts' => API_OUTPUT_EXTEND,
-					'selectGroupDiscovery' => API_OUTPUT_EXTEND
-				]);
-				$expanded['result'] = $result;
-				break;
-		}
-
-		$expanded['call_stack'] = [];
-
-		foreach ($this->call_stack as $commit) {
-			$expanded['call_stack'][] = $commit->expand($client);
-		}
-
-		return $expanded;
-	}
-
-	/**
-	 * Most common identifier based on subrequest method
-	 */
-	public function undo(Client &$client) {
-		$primary = $this->primary();
-
-		if (!$primary) {
-			return null;
-		}
-
-		list($result, $error) = $this->client_resp;
-		if ($error) {
-			return null;
-		}
-
-		switch ($this->method) {
-			case 'template.create':
-				$r = $client->call('template.delete', [$primary]);
-				// TODO: unset primary
-				break;
-			case 'hostgroup.create':
-				$r = $client->call('hostgroup.delete', [$primary]);
-				break;
-		}
-
-		foreach ($this->call_stack as $commit) {
-			$commit->undo($client);
-		}
-	}
-
-	/**
-	 * Most common identifier based on subrequest method
-	 */
-	public function unique() {
-		switch ($this->method) {
-			case 'template.create':
-				return $this->params['host'];
-			case 'hostgroup.create':
-				return $this->params['name'];
-			default:
-				return null;
-		}
-	}
-
-	/**
-	 * Most common identifier based on subrequest method
-	 */
-	public function primary() {
-		if (!$this->client_resp) {
-			return null;
-		}
-
-		list($result, $error) = $this->client_resp;
-		if ($error) {
-			return null;
-		}
-
-		switch ($this->method) {
-			case 'template.create':
-				return reset($result['templateids']);
-			case 'hostgroup.create':
-				return reset($result['groupids']);
-			default:
-				return null;
-		}
-	}
-
-	public function resolve($value, Client &$client, &$error) {
-		$resolved_params = [];
-
-		if ($value instanceof CommitPromise) {
-			list($result, $error) = $value($client);
-
-			if ($result) {
-				$this->call_stack[] =& $value;
-			}
-
-			$resolved_params = $value->primary();
-		}
-		else if (is_array($value)) {
-			foreach ($value as $key => $vvalue) {
-				$resolved_params[$key] = $this->resolve($vvalue, $client, $error);
-			}
-		}
-		else {
-			$resolved_params = $value;
-		}
-
-		return $resolved_params;
-	}
-
-	public function __invoke(Client &$client) {
-		if ($this->client_resp) {
-			return $this->client_resp;
-		}
-
-		$this->resolved_params = [];
-
-		foreach ($this->params as $key => $value) {
-			$this->resolved_params[$key] = $this->resolve($value, $client, $error);
-
-			if ($error) {
-				$this->undo($client);
-				return [null, $error];
-			}
-		}
-
-		$this->client_resp = $client->call($this->method, $this->resolved_params);
-
-		return $this->client_resp;
-	}
-}
-
-
-class SDK {
-
-	/**
-	 * @var array
-	 */
-	public $inner;
-
-	/**
-	 * @var array
-	 */
-	public $rollback = [];
-
-	/**
-	 * @return CommitPromise
-	 */
-	public function hostgroupCreate(array $params) {
-		$this->rollback[] = 'hostgroup.create';
-		return new CommitPromise('hostgroup.create', $params);
-	}
-
-	/**
-	 * @return CommitPromise
-	 */
-	public function templateCreate(array $params) {
-		$request = new CommitPromise('template.create', $params);
-
-		$this->rollback[] = new CommitPromise('template.delete', ['hostid' => $request]);
-
-		return $request;
-	}
-
-	/**
-	 * @return CommitPromise
-	 */
-	public function configurationImport(array $params) {
-		$request = new CommitPromise('configuration.import', $params);
-
-		return $request;
-	}
-
-	/**
-	 * @return CommitPromise
-	 */
-	public function configurationExport(array $params) {
-		$request = new CommitPromise('configuration.export', $params);
-
-		return $request;
-	}
-
-	public function undo(Client &$client) {
-		foreach($this->rollback as $commit) {
-			$commit($client);
-		}
-	}
-}
+require_once dirname(__FILE__).'/../include/sdk/CRequest.php';
+require_once dirname(__FILE__).'/../include/sdk/CSDK.php';
+require_once dirname(__FILE__).'/../include/sdk/CClientError.php';
+require_once dirname(__FILE__).'/../include/sdk/CClient.php';
 
 class testExportIntegration extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var $sdk SDK
+	 * @var $sdk CSDK
 	 */
 	static $sdk;
 
 	/**
-	 * @var $client Client
+	 * @var $client CClient
 	 */
 	static $client;
 
 	public static function setUpBeforeClass() {
 		parent::setUpBeforeClass();
-		static::$client = new Client('Admin', 'zabbix');
+		static::$client = new CClient('Admin', 'zabbix');
 	}
 
 	public static function tearDownAfterClass() {
@@ -490,6 +63,26 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Overall TODO list:
+	 * [ ] extract framework
+	 * [ ] after every test undo any leftover apicall commits
+	 * [ ] solve rollback for cases when assertion fails or execution errors out of test
+	 * [ ] was jenkins running api_tests on php 5.6 or 7.0 ?
+	 * [ ] consider data providers ?
+	 * [ ] basic validation in sdk level
+	 */
+	public function testTemplateWithItem() {
+		/* $sdk = new CSDK(); */
+
+		/*
+		 * A request to create hostgroup.
+		 */
+		/* $hg3 = $sdk->hostgroupCreate([ */
+		/* 	'name' => 'hg4' */
+		/* ]); */
+	}
+
+	/**
 	 * This testCase serves as Tutorial introducing capabilities of "API Integration Tests Framework".
 	 * Each and every one comment line here is of most importance, please read it, to get up to speed.
 	 * Please provide feedback on how this framework behaves in real life examples, what problems it does not solve yet.
@@ -498,7 +91,7 @@ class testExportIntegration extends PHPUnit_Framework_TestCase {
 	 * This one serves as tutorial and describes multiple test-cases - actual tests should not take more than 20 lines (including data creation).
 	 */
 	public function testTemplates() {
-		$sdk = new SDK();
+		$sdk = new CSDK();
 
 		/*
 		 * A request to create hostgroup.
