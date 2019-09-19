@@ -48,7 +48,7 @@
 	border-color: darken($background, 5%);
 }
 
-@function h4-widget-color($font-color) {
+@function widget-head-font-color($font-color) {
 	@if (lightness($font-color) < 50) {
 		@return lighten($font-color, 15%);
 	} @else {

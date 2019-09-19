@@ -177,9 +177,7 @@
 		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
 		// Update buttons on existing widgets to edit mode.
-		jQuery('.dashbrd-grid-container')
-			.addClass('dashbrd-mode-edit')
-			.dashboardGrid('setModeEditDashboard');
+		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
 
 		// Hide filter with timeline.
 		jQuery('.filter-btn-container, .filter-space').hide();

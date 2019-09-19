@@ -110,7 +110,7 @@ foreach ($this->data['alerts'] as $alert) {
 	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		$this->data['actions'][$alert['actionid']]['name'],
-		($mediatype) ? $mediatype['description'] : '',
+		($mediatype) ? $mediatype['name'] : '',
 		$recipient,
 		$message,
 		$status,

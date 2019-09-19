@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'4.4.0alpha3');
+define('ZABBIX_VERSION',		'4.4.0beta1');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030026);
+define('ZABBIX_DB_VERSION',		4030031);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -637,8 +637,6 @@ define('MEDIA_TYPE_STATUS_DISABLED',	1);
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
-define('MEDIA_TYPE_JABBER',		3);
-define('MEDIA_TYPE_EZ_TEXTING',	100);
 
 define('SMTP_CONNECTION_SECURITY_NONE',		0);
 define('SMTP_CONNECTION_SECURITY_STARTTLS',	1);
@@ -649,9 +647,6 @@ define('SMTP_AUTHENTICATION_NORMAL',	1);
 
 define('SMTP_MESSAGE_FORMAT_PLAIN_TEXT',	0);
 define('SMTP_MESSAGE_FORMAT_HTML',			1);
-
-define('EZ_TEXTING_LIMIT_USA',		0);
-define('EZ_TEXTING_LIMIT_CANADA',	1);
 
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
 define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
@@ -779,6 +774,7 @@ define('ZBX_MAX_WIDGET_LINES', 100);
 // dashboards
 define('DASHBOARD_MAX_COLUMNS',		24);
 define('DASHBOARD_MAX_ROWS',		64);
+define('DASHBOARD_WIDGET_MIN_ROWS',	2);
 define('DASHBOARD_WIDGET_MAX_ROWS',	32);
 
 // alignments
@@ -1346,36 +1342,34 @@ define('ZBX_ACTION_REMOVE',		2);
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 // dashboard widgets
-define('WIDGET_ACTION_LOG',		'actionlog');
-define('WIDGET_CLOCK',			'clock');
-define('WIDGET_DATA_OVER',		'dataover');
-define('WIDGET_DISCOVERY',		'discovery');
-define('WIDGET_FAV_GRAPHS',		'favgraphs');
-define('WIDGET_FAV_MAPS',		'favmaps');
-define('WIDGET_FAV_SCREENS',	'favscreens');
-define('WIDGET_SVG_GRAPH',		'svggraph');
-define('WIDGET_GRAPH',			'graph');
-define('WIDGET_HOST_AVAIL',		'hostavail');
-define('WIDGET_MAP',			'map');
-define('WIDGET_NAV_TREE',		'navtree');
-define('WIDGET_PLAIN_TEXT',		'plaintext');
-define('WIDGET_PROBLEM_HOSTS',	'problemhosts');
-define('WIDGET_PROBLEMS',		'problems');
-define('WIDGET_PROBLEMS_BY_SV',	'problemsbysv');
-define('WIDGET_SYSTEM_INFO',	'systeminfo');
-define('WIDGET_TRIG_OVER',		'trigover');
-define('WIDGET_URL',			'url');
-define('WIDGET_WEB',			'web');
+define('WIDGET_ACTION_LOG',			'actionlog');
+define('WIDGET_CLOCK',				'clock');
+define('WIDGET_DATA_OVER',			'dataover');
+define('WIDGET_DISCOVERY',			'discovery');
+define('WIDGET_FAV_GRAPHS',			'favgraphs');
+define('WIDGET_FAV_MAPS',			'favmaps');
+define('WIDGET_FAV_SCREENS',		'favscreens');
+define('WIDGET_SVG_GRAPH',			'svggraph');
+define('WIDGET_GRAPH',				'graph');
+define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
+define('WIDGET_HOST_AVAIL',			'hostavail');
+define('WIDGET_MAP',				'map');
+define('WIDGET_NAV_TREE',			'navtree');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
+define('WIDGET_PROBLEMS',			'problems');
+define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
+define('WIDGET_SYSTEM_INFO',		'systeminfo');
+define('WIDGET_TRIG_OVER',			'trigover');
+define('WIDGET_URL',				'url');
+define('WIDGET_WEB',				'web');
 
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
 
 // widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',		1);
-define('WIDGET_FIELD_SELECT_RES_ITEM',			2);
-define('WIDGET_FIELD_SELECT_RES_GRAPH',			3);
-define('WIDGET_FIELD_SELECT_RES_SIMPLE_GRAPH',  4);
+define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
 
 // max depth of navigation tree
 define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
@@ -1410,8 +1404,10 @@ define('ZBX_WIDGET_FIELD_TYPE_GRAPH',			6);
 define('ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE',	7);
 define('ZBX_WIDGET_FIELD_TYPE_MAP',				8);
 
-define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',				0);
-define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',		1);
+define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH',					0);
+define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH',			1);
+define('ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE',			2);
+define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
