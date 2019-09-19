@@ -43,6 +43,7 @@ class CControllerWidgetHostAvailView extends CControllerWidget {
 
 		$interface_types = array_keys($type_fields);
 
+		// Sanitize non-existing interface types.
 		$fields['interface_type'] = array_intersect($interface_types, $fields['interface_type']);
 
 		$groupids = $fields['groupids'] ? getSubGroups($fields['groupids']) : null;
