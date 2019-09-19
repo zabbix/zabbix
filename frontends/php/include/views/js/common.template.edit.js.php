@@ -25,7 +25,7 @@
 	 * @see init.js add.popup event
 	 */
 	function addPopupValues(data) {
-		if (!isset('object', data) || data.object != 'hostid') {
+		if (!isset('object', data) || data.object !== 'hostid') {
 			return false;
 		}
 
