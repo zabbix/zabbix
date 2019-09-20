@@ -66,7 +66,7 @@ function conditionPopupSubmit(form_name) {
 		if (form_elements.hasOwnProperty(i)) {
 			var inputs = form_elements[i].querySelectorAll('textarea, select, input');
 			for (var j in inputs) {
-				if (inputs.hasOwnProperty(j)) {
+				if (inputs.hasOwnProperty(j) && inputs[j].name.substring(0, 13) === 'new_condition') {
 					// create_var can't add many inputs with same names.
 					var name_len = inputs[j].name.length;
 					if (inputs[j].name.substring(name_len - 2) === '[]') {
