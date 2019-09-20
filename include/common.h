@@ -1461,6 +1461,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_SCRIPT			21
 #define ZBX_PREPROC_PROMETHEUS_PATTERN		22
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
+#define ZBX_PREPROC_CSV_TO_JSON			24
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
