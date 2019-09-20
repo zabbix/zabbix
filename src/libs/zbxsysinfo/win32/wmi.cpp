@@ -128,66 +128,62 @@ extern "C" void	zbx_co_uninitialize()
  ******************************************************************************/
 extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values)
 {
-	int	ret = SYSINFO_RET_FAIL;
-	VARIANT	*vtProp = NULL;
-	ULONG	obj_num = 0;
+	int			ret = SYSINFO_RET_FAIL;
+	VARIANT			*vtProp = NULL;
+	IWbemClassObject	*pclsObj = 0;
+	ULONG			uReturn = 0;
+	HRESULT			hres;
 
-	while (pEnumerator)
+	hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+
+	if (FAILED(hres) || 0 == uReturn)
+		goto out;
+
+
+	if (1 == uReturn)
 	{
-		IWbemClassObject	*pclsObj = 0;
-		ULONG			uReturn = 0;
-		HRESULT			hres;
+		zbx_vector_wmi_prop_t	*inst_val;
+		zbx_wmi_prop_t		prop;
 
-		hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
-		if (0 == uReturn)
-			return ret;
-
-		obj_num += uReturn;
-
-		if (1 == obj_num)
+		if (FAILED(hres))
 		{
-			zbx_vector_wmi_prop_t	*inst_val;
-			zbx_wmi_prop_t		prop;
-
-			hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
-
-			if (FAILED(hres))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
-				goto out;
-			}
-
-			vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
-			VariantInit(vtProp);
-			hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
-
-			if (FAILED(hres))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR",
-						V_VT(vtProp));
-				zbx_free(vtProp);
-				goto out;
-			}
-
-			pclsObj->EndEnumeration();
-
-			if (hres == WBEM_S_NO_MORE_DATA)
-				goto out;
-			else
-				ret = SYSINFO_RET_OK;
-
-			prop.name = NULL;
-			prop.value = vtProp;
-			inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
-			zbx_vector_wmi_prop_create(inst_val);
-			zbx_vector_wmi_prop_append(inst_val, prop);
-			zbx_vector_wmi_instance_append(wmi_values, inst_val);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+			goto out;
 		}
-out:
-		if (0 != pclsObj)
-			pclsObj->Release();
+
+		vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
+		VariantInit(vtProp);
+		hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
+
+		if (FAILED(hres))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", V_VT(vtProp));
+			zbx_free(vtProp);
+			goto out;
+		}
+
+		pclsObj->EndEnumeration();
+
+		if (hres == WBEM_S_NO_MORE_DATA)
+		{
+			zbx_free(vtProp);
+			goto out;
+		}
+		else
+			ret = SYSINFO_RET_OK;
+
+		prop.name = NULL;
+		prop.value = vtProp;
+		inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
+		zbx_vector_wmi_prop_create(inst_val);
+		zbx_vector_wmi_prop_append(inst_val, prop);
+		zbx_vector_wmi_instance_append(wmi_values, inst_val);
 	}
+out:
+	if (0 != pclsObj)
+		pclsObj->Release();
 
 	return ret;
 }
