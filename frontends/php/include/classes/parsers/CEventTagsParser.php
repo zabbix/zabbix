@@ -55,11 +55,11 @@ class CEventTagsParser extends CParser {
 		}
 
 		while (isset($source[$p]) && $this->parsePart($source, $p) == CParser::PARSE_SUCCESS) {
-			$this->match[] = $source[$p];
-			$p += ($source[$p] == '.') ? 1 : 0;
+			$p += (isset($source[$p]) && $source[$p] == '.') ? 1 : 0;
 		}
 
-		if (isset($source[$p]) && $source[$p] != '}') {
+		if (!isset($source[$p]) || $source[$p] != '}') {
+			$this->parts = [];
 			return CParser::PARSE_FAIL;
 		}
 

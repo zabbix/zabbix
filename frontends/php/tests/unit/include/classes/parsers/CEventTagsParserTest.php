@@ -31,10 +31,59 @@ class CEventTagsParserTest extends PHPUnit_Framework_TestCase {
 				]
 			],
 			[
+				CEventTagsParser::TRIM_QUOTE_MARKS, '{EVENT.TAGS."йцукенгшщзфывапролдячсмить"}', 0, [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{EVENT.TAGS."йцукенгшщзфывапролдячсмить"}',
+					'parts' => ['EVENT', 'TAGS', 'йцукенгшщзфывапролдячсмить']
+				]
+			],
+			[
+				0, '{EVENT.TAGS."Jira Id"}', 0, [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{EVENT.TAGS."Jira Id"}',
+					'parts' => ['EVENT', 'TAGS', '"Jira Id"']
+				]
+			],
+			[
+				0, '{EVENT.TAGS.""}.', 0, [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{EVENT.TAGS.""}',
+					'parts' => ['EVENT', 'TAGS', '""']
+				]
+			],
+			[
+				CEventTagsParser::TRIM_QUOTE_MARKS, '{EVENT.TAGS.""}.', 0, [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{EVENT.TAGS.""}',
+					'parts' => ['EVENT', 'TAGS', '']
+				]
+			],
+			[
 				0, '{EVENT.TAGS."{} \"\\\}"}', 0, [
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{EVENT.TAGS."{} \"\\\}"}',
 					'parts' => ['EVENT', 'TAGS', '"{} \"\\\}"']
+				]
+			],
+			[
+				0, '{EVENT.TAGS.TEST', 0, [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'parts' => []
+				]
+			],
+			[
+				0, '{EVENT.TAGS.', 0, [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'parts' => []
+				]
+			],
+			[
+				0, '{EVENT.TAGS.""{} \"\\\}"}', 0, [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'parts' => []
 				]
 			]
 		];
