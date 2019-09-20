@@ -344,14 +344,14 @@ static int	DBpatch_4030020(void)
 
 static int	DBpatch_4030021(void)
 {
-	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("globalmacro", &field);
 }
 
 static int	DBpatch_4030022(void)
 {
-	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hostmacro", &field);
 }
