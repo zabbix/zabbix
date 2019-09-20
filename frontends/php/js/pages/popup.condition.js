@@ -37,14 +37,18 @@ function conditionFormSelector() {
 
 	// Delete active class from form elements.
 	var elements = document.querySelectorAll('.condition-column.condition-column-active');
-	for (var i = 0, len = elements.length; i < len; i++) {
-		elements[i].classList.remove('condition-column-active');
+	for (var i in elements) {
+		if (elements.hasOwnProperty(i)) {
+			elements[i].classList.remove('condition-column-active');
+		}
 	}
 
 	// Add active class to selected form elements.
 	var elements = document.querySelectorAll('.condition-column[data-type=\'' + type + '\']');
-	for (var i = 0, len = elements.length; i < len; i++) {
-		elements[i].classList.add('condition-column-active');
+	for (var i in elements) {
+		if (elements.hasOwnProperty(i)) {
+			elements[i].classList.add('condition-column-active');
+		}
 	}
 }
 
@@ -58,16 +62,20 @@ function conditionPopupSubmit(form_name) {
 
 	create_var(form_name, select_element.name, select_element.value, false);
 
-	for (var i = 0, len = form_elements.length; i < len; i++) {
-		var inputs = form_elements[i].querySelectorAll('textarea, select, input');
-		for (var j = 0, inputs_len = inputs.length; j < inputs_len; j++) {
-			// create_var can't add many inputs with same names.
-			var name_len = inputs[j].name.length;
-			if (inputs[j].name.substring(name_len - 2) == '[]') {
-				inputs[j].name = inputs[j].name.substring(0, name_len - 2) + '[' + (n++) + ']';
-			}
+	for (var i in form_elements) {
+		if (form_elements.hasOwnProperty(i)) {
+			var inputs = form_elements[i].querySelectorAll('textarea, select, input');
+			for (var j in inputs) {
+				if (inputs.hasOwnProperty(j)) {
+					// create_var can't add many inputs with same names.
+					var name_len = inputs[j].name.length;
+					if (inputs[j].name.substring(name_len - 2) === '[]') {
+						inputs[j].name = inputs[j].name.substring(0, name_len - 2) + '[' + (n++) + ']';
+					}
 
-			create_var(form_name, inputs[j].name, inputs[j].value, false);
+					create_var(form_name, inputs[j].name, inputs[j].value, false);
+				}
+			}
 		}
 	}
 
