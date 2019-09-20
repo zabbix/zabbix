@@ -438,7 +438,7 @@ void	del_zeros(char *s)
 
 			if (1 == trim)
 			{
-				/* don't touch invalid numbers with more than one decimal seprator */
+				/* don't touch invalid numbers with more than one decimal separator */
 				return;
 			}
 
@@ -762,7 +762,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcatf                                                     *
  *                                                                            *
- * Purpose: dynamical cating of formated strings                              *
+ * Purpose: dynamical cating of formatted strings                              *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -4218,7 +4218,7 @@ int	num_param(const char *p)
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
@@ -4367,7 +4367,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_param_len(const char *p, int num, size_t *sz)
@@ -4497,7 +4497,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 char	*get_param_dyn(const char *p, int num)
@@ -4560,7 +4560,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
  *      cb        - [IN] callback function                                    *
  *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error messsage                                      *
+ *      error     - [OUT] error message                                      *
  *      maxerrlen - [IN] error size                                           *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *
@@ -4821,7 +4821,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, size_t max_len)
@@ -4856,7 +4856,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)

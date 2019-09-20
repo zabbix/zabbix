@@ -2563,7 +2563,7 @@ out:
     misses: 1
 ---
 # TC45
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned */ 
 test case: Get 1 value during interval when using nanoseconds in end time (2) 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2611,7 +2611,7 @@ out:
     misses: 1
 ---
 # TC46
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned */ 
 test case: Get 10 values during interval when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:

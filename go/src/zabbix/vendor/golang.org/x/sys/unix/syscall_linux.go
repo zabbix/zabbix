@@ -34,7 +34,7 @@ func Chown(path string, uid int, gid int) (err error) {
 	return Fchownat(AT_FDCWD, path, uid, gid, 0)
 }
 
-func Creat(path string, mode uint32) (fd int, err error) {
+func Create(path string, mode uint32) (fd int, err error) {
 	return Open(path, O_CREAT|O_WRONLY|O_TRUNC, mode)
 }
 
@@ -55,7 +55,7 @@ func FanotifyMark(fd int, flags uint, mask uint64, dirFd int, pathname string) (
 //sys	fchmodat(dirfd int, path string, mode uint32) (err error)
 
 func Fchmodat(dirfd int, path string, mode uint32, flags int) (err error) {
-	// Linux fchmodat doesn't support the flags parameter. Mimick glibc's behavior
+	// Linux fchmodat doesn't support the flags parameter. Mimic glibc's behavior
 	// and check the flags. Otherwise the mode would be applied to the symlink
 	// destination which is not what the user expects.
 	if flags&^AT_SYMLINK_NOFOLLOW != 0 {

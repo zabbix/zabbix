@@ -5731,7 +5731,7 @@ DUK_INTERNAL_DECL void duk_to_primitive_ordinary(duk_hthread *thr, duk_idx_t idx
 /* Raw internal valstack access macros: access is unsafe so call site
  * must have a guarantee that the index is valid.  When that is the case,
  * using these macro results in faster and smaller code than duk_get_tval().
- * Both 'ctx' and 'idx' are evaluted multiple times, but only for asserts.
+ * Both 'ctx' and 'idx' are evaluated multiple times, but only for asserts.
  */
 #define DUK_ASSERT_VALID_NEGIDX(thr,idx) \
 	(DUK_ASSERT_EXPR((duk_int_t) (idx) < 0), DUK_ASSERT_EXPR(duk_is_valid_index((thr), (idx))))
@@ -6993,7 +6993,7 @@ DUK_INTERNAL_DECL duk_bool_t duk_hobject_prototype_chain_contains(duk_hthread *t
 
 #if !defined(DUK_USE_OBJECT_BUILTIN)
 /* These declarations are needed when related built-in is disabled and
- * genbuiltins.py won't automatically emit the declerations.
+ * genbuiltins.py won't automatically emit the declarations.
  */
 DUK_INTERNAL_DECL duk_ret_t duk_bi_object_prototype_to_string(duk_hthread *thr);
 DUK_INTERNAL_DECL duk_ret_t duk_bi_function_prototype(duk_hthread *thr);
@@ -38644,7 +38644,7 @@ DUK_INTERNAL duk_ret_t duk_bi_object_setprototype_shared(duk_hthread *thr) {
 		}
 	}
 	DUK_HOBJECT_SET_PROTOTYPE_UPDREF(thr, h_obj, h_new_proto);
-	/* fall thru */
+	/* fall through */
 
  skip:
 	duk_set_top(thr, 1);
@@ -50906,7 +50906,7 @@ DUK_INTERNAL void duk_heaphdr_refcount_finalize_norz(duk_heap *heap, duk_heaphdr
 
 /*
  *  Refzero processing for duk_hobject: queue a refzero'ed object to either
- *  finalize_list or refzero_list and process the relevent list(s) if
+ *  finalize_list or refzero_list and process the relevant list(s) if
  *  necessary.
  *
  *  Refzero_list is single linked, with only 'prev' pointers set and valid.
@@ -58302,7 +58302,7 @@ DUK_INTERNAL duk_bool_t duk_hobject_putprop(duk_hthread *thr, duk_tval *tv_obj, 
 		(void) duk__check_arguments_map_for_put(thr, orig, key, &desc, throw_flag);
 		duk_pop_unsafe(thr);
 	}
-	/* fall thru */
+	/* fall through */
 
  success_no_arguments_exotic:
 	/* shared exit path now */
@@ -62384,7 +62384,7 @@ DUK_LOCAL void duk__create_arguments_object(duk_hthread *thr,
 		 *
 		 * Note that the specification requires that the *same* thrower
 		 * built-in object is used here!  See E5 Section 10.6 main
-		 * algoritm, step 14, and Section 13.2.3 which describes the
+		 * algorithm, step 14, and Section 13.2.3 which describes the
 		 * thrower.  See test case test-arguments-throwers.js.
 		 */
 
@@ -67507,7 +67507,7 @@ DUK_LOCAL duk_regconst_t duk__lookup_active_register_binding(duk_compiler_ctx *c
  * identifier name.  Returns 1 if register-bound, 0 otherwise.  Caller can
  * also check (out_reg_varbind >= 0) to check whether or not identifier is
  * register bound.  The caller must NOT use out_rc_varname at all unless
- * return code is 0 or out_reg_varbind is < 0; this is becuase out_rc_varname
+ * return code is 0 or out_reg_varbind is < 0; this is because out_rc_varname
  * is unsigned and doesn't have a "unused" / none value.
  */
 DUK_LOCAL duk_bool_t duk__lookup_lhs(duk_compiler_ctx *comp_ctx, duk_regconst_t *out_reg_varbind, duk_regconst_t *out_rc_varname) {
@@ -72519,7 +72519,7 @@ DUK_LOCAL void duk__parse_func_like_raw(duk_compiler_ctx *comp_ctx, duk_small_ui
 	 *  parsing handles this retroactively.
 	 *
 	 *  For function expressions and declarations function name must
-	 *  be an Identifer (excludes reserved words).  For setter/getter
+	 *  be an Identifier (excludes reserved words).  For setter/getter
 	 *  it is a PropertyName which allows reserved words and also
 	 *  strings and numbers (e.g. "{ get 1() { ... } }").
 	 *
@@ -72578,7 +72578,7 @@ DUK_LOCAL void duk__parse_func_like_raw(duk_compiler_ctx *comp_ctx, duk_small_ui
 	 *  Formal argument list
 	 *
 	 *  We don't check for prohibited names or for duplicate argument
-	 *  names here, becase we don't yet know whether the function will
+	 *  names here, because we don't yet know whether the function will
 	 *  be strict.  Function body parsing handles this retroactively.
 	 */
 
@@ -74683,7 +74683,7 @@ DUK_LOCAL duk_small_uint_t duk__handle_return(duk_hthread *thr, duk_activation *
 	 * Current approach is to capture the 'thr' return value and store
 	 * a reference to 'thr' in the caller value stack temporarily.  This
 	 * keeps 'thr' reachable until final yield/return handling which
-	 * removes the references atomatically.
+	 * removes the references automatically.
 	 */
 
 	DUK_ASSERT(thr->valstack_top - 1 >= thr->valstack_bottom);
@@ -75711,7 +75711,7 @@ DUK_LOCAL duk_bool_t duk__executor_handle_call(duk_hthread *thr, duk_idx_t idx, 
  *  Other function calls are handled using duk_handle_call(), increasing
  *  C recursion depth.
  *
- *  Abrupt completions (= long control tranfers) are handled either
+ *  Abrupt completions (= long control transfers) are handled either
  *  directly by reconfiguring relevant stacks and restarting execution,
  *  or via a longjmp.  Longjmp-free handling is preferable for performance
  *  (especially Emscripten performance), and is used for: break, continue,
@@ -81582,7 +81582,7 @@ duk_bool_t duk_js_declvar_activation(duk_hthread *thr,
  *  going forward to e.g. support chunked streaming of source from flash.
  *
  *  Decodes UTF-8/CESU-8 leniently with support for code points from U+0000 to
- *  U+10FFFF, causing an error if the input is unparseable.  Leniency means:
+ *  U+10FFFF, causing an error if the input is unparsable.  Leniency means:
  *
  *    * Unicode code point validation is intentionally not performed,
  *      except to check that the codepoint does not exceed 0x10ffff.
@@ -86463,7 +86463,7 @@ DUK_LOCAL duk_uint32_t duk__append_jump_offset(duk_re_compiler_ctx *re_ctx, duk_
  *  codepoints are generated in sequence, and when the output codepoints are
  *  continuous (CP, CP+1, CP+2, ...), they are merged locally into as large a
  *  range as possible.  A small canonicalization bitmap is used to reduce
- *  actual codepoint canonicalizations which are quite slow at present.  The
+ *  actual codepoint canonicalization which are quite slow at present.  The
  *  bitmap provides a "codepoint block is continuous with respect to
  *  canonicalization" for N-codepoint blocks.  This allows blocks to be
  *  skipped quickly.

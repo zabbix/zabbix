@@ -67,7 +67,7 @@ func main() {
 	b = controlRegsRegex.ReplaceAll(b, []byte("_ [0]uint64"))
 
 	// Remove fields that are added by glibc
-	// Note that this is unstable as the identifers are private.
+	// Note that this is unstable as the identifiers are private.
 	removeFieldsRegex := regexp.MustCompile(`X__glibc\S*`)
 	b = removeFieldsRegex.ReplaceAll(b, []byte("_"))
 
