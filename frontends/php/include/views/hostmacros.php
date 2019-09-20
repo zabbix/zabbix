@@ -190,7 +190,7 @@ else {
 		if ($data['show_inherited_macros']) {
 			$table->addRow((new CRow([
 				(new CCol(
-					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description'], ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 						->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
