@@ -42,7 +42,7 @@ void	free_perf_collector(void);
 void	collect_perfstat(void);
 
 int	get_perf_counter_value_by_name(const char *name, double *value, char **error);
-int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_perf_counter_lang_t lang, 
+int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_perf_counter_lang_t lang,
 		double *value, char **error);
 int	get_perf_counter_value(zbx_perf_counter_data_t *counter, int interval, double *value, char **error);
 

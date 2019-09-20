@@ -62,9 +62,9 @@ out:
 static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_RESULT *result,
 		zbx_perf_counter_lang_t lang)
 {
-	char			counterpath[PDH_MAX_COUNTER_PATH], *tmp, *error = NULL;
-	int			interval, ret = SYSINFO_RET_FAIL;
-	double			value;
+	char	counterpath[PDH_MAX_COUNTER_PATH], *tmp, *error = NULL;
+	int	interval, ret = SYSINFO_RET_FAIL;
+	double	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", function);
 

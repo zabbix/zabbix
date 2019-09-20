@@ -289,7 +289,7 @@ int	check_counter_path(char *counterPath, int convert_from_numeric)
 	const char			*__function_name = "check_counter_path";
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
-	int				is_numeric, ret = FAIL;
+	int				ret = FAIL;
 	DWORD				dwSize = 0;
 	wchar_t				*wcounterPath;
 
@@ -316,7 +316,7 @@ int	check_counter_path(char *counterPath, int convert_from_numeric)
 
 	if (0 != convert_from_numeric)
 	{
-		is_numeric = (SUCCEED == _wis_uint(cpe->szObjectName) ? 0x01 : 0);
+		int is_numeric = (SUCCEED == _wis_uint(cpe->szObjectName) ? 0x01 : 0);
 		is_numeric |= (SUCCEED == _wis_uint(cpe->szCounterName) ? 0x02 : 0);
 
 		if (0 != is_numeric)

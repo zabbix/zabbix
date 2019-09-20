@@ -120,12 +120,12 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 			break;
 		}
 
-		if (NULL != name && 0 == strcmp(cptr->name, name))
+		if (NULL != name)
 		{
-			break;
+			if (0 == strcmp(cptr->name, name))
+				break;
 		}
-
-		if (NULL == name && 0 == strcmp(cptr->counterpath, counterpath) &&
+		else if (0 == strcmp(cptr->counterpath, counterpath) &&
 				cptr->interval == interval && cptr->lang == lang)
 		{
 			break;
@@ -363,7 +363,8 @@ void	collect_perfstat(void)
 			if (PERF_COUNTER_NOTSUPPORTED != cptr->status)
 				continue;
 
-			zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, cptr->counterpath, cptr->lang, &cptr->handle);
+			zbx_PdhAddCounter(__function_name, cptr, ppsd.pdh_query, cptr->counterpath,
+					cptr->lang, &cptr->handle);
 		}
 
 		ppsd.nextcheck = now + UNSUPPORTED_REFRESH_PERIOD;
@@ -473,7 +474,9 @@ out:
  *                                                                            *
  * Parameters: name  - [IN] the performance counter name                      *
  *             value - [OUT] the calculated value                             *
- *             error - [OUT] the error message                                *
+ *             error - [OUT] the error message, it is not always produced     *
+ *                     when FAIL is returned. It is a caller responsibility   *
+ *                     to check if the error message is not NULL.             *
  *                                                                            *
  * Returns:  SUCCEED - the value was retrieved successfully                   *
  *           FAIL    - otherwise                                              *
@@ -531,7 +534,7 @@ out:
 		PDH_STATUS pdh_status = calculate_counter_value(__function_name, counterpath, perfs->lang, value);
 
 		if (PDH_NOT_IMPLEMENTED == pdh_status)
-			*error = zbx_strdup(*error, "Counter is not compatible with this OS");
+			*error = zbx_strdup(*error, "Counter is not supported for this Microsoft Windows version");
 		else if (ERROR_SUCCESS == pdh_status)
 			ret = SUCCEED;
 
