@@ -35,9 +35,8 @@
 			]
 		]))
 			->addClass('form_row')
-			->toString()
-	?>
-	<?=(new CRow([
+			->toString().
+		(new CRow([
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
 					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
@@ -87,8 +86,8 @@
 	jQuery(function($) {
 		$('#tbl_macros')
 			.dynamicRows({template: <?= $data['show_inherited_macros']
-				? '\'#macro-row-tmpl-inherited\''
-				: '\'#macro-row-tmpl\'' ?>})
+				? "'#macro-row-tmpl-inherited'"
+				: "'#macro-row-tmpl'" ?>})
 			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
 				if ($(this).hasClass('macro')) {
 					macroToUpperCase(this);

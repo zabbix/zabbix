@@ -73,12 +73,14 @@ else {
 				if (array_key_exists('template', $macro)) {
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['template']['value']);
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
-						$macro['template']['description']);
+						$macro['template']['description']
+					);
 				}
 				else {
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $macro['global']['value']);
 					$macro_cell[] = new CVar('macros['.$i.'][inherited][description]',
-						$macro['global']['description']);
+						$macro['global']['description']
+					);
 				}
 			}
 		}
@@ -105,7 +107,7 @@ else {
 			$row[] = (new CCol(
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+					->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 					->setReadonly($data['readonly'])
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT);
@@ -191,11 +193,13 @@ else {
 			$table->addRow((new CRow([
 				(new CCol(
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-						->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+						->setMaxlength(DB::getFieldLength('hostmacro' , 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($data['readonly'] || !($macro['type'] & ZBX_PROPERTY_OWN))
-					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
+					))
+						->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+						->setColSpan(8)
 			]))->addClass('form_row'));
 		}
 	}
