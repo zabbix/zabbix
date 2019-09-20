@@ -345,17 +345,6 @@ class CMediatype extends CApiService {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
-					if (array_key_exists('timeout', $validated_data)) {
-						$seconds = timeUnitToSeconds($validated_data['timeout']);
-
-						if ($seconds < 1 || $seconds > 60) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-								$validated_data['timeout'], 'timeout', '1s', '60s'
-							));
-						}
-					}
-
 					if (array_key_exists('receive_tags', $validated_data)
 							&& $validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 						unset($validation_rules['url'], $validation_rules['url_name']);
@@ -581,10 +570,12 @@ class CMediatype extends CApiService {
 			}
 
 			$validation_rules = $mediatype_rules['fields'];
-			$validation_rules += array_key_exists($mediatype['type'], $mediatype_rules)
-				? $mediatype_rules[$mediatype['type']]
-				: [];
-			$validated_data = array_intersect_key($mediatype, $validation_rules);
+			$validated_data = [];
+
+			if (array_key_exists($mediatype['type'], $mediatype_rules)) {
+				$validation_rules += $mediatype_rules[$mediatype['type']];
+				$validated_data = array_intersect_key($mediatype, $validation_rules);
+			}
 
 			switch ($mediatype['type']) {
 				case MEDIA_TYPE_EMAIL:
@@ -707,19 +698,9 @@ class CMediatype extends CApiService {
 				case MEDIA_TYPE_WEBHOOK:
 					$validated_data += [
 						'webhook' => $db_mediatype['webhook'],
-						'timeout' => $db_mediatype['timeout'],
 						'receive_tags' => $db_mediatype['receive_tags'],
 						'params' => []
 					];
-
-					$seconds = timeUnitToSeconds($validated_data['timeout']);
-
-					if ($seconds < 1 || $seconds > 60) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-							$validated_data['timeout'], 'timeout', '1s', '60s'
-						));
-					}
 
 					if ($validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 						unset($validation_rules['url'], $validation_rules['url_name']);
@@ -877,8 +858,7 @@ class CMediatype extends CApiService {
 			$mediatypeid = $mediatypeids[$i];
 			$mediatype['mediatypeid'] = $mediatypeid;
 
-			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('params', $mediatype)
-					&& is_array($mediatype['params'])) {
+			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('params', $mediatype)) {
 				foreach ($mediatype['params'] as $param) {
 					$webhook_params[] = compact('mediatypeid') + $param;
 				}
@@ -948,21 +928,23 @@ class CMediatype extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$type_switch_defaults = [
+			MEDIA_TYPE_WEBHOOK => [
+				'webhook' => $defaults['webhook'],
+				'timeout' => $defaults['timeout'],
+				'receive_tags' => $defaults['receive_tags'],
+				'url' => $defaults['url'],
+				'url_name' => $defaults['url_name'],
+			]
+		];
+
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeid = $mediatype['mediatypeid'];
-			$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_mediatypes[$mediatypeid]['type'];
+			$db_type = $db_mediatypes[$mediatypeid]['type'];
+			$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_type;
 			unset($mediatype['mediatypeid']);
 
 			if ($type == MEDIA_TYPE_WEBHOOK) {
-				if ($type != $db_mediatypes[$mediatypeid]['type']) {
-					$mediatype = [
-						'webhook' => $defaults['webhook'],
-						'timeout' => $defaults['timeout'],
-						'receive_tags' => $defaults['receive_tags'],
-						'params' => []
-					] + $mediatype;
-				}
-
 				if (array_key_exists('receive_tags', $mediatype)
 						&& $mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					$mediatype = [
@@ -981,6 +963,13 @@ class CMediatype extends CApiService {
 					$webhooks_params[$mediatypeid] = $params;
 					unset($mediatype['params']);
 				}
+			}
+			else if ($db_type == MEDIA_TYPE_WEBHOOK) {
+				$mediatype = $type_switch_defaults[$db_type] + $mediatype;
+				$webhooks_params[$mediatypeid] = [];
+			}
+			else {
+				$mediatype = array_diff_key($mediatype, $type_switch_defaults[MEDIA_TYPE_WEBHOOK]);
 			}
 
 			if (!empty($mediatype)) {
@@ -1188,14 +1177,15 @@ class CMediatype extends CApiService {
 				],
 				'timeout' => [
 					'type' => API_TIME_UNIT,
-					'length' => DB::getFieldLength('media_type', 'timeout')
+					'length' => DB::getFieldLength('media_type', 'timeout'),
+					'in' => '1:60'
 				],
 				'receive_tags' => [
 					'type' => API_INT32,
 					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
 				],
 				'url' => [
-					// Should be checked as string because it can contain maros tags.
+					// Should be checked as string not as url because it can contain maros tags.
 					'type' => API_STRING_UTF8,
 					'flags' => API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'url')
@@ -1210,11 +1200,12 @@ class CMediatype extends CApiService {
 					'fields' => [
 						'name' => [
 							'type' => API_STRING_UTF8,
-							'flags' => API_NOT_EMPTY,
+							'flags' => API_REQUIRED | API_NOT_EMPTY,
 							'length' => DB::getFieldLength('media_type_param', 'name')
 						],
 						'value' => [
 							'type' => API_STRING_UTF8,
+							'flags' => API_REQUIRED,
 							'length' => DB::getFieldLength('media_type_param', 'value')
 						]
 					]
