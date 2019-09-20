@@ -502,7 +502,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
  *     On success this function produces a changeset with 0 or 1 record       *
  *     because 'config_autoreg_tls' table can have no more than 1 record.     *
  *     If in future you want to support multiple autoregistration PSKs and/or *
- *     select more columns in DBselect() then do not forget to sync changes    *
+ *     select more columns in DBselect() then do not forget to sync changes   *
  *     with DCsync_autoreg_config() !!!                                       *
  *                                                                            *
  ******************************************************************************/
@@ -2613,7 +2613,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: dbsync_compare_action_op                                         *
  *                                                                            *
- * Purpose: compares action operation class and flushes update row if        *
+ * Purpose: compares action operation class and flushes update row if         *
  *          necessary                                                         *
  *                                                                            *
  * Parameter: sync     - [OUT] the changeset                                  *

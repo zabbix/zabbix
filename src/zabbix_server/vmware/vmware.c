@@ -1010,7 +1010,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Function: vmware_shared_perf_entity_clean                                  *
  *                                                                            *
- * Purpose: cleans resources allocated by vmware performance entity in vmware  *
+ * Purpose: cleans resources allocated by vmware performance entity in vmware *
  *          cache                                                             *
  *                                                                            *
  * Parameters: entity - [IN] the entity to free                               *

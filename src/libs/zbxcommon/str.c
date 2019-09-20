@@ -762,7 +762,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcatf                                                     *
  *                                                                            *
- * Purpose: dynamical cating of formatted strings                              *
+ * Purpose: dynamical cating of formatted strings                             *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -4560,7 +4560,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
  *      cb        - [IN] callback function                                    *
  *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error message                                      *
+ *      error     - [OUT] error message                                       *
  *      maxerrlen - [IN] error size                                           *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *

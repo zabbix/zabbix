@@ -457,7 +457,7 @@ static zbx_am_mediatype_t	*am_pop_mediatype(zbx_am_t *manager)
  *                                                                            *
  * Function: am_release_mediatype                                             *
  *                                                                            *
- * Purpose: releases media type, removing it if necessary                      *
+ * Purpose: releases media type, removing it if necessary                     *
  *                                                                            *
  * Parameters: manager - [IN] the alert manager                               *
  *             alert   - [IN] the alert pool                                  *
