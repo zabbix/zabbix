@@ -67,6 +67,10 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		query_result_to_text = zbx_odbc_query_result_to_lld_json;
 	}
+	else if (0 == strcmp(request.key, "db.odbc.get"))
+	{
+		query_result_to_text = zbx_odbc_query_result_to_json;
+	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));

@@ -24,7 +24,7 @@
 #define ZBX_STR(str)	ZBX_STR2(str)
 
 #define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"19 August 2019"
+#define ZABBIX_REVDATE		"18 September 2019"
 #define ZABBIX_VERSION_MAJOR	4
 #define ZABBIX_VERSION_MINOR	4
 #define ZABBIX_VERSION_PATCH	0
@@ -36,5 +36,7 @@
 #define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
 				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
 #define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
+
+int	zbx_get_component_version(char *value);
 
 #endif

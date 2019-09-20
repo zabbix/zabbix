@@ -17,7 +17,7 @@ https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html.&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx&#13;
 &#13;
-Template tooling version used: 0.22</description>
+Template tooling version used: 0.29</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -67,7 +67,8 @@ Handled - the total number of handled connections. Generally, the parameter valu
 Requests - the total number of client requests.&#13;
 Reading - the current number of connections where nginx is reading the request header.&#13;
 Writing - the current number of connections where nginx is writing the response back to the client.&#13;
-Waiting - the current number of idle client connections waiting for a request.</description>
+Waiting - the current number of idle client connections waiting for a request.&#13;
+https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -981,8 +982,8 @@ if (a) {
                <screen_items>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>0</x>
                      <y>0</y>
                      <colspan>1</colspan>
@@ -1003,8 +1004,8 @@ if (a) {
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>1</x>
                      <y>0</y>
                      <colspan>1</colspan>
@@ -1025,8 +1026,8 @@ if (a) {
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>0</x>
                      <y>1</y>
                      <colspan>1</colspan>
@@ -1218,7 +1219,7 @@ if (a) {
          <name>Nginx: Failed to fetch stub status page (or no data for 30m)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
-         <url>https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html</url>
+         <url/>
          <status>0</status>
          <priority>2</priority>
          <description>Last value: {ITEM.LASTVALUE1}.&#13;
