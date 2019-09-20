@@ -241,7 +241,7 @@ function make_event_details($event, $backurl) {
 
 	$table
 		->addRow([_('Tags'), $tags[$event['eventid']]])
-		->addRow([_('Description'), zbx_nl2br($event['comments'])]);
+		->addRow([_('Description'), zbx_str2links($event['comments'])]);
 
 	return $table;
 }
