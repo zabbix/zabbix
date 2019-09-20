@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-15 01:44+0300\n"
+"POT-Creation-Date: 2019-09-18 11:00+0300\n"
 "PO-Revision-Date: 2019-03-28 07:26+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -351,7 +351,7 @@ msgstr[0] "Tài khoản bị khóa khoảng %1$s giây."
 #: include/classes/screens/CScreenProblem.php:898
 #: include/classes/screens/CScreenProblem.php:921
 #: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:256
-#: include/events.inc.php:468 include/views/configuration.action.edit.php:1215
+#: include/events.inc.php:468 include/views/configuration.action.edit.php:1217
 msgid "Ack"
 msgstr "Ghi nhận"
 
@@ -394,17 +394,17 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: include/views/configuration.action.edit.php:439
 #: include/views/configuration.action.edit.php:676
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1098
-#: include/views/configuration.action.edit.php:1263
-#: include/views/configuration.action.edit.php:1281
-#: include/views/configuration.action.edit.php:1426
-#: include/views/configuration.action.edit.php:1448
-#: include/views/configuration.action.edit.php:1662
-#: include/views/configuration.action.edit.php:1879
-#: include/views/configuration.action.edit.php:1973
-#: include/views/configuration.action.edit.php:1995
-#: include/views/configuration.action.edit.php:2140
+#: include/views/configuration.action.edit.php:890
+#: include/views/configuration.action.edit.php:1100
+#: include/views/configuration.action.edit.php:1265
+#: include/views/configuration.action.edit.php:1283
+#: include/views/configuration.action.edit.php:1428
+#: include/views/configuration.action.edit.php:1450
+#: include/views/configuration.action.edit.php:1666
+#: include/views/configuration.action.edit.php:1883
+#: include/views/configuration.action.edit.php:1977
+#: include/views/configuration.action.edit.php:1999
+#: include/views/configuration.action.edit.php:2144
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/configuration.graph.edit.php:351
@@ -576,15 +576,15 @@ msgstr "Kích hoạt"
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
 #: include/views/configuration.action.edit.php:700
-#: include/views/configuration.action.edit.php:1224
-#: include/views/configuration.action.edit.php:1246
-#: include/views/configuration.action.edit.php:1428
-#: include/views/configuration.action.edit.php:1450
-#: include/views/configuration.action.edit.php:1845
-#: include/views/configuration.action.edit.php:1977
-#: include/views/configuration.action.edit.php:1999
-#: include/views/configuration.action.edit.php:2330
-#: include/views/configuration.action.edit.php:2377
+#: include/views/configuration.action.edit.php:1226
+#: include/views/configuration.action.edit.php:1248
+#: include/views/configuration.action.edit.php:1430
+#: include/views/configuration.action.edit.php:1452
+#: include/views/configuration.action.edit.php:1849
+#: include/views/configuration.action.edit.php:1981
+#: include/views/configuration.action.edit.php:2003
+#: include/views/configuration.action.edit.php:2334
+#: include/views/configuration.action.edit.php:2381
 #: include/views/configuration.application.edit.php:60
 #: include/views/configuration.correlation.edit.php:197
 #: include/views/configuration.correlation.edit.php:255
@@ -847,8 +847,8 @@ msgstr "Sắp xếp phần tử sơ đồ"
 #: include/views/administration.auditlogs.list.php:53
 #: include/views/administration.general.gui.edit.php:44
 #: include/views/configuration.action.edit.php:767
-#: include/views/configuration.action.edit.php:1521
-#: include/views/configuration.action.edit.php:2289
+#: include/views/configuration.action.edit.php:1523
+#: include/views/configuration.action.edit.php:2293
 #: include/views/monitoring.sysmap.edit.php:213
 msgid "All"
 msgstr "Tất cả"
@@ -923,7 +923,7 @@ msgstr "Xen kẽ, bạn có thể cài đặt chúng bằng tay:"
 
 #: include/triggers.inc.php:1313
 #: include/views/configuration.action.edit.php:112
-#: include/views/configuration.action.edit.php:1148
+#: include/views/configuration.action.edit.php:1150
 #: include/views/configuration.correlation.edit.php:94
 #: include/views/configuration.host.discovery.edit.php:622
 #: include/views/configuration.trigger.prototype.edit.php:140
@@ -937,7 +937,7 @@ msgstr "Và"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/views/configuration.action.edit.php:111
-#: include/views/configuration.action.edit.php:1147
+#: include/views/configuration.action.edit.php:1149
 #: include/views/configuration.correlation.edit.php:93
 #: include/views/configuration.host.discovery.edit.php:621
 #: include/views/configuration.host.list.php:59
@@ -1164,15 +1164,15 @@ msgstr "Ít nhất một chu kỳ bảo trì phải được thiết lậ
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "Ít nhất một MySQL, PostgreSQL, Oracle  hoặc IBM DB2 cần được hỗ trợ."
 
-#: include/views/configuration.action.edit.php:1266
+#: include/views/configuration.action.edit.php:1268
 msgid "At least one operation must exist."
 msgstr "Ít nhất một thao tác phải tồn tại."
 
-#: include/views/configuration.action.edit.php:1270
+#: include/views/configuration.action.edit.php:1272
 msgid "At least one operation or recovery operation must exist."
 msgstr "Ít nhất một thao tác hoặc thao tác phục hồi phải tồn tại."
 
-#: include/views/configuration.action.edit.php:1867
+#: include/views/configuration.action.edit.php:1871
 msgid "At least one operation, recovery operation or update operation must exist."
 msgstr "Ít nhất một thao tác, thao tác phục hồi hoặc thao tác cập nhật phải tồn tại."
 
@@ -1185,8 +1185,8 @@ msgid "At least one update operation or message must exist."
 msgstr "Ít nhất một thao tác cập nhật hoặc tin nhắn phải tồn tại."
 
 #: include/views/configuration.action.edit.php:754
-#: include/views/configuration.action.edit.php:1505
-#: include/views/configuration.action.edit.php:2264
+#: include/views/configuration.action.edit.php:1507
+#: include/views/configuration.action.edit.php:2268
 msgid "At least one user or user group must be selected."
 msgstr "Ít nhất một người dùng hoặc một nhóm người dùng phải được lựa chọn."
 
@@ -1246,9 +1246,9 @@ msgstr "Thuật toán xác thực"
 msgid "Authentication failed: %1$s."
 msgstr "Xác thực lỗi: %1$s."
 
-#: include/views/configuration.action.edit.php:944
-#: include/views/configuration.action.edit.php:1733
-#: include/views/configuration.action.edit.php:2193
+#: include/views/configuration.action.edit.php:946
+#: include/views/configuration.action.edit.php:1737
+#: include/views/configuration.action.edit.php:2197
 #: include/views/configuration.host.discovery.edit.php:481
 #: include/views/configuration.item.edit.php:601
 #: include/views/configuration.item.massupdate.php:283
@@ -1324,7 +1324,7 @@ msgstr "Sự  kiện đăng kí tự động hoặc cảnh báo chu kì lưu tr�
 
 #: include/hosts.inc.php:1301
 #: include/views/administration.general.other.edit.php:59
-#: include/views/configuration.action.edit.php:1077
+#: include/views/configuration.action.edit.php:1079
 #: include/views/configuration.host.edit.php:718
 #: include/views/configuration.host.massupdate.php:196
 #: include/views/configuration.host.prototype.edit.php:368
@@ -1563,10 +1563,10 @@ msgstr "Không thể xóa"
 #: app/views/monitoring.dashboard.view.php:100
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:106
-#: include/views/configuration.action.edit.php:1229
-#: include/views/configuration.action.edit.php:1249
-#: include/views/configuration.action.edit.php:1850
-#: include/views/configuration.action.edit.php:2333
+#: include/views/configuration.action.edit.php:1231
+#: include/views/configuration.action.edit.php:1251
+#: include/views/configuration.action.edit.php:1854
+#: include/views/configuration.action.edit.php:2337
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:85
 #: include/views/conf.import.php:120
@@ -3177,7 +3177,7 @@ msgstr "Đồng hồ"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.regularexpressions.edit.php:146
 #: include/views/administration.general.valuemapping.edit.php:107
-#: include/views/configuration.action.edit.php:2366
+#: include/views/configuration.action.edit.php:2370
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:135
@@ -3280,12 +3280,12 @@ msgstr "Câu lệnh"
 #: app/controllers/CControllerPopupGeneric.php:321
 #: app/views/administration.script.edit.php:55
 #: app/views/administration.script.list.php:59
-#: include/views/configuration.action.edit.php:997
-#: include/views/configuration.action.edit.php:1004
-#: include/views/configuration.action.edit.php:1783
-#: include/views/configuration.action.edit.php:1792
-#: include/views/configuration.action.edit.php:2242
-#: include/views/configuration.action.edit.php:2251
+#: include/views/configuration.action.edit.php:999
+#: include/views/configuration.action.edit.php:1006
+#: include/views/configuration.action.edit.php:1787
+#: include/views/configuration.action.edit.php:1796
+#: include/views/configuration.action.edit.php:2246
+#: include/views/configuration.action.edit.php:2255
 msgid "Commands"
 msgstr "Các câu lệnh"
 
@@ -3340,7 +3340,7 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr "Điều kiện \"%2$s\" được sử dụng trong công thức \"%3$s\" cho quy tắc khám phá \"%1$s\" không được xác định."
 
 #: include/views/configuration.action.edit.php:124
-#: include/views/configuration.action.edit.php:1166
+#: include/views/configuration.action.edit.php:1168
 #: include/views/configuration.action.list.php:73
 #: include/views/configuration.correlation.edit.php:106
 #: include/views/configuration.correlation.list.php:61
@@ -3442,7 +3442,7 @@ msgstr "Cấu hình của các macro"
 msgid "Configuration of maintenance periods"
 msgstr "Cấu hình của chu kỳ bảo trì"
 
-#: app/controllers/CControllerMediatypeEdit.php:201
+#: app/controllers/CControllerMediatypeEdit.php:182
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Cấu hình của kiểu media"
@@ -4065,9 +4065,9 @@ msgstr ""
 msgid "Custom screens"
 msgstr "Tùy chỉnh screen"
 
-#: include/views/configuration.action.edit.php:921
-#: include/views/configuration.action.edit.php:1683
-#: include/views/configuration.action.edit.php:2161
+#: include/views/configuration.action.edit.php:923
+#: include/views/configuration.action.edit.php:1687
+#: include/views/configuration.action.edit.php:2165
 msgid "Custom script"
 msgstr "Tùy chỉnh script"
 
@@ -4358,17 +4358,17 @@ msgstr "Chế độ kiểm kê máy chủ mặc định"
 msgid "Default login form"
 msgstr "Mẫu đăng nhập mặc định"
 
-#: include/views/configuration.action.edit.php:2298
+#: include/views/configuration.action.edit.php:2302
 msgid "Default media type"
 msgstr "Loại phương tiện mặc định"
 
 #: include/views/configuration.action.edit.php:421
-#: include/views/configuration.action.edit.php:779
-#: include/views/configuration.action.edit.php:1275
-#: include/views/configuration.action.edit.php:1533
-#: include/views/configuration.action.edit.php:1823
-#: include/views/configuration.action.edit.php:1874
-#: include/views/configuration.action.edit.php:2305
+#: include/views/configuration.action.edit.php:781
+#: include/views/configuration.action.edit.php:1277
+#: include/views/configuration.action.edit.php:1537
+#: include/views/configuration.action.edit.php:1827
+#: include/views/configuration.action.edit.php:1878
+#: include/views/configuration.action.edit.php:2309
 msgid "Default message"
 msgstr "Thông điệp mặc định"
 
@@ -4377,8 +4377,8 @@ msgid "Default operation step duration"
 msgstr "Các bước thao tác mặc định"
 
 #: include/views/configuration.action.edit.php:418
-#: include/views/configuration.action.edit.php:1272
-#: include/views/configuration.action.edit.php:1871
+#: include/views/configuration.action.edit.php:1274
+#: include/views/configuration.action.edit.php:1875
 msgid "Default subject"
 msgstr "Đối tượng mặc định"
 
@@ -4462,7 +4462,7 @@ msgstr "Xóa và xóa bỏ hoàn toàn template hay không? (Cảnh báo: 
 msgid "Delete application?"
 msgstr "Xóa ứng dụng?"
 
-#: include/views/configuration.action.edit.php:2368
+#: include/views/configuration.action.edit.php:2372
 msgid "Delete current action?"
 msgstr "Xóa hành động hiện tại?"
 
@@ -4814,8 +4814,8 @@ msgstr "Mô tả được cập nhật"
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
-#: include/views/configuration.action.edit.php:1281
-#: include/views/configuration.action.edit.php:1879
+#: include/views/configuration.action.edit.php:1283
+#: include/views/configuration.action.edit.php:1883
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/inventory.host.view.php:217 queue.php:75
 msgid "Details"
@@ -5257,12 +5257,6 @@ msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết\"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Tạo bản sao \"%1$s\" giá trị \"%2$s\" cho liên kết."
 
-#: include/classes/api/services/CMediatype.php:209
-#: include/classes/api/services/CMediatype.php:510
-#, c-format
-msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr "Tạo bản sao \"mô tả\" giá trị \"%1$s\" cho kiểu phương tiện."
-
 #: include/classes/api/services/CItemPrototype.php:351
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
@@ -5372,8 +5366,8 @@ msgstr "Mỗi URL cần có một tên duy nhất. Xin chắc chắn chi�
 #: app/views/popup.trigdesc.view.php:109
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
-#: include/views/configuration.action.edit.php:1314
-#: include/views/configuration.action.edit.php:1910
+#: include/views/configuration.action.edit.php:1316
+#: include/views/configuration.action.edit.php:1914
 #: include/views/configuration.maintenance.edit.php:90
 #: include/views/configuration.trigger.prototype.edit.php:96
 #: include/views/configuration.trigger.prototype.edit.php:290
@@ -5533,7 +5527,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
 #: include/classes/api/services/CMediatype.php:174
-#: include/classes/api/services/CMediatype.php:436
+#: include/classes/api/services/CMediatype.php:430
 #: include/classes/api/services/CScreen.php:416
 #: include/classes/api/services/CScreen.php:722
 #: include/classes/api/services/CScreen.php:1196
@@ -5556,7 +5550,7 @@ msgstr "Không có các tham số đầu vào."
 msgid "Empty map ID."
 msgstr "ID sơ đồ trống."
 
-#: include/classes/api/services/CMediatype.php:442
+#: include/classes/api/services/CMediatype.php:436
 msgid "Empty media type ID."
 msgstr "ID loại phương tiện trống."
 
@@ -5883,9 +5877,9 @@ msgstr "Thực hiện truy vấn WMI và trả về đối tượng được tr�
 #: app/controllers/CControllerPopupGeneric.php:320
 #: app/views/administration.script.edit.php:48
 #: app/views/administration.script.list.php:58
-#: include/views/configuration.action.edit.php:934
-#: include/views/configuration.action.edit.php:1714
-#: include/views/configuration.action.edit.php:2184
+#: include/views/configuration.action.edit.php:936
+#: include/views/configuration.action.edit.php:1718
+#: include/views/configuration.action.edit.php:2188
 msgid "Execute on"
 msgstr "Thực hiện trên"
 
@@ -6105,8 +6099,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Trường \"%1$s\" thiếu giá trị cho sơ đồ \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:196
-#: include/classes/api/services/CMediatype.php:532
-#: include/classes/api/services/CMediatype.php:903
+#: include/classes/api/services/CMediatype.php:524
+#: include/classes/api/services/CMediatype.php:895
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "Trường \"%1$s\" thiếu giá trị cho phương tiện \"%2$s\"."
@@ -6133,7 +6127,7 @@ msgstr "Trường \"%1$s\" không phải là số nguyên."
 msgid "Field \"%1$s\" is not string."
 msgstr "Trường \"%1$s\" không phải là chuỗi."
 
-#: include/classes/api/services/CMediatype.php:897
+#: include/classes/api/services/CMediatype.php:889
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "Trường \"%1$s\" được chuẩn bị cho loại phương tiện \"%2$s\"."
@@ -6429,9 +6423,9 @@ msgstr "Biểu thức đã cho không phải là một macro"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Biểu thức chính quy toàn cục \"%1$s\" không tồn tại"
 
-#: include/views/configuration.action.edit.php:924
-#: include/views/configuration.action.edit.php:1686
-#: include/views/configuration.action.edit.php:2164
+#: include/views/configuration.action.edit.php:926
+#: include/views/configuration.action.edit.php:1690
+#: include/views/configuration.action.edit.php:2168
 msgid "Global script"
 msgstr "Tập lệnh toàn cục"
 
@@ -7156,7 +7150,7 @@ msgstr "Nhóm máy chủ với ID \"%1$s\" không sẵn sàng."
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
 #: include/forms.inc.php:176 include/menu.inc.php:186
-#: include/views/configuration.action.edit.php:1026
+#: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.copy.elements.php:57
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
@@ -7434,9 +7428,9 @@ msgstr "Dải IP \"%1$s\" vượt quá giới hạn địa chỉ \"%2$s\""
 
 #: app/views/administration.script.edit.php:44
 #: app/views/administration.script.list.php:71 include/hosts.inc.php:471
-#: include/items.inc.php:350 include/views/configuration.action.edit.php:920
-#: include/views/configuration.action.edit.php:1682
-#: include/views/configuration.action.edit.php:2160
+#: include/items.inc.php:350 include/views/configuration.action.edit.php:922
+#: include/views/configuration.action.edit.php:1686
+#: include/views/configuration.action.edit.php:2164
 #: include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:296
 #: include/views/configuration.host.prototype.edit.php:343
@@ -7981,7 +7975,7 @@ msgstr "Đối số không chính xác được thông qua hàm."
 #: include/classes/api/services/CMap.php:1228
 #: include/classes/api/services/CMap.php:1448
 #: include/classes/api/services/CMediatype.php:181
-#: include/classes/api/services/CMediatype.php:472
+#: include/classes/api/services/CMediatype.php:466
 #: include/classes/api/services/CScreen.php:496
 #: include/classes/api/services/CScreen.php:570
 #: include/classes/api/services/CScreen.php:761
@@ -8279,7 +8273,7 @@ msgstr "ID sơ đồ không chính xác."
 msgid "Incorrect max columns provided for screen element."
 msgstr "Giá trị cột lớn nhất được cung cấp không chính xác cho phần tử screen."
 
-#: include/classes/api/services/CMediatype.php:443
+#: include/classes/api/services/CMediatype.php:437
 msgid "Incorrect media type ID."
 msgstr "ID loại phương tiện không chính xác."
 
@@ -8561,21 +8555,21 @@ msgstr "Giá trị \"%1$s\" không chính xác đối với trường unsi
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "Giá trị không chính xác \"%1$s\" trong trường \"%2$s\" cho liên kết \"%3$s\"."
 
-#: include/classes/api/services/CMediatype.php:241
-#: include/classes/api/services/CMediatype.php:252
-#: include/classes/api/services/CMediatype.php:271
-#: include/classes/api/services/CMediatype.php:287
-#: include/classes/api/services/CMediatype.php:303
-#: include/classes/api/services/CMediatype.php:322
-#: include/classes/api/services/CMediatype.php:354
-#: include/classes/api/services/CMediatype.php:552
-#: include/classes/api/services/CMediatype.php:565
-#: include/classes/api/services/CMediatype.php:584
-#: include/classes/api/services/CMediatype.php:601
-#: include/classes/api/services/CMediatype.php:618
-#: include/classes/api/services/CMediatype.php:638
-#: include/classes/api/services/CMediatype.php:670
-#: include/classes/api/services/CMediatype.php:880
+#: include/classes/api/services/CMediatype.php:235
+#: include/classes/api/services/CMediatype.php:246
+#: include/classes/api/services/CMediatype.php:265
+#: include/classes/api/services/CMediatype.php:281
+#: include/classes/api/services/CMediatype.php:297
+#: include/classes/api/services/CMediatype.php:316
+#: include/classes/api/services/CMediatype.php:348
+#: include/classes/api/services/CMediatype.php:544
+#: include/classes/api/services/CMediatype.php:557
+#: include/classes/api/services/CMediatype.php:576
+#: include/classes/api/services/CMediatype.php:593
+#: include/classes/api/services/CMediatype.php:610
+#: include/classes/api/services/CMediatype.php:630
+#: include/classes/api/services/CMediatype.php:662
+#: include/classes/api/services/CMediatype.php:872
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "Giá trị \"%1$s\" không chính xác trong trường \"%2$s\" cho loại phương tiện \"%3$s\"."
@@ -8711,22 +8705,22 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/api/services/CMap.php:680
 #: include/classes/api/services/CMap.php:1139
 #: include/classes/api/services/CMap.php:1145
-#: include/classes/api/services/CMediatype.php:365
-#: include/classes/api/services/CMediatype.php:375
-#: include/classes/api/services/CMediatype.php:384
-#: include/classes/api/services/CMediatype.php:391
-#: include/classes/api/services/CMediatype.php:400
+#: include/classes/api/services/CMediatype.php:359
+#: include/classes/api/services/CMediatype.php:369
+#: include/classes/api/services/CMediatype.php:378
+#: include/classes/api/services/CMediatype.php:385
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:403
 #: include/classes/api/services/CMediatype.php:409
-#: include/classes/api/services/CMediatype.php:415
-#: include/classes/api/services/CMediatype.php:477
-#: include/classes/api/services/CMediatype.php:682
-#: include/classes/api/services/CMediatype.php:692
-#: include/classes/api/services/CMediatype.php:699
-#: include/classes/api/services/CMediatype.php:708
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:725
-#: include/classes/api/services/CMediatype.php:734
-#: include/classes/api/services/CMediatype.php:740
+#: include/classes/api/services/CMediatype.php:470
+#: include/classes/api/services/CMediatype.php:674
+#: include/classes/api/services/CMediatype.php:684
+#: include/classes/api/services/CMediatype.php:691
+#: include/classes/api/services/CMediatype.php:700
+#: include/classes/api/services/CMediatype.php:707
+#: include/classes/api/services/CMediatype.php:717
+#: include/classes/api/services/CMediatype.php:726
+#: include/classes/api/services/CMediatype.php:732
 #: include/classes/api/services/CProxy.php:558
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
@@ -8765,12 +8759,12 @@ msgstr "Giá trị không chính xác cho trường \"%1$s\"."
 #: include/classes/helpers/CSvgGraphHelper.php:247
 #: include/classes/import/CConfigurationImport.php:835
 #: include/classes/import/CConfigurationImport.php:873
-#: include/classes/import/CConfigurationImport.php:2514
-#: include/classes/import/CConfigurationImport.php:2618
-#: include/classes/import/CConfigurationImport.php:2628
-#: include/classes/import/CConfigurationImport.php:2664
-#: include/classes/import/CConfigurationImport.php:2673
-#: include/classes/import/CConfigurationImport.php:2679
+#: include/classes/import/CConfigurationImport.php:2516
+#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:2630
+#: include/classes/import/CConfigurationImport.php:2666
+#: include/classes/import/CConfigurationImport.php:2675
+#: include/classes/import/CConfigurationImport.php:2681
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -9299,7 +9293,7 @@ msgstr "Kiểm kê bị vô hiệu hóa cho host \"%1$s\"."
 msgid "Inventory field"
 msgstr "Trường kiểm kê"
 
-#: include/views/configuration.action.edit.php:1072
+#: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.massupdate.php:190
 msgid "Inventory mode"
 msgstr "Chế độ kiểm kê"
@@ -9717,9 +9711,9 @@ msgstr "Key"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Key \"%1$s\" không khớp với <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 
-#: include/views/configuration.action.edit.php:983
-#: include/views/configuration.action.edit.php:1772
-#: include/views/configuration.action.edit.php:2229
+#: include/views/configuration.action.edit.php:985
+#: include/views/configuration.action.edit.php:1776
+#: include/views/configuration.action.edit.php:2233
 #: include/views/js/common.item.edit.js.php:248
 msgid "Key passphrase"
 msgstr "Key passphrase"
@@ -9776,7 +9770,7 @@ msgid "LLD macros"
 msgstr ""
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1098
+#: include/views/configuration.action.edit.php:1100
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.host.discovery.edit.php:641
 #: include/views/js/monitoring.sysmaps.js.php:110
@@ -10344,7 +10338,7 @@ msgstr "Tham số bắt buộc bị lỗi."
 
 #: include/hosts.inc.php:1300
 #: include/views/administration.general.other.edit.php:58
-#: include/views/configuration.action.edit.php:1076
+#: include/views/configuration.action.edit.php:1078
 #: include/views/configuration.host.edit.php:717
 #: include/views/configuration.host.massupdate.php:195
 #: include/views/configuration.host.prototype.edit.php:367
@@ -10575,8 +10569,10 @@ msgstr "Media"
 msgid "Media type"
 msgstr "Loại phương tiện"
 
-#: include/classes/api/services/CMediatype.php:225
-#: include/classes/api/services/CMediatype.php:498
+#: include/classes/api/services/CMediatype.php:206
+#: include/classes/api/services/CMediatype.php:220
+#: include/classes/api/services/CMediatype.php:490
+#: include/classes/api/services/CMediatype.php:502
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "Loại phương tiện \"%1$s\" đã tồn tại."
@@ -10628,7 +10624,7 @@ msgstr "Kiểu phương tiện với ID \"%1$s\" là không sẵn sàng."
 msgid "Media types"
 msgstr "Các loại phương tiện"
 
-#: include/classes/api/services/CMediatype.php:856
+#: include/classes/api/services/CMediatype.php:848
 #, c-format
 msgid "Media types used by action \"%s\"."
 msgstr "Các loại phương tiện được sử dụng bởi action \"%s\"."
@@ -10660,10 +10656,10 @@ msgstr "Bộ nhớ đã sử dụng bởi tiến trình theo byte. Trả về ki
 #: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
-#: include/views/configuration.action.edit.php:787
-#: include/views/configuration.action.edit.php:1542
-#: include/views/configuration.action.edit.php:1832
-#: include/views/configuration.action.edit.php:2314
+#: include/views/configuration.action.edit.php:789
+#: include/views/configuration.action.edit.php:1546
+#: include/views/configuration.action.edit.php:1836
+#: include/views/configuration.action.edit.php:2318
 msgid "Message"
 msgstr "Tin nhắn"
 
@@ -10954,7 +10950,7 @@ msgstr "NTLM"
 #: include/views/common.filter.trigger.php:66
 #: include/views/configuration.action.edit.php:40
 #: include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1098
+#: include/views/configuration.action.edit.php:1100
 #: include/views/configuration.action.list.php:47
 #: include/views/configuration.action.list.php:72
 #: include/views/configuration.application.edit.php:39
@@ -11090,12 +11086,12 @@ msgid "Never"
 msgstr "Không bao giờ"
 
 #: include/views/configuration.action.edit.php:562
-#: include/views/configuration.action.edit.php:892
-#: include/views/configuration.action.edit.php:1161
-#: include/views/configuration.action.edit.php:1350
-#: include/views/configuration.action.edit.php:1666
-#: include/views/configuration.action.edit.php:2144
-#: include/views/configuration.action.edit.php:2345
+#: include/views/configuration.action.edit.php:894
+#: include/views/configuration.action.edit.php:1163
+#: include/views/configuration.action.edit.php:1352
+#: include/views/configuration.action.edit.php:1670
+#: include/views/configuration.action.edit.php:2148
+#: include/views/configuration.action.edit.php:2349
 #: include/views/configuration.discovery.edit.php:73
 #: include/views/configuration.maintenance.edit.php:123
 msgid "New"
@@ -11224,7 +11220,7 @@ msgstr "\"%1$s\" không được đưa ra cho đồ thị."
 msgid "No \"%1$s\" given for map."
 msgstr "Không có \"%1$s\" cho sơ đồ."
 
-#: include/classes/api/services/CMediatype.php:441
+#: include/classes/api/services/CMediatype.php:435
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "Không có \"%1$s\" cho phương tiện."
@@ -11625,7 +11621,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: include/classes/api/services/CMap.php:1561
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
-#: include/classes/api/services/CMediatype.php:465
+#: include/classes/api/services/CMediatype.php:459
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
 #: include/classes/api/services/CProxy.php:415
@@ -11786,7 +11782,7 @@ msgid "Norwegian (nb_NO)"
 msgstr "Norwegian (nb_NO)"
 
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/views/configuration.action.edit.php:1214
+#: include/views/configuration.action.edit.php:1216
 msgid "Not Ack"
 msgstr "Không báo nhận"
 
@@ -12168,7 +12164,7 @@ msgstr "Chỉ các Super Admin mới có thể tạo các media type."
 msgid "Only Super Admins can create user groups."
 msgstr "Chỉ Siêu Admin mới có thể tạo nhóm người dùng."
 
-#: include/classes/api/services/CMediatype.php:846
+#: include/classes/api/services/CMediatype.php:838
 msgid "Only Super Admins can delete media types."
 msgstr "Chỉ các Super Admin mới có thể xóa các media type."
 
@@ -12176,7 +12172,7 @@ msgstr "Chỉ các Super Admin mới có thể xóa các media type."
 msgid "Only Super Admins can delete user groups."
 msgstr "Chỉ các Super Admin mới có thể xóa các nhóm người dùng."
 
-#: include/classes/api/services/CMediatype.php:432
+#: include/classes/api/services/CMediatype.php:426
 msgid "Only Super Admins can edit media types."
 msgstr "Chỉ các Super Admin mới có thể chỉnh sửa các media type."
 
@@ -12279,13 +12275,13 @@ msgstr "Thao tác \"%s\" đã tồn tại."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Thao tác không thể được thực hiện do yêu cầu không được cho phép."
 
-#: include/views/configuration.action.edit.php:1220
+#: include/views/configuration.action.edit.php:1222
 msgid "Operation condition"
 msgstr "Điều kiện thao tác"
 
-#: include/views/configuration.action.edit.php:1241
-#: include/views/configuration.action.edit.php:1840
-#: include/views/configuration.action.edit.php:2327
+#: include/views/configuration.action.edit.php:1243
+#: include/views/configuration.action.edit.php:1844
+#: include/views/configuration.action.edit.php:2331
 msgid "Operation details"
 msgstr "Chie tiết thao tác"
 
@@ -12299,9 +12295,9 @@ msgstr "Thao tác không có template để hoạt động."
 
 #: include/views/configuration.action.edit.php:615
 #: include/views/configuration.action.edit.php:627
-#: include/views/configuration.action.edit.php:1383
-#: include/views/configuration.action.edit.php:1395
-#: include/views/configuration.action.edit.php:1963
+#: include/views/configuration.action.edit.php:1385
+#: include/views/configuration.action.edit.php:1397
+#: include/views/configuration.action.edit.php:1967
 msgid "Operation type"
 msgstr "Kiểu thao tác"
 
@@ -12317,10 +12313,10 @@ msgid "Operational data"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:567
-#: include/views/configuration.action.edit.php:1264
-#: include/views/configuration.action.edit.php:1355
-#: include/views/configuration.action.edit.php:2321
-#: include/views/configuration.action.edit.php:2343
+#: include/views/configuration.action.edit.php:1266
+#: include/views/configuration.action.edit.php:1357
+#: include/views/configuration.action.edit.php:2325
+#: include/views/configuration.action.edit.php:2347
 #: include/views/configuration.action.list.php:74
 #: include/views/configuration.correlation.edit.php:242
 #: include/views/configuration.correlation.edit.php:267
@@ -12341,7 +12337,7 @@ msgstr "Tùy chọn"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:380
 #: include/triggers.inc.php:1313
 #: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:1149
+#: include/views/configuration.action.edit.php:1151
 #: include/views/configuration.correlation.edit.php:95
 #: include/views/configuration.host.discovery.edit.php:623
 #: include/views/configuration.host.list.php:60
@@ -12807,12 +12803,12 @@ msgstr "Thụ động"
 #: app/views/administration.user.edit.php:116 disc_prototypes.php:278
 #: host_discovery.php:218 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/configuration.action.edit.php:948
-#: include/views/configuration.action.edit.php:977
-#: include/views/configuration.action.edit.php:1728
-#: include/views/configuration.action.edit.php:1760
-#: include/views/configuration.action.edit.php:2197
-#: include/views/configuration.action.edit.php:2224
+#: include/views/configuration.action.edit.php:950
+#: include/views/configuration.action.edit.php:979
+#: include/views/configuration.action.edit.php:1732
+#: include/views/configuration.action.edit.php:1764
+#: include/views/configuration.action.edit.php:2201
+#: include/views/configuration.action.edit.php:2228
 #: include/views/configuration.host.discovery.edit.php:293
 #: include/views/configuration.host.discovery.edit.php:483
 #: include/views/configuration.host.discovery.edit.php:512
@@ -12998,9 +12994,9 @@ msgstr "Gắn linh kiện vào trường host còn lại"
 #: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:123
 #: host_discovery.php:111 include/classes/setup/CSetupWizard.php:279
-#: include/forms.inc.php:318 include/views/configuration.action.edit.php:991
-#: include/views/configuration.action.edit.php:1775
-#: include/views/configuration.action.edit.php:2236
+#: include/forms.inc.php:318 include/views/configuration.action.edit.php:993
+#: include/views/configuration.action.edit.php:1779
+#: include/views/configuration.action.edit.php:2240
 #: include/views/configuration.host.discovery.edit.php:470
 #: include/views/configuration.host.edit.php:115
 #: include/views/configuration.host.edit.php:198
@@ -13151,9 +13147,9 @@ msgstr "Giao thức riêng"
 msgid "Private"
 msgstr "Riêng"
 
-#: include/views/configuration.action.edit.php:970
-#: include/views/configuration.action.edit.php:1752
-#: include/views/configuration.action.edit.php:2217
+#: include/views/configuration.action.edit.php:972
+#: include/views/configuration.action.edit.php:1756
+#: include/views/configuration.action.edit.php:2221
 #: include/views/configuration.host.discovery.edit.php:506
 #: include/views/configuration.item.edit.php:620
 #: include/views/configuration.item.massupdate.php:307
@@ -13367,9 +13363,9 @@ msgstr "Proxy đã được cập nhật"
 msgid "Public"
 msgstr "Công khai"
 
-#: include/views/configuration.action.edit.php:949
-#: include/views/configuration.action.edit.php:1729
-#: include/views/configuration.action.edit.php:2198
+#: include/views/configuration.action.edit.php:951
+#: include/views/configuration.action.edit.php:1733
+#: include/views/configuration.action.edit.php:2202
 #: include/views/configuration.host.discovery.edit.php:484
 #: include/views/configuration.item.edit.php:590
 #: include/views/configuration.item.massupdate.php:287
@@ -13378,9 +13374,9 @@ msgstr "Công khai"
 msgid "Public key"
 msgstr "Khóa công khai"
 
-#: include/views/configuration.action.edit.php:962
-#: include/views/configuration.action.edit.php:1743
-#: include/views/configuration.action.edit.php:2209
+#: include/views/configuration.action.edit.php:964
+#: include/views/configuration.action.edit.php:1747
+#: include/views/configuration.action.edit.php:2213
 #: include/views/configuration.host.discovery.edit.php:499
 #: include/views/configuration.item.edit.php:613
 #: include/views/configuration.item.massupdate.php:300
@@ -13520,7 +13516,7 @@ msgstr "Biểu thức phục hồi"
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:1862
+#: include/views/configuration.action.edit.php:1866
 msgid "Recovery operations"
 msgstr "Phục hồi hoạt động"
 
@@ -13639,9 +13635,9 @@ msgstr "Lệnh từ xa"
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.action.edit.php:533
-#: include/views/configuration.action.edit.php:1131
-#: include/views/configuration.action.edit.php:1320
-#: include/views/configuration.action.edit.php:1916
+#: include/views/configuration.action.edit.php:1133
+#: include/views/configuration.action.edit.php:1322
+#: include/views/configuration.action.edit.php:1920
 #: include/views/configuration.correlation.edit.php:76
 #: include/views/configuration.correlation.edit.php:230
 #: include/views/configuration.host.discovery.edit.php:130
@@ -14246,9 +14242,9 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Thực hiện câu lệnh SQL đã thất bại \"%1$s\"."
 
 #: include/discovery.inc.php:47
-#: include/views/configuration.action.edit.php:922
-#: include/views/configuration.action.edit.php:1684
-#: include/views/configuration.action.edit.php:2162
+#: include/views/configuration.action.edit.php:924
+#: include/views/configuration.action.edit.php:1688
+#: include/views/configuration.action.edit.php:2166
 #: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SSH"
 msgstr "SSH"
@@ -14473,9 +14469,9 @@ msgstr "Danh sách đường dẫn script \"%1$s\" đã được sử dụ
 
 #: app/views/administration.mediatype.edit.php:84
 #: app/views/administration.mediatype.list.php:82
-#: include/views/configuration.action.edit.php:929
-#: include/views/configuration.action.edit.php:1708
-#: include/views/configuration.action.edit.php:2168
+#: include/views/configuration.action.edit.php:931
+#: include/views/configuration.action.edit.php:1712
+#: include/views/configuration.action.edit.php:2172
 msgid "Script name"
 msgstr "Tên script"
 
@@ -14488,8 +14484,8 @@ msgstr "Tên script \"%1$s\" đã được sử dụng trong danh sách đư
 msgid "Script parameters"
 msgstr "Tiến trình tham số "
 
-#: include/classes/api/services/CMediatype.php:337
-#: include/classes/api/services/CMediatype.php:653
+#: include/classes/api/services/CMediatype.php:331
+#: include/classes/api/services/CMediatype.php:645
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "Tiến trình tham số \"%1$s\" đang thiếu nguồn cấp dữ liệu dòng mới cuối cùng cho loại phương tiện \"%2$s\"."
@@ -14580,9 +14576,9 @@ msgstr "Tên bảo mật"
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
 #: include/views/configuration.action.edit.php:269
-#: include/views/configuration.action.edit.php:910
-#: include/views/configuration.action.edit.php:1700
-#: include/views/configuration.action.edit.php:2179
+#: include/views/configuration.action.edit.php:912
+#: include/views/configuration.action.edit.php:1704
+#: include/views/configuration.action.edit.php:2183
 #: include/views/configuration.graph.edit.php:188
 #: include/views/configuration.graph.edit.php:270
 #: include/views/configuration.item.edit.php:94
@@ -14666,9 +14662,9 @@ msgstr "Gửi tin nhắc đến các nhóm người dùng"
 msgid "Send message to users"
 msgstr "Gửi tin nhắn đến các người dùng"
 
-#: include/views/configuration.action.edit.php:778
-#: include/views/configuration.action.edit.php:1532
-#: include/views/configuration.action.edit.php:2301
+#: include/views/configuration.action.edit.php:780
+#: include/views/configuration.action.edit.php:1536
+#: include/views/configuration.action.edit.php:2305
 msgid "Send only to"
 msgstr "Chỉ gửi đến"
 
@@ -14678,14 +14674,14 @@ msgid "Send to"
 msgstr "Gửi tới"
 
 #: include/views/configuration.action.edit.php:755
-#: include/views/configuration.action.edit.php:1508
-#: include/views/configuration.action.edit.php:2270
+#: include/views/configuration.action.edit.php:1510
+#: include/views/configuration.action.edit.php:2274
 msgid "Send to User groups"
 msgstr "Gửi tới các nhóm người dùng"
 
 #: include/views/configuration.action.edit.php:760
-#: include/views/configuration.action.edit.php:1513
-#: include/views/configuration.action.edit.php:2278
+#: include/views/configuration.action.edit.php:1515
+#: include/views/configuration.action.edit.php:2282
 msgid "Send to Users"
 msgstr "Gửi tới các người dùng"
 
@@ -15512,10 +15508,10 @@ msgstr ""
 
 #: app/views/popup.mediatypetest.edit.php:32
 #: include/views/administration.auditacts.list.php:86
-#: include/views/configuration.action.edit.php:783
-#: include/views/configuration.action.edit.php:1537
-#: include/views/configuration.action.edit.php:1827
-#: include/views/configuration.action.edit.php:2309
+#: include/views/configuration.action.edit.php:785
+#: include/views/configuration.action.edit.php:1541
+#: include/views/configuration.action.edit.php:1831
+#: include/views/configuration.action.edit.php:2313
 msgid "Subject"
 msgstr "Đối tượng"
 
@@ -15741,9 +15737,9 @@ msgstr "Thẻ giá trị"
 msgid "Tags"
 msgstr "Thẻ"
 
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1662
-#: include/views/configuration.action.edit.php:2140
+#: include/views/configuration.action.edit.php:890
+#: include/views/configuration.action.edit.php:1666
+#: include/views/configuration.action.edit.php:2144
 #: include/views/configuration.copy.elements.php:64
 #: include/views/configuration.trigger.prototype.edit.php:182
 #: include/views/configuration.trigger.prototype.edit.php:377
@@ -15755,9 +15751,9 @@ msgstr "Thẻ"
 msgid "Target"
 msgstr "Target"
 
-#: include/views/configuration.action.edit.php:884
-#: include/views/configuration.action.edit.php:1658
-#: include/views/configuration.action.edit.php:2136
+#: include/views/configuration.action.edit.php:886
+#: include/views/configuration.action.edit.php:1662
+#: include/views/configuration.action.edit.php:2140
 msgid "Target list"
 msgstr "Danh sách Target"
 
@@ -15766,9 +15762,9 @@ msgid "Target type"
 msgstr "Kiểu Target"
 
 #: include/discovery.inc.php:61
-#: include/views/configuration.action.edit.php:923
-#: include/views/configuration.action.edit.php:1685
-#: include/views/configuration.action.edit.php:2163
+#: include/views/configuration.action.edit.php:925
+#: include/views/configuration.action.edit.php:1689
+#: include/views/configuration.action.edit.php:2167
 #: include/views/js/configuration.discovery.edit.js.php:218
 msgid "Telnet"
 msgstr "Telnet"
@@ -15876,7 +15872,7 @@ msgstr "Template với cùng một tên hiển thị \"%s\" đã tồn ta�
 #: app/controllers/CControllerPopupGeneric.php:75 app/views/search.php:135
 #: app/views/search.php:153 app/views/search.php:156 app/views/search.php:157
 #: app/views/search.php:252 include/menu.inc.php:190
-#: include/views/configuration.action.edit.php:1049
+#: include/views/configuration.action.edit.php:1051
 #: include/views/configuration.copy.elements.php:59
 #: include/views/configuration.host.edit.php:653
 #: include/views/configuration.hostgroups.list.php:59
@@ -16638,9 +16634,9 @@ msgstr "Hai phần tử sơ đồ nên được chọn"
 #: include/forms.inc.php:193 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/configuration.action.edit.php:916
-#: include/views/configuration.action.edit.php:1704
-#: include/views/configuration.action.edit.php:2156
+#: include/views/configuration.action.edit.php:918
+#: include/views/configuration.action.edit.php:1708
+#: include/views/configuration.action.edit.php:2160
 #: include/views/configuration.graph.edit.php:337
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.discovery.edit.php:59
@@ -16690,7 +16686,7 @@ msgid "Type (descending)"
 msgstr "Kiểu (giảm dần)"
 
 #: include/views/configuration.action.edit.php:118
-#: include/views/configuration.action.edit.php:1153
+#: include/views/configuration.action.edit.php:1155
 #: include/views/configuration.correlation.edit.php:91
 #: include/views/configuration.host.discovery.edit.php:618
 msgid "Type of calculation"
@@ -17031,10 +17027,10 @@ msgstr "Up"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/configuration.action.edit.php:1246
-#: include/views/configuration.action.edit.php:1845
-#: include/views/configuration.action.edit.php:2330
-#: include/views/configuration.action.edit.php:2365
+#: include/views/configuration.action.edit.php:1248
+#: include/views/configuration.action.edit.php:1849
+#: include/views/configuration.action.edit.php:2334
+#: include/views/configuration.action.edit.php:2369
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:133
@@ -17083,7 +17079,7 @@ msgstr "Cập nhật đã tồn tại"
 msgid "Update interval"
 msgstr "Khoảng thời gian cập nhật"
 
-#: include/views/configuration.action.edit.php:2354
+#: include/views/configuration.action.edit.php:2358
 msgid "Update operations"
 msgstr "Cập nhật thao tác"
 
@@ -17167,8 +17163,8 @@ msgstr "item đã được sử dụng"
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:1448
-#: include/views/configuration.action.edit.php:1995
+#: include/views/configuration.action.edit.php:1450
+#: include/views/configuration.action.edit.php:1999
 #: include/views/configuration.httpconf.edit.php:163
 msgid "User"
 msgstr "Người dùng"
@@ -17239,8 +17235,8 @@ msgstr[0] "Người dùng đã bị xóa"
 #: app/views/administration.user.list.php:35 include/audit.inc.php:33
 #: include/views/administration.usergroups.edit.php:268
 #: include/views/configuration.action.edit.php:676
-#: include/views/configuration.action.edit.php:1426
-#: include/views/configuration.action.edit.php:1973
+#: include/views/configuration.action.edit.php:1428
+#: include/views/configuration.action.edit.php:1977
 msgid "User group"
 msgstr "Nhóm người dùng"
 
@@ -17327,9 +17323,9 @@ msgid "User menu"
 msgstr "Danh sách người dùng"
 
 #: disc_prototypes.php:85 host_discovery.php:78
-#: include/views/configuration.action.edit.php:954
-#: include/views/configuration.action.edit.php:1735
-#: include/views/configuration.action.edit.php:2201
+#: include/views/configuration.action.edit.php:956
+#: include/views/configuration.action.edit.php:1739
+#: include/views/configuration.action.edit.php:2205
 #: include/views/configuration.host.discovery.edit.php:285
 #: include/views/configuration.host.discovery.edit.php:494
 #: include/views/configuration.item.edit.php:331
@@ -18365,9 +18361,9 @@ msgstr "Zabbix User"
 
 #: app/views/administration.script.edit.php:50 include/actions.inc.php:920
 #: include/discovery.inc.php:56 include/items.inc.php:86
-#: include/views/configuration.action.edit.php:938
-#: include/views/configuration.action.edit.php:1718
-#: include/views/configuration.action.edit.php:2188
+#: include/views/configuration.action.edit.php:940
+#: include/views/configuration.action.edit.php:1722
+#: include/views/configuration.action.edit.php:2192
 #: include/views/js/configuration.discovery.edit.js.php:219
 msgid "Zabbix agent"
 msgstr "Zabbix agent"
@@ -18398,9 +18394,9 @@ msgstr "Mẫu đăng nhập zabbix"
 
 #: app/views/administration.script.edit.php:52 include/actions.inc.php:930
 #: include/classes/setup/CSetupWizard.php:320
-#: include/views/configuration.action.edit.php:940
-#: include/views/configuration.action.edit.php:1720
-#: include/views/configuration.action.edit.php:2190
+#: include/views/configuration.action.edit.php:942
+#: include/views/configuration.action.edit.php:1724
+#: include/views/configuration.action.edit.php:2194
 msgid "Zabbix server"
 msgstr "Máy chủ Zabbix"
 
@@ -18416,9 +18412,9 @@ msgstr ""
 "2. Cấu hình mạng không chính xác.\n"
 
 #: app/views/administration.script.edit.php:51 include/actions.inc.php:925
-#: include/views/configuration.action.edit.php:939
-#: include/views/configuration.action.edit.php:1719
-#: include/views/configuration.action.edit.php:2189
+#: include/views/configuration.action.edit.php:941
+#: include/views/configuration.action.edit.php:1723
+#: include/views/configuration.action.edit.php:2193
 msgid "Zabbix server (proxy)"
 msgstr "Máy chủ zabbix (proxy)"
 
@@ -18736,13 +18732,13 @@ msgstr "Không thể thay đổi"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:366
-#: include/classes/api/services/CMediatype.php:385
-#: include/classes/api/services/CMediatype.php:401
-#: include/classes/api/services/CMediatype.php:477
-#: include/classes/api/services/CMediatype.php:683
-#: include/classes/api/services/CMediatype.php:709
-#: include/classes/api/services/CMediatype.php:726
+#: include/classes/api/services/CMediatype.php:360
+#: include/classes/api/services/CMediatype.php:379
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:470
+#: include/classes/api/services/CMediatype.php:675
+#: include/classes/api/services/CMediatype.php:701
+#: include/classes/api/services/CMediatype.php:718
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:248
@@ -18789,7 +18785,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "kiểm tra biểu thức bắt đầu từ \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1929
-#: include/classes/import/CConfigurationImport.php:2665
+#: include/classes/import/CConfigurationImport.php:2667
 msgid "circular item dependency is not allowed"
 msgstr "phụ thuộc item không được phép"
 
@@ -19194,8 +19190,8 @@ msgid "maximum dependent items count reached"
 msgstr "số lượng phụ thuộc tối đa đạt đến"
 
 #: include/classes/api/services/CItemGeneral.php:2009
-#: include/classes/import/CConfigurationImport.php:2619
-#: include/classes/import/CConfigurationImport.php:2680
+#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2682
 msgid "maximum number of dependency levels reached"
 msgstr "số lượng mức độ phụ thuộc tối đa đạt được"
 
@@ -19234,15 +19230,15 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr "Phải có một người dùng LDAP hợp lệ"
 
-#: include/classes/api/services/CMediatype.php:376
-#: include/classes/api/services/CMediatype.php:392
+#: include/classes/api/services/CMediatype.php:370
+#: include/classes/api/services/CMediatype.php:386
+#: include/classes/api/services/CMediatype.php:404
 #: include/classes/api/services/CMediatype.php:410
-#: include/classes/api/services/CMediatype.php:416
-#: include/classes/api/services/CMediatype.php:693
-#: include/classes/api/services/CMediatype.php:700
-#: include/classes/api/services/CMediatype.php:716
-#: include/classes/api/services/CMediatype.php:735
-#: include/classes/api/services/CMediatype.php:741
+#: include/classes/api/services/CMediatype.php:685
+#: include/classes/api/services/CMediatype.php:692
+#: include/classes/api/services/CMediatype.php:708
+#: include/classes/api/services/CMediatype.php:727
+#: include/classes/api/services/CMediatype.php:733
 #: include/classes/api/services/CScreen.php:400
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
@@ -19733,9 +19729,9 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:836
 #: include/classes/import/CConfigurationImport.php:874
-#: include/classes/import/CConfigurationImport.php:2515
-#: include/classes/import/CConfigurationImport.php:2629
-#: include/classes/import/CConfigurationImport.php:2674
+#: include/classes/import/CConfigurationImport.php:2517
+#: include/classes/import/CConfigurationImport.php:2631
+#: include/classes/import/CConfigurationImport.php:2676
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "Giá trị \"%1$s\" không được tìm thấy"

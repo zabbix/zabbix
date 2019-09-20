@@ -25,6 +25,13 @@
 #	pragma comment(lib, "user32.lib")
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Function: SYSTEM_LOCALTIME                                                 *
+ *                                                                            *
+ * Comments: Thread-safe                                                      *
+ *                                                                            *
+ ******************************************************************************/
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*type, buf[32];
