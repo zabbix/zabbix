@@ -34,7 +34,7 @@ func Chown(path string, uid int, gid int) (err error) {
 	return Fchownat(AT_FDCWD, path, uid, gid, 0)
 }
 
-func Create(path string, mode uint32) (fd int, err error) {
+func Creat(path string, mode uint32) (fd int, err error) {
 	return Open(path, O_CREAT|O_WRONLY|O_TRUNC, mode)
 }
 
