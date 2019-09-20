@@ -848,6 +848,13 @@ output {
 		}
 
 		.link-action {
+			display: inline-block;
+			max-width: calc(100% - 20px);
+			height: 16px;
+			line-height: 18px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			vertical-align: top;
 			color: $font-color;
 
 			&.red {
@@ -904,6 +911,8 @@ output {
 			}
 
 			.rel-container {
+				display: inline;
+				line-height: 18px;
 
 				span {
 					margin: 0;
@@ -935,8 +944,7 @@ output {
 				display: inline-block;
 				height: 12px;
 				width: 12px;
-				margin: 0 1px 0 2px !important;
-				vertical-align: bottom;
+				margin: 0 1px 2px 2px !important;
 
 				&::before {
 					height: 12px;
@@ -7101,7 +7109,6 @@ ul.checkbox-list {
 }
 .icon-description {
 	margin-left: 5px;
-	vertical-align: middle;
 
 	&::after {
 		content: '?';

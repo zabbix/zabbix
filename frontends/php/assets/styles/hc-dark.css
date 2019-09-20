@@ -558,6 +558,13 @@ output {
   border-collapse: separate;
   border: 1px solid #444; }
   .list-table.compact-view .link-action {
+    display: inline-block;
+    max-width: calc(100% - 20px);
+    height: 16px;
+    line-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
     color: #fff; }
     .list-table.compact-view .link-action.red {
       color: #ff5050; }
@@ -588,8 +595,11 @@ output {
         margin-right: 0; }
     .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
       margin-right: 12px; }
-    .list-table.compact-view td .rel-container span {
-      margin: 0; }
+    .list-table.compact-view td .rel-container {
+      display: inline;
+      line-height: 18px; }
+      .list-table.compact-view td .rel-container span {
+        margin: 0; }
     .list-table.compact-view td .tag {
       display: inline-block;
       line-height: 16px;
@@ -610,8 +620,7 @@ output {
       display: inline-block;
       height: 12px;
       width: 12px;
-      margin: 0 1px 0 2px !important;
-      vertical-align: bottom; }
+      margin: 0 1px 2px 2px !important; }
       .list-table.compact-view td .icon-maint::before {
         height: 12px;
         width: 12px;
@@ -5038,8 +5047,7 @@ ul.checkbox-list.col-3 > li {
   background-position: -524px -245px; }
 
 .icon-description {
-  margin-left: 5px;
-  vertical-align: middle; }
+  margin-left: 5px; }
   .icon-description::after {
     content: '?';
     color: #000; }

@@ -81,22 +81,5 @@
 				}
 			}
 		}, 'table.<?= ZBX_STYLE_COMPACT_VIEW ?> a.<?= ZBX_STYLE_LINK_ACTION ?>');
-
-		$(window).on('resize', function() {
-			$('table.<?= ZBX_STYLE_COMPACT_VIEW ?> span.<?= ZBX_STYLE_ICON_DESCRIPTION ?>').each(function() {
-				var $icon = $(this),
-					$icon_parent = $icon.parent('td'),
-					$problem_name = $icon.prev('a.<?= ZBX_STYLE_LINK_ACTION ?>');
-
-				if ($problem_name.width() + 20 > $icon_parent.width()) {
-					$icon.css({position: 'absolute', right: 0, top: '2px'});
-					$icon_parent.css({'padding-right': '20px'});
-				}
-				else {
-					$icon.removeAttr('style');
-					$icon_parent.removeAttr('style');
-				}
-			});
-		}).trigger('resize');
 	});
 </script>
