@@ -56,10 +56,10 @@ extern "C" static void	wmi_prop_clear(zbx_wmi_prop_t *prop)
 
 extern "C" static void	wmi_instance_clear(zbx_vector_wmi_prop_t *wmi_inst_value)
 {
-	int	index;
+	int	i;
 
-	for (index = 0; index < wmi_inst_value->values_num; index++)
-		wmi_prop_clear(&wmi_inst_value->values[index]);
+	for (i = 0; i < wmi_inst_value->values_num; i++)
+		wmi_prop_clear(&wmi_inst_value->values[i]);
 
 	zbx_vector_wmi_prop_destroy(wmi_inst_value);
 	zbx_free(wmi_inst_value);
