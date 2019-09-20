@@ -72,7 +72,7 @@ class CWidgetConfig {
 			WIDGET_FAV_SCREENS			=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
-			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 2],
+			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
 			WIDGET_MAP					=> ['width' => 18,	'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 6,	'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 6,	'height' => 3],
