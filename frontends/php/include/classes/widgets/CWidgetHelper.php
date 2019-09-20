@@ -184,14 +184,14 @@ class CWidgetHelper {
 	/**
 	 * Creates label linked to the multiselect field.
 	 *
-	 * @param CWidgetFieldMultiselect $field
+	 * @param CWidgetFieldMs $field
 	 *
 	 * @return CLabel
 	 */
 	public static function getMultiselectLabel($field) {
 		$field_name = $field->getName();
 
-		if ($field instanceof CWidgetFieldMultiselect) {
+		if ($field instanceof CWidgetFieldMs) {
 			$field_name .= ($field->isMultiple() ? '[]' : '');
 		}
 		else {
@@ -203,7 +203,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselect $field
+	 * @param CWidgetFieldMs $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -230,7 +230,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGroup $field
+	 * @param CWidgetFieldMsGroup $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -246,7 +246,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectHost $field
+	 * @param CWidgetFieldMsHost $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -260,7 +260,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectItem $field
+	 * @param CWidgetFieldMsItem $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -276,7 +276,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGraph $field
+	 * @param CWidgetFieldMsGraph $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -293,7 +293,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectItemPrototype $field
+	 * @param CWidgetFieldMsItemPrototype $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -308,7 +308,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGraphPrototype $field
+	 * @param CWidgetFieldMsGraphPrototype $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *

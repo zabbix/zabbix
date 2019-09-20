@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <winsock.h>
 
 #include "zabbix_sender.h"
 
@@ -45,6 +46,13 @@ int main(int argc, char *argv[])
 		zabbix_sender_info_t	info;
 		zabbix_sender_value_t	value = {argv[2], argv[3], argv[4]};
 		int			response;
+		WSADATA			sockInfo;
+
+		if (0 != WSAStartup(MAKEWORD(2, 2), &sockInfo))
+		{
+			printf("Cannot initialize Winsock DLL\n");
+			return EXIT_FAILURE;
+		}
 
 		/* send one value to the argv[1] IP address and the default trapper port 10051 */
 		if (-1 == zabbix_sender_send_values(argv[1], 10051, NULL, &value, 1, &result))
@@ -68,6 +76,7 @@ int main(int argc, char *argv[])
 
 		/* free the server response */
 		zabbix_sender_free_result(result);
+		while (0 == WSACleanup());
 	}
 	else
 	{

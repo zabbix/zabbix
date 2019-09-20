@@ -1,0 +1,3 @@
+SUBDIRS = \
+	zabbix_agent2 \
+	mock_server
