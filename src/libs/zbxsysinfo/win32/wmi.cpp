@@ -139,7 +139,6 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_v
 	if (FAILED(hres) || 0 == uReturn)
 		goto out;
 
-
 	if (1 == uReturn)
 	{
 		zbx_vector_wmi_prop_t	*inst_val;
