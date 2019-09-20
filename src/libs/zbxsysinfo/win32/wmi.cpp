@@ -133,53 +133,49 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_v
 	IWbemClassObject	*pclsObj = 0;
 	ULONG			uReturn = 0;
 	HRESULT			hres;
+	zbx_vector_wmi_prop_t	*inst_val;
+	zbx_wmi_prop_t		prop;
 
 	hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
 	if (FAILED(hres) || 0 == uReturn)
 		goto out;
 
-	if (1 == uReturn)
+	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+
+	if (FAILED(hres))
 	{
-		zbx_vector_wmi_prop_t	*inst_val;
-		zbx_wmi_prop_t		prop;
-
-		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
-
-		if (FAILED(hres))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
-			goto out;
-		}
-
-		vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
-		VariantInit(vtProp);
-		hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
-
-		if (FAILED(hres))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", V_VT(vtProp));
-			zbx_free(vtProp);
-			goto out;
-		}
-
-		pclsObj->EndEnumeration();
-
-		if (hres == WBEM_S_NO_MORE_DATA)
-		{
-			zbx_free(vtProp);
-			goto out;
-		}
-		else
-			ret = SYSINFO_RET_OK;
-
-		prop.name = NULL;
-		prop.value = vtProp;
-		inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
-		zbx_vector_wmi_prop_create(inst_val);
-		zbx_vector_wmi_prop_append(inst_val, prop);
-		zbx_vector_wmi_instance_append(wmi_values, inst_val);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+		goto out;
 	}
+
+	vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
+	VariantInit(vtProp);
+	hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
+
+	if (FAILED(hres))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", V_VT(vtProp));
+		zbx_free(vtProp);
+		goto out;
+	}
+
+	pclsObj->EndEnumeration();
+
+	if (hres == WBEM_S_NO_MORE_DATA)
+	{
+		zbx_free(vtProp);
+		goto out;
+	}
+	else
+		ret = SYSINFO_RET_OK;
+
+	prop.name = NULL;
+	prop.value = vtProp;
+	inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
+	zbx_vector_wmi_prop_create(inst_val);
+	zbx_vector_wmi_prop_append(inst_val, prop);
+	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out:
 	if (0 != pclsObj)
 		pclsObj->Release();
