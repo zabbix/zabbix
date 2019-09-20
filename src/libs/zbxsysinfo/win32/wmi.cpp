@@ -223,7 +223,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 
 		hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
-		if (0 == uReturn)
+		if (FAILED(hres) || 0 == uReturn)
 			return ret;
 
 		hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
@@ -340,7 +340,8 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		goto exit;
 	}
 
-	ret = parse_value_cb(pEnumerator, wmi_values);
+	if (NULL != pEnumerator)
+		ret = parse_value_cb(pEnumerator, wmi_values);
 exit:
 	if (0 != pEnumerator)
 		pEnumerator->Release();
