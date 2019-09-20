@@ -62,13 +62,13 @@ abstract class CControllerUserEditGeneral extends CController {
 		}
 
 		$mediatypes = API::Mediatype()->get([
-			'output' => ['description', 'type'],
+			'output' => ['name', 'type'],
 			'mediatypeids' => array_keys($mediatypeids),
 			'preservekeys' => true
 		]);
 
 		foreach ($data['user_medias'] as &$media) {
-			$media['description'] = $mediatypes[$media['mediatypeid']]['description'];
+			$media['name'] = $mediatypes[$media['mediatypeid']]['name'];
 			$media['mediatype'] = $mediatypes[$media['mediatypeid']]['type'];
 			$media['send_to_sort_field'] = is_array($media['sendto'])
 				? implode(', ', $media['sendto'])
@@ -76,7 +76,7 @@ abstract class CControllerUserEditGeneral extends CController {
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], ['description', 'send_to_sort_field']);
+		CArrayHelper::sort($data['user_medias'], ['name', 'send_to_sort_field']);
 
 		foreach ($data['user_medias'] as &$media) {
 			unset($media['send_to_sort_field']);

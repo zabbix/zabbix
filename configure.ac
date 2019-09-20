@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0alpha3])
+AC_INIT([Zabbix],[4.4.0beta1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1268,6 +1268,15 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test "x$agent" = "xyes")
 
+AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2],
+[case "${enableval}" in
+  yes) agent2=yes ;;
+  no)  agent2=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
+esac],
+[agent2=no])
+AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
+
 AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java gateway],
 [case "${enableval}" in
   yes) java=yes ;;
@@ -1288,12 +1297,11 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
 have_web_monitoring="no"
-have_jabber="no"
 have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
@@ -1448,20 +1456,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
-
-	dnl Checking for Jabber libraries
-	JABBER_CHECK_CONFIG()
-	if test "x$want_jabber" = "xyes"; then
-		if test "x$found_jabber" != "xyes"; then
-			AC_MSG_ERROR([Jabber library not found])
-		else
-			have_jabber="yes"
-		fi
-	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $JABBER_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $JABBER_LIBS"
-
-	AC_SUBST(JABBER_CPPFLAGS)
 
 	dnl Check for LIBXML2 [by default - skip]
 	LIBXML2_CHECK_CONFIG([no])
@@ -1689,6 +1683,13 @@ ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
+if test "x$agent2" = "xyes"; then
+	AC_CHECK_PROGS([GO], [go], [no])
+	if test "x$go" = "xno"; then
+		AC_MSG_ERROR([Unable to find "go" executable in path])
+	fi
+fi
+
 if test "x$java" = "xyes"; then
 	AC_CHECK_PROGS([JAVAC], [javac], [no])
 	if test "x$JAVAC" = "xno"; then
@@ -1745,7 +1746,7 @@ AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
 dnl Check for libpcre, used by Zabbix for regular expressions
-if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes"; then
+if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
 	LIBPCRE_CHECK_CONFIG([no])
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
@@ -1779,6 +1780,7 @@ AC_SUBST(RANLIB)
 SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
+AGENT2_CONFIG_FILE="${sysconfdir}/zabbix_agent2.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
 ALERT_SCRIPTS_PATH="${datadir}/zabbix/alertscripts"
@@ -1797,6 +1799,29 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
+CGO_LDFLAGS="-Wl,--start-group \
+	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
+	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
+	\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
+	\${abs_top_builddir}/src/libs/zbxsys/libzbxsys.a \
+	\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
+	\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
+	\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
+	\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
+	\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+	$LIBS $AGENT_LIBS \
+	-Wl,--end-group"
+AC_SUBST(CGO_LDFLAGS)
+
 AC_SUBST(ZBXGET_LDFLAGS)
 AC_SUBST(ZBXGET_LIBS)
 
@@ -1806,6 +1831,7 @@ AC_SUBST(SENDER_LIBS)
 AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
+AC_SUBST(AGENT2_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
 AC_SUBST(ALERT_SCRIPTS_PATH)
@@ -1814,6 +1840,17 @@ AC_SUBST(CURL_SSL_CERT_LOCATION)
 AC_SUBST(CURL_SSL_KEY_LOCATION)
 
 AC_SUBST(LOAD_MODULE_PATH)
+
+GOBIN=${sbindir}
+GOPATH=$ac_abs_confdir/go
+GOCMD=go
+GOWORKDIR=$ac_abs_confdir/go/src/zabbix
+
+export GOBIN=${GOBIN}
+AC_SUBST(GOBIN)
+AC_SUBST(GOPATH)
+AC_SUBST(GOCMD)
+AC_SUBST(GOWORKDIR)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1902,6 +1939,7 @@ AC_OUTPUT([
 	src/libs/zbxembed/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/zabbix_agent/Makefile
+	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
@@ -1934,6 +1972,53 @@ AC_OUTPUT([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile
+	go/Makefile
+	go/src/Makefile
+	go/src/zabbix/Makefile
+	go/src/zabbix/cmd/Makefile
+	go/src/zabbix/cmd/zabbix_agent2/Makefile
+	go/src/zabbix/cmd/mock_server/Makefile
+	go/src/zabbix/pkg/Makefile
+	go/src/zabbix/pkg/conf/Makefile
+	go/src/zabbix/pkg/glexpr/Makefile
+	go/src/zabbix/pkg/itemutil/Makefile
+	go/src/zabbix/pkg/log/Makefile
+	go/src/zabbix/pkg/plugin/Makefile
+	go/src/zabbix/pkg/std/Makefile
+	go/src/zabbix/pkg/tls/Makefile
+	go/src/zabbix/pkg/version/Makefile
+	go/src/zabbix/pkg/watch/Makefile
+	go/src/zabbix/pkg/zbxcomms/Makefile
+	go/src/zabbix/pkg/zbxlib/Makefile
+	go/src/zabbix/pkg/zbxcmd/Makefile
+	go/src/zabbix/internal/Makefile
+	go/src/zabbix/internal/agent/Makefile
+	go/src/zabbix/internal/agent/remotecontrol/Makefile
+	go/src/zabbix/internal/agent/resultcache/Makefile
+	go/src/zabbix/internal/agent/scheduler/Makefile
+	go/src/zabbix/internal/agent/serverconnector/Makefile
+	go/src/zabbix/internal/agent/serverlistener/Makefile
+	go/src/zabbix/internal/agent/statuslistener/Makefile
+	go/src/zabbix/internal/monitor/Makefile
+	go/src/zabbix/plugins/Makefile
+	go/src/zabbix/plugins/log/Makefile
+	go/src/zabbix/plugins/system/Makefile
+	go/src/zabbix/plugins/system/cpucollector/Makefile
+	go/src/zabbix/plugins/system/uptime/Makefile
+	go/src/zabbix/plugins/system/uname/Makefile
+	go/src/zabbix/plugins/systemd/Makefile
+	go/src/zabbix/plugins/systemrun/Makefile
+	go/src/zabbix/plugins/kernel/Makefile
+	go/src/zabbix/plugins/proc/Makefile
+	go/src/zabbix/plugins/vfs/Makefile
+	go/src/zabbix/plugins/vfs/dev/Makefile
+	go/src/zabbix/plugins/vfs/file/Makefile
+	go/src/zabbix/plugins/zabbix/Makefile
+	go/src/zabbix/plugins/zabbix/stats/Makefile
+	go/src/zabbix/plugins/zabbix/sync/Makefile
+	go/src/zabbix/plugins/zabbix/async/Makefile
+	go/src/zabbix/plugins/net/Makefile
+	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as
@@ -1951,6 +2036,9 @@ PROXY_CONFIG_FILE=`eval echo "${PROXY_CONFIG_FILE}"`
 
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
+
+AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
+AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
 
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
 EXTERNAL_SCRIPTS_PATH=`eval echo "${EXTERNAL_SCRIPTS_PATH}"`
@@ -1982,10 +2070,6 @@ Configuration:
 
 if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
-fi
-
-if test "x$JABBER_CPPFLAGS" != "x"; then
-	echo "    Jabber:                ${JABBER_CPPFLAGS}"
 fi
 
 if test "x$LIBXML2_CFLAGS" != "x"; then
@@ -2038,8 +2122,7 @@ echo "      SSL certificates:      ${CURL_SSL_CERT_LOCATION}
       SSL keys:              ${CURL_SSL_KEY_LOCATION}"
 fi
 
-echo "    Native Jabber:         ${have_jabber}
-    SNMP:                  ${have_snmp}
+echo "    SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
@@ -2093,6 +2176,9 @@ echo "  Agent details:
     Modules:               ${LOAD_MODULE_PATH}"
 
 fi
+
+echo "
+  Enable agent 2:        ${agent2}"
 
 echo "
   Enable Java gateway:   ${java}"

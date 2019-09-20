@@ -30,7 +30,7 @@ class testPageTemplates extends CLegacyWebTest {
 	use TableTrait;
 
 	public static function allTemplates() {
-		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
+		return CDBHelper::getRandomizedDataProvider('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25);
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -78,11 +78,16 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('templates.php?page=1');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->zbxTestTextPresent($name);
-		$this->zbxTestClickLinkText($name);
+		// Check if template name present on page, if not, check on second page.
+		if ($this->query('link', $name)->one(false) === null) {
+			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
+			$this->zbxTestWaitForPageToLoad();
+		}
+		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');

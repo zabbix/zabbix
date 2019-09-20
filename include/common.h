@@ -440,9 +440,7 @@ typedef enum
 {
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
-	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_JABBER,
-	MEDIA_TYPE_EZ_TEXTING = 100
+	MEDIA_TYPE_SMS
 }
 zbx_media_type_t;
 
@@ -938,7 +936,6 @@ int	is_double_suffix(const char *str, unsigned char flags);
 int	is_double(const char *c);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
 int	is_time_suffix(const char *c, int *value, int length);
-int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
@@ -1202,7 +1199,6 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
-char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
@@ -1540,6 +1536,8 @@ zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
 int	zbx_validate_value_dbl(double value);
 
 void	zbx_update_env(double time_now);
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
+		int refresh_unsupported, int *nextcheck, char **error);
 
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);

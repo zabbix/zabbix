@@ -270,7 +270,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 			}
 			else
 			{
-				proxy->version = zbx_get_protocol_version(&jp);
+				proxy->version = zbx_get_proxy_protocol_version(&jp);
 				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
 				proxy->lastaccess = time(NULL);
 			}
@@ -328,7 +328,7 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 		goto out;
 	}
 
-	proxy->version = zbx_get_protocol_version(&jp);
+	proxy->version = zbx_get_proxy_protocol_version(&jp);
 
 	if (SUCCEED != zbx_check_protocol_version(proxy))
 	{
