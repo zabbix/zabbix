@@ -474,6 +474,20 @@ static int	DBpatch_4030031(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4030032(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("globalmacro", &field);
+}
+
+static int	DBpatch_4030033(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -511,5 +525,7 @@ DBPATCH_ADD(4030028, 0, 1)
 DBPATCH_ADD(4030029, 0, 1)
 DBPATCH_ADD(4030030, 0, 1)
 DBPATCH_ADD(4030031, 0, 1)
+DBPATCH_ADD(4030032, 0, 1)
+DBPATCH_ADD(4030033, 0, 1)
 
 DBPATCH_END()
