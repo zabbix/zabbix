@@ -90,7 +90,7 @@ typedef struct
 	zbx_vector_uint64_t	new_groupids;		/* host groups which should be added */
 	zbx_vector_uint64_t	lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
-	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added */
+	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added, deleted or updated */
 	zbx_vector_ptr_t	interfaces;
 	char			*host_proto;
 	char			*host;
@@ -1606,46 +1606,42 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_hostmacro_make                                               *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
 		const char *value, const char *description)
 {
-	zbx_lld_hostmacro_t	*hostmacro = NULL;
+	zbx_lld_hostmacro_t	*hostmacro;
 	int			i;
 
 	for (i = 0; i < hostmacros->values_num; i++)
 	{
 		hostmacro = (zbx_lld_hostmacro_t *)hostmacros->values[i];
 
-		if (0 != hostmacro->hostmacroid)
-			continue;
-
-		if (0 == strcmp(hostmacro->macro, macro))
-			break;
+		/* check if host macro has already been added */
+		if (0 == hostmacro->hostmacroid && 0 == strcmp(hostmacro->macro, macro))
+		{
+			hostmacro->hostmacroid = hostmacroid;
+			if (0 != strcmp(hostmacro->value, value))
+				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE;
+			if (0 != strcmp(hostmacro->description, description))
+				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION;
+			return;
+		}
 	}
 
-	if (i == hostmacros->values_num)
-	{
-		/* host macros which should be deleted */
-		hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+	/* host macro is present on the host but not in new list, it should be removed */
+	hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+	hostmacro->hostmacroid = hostmacroid;
+	hostmacro->macro = NULL;
+	hostmacro->value = NULL;
+	hostmacro->description = NULL;
+	hostmacro->flags = ZBX_FLAG_LLD_HOSTMACRO_REMOVE;
 
-		hostmacro->hostmacroid =  hostmacroid;
-		hostmacro->macro = NULL;
-		hostmacro->value = NULL;
-		hostmacro->description = NULL;
-		hostmacro->flags = ZBX_FLAG_LLD_HOSTMACRO_REMOVE;
-
-		zbx_vector_ptr_append(hostmacros, hostmacro);
-	}
-	else
-	{
-		/* host macros which have already been added */
-		if (0 != strcmp(hostmacro->value, value))
-			hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE;
-		if (0 != strcmp(hostmacro->description, description))
-			hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION;
-	}
-
-	hostmacro->hostmacroid =  hostmacroid;
+	zbx_vector_ptr_append(hostmacros, hostmacro);
 }
 
 /******************************************************************************
@@ -2333,6 +2329,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 		if (0 != del_hostmacroids.values_num)
 		{
+			zbx_vector_uint64_sort(&del_hostmacroids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hostmacro where");
 			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostmacroid",
 					del_hostmacroids.values, del_hostmacroids.values_num);
