@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-18 11:00+0300\n"
+"POT-Creation-Date: 2019-09-22 01:44+0300\n"
 "PO-Revision-Date: 2019-03-28 07:26+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -13974,15 +13974,19 @@ msgstr "Chỉ lấy nội dùng 1 tệp tin. Trả về kiểu text"
 msgid "Retry"
 msgstr "Thử lại"
 
-#: include/classes/items/CHelpItems.php:1075
-msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Trả về một đối tượng JSON mô tả các đối tượng MBean hoặc các thuộc tính của chúng. Có thể được sử dụng cho LLD."
+#: include/classes/items/CHelpItems.php:1079
+msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1083
+msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Trả về cột đầu tiên của hàng đầu tiên của kết quả truy vấn SQL."
 
-#: include/classes/items/CHelpItems.php:1071
+#: include/classes/items/CHelpItems.php:1075
 msgid "Return value of an attribute of MBean object."
 msgstr "Trả về giá trị của một thuộc tính của đối tượng MBean."
 
@@ -13990,15 +13994,15 @@ msgstr "Trả về giá trị của một thuộc tính của đối tượng MB
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Trả về thời gian đáp ứng ICMP ping trong vài giây. Ví dụ: 0.02"
 
+#: include/classes/items/CHelpItems.php:971
+msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
 #: include/classes/items/CHelpItems.php:1019
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
-
-#: include/classes/items/CHelpItems.php:971
-msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Trả về một đối tượng JSON mô tả các giao diện mạng máy chủ được cấu hình trong Zabbix. Có thể được sử dụng cho LLD."
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -16277,8 +16281,12 @@ msgid "Transaction has not been closed. Aborting..."
 msgstr "Giao dịch chưa được đóng lại. Đang hủy bỏ..."
 
 #: include/classes/items/CHelpItems.php:1065
-msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr "Chuyển đổi kết quả truy vấn SQL thành một đối tượng JSON để khám phá mức độ thấp."
+msgid "Transform SQL query result into a JSON array for low-level discovery."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1069
+msgid "Transform SQL query result into a JSON array."
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:708
 #: include/classes/widgets/CWidgetHelper.php:752
