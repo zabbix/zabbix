@@ -1816,7 +1816,6 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
-#define MVAR_EVENT_RECOVERY_NAME	MVAR_EVENT_RECOVERY "NAME}"
 #define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE."
 #define MVAR_EVENT_UPDATE_ACTION	MVAR_EVENT_UPDATE "ACTION}"
 #define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT_UPDATE "DATE}"
@@ -2330,10 +2329,6 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 	{
 		get_event_tags(r_event, replace_to);
 	}
-	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_NAME))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
-	}
 }
 
 /******************************************************************************
@@ -2834,7 +2829,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, event->name);
+					replace_to = zbx_strdup(replace_to, c_event->name);
 				}
 				else if (0 == strcmp(m, MVAR_ACK_MESSAGE) || 0 == strcmp(m, MVAR_EVENT_UPDATE_MESSAGE))
 				{
@@ -3134,7 +3129,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, event->name);
+					replace_to = zbx_strdup(replace_to, c_event->name);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
@@ -3522,7 +3517,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_NAME))
 				{
-					replace_to = zbx_strdup(replace_to, event->name);
+					replace_to = zbx_strdup(replace_to, c_event->name);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
