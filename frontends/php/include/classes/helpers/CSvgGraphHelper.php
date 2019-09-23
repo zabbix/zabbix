@@ -142,7 +142,10 @@ class CSvgGraphHelper {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
-			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval']);
+			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'] == ''
+				? GRAPH_AGGREGATE_DEFAULT_INTERVAL
+				: $metric['options']['aggregate_interval']
+			);
 			$dataset_num = $metric['data_set'];
 
 			if ($aggregate_interval == null || $aggregate_interval <= 0

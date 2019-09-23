@@ -964,6 +964,8 @@ define('TAG_EVAL_TYPE_OR',		2);
 define('TAG_OPERATOR_LIKE',		0);
 define('TAG_OPERATOR_EQUAL',	1);
 
+define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
+
 define('GRAPH_AGGREGATE_NONE',	0);
 define('GRAPH_AGGREGATE_MIN',	1);
 define('GRAPH_AGGREGATE_MAX',	2);
