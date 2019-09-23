@@ -916,7 +916,7 @@ class CMediatype extends CApiService {
 
 		$update = [];
 		$webhooks_params = [];
-		$defaults = DB::getDefaults('media_type');
+		$default_values = DB::getDefaults('media_type');
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
@@ -928,15 +928,22 @@ class CMediatype extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$type_switch_defaults = [
+		$type_switch_fields = [
+			MEDIA_TYPE_EMAIL => [
+				'smtp_server', 'smtp_helo', 'smtp_email', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
+				'smtp_verify_host', 'smtp_authentication', 'passwd', 'username', 'content_type'
+			],
+			MEDIA_TYPE_EXEC => [
+				'exec_path', 'exec_params'
+			],
+			MEDIA_TYPE_SMS => [
+				'gsm_modem'
+			],
 			MEDIA_TYPE_WEBHOOK => [
-				'webhook' => $defaults['webhook'],
-				'timeout' => $defaults['timeout'],
-				'receive_tags' => $defaults['receive_tags'],
-				'url' => $defaults['url'],
-				'url_name' => $defaults['url_name'],
+				'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'params'
 			]
 		];
+		$default_values['params'] = [];
 
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeid = $mediatype['mediatypeid'];
@@ -948,8 +955,8 @@ class CMediatype extends CApiService {
 				if (array_key_exists('receive_tags', $mediatype)
 						&& $mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					$mediatype = [
-						'url' => $defaults['url'],
-						'url_name' => $defaults['url_name'],
+						'url' => $default_values['url'],
+						'url_name' => $default_values['url_name'],
 					] + $mediatype;
 				}
 
@@ -964,12 +971,10 @@ class CMediatype extends CApiService {
 					unset($mediatype['params']);
 				}
 			}
-			else if ($db_type == MEDIA_TYPE_WEBHOOK) {
-				$mediatype = $type_switch_defaults[$db_type] + $mediatype;
-				$webhooks_params[$mediatypeid] = [];
-			}
-			else {
-				$mediatype = array_diff_key($mediatype, $type_switch_defaults[MEDIA_TYPE_WEBHOOK]);
+
+			if ($type != $db_type) {
+				$mediatype = array_intersect_key($default_values,
+					array_fill_keys($type_switch_fields[$db_type], '')) + $mediatype;
 			}
 
 			if (!empty($mediatype)) {
