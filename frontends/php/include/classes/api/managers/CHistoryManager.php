@@ -499,8 +499,7 @@ class CHistoryManager {
 		];
 
 		if ($interval !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$step = timeUnitToSeconds($interval, true);
 
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
@@ -510,15 +509,12 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*((doc[\'clock\'].date.getMillis()/1000+params.delta)%params.size))'.
-				'/params.size)';
+			$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.step))';
 
 			$script = [
 				'inline' => $formula,
 				'params' => [
-					'width' => (int)$interval,
-					'delta' => $delta,
-					'size' => $size
+					'step' => (int)$step
 				]
 			];
 			$aggs = [
