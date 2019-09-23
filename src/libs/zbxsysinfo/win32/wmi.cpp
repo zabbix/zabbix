@@ -231,7 +231,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 
 		while( !( FAILED(hres) || WBEM_S_NO_MORE_DATA == hres ))
 		{
-			zbx_wmi_prop_t		prop = {NULL, NULL};
+			zbx_wmi_prop_t	prop = {NULL, NULL};
 
 			vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
 			VariantInit(vtProp);
