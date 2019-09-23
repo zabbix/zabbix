@@ -1,8 +1,16 @@
 Changes for 4.4.0beta1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
+....I..... [ZBXNEXT-5406] updated widgets on default dashboards (vmurzins)
+..F..J.... [ZBXNEXT-4209] added jmx.get[<discovery mode>,<object name pattern>] key for JMX LLD (atumilovics)
+...G...... [ZBXNEXT-5453] added Zabbix agent 2 (akozlovs, Andris, asestakovs, MVekslers, viktors, vso, wiper)
+..F....PS. [ZBXNEXT-4033] added possibility to return multiple columns (and rows) from SQL ODBC (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16645] fixed suggested selection font weight for new item (vasilijs)
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.0alpha3
