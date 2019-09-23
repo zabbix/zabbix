@@ -178,7 +178,7 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 #define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
 /* cURL specific attribute to prevent the use of "Expect" directive */
-/* according to RFC 7231/5.1.1 if xml request with a size is larger than 1k */
+/* according to RFC 7231/5.1.1 if xml request is larger than 1k */
 #define ZBX_XML_HEADER3		"Expect:"
 
 #define ZBX_POST_VSPHERE_HEADER									\
