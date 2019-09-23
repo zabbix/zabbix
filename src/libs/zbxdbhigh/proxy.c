@@ -2390,7 +2390,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value)
 	if (HOST_STATUS_MONITORED != item->host.status)
 		return FAIL;
 
-	/*return SUCCEED to be able update item nextcheck during maintenance*/
+	/* update item nextcheck during maintenance */
 	if (SUCCEED == in_maintenance_without_data_collection(item->host.maintenance_status,
 			item->host.maintenance_type, item->type) &&
 			item->host.maintenance_from <= value->ts.sec)
