@@ -754,7 +754,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (maintenance_time != update_time)
 		{
-			update_time -=  update_time % 60;
+			update_time -= update_time % 60;
 			maintenance_time = update_time;
 
 			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - maintenance_time)))
