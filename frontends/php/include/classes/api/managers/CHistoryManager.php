@@ -399,24 +399,6 @@ class CHistoryManager {
 		return $result;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	/**
 	 * Returns history value aggregation for graphs.
 	 *
@@ -448,7 +430,6 @@ class CHistoryManager {
 
 		return $results;
 	}
-
 
 	/**
 	 * Elasticsearch specific implementation of getGraphAggregationByWidth.

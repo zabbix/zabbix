@@ -95,7 +95,7 @@ class CSvgGraphHelper {
 
 			foreach ($metrics as $metric) {
 				$labels[] = [
-					'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
+					'name' => $metric['name'],
 					'color' => $metric['options']['color']
 				];
 			}
@@ -138,18 +138,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	protected static function getMetricsAggregatedData(array &$metrics = []) { sdff($metrics);
-		$function_labels = [
-			GRAPH_AGGREGATE_NONE => 'none',
-			GRAPH_AGGREGATE_MIN => 'min',
-			GRAPH_AGGREGATE_MAX => 'max',
-			GRAPH_AGGREGATE_AVG => 'avg',
-			GRAPH_AGGREGATE_COUNT => 'count',
-			GRAPH_AGGREGATE_SUM => 'sum',
-			GRAPH_AGGREGATE_FIRST => 'first',
-			GRAPH_AGGREGATE_LAST => 'last',
-		];
-
+	protected static function getMetricsAggregatedData(array &$metrics = []) {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -178,7 +167,7 @@ class CSvgGraphHelper {
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
 				$metric = array_merge($metric, [
-					'name' => $function_labels[$metric['options']['aggregate_function']].'('.$name.')',
+					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
 					'items' => [],
 					'points' => []
 				]);

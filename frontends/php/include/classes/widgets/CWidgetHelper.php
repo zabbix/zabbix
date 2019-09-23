@@ -1021,14 +1021,14 @@ class CWidgetHelper {
 									$field_name.'['.$row_num.'][aggregate_function]',
 									(int) $value['aggregate_function'], null,
 									[
-										GRAPH_AGGREGATE_NONE => 'None',
-										GRAPH_AGGREGATE_MIN => 'Min',
-										GRAPH_AGGREGATE_MAX => 'Max',
-										GRAPH_AGGREGATE_AVG => 'Avg',
-										GRAPH_AGGREGATE_COUNT => 'Count',
-										GRAPH_AGGREGATE_SUM => 'Sum',
-										GRAPH_AGGREGATE_FIRST => 'First',
-										GRAPH_AGGREGATE_LAST => 'Last',
+										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
+										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
+										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
+										GRAPH_AGGREGATE_AVG => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_AVG),
+										GRAPH_AGGREGATE_COUNT => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_COUNT),
+										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
+										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
+										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
 									]
 								))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1037,7 +1037,7 @@ class CWidgetHelper {
 									$field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
-									->setAttribute('placeholder', _('none'))
+									->setAttribute('placeholder', '1h')
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
 							->addRow(_('Aggregate by'),
