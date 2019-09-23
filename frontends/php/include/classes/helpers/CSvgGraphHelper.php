@@ -142,18 +142,21 @@ class CSvgGraphHelper {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
+			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+				continue;
+			}
+
 			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'] == ''
 				? GRAPH_AGGREGATE_DEFAULT_INTERVAL
 				: $metric['options']['aggregate_interval']
 			);
-			$dataset_num = $metric['data_set'];
 
-			if ($aggregate_interval == null || $aggregate_interval <= 0
-				|| $metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE
-			) {
+			if ($aggregate_interval == null || $aggregate_interval <= 0) {
 				$metric['options']['aggregate_function'] = GRAPH_AGGREGATE_NONE;
 				continue;
 			}
+
+			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == 0) {
 				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
@@ -176,7 +179,7 @@ class CSvgGraphHelper {
 				]);
 				$metric['options']['aggregate_interval'] = $aggregate_interval;
 
-				if ($metric['options']['aggregate_grouping'] == 1) {
+				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
 					$dataset_metrics[$dataset_num] = $metric_num;
 				}
 
@@ -186,8 +189,6 @@ class CSvgGraphHelper {
 				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
 				unset($metrics[$metric_num]);
 			}
-
-
 		}
 		unset($metric);
 

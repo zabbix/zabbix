@@ -1030,7 +1030,9 @@ class CWidgetHelper {
 										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
 										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
 									]
-								))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+								))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+									->onChange('changeDataSetAggregateFunction(this);')
 							)
 							->addRow(_('Aggregation interval'),
 								(new CTextBox(
@@ -1154,6 +1156,14 @@ class CWidgetHelper {
 						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
 						'break;'.
 				'}'.
+			'};',
+
+			'function changeDataSetAggregateFunction(obj) {'.
+				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
+				'var no_aggregation = (jQuery(obj).val() == '.GRAPH_AGGREGATE_NONE.');'.
+				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
 			'};',
 
 			// Initialize dynamic rows.
