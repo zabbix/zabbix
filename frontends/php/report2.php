@@ -280,7 +280,7 @@ elseif (hasRequest('filter_hostid')) {
 		// Sanitize $tpl_triggerid and prepare "Template Trigger" combo box.
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'flags'],
+			'output' => ['description'],
 			'selectHosts' => ['name'],
 			'selectItems' => ['status'],
 			'templateids' => ($filter_hostid !== '0') ? $filter_hostid : null,
@@ -309,12 +309,12 @@ elseif (hasRequest('filter_hostid')) {
 			->addItem(0, _('all'));
 
 		$tpl_triggerids = [];
-		foreach ($triggers as $trigger) {
-			$tpl_triggerid_combo->addItem($trigger['triggerid'],
+		foreach ($triggers as $triggerid => $trigger) {
+			$tpl_triggerid_combo->addItem($triggerid,
 				(($filter_hostid === '0') ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
 			);
 
-			$tpl_triggerids[$trigger['triggerid']] = true;
+			$tpl_triggerids[$triggerid] = true;
 		}
 
 		// Sanitize $hostgroupid and prepare "Host Group" combo box.
