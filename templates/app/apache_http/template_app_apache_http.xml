@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.21</description>
+Template tooling version used: 0.29</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -59,7 +59,8 @@ Template tooling version used: 0.21</description>
                <publickey/>
                <privatekey/>
                <port/>
-               <description>Getting data from a machine-readable version of the Apache status page</description>
+               <description>Getting data from a machine-readable version of the Apache status page.&#13;
+https://httpd.apache.org/docs/current/mod/mod_status.html</description>
                <inventory_link>0</inventory_link>
                <applications>
                   <application>
@@ -2206,8 +2207,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <screen_items>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>0</x>
                      <y>0</y>
                      <colspan>1</colspan>
@@ -2228,8 +2229,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>1</x>
                      <y>0</y>
                      <colspan>1</colspan>
@@ -2250,8 +2251,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>0</x>
                      <y>1</y>
                      <colspan>1</colspan>
@@ -2272,8 +2273,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>1</x>
                      <y>1</y>
                      <colspan>1</colspan>
@@ -2294,8 +2295,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>320</width>
-                     <height>200</height>
+                     <width>500</width>
+                     <height>100</height>
                      <x>0</x>
                      <y>2</y>
                      <colspan>1</colspan>
@@ -2558,7 +2559,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
          <name>Apache: Failed to fetch status page (or no data for 30m)</name>
          <correlation_mode>0</correlation_mode>
          <correlation_tag/>
-         <url>https://httpd.apache.org/docs/current/mod/mod_status.html</url>
+         <url/>
          <status>0</status>
          <priority>2</priority>
          <description>Last value: {ITEM.LASTVALUE1}.&#13;

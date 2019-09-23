@@ -2188,7 +2188,7 @@ INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (184, 10011
 INSERT INTO trigger_tag (triggertagid, triggerid, tag, value) VALUES (185, 100112, 'tag', 'trigger');
 
 -- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, description, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
+INSERT INTO media_type (mediatypeid, type, name, exec_path, status) VALUES (100, 1, 'Test script', 'Selenium test script', 1);
 
 -- testFormUser
 INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status,debug_mode) VALUES (16,'LDAP user group',2,0,0);

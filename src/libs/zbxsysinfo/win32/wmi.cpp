@@ -31,7 +31,7 @@ extern "C"
 
 #pragma comment(lib, "wbemuuid.lib")
 
-ZBX_THREAD_LOCAL static int	com_initialized = 0;
+static ZBX_THREAD_LOCAL int	com_initialized = 0;
 
 extern "C" int	zbx_co_initialize()
 {
