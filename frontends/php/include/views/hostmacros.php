@@ -197,9 +197,9 @@ else {
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($data['readonly'] || !($macro['type'] & ZBX_PROPERTY_OWN))
-					))
-						->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-						->setColSpan(8)
+				))
+					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+					->setColSpan(8)
 			]))->addClass('form_row'));
 		}
 	}
