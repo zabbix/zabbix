@@ -116,8 +116,8 @@ extern "C" void	zbx_co_uninitialize()
  *                                                                            *
  * Purpose: extract only one value from the search result                     *
  *                                                                            *
- * Parameters: pEnumerator [IN]     - the search result                       *
- *             wmi_values  [IN/OUT] - vector with found value                 *
+ * Parameters: pEnumerator - [IN] the search result                           *
+ *             wmi_values  - [IN/OUT] vector with found value                 *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved value   *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -189,8 +189,8 @@ out:
  *                                                                            *
  * Purpose: extract all values from the search result                         *
  *                                                                            *
- * Parameters: pEnumerator [IN]     - the search result                       *
- *             wmi_values  [IN/OUT] - vector with found values                *
+ * Parameters: pEnumerator - [IN] the search result                           *
+ *             wmi_values  - [IN/OUT] vector with found values                *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved values  *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -268,9 +268,9 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
  *                                                                            *
  * Purpose: retrieves WMI value and stores it in the provided memory location *
  *                                                                            *
- * Parameters: wmi_namespace [IN]  - object path of the WMI namespace (UTF-8) *
- *             wmi_query     [IN]  - WQL query (UTF-8)                        *
- *             vtProp        [OUT] - pointer to memory for the queried value  *
+ * Parameters: wmi_namespace - [IN] object path of the WMI namespace (UTF-8)  *
+ *             wmi_query     - [IN] WQL query (UTF-8)                         *
+ *             vtProp        - [OUT] pointer to memory for the queried value  *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -353,9 +353,9 @@ exit:
  * Purpose: wrapper function for zbx_wmi_get_variant(), stores the retrieved  *
  *          WMI value as UTF-8 encoded string                                 *
  *                                                                            *
- * Parameters: wmi_namespace [IN]  - object path of the WMI namespace (UTF-8) *
- *             wmi_query     [IN]  - WQL query (UTF-8)                        *
- *             utf8_value    [OUT] - address of the pointer to the retrieved  *
+ * Parameters: wmi_namespace - [IN] object path of the WMI namespace (UTF-8)  *
+ *             wmi_query     - [IN] WQL query (UTF-8)                         *
+ *             utf8_value    - [OUT] address of the pointer to the retrieved  *
  *                                   value (dynamically allocated)            *
  *                                                                            *
  * Comments: if either retrieval or type conversion failed then *utf8_value   *
@@ -405,8 +405,8 @@ out:
  *                                                                            *
  * Purpose: wrapper function for wmi.get metric                               *
  *                                                                            *
- * Parameters: request - [IN]  - WMI request parameters                       *
- *             result  - [OUT] - one value of property from WMI Class         *
+ * Parameters: request - [IN] WMI request parameters                          *
+ *             result  - [OUT] one value of property from WMI Class           *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - result contains the retrieved WMI value   *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -524,11 +524,11 @@ out:
  *                                                                            *
  * Purpose: take one element from array and put value to JSON document        *
  *                                                                            *
- * Parameters: sa       - [IN]     - SafeArray from WMI property              *
- *             index    - [IN]     - ID of element in array                   *
- *             prop_err - [IN]     - json attribute name                      *
- *             jdoc     - [IN/OUT] - JSON document                            *
- *             error    - [OUT]    - the error description                    *
+ * Parameters: sa       - [IN] SafeArray from WMI property                    *
+ *             index    - [IN] ID of element in array                         *
+ *             prop_err - [IN] json attribute name                            *
+ *             jdoc     - [IN/OUT] JSON document                              *
+ *             error    - [OUT] the error description                         *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - json document contains the array element  *
  *               SYSINFO_RET_FAIL - transformation of variant array failed    *
@@ -660,13 +660,13 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *index, const char *prop_err
  *                                                                            *
  * Purpose: transformation of variant array from WMI search result to JSON    *
  *                                                                            *
- * Parameters: vtProp     - [IN]     - variant WMI property value             *
- *             prop_name  - [IN]     - json attribute name                    *
- *             dim        - [IN]     - dimension of array                     *
- *             offset_dim - [IN]     - index of dimension for processing      *
- *             index      - [IN/OUT] - index of element in the array          *
- *             jdoc       - [IN/OUT] - JSON document                          *
- *             error      - [OUT]    - the error description                  *
+ * Parameters: vtProp     - [IN] variant WMI property value                   *
+ *             prop_name  - [IN] json attribute name                          *
+ *             dim        - [IN] dimension of array                           *
+ *             offset_dim - [IN] index of dimension for processing            *
+ *             index      - [IN/OUT] index of element in the array            *
+ *             jdoc       - [IN/OUT] JSON document                            *
+ *             error      - [OUT] the error description                       *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - json document contains the WMI array      *
  *               SYSINFO_RET_FAIL - transformation of variant array failed    *
@@ -731,11 +731,11 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
  *                                                                            *
  * Purpose: copy value of VARIANT type to JSON document                       *
  *                                                                            *
- * Parameters: prop_json - [IN]     - json attribute name                     *
- *             prop_err  - [IN]     - json attribute name                     *
- *             vtProp    - [IN]     - variant WMI property value              *
- *             jdoc      - [IN/OUT] - JSON document                           *
- *             error     - [OUT]    - the error description                   *
+ * Parameters: prop_json - [IN] json attribute name                           *
+ *             prop_err  - [IN] json attribute name                           *
+ *             vtProp    - [IN] variant WMI property value                    *
+ *             jdoc      - [IN/OUT] JSON document                             *
+ *             error     - [OUT] the error description                        *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - json document contains the WMI property   *
  *               SYSINFO_RET_FAIL - transformation of variant failed          *
@@ -824,9 +824,9 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
  *                                                                            *
  * Purpose: transformation of WMI search result to JSON                       *
  *                                                                            *
- * Parameters: wmi_values - [IN]  - WMI search result                         *
- *             json_data  - [OUT] - JSON document with WMI search result      *
- *             error      - [OUT] - the error description                     *
+ * Parameters: wmi_values - [IN] WMI search result                            *
+ *             json_data  - [OUT] JSON document with WMI search result        *
+ *             error      - [OUT] the error description                       *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - result contains the retrieved WMI value   *
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
@@ -876,8 +876,8 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
  *                                                                            *
  * Purpose: wrapper function for wmi.getall metric                            *
  *                                                                            *
- * Parameters: request - [IN]  - WMI request parameters                       *
- *             result  - [OUT] - all values from WMI Class in JSON format     *
+ * Parameters: request - [IN] WMI request parameters                          *
+ *             result  - [OUT] all values from WMI Class in JSON format       *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - result contains the retrieved WMI value   *
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
