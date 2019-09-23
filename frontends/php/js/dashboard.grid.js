@@ -2275,12 +2275,11 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos_type = (typeof type === 'undefined') ? Object.keys(data.widget_defaults)[0] : type,
-			pos = {
+		var pos = {
 				'x': 0,
 				'y': 0,
-				'width': data.widget_defaults[pos_type].size.width,
-				'height': data.widget_defaults[pos_type].size.height
+				'width': data.widget_defaults[type].size.width,
+				'height': data.widget_defaults[type].size.height
 			};
 
 		// Go y by row and try to position widget in each space.
@@ -3372,9 +3371,10 @@
 					// Take values from form.
 					fields = form.serializeJSON();
 					ajax_data['type'] = fields['type'];
+					ajax_data['prev_type'] = data.dialogue['widget_type'];
 					delete fields['type'];
 
-					if (data.dialogue['widget_type'] === ajax_data['type']) {
+					if (ajax_data['prev_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
 						ajax_data['view_mode'] = (fields['show_header'] == 1)
 							? ZBX_WIDGET_VIEW_MODE_NORMAL
@@ -3399,8 +3399,6 @@
 					// Get default config for new widget.
 					fields = {};
 				}
-
-				data.dialogue['widget_type'] = ajax_data['type'];
 
 				if (Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
@@ -3427,6 +3425,7 @@
 					}
 				})
 					.done(function(response) {
+						data.dialogue['widget_type'] = response.type;
 						body.empty();
 						body.append(response.body);
 						if (typeof response.debug !== 'undefined') {
@@ -3434,6 +3433,10 @@
 						}
 						if (typeof response.messages !== 'undefined') {
 							body.append(response.messages);
+						}
+
+						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+							showMessageExhausted(data);
 						}
 
 						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
@@ -3446,8 +3449,7 @@
 
 						// Enable save button after successful form update.
 						$('.dialogue-widget-save', footer).prop('disabled', false);
-					})
-					.always(function() {
+
 						if (data.dialogue['widget_type'] === 'svggraph') {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
 						}
@@ -3455,10 +3457,6 @@
 							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
-						if (data.dialogue.widget === null
-								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
-							showMessageExhausted(data);
-						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					});
 			});
