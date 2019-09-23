@@ -65,7 +65,8 @@ extern "C" static void	wmi_instance_clear(zbx_vector_wmi_prop_t *wmi_inst_value)
 	zbx_free(wmi_inst_value);
 }
 
-typedef int	(*zbx_parse_wmi_t)(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values);
+typedef int	(*zbx_parse_wmi_t)(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values,
+		char **error);
 
 static ZBX_THREAD_LOCAL int	com_initialized = 0;
 
@@ -118,6 +119,7 @@ extern "C" void	zbx_co_uninitialize()
  *                                                                            *
  * Parameters: pEnumerator - [IN] the search result                           *
  *             wmi_values  - [IN/OUT] vector with found value                 *
+ *             error       - [OUT] the error description                      *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved value   *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -126,7 +128,8 @@ extern "C" void	zbx_co_uninitialize()
  *           instance from search result                                      *
  *                                                                            *
  ******************************************************************************/
-extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values)
+extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values,
+		char **error)
 {
 	int			ret = SYSINFO_RET_FAIL;
 	VARIANT			*vtProp = NULL;
@@ -145,7 +148,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_v
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+		*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
 		goto out;
 	}
 
@@ -155,7 +158,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_v
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", V_VT(vtProp));
+		*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 		zbx_free(vtProp);
 		goto out;
 	}
@@ -191,12 +194,14 @@ out:
  *                                                                            *
  * Parameters: pEnumerator - [IN] the search result                           *
  *             wmi_values  - [IN/OUT] vector with found values                *
+ *             error       - [OUT] the error description                      *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - wmi_values contains the retrieved values  *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values)
+extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values,
+		char **error)
 {
 	int			ret = SYSINFO_RET_FAIL;
 	VARIANT			*vtProp = NULL;
@@ -221,7 +226,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 
 		if (FAILED(hres))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+			*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
 			continue;
 		}
 
@@ -240,11 +245,8 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 			if (FAILED(hres) || WBEM_S_NO_MORE_DATA == hres || VT_EMPTY == V_VT(vtProp) ||
 					VT_NULL == V_VT(vtProp))
 			{
-				if (WBEM_S_NO_MORE_DATA != hres)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR",
-							V_VT(vtProp));
-				}
+				if (FAILED(hres))
+					*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 
 				SysFreeString(prop.name);
 				zbx_free(vtProp);
@@ -254,6 +256,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 			prop.value = vtProp;
 			zbx_vector_wmi_prop_append(inst_val, prop);
 			ret = SYSINFO_RET_OK;
+			zbx_free(*error);
 		}
 
 		pclsObj->EndEnumeration();
@@ -271,6 +274,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
  * Parameters: wmi_namespace - [IN] object path of the WMI namespace (UTF-8)  *
  *             wmi_query     - [IN] WQL query (UTF-8)                         *
  *             vtProp        - [OUT] pointer to memory for the queried value  *
+ *             error         - [OUT] the error description                    *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
  *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
@@ -281,7 +285,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
  *                                                                            *
  ******************************************************************************/
 extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query, zbx_parse_wmi_t parse_value_cb,
-		zbx_vector_wmi_instance_t *wmi_values)
+		zbx_vector_wmi_instance_t *wmi_values, char **error)
 {
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
@@ -296,7 +300,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain WMI locator service");
+		*error = zbx_strdup(*error, "Cannot obtain WMI locator service.");
 		goto exit;
 	}
 
@@ -306,7 +310,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain %s WMI service", wmi_namespace);
+		*error = zbx_dsprintf(*error, "Cannot obtain %s WMI service.", wmi_namespace);
 		goto exit;
 	}
 
@@ -316,7 +320,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot set IWbemServices proxy");
+		*error = zbx_strdup(*error, "Cannot set IWbemServices proxy.");
 		goto exit;
 	}
 
@@ -327,12 +331,15 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "failed to execute WMI query %s", wmi_query);
+		*error = zbx_dsprintf(*error, "Failed to execute WMI query %s.", wmi_query);
 		goto exit;
 	}
 
 	if (NULL != pEnumerator)
-		ret = parse_value_cb(pEnumerator, wmi_values);
+		ret = parse_value_cb(pEnumerator, wmi_values, error);
+
+	if (SYSINFO_RET_FAIL == ret && NULL == *error)
+		*error = zbx_dsprintf(*error, "Empty WMI search result for query:\"%s\"", wmi_query);
 exit:
 	if (0 != pEnumerator)
 		pEnumerator->Release();
@@ -368,6 +375,7 @@ extern "C" void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, ch
 	VARIANT				*vtProp;
 	HRESULT				hres;
 	zbx_vector_wmi_instance_t	wmi_values;
+	char				*error = NULL;
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
@@ -377,9 +385,9 @@ extern "C" void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, ch
 		goto out;
 	}
 
-	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values))
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values, &error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get WMI result");
+		zabbix_log(LOG_LEVEL_DEBUG, error);
 		goto out;
 	}
 
@@ -396,6 +404,7 @@ extern "C" void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, ch
 out:
 	zbx_vector_wmi_instance_clear_ext(&wmi_values, wmi_instance_clear);
 	zbx_vector_wmi_instance_destroy(&wmi_values);
+	zbx_free(error);
 }
 
 
@@ -437,11 +446,8 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
-	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values))
-	{
-		error = zbx_strdup(error, "Cannot obtain WMI information.");
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_first_first, &wmi_values, &error))
 		goto out;
-	}
 
 	vtProp = wmi_values.values[0]->values[0].value;
 	if (V_ISARRAY(vtProp))
@@ -906,9 +912,7 @@ extern "C" int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
-	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_all, &wmi_values))
-		error = zbx_strdup(error, "Cannot obtain WMI information.");
-	else
+	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_all, &wmi_values, &error))
 		ret = convert_wmi_json(&wmi_values, &jd, &error);
 
 	zbx_vector_wmi_instance_clear_ext(&wmi_values, wmi_instance_clear);
