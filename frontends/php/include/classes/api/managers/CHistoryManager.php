@@ -399,52 +399,63 @@ class CHistoryManager {
 		return $result;
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * Returns history value aggregation for graphs.
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
 	 *
-	 * @param array  $items        items to get aggregated values for
-	 * @param int    $time_from    minimal timestamp (seconds) to get data from
-	 * @param int    $time_to      maximum timestamp (seconds) to get data from
-	 * @param int    $width        graph width in pixels (is not required for pie charts)
+	 * @param array  $items      items to get aggregated values for
+	 * @param int    $time_from  minimal timestamp (seconds) to get data from
+	 * @param int    $time_to    maximum timestamp (seconds) to get data from
+	 * @param string $function   function for data aggregation
+	 * @param string $interval   graph width in pixels (is not required for pie charts)
 	 *
 	 * @return array    history value aggregation for graphs
 	 */
-	public function getGraphAggregation(array $items, $time_from, $time_to, $width = null) {
-		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
-		}
-		else {
-			$size = null;
-			$delta = null;
-		}
-
+	public function getGraphAggregationByInterval(array $items, $time_from, $time_to, $function, $interval = null) {
 		$grouped_items = self::getItemsGroupedByStorage($items);
 
 		$results = [];
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results += $this->getGraphAggregationFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
-					$time_from, $time_to, $width, $size, $delta
+			$results = $this->getGraphAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+				$time_from, $time_to, $function, $interval
 			);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			$results += $this->getGraphAggregationFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL], $time_from, $time_to,
-					$width, $size, $delta
+			$results += $this->getGraphAggregationByIntervalFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL],
+				$time_from, $time_to, $function, $interval
 			);
 		}
 
 		return $results;
 	}
 
+
 	/**
-	 * Elasticsearch specific implementation of getGraphAggregation.
+	 * Elasticsearch specific implementation of getGraphAggregationByWidth.
 	 *
-	 * @see CHistoryManager::getGraphAggregation
+	 * @see CHistoryManager::getGraphAggregationByInterval
 	 */
-	private function getGraphAggregationFromElasticsearch(array $items, $time_from, $time_to, $width, $size, $delta) {
+	private function getGraphAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function, $interval) {
 		$terms = [];
 
 		foreach ($items as $item) {
@@ -506,7 +517,311 @@ class CHistoryManager {
 			'size' => 0
 		];
 
-		if ($width !== null && $size !== null && $delta !== null) {
+		if ($interval !== null) {
+			$size = $time_to - $time_from;
+			$delta = $size - $time_from % $size;
+
+			// Additional grouping for line graphs.
+			$aggs['max_clock'] = [
+				'max' => [
+					'field' => 'clock'
+				]
+			];
+
+			// Clock value is divided by 1000 as it is stored as milliseconds.
+			$formula = 'Math.floor((params.width*((doc[\'clock\'].date.getMillis()/1000+params.delta)%params.size))'.
+				'/params.size)';
+
+			$script = [
+				'inline' => $formula,
+				'params' => [
+					'width' => (int)$interval,
+					'delta' => $delta,
+					'size' => $size
+				]
+			];
+			$aggs = [
+				'group_by_script' => [
+					'terms' => [
+						'size' => $interval,
+						'script' => $script
+					],
+					'aggs' => $aggs
+				]
+			];
+		}
+
+		$query['aggs']['group_by_itemid']['aggs'] = $aggs;
+
+		$results = [];
+
+		foreach (self::getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
+			$query['query']['bool']['must'] = [
+				[
+					'terms' => [
+						'itemid' => $terms[$type]
+					]
+				],
+				[
+					'range' => [
+						'clock' => [
+							'gte' => $time_from,
+							'lte' => $time_to
+						]
+					]
+				]
+			];
+
+			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
+
+			if ($interval !== null) {
+				foreach ($data['group_by_itemid']['buckets'] as $item) {
+					if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
+						|| !is_array($item['group_by_script']['buckets'])) {
+						continue;
+					}
+
+					$results[$item['key']]['source'] = 'history';
+					foreach ($item['group_by_script']['buckets'] as $point) {
+						$results[$item['key']]['data'][] = [
+							'itemid' => $item['key'],
+							'i' => $point['key'],
+							'count' => $point['doc_count'],
+							'min' => $point['min_value']['value'],
+							'avg' => $point['avg_value']['value'],
+							'max' => $point['max_value']['value'],
+							// Field value_as_string is used to get value as seconds instead of milliseconds.
+							'clock' => $point['max_clock']['value_as_string']
+						];
+					}
+				}
+			}
+			else {
+				foreach ($data['group_by_itemid']['buckets'] as $item) {
+					$results[$item['key']]['source'] = 'history';
+					$results[$item['key']]['data'][] = [
+						'itemid' => $item['key'],
+						'min' => $item['min_value']['value'],
+						'avg' => $item['avg_value']['value'],
+						'max' => $item['max_value']['value'],
+						// Field value_as_string is used to get value as seconds instead of milliseconds.
+						'clock' => $item['max_clock']['value_as_string']
+					];
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * SQL specific implementation of getGraphAggregationByWidth.
+	 *
+	 * @see CHistoryManager::getGraphAggregationByInterval
+	 */
+	private function getGraphAggregationByIntervalFromSql(array $items, $time_from, $time_to, $function, $interval) {
+		$items_by_table = [];
+		foreach ($items as $item) {
+			$items_by_table[$item['value_type']][$item['source']][] = $item['itemid'];
+		}
+
+		$result = [];
+
+		foreach ($items_by_table as $value_type => $items_by_source) {
+			foreach ($items_by_source as $source => $itemids) {
+				$sql_select = ['itemid'];
+				$sql_group_by = ['itemid'];
+
+				if ($source === 'history') {
+					switch ($function) {
+						case GRAPH_AGGREGATE_MIN:
+							$sql_select[] = 'MIN(value) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_MAX:
+							$sql_select[] = 'MAX(value) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_AVG:
+							$sql_select[] = 'COUNT(*) AS count, SUM(value) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_COUNT:
+							$sql_select[] = 'COUNT(*) AS count, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_SUM:
+							$sql_select[] = 'SUM(value) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_FIRST:
+							$sql_select[] = 'MIN(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_LAST:
+							$sql_select[] = 'value as value, MAX(clock) AS clock';
+							break;
+					}
+					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
+				}
+				else {
+					switch ($function) {
+						case GRAPH_AGGREGATE_MIN:
+							$sql_select[] = 'MIN(value_min) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_MAX:
+							$sql_select[] = 'MAX(value_max) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_AVG:
+							$sql_select[] = 'SUM(num) AS count, SUM(value_avg) AS value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_COUNT:
+							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_SUM:
+							$sql_select[] = '(value_avg * num) as value, MAX(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_FIRST:
+							$sql_select[] = 'MIN(clock) AS clock';
+							break;
+						case GRAPH_AGGREGATE_LAST:
+							$sql_select[] = 'MAX(clock) AS clock';
+							break;
+					}
+					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+				}
+
+				if ($interval !== null) {
+					$step = timeUnitToSeconds($interval, true);
+
+					// Required for 'group by' support of Oracle.
+					$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $step);
+					$sql_select[] = $calc_field.' AS tick';
+					$sql_group_by[] = $calc_field;
+				}
+
+				$sql = 'SELECT '.implode(', ', $sql_select).
+					' FROM '.$sql_from.
+					' WHERE '.dbConditionInt('itemid', $itemids).
+					' AND clock >= '.zbx_dbstr($time_from).
+					' AND clock <= '.zbx_dbstr($time_to).
+					($sql_group_by ? ' GROUP BY '.implode(', ', $sql_group_by) : '');
+
+				if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
+					$sql = 'SELECT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
+						' FROM '.$sql_from.' AS h'.
+						' JOIN('.$sql.') AS hi ON h.itemid = hi.itemid AND h.clock = hi.clock'.
+						' GROUP BY itemid, tick';
+				}
+
+				$sql_result = DBselect($sql);
+
+				while (($row = DBfetch($sql_result)) !== false) {
+					$result[$row['itemid']]['source'] = $source;
+					$result[$row['itemid']]['data'][] = $row;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Returns history value aggregation for graphs.
+	 *
+	 * The $item parameter must have the value_type, itemid and source properties set.
+	 *
+	 * @param array $items      items to get aggregated values for
+	 * @param int   $time_from  minimal timestamp (seconds) to get data from
+	 * @param int   $time_to    maximum timestamp (seconds) to get data from
+	 * @param int   $width      graph width in pixels (is not required for pie charts)
+	 *
+	 * @return array    history value aggregation for graphs
+	 */
+	public function getGraphAggregationByWidth(array $items, $time_from, $time_to, $width = null) {
+		$grouped_items = self::getItemsGroupedByStorage($items);
+
+		$results = [];
+		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
+			$results += $this->getGraphAggregationByWidthFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+					$time_from, $time_to, $width
+			);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
+			$results += $this->getGraphAggregationByWidthFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL],
+				$time_from, $time_to, $width
+			);
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Elasticsearch specific implementation of getGraphAggregationByWidth.
+	 *
+	 * @see CHistoryManager::getGraphAggregationByWidth
+	 */
+	private function getGraphAggregationByWidthFromElasticsearch(array $items, $time_from, $time_to, $width) {
+		$terms = [];
+
+		foreach ($items as $item) {
+			$terms[$item['value_type']][] = $item['itemid'];
+		}
+
+		$aggs = [
+			'max_value' => [
+				'max' => [
+					'field' => 'value'
+				]
+			],
+			'avg_value' => [
+				'avg' => [
+					'field' => 'value'
+				]
+			],
+			'min_value' => [
+				'min' => [
+					'field' => 'value'
+				]
+			],
+			'max_clock' => [
+				'max' => [
+					'field' => 'clock'
+				]
+			]
+		];
+
+		$query = [
+			'aggs' => [
+				'group_by_itemid' => [
+					'terms' => [
+						// Assure that aggregations for all terms are returned.
+						'size' => count($items),
+						'field' => 'itemid'
+					]
+				]
+			],
+			'query' => [
+				'bool' => [
+					'must' => [
+						[
+							'terms' => [
+								'itemid' => $terms
+							]
+						],
+						[
+							'range' => [
+								'clock' => [
+									'gte' => $time_from,
+									'lte' => $time_to
+								]
+							]
+						]
+					]
+				]
+			],
+			'size' => 0
+		];
+
+		if ($width !== null) {
+			$size = $time_to - $time_from;
+			$delta = $size - $time_from % $size;
+
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
 				'max' => [
@@ -560,7 +875,7 @@ class CHistoryManager {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
-			if ($width !== null && $size !== null && $delta !== null) {
+			if ($width !== null) {
 				foreach ($data['group_by_itemid']['buckets'] as $item) {
 					if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
 							|| !is_array($item['group_by_script']['buckets'])) {
@@ -601,15 +916,18 @@ class CHistoryManager {
 	}
 
 	/**
-	 * SQL specific implementation of getGraphAggregation.
+	 * SQL specific implementation of getGraphAggregationByWidth.
 	 *
-	 * @see CHistoryManager::getGraphAggregation
+	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	private function getGraphAggregationFromSql(array $items, $time_from, $time_to, $width, $size, $delta) {
+	private function getGraphAggregationByWidthFromSql(array $items, $time_from, $time_to, $width) {
 		$group_by = 'itemid';
 		$sql_select_extra = '';
 
-		if ($width !== null && $size !== null && $delta !== null) {
+		if ($width !== null) {
+			$size = $time_to - $time_from;
+			$delta = $size - $time_from % $size;
+
 			// Required for 'group by' support of Oracle.
 			$calc_field = 'round('.$width.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$delta, $size)
 					.'/('.$size.'),0)';

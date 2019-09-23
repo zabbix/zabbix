@@ -41,18 +41,22 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
-			'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
-			'color'				=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'type'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
-			'width'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-			'pointsize'			=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
-			'transparency'		=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
-			'fill'				=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-			'missingdatafunc'	=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO])],
-			'axisy'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
-			'timeshift'			=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])]
+			'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
+			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
+			'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
+			'width'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+			'pointsize'				=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
+			'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
+			'fill'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO])],
+			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
+			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_COUNT, GRAPH_AGGREGATE_SUM, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_LAST])],
+			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_YEAR],
+			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])]
 		]]);
+
 		$this->setDefault([]);
 	}
 
@@ -97,7 +101,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'fill' => SVG_GRAPH_DEFAULT_FILL,
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
 			'timeshift' => '',
-			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE
+			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE,
+			'aggregate_function' => GRAPH_AGGREGATE_NONE,
+			'aggregate_interval' => '',
+			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM
 		];
 	}
 
@@ -179,6 +186,27 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 					'name' => $this->name.'.missingdatafunc.'.$index,
 					'value' => $val['missingdatafunc']
+				];
+			}
+			if (array_key_exists('aggregate_function', $val)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.aggregate_function.'.$index,
+					'value' => $val['aggregate_function']
+				];
+			}
+			if (array_key_exists('aggregate_interval', $val)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.aggregate_interval.'.$index,
+					'value' => $val['aggregate_interval']
+				];
+			}
+			if (array_key_exists('aggregate_grouping', $val)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.aggregate_grouping.'.$index,
+					'value' => $val['aggregate_grouping']
 				];
 			}
 		}

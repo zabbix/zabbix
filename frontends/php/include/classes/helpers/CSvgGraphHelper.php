@@ -49,19 +49,25 @@ class CSvgGraphHelper {
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
+
+		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
+		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
+
 		self::applyOverrides($metrics, $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
-		self::getMetricsData($metrics, $errors, $width);
+		self::getMetricsData($metrics, $width);
+		// Load aggregated Data for each dataset.
+		self::getMetricsAggregatedData($metrics);
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
 
-		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
-		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
+//		$metrics = CMacrosResolverHelper::resolveItemNames($metrics);
+//		$metrics = CArrayHelper::renameObjectsKeys($metrics, ['name_expanded' => 'name']);
 
 		// Draw SVG graph.
 		$graph = (new CSvgGraph([
@@ -130,19 +136,174 @@ class CSvgGraphHelper {
 	}
 
 	/**
+	 * Select aggregated data to show in graph for each metric.
+	 */
+	protected static function getMetricsAggregatedData(array &$metrics = []) { sdff($metrics);
+		$function_labels = [
+			GRAPH_AGGREGATE_NONE => 'none',
+			GRAPH_AGGREGATE_MIN => 'min',
+			GRAPH_AGGREGATE_MAX => 'max',
+			GRAPH_AGGREGATE_AVG => 'avg',
+			GRAPH_AGGREGATE_COUNT => 'count',
+			GRAPH_AGGREGATE_SUM => 'sum',
+			GRAPH_AGGREGATE_FIRST => 'first',
+			GRAPH_AGGREGATE_LAST => 'last',
+		];
+
+		$dataset_metrics = [];
+
+		foreach ($metrics as $metric_num => &$metric) {
+			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval']);
+			$dataset_num = $metric['data_set'];
+
+			if ($aggregate_interval == null || $aggregate_interval <= 0
+				|| $metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE
+			) {
+				$metric['options']['aggregate_function'] = GRAPH_AGGREGATE_NONE;
+				continue;
+			}
+
+			if ($metric['options']['aggregate_grouping'] == 0) {
+				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			}
+			else {
+				$name = 'Dataset #'.($dataset_num + 1);
+			}
+
+			$item = [
+				'itemid' => $metric['itemid'],
+				'value_type' => $metric['value_type'],
+				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+			];
+
+			if (!array_key_exists($dataset_num, $dataset_metrics)) {
+				$metric = array_merge($metric, [
+					'name' => $function_labels[$metric['options']['aggregate_function']].'('.$name.')',
+					'items' => [],
+					'points' => []
+				]);
+				$metric['options']['aggregate_interval'] = $aggregate_interval;
+
+				if ($metric['options']['aggregate_grouping'] == 1) {
+					$dataset_metrics[$dataset_num] = $metric_num;
+				}
+
+				$metric['items'][] = $item;
+			}
+			else {
+				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
+				unset($metrics[$metric_num]);
+			}
+
+
+		}
+		unset($metric);
+
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
+				continue;
+			}
+
+			$result = Manager::History()->getGraphAggregationByInterval(
+				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
+				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
+			);
+
+			$metric_points = [];
+
+			if ($result) {
+				foreach ($result as $itemid => $points) {
+					foreach ($points['data'] as $point) {
+
+						$metric_points[$point['tick']]['itemid'][] = $point['itemid'];
+						$metric_points[$point['tick']]['clock'][] = $point['clock'];
+
+						if (array_key_exists('count', $point)) {
+							$metric_points[$point['tick']]['count'][] = $point['count'];
+						}
+						if (array_key_exists('value', $point)) {
+							$metric_points[$point['tick']]['value'][] = $point['value'];
+						}
+					}
+				}
+
+				switch ($metric['options']['aggregate_function']) {
+					case GRAPH_AGGREGATE_MIN:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
+						}
+						break;
+					case GRAPH_AGGREGATE_MAX:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
+						}
+						break;
+					case GRAPH_AGGREGATE_AVG:
+						foreach ($metric_points as $tick => $point) {
+							if ($point['count']) {
+								$metric['points'][] = [
+									'clock' => $tick,
+									'value' => array_sum($point['value']) / array_sum($point['count'])
+								];
+							}
+						}
+						break;
+					case GRAPH_AGGREGATE_COUNT:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
+						}
+						break;
+					case GRAPH_AGGREGATE_SUM:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
+						}
+						break;
+					case GRAPH_AGGREGATE_FIRST:
+						foreach ($metric_points as $tick => $point) {
+							if ($point['clock']) {
+								$metric['points'][] = [
+									'clock' => $tick,
+									'value' => $point['value'][array_search(min($point['clock']), $point['clock'])]
+								];
+							}
+						}
+						break;
+					case GRAPH_AGGREGATE_LAST:
+						foreach ($metric_points as $tick => $point) {
+							if ($point['clock']) {
+								$metric['points'][] = [
+									'clock' => $tick,
+									'value' => $point['value'][array_search(max($point['clock']), $point['clock'])]
+								];
+							}
+						}
+						break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Select data to show in graph for each metric.
 	 */
-	protected static function getMetricsData(array &$metrics = [], array &$errors = [], $width) {
+	protected static function getMetricsData(array &$metrics = [], $width) {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 		foreach ($metrics as $metric_num => &$metric) {
+			if ($metric['options']['aggregate_function'] != GRAPH_AGGREGATE_NONE) {
+				continue;
+			}
+
+			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
 			$metric['points'] = [];
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
 			if (!array_key_exists($key, $tr_groups)) {
-				$tr_groups[$key]['time'] = [
-					'from' => $metric['time_period']['time_from'],
-					'to' => $metric['time_period']['time_to']
+				$tr_groups[$key] = [
+					'time' => [
+						'from' => $metric['time_period']['time_from'],
+						'to' => $metric['time_period']['time_to']
+					]
 				];
 			}
 
@@ -156,7 +317,7 @@ class CSvgGraphHelper {
 
 		// Request data.
 		foreach ($tr_groups as $tr_group) {
-			$results = Manager::History()->getGraphAggregation($tr_group['items'], $tr_group['time']['from'],
+			$results = Manager::History()->getGraphAggregationByWidth($tr_group['items'], $tr_group['time']['from'],
 				$tr_group['time']['to'], $width
 			);
 
@@ -179,8 +340,6 @@ class CSvgGraphHelper {
 				unset($metric);
 			}
 		}
-
-		return $metrics;
 	}
 
 	/**
@@ -381,7 +540,7 @@ class CSvgGraphHelper {
 	protected static function getMetrics(array &$metrics, array $data_sets) {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
-		foreach ($data_sets as $data_set) {
+		foreach ($data_sets as $index => $data_set) {
 			if (!$data_set['hosts'] || !$data_set['items']) {
 				continue;
 			}
@@ -439,7 +598,7 @@ class CSvgGraphHelper {
 
 				foreach ($items as $item) {
 					$data_set['color'] = array_shift($colors);
-					$metrics[] = $item + ['options' => $data_set];
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
 					$max_metrics--;
 				}
 			}

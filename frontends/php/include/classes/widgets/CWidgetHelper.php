@@ -1016,6 +1016,39 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
+							->addRow(_('Aggregation function'),
+								(new CComboBox(
+									$field_name.'['.$row_num.'][aggregate_function]',
+									(int) $value['aggregate_function'], null,
+									[
+										GRAPH_AGGREGATE_NONE => 'None',
+										GRAPH_AGGREGATE_MIN => 'Min',
+										GRAPH_AGGREGATE_MAX => 'Max',
+										GRAPH_AGGREGATE_AVG => 'Avg',
+										GRAPH_AGGREGATE_COUNT => 'Count',
+										GRAPH_AGGREGATE_SUM => 'Sum',
+										GRAPH_AGGREGATE_FIRST => 'First',
+										GRAPH_AGGREGATE_LAST => 'Last',
+									]
+								))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+							->addRow(_('Aggregation interval'),
+								(new CTextBox(
+									$field_name.'['.$row_num.'][aggregate_interval]',
+									$value['aggregate_interval']
+								))
+									->setAttribute('placeholder', _('none'))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+							->addRow(_('Aggregate by'),
+								(new CRadioButtonList(
+									$field_name.'['.$row_num.'][aggregate_grouping]',
+									(int) $value['aggregate_grouping'])
+								)
+									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
+									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
+									->setModern(true)
+							)
 					))
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
