@@ -32,7 +32,7 @@ switch($data['condition_type']) {
 	case ZBX_POPUP_CONDITION_TYPE_CORRELATION:
 		require_once dirname(__FILE__).'/../../include/correlation.inc.php';
 
-		$popup_action = 'return conditionPopupSubmit(\'correlation.edit\');';
+		$popup_action = 'return conditionPopupSubmit(\'correlation.edit\', \'new_condition_type\', \'add_condition\');';
 
 		// Collect all options for combobox.
 		$combobox_options = [];
@@ -48,7 +48,7 @@ switch($data['condition_type']) {
 		$event_correlation_type_div = (new CDiv(new CComboBox(
 			'new_condition[type]',
 			null,
-			'conditionFormSelector()',
+			'conditionFormSelector(\'new_condition_type\')',
 			corrConditionTypes()
 		)))->addClass('condition-column condition-column-select');
 
@@ -170,10 +170,11 @@ switch($data['condition_type']) {
 
 		$form->addItem($flex_container);
 		break;
+
 	case ZBX_POPUP_CONDITION_TYPE_ACTION:
 		require_once dirname(__FILE__).'/../../include/actions.inc.php';
 
-		$popup_action = 'return conditionPopupSubmit(\'action.edit\');';
+		$popup_action = 'return conditionPopupSubmit(\'action.edit\', \'new_condition_conditiontype\', \'add_condition\');';
 
 		// Collect all options for combobox.
 		$action_condition_options = [];
@@ -191,7 +192,7 @@ switch($data['condition_type']) {
 		$action_condition_type_div = (new CDiv(new CComboBox(
 			'new_condition[conditiontype]',
 			null,
-			'conditionFormSelector()',
+			'conditionFormSelector(\'new_condition_conditiontype\')',
 			$action_condition_options
 		)))->addClass('condition-column condition-column-select');
 
@@ -825,6 +826,54 @@ switch($data['condition_type']) {
 					->addClass('condition-column')
 			]);
 		}
+
+		$form->addItem($flex_container);
+		break;
+
+	case ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION:
+		require_once dirname(__FILE__).'/../../include/actions.inc.php';
+
+		$popup_action = 'return conditionPopupSubmit(\'action.edit\', \'new_opcondition_conditiontype\', \'add_opcondition\');';
+
+		// Collect all options for combobox.
+		$combobox_options = [];
+		foreach ($data['allowed_conditions'] as $type) {
+			$combobox_options[$type] = condition_type2str($type);
+		}
+
+		$flex_container = (new CDiv())->addClass('condition-container');
+
+		// Type select.
+		$condition_type_div = (new CDiv(new CComboBox(
+			'new_opcondition[conditiontype]',
+			null,
+			'conditionFormSelector(\'new_opcondition_conditiontype\')',
+			$combobox_options
+		)))->addClass('condition-column condition-column-select');
+
+		$flex_container->addItem($condition_type_div);
+
+		// Acknowledge form elements.
+		$operators_options = [];
+		foreach (get_operators_by_conditiontype(CONDITION_TYPE_EVENT_ACKNOWLEDGED) as $type) {
+			$operators_options[$type] = condition_operator2str($type);
+		}
+
+		$condition_operator = new CComboBox('new_opcondition[operator]', null, null, $operators_options);
+
+		$condition_value = new CComboBox('new_opcondition[value]', '', null, [
+			0 => _('Not Ack'),
+			1 => _('Ack')
+		]);
+
+		$flex_container->addItem([
+			(new CDiv($condition_operator))
+				->setAttribute('data-type', CONDITION_TYPE_EVENT_ACKNOWLEDGED)
+				->addClass('condition-column condition-column-active'),
+			(new CDiv($condition_value))
+				->setAttribute('data-type', CONDITION_TYPE_EVENT_ACKNOWLEDGED)
+				->addClass('condition-column condition-column-active')
+		]);
 
 		$form->addItem($flex_container);
 		break;

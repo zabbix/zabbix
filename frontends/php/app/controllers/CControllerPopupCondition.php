@@ -27,7 +27,7 @@ class CControllerPopupCondition extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'condition_type' => 'in 0,1|required',
+			'condition_type' => 'required|in '.implode(',', [ZBX_POPUP_CONDITION_TYPE_CORRELATION, ZBX_POPUP_CONDITION_TYPE_ACTION, ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION]),
 			'allowed_conditions' => 'array_id',
 			'severities' => 'array'
 		];

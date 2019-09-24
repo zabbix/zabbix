@@ -903,83 +903,17 @@ if (!empty($data['new_operation'])) {
 			(new CSpan())->setId('operationConditionLabel')
 		]);
 
-		if (!hasRequest('new_opcondition')) {
-			$operationConditionsTable->addRow((new CCol(
-				(new CSimpleButton(_('New')))
-					->onClick('javascript: submitFormWithParam("'.$actionForm->getName().'", "new_opcondition", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColspan(3));
-		}
+		$operationConditionsTable->addRow([
+			(new CSimpleButton(_('Add')))
+				->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
+					'condition_type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
+					'allowed_conditions' => get_opconditions_by_eventsource($data['eventsource'])
+				]).', null, this);')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		]);
+
 		$new_operation_formlist->addRow(_('Conditions'),
 			(new CDiv($operationConditionsTable))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		);
-	}
-
-	// Append new operation condition to form list.
-	if (hasRequest('new_opcondition')) {
-		$newOperationConditionTable = (new CTable())->setAttribute('style', 'width: 100%;');
-
-		$allowedOpConditions = get_opconditions_by_eventsource($data['eventsource']);
-
-		$new_opcondition = getRequest('new_opcondition', []);
-		if (!is_array($new_opcondition)) {
-			$new_opcondition = [];
-		}
-
-		if (empty($new_opcondition)) {
-			$new_opcondition['conditiontype'] = CONDITION_TYPE_EVENT_ACKNOWLEDGED;
-			$new_opcondition['operator'] = CONDITION_OPERATOR_LIKE;
-			$new_opcondition['value'] = 0;
-		}
-
-		if (!str_in_array($new_opcondition['conditiontype'], $allowedOpConditions)) {
-			$new_opcondition['conditiontype'] = $allowedOpConditions[0];
-		}
-
-		$condition_types = [];
-		foreach ($allowedOpConditions as $opcondition) {
-			$condition_types[$opcondition] = condition_type2str($opcondition);
-		}
-
-		$operators = [];
-		foreach (get_operators_by_conditiontype($new_opcondition['conditiontype']) as $operation_condition) {
-			$operators[$operation_condition] = condition_operator2str($operation_condition);
-		}
-
-		$rowCondition = [
-			new CComboBox('new_opcondition[conditiontype]', $new_opcondition['conditiontype'], 'submit()',
-				$condition_types
-			),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CComboBox('new_opcondition[operator]', null, null, $operators)
-		];
-		if ($new_opcondition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
-			$rowCondition[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-			$rowCondition[] = new CComboBox('new_opcondition[value]', $new_opcondition['value'], null, [
-				0 => _('Not Ack'),
-				1 => _('Ack')
-			]);
-		}
-		$newOperationConditionTable->addRow(new CCol($rowCondition));
-
-		$new_operation_formlist->addRow(_('Operation condition'),
-			(new CDiv([
-				$newOperationConditionTable,
-				new CHorList([
-					(new CSimpleButton(_('Add')))
-						->onClick('javascript: submitFormWithParam('.
-							'"'.$actionForm->getName().'", "add_opcondition", "1"'.
-						');')
-						->addClass(ZBX_STYLE_BTN_LINK),
-					(new CSimpleButton(_('Cancel')))
-						->onClick('javascript: submitFormWithParam('.
-							'"'.$actionForm->getName().'", "cancel_new_opcondition", "1"'.
-						');')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				])
-			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		);
