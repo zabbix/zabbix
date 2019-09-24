@@ -36,10 +36,10 @@ class CMacroParser extends CParser {
 	private $n;
 
 	/**
-	 * @var CSetParser
+	 * Macro last part without quotes if option 'allow_quoted_suffix' was defined.
+	 *
+	 * @var string
 	 */
-	private $set_parser;
-
 	private $unquoted_suffix;
 
 	/**
@@ -71,8 +71,6 @@ class CMacroParser extends CParser {
 
 		$this->max_match_len = max(array_map('strlen', $this->needles));
 		$this->min_match_len = min(array_map('strlen', $this->needles));
-		//$this->set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
-
 		$this->options = $options + $this->options;
 	}
 
@@ -86,10 +84,10 @@ class CMacroParser extends CParser {
 		$this->match = '';
 		$this->macro = '';
 		$this->n = 0;
-		$source_len = strlen($source);
+		$length = strlen($source);
 		$p = $pos;
 
-		if ($p >= $source_len || $source[$p] != '{') {
+		if ($p >= $length || $source[$p] != '{') {
 			return CParser::PARSE_FAIL;
 		}
 
@@ -101,29 +99,25 @@ class CMacroParser extends CParser {
 
 		$p += strlen($this->macro);
 
-		if ($this->options['allow_quoted_suffix'] && $p < $source_len && $source[$p] == '"') {
+		if ($this->options['allow_quoted_suffix'] && $p < $length && $source[$p] == '"') {
 			$p++;
 
 			if ($this->findSuffix($source, $p) == CParser::PARSE_FAIL) {
 				$this->macro = '';
+				$this->unquoted_suffix = '';
 
 				return CParser::PARSE_FAIL;
 			}
 
 			$p += strlen($this->unquoted_suffix) + 2;
 
-			if ($p >= $source_len || $source[$p] !== '"') {
+			if ($p >= $length || $source[$p] !== '"') {
 				$this->macro = '';
 				$this->unquoted_suffix = '';
 
 				return CParser::PARSE_FAIL;
 			}
 		}
-
-		// if ($this->set_parser->parse($source, $p) == self::PARSE_FAIL) {
-		// 	return self::PARSE_FAIL;
-		// }
-		// $p += $this->set_parser->getLength();
 
 		if ($this->options['allow_reference']) {
 			if (isset($source[$p]) && $source[$p] >= '1' && $source[$p] <= '9') {
@@ -133,6 +127,8 @@ class CMacroParser extends CParser {
 		}
 
 		if (!isset($source[$p]) || $source[$p] != '}') {
+			$this->macro = '';
+			$this->unquoted_suffix = '';
 			$this->n = 0;
 
 			return CParser::PARSE_FAIL;
@@ -141,17 +137,23 @@ class CMacroParser extends CParser {
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
-		// $this->macro = $this->set_parser->getMatch();
 
-		return $p < $source_len ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS;
+		return $p < $length ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS;
 	}
 
+	/**
+	 * Find quoted suffix value for option "allow_quoted_suffix". Return CParser search state.
+	 *
+	 * @param string $source     Source string.
+	 * @param int    $p          Search start position, after quotation mark.
+	 * @return int
+	 */
 	protected function findSuffix($source, $p) {
 		$escaped = false;
-		$source_len = strlen($source);
+		$length = strlen($source);
 		$pos = $p;
 
-		while ($p < $source_len && ($escaped || preg_match('/[0-9A-Z_ ]/', $source[$p]) == 1)) {
+		while ($p < $length && ($escaped || preg_match('/[0-9A-Z_ ]/', $source[$p]) == 1)) {
 			if ($escaped || $source[$p] == '\\') {
 				$escaped = !$escaped;
 			}
@@ -167,11 +169,18 @@ class CMacroParser extends CParser {
 		return CParser::PARSE_SUCCESS;
 	}
 
+	/**
+	 * Find desired macro, returns parser state.
+	 *
+	 * @param string $source     Source string.
+	 * @param int    $p          Search start position, after { character.
+	 * @return int
+	 */
 	protected function findMatch($source, $p) {
 		$len = $this->max_match_len;
 
 		while ($len >= $this->min_match_len) {
-			$needle = substr($source[$p], $len);
+			$needle = substr($source, $p, $len);
 
 			if (in_array($needle, $this->needles)) {
 				$this->macro = $needle;
@@ -201,5 +210,14 @@ class CMacroParser extends CParser {
 	 */
 	public function getN() {
 		return $this->n;
+	}
+
+	/**
+	 * Get uquoted_suffix
+	 *
+	 * @return string
+	 */
+	public function getSuffix() {
+		return $this->unquoted_suffix;
 	}
 }
