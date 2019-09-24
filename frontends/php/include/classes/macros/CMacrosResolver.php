@@ -659,6 +659,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($matched_macros['macros']['event'] as $macro) {
+			if (!$trigger['eventid']) {
+				$trigger['eventid'] = UNRESOLVED_MACRO_STRING;
+			}
 			$macro_values[$triggerid][$macro] = $trigger['eventid'];
 		}
 
