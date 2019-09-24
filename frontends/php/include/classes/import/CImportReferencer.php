@@ -872,7 +872,7 @@ class CImportReferencer {
 			$this->valueMapsRefs = [];
 
 			$valuemaps = API::ValueMap()->get([
-				'output' => ['valeumapid', 'name'],
+				'output' => ['valuemapid', 'name'],
 				'filter' => ['name' => $this->valueMaps]
 			]);
 

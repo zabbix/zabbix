@@ -385,8 +385,8 @@ class DB {
 							$length = mb_strlen($values[$field]);
 
 							if ($length > 2048) {
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
-									$values[$field], $field, $length));
+								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
+									$values[$field], $field, $length, 2048));
 							}
 						}
 						$values[$field] = zbx_dbstr($values[$field]);

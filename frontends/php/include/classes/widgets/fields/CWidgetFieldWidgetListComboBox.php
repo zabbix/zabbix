@@ -41,6 +41,28 @@ class CWidgetFieldWidgetListComboBox extends CWidgetField {
 	}
 
 	/**
+	 * Set additional flags, which can be used in configuration form.
+	 *
+	 * @param int $flags
+	 *
+	 * @return $this
+	 */
+	public function setFlags($flags) {
+		parent::setFlags($flags);
+
+		if ($flags & self::FLAG_NOT_EMPTY) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules(null);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * JS code, that should be executed, to fill ComboBox with values and select current one.
 	 *
 	 * @return string

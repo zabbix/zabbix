@@ -4,6 +4,7 @@ SERVER_tests = \
 	parse_key \
 	replace_key_params_dyn \
 	calculate_item_nextcheck \
+	calculate_item_nextcheck_unreachable \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
 	zbx_interval_preproc \
@@ -145,6 +146,18 @@ calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+calculate_item_nextcheck_unreachable_SOURCES = \
+	calculate_item_nextcheck_unreachable.c \
+	$(COMMON_SRC_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD = \
+	$(COMMON_LIB_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
+
+calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@
+
+calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 zbx_function_get_param_dyn_SOURCES = \
 	zbx_function_get_param_dyn.c \

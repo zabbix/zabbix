@@ -142,13 +142,18 @@ if (hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) {
 
 		$delay = timeUnitToSeconds(($screen['delay'] === '0') ? $data['screen']['delay'] : $screen['delay']);
 
-		insert_js(
-			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.
+		$js = 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.
 				CJs::encodeJson($delay * $widgetRefreshRate).
 			');'.
 			"\n".
-			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();'
-		);
+			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';
+
+		if ($page['type'] == PAGE_TYPE_JS) {
+			echo $js;
+		}
+		elseif ($page['type'] == PAGE_TYPE_HTML_BLOCK) {
+			insert_js($js);
+		}
 	}
 }
 
