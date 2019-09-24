@@ -204,17 +204,25 @@ static int	json_parse_number(const char *start, char **error)
 	char		first_digit;
 	int		point = 0, digit = 0;
 
+	/* Valid number endings:
+	 * zero: "123"
+	 * comma: "[123,456]"
+	 * whitespace or newline: "[123 ]"
+	 * closing brackets: "[123]" or "{"id":123}"
+	 */
+#	define IS_VALID_NUMBER_ENDING(c) ('\0' == c || ',' == c || 0 != isspace(c) || ']' == c || '}' == c)
+
 	if ('-' == *ptr)
 		ptr++;
 
 	first_digit = *ptr;
 
-	while ('\0' != *ptr)
+	while (0 == IS_VALID_NUMBER_ENDING(*ptr))
 	{
 		if ('.' == *ptr)
 		{
 			if (0 != point)
-				break;
+				return json_error("invalid numeric value format", start, error);/* 1.2.3 */
 			point = 1;
 		}
 		else if (0 == isdigit((unsigned char)*ptr))
@@ -235,24 +243,32 @@ static int	json_parse_number(const char *start, char **error)
 
 	if ('e' == *ptr || 'E' == *ptr)
 	{
-		if ('\0' == *(++ptr))
+		ptr++;
+		if (0 != IS_VALID_NUMBER_ENDING(*ptr))
 			return json_error("unexpected end of numeric value", NULL, error);
 
 		if ('+' == *ptr || '-' == *ptr)
 		{
-			if ('\0' == *(++ptr))
+			ptr++;
+			if (0 != IS_VALID_NUMBER_ENDING(*ptr))
 				return json_error("unexpected end of numeric value", NULL, error);
 		}
 
 		if (0 == isdigit((unsigned char)*ptr))
 			return json_error("invalid power value of number in E notation", ptr, error);
 
-		while ('\0' != *(++ptr))
+		ptr++;
+		while (0 == IS_VALID_NUMBER_ENDING(*ptr))
 		{
-			if (0 == isdigit((unsigned char)*ptr))
+			if (0 == isdigit((unsigned char)*(++ptr)))
 				break;
 		}
 	}
+
+	if ( 0 == IS_VALID_NUMBER_ENDING(*ptr) )
+		return json_error("invalid numeric value format", start, error);
+
+#	undef IS_VALID_NUMBER_ENDING
 
 	return (int)(ptr - start);
 }

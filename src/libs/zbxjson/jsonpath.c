@@ -2088,16 +2088,49 @@ static int	jsonpath_extract_element(const char *ptr, char **element)
 static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
 {
 	char	buffer[MAX_STRING_LEN];
+	int	ret = FAIL;
+	char	*data = (char*)ptr;
+	zbx_json_type_t	type = ZBX_JSON_TYPE_UNKNOWN;
 
-	if (('-' != *ptr && 0 == isdigit((unsigned char)*ptr)) ||
-		NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL))
+	/* remove wrapping quotes */
+	if ('"' == *ptr)
 	{
-		zbx_set_json_strerror("array value is not a number starting with: %s", ptr);
-		return FAIL;
+		size_t	len = 1;
+
+		while('"' != ptr[len])
+		{
+			if ('\0' == ptr[len])
+				goto out;
+			len++;
+		}
+		len--;
+
+		if (0 < len)
+		{
+			data = (char *)zbx_malloc(NULL, len + 1);
+			memcpy(data, ptr + 1, len);
+			data[len] = '\0';
+		}
+	}
+
+	if (NULL == zbx_json_decodevalue(data, buffer, sizeof(buffer), &type) || ZBX_JSON_TYPE_INT != type)
+	{
+		goto out;
 	}
 
 	*value = atof(buffer);
-	return SUCCEED;
+	ret = SUCCEED;
+
+out:
+	if (data != ptr)
+		zbx_free(data);
+
+	if (SUCCEED != ret)
+	{
+		zbx_set_json_strerror("array value is not a number starting with: %s", ptr);
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2207,6 +2240,11 @@ static int	jsonpath_apply_function(const zbx_vector_str_t *objects, zbx_jsonpath
 		result /= objects->values_num;
 
 	*output = zbx_dsprintf(NULL, ZBX_FS_DBL, result);
+	if (0 == isdigit(**output) && '-' != **output)
+	{
+		zbx_set_json_strerror("invalid function result: %s", *output);
+		goto out;
+	}
 	del_zeros(*output);
 	ret = SUCCEED;
 out:
