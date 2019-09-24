@@ -4958,7 +4958,8 @@ ul.checkbox-list.col-3 > li {
 .icon-problem-recovery,
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
-.icon-actions-number-red {
+.icon-actions-number-red,
+.icon-description {
   display: inline-block;
   position: relative;
   height: 18px;
@@ -4981,7 +4982,8 @@ ul.checkbox-list.col-3 > li {
   .icon-problem-recovery::before,
   .icon-actions-number-gray::before,
   .icon-actions-number-yellow::before,
-  .icon-actions-number-red::before {
+  .icon-actions-number-red::before,
+  .icon-description::before {
     content: '';
     display: inline-block;
     position: absolute;
@@ -4992,7 +4994,8 @@ ul.checkbox-list.col-3 > li {
     background-image: url(../img/icon-sprite.svg);
     background-repeat: no-repeat; }
 
-[data-count][class*='icon-']::after {
+[data-count][class*='icon-']::after,
+.icon-description::after {
   position: absolute;
   content: attr(data-count);
   text-align: center;
@@ -5053,6 +5056,14 @@ ul.checkbox-list.col-3 > li {
   color: #1f2c33; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.icon-description {
+  margin-left: 5px; }
+  .icon-description::after {
+    content: '?';
+    color: #fff; }
+  .icon-description::before {
+    background-position: -474px -245px; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }

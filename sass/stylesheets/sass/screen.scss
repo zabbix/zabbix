@@ -6995,7 +6995,8 @@ ul.checkbox-list {
 .icon-problem-recovery,
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
-.icon-actions-number-red {
+.icon-actions-number-red,
+.icon-description {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -7018,7 +7019,8 @@ ul.checkbox-list {
 	}
 }
 
-[data-count][class*='icon-']::after {
+[data-count][class*='icon-']::after,
+.icon-description::after {
 	position: absolute;
 	content: attr(data-count);
 	text-align: center;
@@ -7091,6 +7093,17 @@ ul.checkbox-list {
 	}
 	&::before {
 		background-position: -524px -245px;
+	}
+}
+.icon-description {
+	margin-left: 5px;
+
+	&::after {
+		content: '?';
+		color: $ui-bg-color;
+	}
+	&::before {
+		background-position: -474px -245px;
 	}
 }
 

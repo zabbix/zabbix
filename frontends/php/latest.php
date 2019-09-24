@@ -192,7 +192,8 @@ if ($hosts) {
 	$items = API::Item()->get([
 		'hostids' => array_keys($hosts),
 		'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-			'error', 'trends', 'history', 'delay', 'key_', 'flags'],
+			'error', 'trends', 'history', 'delay', 'key_', 'flags', 'description'
+		],
 		'selectApplications' => ['applicationid'],
 		'selectItemDiscovery' => ['ts_delete'],
 		'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
@@ -546,6 +547,7 @@ foreach ($items as $key => $item) {
 		$checkbox->setEnabled(false);
 	}
 
+	$desc_icon = ($item['description'] !== '') ? makeDescriptionIcon($item['description']) : null;
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	if ($filter['showDetails']) {
@@ -565,7 +567,7 @@ foreach ($items as $key => $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
+			(new CCol([$item['name_expanded'], $desc_icon, BR(), $itemKey]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
 			(new CCol($item['trends']))->addClass($state_css),
@@ -582,7 +584,7 @@ foreach ($items as $key => $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol($item['name_expanded']))->addClass($state_css),
+			(new CCol([$item['name_expanded'], $desc_icon]))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
@@ -698,6 +700,7 @@ foreach ($items as $item) {
 		$checkbox->setEnabled(false);
 	}
 
+	$desc_icon = ($item['description'] !== '') ? makeDescriptionIcon($item['description']) : null;
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$host = $hosts[$item['hostid']];
@@ -718,7 +721,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
+			(new CCol([$item['name_expanded'], $desc_icon, BR(), $itemKey]))->addClass($state_css),
 			(new CCol($item['delay']))->addClass($state_css),
 			(new CCol($item['history']))->addClass($state_css),
 			(new CCol($item['trends']))->addClass($state_css),
@@ -735,7 +738,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			'',
-			(new CCol($item['name_expanded']))->addClass($state_css),
+			(new CCol([$item['name_expanded'], $desc_icon]))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
