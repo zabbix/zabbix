@@ -1245,6 +1245,8 @@ int	main(int argc, char **argv)
 
 			while (0 == WSACleanup())
 				;
+
+			zbx_co_uninitialize();
 #endif
 #ifndef _WINDOWS
 			zbx_unload_modules();

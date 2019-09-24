@@ -68,10 +68,10 @@ extern "C" static void	wmi_instance_clear(zbx_vector_wmi_prop_t *wmi_inst_value)
 typedef int	(*zbx_parse_wmi_t)(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values,
 		char **error);
 
-static ZBX_THREAD_LOCAL int	com_initialized = 0;
-
 extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VARIANT *vtProp, struct zbx_json *jdoc,
 		char **error);
+
+static ZBX_THREAD_LOCAL int	com_initialized = 0;
 
 extern "C" int	zbx_co_initialize()
 {
@@ -203,19 +203,17 @@ out:
 extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wmi_instance_t *wmi_values,
 		char **error)
 {
-	int			ret = SYSINFO_RET_FAIL;
-	VARIANT			*vtProp = NULL;
-	ULONG			obj_num = 0;
-	IWbemClassObject	*pclsObj = NULL;
+	int	ret = SYSINFO_RET_FAIL;
+	VARIANT	*vtProp = NULL;
+	ULONG	obj_num = 0;
+	HRESULT	hres = S_OK;
 
-	while (pEnumerator)
+	while (pEnumerator && SUCCEEDED(hres))
 	{
+		IWbemClassObject	*pclsObj;
 		ULONG			uReturn = 0;
 		HRESULT			hres;
 		zbx_vector_wmi_prop_t	*inst_val = NULL;
-
-		if (NULL != pclsObj)
-			pclsObj->Release();
 
 		hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
@@ -227,7 +225,8 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 		if (FAILED(hres))
 		{
 			*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
-			continue;
+			pclsObj->Release();
+			break;
 		}
 
 		inst_val = (zbx_vector_wmi_prop_t*) zbx_malloc(NULL, sizeof(zbx_vector_wmi_prop_t));
@@ -256,10 +255,10 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, zbx_vector_wm
 			prop.value = vtProp;
 			zbx_vector_wmi_prop_append(inst_val, prop);
 			ret = SYSINFO_RET_OK;
-			zbx_free(*error);
 		}
 
 		pclsObj->EndEnumeration();
+		pclsObj->Release();
 	}
 
 	return ret;
