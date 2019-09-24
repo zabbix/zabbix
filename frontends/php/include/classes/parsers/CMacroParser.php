@@ -21,6 +21,16 @@
 
 class CMacroParser extends CParser {
 
+	// Do not allow any references.
+	const REFERENCE_NONE = 0;
+	// Allow only numeric reference, {HOST.HOST3}
+	const REFERENCE_NUMERIC = 1;
+	/**
+	 * Allow alpha numeric reference, {EVENT.TAGS.test}. Reference can be quoted if it contains non alphanumeric
+	 * characters, {EVEN.TAGS."Jira id"}
+	 */
+	const REFERENCE_ALPHANUMERIC = 2;
+
 	/**
 	 * Macro name.
 	 *
@@ -42,27 +52,16 @@ class CMacroParser extends CParser {
 	 */
 	private $suffix;
 
-	/**
-	 * An options array.
-	 *
-	 * Supported options:
-	 *   'allow_reference' => true		support of reference {MACRO<1-9>}
-	 *   'allow_quoted_suffix' => true  support of quoted last part of macro {EVENT.TAGS."Jira id"}
-	 *
-	 * @var array
-	 */
-	private $options = [
-		'allow_reference' => false,
-		'allow_quoted_suffix' => false
-	];
+	// Allowed reference type.
+	private $reference_type;
 
 	/**
 	 * Array of strings to search for.
 	 *
-	 * @param array $macros		the list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
-	 * @param array $options
+	 * @param array $macros     The list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
+	 * @param int   $ref_type   Allowed reference type: REFERENCE_NONE, REFERENCE_NUMERIC, REFERENCE_ALPHANUMERIC
 	 */
-	public function __construct(array $macros, array $options = []) {
+	public function __construct(array $macros, $ref_type = CMacroParser::REFERENCE_NONE) {
 		$this->needles = [];
 
 		foreach ($macros as $macro) {
@@ -71,7 +70,7 @@ class CMacroParser extends CParser {
 
 		$this->max_match_len = max(array_map('strlen', $this->needles));
 		$this->min_match_len = min(array_map('strlen', $this->needles));
-		$this->options = $options + $this->options;
+		$this->reference_type = $ref_type;
 	}
 
 	/**
@@ -100,27 +99,32 @@ class CMacroParser extends CParser {
 
 		$p += strlen($this->macro);
 
-		if ($this->options['allow_quoted_suffix'] && $p < $length - 1 && $source[$p] == '.') {
-			$p++;
+		switch ($this->reference_type) {
+			case CMacroParser::REFERENCE_NUMERIC:
+				if ($p < $length && $source[$p] >= '1' && $source[$p] <= '9') {
+					$this->n = (int) $source[$p];
+					$p++;
+				}
+				break;
 
-			if ($this->parseSuffix($source, $p) == CParser::PARSE_FAIL) {
-				$this->macro = '';
+			case CMacroParser::REFERENCE_ALPHANUMERIC:
+				if ($p < $length - 1 && $source[$p] == '.') {
+					$p++;
 
-				return CParser::PARSE_FAIL;
-			}
+					if ($this->parseSuffix($source, $p) == CParser::PARSE_FAIL) {
+						$this->macro = '';
 
-			$p += mb_strlen($this->suffix);
+						return CParser::PARSE_FAIL;
+					}
 
-			if ($this->suffix[0] == '"') {
-				$this->suffix = mb_substr($this->suffix, 1, -1);
-			}
-		}
+					$p += mb_strlen($this->suffix);
 
-		if ($this->options['allow_reference']) {
-			if (isset($source[$p]) && $source[$p] >= '1' && $source[$p] <= '9') {
-				$this->n = (int) $source[$p];
-				$p++;
-			}
+					if ($this->suffix[0] == '"') {
+						$this->suffix = mb_substr($this->suffix, 1, -1);
+					}
+				}
+				break;
+
 		}
 
 		if ($p >= $length || $source[$p] != '}') {
