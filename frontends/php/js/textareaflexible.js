@@ -31,17 +31,25 @@
 				$textarea
 					.on('input keydown paste', function(e) {
 						if (e.which === 13) {
+							if (settings.submit === 'form') {
+								$(this).closest('form').submit();
+							}
+							else if (typeof(settings.submit) === 'string') {
+								$('#' + settings.submit).click();
+							}
 							return false;
 						}
 
 						var old_value = $textarea.val(),
-							new_value = old_value.replace(/\r?\n/gi, '');
+							new_value = old_value.replace(/\r?\n/gi, ''),
+							scrollsave = $(window).scrollTop();
 
 						if (old_value.length !== new_value.length) {
 							$textarea.val(new_value);
 						}
 
 						$textarea.height(0).innerHeight($textarea[0].scrollHeight);
+						$(window).scrollTop(scrollsave);
 					})
 					.trigger('input');
 			});
