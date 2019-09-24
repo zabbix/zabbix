@@ -1,8 +1,16 @@
 Changes for 4.4.0beta1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
+....I..... [ZBXNEXT-5406] updated widgets on default dashboards (vmurzins)
+..F..J.... [ZBXNEXT-4209] added jmx.get[<discovery mode>,<object name pattern>] key for JMX LLD (atumilovics)
+...G...... [ZBXNEXT-5453] added Zabbix agent 2 (akozlovs, Andris, asestakovs, MVekslers, viktors, vso, wiper)
+..F....PS. [ZBXNEXT-4033] added possibility to return multiple columns (and rows) from SQL ODBC (akozlovs)
 
 Bug fixes:
+..F....... [ZBX-16645] fixed suggested selection font weight for new item (vasilijs)
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.0alpha3
@@ -113,11 +121,13 @@ Bug fixes:
 Changes for 4.2.7rc1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 .......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
 .......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
@@ -672,10 +682,12 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.13rc1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
 .......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)

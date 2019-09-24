@@ -52,7 +52,7 @@ zabbix_agent2 \- Zabbix agent 2
 .B \-t
 .I item\-key
 .br
-.B zabbix_agent2zabbix_agent2
+.B zabbix_agent2
 .RB [ \-c
 .IR config\-file ]
 .B \-R
