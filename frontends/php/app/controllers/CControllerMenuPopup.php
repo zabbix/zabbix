@@ -511,10 +511,12 @@ class CControllerMenuPopup extends CController {
 		]);
 
 		if ($db_triggers) {
-			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);
-
 			$db_trigger = reset($db_triggers);
+
 			$db_trigger['items'] = CMacrosResolverHelper::resolveItemNames($db_trigger['items']);
+			$db_trigger['url'] = CMacrosResolverHelper::resolveTriggerUrl(
+				$db_trigger + ['eventid' => $data['eventid']]
+			);
 
 			$hosts = [];
 			$show_events = true;
