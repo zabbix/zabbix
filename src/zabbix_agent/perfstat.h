@@ -26,7 +26,8 @@
 
 #include "perfmon.h"
 
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval, char **error);
+zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error);
 void			remove_perf_counter(zbx_perf_counter_data_t *counter);
 
 typedef enum
@@ -41,7 +42,8 @@ void	free_perf_collector(void);
 void	collect_perfstat(void);
 
 int	get_perf_counter_value_by_name(const char *name, double *value, char **error);
-int	get_perf_counter_value_by_path(const char *counterpath, int interval, double *value, char **error);
+int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_perf_counter_lang_t lang,
+		double *value, char **error);
 int	get_perf_counter_value(zbx_perf_counter_data_t *counter, int interval, double *value, char **error);
 
 #endif
