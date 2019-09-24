@@ -6924,6 +6924,26 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 	UNLOCK_CACHE;
 }
 
+int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid)
+{
+	const ZBX_DC_HOST	*dc_host;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_host = DCfind_host(host)))
+	{
+		*hostid = dc_host->hostid;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_items_by_itemids                                    *

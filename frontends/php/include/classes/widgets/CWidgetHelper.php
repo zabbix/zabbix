@@ -184,14 +184,14 @@ class CWidgetHelper {
 	/**
 	 * Creates label linked to the multiselect field.
 	 *
-	 * @param CWidgetFieldMultiselect $field
+	 * @param CWidgetFieldMs $field
 	 *
 	 * @return CLabel
 	 */
 	public static function getMultiselectLabel($field) {
 		$field_name = $field->getName();
 
-		if ($field instanceof CWidgetFieldMultiselect) {
+		if ($field instanceof CWidgetFieldMs) {
 			$field_name .= ($field->isMultiple() ? '[]' : '');
 		}
 		else {
@@ -203,7 +203,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselect $field
+	 * @param CWidgetFieldMs $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -230,7 +230,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGroup $field
+	 * @param CWidgetFieldMsGroup $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -246,7 +246,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectHost $field
+	 * @param CWidgetFieldMsHost $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -260,7 +260,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectItem $field
+	 * @param CWidgetFieldMsItem $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -276,7 +276,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGraph $field
+	 * @param CWidgetFieldMsGraph $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -293,7 +293,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectItemPrototype $field
+	 * @param CWidgetFieldMsItemPrototype $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -308,7 +308,7 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * @param CWidgetFieldMultiselectGraphPrototype $field
+	 * @param CWidgetFieldMsGraphPrototype $field
 	 * @param array $captions
 	 * @param string $form_name
 	 *
@@ -400,23 +400,39 @@ class CWidgetHelper {
 	 * @return CList
 	 */
 	public static function getSeverities($field, $config) {
-		$severities = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
-
-		if ($field->getOrientation() == CWidgetFieldSeverities::ORIENTATION_HORIZONTAL) {
-			$severities->addClass(ZBX_STYLE_HOR_LIST);
-		}
+		$severities = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severities->addItem(
-				(new CCheckBox($field->getName().'[]', $severity))
-					->setLabel(getSeverityName($severity, $config))
-					->setId($field->getName().'_'.$severity)
-					->setChecked(in_array($severity, $field->getValue()))
+			$severities[$severity] = getSeverityName($severity, $config);
+		}
+
+		return self::getCheckBoxList($field, $severities);
+	}
+
+	/**
+	 * @param CWidgetFieldCheckBoxList $field
+	 * @param array $config
+	 *
+	 * @return CList
+	 */
+	public static function getCheckBoxList($field, array $config) {
+		$checkbox_list = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+
+		if ($field->getOrientation() == CWidgetFieldCheckBoxList::ORIENTATION_HORIZONTAL) {
+			$checkbox_list->addClass(ZBX_STYLE_HOR_LIST);
+		}
+
+		foreach ($config as $key => $label) {
+			$checkbox_list->addItem(
+				(new CCheckBox($field->getName().'[]', $key))
+					->setLabel($label)
+					->setId($field->getName().'_'.$key)
+					->setChecked(in_array($key, $field->getValue()))
 					->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			);
 		}
 
-		return $severities;
+		return $checkbox_list;
 	}
 
 	/**

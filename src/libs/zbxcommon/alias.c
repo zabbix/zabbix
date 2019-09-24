@@ -83,8 +83,8 @@ const char	*zbx_alias_get(const char *orig)
 {
 	ALIAS				*alias;
 	size_t				len_name, len_value;
-	ZBX_THREAD_LOCAL static char	*buffer = NULL;
-	ZBX_THREAD_LOCAL static size_t	buffer_alloc = 0;
+	static ZBX_THREAD_LOCAL char	*buffer = NULL;
+	static ZBX_THREAD_LOCAL size_t	buffer_alloc = 0;
 	size_t				buffer_offset = 0;
 	const char			*p = orig;
 

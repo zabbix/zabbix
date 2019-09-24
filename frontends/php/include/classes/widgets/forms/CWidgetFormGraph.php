@@ -45,7 +45,7 @@ class CWidgetFormGraph extends CWidgetForm {
 		if (array_key_exists('source_type', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 			// Select simple graph field.
-			$field_item = (new CWidgetFieldMultiselectItem('itemid', _('Item')))
+			$field_item = (new CWidgetFieldMsItem('itemid', _('Item')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false)
 				->setFilterParameter('numeric', true) // For filtering items.
@@ -59,7 +59,7 @@ class CWidgetFormGraph extends CWidgetForm {
 		}
 		else {
 			// Select graph field.
-			$field_graph = (new CWidgetFieldMultiselectGraph('graphid', _('Graph')))
+			$field_graph = (new CWidgetFieldMsGraph('graphid', _('Graph')))
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 				->setMultiple(false);
 

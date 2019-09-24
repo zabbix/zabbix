@@ -43,6 +43,9 @@ struct zbx_odbc_query_result
 	char		**row;
 };
 
+#define ZBX_FLAG_ODBC_NONE	0x00
+#define ZBX_FLAG_ODBC_LLD	0x01
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_odbc_rc_str                                                  *
@@ -533,12 +536,14 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_odbc_query_result_to_lld_json                                *
+ * Function: odbc_query_result_to_json                                        *
  *                                                                            *
- * Purpose: convert ODBC SQL query result into low level discovery data       *
+ * Purpose: convert ODBC SQL query result into JSON                           *
  *                                                                            *
  * Parameters: query_result - [IN] result of SQL query                        *
- *             lld_json     - [OUT] low level discovery data                  *
+ *             flags        - [IN] specify if column names must be converted  *
+ *                                 to LLD macros or preserved as they are     *
+ *             out_json     - [OUT] query result converted to JSON            *
  *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: SUCCEED - conversion was successful and allocated LLD JSON   *
@@ -550,17 +555,18 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
  * Comments: It is caller's responsibility to free allocated buffers!         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
+static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int flags, char **out_json,
+		char **error)
 {
 	const char		*const *row;
 	struct zbx_json		json;
-	zbx_vector_str_t	macros;
+	zbx_vector_str_t	names;
 	int			ret = FAIL, i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_str_create(&macros);
-	zbx_vector_str_reserve(&macros, query_result->col_num);
+	zbx_vector_str_create(&names);
+	zbx_vector_str_reserve(&names, query_result->col_num);
 
 	for (i = 0; i < query_result->col_num; i++)
 	{
@@ -578,27 +584,37 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 
 		zabbix_log(LOG_LEVEL_DEBUG, "column #%d name:'%s'", i + 1, str);
 
-		for (p = str; '\0' != *p; p++)
+		if (flags & ZBX_FLAG_ODBC_LLD)
 		{
-			if (0 != isalpha((unsigned char)*p))
-				*p = toupper((unsigned char)*p);
-
-			if (SUCCEED != is_macro_char(*p))
+			for (p = str; '\0' != *p; p++)
 			{
-				*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
-				goto out;
+				if (0 != isalpha((unsigned char)*p))
+					*p = toupper((unsigned char)*p);
+
+				if (SUCCEED != is_macro_char(*p))
+				{
+					*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
+					goto out;
+				}
+			}
+
+			zbx_vector_str_append(&names, zbx_dsprintf(NULL, "{#%s}", str));
+
+			for (j = 0; j < i; j++)
+			{
+				if (0 == strcmp(names.values[i], names.values[j]))
+				{
+					*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", names.values[i]);
+					goto out;
+				}
 			}
 		}
-
-		zbx_vector_str_append(&macros, zbx_dsprintf(NULL, "{#%s}", str));
-
-		for (j = 0; j < i; j++)
+		else
 		{
-			if (0 == strcmp(macros.values[i], macros.values[j]))
-			{
-				*error = zbx_dsprintf(*error, "Duplicate macro name: %s.", macros.values[i]);
-				goto out;
-			}
+			char	*name;
+
+			zbx_replace_invalid_utf8((name = zbx_strdup(NULL, str)));
+			zbx_vector_str_append(&names, name);
 		}
 	}
 
@@ -618,7 +634,7 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 				zbx_replace_invalid_utf8(value);
 			}
 
-			zbx_json_addstring(&json, macros.values[i], value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, names.values[i], value, ZBX_JSON_TYPE_STRING);
 			zbx_free(value);
 		}
 
@@ -627,18 +643,42 @@ int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, cha
 
 	zbx_json_close(&json);
 
-	*lld_json = zbx_strdup(*lld_json, json.buffer);
+	*out_json = zbx_strdup(*out_json, json.buffer);
 
 	zbx_json_free(&json);
 
 	ret = SUCCEED;
 out:
-	zbx_vector_str_clear_ext(&macros, zbx_str_free);
-	zbx_vector_str_destroy(&macros);
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_odbc_query_result_to_lld_json                                *
+ *                                                                            *
+ * Purpose: public wrapper for odbc_query_result_to_json                      *
+ *                                                                            *
+ *****************************************************************************/
+int	zbx_odbc_query_result_to_lld_json(zbx_odbc_query_result_t *query_result, char **lld_json, char **error)
+{
+	return odbc_query_result_to_json(query_result, ZBX_FLAG_ODBC_LLD, lld_json, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_odbc_query_result_to_json                                    *
+ *                                                                            *
+ * Purpose: public wrapper for odbc_query_result_to_json                      *
+ *                                                                            *
+ *****************************************************************************/
+int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **out_json, char **error)
+{
+	return odbc_query_result_to_json(query_result, ZBX_FLAG_ODBC_NONE, out_json, error);
 }
 
 #endif	/* HAVE_UNIXODBC */

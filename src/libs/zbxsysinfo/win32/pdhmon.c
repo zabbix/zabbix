@@ -58,13 +58,14 @@ out:
 	return ret;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_RESULT *result,
+		zbx_perf_counter_lang_t lang)
 {
 	char	counterpath[PDH_MAX_COUNTER_PATH], *tmp, *error = NULL;
 	int	interval, ret = SYSINFO_RET_FAIL;
 	double	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", function);
 
 	if (2 < request->nparam)
 	{
@@ -98,13 +99,13 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (FAIL == check_counter_path(counterpath))
+	if (FAIL == check_counter_path(counterpath, PERF_COUNTER_LANG_DEFAULT == lang))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid performance counter path."));
 		goto out;
 	}
 
-	if (SUCCEED != get_perf_counter_value_by_path(counterpath, interval, &value, &error))
+	if (SUCCEED != get_perf_counter_value_by_path(counterpath, interval, lang, &value, &error))
 	{
 		SET_MSG_RESULT(result, error != NULL ? error :
 				zbx_strdup(NULL, "Cannot obtain performance information from collector."));
@@ -114,7 +115,17 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ret = SYSINFO_RET_OK;
 	SET_DBL_RESULT(result, value);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", function, zbx_result_string(ret));
 
 	return ret;
+}
+
+int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
+}
+
+int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
