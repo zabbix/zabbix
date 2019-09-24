@@ -338,7 +338,7 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		ret = parse_value_cb(pEnumerator, wmi_values, error);
 
 	if (SYSINFO_RET_FAIL == ret && NULL == *error)
-		*error = zbx_strdup(*error, "Empty WMI search result for query.");
+		*error = zbx_strdup(*error, "Empty WMI search result.");
 exit:
 	if (0 != pEnumerator)
 		pEnumerator->Release();
