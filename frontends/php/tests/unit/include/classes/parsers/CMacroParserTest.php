@@ -22,35 +22,48 @@
 class CMacroParserTest extends PHPUnit_Framework_TestCase {
 
 	public function testProvider() {
+		$fail = [
+			'rc' => CParser::PARSE_FAIL,
+			'match' => '',
+			'macro' => '',
+			'suffix' => '',
+			'n' => 0
+		];
+
 		return [
 			[[], '{HOST.HOST}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], 'chunk{HOST.HOST}', 5, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], 'chunk{HOST.HOST}chunk2', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{HOST.HOST}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{HOST.HOST2}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST2}',
 				'macro' => 'HOST.HOST',
+				'suffix' => '',
 				'n' => 2
 			]],
 
@@ -58,56 +71,100 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], '{}', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], '{', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], '{{HOST.HOST}abc', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[[], '{HOST.HOST', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{HOST.HOST', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{HOST.HOST1', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{HOST.HOST0}', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
 			]],
 			[['allow_reference' => true], '{5}', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'macro' => '',
+				'suffix' => '',
 				'n' => 0
-			]]
+			]],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS."Test test"}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Test test"}',
+				'macro' => 'EVENT.TAGS',
+				'suffix' => 'Test test',
+				'n' => 0
+			]],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS."Test\"\\\\ test"}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Test\"\\\\ test"}',
+				'macro' => 'EVENT.TAGS',
+				'suffix' => 'Test\"\\\\ test',
+				'n' => 0
+			]],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS.test}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS.test}',
+				'macro' => 'EVENT.TAGS',
+				'suffix' => 'test',
+				'n' => 0
+			]],
+			[[], '{EVENT.TAGS."Test test"}', 0, $fail],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS."Te\\st test"}', 0, $fail],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS.test"}', 0, $fail],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS."Test}', 0, $fail],
+			[['allow_quoted_suffix' => true], '{EVENT.TAGS"Test test"}', 0, $fail],
+			[['allow_quoted_suffix' => false], '{EVENT.TAGS."Test test"}', 0, $fail],
+			[['allow_quoted_suffix' => true, 'allow_reference' => true], '{EVENT.TAGS."Test test"1}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Test test"1}',
+				'macro' => 'EVENT.TAGS',
+				'suffix' => 'Test test',
+				'n' => 1
+			]],
+			[['allow_quoted_suffix' => true, 'allow_reference' => true], '{EVENT.TAGS1."Test test"}', 0, $fail]
 		];
 	}
 
@@ -119,12 +176,13 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 	 * @param array  $expected
 	*/
 	public function testParse($options, $source, $pos, $expected) {
-		$macro_parser = new CMacroParser(['{HOST.HOST}', '{HOST.IP}', '{ITEM.VALUE}'], $options);
+		$macro_parser = new CMacroParser(['{HOST.HOST}', '{HOST.IP}', '{ITEM.VALUE}', '{EVENT.TAGS}'], $options);
 
 		$this->assertSame($expected, [
 			'rc' => $macro_parser->parse($source, $pos),
 			'match' => $macro_parser->getMatch(),
 			'macro' => $macro_parser->getMacro(),
+			'suffix' => $macro_parser->getSuffix(),
 			'n' => $macro_parser->getN()
 		]);
 		$this->assertSame(strlen($expected['match']), $macro_parser->getLength());

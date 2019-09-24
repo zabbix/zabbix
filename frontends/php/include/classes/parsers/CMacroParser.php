@@ -36,11 +36,11 @@ class CMacroParser extends CParser {
 	private $n;
 
 	/**
-	 * Macro last part without quotes if option 'allow_quoted_suffix' was defined.
+	 * Macro last part without quotes for option 'allow_quoted_suffix' was defined.
 	 *
 	 * @var string
 	 */
-	private $unquoted_suffix;
+	private $suffix;
 
 	/**
 	 * An options array.
@@ -80,11 +80,12 @@ class CMacroParser extends CParser {
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
 	 */
 	public function parse($source, $pos = 0) {
-		$this->length = 0;
+		$this->suffix = '';
 		$this->match = '';
 		$this->macro = '';
+		$this->length = 0;
 		$this->n = 0;
-		$length = strlen($source);
+		$length = mb_strlen($source);
 		$p = $pos;
 
 		if ($p >= $length || $source[$p] != '{') {
@@ -93,29 +94,25 @@ class CMacroParser extends CParser {
 
 		$p++;
 
-		if ($this->findMatch($source, $p) == CParser::PARSE_FAIL) {
+		if ($this->parseMatch($source, $p) == CParser::PARSE_FAIL) {
 			return CParser::PARSE_FAIL;
 		}
 
 		$p += strlen($this->macro);
 
-		if ($this->options['allow_quoted_suffix'] && $p < $length && $source[$p] == '"') {
+		if ($this->options['allow_quoted_suffix'] && $p < $length - 1 && $source[$p] == '.') {
 			$p++;
 
-			if ($this->findSuffix($source, $p) == CParser::PARSE_FAIL) {
+			if ($this->parseSuffix($source, $p) == CParser::PARSE_FAIL) {
 				$this->macro = '';
-				$this->unquoted_suffix = '';
 
 				return CParser::PARSE_FAIL;
 			}
 
-			$p += strlen($this->unquoted_suffix) + 2;
+			$p += mb_strlen($this->suffix);
 
-			if ($p >= $length || $source[$p] !== '"') {
-				$this->macro = '';
-				$this->unquoted_suffix = '';
-
-				return CParser::PARSE_FAIL;
+			if ($this->suffix[0] == '"') {
+				$this->suffix = mb_substr($this->suffix, 1, -1);
 			}
 		}
 
@@ -126,9 +123,9 @@ class CMacroParser extends CParser {
 			}
 		}
 
-		if (!isset($source[$p]) || $source[$p] != '}') {
+		if ($p >= $length || $source[$p] != '}') {
 			$this->macro = '';
-			$this->unquoted_suffix = '';
+			$this->suffix = '';
 			$this->n = 0;
 
 			return CParser::PARSE_FAIL;
@@ -142,41 +139,37 @@ class CMacroParser extends CParser {
 	}
 
 	/**
-	 * Find quoted suffix value for option "allow_quoted_suffix". Return CParser search state.
+	 * Parse suffix value for option "allow_quoted_suffix", return CParser search state, in case of success also
+	 * will set $this->suffix value. Suffix containing non alphanumeric characters or underscore should be quoted.
+	 * Inside quotes only " and \ escape sequences are allowed.
 	 *
 	 * @param string $source     Source string.
 	 * @param int    $p          Search start position, after quotation mark.
 	 * @return int
 	 */
-	protected function findSuffix($source, $p) {
-		$escaped = false;
-		$length = strlen($source);
+	protected function parseSuffix($source, $p) {
 		$pos = $p;
+		$quoted = ($source[$p] == '"');
+		$p += $quoted ? 1 : 0;
+		$regex = $quoted ? '/(?:\\\\["\\\\]|[^"\\\\])+/' : '/[A-Z0-9_]+/i';
+		$match = [];
 
-		while ($p < $length && ($escaped || preg_match('/[0-9A-Z_ ]/', $source[$p]) == 1)) {
-			if ($escaped || $source[$p] == '\\') {
-				$escaped = !$escaped;
-			}
-
-			$p++;
-		}
-
-		if ($escaped) {
+		if (preg_match($regex, $source, $match, 0, $p) != 1) {
 			return CParser::PARSE_FAIL;
 		}
 
-		$this->unquoted_suffix = substr($source, $p, $p - $pos - 1);
+		$this->suffix = $quoted ? '"'.$match[0].'"' : $match[0];
 		return CParser::PARSE_SUCCESS;
 	}
 
 	/**
-	 * Find desired macro, returns parser state.
+	 * Find desired macro, returns parser state, on success also set $this->macro value.
 	 *
 	 * @param string $source     Source string.
 	 * @param int    $p          Search start position, after { character.
 	 * @return int
 	 */
-	protected function findMatch($source, $p) {
+	protected function parseMatch($source, $p) {
 		$len = $this->max_match_len;
 
 		while ($len >= $this->min_match_len) {
@@ -213,11 +206,11 @@ class CMacroParser extends CParser {
 	}
 
 	/**
-	 * Get uquoted_suffix
+	 * Get macro suffix.
 	 *
 	 * @return string
 	 */
 	public function getSuffix() {
-		return $this->unquoted_suffix;
+		return $this->suffix;
 	}
 }
