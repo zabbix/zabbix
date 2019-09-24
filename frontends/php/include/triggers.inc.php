@@ -1178,10 +1178,11 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
  * Make trigger info block.
  *
  * @param array $trigger  Trigger described in info block.
+ * @param array $eventid  Associated eventid.
  *
  * @return object
  */
-function make_trigger_details($trigger) {
+function make_trigger_details($trigger, $eventid) {
 	$hostNames = [];
 
 	$config = select_config();
@@ -1211,7 +1212,7 @@ function make_trigger_details($trigger) {
 		->addRow([
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
 			)
 		])
 		->addRow([
