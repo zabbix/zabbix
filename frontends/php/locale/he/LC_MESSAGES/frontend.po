@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-18 11:00+0300\n"
+"POT-Creation-Date: 2019-09-22 01:44+0300\n"
 "PO-Revision-Date: 2019-03-24 15:52+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -14055,15 +14055,19 @@ msgstr "קבלת תוכן של קובץ. מחזירה טקסט"
 msgid "Retry"
 msgstr "ניסיון חוזר"
 
-#: include/classes/items/CHelpItems.php:1075
-msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "מחזירה פריט JSON המתאר את פריטי ה־MBean ואת התכונות שלהם. ניתן להשתמש לטובת LLD."
+#: include/classes/items/CHelpItems.php:1079
+msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1083
+msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
 msgstr "החזרת העמודה הראשונה של השורה הראשונה מתוצאת שאילתת ה־SQL."
 
-#: include/classes/items/CHelpItems.php:1071
+#: include/classes/items/CHelpItems.php:1075
 msgid "Return value of an attribute of MBean object."
 msgstr "מחזירה ערך של מאפיין של רכיב MBean."
 
@@ -14071,15 +14075,15 @@ msgstr "מחזירה ערך של מאפיין של רכיב MBean."
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "מחזירה תגובת ping מסוג ICMP בשניות. למשל: 0.02"
 
+#: include/classes/items/CHelpItems.php:971
+msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
 #: include/classes/items/CHelpItems.php:1019
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
-
-#: include/classes/items/CHelpItems.php:971
-msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "מחזירה עצם JSON המתאר את מנשקי הרשת של המארח המוגדרים ב־Zabbix. יכולה לשמש לגילוי ברמה נמוכה (LLD)."
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -16361,8 +16365,12 @@ msgid "Transaction has not been closed. Aborting..."
 msgstr "ההעברה לא נסגרה. מתבצע ביטול…"
 
 #: include/classes/items/CHelpItems.php:1065
-msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr "התמרת תוצאות שאילתת SQL לפריט JSON לטובת גילוי ברמה נמוכה."
+msgid "Transform SQL query result into a JSON array for low-level discovery."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1069
+msgid "Transform SQL query result into a JSON array."
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:708
 #: include/classes/widgets/CWidgetHelper.php:752
