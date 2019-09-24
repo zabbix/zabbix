@@ -64,11 +64,19 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 		}
 		$data['problems'] = array_slice($data['problems'], 0, $fields['show_lines'], true);
 
+		$resolve_urls = false;
+		foreach ($data['triggers'] as $trigger) {
+			if ($trigger['url']) {
+				$resolve_urls = true;
+				break;
+			}
+		}
+
 		$data = CScreenProblem::makeData($data, [
 			'show' => $fields['show'],
 			'details' => 0,
 			'show_opdata' => $fields['show_opdata']
-		], true, true);
+		], true, $resolve_urls);
 
 		if ($fields['show_tags']) {
 			$data['tags'] = makeTags($data['problems'], true, 'eventid', $fields['show_tags'], $fields['tags'],

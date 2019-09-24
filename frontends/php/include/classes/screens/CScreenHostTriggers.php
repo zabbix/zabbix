@@ -207,7 +207,16 @@ class CScreenHostTriggers extends CScreenBase {
 			min($config['search_limit'], count($data['problems']))
 		);
 		$data['problems'] = array_slice($data['problems'], 0, $filter['limit'], true);
-		$data = CScreenProblem::makeData($data, $filter, true, true);
+
+		$resolve_urls = false;
+		foreach ($data['triggers'] as $trigger) {
+			if ($trigger['url']) {
+				$resolve_urls = true;
+				break;
+			}
+		}
+
+		$data = CScreenProblem::makeData($data, $filter, true, $resolve_urls);
 
 		$hostids = [];
 		foreach ($data['triggers'] as $trigger) {
