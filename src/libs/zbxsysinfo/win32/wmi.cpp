@@ -449,6 +449,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 
 	vtProp = wmi_values.values[0]->values[0].value;
+
 	if (V_ISARRAY(vtProp))
 	{
 		error = zbx_strdup(error, "Cannot convert WMI array result.");
