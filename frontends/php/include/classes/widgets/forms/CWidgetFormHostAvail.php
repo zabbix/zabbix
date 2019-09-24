@@ -35,6 +35,15 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
 
+		// Interface type.
+		$field_interface_type = new CWidgetFieldCheckBoxList('interface_type', _('Interface type'));
+
+		if (array_key_exists('interface_type', $this->data)) {
+			$field_interface_type->setValue($this->data['interface_type']);
+		}
+
+		$this->fields[$field_interface_type->getName()] = $field_interface_type;
+
 		// Layout.
 		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [
 			STYLE_HORIZONTAL => _('Horizontal'),
