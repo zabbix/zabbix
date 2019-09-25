@@ -432,7 +432,7 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Elasticsearch specific implementation of getGraphAggregationByWidth.
+	 * Elasticsearch specific implementation of getGraphAggregationByInterval.
 	 *
 	 * @see CHistoryManager::getGraphAggregationByInterval
 	 */
@@ -443,28 +443,29 @@ class CHistoryManager {
 			$terms[$item['value_type']][] = $item['itemid'];
 		}
 
-		$aggs = [
-			'max_value' => [
-				'max' => [
-					'field' => 'value'
-				]
-			],
-			'avg_value' => [
-				'avg' => [
-					'field' => 'value'
-				]
-			],
-			'min_value' => [
-				'min' => [
-					'field' => 'value'
-				]
-			],
-			'max_clock' => [
-				'max' => [
-					'field' => 'clock'
-				]
-			]
-		];
+		$aggs = ['clock' => ['max' => ['field' => 'clock']]];
+
+		switch ($function) {
+			case GRAPH_AGGREGATE_MIN:
+				$aggs['value'] = ['min' => ['field' => 'value']];
+				break;
+			case GRAPH_AGGREGATE_MAX:
+				$aggs['value'] = ['max' => ['field' => 'value']];
+				break;
+			case GRAPH_AGGREGATE_AVG:
+				$aggs['value'] = ['sum' => ['field' => 'value']];
+				break;
+			case GRAPH_AGGREGATE_SUM:
+				$aggs['value'] = ['sum' => ['field' => 'value']];
+				break;
+			case GRAPH_AGGREGATE_FIRST:
+				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
+				$aggs['clock'] = ['min' => ['field' => 'clock']];
+				break;
+			case GRAPH_AGGREGATE_LAST:
+				$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
+				break;
+		}
 
 		$query = [
 			'aggs' => [
@@ -476,62 +477,30 @@ class CHistoryManager {
 					]
 				]
 			],
-			'query' => [
-				'bool' => [
-					'must' => [
-						[
-							'terms' => [
-								'itemid' => $terms
-							]
-						],
-						[
-							'range' => [
-								'clock' => [
-									'gte' => $time_from,
-									'lte' => $time_to
-								]
-							]
-						]
-					]
-				]
-			],
 			'size' => 0
 		];
 
-		if ($interval !== null) {
-			$step = timeUnitToSeconds($interval, true);
+		$step = timeUnitToSeconds($interval, true);
 
-			// Additional grouping for line graphs.
-			$aggs['max_clock'] = [
-				'max' => [
-					'field' => 'clock'
-				]
-			];
+		// Clock value is divided by 1000 as it is stored as milliseconds.
+		$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.step))';
 
-			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.step))';
-
-			$script = [
-				'inline' => $formula,
-				'params' => [
-					'step' => (int)$step
-				]
-			];
-			$aggs = [
-				'group_by_script' => [
-					'terms' => [
-						'size' => $interval,
-						'script' => $script
-					],
-					'aggs' => $aggs
-				]
-			];
-		}
-
-		$query['aggs']['group_by_itemid']['aggs'] = $aggs;
+		$query['aggs']['group_by_itemid']['aggs'] = [
+			'group_by_script' => [
+				'terms' => [
+					'size' => (($time_to - $time_from) / $step) + 1,
+					'script' => [
+						'inline' => $formula,
+						'params' => [
+							'step' => (int)$step
+						]
+					]
+				],
+				'aggs' => $aggs
+			]
+		];
 
 		$results = [];
-
 		foreach (self::getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
 			$query['query']['bool']['must'] = [
 				[
@@ -551,42 +520,43 @@ class CHistoryManager {
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
-			if ($interval !== null) {
-				foreach ($data['group_by_itemid']['buckets'] as $item) {
-					if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
-						|| !is_array($item['group_by_script']['buckets'])) {
-						continue;
+			foreach ($data['group_by_itemid']['buckets'] as $item) {
+				if (!is_array($item['group_by_script']) || !array_key_exists('buckets', $item['group_by_script'])
+					|| !is_array($item['group_by_script']['buckets'])) {
+					continue;
+				}
+
+				foreach ($item['group_by_script']['buckets'] as $point) {
+					$row = [
+						'itemid' => $item['key'],
+						'tick' => (int)$point['key'],
+						'count' => $point['doc_count'],
+						'clock' => (int)$point['clock']['value_as_string']
+					];
+
+					if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
+						$row['value'] = $point['value']['hits']['hits'][0]['_source']['value'];
+					}
+					else {
+						$row['value'] = array_key_exists('value', $point) ? $point['value']['value'] : null;
 					}
 
-					$results[$item['key']]['source'] = 'history';
-					foreach ($item['group_by_script']['buckets'] as $point) {
-						$results[$item['key']]['data'][] = [
-							'itemid' => $item['key'],
-							'i' => $point['key'],
-							'count' => $point['doc_count'],
-							'min' => $point['min_value']['value'],
-							'avg' => $point['avg_value']['value'],
-							'max' => $point['max_value']['value'],
-							// Field value_as_string is used to get value as seconds instead of milliseconds.
-							'clock' => $point['max_clock']['value_as_string']
-						];
-					}
+					$results[$item['key']]['data'][] = $row;
 				}
-			}
-			else {
-				foreach ($data['group_by_itemid']['buckets'] as $item) {
+
+				if (array_key_exists($item['key'], $results)) {
 					$results[$item['key']]['source'] = 'history';
-					$results[$item['key']]['data'][] = [
-						'itemid' => $item['key'],
-						'min' => $item['min_value']['value'],
-						'avg' => $item['avg_value']['value'],
-						'max' => $item['max_value']['value'],
-						// Field value_as_string is used to get value as seconds instead of milliseconds.
-						'clock' => $item['max_clock']['value_as_string']
-					];
 				}
 			}
 		}
+
+		// Results should be ordered by 'tick'.
+		foreach ($results as &$data) {
+			usort($data['data'], function ($a, $b) {
+				return $a['tick'] - $b['tick'];
+			});
+		}
+		unset($data);
 
 		return $results;
 	}
