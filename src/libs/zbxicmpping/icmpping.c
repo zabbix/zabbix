@@ -167,6 +167,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	ZBX_FPING_HOST	*host;
 	double		sec;
 	int 		i, ret = NOTSUPPORTED, index;
+
 #ifdef HAVE_IPV6
 	int		family;
 	char		params6[70];
