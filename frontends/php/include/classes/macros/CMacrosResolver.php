@@ -616,12 +616,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger URL.
 	 *
-	 * @param array $trigger
+	 * @param array  $trigger
 	 * @param string $trigger['triggerid']
 	 * @param string $trigger['expression']
 	 * @param string $trigger['url']
-	 * @param string $trigger['eventid']  Optional field.
-	 * @param string &$url
+	 * @param string $trigger['eventid']     (optional)
+	 * @param string $url
 	 *
 	 * @return bool
 	 */
@@ -662,7 +662,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($matched_macros['macros']['event'] as $macro) {
-			if (!array_key_exists('eventid', $trigger) && $macro == '{EVENT.ID}') {
+			if (!array_key_exists('eventid', $trigger) && $macro === '{EVENT.ID}') {
 				return false;
 			}
 			$macro_values[$triggerid][$macro] = $trigger['eventid'];

@@ -295,12 +295,12 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $trigger
+	 * @param array  $trigger
 	 * @param string $trigger['triggerid']
 	 * @param string $trigger['expression']
 	 * @param string $trigger['url']
 	 * @param string $trigger['eventid']
-	 * @param string &$url
+	 * @param string $url
 	 *
 	 * @return bool
 	 */
