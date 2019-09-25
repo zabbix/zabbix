@@ -40,9 +40,9 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'webhook_params' =>			'array',
-			'webhook' => 				'db media_type.webhook',
+			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
-			'receive_tags' =>			'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
+			'save_tags' =>				'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
 			'url' =>					'db media_type.url',
 			'url_name' =>				'db media_type.url_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
@@ -140,8 +140,8 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 
 			case MEDIA_TYPE_WEBHOOK:
-				$mediatype['receive_tags'] = MEDIA_TYPE_TAGS_DISABLED;
-				$this->getInputs($mediatype, ['webhook', 'timeout', 'receive_tags', 'url', 'url_name']);
+				$mediatype['save_tags'] = MEDIA_TYPE_TAGS_DISABLED;
+				$this->getInputs($mediatype, ['script', 'timeout', 'save_tags', 'url', 'url_name']);
 
 				$params = $this->getInput('webhook_params', []);
 				$mediatype['parameters'] = array_map(function ($name, $value) {
@@ -151,7 +151,7 @@ class CControllerMediatypeUpdate extends CController {
 					$params['value']
 				);
 
-				if ($mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
+				if ($mediatype['save_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					unset($mediatype['url'], $mediatype['url_name']);
 				}
 				break;

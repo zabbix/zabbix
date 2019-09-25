@@ -46,9 +46,9 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'webhook_params' =>			'array',
-			'webhook' => 				'db media_type.webhook',
+			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
-			'receive_tags' =>			'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
+			'save_tags' =>				'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
 			'url' =>					'db media_type.url',
 			'url_name' =>				'db media_type.url_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
@@ -89,7 +89,7 @@ class CControllerMediatypeEdit extends CController {
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
-					'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
+					'attempt_interval', 'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name',
 					'parameters', 'description'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
@@ -132,9 +132,9 @@ class CControllerMediatypeEdit extends CController {
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
-			'webhook' => $db_defaults['webhook'],
+			'script' => $db_defaults['script'],
 			'timeout' => $db_defaults['timeout'],
-			'receive_tags' => $db_defaults['receive_tags'],
+			'save_tags' => $db_defaults['save_tags'],
 			'url' => $db_defaults['url'],
 			'url_name' => $db_defaults['url_name'],
 			'webhook_params' => [
@@ -148,7 +148,7 @@ class CControllerMediatypeEdit extends CController {
 			'content_type' => $db_defaults['content_type'],
 			'max_length' => [
 				'url' => DB::getFieldLength('media_type', 'url'),
-				'webhook' => DB::getFieldLength('media_type', 'webhook'),
+				'script' => DB::getFieldLength('media_type', 'script'),
 				'url_name' => DB::getFieldLength('media_type', 'url_name'),
 				'params_key' => DB::getFieldLength('media_type_param', 'name'),
 				'params_value' => DB::getFieldLength('media_type_param', 'value')
@@ -196,9 +196,9 @@ class CControllerMediatypeEdit extends CController {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
-					$data['webhook'] = $this->mediatype['webhook'];
+					$data['script'] = $this->mediatype['script'];
 					$data['timeout'] = $this->mediatype['timeout'];
-					$data['receive_tags'] = $this->mediatype['receive_tags'];
+					$data['save_tags'] = $this->mediatype['save_tags'];
 					$data['url'] = $this->mediatype['url'];
 					$data['url_name'] = $this->mediatype['url_name'];
 					$data['webhook_params'] = $this->mediatype['parameters'];
@@ -212,7 +212,7 @@ class CControllerMediatypeEdit extends CController {
 		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
 			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
 			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
-			'form_refresh', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'description'
+			'form_refresh', 'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name', 'description'
 		]);
 
 		if ($this->hasInput('form_refresh')) {

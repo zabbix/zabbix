@@ -104,7 +104,7 @@
 			toggleAuthenticationOptions();
 		});
 
-		$('#receive_tags').change(function() {
+		$('#save_tags').change(function() {
 			$('#url, #url_name').attr('disabled', !$(this).is(':checked'));
 			$('[for=url], [for=url_name]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
 		});

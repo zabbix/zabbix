@@ -345,11 +345,6 @@ class CMediatype extends CApiService {
 					break;
 
 				case MEDIA_TYPE_WEBHOOK:
-					if (array_key_exists('receive_tags', $validated_data)
-							&& $validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
-						unset($validation_rules['url'], $validation_rules['url_name']);
-					}
-
 					$params = [];
 
 					foreach ($validated_data['parameters'] as $index => $param) {
@@ -477,7 +472,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name'
+				'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name'
 			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -697,15 +692,10 @@ class CMediatype extends CApiService {
 
 				case MEDIA_TYPE_WEBHOOK:
 					$validated_data += [
-						'webhook' => $db_mediatype['webhook'],
-						'receive_tags' => $db_mediatype['receive_tags'],
+						'script' => $db_mediatype['script'],
+						'save_tags' => $db_mediatype['save_tags'],
 						'parameters' => []
 					];
-
-					if ($validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
-						unset($validation_rules['url'], $validation_rules['url_name']);
-					}
-
 					$params = [];
 
 					foreach ($validated_data['parameters'] as $index => $param) {
@@ -837,11 +827,11 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['webhook']              Webhook javascript body.
+	 * @param string    $mediatypes['script']               Webhook javascript body.
 	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
 	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
+	 * @param string    $mediatypes['save_tags']            Webhook HTTP response should be saved as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
 	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
 	 * @param string    $mediatypes['description']          Media type description.
@@ -902,11 +892,11 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxsessions']			Limit of simultaneously processed alerts.
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
-	 * @param string    $mediatypes['webhook']              Webhook javascript body.
+	 * @param string    $mediatypes['script']               Webhook javascript body.
 	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
 	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
+	 * @param string    $mediatypes['save_tags']            Webhook HTTP response should be saved as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
 	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
 	 * @param string    $mediatypes['description']          Media type description.
@@ -925,7 +915,7 @@ class CMediatype extends CApiService {
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
-				'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
+				'attempt_interval', 'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name',
 				'description'
 			],
 			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
@@ -944,7 +934,7 @@ class CMediatype extends CApiService {
 				'gsm_modem'
 			],
 			MEDIA_TYPE_WEBHOOK => [
-				'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'parameters'
+				'script', 'timeout', 'save_tags', 'url', 'url_name', 'parameters'
 			]
 		];
 		$default_values['parameters'] = [];
@@ -956,8 +946,8 @@ class CMediatype extends CApiService {
 			unset($mediatype['mediatypeid']);
 
 			if ($type == MEDIA_TYPE_WEBHOOK) {
-				if (array_key_exists('receive_tags', $mediatype)
-						&& $mediatype['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
+				if (array_key_exists('save_tags', $mediatype)
+						&& $mediatype['save_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					$mediatype = [
 						'url' => $default_values['url'],
 						'url_name' => $default_values['url_name'],
@@ -1179,17 +1169,17 @@ class CMediatype extends CApiService {
 				]
 			],
 			MEDIA_TYPE_WEBHOOK => [
-				'webhook' => [
+				'script' => [
 					'type' => API_STRING_UTF8,
 					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'webhook')
+					'length' => DB::getFieldLength('media_type', 'script')
 				],
 				'timeout' => [
 					'type' => API_TIME_UNIT,
 					'length' => DB::getFieldLength('media_type', 'timeout'),
 					'in' => '1:60'
 				],
-				'receive_tags' => [
+				'save_tags' => [
 					'type' => API_INT32,
 					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
 				],

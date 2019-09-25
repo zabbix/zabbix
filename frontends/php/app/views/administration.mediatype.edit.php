@@ -204,14 +204,14 @@ $mediatype_formlist
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row_webhook_params'
 	)
-	->addRow((new CLabel(_('Webhook'), 'row_webhook_webhook'))->setAsteriskMark(),
-		(new CMultilineInput('webhook', $data['webhook'], [
+	->addRow((new CLabel(_('Webhook script'), 'row_webhook_webhook'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['script'], [
 			'title' => _('JavaScript'),
 			'placeholder' => _('script'),
 			'placeholder_textarea' => 'return value',
 			'grow' => 'auto',
 			'rows' => 0,
-			'maxlength' => $max_length['webhook']
+			'maxlength' => $max_length['script']
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
@@ -221,22 +221,22 @@ $mediatype_formlist
 		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_webhook_timeout'
 	)
-	->addRow(new CLabel(_('Receive tags'), 'row_webhook_tags'),
-		(new CCheckBox('receive_tags', MEDIA_TYPE_TAGS_ENABLED))
-			->setChecked($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+	->addRow(new CLabel(_('Save tags'), 'row_webhook_tags'),
+		(new CCheckBox('save_tags', MEDIA_TYPE_TAGS_ENABLED))
+			->setChecked($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
 		'row_webhook_tags'
 	)
-	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
 		(new CTextBox('url', $data['url'], false, $max_length['url']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setEnabled($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED)
+		->setEnabled($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED)
 			->setAriaRequired(),
 		'row_webhook_url'
 	)
-	->addRow((new CLabel(_('URL name'), 'url_name'))->setAsteriskMark($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+	->addRow((new CLabel(_('URL name'), 'url_name'))->setAsteriskMark($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
 		(new CTextBox('url_name', $data['url_name'], false, $max_length['url_name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['receive_tags'] == MEDIA_TYPE_TAGS_ENABLED)
+			->setEnabled($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED)
 			->setAriaRequired(),
 		'row_webhook_url_name'
 	)
