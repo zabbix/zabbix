@@ -1850,7 +1850,7 @@ return [
 				'length' => 10,
 				'default' => '1',
 			],
-			'webhook' => [
+			'script' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
@@ -1861,7 +1861,7 @@ return [
 				'length' => 32,
 				'default' => '30s',
 			],
-			'receive_tags' => [
+			'save_tags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4624,10 +4624,10 @@ return [
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid',
 			],
-			'params' => [
+			'parameters' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
+				'default' => '{}',
 			],
 		],
 	],
