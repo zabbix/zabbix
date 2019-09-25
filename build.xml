@@ -322,6 +322,20 @@
 		</exec>
 	</target>
 
+	<target name="build-agent2">
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+			<arg line="--prefix=${basedir}"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<env key="GOPATH" value="$GOPATH:$PWD"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
 	<target name="build-phpunit" depends="test-phpunit"/>
 	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
 	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
@@ -331,5 +345,5 @@
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 
 	<!-- Default target -->
-	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql"/>
+	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-agent2"/>
 </project>
