@@ -370,6 +370,20 @@
 		</for>
 	</target>
 
+	<target name="build-agent2">
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+			<arg line="--prefix=${basedir}"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<env key="GOPATH" value="$GOPATH:$PWD"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+	</target>
+
 	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
 
 	<target name="make-dist">
@@ -395,5 +409,5 @@
 		<ant antfile="../build-backend.xml" dir="${prop.dist.dir}" target="build-dist" inheritAll="true" inheritRefs="true"/>
 	</target>
 
-	<target name="build" depends="make-dist"/>
+	<target name="build" depends="make-dist,build-agent2"/>
 </project>
