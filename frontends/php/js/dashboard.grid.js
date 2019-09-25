@@ -3444,7 +3444,6 @@
 
 						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
 							showMessageExhausted(data);
-							$('.dialogue-widget-save', footer).prop('disabled', true);
 						}
 						else {
 							// Enable save button after successful form update.
