@@ -84,11 +84,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.PROCESS_NAME}|<p>Apache server process name</p>|httpd|
-|{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|10|
-|{$APACHE.STATUS.HOST}|<p>Hostname or IP address of the Apache status page</p>|127.0.0.1|
-|{$APACHE.STATUS.PATH}|<p>The URL path</p>|server-status?auto|
-|{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|80|
+|{$APACHE.PROCESS_NAME}|<p>Apache server process name</p>|`httpd`|
+|{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|`10`|
+|{$APACHE.STATUS.HOST}|<p>Hostname or IP address of the Apache status page</p>|`127.0.0.1`|
+|{$APACHE.STATUS.PATH}|<p>The URL path</p>|`server-status?auto`|
+|{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|`80`|
 
 ## Template links
 
@@ -135,7 +135,7 @@ There are no template links in this template.
 |Apache|Apache: Connections total|<p>Number of total connections</p>|DEPENDENT|apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p>|
 |Apache|Apache: Bytes per request|<p>Average number of client requests per second</p>|DEPENDENT|apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p>|
 |Apache|Apache: Number of async processes|<p>Number of async processes</p>|DEPENDENT|apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p>|
-|Zabbix_raw_items|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page</p>|ZABBIX_PASSIVE|web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } } // For versions without "ServerUptimeSeconds" metric output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime   // Parse "Scoreboard" to get worker count if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string return JSON.stringify(output);`</p>|
+|Zabbix_raw_items|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p>|ZABBIX_PASSIVE|web.page.get["{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PATH}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } } // For versions without "ServerUptimeSeconds" metric output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime   // Parse "Scoreboard" to get worker count if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string return JSON.stringify(output);`</p>|
 
 ## Triggers
 

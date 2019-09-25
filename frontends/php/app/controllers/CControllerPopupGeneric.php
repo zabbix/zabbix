@@ -579,7 +579,9 @@ class CControllerPopupGeneric extends CController {
 			'multiselect' => $this->getInput('multiselect', 0),
 			'patternselect' => $this->getInput('patternselect', 0),
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
-			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
+			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown')),
+			'disableids' => $this->getInput('disableids', []),
+			'excludeids' => $this->getInput('excludeids', [])
 		];
 
 		$excludeids = $this->getInput('excludeids', []);
