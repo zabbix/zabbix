@@ -323,7 +323,7 @@ class CMacrosResolverGeneral {
 						if ($macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macros['macros_n'][$key][$macro_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getN()
+								'f_num' => $macro_n_parser->getReference()
 							];
 							$pos += $macro_n_parser->getLength() - 1;
 							continue 2;
@@ -352,7 +352,7 @@ class CMacrosResolverGeneral {
 
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getN(),
+								'f_num' => $macro_n_parser->getReference(),
 								'function' => $function_parser->getFunction(),
 								'parameters' => $function_parameters
 							];

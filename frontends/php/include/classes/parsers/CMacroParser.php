@@ -20,10 +20,13 @@
 
 
 class CMacroParser extends CParser {
-
-	// Do not allow any references.
+	/**
+	 * Do not allow any references.
+	 */
 	const REFERENCE_NONE = 0;
-	// Allow only numeric reference, {HOST.HOST3}
+	/**
+	 * Allow only numeric reference, {HOST.HOST3}
+	 */
 	const REFERENCE_NUMERIC = 1;
 	/**
 	 * Allow alpha numeric reference, {EVENT.TAGS.test}. Reference can be quoted if it contains non alphanumeric
@@ -39,21 +42,31 @@ class CMacroParser extends CParser {
 	private $macro;
 
 	/**
-	 * Reference number.
+	 * Reference value.
 	 *
-	 * @var int
+	 * @var null|int|string
 	 */
-	private $n;
+	private $reference;
 
 	/**
-	 * Macro last part without quotes for option 'allow_quoted_suffix' was defined.
-	 *
-	 * @var string
+	 * Allowed reference type.
 	 */
-	private $suffix;
-
-	// Allowed reference type.
 	private $reference_type;
+
+	/**
+	 * Array of strings with macro value.
+	 */
+	private $macroses = [];
+
+	/**
+	 * Shortest macro length.
+	 */
+	private $min_length;
+
+	/**
+	 * Longest macro length.
+	 */
+	private $max_length;
 
 	/**
 	 * Array of strings to search for.
@@ -62,14 +75,15 @@ class CMacroParser extends CParser {
 	 * @param int   $ref_type   Allowed reference type: REFERENCE_NONE, REFERENCE_NUMERIC, REFERENCE_ALPHANUMERIC
 	 */
 	public function __construct(array $macros, $ref_type = CMacroParser::REFERENCE_NONE) {
-		$this->needles = [];
+		$lengths = [];
 
 		foreach ($macros as $macro) {
-			$this->needles[] = substr($macro, 1, -1);
+			$this->macroses[] = substr($macro, 1, -1);
+			$lengths[] = strlen($macro) - 2;
 		}
 
-		$this->max_match_len = max(array_map('strlen', $this->needles));
-		$this->min_match_len = min(array_map('strlen', $this->needles));
+		$this->min_length = min($lengths);
+		$this->max_length = max($lengths);
 		$this->reference_type = $ref_type;
 	}
 
@@ -79,11 +93,10 @@ class CMacroParser extends CParser {
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
 	 */
 	public function parse($source, $pos = 0) {
-		$this->suffix = '';
 		$this->match = '';
 		$this->macro = '';
 		$this->length = 0;
-		$this->n = 0;
+		$this->reference = null;
 		$length = mb_strlen($source);
 		$p = $pos;
 
@@ -102,7 +115,7 @@ class CMacroParser extends CParser {
 		switch ($this->reference_type) {
 			case CMacroParser::REFERENCE_NUMERIC:
 				if ($p < $length && $source[$p] >= '1' && $source[$p] <= '9') {
-					$this->n = (int) $source[$p];
+					$this->reference = (int) $source[$p];
 					$p++;
 				}
 				break;
@@ -117,10 +130,10 @@ class CMacroParser extends CParser {
 						return CParser::PARSE_FAIL;
 					}
 
-					$p += mb_strlen($this->suffix);
+					$p += mb_strlen($this->reference);
 
-					if ($this->suffix[0] == '"') {
-						$this->suffix = mb_substr($this->suffix, 1, -1);
+					if ($this->reference[0] == '"') {
+						$this->reference = mb_substr($this->reference, 1, -1);
 					}
 				}
 				break;
@@ -129,8 +142,7 @@ class CMacroParser extends CParser {
 
 		if ($p >= $length || $source[$p] != '}') {
 			$this->macro = '';
-			$this->suffix = '';
-			$this->n = 0;
+			$this->reference = null;
 
 			return CParser::PARSE_FAIL;
 		}
@@ -162,7 +174,7 @@ class CMacroParser extends CParser {
 			return CParser::PARSE_FAIL;
 		}
 
-		$this->suffix = $quoted ? '"'.$match[0].'"' : $match[0];
+		$this->reference = $quoted ? '"'.$match[0].'"' : $match[0];
 		return CParser::PARSE_SUCCESS;
 	}
 
@@ -174,13 +186,13 @@ class CMacroParser extends CParser {
 	 * @return int
 	 */
 	protected function parseMatch($source, $p) {
-		$len = $this->max_match_len;
+		$len = $this->max_length;
 
-		while ($len >= $this->min_match_len) {
-			$needle = substr($source, $p, $len);
+		while ($len >= $this->min_length) {
+			$macro = substr($source, $p, $len);
 
-			if (in_array($needle, $this->needles)) {
-				$this->macro = $needle;
+			if (in_array($macro, $this->macroses)) {
+				$this->macro = $macro;
 
 				return CParser::PARSE_SUCCESS;
 			}
@@ -201,20 +213,14 @@ class CMacroParser extends CParser {
 	}
 
 	/**
-	 * Returns the reference.
+	 * Returns reference value, for reference of type:
+	 * - CMacroParser::REFERENCE_NUMERIC will be of type int.
+	 * - CMacroParser::REFERENCE_ALPHANUMERIC will be of type string.
+	 * - CMacroParser::REFERENCE_NONE or parsing failed will be null.
 	 *
-	 * @return int
+	 * @return null|int|string
 	 */
-	public function getN() {
-		return $this->n;
-	}
-
-	/**
-	 * Get macro suffix.
-	 *
-	 * @return string
-	 */
-	public function getSuffix() {
-		return $this->suffix;
+	public function getReference() {
+		return $this->reference;
 	}
 }

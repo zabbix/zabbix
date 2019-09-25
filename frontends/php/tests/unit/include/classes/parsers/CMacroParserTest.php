@@ -26,8 +26,7 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 			'rc' => CParser::PARSE_FAIL,
 			'match' => '',
 			'macro' => '',
-			'suffix' => '',
-			'n' => 0
+			'ref' => null
 		];
 
 		return [
@@ -35,90 +34,58 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
-				'suffix' => '',
-				'n' => 0
+				'ref'	=> null
 			]],
 			[CMacroParser::REFERENCE_NONE, 'chunk{HOST.HOST}', 5, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
-				'suffix' => '',
-				'n' => 0
+				'ref'	=> null
 			]],
 			[CMacroParser::REFERENCE_NONE, 'chunk{HOST.HOST}chunk2', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
-				'suffix' => '',
-				'n' => 0
+				'ref'	=> null
 			]],
 			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
-				'suffix' => '',
-				'n' => 0
+				'ref'	=> null
 			]],
 			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST2}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST2}',
 				'macro' => 'HOST.HOST',
-				'suffix' => '',
-				'n' => 2
+				'ref'	=> 2
 			]],
 			[CMacroParser::REFERENCE_NONE, '', 0, $fail],
 			[CMacroParser::REFERENCE_NONE, '{}', 0, $fail],
 			[CMacroParser::REFERENCE_NONE, '{', 0, $fail],
 			[CMacroParser::REFERENCE_NONE, '{{HOST.HOST}abc', 0, $fail],
 			[CMacroParser::REFERENCE_NONE, '{HOST.HOST', 0, $fail],
-			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'suffix' => '',
-				'n' => 0
-			]],
-			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST1', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'suffix' => '',
-				'n' => 0
-			]],
-			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST0}', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'suffix' => '',
-				'n' => 0
-			]],
-			[CMacroParser::REFERENCE_NUMERIC, '{5}', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'suffix' => '',
-				'n' => 0
-			]],
+			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST', 0, $fail],
+			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST1', 0, $fail],
+			[CMacroParser::REFERENCE_NUMERIC, '{HOST.HOST0}', 0, $fail],
+			[CMacroParser::REFERENCE_NUMERIC, '{5}', 0, $fail],
 			[CMacroParser::REFERENCE_ALPHANUMERIC, '{EVENT.TAGS."Test test"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{EVENT.TAGS."Test test"}',
 				'macro' => 'EVENT.TAGS',
-				'suffix' => 'Test test',
-				'n' => 0
+				'ref'	=> 'Test test'
 			]],
 			[CMacroParser::REFERENCE_ALPHANUMERIC, '{EVENT.TAGS."Test\"\\\\ test"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{EVENT.TAGS."Test\"\\\\ test"}',
 				'macro' => 'EVENT.TAGS',
-				'suffix' => 'Test\"\\\\ test',
-				'n' => 0
+				'ref'	=> 'Test\"\\\\ test'
 			]],
 			[CMacroParser::REFERENCE_ALPHANUMERIC, '{EVENT.TAGS.test}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{EVENT.TAGS.test}',
 				'macro' => 'EVENT.TAGS',
-				'suffix' => 'test',
-				'n' => 0
+				'ref'	=> 'test'
 			]],
 			[CMacroParser::REFERENCE_ALPHANUMERIC, '{EVENT.TAGS."Te\\st test"}', 0, $fail],
 			[CMacroParser::REFERENCE_ALPHANUMERIC, '{EVENT.TAGS.test"}', 0, $fail],
@@ -143,8 +110,7 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 			'rc' => $macro_parser->parse($source, $pos),
 			'match' => $macro_parser->getMatch(),
 			'macro' => $macro_parser->getMacro(),
-			'suffix' => $macro_parser->getSuffix(),
-			'n' => $macro_parser->getN()
+			'ref' => $macro_parser->getReference()
 		]);
 		$this->assertSame(strlen($expected['match']), $macro_parser->getLength());
 	}
