@@ -332,7 +332,7 @@ func (conn *Conn) export(methods map[string]reflect.Value, path ObjectPath, ifac
 	h, ok := conn.handler.(*defaultHandler)
 	if !ok {
 		return fmt.Errorf(
-			`dbus: export only allowed on the default handler have %T"`,
+			`dbus: export only allowed on the default hander handler have %T"`,
 			conn.handler)
 	}
 
