@@ -1858,12 +1858,6 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	if ('\n' != *params && '\0' != *params)
 		quote = *params++;
 
-	if (delim == quote)
-	{
-		*errmsg = zbx_strdup(*errmsg, "delimiter cannot be the same as quotation character");
-		return FAIL;
-	}
-
 	if ('\n' != *params++ || '\0' == *params)
 	{
 		*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
