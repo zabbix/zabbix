@@ -41,11 +41,11 @@ static unsigned char	source_ip6_checked = 0;
 static const char	*source_ip6_option = NULL;
 #endif
 
-#define FPING_UNINITIALIZED_VALUE	-1
+#define FPING_UNINITIALIZED_VALUE	-2
 static int		packet_interval = FPING_UNINITIALIZED_VALUE;
 #ifdef HAVE_IPV6
 static int		packet_interval6 = FPING_UNINITIALIZED_VALUE;
-static int		ipv6_supported = FPING_UNINITIALIZED_VALUE;
+static int		fping_ipv6_supported = FPING_UNINITIALIZED_VALUE;
 #endif
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
@@ -127,31 +127,30 @@ static int	get_interval_option(const char * fping, const char *dst)
  * Parameters: fping - [IN] the the location of fping program                 *
  *             dst   - [IN] the the ip address for test                       *
  *                                                                            *
- * Return value: 1 - IPv6 is supported                                        *
- *               0 - IPv6 is not supported                                    *
+ * Return value: SUCCEED - IPv6 is supported                                  *
+ *               FAIL    - IPv6 is not supported                              *
  *                                                                            *
  ******************************************************************************/
 static int	get_ipv6_support(const char * fping, const char *dst)
 {
-	int	ret = 0;
+	int	ret;
 	char	tmp[MAX_STRING_LEN], error[255], *out = NULL;
-	int 	value = 0;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s -6 -c1 -t50 %s", fping, dst);
 
 	if ((SUCCEED == (ret = zbx_execute(tmp, &out, error, sizeof(error), 1, ZBX_EXIT_CODE_CHECKS_DISABLED)) &&
 				ZBX_KIBIBYTE > strlen(out) && NULL != strstr(out, dst)) || TIMEOUT_ERROR == ret)
 	{
-		value = 1;
+		ret = SUCCEED;
 	}
 	else
 	{
-		value = 0;
+		ret = FAIL;
 	}
 
 	zbx_free(out);
 
-	return value;
+	return ret;
 
 }
 #endif	/* HAVE_IPV6 */
@@ -325,16 +324,18 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		if (0 != (fping_existence & FPING_EXISTS))
 		{
-			if (FPING_UNINITIALIZED_VALUE == ipv6_supported)
-				ipv6_supported = get_ipv6_support(CONFIG_FPING_LOCATION,hosts[0].addr);
+			if (FPING_UNINITIALIZED_VALUE == fping_ipv6_supported)
+				fping_ipv6_supported = get_ipv6_support(CONFIG_FPING_LOCATION,hosts[0].addr);
 
 			offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
 		}
 
-		if (0 != (fping_existence & FPING6_EXISTS) && 1 != ipv6_supported)
+		if (0 != (fping_existence & FPING6_EXISTS) && SUCCEED != fping_ipv6_supported)
+		{
 			zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 					"%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
+		}
 	}
 #else
 	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
@@ -357,6 +358,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	fclose(f);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", tmp);
+zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG %s", tmp);
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
