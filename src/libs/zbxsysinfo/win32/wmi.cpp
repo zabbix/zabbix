@@ -165,7 +165,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, zbx_v
 
 	pclsObj->EndEnumeration();
 
-	if (hres == WBEM_S_NO_MORE_DATA)
+	if (hres == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
 		goto out;
