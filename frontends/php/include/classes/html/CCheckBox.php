@@ -178,8 +178,6 @@ class CCheckBox extends CInput {
 		$label = (new CLabel($elements, $this->getId()))
 			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
 
-		$this->setEnabled($this->enabled && !$this->readonly);
-
 		/*
 		 * Create only hidden fields for enabled readonly and checked elements. Once set unchecked value is properly
 		 * implemented, this code will change.
@@ -191,6 +189,8 @@ class CCheckBox extends CInput {
 				->toString();
 			$this->removeId();
 		}
+
+		$this->setEnabled($this->enabled && !$this->readonly);
 
 		return $hidden.parent::toString($destroy).$label->toString();
 	}
