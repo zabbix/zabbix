@@ -98,7 +98,7 @@ class CWidgetForm {
 				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
 				unset($data[$key]);
 			}
-			elseif (preg_match('/^([a-z_]+)\.(\d+)$/', $key, $matches) === 1) {
+			elseif (preg_match('/^([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
 				$data[$matches[1]][$matches[2]] = $value;
 				unset($data[$key]);
 			}
