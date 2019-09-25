@@ -1134,7 +1134,7 @@ define('ZBX_EOL_CRLF',	1);
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
-define('ZBX_YEAR_SUFFIXES', 'smhdwMy');
+define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'smhdwMy');
 
 // preg
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
@@ -1281,7 +1281,7 @@ define('API_ALLOW_USER_MACRO',		0x0020);
 define('API_ALLOW_COUNT',			0x0040);
 define('API_ALLOW_LLD_MACRO',		0x0080);
 define('API_REQUIRED_LLD_MACRO',	0x0100);
-define('API_TIME_UNIT_YEAR',		0x0200);
+define('API_TIME_UNIT_WITH_YEAR',	0x0200);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

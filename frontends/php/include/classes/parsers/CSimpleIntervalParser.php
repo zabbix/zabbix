@@ -74,7 +74,8 @@ class CSimpleIntervalParser extends CParser {
 		$p = $pos;
 
 		if (preg_match(
-			'/^('.$minus.'(0|[1-9][0-9]*)['.($this->options['with_year'] ? ZBX_YEAR_SUFFIXES : ZBX_TIME_SUFFIXES).']?)/',
+			'/^('.$minus.'(0|[1-9][0-9]*)['.
+			($this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).']?)/',
 			substr($source, $p), $matches)
 		) {
 			$p += strlen($matches[0]);

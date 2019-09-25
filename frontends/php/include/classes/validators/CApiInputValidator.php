@@ -1350,8 +1350,9 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_TIME_UNIT_YEAR
-	 * @param int    $rule['in']      (optional)
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                          API_TIME_UNIT_WITH_YEAR
+	 * @param int    $rule['in']     (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1381,7 +1382,7 @@ class CApiInputValidator {
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
 			'negative' => true,
-			'with_year' => ($flags & API_TIME_UNIT_YEAR)
+			'with_year' => ($flags & API_TIME_UNIT_WITH_YEAR)
 		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {

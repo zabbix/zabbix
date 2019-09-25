@@ -811,36 +811,6 @@ function convert_units($options = []) {
 }
 
 /**
- * Return second for time suffix.
- * Examples:
- *        10m = 60
- *        3d = 86400
- *
- * @param string $time
- * @param bool   $with_year
- *
- * @return int
- */
-function timeSuffixToSeconds($time, $with_year = false) {
-	preg_match(
-		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.($with_year ? ZBX_YEAR_SUFFIXES : ZBX_TIME_SUFFIXES).'])?$/',
-		$time, $matches
-	);
-
-	$unit_sec = [
-		's' => 1,
-		'm' => SEC_PER_MIN,
-		'h' => SEC_PER_HOUR,
-		'd' => SEC_PER_DAY,
-		'w' => SEC_PER_WEEK,
-		'M' => SEC_PER_MONTH,
-		'y' => SEC_PER_YEAR,
-	];
-
-	return array_key_exists('suffix', $matches) ? $unit_sec[$matches['suffix']] : 1;
-}
-
-/**
  * Convert time format with suffixes to seconds.
  * Examples:
  *        10m = 600
@@ -854,7 +824,8 @@ function timeSuffixToSeconds($time, $with_year = false) {
  */
 function timeUnitToSeconds($time, $with_year = false) {
 	preg_match(
-		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.($with_year ? ZBX_YEAR_SUFFIXES : ZBX_TIME_SUFFIXES).'])?$/',
+		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.
+		($with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).'])?$/',
 		$time, $matches
 	);
 
