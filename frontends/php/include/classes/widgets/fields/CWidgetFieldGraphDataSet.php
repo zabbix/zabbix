@@ -204,7 +204,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			}
 			if (array_key_exists('aggregate_grouping', $val)) {
 				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 					'name' => $this->name.'.aggregate_grouping.'.$index,
 					'value' => $val['aggregate_grouping']
 				];
