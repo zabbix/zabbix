@@ -184,13 +184,14 @@ class CCheckBox extends CInput {
 		 * Create only hidden fields for enabled readonly and checked elements. Once set unchecked value is properly
 		 * implemented, this code will change.
 		 */
+		$hidden = '';
 		if ($this->readonly && $this->enabled && $this->checked) {
-			$hidden = (new CVar($this->getName(), $this->value, $this->getId()))->setEnabled(true);
+			$hidden = (new CVar($this->getName(), $this->value, $this->getId()))
+				->setEnabled(true)
+				->toString();
 			$this->removeId();
-
-			return ($hidden->toString(true)).parent::toString($destroy).($label->toString(true));
 		}
 
-		return parent::toString($destroy).($label->toString(true));
+		return $hidden.parent::toString($destroy).$label->toString();
 	}
 }
