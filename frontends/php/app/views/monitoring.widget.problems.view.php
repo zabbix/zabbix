@@ -149,6 +149,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
 	}
 
+sdFile($problem,1);
 	$description = (new CCol([
 		(new CLinkAction($problem['name']))
 			->setHint(

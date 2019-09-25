@@ -616,13 +616,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger URL.
 	 *
+	 * @param array $trigger
+	 * @param string $trigger['triggerid']
 	 * @param string $trigger['expression']
 	 * @param string $trigger['url']
-	 * @param string $trigger['eventid']
+	 * @param string $trigger['eventid']  Optional field.
+	 * @param string &$url
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	public function resolveTriggerUrl(array $trigger) {
+	public function resolveTriggerUrl(array $trigger, &$url) {
 		$macros = [
 			'host' => [],
 			'interface' => [],
@@ -659,8 +662,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($matched_macros['macros']['event'] as $macro) {
-			if (!$trigger['eventid']) {
-				$trigger['eventid'] = UNRESOLVED_MACRO_STRING;
+			if (!array_key_exists('eventid', $trigger) && $macro == '{EVENT.ID}') {
+				return false;
 			}
 			$macro_values[$triggerid][$macro] = $trigger['eventid'];
 		}
@@ -738,12 +741,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$matched_macros = $this->getMacroPositions($trigger['url'], $types);
 
+		$url = $trigger['url'];
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$trigger['url'] =
-				substr_replace($trigger['url'], $macro_values[$triggerid][$macro], $pos, strlen($macro));
+			$url = substr_replace($url, $macro_values[$triggerid][$macro], $pos, strlen($macro));
 		}
 
-		return $trigger;
+		return true;
 	}
 
 	/**

@@ -296,18 +296,18 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array $trigger
+	 * @param string $trigger['triggerid']
 	 * @param string $trigger['expression']
 	 * @param string $trigger['url']
 	 * @param string $trigger['eventid']
+	 * @param string &$url
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	public static function resolveTriggerUrl(array $trigger) {
+	public static function resolveTriggerUrl(array $trigger, &$url) {
 		self::init();
 
-		$trigger = self::$macrosResolver->resolveTriggerUrl($trigger);
-
-		return $trigger['url'];
+		return self::$macrosResolver->resolveTriggerUrl($trigger, $url);
 	}
 
 	/**
