@@ -1504,6 +1504,12 @@
 					ui.position.top = 0;
 				}
 
+				if (data['resizing_top']) {
+					ui.position.top += Math.max(0,
+						ui.size.height - data['options']['widget-max-rows'] * data['options']['widget-height']
+					);
+				}
+
 				widget['div'].css({
 					'left': ui.position.left,
 					'top': ui.position.top,
@@ -1511,6 +1517,7 @@
 						data['cell-width'] * data['options']['max-columns'] - ui.position.left
 					),
 					'max-height': Math.min(ui.size.height,
+						data['options']['widget-max-rows'] * data['options']['widget-height'],
 						data['options']['max-rows'] * data['options']['widget-height'] - ui.position.top
 					)
 				});
