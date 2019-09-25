@@ -1808,7 +1808,6 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 #define CSV_STATE_FIELD		0
 #define CSV_STATE_DELIM		1
 #define CSV_STATE_FIELD_QUOTED	2
-#define CSV_STATE_NL		3
 
 	unsigned int	fld_num = 0, fld_num_first = 0, state, hdr_line;
 	char		delim = ',', quote = '\0', *field = NULL, *field_esc = NULL, **field_names = NULL, *data;
@@ -1867,11 +1866,24 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	hdr_line = ('1' == *params ? 1 : 0);
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (state = CSV_STATE_NL; '\0' != *data; data++)
+	for (state = CSV_STATE_DELIM; '\0' != *data; data++)
 	{
-		if (('\r' == *data || '\n' == *data))
+		if (CSV_STATE_FIELD_QUOTED != state)
 		{
-			if (CSV_STATE_NL != state && CSV_STATE_FIELD_QUOTED != state)
+			if ('\r' == *data)
+			{
+				*data = '\0';
+
+				if ('\n' != *(++data) && '\0' != *data)
+				{
+					*errmsg = zbx_strdup(*errmsg,
+							"cannot convert CSV data to JSON: unsupported line break");
+					ret = FAIL;
+					goto out;
+				}
+			}
+
+			if ('\n' == *data)
 			{
 				if (0 == fld_num_first)
 				{
@@ -1885,18 +1897,15 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 					goto out;
 				}
 
-				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
-						&fld_num, &field_esc, hdr_line);
+				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data, &fld_num,
+						&field_esc, hdr_line);
 				zbx_json_close(&json);
 
 				fld_num = 0;
 				hdr_line = 2;
-				state = CSV_STATE_NL;
+				state = CSV_STATE_DELIM;
 			}
-		}
-		else if (delim == *data)
-		{
-			if (CSV_STATE_FIELD_QUOTED != state)
+			else if (delim == *data)
 			{
 				if (0 != fld_num_first && fld_num_first <= fld_num)
 				{
@@ -1906,69 +1915,58 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 					goto out;
 				}
 
-				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
-						&fld_num, &field_esc, hdr_line);
+				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data, &fld_num,
+						&field_esc, hdr_line);
 				state = CSV_STATE_DELIM;
+			}
+			else if ('\0' != quote && quote == *data)
+			{
+				state = CSV_STATE_FIELD_QUOTED;
+			}
+			else if (CSV_STATE_FIELD != state)
+			{
+				field = data;
+				state = CSV_STATE_FIELD;
 			}
 		}
 		else if ('\0' != quote && quote == *data)
 		{
-			if (CSV_STATE_FIELD == state)
+			char	*data_next = data + 1;
+
+			if (quote == *data_next)
 			{
-				*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: quotation character "
-						"within unquoted field");
-				ret = FAIL;
-				goto out;
+				if (NULL == field)
+					field = data;
+
+				*(++data) = '\0';
+				field_esc = zbx_dsprintf(field_esc, "%s%s", (NULL == field_esc ? "" : field_esc),
+						field);
+				field = NULL;
 			}
-
-			if (CSV_STATE_FIELD_QUOTED == state)
+			else if ('\r' == *data_next || '\n' == *data_next || delim == *data_next || '\0' == *data_next)
 			{
-				char	*data_next = data + 1;
+				state = CSV_STATE_FIELD;
+				*data = '\0';
 
-				if (quote == *data_next)
+				if (NULL != field_esc)
 				{
-					if (NULL == field)
-						field = data;
-
-					*(++data) = '\0';
-					field_esc = zbx_dsprintf(field_esc, "%s%s",
-							(NULL == field_esc ? "" : field_esc), field);
-					field = NULL;
-				}
-				else if ('\r' == *data_next || '\n' == *data_next ||
-						delim == *data_next || '\0' == *data_next)
-				{
-					state = CSV_STATE_FIELD;
-					*data = '\0';
-
-					if (NULL != field_esc)
-					{
-						field_esc = zbx_dsprintf(field_esc, "%s%s",
-								field_esc, (NULL == field ? "" : field));
-						field = field_esc;
-					}
-				}
-				else
-				{
-					*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unexpected "
-							"character after quoted field");
-					zbx_free(field_esc);
-					ret = FAIL;
-					goto out;
+					field_esc = zbx_dsprintf(field_esc, "%s%s", field_esc,
+							(NULL == field ? "" : field));
+					field = field_esc;
 				}
 			}
 			else
-				state = CSV_STATE_FIELD_QUOTED;
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unexpected "
+						"character after quoted field");
+				zbx_free(field_esc);
+				ret = FAIL;
+				goto out;
+			}
 		}
-		else if (CSV_STATE_FIELD_QUOTED == state)
-		{
-			if (NULL == field)
-				field = data;
-		}
-		else if (CSV_STATE_FIELD != state)
+		else if (NULL == field)
 		{
 			field = data;
-			state = CSV_STATE_FIELD;
 		}
 	}
 
@@ -2011,7 +2009,6 @@ out:
 #undef CSV_STATE_FIELD
 #undef CSV_STATE_DELIM
 #undef CSV_STATE_FIELD_QUOTED
-#undef CSV_STATE_NL
 }
 
 /******************************************************************************
