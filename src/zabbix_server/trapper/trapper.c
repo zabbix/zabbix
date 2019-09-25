@@ -469,11 +469,11 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], sessionid[MAX_STRING_LEN], *sendto = NULL, *subject = NULL,
-				*message = NULL, *error = NULL;
+				*message = NULL, *error = NULL, *params = NULL, *value = NULL;
 	zbx_uint64_t		mediatypeid;
 	size_t			string_alloc;
 	struct zbx_json		json;
-	struct zbx_json_parse	jp_data;
+	struct zbx_json_parse	jp_data, jp_params;
 	unsigned char		*data = NULL, *result;
 	zbx_uint32_t		size;
 	zbx_user_t		user;
@@ -501,27 +501,22 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	}
 
 	string_alloc = 0;
-	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc))
-	{
-		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SENDTO);
-		goto fail;
-	}
-
+	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc);
 	string_alloc = 0;
-	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc))
-	{
-		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_SUBJECT);
-		goto fail;
-	}
-
+	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc);
 	string_alloc = 0;
-	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc))
+	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc);
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_params))
 	{
-		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_MESSAGE);
-		goto fail;
+		size_t	string_offset = 0;
+
+		string_alloc = 0;
+		zbx_strncpy_alloc(&params, &string_alloc, &string_offset, jp_params.start,
+				jp_params.end - jp_params.start + 1);
 	}
 
-	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message);
+	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, sendto, subject, message, params);
 
 	if (SUCCEED != zbx_ipc_async_exchange(ZBX_IPC_SERVICE_ALERTER, ZBX_IPC_ALERTER_ALERT, SEC_PER_MIN, data, size,
 			&result, &error))
@@ -529,7 +524,7 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto fail;
 	}
 
-	zbx_alerter_deserialize_result(result, &errcode, &error);
+	zbx_alerter_deserialize_result(result, &value, &errcode, &error);
 	zbx_free(result);
 
 	if (SUCCEED != errcode)
@@ -537,6 +532,8 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	if (NULL != value)
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESULT, value, ZBX_JSON_TYPE_STRING);
 
 	(void)zbx_tcp_send(sock, json.buffer);
 
@@ -551,6 +548,7 @@ fail:
 	zbx_free(subject);
 	zbx_free(sendto);
 	zbx_free(data);
+	zbx_free(value);
 	zbx_free(error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

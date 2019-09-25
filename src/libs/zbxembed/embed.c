@@ -40,6 +40,7 @@ struct zbx_es_env
 	char		*error;
 	int		rt_error_num;
 	int		fatal_error;
+	int		timeout;
 
 	jmp_buf		loc;
 };
@@ -141,7 +142,7 @@ int	zbx_es_check_timeout(void *udata)
 {
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 
-	if (time(NULL) - env->start_time > ZBX_ES_TIMEOUT)
+	if (time(NULL) - env->start_time > env->timeout)
 		return 1;
 
 	return 0;
@@ -214,6 +215,8 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 	duk_push_global_object(es->env->ctx);
 	duk_del_prop_string(es->env->ctx, -1, "Duktape");
 	duk_pop(es->env->ctx);
+
+	es->env->timeout = ZBX_ES_TIMEOUT;
 
 	ret = SUCCEED;
 out:
@@ -489,4 +492,19 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_es_set_timeout                                               *
+ *                                                                            *
+ * Purpose: sets script execution timeout                                     *
+ *                                                                            *
+ * Parameters: es      - [IN] the embedded scripting engine                   *
+ *             timeout - [IN] the script execution timeout in seconds         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_es_set_timeout(zbx_es_t *es, int timeout)
+{
+	es->env->timeout = timeout;
 }

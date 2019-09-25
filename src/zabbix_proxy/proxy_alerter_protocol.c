@@ -21,21 +21,23 @@
 #include "../zabbix_server/alerter/alerter_protocol.h"
 
 zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
-		const char *subject, const char *message)
+		const char *subject, const char *message, const char *params)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(mediatypeid);
 	ZBX_UNUSED(sendto);
 	ZBX_UNUSED(subject);
 	ZBX_UNUSED(message);
+	ZBX_UNUSED(params);
 
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return 0;
 }
 
-void	zbx_alerter_deserialize_result(const unsigned char *data, int *errcode, char **errmsg)
+void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **errmsg)
 {
+	ZBX_UNUSED(value);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(errcode);
 	ZBX_UNUSED(errmsg);

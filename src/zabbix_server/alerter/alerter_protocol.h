@@ -33,9 +33,10 @@
 #define ZBX_IPC_ALERTER_EMAIL		1100
 #define ZBX_IPC_ALERTER_SMS		1102
 #define ZBX_IPC_ALERTER_EXEC		1104
+#define ZBX_IPC_ALERTER_WEBHOOK		1105
 
-zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, int errcode, const char *errmsg);
-void	zbx_alerter_deserialize_result(const unsigned char *data, int *errcode, char **errmsg);
+zbx_uint32_t	zbx_alerter_serialize_result(unsigned char **data, const char *value, int errcode, const char *error);
+void	zbx_alerter_deserialize_result(const unsigned char *data, char **value, int *errcode, char **error);
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, const char *sendto,
 		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,
@@ -59,9 +60,15 @@ zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alert
 void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alertid, char **command);
 
 zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
-		const char *subject, const char *message);
+		const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, char **sendto,
-		char **subject, char **message);
+		char **subject, char **message, char **params);
+
+zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
+		int timeout, const char *params);
+
+void	zbx_alerter_deserialize_webhook(const unsigned char *data, char **script_bin, int *script_sz, int *timeout,
+		char **params);
 
 #endif
