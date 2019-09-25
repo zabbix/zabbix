@@ -476,7 +476,7 @@ static int	DBpatch_4030031(void)
 
 static int	DBpatch_4030032(void)
 {
-	const ZBX_FIELD	field = {"webhook", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
@@ -490,7 +490,7 @@ static int	DBpatch_4030033(void)
 
 static int	DBpatch_4030034(void)
 {
-	const ZBX_FIELD	field = {"receive_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"save_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
@@ -547,7 +547,7 @@ static int	DBpatch_4030040(void)
 
 static int	DBpatch_4030041(void)
 {
-	const ZBX_FIELD	field = {"params", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("alerts", &field);
 }
