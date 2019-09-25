@@ -1192,12 +1192,10 @@ class CMediatype extends CApiService {
 				'url' => [
 					// Should be checked as string not as url because it can contain maros tags.
 					'type' => API_STRING_UTF8,
-					'flags' => API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'url')
 				],
 				'url_name' => [
 					'type' => API_STRING_UTF8,
-					'flags' => API_NOT_EMPTY,
 					'length' => DB::getFieldLength('media_type', 'url_name')
 				],
 				'params' => [
