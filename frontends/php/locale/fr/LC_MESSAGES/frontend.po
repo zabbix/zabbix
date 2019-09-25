@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-15 01:44+0300\n"
+"POT-Creation-Date: 2019-09-22 01:44+0300\n"
 "PO-Revision-Date: 2019-04-01 12:13+0300\n"
 "Last-Translator: Daudet <aremy@gab6.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -367,7 +367,7 @@ msgstr[1] "Le compte est bloqué pendant %1$s secondes."
 #: include/classes/screens/CScreenProblem.php:898
 #: include/classes/screens/CScreenProblem.php:921
 #: include/classes/screens/CScreenProblem.php:1152 include/events.inc.php:256
-#: include/events.inc.php:468 include/views/configuration.action.edit.php:1215
+#: include/events.inc.php:468 include/views/configuration.action.edit.php:1217
 msgid "Ack"
 msgstr "Acquitté"
 
@@ -410,17 +410,17 @@ msgstr "Événements RÉSOLUS acquittés"
 #: include/views/configuration.action.edit.php:439
 #: include/views/configuration.action.edit.php:676
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1098
-#: include/views/configuration.action.edit.php:1263
-#: include/views/configuration.action.edit.php:1281
-#: include/views/configuration.action.edit.php:1426
-#: include/views/configuration.action.edit.php:1448
-#: include/views/configuration.action.edit.php:1662
-#: include/views/configuration.action.edit.php:1879
-#: include/views/configuration.action.edit.php:1973
-#: include/views/configuration.action.edit.php:1995
-#: include/views/configuration.action.edit.php:2140
+#: include/views/configuration.action.edit.php:890
+#: include/views/configuration.action.edit.php:1100
+#: include/views/configuration.action.edit.php:1265
+#: include/views/configuration.action.edit.php:1283
+#: include/views/configuration.action.edit.php:1428
+#: include/views/configuration.action.edit.php:1450
+#: include/views/configuration.action.edit.php:1666
+#: include/views/configuration.action.edit.php:1883
+#: include/views/configuration.action.edit.php:1977
+#: include/views/configuration.action.edit.php:1999
+#: include/views/configuration.action.edit.php:2144
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/configuration.graph.edit.php:351
@@ -594,15 +594,15 @@ msgstr "Actif jusqu'à"
 #: include/views/configuration.action.edit.php:393
 #: include/views/configuration.action.edit.php:678
 #: include/views/configuration.action.edit.php:700
-#: include/views/configuration.action.edit.php:1224
-#: include/views/configuration.action.edit.php:1246
-#: include/views/configuration.action.edit.php:1428
-#: include/views/configuration.action.edit.php:1450
-#: include/views/configuration.action.edit.php:1845
-#: include/views/configuration.action.edit.php:1977
-#: include/views/configuration.action.edit.php:1999
-#: include/views/configuration.action.edit.php:2330
-#: include/views/configuration.action.edit.php:2377
+#: include/views/configuration.action.edit.php:1226
+#: include/views/configuration.action.edit.php:1248
+#: include/views/configuration.action.edit.php:1430
+#: include/views/configuration.action.edit.php:1452
+#: include/views/configuration.action.edit.php:1849
+#: include/views/configuration.action.edit.php:1981
+#: include/views/configuration.action.edit.php:2003
+#: include/views/configuration.action.edit.php:2334
+#: include/views/configuration.action.edit.php:2381
 #: include/views/configuration.application.edit.php:60
 #: include/views/configuration.correlation.edit.php:197
 #: include/views/configuration.correlation.edit.php:255
@@ -865,8 +865,8 @@ msgstr "Aligner les éléments de carte"
 #: include/views/administration.auditlogs.list.php:53
 #: include/views/administration.general.gui.edit.php:44
 #: include/views/configuration.action.edit.php:767
-#: include/views/configuration.action.edit.php:1521
-#: include/views/configuration.action.edit.php:2289
+#: include/views/configuration.action.edit.php:1523
+#: include/views/configuration.action.edit.php:2293
 #: include/views/monitoring.sysmap.edit.php:213
 msgid "All"
 msgstr "Tous"
@@ -941,7 +941,7 @@ msgstr "Alternativement, vous pouvez l'installer manuellement :"
 
 #: include/triggers.inc.php:1313
 #: include/views/configuration.action.edit.php:112
-#: include/views/configuration.action.edit.php:1148
+#: include/views/configuration.action.edit.php:1150
 #: include/views/configuration.correlation.edit.php:94
 #: include/views/configuration.host.discovery.edit.php:622
 #: include/views/configuration.trigger.prototype.edit.php:140
@@ -955,7 +955,7 @@ msgstr "Et"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:94
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
 #: include/views/configuration.action.edit.php:111
-#: include/views/configuration.action.edit.php:1147
+#: include/views/configuration.action.edit.php:1149
 #: include/views/configuration.correlation.edit.php:93
 #: include/views/configuration.host.discovery.edit.php:621
 #: include/views/configuration.host.list.php:59
@@ -1181,15 +1181,15 @@ msgstr "Au moins une période de maintenance doit être créée."
 msgid "At least one of MySQL, PostgreSQL, Oracle or IBM DB2 should be supported."
 msgstr "Au moins l'une parmi MySQL, PostgreSQL, Oracle et IBM DB2 doit être supportée."
 
-#: include/views/configuration.action.edit.php:1266
+#: include/views/configuration.action.edit.php:1268
 msgid "At least one operation must exist."
 msgstr "Au moins une opération doit exister."
 
-#: include/views/configuration.action.edit.php:1270
+#: include/views/configuration.action.edit.php:1272
 msgid "At least one operation or recovery operation must exist."
 msgstr "Au moins une opération ou une opération de récupération doit exister."
 
-#: include/views/configuration.action.edit.php:1867
+#: include/views/configuration.action.edit.php:1871
 msgid "At least one operation, recovery operation or update operation must exist."
 msgstr "Au moins une opération, une opération de récupération ou une opération de mise à jour doit exister."
 
@@ -1202,8 +1202,8 @@ msgid "At least one update operation or message must exist."
 msgstr "Au moins une opération de mise à jour ou un message doit exister."
 
 #: include/views/configuration.action.edit.php:754
-#: include/views/configuration.action.edit.php:1505
-#: include/views/configuration.action.edit.php:2264
+#: include/views/configuration.action.edit.php:1507
+#: include/views/configuration.action.edit.php:2268
 msgid "At least one user or user group must be selected."
 msgstr "Au moins un utilisateur ou un groupe d'utilisateurs doit être sélectionné."
 
@@ -1263,9 +1263,9 @@ msgstr "Algorithme d'authentification"
 msgid "Authentication failed: %1$s."
 msgstr "L'authentification a échoué: %1$s."
 
-#: include/views/configuration.action.edit.php:944
-#: include/views/configuration.action.edit.php:1733
-#: include/views/configuration.action.edit.php:2193
+#: include/views/configuration.action.edit.php:946
+#: include/views/configuration.action.edit.php:1737
+#: include/views/configuration.action.edit.php:2197
 #: include/views/configuration.host.discovery.edit.php:481
 #: include/views/configuration.item.edit.php:601
 #: include/views/configuration.item.massupdate.php:283
@@ -1341,7 +1341,7 @@ msgstr "Période de stockage des données des événements et des alertes d'auto
 
 #: include/hosts.inc.php:1301
 #: include/views/administration.general.other.edit.php:59
-#: include/views/configuration.action.edit.php:1077
+#: include/views/configuration.action.edit.php:1079
 #: include/views/configuration.host.edit.php:718
 #: include/views/configuration.host.massupdate.php:196
 #: include/views/configuration.host.prototype.edit.php:368
@@ -1580,10 +1580,10 @@ msgstr "Ne peut être supprimé"
 #: app/views/monitoring.dashboard.view.php:100
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:106
-#: include/views/configuration.action.edit.php:1229
-#: include/views/configuration.action.edit.php:1249
-#: include/views/configuration.action.edit.php:1850
-#: include/views/configuration.action.edit.php:2333
+#: include/views/configuration.action.edit.php:1231
+#: include/views/configuration.action.edit.php:1251
+#: include/views/configuration.action.edit.php:1854
+#: include/views/configuration.action.edit.php:2337
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.services.parent.list.php:85
 #: include/views/conf.import.php:120
@@ -3229,7 +3229,7 @@ msgstr "Horloge"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.regularexpressions.edit.php:146
 #: include/views/administration.general.valuemapping.edit.php:107
-#: include/views/configuration.action.edit.php:2366
+#: include/views/configuration.action.edit.php:2370
 #: include/views/configuration.application.edit.php:52
 #: include/views/configuration.correlation.edit.php:277
 #: include/views/configuration.discovery.edit.php:135
@@ -3332,12 +3332,12 @@ msgstr "Commande"
 #: app/controllers/CControllerPopupGeneric.php:321
 #: app/views/administration.script.edit.php:55
 #: app/views/administration.script.list.php:59
-#: include/views/configuration.action.edit.php:997
-#: include/views/configuration.action.edit.php:1004
-#: include/views/configuration.action.edit.php:1783
-#: include/views/configuration.action.edit.php:1792
-#: include/views/configuration.action.edit.php:2242
-#: include/views/configuration.action.edit.php:2251
+#: include/views/configuration.action.edit.php:999
+#: include/views/configuration.action.edit.php:1006
+#: include/views/configuration.action.edit.php:1787
+#: include/views/configuration.action.edit.php:1796
+#: include/views/configuration.action.edit.php:2246
+#: include/views/configuration.action.edit.php:2255
 msgid "Commands"
 msgstr "Commandes"
 
@@ -3392,7 +3392,7 @@ msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" i
 msgstr "La condition \"%2$s\" utilisée dans la formule \"%3$s\" pour la règle de découverte \"%1$s\" n'est pas définie."
 
 #: include/views/configuration.action.edit.php:124
-#: include/views/configuration.action.edit.php:1166
+#: include/views/configuration.action.edit.php:1168
 #: include/views/configuration.action.list.php:73
 #: include/views/configuration.correlation.edit.php:106
 #: include/views/configuration.correlation.list.php:61
@@ -3494,7 +3494,7 @@ msgstr "Configuration des macros"
 msgid "Configuration of maintenance periods"
 msgstr "Configuration des périodes de maintenance"
 
-#: app/controllers/CControllerMediatypeEdit.php:201
+#: app/controllers/CControllerMediatypeEdit.php:182
 #: app/controllers/CControllerMediatypeList.php:139
 msgid "Configuration of media types"
 msgstr "Configuration des types de médias"
@@ -4119,9 +4119,9 @@ msgstr "Personnalisé en cas d'échec"
 msgid "Custom screens"
 msgstr "Écrans personnalisés"
 
-#: include/views/configuration.action.edit.php:921
-#: include/views/configuration.action.edit.php:1683
-#: include/views/configuration.action.edit.php:2161
+#: include/views/configuration.action.edit.php:923
+#: include/views/configuration.action.edit.php:1687
+#: include/views/configuration.action.edit.php:2165
 msgid "Custom script"
 msgstr "Script personnalisé"
 
@@ -4413,17 +4413,17 @@ msgstr "Mode d'inventaire d'hôte par défaut"
 msgid "Default login form"
 msgstr "Formulaire de connexion par défaut"
 
-#: include/views/configuration.action.edit.php:2298
+#: include/views/configuration.action.edit.php:2302
 msgid "Default media type"
 msgstr "Type de média par défaut"
 
 #: include/views/configuration.action.edit.php:421
-#: include/views/configuration.action.edit.php:779
-#: include/views/configuration.action.edit.php:1275
-#: include/views/configuration.action.edit.php:1533
-#: include/views/configuration.action.edit.php:1823
-#: include/views/configuration.action.edit.php:1874
-#: include/views/configuration.action.edit.php:2305
+#: include/views/configuration.action.edit.php:781
+#: include/views/configuration.action.edit.php:1277
+#: include/views/configuration.action.edit.php:1537
+#: include/views/configuration.action.edit.php:1827
+#: include/views/configuration.action.edit.php:1878
+#: include/views/configuration.action.edit.php:2309
 msgid "Default message"
 msgstr "Message par défaut"
 
@@ -4432,8 +4432,8 @@ msgid "Default operation step duration"
 msgstr "Durée de l'étape d'opération par défaut"
 
 #: include/views/configuration.action.edit.php:418
-#: include/views/configuration.action.edit.php:1272
-#: include/views/configuration.action.edit.php:1871
+#: include/views/configuration.action.edit.php:1274
+#: include/views/configuration.action.edit.php:1875
 msgid "Default subject"
 msgstr "Sujet par défaut"
 
@@ -4517,7 +4517,7 @@ msgstr "Supprimer et nettoyer le modèle ? (Attention : tous les hôtes liés se
 msgid "Delete application?"
 msgstr "Supprimer l'application ?"
 
-#: include/views/configuration.action.edit.php:2368
+#: include/views/configuration.action.edit.php:2372
 msgid "Delete current action?"
 msgstr "Effacer l'action actuelle ?"
 
@@ -4870,8 +4870,8 @@ msgstr "Description mise à jour"
 #: include/views/administration.auditlogs.list.php:77
 #: include/views/configuration.action.edit.php:435
 #: include/views/configuration.action.edit.php:439
-#: include/views/configuration.action.edit.php:1281
-#: include/views/configuration.action.edit.php:1879
+#: include/views/configuration.action.edit.php:1283
+#: include/views/configuration.action.edit.php:1883
 #: include/views/configuration.correlation.edit.php:218
 #: include/views/inventory.host.view.php:217 queue.php:75
 msgid "Details"
@@ -5315,12 +5315,6 @@ msgstr "Valeur \"%1$s\" \"%2$s\" dupliquée pour la corrélation \"%3$s\"."
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
 msgstr "Valeur \"%1$s\" \"%2$s\" dupliquée pour la corrélation."
 
-#: include/classes/api/services/CMediatype.php:209
-#: include/classes/api/services/CMediatype.php:510
-#, c-format
-msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr "Valeur \"description\" \"%1$s\" en doublon pour le type de média."
-
 #: include/classes/api/services/CItemPrototype.php:351
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
@@ -5430,8 +5424,8 @@ msgstr "Chaque URL doit avoir un nom unique. Veuillez vous assurer qu'il n'exist
 #: app/views/popup.trigdesc.view.php:109
 #: include/views/configuration.action.edit.php:506
 #: include/views/configuration.action.edit.php:527
-#: include/views/configuration.action.edit.php:1314
-#: include/views/configuration.action.edit.php:1910
+#: include/views/configuration.action.edit.php:1316
+#: include/views/configuration.action.edit.php:1914
 #: include/views/configuration.maintenance.edit.php:90
 #: include/views/configuration.trigger.prototype.edit.php:96
 #: include/views/configuration.trigger.prototype.edit.php:290
@@ -5591,7 +5585,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:581
 #: include/classes/api/services/CMap.php:1022
 #: include/classes/api/services/CMediatype.php:174
-#: include/classes/api/services/CMediatype.php:436
+#: include/classes/api/services/CMediatype.php:430
 #: include/classes/api/services/CScreen.php:416
 #: include/classes/api/services/CScreen.php:722
 #: include/classes/api/services/CScreen.php:1196
@@ -5614,7 +5608,7 @@ msgstr "Paramètres d'entrée vides."
 msgid "Empty map ID."
 msgstr "Identifiant de carte vide."
 
-#: include/classes/api/services/CMediatype.php:442
+#: include/classes/api/services/CMediatype.php:436
 msgid "Empty media type ID."
 msgstr "Identifiant de type de média vide."
 
@@ -5942,9 +5936,9 @@ msgstr "Exécute une requête WMI et retourne le premier objet sélectionné. Re
 #: app/controllers/CControllerPopupGeneric.php:320
 #: app/views/administration.script.edit.php:48
 #: app/views/administration.script.list.php:58
-#: include/views/configuration.action.edit.php:934
-#: include/views/configuration.action.edit.php:1714
-#: include/views/configuration.action.edit.php:2184
+#: include/views/configuration.action.edit.php:936
+#: include/views/configuration.action.edit.php:1718
+#: include/views/configuration.action.edit.php:2188
 msgid "Execute on"
 msgstr "Exécuter sur"
 
@@ -6164,8 +6158,8 @@ msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "La valeur pour le champ \"%1$s\" de la carte \"%2$s\" est manquante."
 
 #: include/classes/api/services/CMediatype.php:196
-#: include/classes/api/services/CMediatype.php:532
-#: include/classes/api/services/CMediatype.php:903
+#: include/classes/api/services/CMediatype.php:524
+#: include/classes/api/services/CMediatype.php:895
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
 msgstr "La valeur pour le champ \"%1$s\" du type de média \"%2$s\" est manquante."
@@ -6192,7 +6186,7 @@ msgstr "Le champ \"%1$s\" n'est pas un entier."
 msgid "Field \"%1$s\" is not string."
 msgstr "Le champ \"%1$s\" n'est pas une chaîne."
 
-#: include/classes/api/services/CMediatype.php:897
+#: include/classes/api/services/CMediatype.php:889
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
 msgstr "Le champ \"%1$s\" est requis pour le type de média \"%2$s\"."
@@ -6488,9 +6482,9 @@ msgstr "L'expression fournie n'est pas une macro"
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "L'expression régulière globale \"%1$s\" n'existe pas."
 
-#: include/views/configuration.action.edit.php:924
-#: include/views/configuration.action.edit.php:1686
-#: include/views/configuration.action.edit.php:2164
+#: include/views/configuration.action.edit.php:926
+#: include/views/configuration.action.edit.php:1690
+#: include/views/configuration.action.edit.php:2168
 msgid "Global script"
 msgstr "Script global"
 
@@ -7220,7 +7214,7 @@ msgstr "Le groupe d'hôtes avec l'ID \"%1$s\" n'est pas disponible."
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:46
 #: include/classes/widgets/forms/CWidgetFormWeb.php:31
 #: include/forms.inc.php:176 include/menu.inc.php:186
-#: include/views/configuration.action.edit.php:1026
+#: include/views/configuration.action.edit.php:1028
 #: include/views/configuration.copy.elements.php:57
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:23
@@ -7499,9 +7493,9 @@ msgstr "La plage d'IP \"%1$s\" dépasse la limite d'adresses \"%2$s\""
 
 #: app/views/administration.script.edit.php:44
 #: app/views/administration.script.list.php:71 include/hosts.inc.php:471
-#: include/items.inc.php:350 include/views/configuration.action.edit.php:920
-#: include/views/configuration.action.edit.php:1682
-#: include/views/configuration.action.edit.php:2160
+#: include/items.inc.php:350 include/views/configuration.action.edit.php:922
+#: include/views/configuration.action.edit.php:1686
+#: include/views/configuration.action.edit.php:2164
 #: include/views/configuration.host.edit.php:675
 #: include/views/configuration.host.massupdate.php:296
 #: include/views/configuration.host.prototype.edit.php:343
@@ -8046,7 +8040,7 @@ msgstr "Arguments incorrects passés à la fonction"
 #: include/classes/api/services/CMap.php:1228
 #: include/classes/api/services/CMap.php:1448
 #: include/classes/api/services/CMediatype.php:181
-#: include/classes/api/services/CMediatype.php:472
+#: include/classes/api/services/CMediatype.php:466
 #: include/classes/api/services/CScreen.php:496
 #: include/classes/api/services/CScreen.php:570
 #: include/classes/api/services/CScreen.php:761
@@ -8344,7 +8338,7 @@ msgstr "Identifiant de carte incorrect."
 msgid "Incorrect max columns provided for screen element."
 msgstr "Nombre maximum de colonnes incorrect pour l'élément d'écran."
 
-#: include/classes/api/services/CMediatype.php:443
+#: include/classes/api/services/CMediatype.php:437
 msgid "Incorrect media type ID."
 msgstr "Identifiant de type de média incorrect."
 
@@ -8626,21 +8620,21 @@ msgstr "Valeur incorrecte \"%1$s\" pour le champ d'entier non signé \"%2$s\"."
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for correlation \"%3$s\"."
 msgstr "Valeur incorrecte \"%1$s\" dans le champ \"%2$s\" pour la corrélation \"%3$s\"."
 
-#: include/classes/api/services/CMediatype.php:241
-#: include/classes/api/services/CMediatype.php:252
-#: include/classes/api/services/CMediatype.php:271
-#: include/classes/api/services/CMediatype.php:287
-#: include/classes/api/services/CMediatype.php:303
-#: include/classes/api/services/CMediatype.php:322
-#: include/classes/api/services/CMediatype.php:354
-#: include/classes/api/services/CMediatype.php:552
-#: include/classes/api/services/CMediatype.php:565
-#: include/classes/api/services/CMediatype.php:584
-#: include/classes/api/services/CMediatype.php:601
-#: include/classes/api/services/CMediatype.php:618
-#: include/classes/api/services/CMediatype.php:638
-#: include/classes/api/services/CMediatype.php:670
-#: include/classes/api/services/CMediatype.php:880
+#: include/classes/api/services/CMediatype.php:235
+#: include/classes/api/services/CMediatype.php:246
+#: include/classes/api/services/CMediatype.php:265
+#: include/classes/api/services/CMediatype.php:281
+#: include/classes/api/services/CMediatype.php:297
+#: include/classes/api/services/CMediatype.php:316
+#: include/classes/api/services/CMediatype.php:348
+#: include/classes/api/services/CMediatype.php:544
+#: include/classes/api/services/CMediatype.php:557
+#: include/classes/api/services/CMediatype.php:576
+#: include/classes/api/services/CMediatype.php:593
+#: include/classes/api/services/CMediatype.php:610
+#: include/classes/api/services/CMediatype.php:630
+#: include/classes/api/services/CMediatype.php:662
+#: include/classes/api/services/CMediatype.php:872
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "Valeur \"%1$s\" incorrecte dans le champ \"%2$s\" pour le type de média \"%3$s\"."
@@ -8776,22 +8770,22 @@ msgstr "Valeur incorrecte pour le champ \"%1$s\"."
 #: include/classes/api/services/CMap.php:680
 #: include/classes/api/services/CMap.php:1139
 #: include/classes/api/services/CMap.php:1145
-#: include/classes/api/services/CMediatype.php:365
-#: include/classes/api/services/CMediatype.php:375
-#: include/classes/api/services/CMediatype.php:384
-#: include/classes/api/services/CMediatype.php:391
-#: include/classes/api/services/CMediatype.php:400
+#: include/classes/api/services/CMediatype.php:359
+#: include/classes/api/services/CMediatype.php:369
+#: include/classes/api/services/CMediatype.php:378
+#: include/classes/api/services/CMediatype.php:385
+#: include/classes/api/services/CMediatype.php:394
+#: include/classes/api/services/CMediatype.php:403
 #: include/classes/api/services/CMediatype.php:409
-#: include/classes/api/services/CMediatype.php:415
-#: include/classes/api/services/CMediatype.php:477
-#: include/classes/api/services/CMediatype.php:682
-#: include/classes/api/services/CMediatype.php:692
-#: include/classes/api/services/CMediatype.php:699
-#: include/classes/api/services/CMediatype.php:708
-#: include/classes/api/services/CMediatype.php:715
-#: include/classes/api/services/CMediatype.php:725
-#: include/classes/api/services/CMediatype.php:734
-#: include/classes/api/services/CMediatype.php:740
+#: include/classes/api/services/CMediatype.php:470
+#: include/classes/api/services/CMediatype.php:674
+#: include/classes/api/services/CMediatype.php:684
+#: include/classes/api/services/CMediatype.php:691
+#: include/classes/api/services/CMediatype.php:700
+#: include/classes/api/services/CMediatype.php:707
+#: include/classes/api/services/CMediatype.php:717
+#: include/classes/api/services/CMediatype.php:726
+#: include/classes/api/services/CMediatype.php:732
 #: include/classes/api/services/CProxy.php:558
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
@@ -8830,12 +8824,12 @@ msgstr "Valeur incorrecte pour le champ \"%1$s\"."
 #: include/classes/helpers/CSvgGraphHelper.php:247
 #: include/classes/import/CConfigurationImport.php:835
 #: include/classes/import/CConfigurationImport.php:873
-#: include/classes/import/CConfigurationImport.php:2514
-#: include/classes/import/CConfigurationImport.php:2618
-#: include/classes/import/CConfigurationImport.php:2628
-#: include/classes/import/CConfigurationImport.php:2664
-#: include/classes/import/CConfigurationImport.php:2673
-#: include/classes/import/CConfigurationImport.php:2679
+#: include/classes/import/CConfigurationImport.php:2516
+#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:2630
+#: include/classes/import/CConfigurationImport.php:2666
+#: include/classes/import/CConfigurationImport.php:2675
+#: include/classes/import/CConfigurationImport.php:2681
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -9365,7 +9359,7 @@ msgstr "Inventaire désactivé pour l'hôte \"%1$s\"."
 msgid "Inventory field"
 msgstr "Champ d'inventaire"
 
-#: include/views/configuration.action.edit.php:1072
+#: include/views/configuration.action.edit.php:1074
 #: include/views/configuration.host.massupdate.php:190
 msgid "Inventory mode"
 msgstr "Mode d'inventaire"
@@ -9787,9 +9781,9 @@ msgstr "Clé"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "La clé \"%1$s\" ne correspond pas à <grpmax|grpmin|grpsum|grpavg>[\"Groupe(s) d'hôtes\", \"Clé\", \"<last|min|max|avg|sum|count>\", \"paramètre\"]."
 
-#: include/views/configuration.action.edit.php:983
-#: include/views/configuration.action.edit.php:1772
-#: include/views/configuration.action.edit.php:2229
+#: include/views/configuration.action.edit.php:985
+#: include/views/configuration.action.edit.php:1776
+#: include/views/configuration.action.edit.php:2233
 #: include/views/js/common.item.edit.js.php:248
 msgid "Key passphrase"
 msgstr "Phrase de passe de la clé"
@@ -9846,7 +9840,7 @@ msgid "LLD macros"
 msgstr "macros LLD"
 
 #: include/maps.inc.php:45 include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1098
+#: include/views/configuration.action.edit.php:1100
 #: include/views/configuration.correlation.edit.php:48
 #: include/views/configuration.host.discovery.edit.php:641
 #: include/views/js/monitoring.sysmaps.js.php:110
@@ -10420,7 +10414,7 @@ msgstr "Un paramètre obligatoire est manquant."
 
 #: include/hosts.inc.php:1300
 #: include/views/administration.general.other.edit.php:58
-#: include/views/configuration.action.edit.php:1076
+#: include/views/configuration.action.edit.php:1078
 #: include/views/configuration.host.edit.php:717
 #: include/views/configuration.host.massupdate.php:195
 #: include/views/configuration.host.prototype.edit.php:367
@@ -10652,8 +10646,10 @@ msgstr "Média"
 msgid "Media type"
 msgstr "Type de média"
 
-#: include/classes/api/services/CMediatype.php:225
-#: include/classes/api/services/CMediatype.php:498
+#: include/classes/api/services/CMediatype.php:206
+#: include/classes/api/services/CMediatype.php:220
+#: include/classes/api/services/CMediatype.php:490
+#: include/classes/api/services/CMediatype.php:502
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "Le type de média \"%1$s\" existe déjà."
@@ -10708,7 +10704,7 @@ msgstr "Le type de média avec l'IS \"%1$s\" n'est pas disponible."
 msgid "Media types"
 msgstr "Types de média"
 
-#: include/classes/api/services/CMediatype.php:856
+#: include/classes/api/services/CMediatype.php:848
 #, c-format
 msgid "Media types used by action \"%s\"."
 msgstr "Types de média utilisés par l'action \"%s\"."
@@ -10740,10 +10736,10 @@ msgstr "Mémoire utilisée par un processeur en octets. Retourne un entier"
 #: include/classes/screens/CScreenActions.php:115
 #: include/views/administration.auditacts.list.php:60
 #: include/views/administration.auditacts.list.php:91
-#: include/views/configuration.action.edit.php:787
-#: include/views/configuration.action.edit.php:1542
-#: include/views/configuration.action.edit.php:1832
-#: include/views/configuration.action.edit.php:2314
+#: include/views/configuration.action.edit.php:789
+#: include/views/configuration.action.edit.php:1546
+#: include/views/configuration.action.edit.php:1836
+#: include/views/configuration.action.edit.php:2318
 msgid "Message"
 msgstr "Message"
 
@@ -11035,7 +11031,7 @@ msgstr "NTLM"
 #: include/views/common.filter.trigger.php:66
 #: include/views/configuration.action.edit.php:40
 #: include/views/configuration.action.edit.php:51
-#: include/views/configuration.action.edit.php:1098
+#: include/views/configuration.action.edit.php:1100
 #: include/views/configuration.action.list.php:47
 #: include/views/configuration.action.list.php:72
 #: include/views/configuration.application.edit.php:39
@@ -11171,12 +11167,12 @@ msgid "Never"
 msgstr "Jamais"
 
 #: include/views/configuration.action.edit.php:562
-#: include/views/configuration.action.edit.php:892
-#: include/views/configuration.action.edit.php:1161
-#: include/views/configuration.action.edit.php:1350
-#: include/views/configuration.action.edit.php:1666
-#: include/views/configuration.action.edit.php:2144
-#: include/views/configuration.action.edit.php:2345
+#: include/views/configuration.action.edit.php:894
+#: include/views/configuration.action.edit.php:1163
+#: include/views/configuration.action.edit.php:1352
+#: include/views/configuration.action.edit.php:1670
+#: include/views/configuration.action.edit.php:2148
+#: include/views/configuration.action.edit.php:2349
 #: include/views/configuration.discovery.edit.php:73
 #: include/views/configuration.maintenance.edit.php:123
 msgid "New"
@@ -11305,7 +11301,7 @@ msgstr "Aucun \"%1$s\" donné pour le graphique."
 msgid "No \"%1$s\" given for map."
 msgstr "Aucun \"%1$s\" donné pour la carte."
 
-#: include/classes/api/services/CMediatype.php:441
+#: include/classes/api/services/CMediatype.php:435
 #, c-format
 msgid "No \"%1$s\" given for media type."
 msgstr "Aucun \"%1$s\" donné pour le type de média."
@@ -11706,7 +11702,7 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CMap.php:1561
 #: include/classes/api/services/CMap.php:1999
 #: include/classes/api/services/CMap.php:2061
-#: include/classes/api/services/CMediatype.php:465
+#: include/classes/api/services/CMediatype.php:459
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
 #: include/classes/api/services/CProxy.php:415
@@ -11867,7 +11863,7 @@ msgid "Norwegian (nb_NO)"
 msgstr "Norvégien (nb_NO)"
 
 #: include/actions.inc.php:157 include/actions.inc.php:337
-#: include/views/configuration.action.edit.php:1214
+#: include/views/configuration.action.edit.php:1216
 msgid "Not Ack"
 msgstr "Non acquitté"
 
@@ -12249,7 +12245,7 @@ msgstr "Seuls les super administrateurs peuvent créer des types de médias."
 msgid "Only Super Admins can create user groups."
 msgstr "Seuls les super administrateurs peuvent créer des groupes d'utilisateurs."
 
-#: include/classes/api/services/CMediatype.php:846
+#: include/classes/api/services/CMediatype.php:838
 msgid "Only Super Admins can delete media types."
 msgstr "Seuls les super administrateurs peuvent effacer des types de médias."
 
@@ -12257,7 +12253,7 @@ msgstr "Seuls les super administrateurs peuvent effacer des types de médias."
 msgid "Only Super Admins can delete user groups."
 msgstr "Seuls les super administrateurs peuvent effacer des groupes d'utilisateurs."
 
-#: include/classes/api/services/CMediatype.php:432
+#: include/classes/api/services/CMediatype.php:426
 msgid "Only Super Admins can edit media types."
 msgstr "Seuls les super administrateurs peuvent éditer les types de médias."
 
@@ -12361,13 +12357,13 @@ msgstr "L'opération \"%s\" existe déjà."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "L'opération ne peut pas être effectuée en raison d'une requête non autorisée."
 
-#: include/views/configuration.action.edit.php:1220
+#: include/views/configuration.action.edit.php:1222
 msgid "Operation condition"
 msgstr "Condition d'opération"
 
-#: include/views/configuration.action.edit.php:1241
-#: include/views/configuration.action.edit.php:1840
-#: include/views/configuration.action.edit.php:2327
+#: include/views/configuration.action.edit.php:1243
+#: include/views/configuration.action.edit.php:1844
+#: include/views/configuration.action.edit.php:2331
 msgid "Operation details"
 msgstr "Détails de l'opération"
 
@@ -12381,9 +12377,9 @@ msgstr "L'opération n'a pas de modèle à exploiter."
 
 #: include/views/configuration.action.edit.php:615
 #: include/views/configuration.action.edit.php:627
-#: include/views/configuration.action.edit.php:1383
-#: include/views/configuration.action.edit.php:1395
-#: include/views/configuration.action.edit.php:1963
+#: include/views/configuration.action.edit.php:1385
+#: include/views/configuration.action.edit.php:1397
+#: include/views/configuration.action.edit.php:1967
 msgid "Operation type"
 msgstr "Type d'opération"
 
@@ -12399,10 +12395,10 @@ msgid "Operational data"
 msgstr ""
 
 #: include/views/configuration.action.edit.php:567
-#: include/views/configuration.action.edit.php:1264
-#: include/views/configuration.action.edit.php:1355
-#: include/views/configuration.action.edit.php:2321
-#: include/views/configuration.action.edit.php:2343
+#: include/views/configuration.action.edit.php:1266
+#: include/views/configuration.action.edit.php:1357
+#: include/views/configuration.action.edit.php:2325
+#: include/views/configuration.action.edit.php:2347
 #: include/views/configuration.action.list.php:74
 #: include/views/configuration.correlation.edit.php:242
 #: include/views/configuration.correlation.edit.php:267
@@ -12423,7 +12419,7 @@ msgstr "Options"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:380
 #: include/triggers.inc.php:1313
 #: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:1149
+#: include/views/configuration.action.edit.php:1151
 #: include/views/configuration.correlation.edit.php:95
 #: include/views/configuration.host.discovery.edit.php:623
 #: include/views/configuration.host.list.php:60
@@ -12889,12 +12885,12 @@ msgstr "Passif"
 #: app/views/administration.user.edit.php:116 disc_prototypes.php:278
 #: host_discovery.php:218 httpconf.php:65
 #: include/classes/setup/CSetupWizard.php:248
-#: include/views/configuration.action.edit.php:948
-#: include/views/configuration.action.edit.php:977
-#: include/views/configuration.action.edit.php:1728
-#: include/views/configuration.action.edit.php:1760
-#: include/views/configuration.action.edit.php:2197
-#: include/views/configuration.action.edit.php:2224
+#: include/views/configuration.action.edit.php:950
+#: include/views/configuration.action.edit.php:979
+#: include/views/configuration.action.edit.php:1732
+#: include/views/configuration.action.edit.php:1764
+#: include/views/configuration.action.edit.php:2201
+#: include/views/configuration.action.edit.php:2228
 #: include/views/configuration.host.discovery.edit.php:293
 #: include/views/configuration.host.discovery.edit.php:483
 #: include/views/configuration.host.discovery.edit.php:512
@@ -13080,9 +13076,9 @@ msgstr "Remplit le champ d'inventaire d'hôte"
 #: app/views/administration.authentication.edit.php:92
 #: app/views/administration.proxy.edit.php:43 disc_prototypes.php:123
 #: host_discovery.php:111 include/classes/setup/CSetupWizard.php:279
-#: include/forms.inc.php:318 include/views/configuration.action.edit.php:991
-#: include/views/configuration.action.edit.php:1775
-#: include/views/configuration.action.edit.php:2236
+#: include/forms.inc.php:318 include/views/configuration.action.edit.php:993
+#: include/views/configuration.action.edit.php:1779
+#: include/views/configuration.action.edit.php:2240
 #: include/views/configuration.host.discovery.edit.php:470
 #: include/views/configuration.host.edit.php:115
 #: include/views/configuration.host.edit.php:198
@@ -13233,9 +13229,9 @@ msgstr "Protocole de confidentialité"
 msgid "Private"
 msgstr "Privé"
 
-#: include/views/configuration.action.edit.php:970
-#: include/views/configuration.action.edit.php:1752
-#: include/views/configuration.action.edit.php:2217
+#: include/views/configuration.action.edit.php:972
+#: include/views/configuration.action.edit.php:1756
+#: include/views/configuration.action.edit.php:2221
 #: include/views/configuration.host.discovery.edit.php:506
 #: include/views/configuration.item.edit.php:620
 #: include/views/configuration.item.massupdate.php:307
@@ -13450,9 +13446,9 @@ msgstr "Proxy modifié"
 msgid "Public"
 msgstr "Public"
 
-#: include/views/configuration.action.edit.php:949
-#: include/views/configuration.action.edit.php:1729
-#: include/views/configuration.action.edit.php:2198
+#: include/views/configuration.action.edit.php:951
+#: include/views/configuration.action.edit.php:1733
+#: include/views/configuration.action.edit.php:2202
 #: include/views/configuration.host.discovery.edit.php:484
 #: include/views/configuration.item.edit.php:590
 #: include/views/configuration.item.massupdate.php:287
@@ -13461,9 +13457,9 @@ msgstr "Public"
 msgid "Public key"
 msgstr "Clé publique"
 
-#: include/views/configuration.action.edit.php:962
-#: include/views/configuration.action.edit.php:1743
-#: include/views/configuration.action.edit.php:2209
+#: include/views/configuration.action.edit.php:964
+#: include/views/configuration.action.edit.php:1747
+#: include/views/configuration.action.edit.php:2213
 #: include/views/configuration.host.discovery.edit.php:499
 #: include/views/configuration.item.edit.php:613
 #: include/views/configuration.item.massupdate.php:300
@@ -13603,7 +13599,7 @@ msgstr "Expression de récupération"
 msgid "Recovery expression syntax error."
 msgstr ""
 
-#: include/views/configuration.action.edit.php:1862
+#: include/views/configuration.action.edit.php:1866
 msgid "Recovery operations"
 msgstr "Opérations de récupération"
 
@@ -13723,9 +13719,9 @@ msgstr "Commande à distance"
 #: include/views/configuration.action.edit.php:89
 #: include/views/configuration.action.edit.php:512
 #: include/views/configuration.action.edit.php:533
-#: include/views/configuration.action.edit.php:1131
-#: include/views/configuration.action.edit.php:1320
-#: include/views/configuration.action.edit.php:1916
+#: include/views/configuration.action.edit.php:1133
+#: include/views/configuration.action.edit.php:1322
+#: include/views/configuration.action.edit.php:1920
 #: include/views/configuration.correlation.edit.php:76
 #: include/views/configuration.correlation.edit.php:230
 #: include/views/configuration.host.discovery.edit.php:130
@@ -14062,15 +14058,19 @@ msgstr "Récupère le contenu d'un fichier. Retourne du texte"
 msgid "Retry"
 msgstr "Réessayer"
 
-#: include/classes/items/CHelpItems.php:1075
-msgid "Return a JSON object describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Retourne un objet JSON décrivant les objets MBean ou leurs attributs. Peut être utilisé pour la découverte bas niveau."
+#: include/classes/items/CHelpItems.php:1079
+msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1083
+msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
+msgstr ""
 
 #: include/classes/items/CHelpItems.php:1061
 msgid "Return first column of the first row of the SQL query result."
 msgstr "Retourne la première colonne de la première ligne du résultat d'une requête SQL."
 
-#: include/classes/items/CHelpItems.php:1071
+#: include/classes/items/CHelpItems.php:1075
 msgid "Return value of an attribute of MBean object."
 msgstr "Retourne la valeur d'un attribut d'un objet MBean."
 
@@ -14078,15 +14078,15 @@ msgstr "Retourne la valeur d'un attribut d'un objet MBean."
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
 msgstr "Retourne le temps de réponse au ping ICMP en secondes. Exemple : 0.02"
 
+#: include/classes/items/CHelpItems.php:971
+msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
+msgstr ""
+
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:655
 #: include/classes/items/CHelpItems.php:1019
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr ""
-
-#: include/classes/items/CHelpItems.php:971
-msgid "Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "Retourne un objet JSON décrivant les interfaces réseau de l'hôte configurées dans Zabbix. Peut être utilisé pour de la détection bas niveau."
 
 #: include/classes/items/CHelpItems.php:975
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -14330,9 +14330,9 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "L'exécution de l'instruction SQL a échoué\"%1$s\"."
 
 #: include/discovery.inc.php:47
-#: include/views/configuration.action.edit.php:922
-#: include/views/configuration.action.edit.php:1684
-#: include/views/configuration.action.edit.php:2162
+#: include/views/configuration.action.edit.php:924
+#: include/views/configuration.action.edit.php:1688
+#: include/views/configuration.action.edit.php:2166
 #: include/views/js/configuration.discovery.edit.js.php:217
 msgid "SSH"
 msgstr "SSH"
@@ -14558,9 +14558,9 @@ msgstr "Le chemin de menu \"%1$s\" du script est déjà utilisé dans le nom du 
 
 #: app/views/administration.mediatype.edit.php:84
 #: app/views/administration.mediatype.list.php:82
-#: include/views/configuration.action.edit.php:929
-#: include/views/configuration.action.edit.php:1708
-#: include/views/configuration.action.edit.php:2168
+#: include/views/configuration.action.edit.php:931
+#: include/views/configuration.action.edit.php:1712
+#: include/views/configuration.action.edit.php:2172
 msgid "Script name"
 msgstr "Nom du script"
 
@@ -14573,8 +14573,8 @@ msgstr "Le nom du script \"%1$s\" est déjà utilisé dans le chemin de menu du 
 msgid "Script parameters"
 msgstr "Paramètres du script"
 
-#: include/classes/api/services/CMediatype.php:337
-#: include/classes/api/services/CMediatype.php:653
+#: include/classes/api/services/CMediatype.php:331
+#: include/classes/api/services/CMediatype.php:645
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr "Le dernier retour à la ligne manque dans les paramètres \"%1$s\" du script pour le type de média \"%2$s\"."
@@ -14665,9 +14665,9 @@ msgstr "Nom de la sécurité"
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:72
 #: include/views/configuration.action.edit.php:269
-#: include/views/configuration.action.edit.php:910
-#: include/views/configuration.action.edit.php:1700
-#: include/views/configuration.action.edit.php:2179
+#: include/views/configuration.action.edit.php:912
+#: include/views/configuration.action.edit.php:1704
+#: include/views/configuration.action.edit.php:2183
 #: include/views/configuration.graph.edit.php:188
 #: include/views/configuration.graph.edit.php:270
 #: include/views/configuration.item.edit.php:94
@@ -14751,9 +14751,9 @@ msgstr "Envoyer le message aux groupes d'utilisateurs"
 msgid "Send message to users"
 msgstr "Envoyer le message aux utilisateurs"
 
-#: include/views/configuration.action.edit.php:778
-#: include/views/configuration.action.edit.php:1532
-#: include/views/configuration.action.edit.php:2301
+#: include/views/configuration.action.edit.php:780
+#: include/views/configuration.action.edit.php:1536
+#: include/views/configuration.action.edit.php:2305
 msgid "Send only to"
 msgstr "Envoyer uniquement à"
 
@@ -14763,14 +14763,14 @@ msgid "Send to"
 msgstr "Envoyer"
 
 #: include/views/configuration.action.edit.php:755
-#: include/views/configuration.action.edit.php:1508
-#: include/views/configuration.action.edit.php:2270
+#: include/views/configuration.action.edit.php:1510
+#: include/views/configuration.action.edit.php:2274
 msgid "Send to User groups"
 msgstr "Envoyer aux groupes d'utilisateurs"
 
 #: include/views/configuration.action.edit.php:760
-#: include/views/configuration.action.edit.php:1513
-#: include/views/configuration.action.edit.php:2278
+#: include/views/configuration.action.edit.php:1515
+#: include/views/configuration.action.edit.php:2282
 msgid "Send to Users"
 msgstr "Envoyer aux utilisateurs"
 
@@ -15597,10 +15597,10 @@ msgstr ""
 
 #: app/views/popup.mediatypetest.edit.php:32
 #: include/views/administration.auditacts.list.php:86
-#: include/views/configuration.action.edit.php:783
-#: include/views/configuration.action.edit.php:1537
-#: include/views/configuration.action.edit.php:1827
-#: include/views/configuration.action.edit.php:2309
+#: include/views/configuration.action.edit.php:785
+#: include/views/configuration.action.edit.php:1541
+#: include/views/configuration.action.edit.php:1831
+#: include/views/configuration.action.edit.php:2313
 msgid "Subject"
 msgstr "Sujet"
 
@@ -15826,9 +15826,9 @@ msgstr "Valeur du tag"
 msgid "Tags"
 msgstr "Tags"
 
-#: include/views/configuration.action.edit.php:888
-#: include/views/configuration.action.edit.php:1662
-#: include/views/configuration.action.edit.php:2140
+#: include/views/configuration.action.edit.php:890
+#: include/views/configuration.action.edit.php:1666
+#: include/views/configuration.action.edit.php:2144
 #: include/views/configuration.copy.elements.php:64
 #: include/views/configuration.trigger.prototype.edit.php:182
 #: include/views/configuration.trigger.prototype.edit.php:377
@@ -15840,9 +15840,9 @@ msgstr "Tags"
 msgid "Target"
 msgstr "Cible"
 
-#: include/views/configuration.action.edit.php:884
-#: include/views/configuration.action.edit.php:1658
-#: include/views/configuration.action.edit.php:2136
+#: include/views/configuration.action.edit.php:886
+#: include/views/configuration.action.edit.php:1662
+#: include/views/configuration.action.edit.php:2140
 msgid "Target list"
 msgstr "Liste des cibles"
 
@@ -15851,9 +15851,9 @@ msgid "Target type"
 msgstr "Type de cible"
 
 #: include/discovery.inc.php:61
-#: include/views/configuration.action.edit.php:923
-#: include/views/configuration.action.edit.php:1685
-#: include/views/configuration.action.edit.php:2163
+#: include/views/configuration.action.edit.php:925
+#: include/views/configuration.action.edit.php:1689
+#: include/views/configuration.action.edit.php:2167
 #: include/views/js/configuration.discovery.edit.js.php:218
 msgid "Telnet"
 msgstr "Telnet"
@@ -15961,7 +15961,7 @@ msgstr "Un modèle avec le même nom visible \"%s\" existe déjà."
 #: app/controllers/CControllerPopupGeneric.php:75 app/views/search.php:135
 #: app/views/search.php:153 app/views/search.php:156 app/views/search.php:157
 #: app/views/search.php:252 include/menu.inc.php:190
-#: include/views/configuration.action.edit.php:1049
+#: include/views/configuration.action.edit.php:1051
 #: include/views/configuration.copy.elements.php:59
 #: include/views/configuration.host.edit.php:653
 #: include/views/configuration.hostgroups.list.php:59
@@ -16368,8 +16368,12 @@ msgid "Transaction has not been closed. Aborting..."
 msgstr "La transaction n'a pas été fermée. Abandon..."
 
 #: include/classes/items/CHelpItems.php:1065
-msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr "Transforme le résultat de la requête SQL en objet JSON pour une découverte de bas niveau."
+msgid "Transform SQL query result into a JSON array for low-level discovery."
+msgstr ""
+
+#: include/classes/items/CHelpItems.php:1069
+msgid "Transform SQL query result into a JSON array."
+msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:708
 #: include/classes/widgets/CWidgetHelper.php:752
@@ -16729,9 +16733,9 @@ msgstr "Deux éléments de carte devraient être sélectionnés"
 #: include/forms.inc.php:193 include/hosts.inc.php:99
 #: include/views/administration.auditacts.list.php:58
 #: include/views/administration.general.image.list.php:30
-#: include/views/configuration.action.edit.php:916
-#: include/views/configuration.action.edit.php:1704
-#: include/views/configuration.action.edit.php:2156
+#: include/views/configuration.action.edit.php:918
+#: include/views/configuration.action.edit.php:1708
+#: include/views/configuration.action.edit.php:2160
 #: include/views/configuration.graph.edit.php:337
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.discovery.edit.php:59
@@ -16781,7 +16785,7 @@ msgid "Type (descending)"
 msgstr "Type (décroissant)"
 
 #: include/views/configuration.action.edit.php:118
-#: include/views/configuration.action.edit.php:1153
+#: include/views/configuration.action.edit.php:1155
 #: include/views/configuration.correlation.edit.php:91
 #: include/views/configuration.host.discovery.edit.php:618
 msgid "Type of calculation"
@@ -17122,10 +17126,10 @@ msgstr "Fonctionne"
 #: include/views/administration.general.valuemapping.edit.php:105
 #: include/views/administration.general.workingtime.edit.php:44
 #: include/views/administration.usergroups.edit.php:278
-#: include/views/configuration.action.edit.php:1246
-#: include/views/configuration.action.edit.php:1845
-#: include/views/configuration.action.edit.php:2330
-#: include/views/configuration.action.edit.php:2365
+#: include/views/configuration.action.edit.php:1248
+#: include/views/configuration.action.edit.php:1849
+#: include/views/configuration.action.edit.php:2334
+#: include/views/configuration.action.edit.php:2369
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.correlation.edit.php:276
 #: include/views/configuration.discovery.edit.php:133
@@ -17174,7 +17178,7 @@ msgstr "Actualiser l'existant"
 msgid "Update interval"
 msgstr "Intervalle d'actualisation"
 
-#: include/views/configuration.action.edit.php:2354
+#: include/views/configuration.action.edit.php:2358
 msgid "Update operations"
 msgstr "Opérations de mise à jour"
 
@@ -17258,8 +17262,8 @@ msgstr "Utilisé dans les éléments"
 #: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
 #: include/views/configuration.action.edit.php:698
-#: include/views/configuration.action.edit.php:1448
-#: include/views/configuration.action.edit.php:1995
+#: include/views/configuration.action.edit.php:1450
+#: include/views/configuration.action.edit.php:1999
 #: include/views/configuration.httpconf.edit.php:163
 msgid "User"
 msgstr "Utilisateur"
@@ -17331,8 +17335,8 @@ msgstr[1] "Utilisateur supprimé"
 #: app/views/administration.user.list.php:35 include/audit.inc.php:33
 #: include/views/administration.usergroups.edit.php:268
 #: include/views/configuration.action.edit.php:676
-#: include/views/configuration.action.edit.php:1426
-#: include/views/configuration.action.edit.php:1973
+#: include/views/configuration.action.edit.php:1428
+#: include/views/configuration.action.edit.php:1977
 msgid "User group"
 msgstr "Groupe d'utilisateurs"
 
@@ -17421,9 +17425,9 @@ msgid "User menu"
 msgstr "Menu utilisateur"
 
 #: disc_prototypes.php:85 host_discovery.php:78
-#: include/views/configuration.action.edit.php:954
-#: include/views/configuration.action.edit.php:1735
-#: include/views/configuration.action.edit.php:2201
+#: include/views/configuration.action.edit.php:956
+#: include/views/configuration.action.edit.php:1739
+#: include/views/configuration.action.edit.php:2205
 #: include/views/configuration.host.discovery.edit.php:285
 #: include/views/configuration.host.discovery.edit.php:494
 #: include/views/configuration.item.edit.php:331
@@ -18463,9 +18467,9 @@ msgstr "Utilisateur Zabbix"
 
 #: app/views/administration.script.edit.php:50 include/actions.inc.php:920
 #: include/discovery.inc.php:56 include/items.inc.php:86
-#: include/views/configuration.action.edit.php:938
-#: include/views/configuration.action.edit.php:1718
-#: include/views/configuration.action.edit.php:2188
+#: include/views/configuration.action.edit.php:940
+#: include/views/configuration.action.edit.php:1722
+#: include/views/configuration.action.edit.php:2192
 #: include/views/js/configuration.discovery.edit.js.php:219
 msgid "Zabbix agent"
 msgstr "agent Zabbix"
@@ -18496,9 +18500,9 @@ msgstr "Formulaire de connexion Zabbix"
 
 #: app/views/administration.script.edit.php:52 include/actions.inc.php:930
 #: include/classes/setup/CSetupWizard.php:320
-#: include/views/configuration.action.edit.php:940
-#: include/views/configuration.action.edit.php:1720
-#: include/views/configuration.action.edit.php:2190
+#: include/views/configuration.action.edit.php:942
+#: include/views/configuration.action.edit.php:1724
+#: include/views/configuration.action.edit.php:2194
 msgid "Zabbix server"
 msgstr "Serveur Zabbix"
 
@@ -18514,9 +18518,9 @@ msgstr ""
 "2. configuration réseau incorrecte.\n"
 
 #: app/views/administration.script.edit.php:51 include/actions.inc.php:925
-#: include/views/configuration.action.edit.php:939
-#: include/views/configuration.action.edit.php:1719
-#: include/views/configuration.action.edit.php:2189
+#: include/views/configuration.action.edit.php:941
+#: include/views/configuration.action.edit.php:1723
+#: include/views/configuration.action.edit.php:2193
 msgid "Zabbix server (proxy)"
 msgstr "Serveur Zabbix (proxy)"
 
@@ -18834,13 +18838,13 @@ msgstr "ne peut pas être changé"
 #: include/classes/api/services/CMapElement.php:106
 #: include/classes/api/services/CMapElement.php:125
 #: include/classes/api/services/CMapElement.php:163
-#: include/classes/api/services/CMediatype.php:366
-#: include/classes/api/services/CMediatype.php:385
-#: include/classes/api/services/CMediatype.php:401
-#: include/classes/api/services/CMediatype.php:477
-#: include/classes/api/services/CMediatype.php:683
-#: include/classes/api/services/CMediatype.php:709
-#: include/classes/api/services/CMediatype.php:726
+#: include/classes/api/services/CMediatype.php:360
+#: include/classes/api/services/CMediatype.php:379
+#: include/classes/api/services/CMediatype.php:395
+#: include/classes/api/services/CMediatype.php:470
+#: include/classes/api/services/CMediatype.php:675
+#: include/classes/api/services/CMediatype.php:701
+#: include/classes/api/services/CMediatype.php:718
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
 #: include/classes/api/services/CTriggerGeneral.php:248
@@ -18887,7 +18891,7 @@ msgid "check expression starting from \"%1$s\""
 msgstr "vérifiez l'expression à partir de \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1929
-#: include/classes/import/CConfigurationImport.php:2665
+#: include/classes/import/CConfigurationImport.php:2667
 msgid "circular item dependency is not allowed"
 msgstr "la dépendance d'élément circulaire n'est pas autorisée"
 
@@ -19292,8 +19296,8 @@ msgid "maximum dependent items count reached"
 msgstr "nombre maximal d'éléments dépendants atteint"
 
 #: include/classes/api/services/CItemGeneral.php:2009
-#: include/classes/import/CConfigurationImport.php:2619
-#: include/classes/import/CConfigurationImport.php:2680
+#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2682
 msgid "maximum number of dependency levels reached"
 msgstr "nombre maximal de niveaux de dépendance atteint"
 
@@ -19332,15 +19336,15 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr "doit être un utilisateur LDAP correct"
 
-#: include/classes/api/services/CMediatype.php:376
-#: include/classes/api/services/CMediatype.php:392
+#: include/classes/api/services/CMediatype.php:370
+#: include/classes/api/services/CMediatype.php:386
+#: include/classes/api/services/CMediatype.php:404
 #: include/classes/api/services/CMediatype.php:410
-#: include/classes/api/services/CMediatype.php:416
-#: include/classes/api/services/CMediatype.php:693
-#: include/classes/api/services/CMediatype.php:700
-#: include/classes/api/services/CMediatype.php:716
-#: include/classes/api/services/CMediatype.php:735
-#: include/classes/api/services/CMediatype.php:741
+#: include/classes/api/services/CMediatype.php:685
+#: include/classes/api/services/CMediatype.php:692
+#: include/classes/api/services/CMediatype.php:708
+#: include/classes/api/services/CMediatype.php:727
+#: include/classes/api/services/CMediatype.php:733
 #: include/classes/api/services/CScreen.php:400
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
@@ -19831,9 +19835,9 @@ msgstr "la valeur \"%1$s\" existe déjà"
 
 #: include/classes/import/CConfigurationImport.php:836
 #: include/classes/import/CConfigurationImport.php:874
-#: include/classes/import/CConfigurationImport.php:2515
-#: include/classes/import/CConfigurationImport.php:2629
-#: include/classes/import/CConfigurationImport.php:2674
+#: include/classes/import/CConfigurationImport.php:2517
+#: include/classes/import/CConfigurationImport.php:2631
+#: include/classes/import/CConfigurationImport.php:2676
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "valeur \"%1$s\" non trouvée"

@@ -147,9 +147,9 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * Get field by label name.
+	 * Get field by label name or selector.
 	 *
-	 * @param string  $name          field label text
+	 * @param string  $name          field label text or element selector
 	 * @param boolean $invalidate    cache usage flag
 	 *
 	 * @return CElement
@@ -157,17 +157,30 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	public function getField($name, $invalidate = false) {
-		if ($invalidate || !$this->fields->exists($name)) {
+		if (!$invalidate && $this->fields->exists($name)) {
+			return $this->fields->get($name);
+		}
+
+		$parts = explode(':', $name, 2);
+		$element = null;
+
+		if (count($parts) === 2
+				&& in_array($parts[0], ['id', 'name', 'css', 'class', 'tag', 'link', 'button', 'xpath'])
+				&& (($element = $this->query($name)->one(false)) !== null)) {
+			$element = $element->detect();
+		}
+
+		if ($element === null) {
 			$label = $this->getLabel($name);
 
 			if (($element = $this->getFieldByLabelElement($label)) === null) {
-				throw new Exception('Failed to find form field by label name: "'.$name.'".');
+				throw new Exception('Failed to find form field by label name or selector: "'.$name.'".');
 			}
-
-			$this->fields->set($name, $element);
 		}
 
-		return $this->fields->get($name);
+		$this->fields->set($name, $element);
+
+		return $element;
 	}
 
 	/**
@@ -283,16 +296,27 @@ class CFormElement extends CElement {
 	 * @return $this
 	 */
 	public function fill($data) {
-		if ($data) {
-			if (!is_array($data)) {
-				$data = [$data];
-			}
-
+		if ($data && is_array($data)) {
 			foreach ($data as $field => $value) {
 				$this->getField($field)->fill($value);
 			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		if ($expected && is_array($expected)) {
+			foreach ($expected as $field => $value) {
+				if ($this->getField($field)->checkValue($value, $raise_exception) === false) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
