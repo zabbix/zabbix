@@ -2900,7 +2900,6 @@
 		data.dialogue.body.prepend(makeMessageBox(
 			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
 		));
-		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
 
 	/**
@@ -3435,10 +3434,6 @@
 							body.append(response.messages);
 						}
 
-						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
-							showMessageExhausted(data);
-						}
-
 						body.find('form').attr('aria-labeledby', header.find('h4').attr('id'));
 
 						// Change submit function for returned form.
@@ -3447,8 +3442,14 @@
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// Enable save button after successful form update.
-						$('.dialogue-widget-save', footer).prop('disabled', false);
+						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+							showMessageExhausted(data);
+							$('.dialogue-widget-save', footer).prop('disabled', true);
+						}
+						else {
+							// Enable save button after successful form update.
+							$('.dialogue-widget-save', footer).prop('disabled', false);
+						}
 
 						if (data.dialogue['widget_type'] === 'svggraph') {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
