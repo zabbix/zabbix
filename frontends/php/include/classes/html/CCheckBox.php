@@ -60,13 +60,6 @@ class CCheckBox extends CInput {
 	private $readonly = false;
 
 	/**
-	 * Enabled or disabled state of checkbox.
-	 *
-	 * @var bool
-	 */
-	private $enabled = true;
-
-	/**
 	 * Checked or unchecked state of checkbox.
 	 *
 	 * @var bool
