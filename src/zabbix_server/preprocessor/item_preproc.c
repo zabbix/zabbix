@@ -1821,20 +1821,28 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 	data = value->data.str;
 
-#define CSV_SEP_LINE	"Sep="
-	if (ZBX_CONST_STRLEN(CSV_SEP_LINE) < strlen(value->data.str) &&
-			0 == zbx_strncasecmp(value->data.str, CSV_SEP_LINE, ZBX_CONST_STRLEN(CSV_SEP_LINE)))
+#define CSV_SEP_LINE	"sep="
+	if (ZBX_CONST_STRLEN(CSV_SEP_LINE) < strlen(data) &&
+			0 == zbx_strncasecmp(data, CSV_SEP_LINE, ZBX_CONST_STRLEN(CSV_SEP_LINE)))
 	{
+		char	*nl;
+
 		data += ZBX_CONST_STRLEN(CSV_SEP_LINE);
 
-		if (*data == '\r' || *data == '\n' ||
-				(*(data + 1) != '\r' && *(data + 1) != '\n'))
+		if (NULL == (nl = strpbrk(data, "\r\n")))
 		{
-			*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: invalid first line");
-			return FAIL;
+			/* return empty JSON array */
+			zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+			goto out;
 		}
 
-		delim = *data++;
+		if (data + 1 == nl)
+			delim = *data;
+
+		if ('\r' == *nl++)
+			nl++;
+
+		data = nl;
 	}
 #undef CSV_SEP_LINE
 
