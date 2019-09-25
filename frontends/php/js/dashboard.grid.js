@@ -597,8 +597,7 @@
 	}
 
 	function calcDivPosition($obj, data, $div) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = $div.position(),
+		var	pos = $div.position(),
 			cell_w = data['cell-width'],
 			cell_h = data['options']['widget-height'];
 
@@ -1241,7 +1240,7 @@
 		});
 	}
 
-	function checkWidgetOverlap(data, widget) {
+	function checkWidgetOverlap(data) {
 		resetCurrentPositions(data['widgets']);
 
 		$.each(data['widgets'], function() {
@@ -3323,7 +3322,7 @@
 				setDivPosition(widget_local['div'], data, widget_local['pos']);
 
 				if (data['pos-action'] !== 'updateWidgetConfig') {
-					checkWidgetOverlap(data, widget_local);
+					checkWidgetOverlap(data);
 					resizeDashboardGrid($this, data);
 				}
 
