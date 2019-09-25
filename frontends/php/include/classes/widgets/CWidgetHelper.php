@@ -1039,6 +1039,7 @@ class CWidgetHelper {
 									$field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -1049,6 +1050,7 @@ class CWidgetHelper {
 								)
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
 									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
 									->setModern(true)
 							)
 					))
