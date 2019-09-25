@@ -144,7 +144,7 @@ class CControllerMediatypeUpdate extends CController {
 				$this->getInputs($mediatype, ['webhook', 'timeout', 'receive_tags', 'url', 'url_name']);
 
 				$params = $this->getInput('webhook_params', []);
-				$mediatype['params'] = array_map(function ($name, $value) {
+				$mediatype['parameters'] = array_map(function ($name, $value) {
 						return compact('name', 'value');
 					},
 					$params['name'],

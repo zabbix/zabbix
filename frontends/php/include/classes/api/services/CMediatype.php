@@ -352,10 +352,10 @@ class CMediatype extends CApiService {
 
 					$params = [];
 
-					foreach ($validated_data['params'] as $index => $param) {
+					foreach ($validated_data['parameters'] as $index => $param) {
 						if (array_key_exists($param['name'], $params)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', '/params/'.$index.'/name',
+								_s('Invalid parameter "%1$s": %2$s.', '/parameters/'.$index.'/name',
 									_s('value "%1$s" already exists', $param['name'])
 							));
 						}
@@ -699,7 +699,7 @@ class CMediatype extends CApiService {
 					$validated_data += [
 						'webhook' => $db_mediatype['webhook'],
 						'receive_tags' => $db_mediatype['receive_tags'],
-						'params' => []
+						'parameters' => []
 					];
 
 					if ($validated_data['receive_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
@@ -708,10 +708,10 @@ class CMediatype extends CApiService {
 
 					$params = [];
 
-					foreach ($validated_data['params'] as $index => $param) {
+					foreach ($validated_data['parameters'] as $index => $param) {
 						if (array_key_exists($param['name'], $params)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', '/params/'.$index.'/name',
+								_s('Invalid parameter "%1$s": %2$s.', '/parameters/'.$index.'/name',
 									_s('value "%1$s" already exists', $param['name'])
 							));
 						}
@@ -838,6 +838,8 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
 	 * @param string    $mediatypes['webhook']              Webhook javascript body.
+	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
+	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
@@ -858,8 +860,8 @@ class CMediatype extends CApiService {
 			$mediatypeid = $mediatypeids[$i];
 			$mediatype['mediatypeid'] = $mediatypeid;
 
-			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('params', $mediatype)) {
-				foreach ($mediatype['params'] as $param) {
+			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('parameters', $mediatype)) {
+				foreach ($mediatype['parameters'] as $param) {
 					$webhook_params[] = compact('mediatypeid') + $param;
 				}
 			}
@@ -901,6 +903,8 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['maxattempts']			Maximum attempts to deliver alert successfully.
 	 * @param string	$mediatypes['attempt_interval']		Interval between alert delivery attempts.
 	 * @param string    $mediatypes['webhook']              Webhook javascript body.
+	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
+	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
 	 * @param string    $mediatypes['receive_tags']         Webhook HTTP response should be parsed as tags.
 	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
@@ -940,10 +944,10 @@ class CMediatype extends CApiService {
 				'gsm_modem'
 			],
 			MEDIA_TYPE_WEBHOOK => [
-				'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'params'
+				'webhook', 'timeout', 'receive_tags', 'url', 'url_name', 'parameters'
 			]
 		];
-		$default_values['params'] = [];
+		$default_values['parameters'] = [];
 
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeid = $mediatype['mediatypeid'];
@@ -960,15 +964,15 @@ class CMediatype extends CApiService {
 					] + $mediatype;
 				}
 
-				if (array_key_exists('params', $mediatype)) {
+				if (array_key_exists('parameters', $mediatype)) {
 					$params = [];
 
-					foreach ($mediatype['params'] as $param) {
+					foreach ($mediatype['parameters'] as $param) {
 						$params[$param['name']] = $param['value'];
 					};
 
 					$webhooks_params[$mediatypeid] = $params;
-					unset($mediatype['params']);
+					unset($mediatype['parameters']);
 				}
 			}
 
@@ -1138,9 +1142,9 @@ class CMediatype extends CApiService {
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
-		if ($this->outputIsRequested('params', $options['output'])) {
+		if ($this->outputIsRequested('parameters', $options['output'])) {
 			foreach ($result as &$mediatype) {
-				$mediatype['params'] = [];
+				$mediatype['parameters'] = [];
 			}
 			unset($mediatype);
 
@@ -1150,7 +1154,7 @@ class CMediatype extends CApiService {
 			]);
 
 			foreach ($mediatype_params as $param) {
-				$result[$param['mediatypeid']]['params'][] = [
+				$result[$param['mediatypeid']]['parameters'][] = [
 					'name' => $param['name'],
 					'value' => $param['value']
 				];
@@ -1198,7 +1202,7 @@ class CMediatype extends CApiService {
 					'type' => API_STRING_UTF8,
 					'length' => DB::getFieldLength('media_type', 'url_name')
 				],
-				'params' => [
+				'parameters' => [
 					'type' => API_OBJECTS,
 					'fields' => [
 						'name' => [

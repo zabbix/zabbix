@@ -90,7 +90,7 @@ class CControllerMediatypeEdit extends CController {
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'webhook', 'timeout', 'receive_tags', 'url', 'url_name',
-					'params', 'description'
+					'parameters', 'description'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -201,7 +201,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['receive_tags'] = $this->mediatype['receive_tags'];
 					$data['url'] = $this->mediatype['url'];
 					$data['url_name'] = $this->mediatype['url_name'];
-					$data['webhook_params'] = $this->mediatype['params'];
+					$data['webhook_params'] = $this->mediatype['parameters'];
 					break;
 			}
 
