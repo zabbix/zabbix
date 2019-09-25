@@ -155,11 +155,13 @@ class CMacrosResolverGeneral {
 		}
 
 		if ($extract_macros_n) {
-			$macro_n_parser = new CMacroParser($types['macros_n'], CMacroParser::REFERENCE_NUMERIC);
+			$macro_n_parser = new CMacroParser($types['macros_n'], ['ref_type' => CMacroParser::REFERENCE_NUMERIC]);
 		}
 
 		if ($extract_macro_funcs_n) {
-			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'], CMacroParser::REFERENCE_NUMERIC);
+			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'],
+				['ref_type' => CMacroParser::REFERENCE_NUMERIC]
+			);
 		}
 
 		if ($extract_references) {
@@ -265,7 +267,9 @@ class CMacrosResolverGeneral {
 			$macros['macros_n'] = [];
 
 			foreach ($types['macros_n'] as $key => $macro_patterns) {
-				$types['macros_n'][$key] = new CMacroParser($macro_patterns, CMacroParser::REFERENCE_NUMERIC);
+				$types['macros_n'][$key] = new CMacroParser($macro_patterns,
+					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
+				);
 				$macros['macros_n'][$key] = [];
 			}
 		}
@@ -275,7 +279,7 @@ class CMacrosResolverGeneral {
 
 			foreach ($types['macro_funcs_n'] as $key => $macro_patterns) {
 				$types['macro_funcs_n'][$key] = new CMacroFunctionParser($macro_patterns,
-					CMacroParser::REFERENCE_NUMERIC
+					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
 				);
 				$macros['macro_funcs_n'][$key] = [];
 			}
@@ -323,7 +327,7 @@ class CMacrosResolverGeneral {
 						if ($macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macros['macros_n'][$key][$macro_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => (int) $macro_n_parser->getReference()
+								'f_num' => $macro_n_parser->getReference()
 							];
 							$pos += $macro_n_parser->getLength() - 1;
 							continue 2;
@@ -352,7 +356,7 @@ class CMacrosResolverGeneral {
 
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => (int) $macro_n_parser->getReference(),
+								'f_num' => $macro_n_parser->getReference(),
 								'function' => $function_parser->getFunction(),
 								'parameters' => $function_parameters
 							];

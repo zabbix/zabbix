@@ -39,11 +39,11 @@ class CMacroFunctionParser extends CParser {
 	private $function_parser;
 
 	/**
-	 * @param array $macros    the list of macros, for example ['{ITEM.VALUE}', '{ITEM.LASTVALUE}']
-	 * @param int   $ref_type  Allowed reference type: REFERENCE_NONE, REFERENCE_NUMERIC, REFERENCE_ALPHANUMERIC
+	 * @param array $macros   The list of macros, for example ['{ITEM.VALUE}', '{ITEM.LASTVALUE}'].
+	 * @param array $options
 	 */
-	public function __construct(array $macros, $ref_type) {
-		$this->macro_parser = new CMacroParser($macros, $ref_type);
+	public function __construct(array $macros, array $options = []) {
+		$this->macro_parser = new CMacroParser($macros, $options);
 		$this->function_parser = new CFunctionParser();
 	}
 

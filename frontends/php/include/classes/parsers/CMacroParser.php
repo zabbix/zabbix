@@ -25,12 +25,12 @@ class CMacroParser extends CParser {
 	 */
 	const REFERENCE_NONE = 0;
 	/**
-	 * Allow only numeric reference, {HOST.HOST3}
+	 * Allow only numeric reference <1-9>, {HOST.HOST3}.
 	 */
 	const REFERENCE_NUMERIC = 1;
 	/**
-	 * Allow alpha numeric reference, {EVENT.TAGS.test}. Reference can be quoted if it contains non alphanumeric
-	 * characters, {EVEN.TAGS."Jira id"}
+	 * Allow alpha numeric reference, {EVENT.TAGS.issue_number}. Reference can be quoted if it contains non alphanumeric
+	 * characters, {EVEN.TAGS."Jira ID"}.
 	 */
 	const REFERENCE_ALPHANUMERIC = 2;
 
@@ -49,42 +49,32 @@ class CMacroParser extends CParser {
 	private $reference;
 
 	/**
-	 * Allowed reference type.
+	 * @var CSetParser
 	 */
-	private $reference_type;
+	private $set_parser;
 
 	/**
-	 * Array of strings with macro value.
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'allow_reference' => true		support of reference {MACRO<1-9>}
+	 *
+	 * @var array
 	 */
-	private $macroses = [];
-
-	/**
-	 * Shortest macro length.
-	 */
-	private $min_length;
-
-	/**
-	 * Longest macro length.
-	 */
-	private $max_length;
+	private $options = ['ref_type' => self::REFERENCE_NONE];
 
 	/**
 	 * Array of strings to search for.
 	 *
-	 * @param array $macros     The list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
-	 * @param int   $ref_type   Allowed reference type: REFERENCE_NONE, REFERENCE_NUMERIC, REFERENCE_ALPHANUMERIC
+	 * @param array $macros   The list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}'].
+	 * @param array $options
 	 */
-	public function __construct(array $macros, $ref_type = CMacroParser::REFERENCE_NONE) {
-		$lengths = [];
+	public function __construct(array $macros, array $options = []) {
+		$this->set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
 
-		foreach ($macros as $macro) {
-			$this->macroses[] = substr($macro, 1, -1);
-			$lengths[] = strlen($macro) - 2;
+		if (array_key_exists('ref_type', $options)) {
+			$this->options['ref_type'] = $options['ref_type'];
 		}
-
-		$this->min_length = min($lengths);
-		$this->max_length = max($lengths);
-		$this->reference_type = $ref_type;
 	}
 
 	/**
@@ -93,65 +83,37 @@ class CMacroParser extends CParser {
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
 	 */
 	public function parse($source, $pos = 0) {
+		$this->length = 0;
 		$this->match = '';
 		$this->macro = '';
-		$this->length = 0;
 		$this->reference = null;
-		$length = mb_strlen($source);
+
 		$p = $pos;
 
-		if ($p >= $length || $source[$p] != '{') {
-			return CParser::PARSE_FAIL;
+		if (!isset($source[$p]) || $source[$p] !== '{') {
+			return self::PARSE_FAIL;
 		}
-
 		$p++;
 
-		if ($this->parseMatch($source, $p) == CParser::PARSE_FAIL) {
-			return CParser::PARSE_FAIL;
+		if ($this->set_parser->parse($source, $p) == self::PARSE_FAIL) {
+			return self::PARSE_FAIL;
 		}
+		$p += $this->set_parser->getLength();
 
-		$p += strlen($this->macro);
+		$this->parseReference($source, $p);
 
-		switch ($this->reference_type) {
-			case CMacroParser::REFERENCE_NUMERIC:
-				if ($p < $length && $source[$p] >= '1' && $source[$p] <= '9') {
-					$this->reference = (int) $source[$p];
-					$p++;
-				}
-				break;
-
-			case CMacroParser::REFERENCE_ALPHANUMERIC:
-				if ($p < $length - 1 && $source[$p] == '.') {
-					$p++;
-
-					if ($this->parseSuffix($source, $p) == CParser::PARSE_FAIL) {
-						$this->macro = '';
-
-						return CParser::PARSE_FAIL;
-					}
-
-					$p += mb_strlen($this->reference);
-
-					if ($this->reference[0] == '"') {
-						$this->reference = mb_substr($this->reference, 1, -1);
-					}
-				}
-				break;
-
-		}
-
-		if ($p >= $length || $source[$p] != '}') {
-			$this->macro = '';
+		if (!isset($source[$p]) || $source[$p] !== '}') {
 			$this->reference = null;
 
-			return CParser::PARSE_FAIL;
+			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
+		$this->macro = $this->set_parser->getMatch();
 
-		return $p < $length ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS;
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
 
 	/**
@@ -159,48 +121,38 @@ class CMacroParser extends CParser {
 	 * will set $this->suffix value. Suffix containing non alphanumeric characters or underscore should be quoted.
 	 * Inside quotes only " and \ escape sequences are allowed.
 	 *
-	 * @param string $source     Source string.
-	 * @param int    $p          Search start position, after quotation mark.
-	 * @return int
+	 * @param  string $source
+	 * @param  int    $pos
 	 */
-	protected function parseSuffix($source, $p) {
+	private function parseReference($source, &$pos) {
+		$p = $pos;
+
+		switch ($this->options['ref_type']) {
+			case self::REFERENCE_NUMERIC:
+				if (isset($source[$p]) && $source[$p] >= '1' && $source[$p] <= '9') {
+					$this->reference = (int) $source[$p];
+					$p++;
+				}
+				else {
+					$this->reference = 0;
+				}
+				break;
+
+			case self::REFERENCE_ALPHANUMERIC:
+				$pattern_quoted = '"(?:\\\\["\\\\]|[^"\\\\])*"';
+				$pattern_unquoted = '[A-Za-z0-9_]+';
+				$pattern = '\.(?P<ref>'.$pattern_quoted.'|'.$pattern_unquoted.')';
+
+				if (preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
+					$this->reference = (isset($matches['ref'][0]) && $matches['ref'][0] === '"')
+						? str_replace(['\\"', '\\\\'], ['"', '\\'], substr($matches['ref'], 1, -1))
+						: $matches['ref'];
+					$p += strlen($matches[0]);
+				}
+				break;
+		}
+
 		$pos = $p;
-		$quoted = ($source[$p] == '"');
-		$p += $quoted ? 1 : 0;
-		$regex = $quoted ? '/(?:\\\\["\\\\]|[^"\\\\])+/' : '/[A-Z0-9_]+/i';
-		$match = [];
-
-		if (preg_match($regex, $source, $match, 0, $p) != 1) {
-			return CParser::PARSE_FAIL;
-		}
-
-		$this->reference = $quoted ? '"'.$match[0].'"' : $match[0];
-		return CParser::PARSE_SUCCESS;
-	}
-
-	/**
-	 * Find desired macro, returns parser state, on success also set $this->macro value.
-	 *
-	 * @param string $source     Source string.
-	 * @param int    $p          Search start position, after { character.
-	 * @return int
-	 */
-	protected function parseMatch($source, $p) {
-		$len = $this->max_length;
-
-		while ($len >= $this->min_length) {
-			$macro = substr($source, $p, $len);
-
-			if (in_array($macro, $this->macroses)) {
-				$this->macro = $macro;
-
-				return CParser::PARSE_SUCCESS;
-			}
-
-			$len--;
-		}
-
-		return CParser::PARSE_FAIL;
 	}
 
 	/**
