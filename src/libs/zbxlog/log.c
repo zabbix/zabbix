@@ -145,7 +145,7 @@ static void	rotate_log(const char *filename)
 	zbx_uint64_t		new_size;
 	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
 
-	if (0 == CONFIG_LOG_FILE_SIZE || NULL == filename || '\0' == *filename)
+	if (0 == CONFIG_LOG_FILE_SIZE)
 	{
 		/* redirect only once if log file wasn't specified or there is no log file size limit */
 		if (ZBX_MAX_UINT64 == old_size)
@@ -153,9 +153,6 @@ static void	rotate_log(const char *filename)
 			old_size = 0;
 			zbx_redirect_stdio(filename);
 		}
-
-		if (0 != CONFIG_LOG_FILE_SIZE)
-			return;
 	}
 
 	if (0 != zbx_stat(filename, &buf))
@@ -381,7 +378,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		LOCK_LOG;
 
-		rotate_log(log_filename);
+		if (0 != CONFIG_LOG_FILE_SIZE)
+			rotate_log(log_filename);
 
 		if (NULL != (log_file = fopen(log_filename, "a+")))
 		{
