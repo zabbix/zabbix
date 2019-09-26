@@ -142,14 +142,16 @@ class CControllerMediatypeUpdate extends CController {
 			case MEDIA_TYPE_WEBHOOK:
 				$mediatype['save_tags'] = MEDIA_TYPE_TAGS_DISABLED;
 				$this->getInputs($mediatype, ['script', 'timeout', 'save_tags', 'url', 'url_name']);
-
 				$params = $this->getInput('webhook_params', []);
-				$mediatype['parameters'] = array_map(function ($name, $value) {
-						return compact('name', 'value');
-					},
-					$params['name'],
-					$params['value']
-				);
+
+				if (array_key_exists('name', $params) && array_key_exists('value', $params)) {
+					$mediatype['parameters'] = array_map(function ($name, $value) {
+							return compact('name', 'value');
+						},
+						$params['name'],
+						$params['value']
+					);
+				}
 
 				if ($mediatype['save_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
 					unset($mediatype['url'], $mediatype['url_name']);
