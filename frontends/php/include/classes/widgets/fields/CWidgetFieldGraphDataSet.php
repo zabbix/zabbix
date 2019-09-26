@@ -52,12 +52,28 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO])],
 			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_COUNT, GRAPH_AGGREGATE_SUM, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_LAST])],
+			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_COUNT, GRAPH_AGGREGATE_SUM, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_LAST])],
 			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR],
 			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])]
 		]]);
 
 		$this->setDefault([]);
+	}
+
+	/**
+	 * Get dataset fields value. If no value is set, will set to default value.
+	 *
+	 * @return mixed
+	 */
+	public function getValue() {
+		$data_sets = ($this->value === null) ? $this->default : $this->value;
+
+		foreach ($data_sets as &$data_set) {
+			$data_set += self::getDefaults();
+		}
+		unset($data_set);
+
+		return $data_sets;
 	}
 
 	/**
@@ -103,7 +119,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE,
 			'aggregate_function' => GRAPH_AGGREGATE_NONE,
-			'aggregate_interval' => '',
+			'aggregate_interval' => GRAPH_AGGREGATE_DEFAULT_INTERVAL,
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM
 		];
 	}
@@ -113,12 +129,27 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.
 	 *
-	 * @param array $widget_fields   reference to Array of widget fields.
+	 * @param array $widget_fields  Reference to array of widget fields.
 	 */
 	public function toApi(array &$widget_fields = []) {
 		$value = $this->getValue();
 
-		// TODO: fields with default values shouldn't be saved in the database
+		$dataset_fields = [
+			'color' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'width' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'pointsize' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'transparency' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'fill' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'axisy' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'missingdatafunc' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32
+		];
+		$dataset_defaults = self::getDefaults();
+
 		foreach ($value as $index => $val) {
 			// Hosts and items fields are stored as arrays to bypass length limit.
 			foreach ($val['hosts'] as $num => $pattern_item) {
@@ -135,77 +166,16 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'value' => $pattern_item
 				];
 			}
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'.color.'.$index,
-				'value' => $val['color']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.type.'.$index,
-				'value' => $val['type']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.transparency.'.$index,
-				'value' => $val['transparency']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.axisy.'.$index,
-				'value' => $val['axisy']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'.timeshift.'.$index,
-				'value' => $val['timeshift']
-			];
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.aggregate_function.'.$index,
-				'value' => $val['aggregate_function']
-			];
-			if (array_key_exists('width', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.width.'.$index,
-					'value' => $val['width']
-				];
-			}
-			if (array_key_exists('pointsize', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.pointsize.'.$index,
-					'value' => $val['pointsize']
-				];
-			}
-			if (array_key_exists('fill', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.fill.'.$index,
-					'value' => $val['fill']
-				];
-			}
-			if (array_key_exists('missingdatafunc', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.missingdatafunc.'.$index,
-					'value' => $val['missingdatafunc']
-				];
-			}
-			if (array_key_exists('aggregate_interval', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.aggregate_interval.'.$index,
-					'value' => $val['aggregate_interval']
-				];
-			}
-			if (array_key_exists('aggregate_grouping', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.aggregate_grouping.'.$index,
-					'value' => $val['aggregate_grouping']
-				];
+
+			// Other dataset fields are stored if different from the defaults.
+			foreach ($dataset_fields as $name => $type) {
+				if ($val[$name] !== null && $val[$name] != $dataset_defaults[$name]) {
+					$widget_fields[] = [
+						'type' => $type,
+						'name' => $this->name.'.'.$name.'.'.$index,
+						'value' => $val[$name]
+					];
+				}
 			}
 		}
 	}

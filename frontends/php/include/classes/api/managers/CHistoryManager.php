@@ -436,7 +436,8 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByInterval
 	 */
-	private function getGraphAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function, $interval) {
+	private function getGraphAggregationByIntervalFromElasticsearch(array $items, $time_from, $time_to, $function,
+			$interval) {
 		$terms = [];
 
 		foreach ($items as $item) {
@@ -550,14 +551,6 @@ class CHistoryManager {
 			}
 		}
 
-		// Results should be ordered by 'tick'.
-		foreach ($results as &$data) {
-			usort($data['data'], function ($a, $b) {
-				return $a['tick'] - $b['tick'];
-			});
-		}
-		unset($data);
-
 		return $results;
 	}
 
@@ -632,21 +625,19 @@ class CHistoryManager {
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 				}
 
-				if ($interval !== null) {
-					$step = timeUnitToSeconds($interval, true);
+				$step = timeUnitToSeconds($interval, true);
 
-					// Required for 'group by' support of Oracle.
-					$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $step);
-					$sql_select[] = $calc_field.' AS tick';
-					$sql_group_by[] = $calc_field;
-				}
+				// Required for 'group by' support of Oracle.
+				$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $step);
+				$sql_select[] = $calc_field.' AS tick';
+				$sql_group_by[] = $calc_field;
 
 				$sql = 'SELECT '.implode(', ', $sql_select).
 					' FROM '.$sql_from.
 					' WHERE '.dbConditionInt('itemid', $itemids).
 					' AND clock >= '.zbx_dbstr($time_from).
 					' AND clock <= '.zbx_dbstr($time_to).
-					($sql_group_by ? ' GROUP BY '.implode(', ', $sql_group_by) : '');
+					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
 					$sql = 'SELECT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
