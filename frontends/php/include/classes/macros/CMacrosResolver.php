@@ -2759,16 +2759,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				if (array_key_exists($url['url'], $match_tag)) {
 					foreach ($pos_match[$url['url']] as $pos => $match) {
 						$tag = $match_tag[$url['url']][$match];
-						$replace = $tag_value[$tag];
-						$url['url'] = substr_replace($url['url'], $replace, $pos, strlen($match));
+						$url['url'] = substr_replace($url['url'], $tag_value[$tag], $pos, strlen($match));
 					}
 				}
 
 				if (array_key_exists($url['name'], $match_tag)) {
 					foreach ($pos_match[$url['name']] as $pos => $match) {
 						$tag = $match_tag[$url['name']][$match];
-						$replace = $tag_value[$tag];
-						$url['name'] = substr_replace($url['name'], $replace, $pos, strlen($match));
+						$url['name'] = substr_replace($url['name'], $tag_value[$tag], $pos, strlen($match));
 					}
 				}
 

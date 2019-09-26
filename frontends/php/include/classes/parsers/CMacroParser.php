@@ -20,18 +20,9 @@
 
 
 class CMacroParser extends CParser {
-	/**
-	 * Do not allow any references.
-	 */
+
 	const REFERENCE_NONE = 0;
-	/**
-	 * Allow only numeric reference <1-9>, {HOST.HOST3}.
-	 */
 	const REFERENCE_NUMERIC = 1;
-	/**
-	 * Allow alpha numeric reference, {EVENT.TAGS.issue_number}. Reference can be quoted if it contains non alphanumeric
-	 * characters, {EVEN.TAGS."Jira ID"}.
-	 */
 	const REFERENCE_ALPHANUMERIC = 2;
 
 	/**
@@ -57,7 +48,11 @@ class CMacroParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'allow_reference' => true		support of reference {MACRO<1-9>}
+	 *   'ref_type' => CMacroParser::REFERENCE_NONE            Default, do not support any reference tyep.
+	 *   'ref_type' => CMacroParser::REFERENCE_NUMERIC         Support only numeric reference <1-9>, {HOST.HOST3}.
+	 *   'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC    Allow alpha numeric reference, {EVENT.TAGS.issue_number}.
+	 *                                                         Reference can be quoted if it contains non alphanumeric
+	 *                                                         characters, {EVEN.TAGS."Jira ID"}.
 	 *
 	 * @var array
 	 */
@@ -81,6 +76,9 @@ class CMacroParser extends CParser {
 	 * Find one of the given strings at the given position.
 	 *
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
+	 *
+	 * @param string $source    Search and replace string.
+	 * @param int    $pos       Initial position in $source string.
 	 */
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
@@ -117,9 +115,8 @@ class CMacroParser extends CParser {
 	}
 
 	/**
-	 * Parse suffix value for option "allow_quoted_suffix", return CParser search state, in case of success also
-	 * will set $this->suffix value. Suffix containing non alphanumeric characters or underscore should be quoted.
-	 * Inside quotes only " and \ escape sequences are allowed.
+	 * Parse reference of type defined in "ref_type". Reference of type REFERENCE_ALPHANUMERIC containing non
+	 * alphanumeric characters or underscore should be quoted. Inside quotes only " and \ escape sequences are allowed.
 	 *
 	 * @param  string $source
 	 * @param  int    $pos
@@ -165,10 +162,7 @@ class CMacroParser extends CParser {
 	}
 
 	/**
-	 * Returns reference value, for reference of type:
-	 * - CMacroParser::REFERENCE_NUMERIC will be of type int.
-	 * - CMacroParser::REFERENCE_ALPHANUMERIC will be of type string.
-	 * - CMacroParser::REFERENCE_NONE or parsing failed will be null.
+	 * Returns reference value.
 	 *
 	 * @return null|int|string
 	 */

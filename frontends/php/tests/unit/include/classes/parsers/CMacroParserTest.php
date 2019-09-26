@@ -97,7 +97,7 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 			]],
 			['{EVENT.TAGS."Test\"\\\\ test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '{EVENT.TAGS."Test\\"\\\\ test"}',
+				'match' => '{EVENT.TAGS."Test\"\\\\ test"}',
 				'macro' => 'EVENT.TAGS',
 				'ref'	=> 'Test"\\ test'
 			]],
@@ -112,6 +112,12 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 				'match' => '{EVENT.TAGS.test}',
 				'macro' => 'EVENT.TAGS',
 				'ref'	=> 'test'
+			]],
+			['{EVENT.TAGS."{\"\\\\\"}"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."{\"\\\\\"}"}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> '{"\\"}'
 			]],
 			['{EVENT.TAGS.$%%^}%&test}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS."Te\\st test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
