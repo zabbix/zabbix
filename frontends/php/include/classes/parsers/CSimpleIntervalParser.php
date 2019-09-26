@@ -61,7 +61,7 @@ class CSimpleIntervalParser extends CParser {
 	/**
 	 * Parse the given source string.
 	 *
-	 * 0..N[smhdw]|{$M}|{#M}|{{#M}.func()}
+	 * 0..N[smhdwMy]|{$M}|{#M}|{{#M}.func()}
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
