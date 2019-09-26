@@ -285,25 +285,23 @@ $multiselect-selected-bg-color: #696969;
 	color: $font-selected-color;
 }
 
+.totals-list {
+	color: darken($font-color, 85%);
+}
+
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
-	color: darken($font-color, 85%);
+
+	&.list-table {
+		color: darken($font-color, 85%);
+
+		tbody th {
+			color: $font-color;
+		}
+	}
 
 	.host-avail-total {
-		color: $font-color;
-	}
-}
-
-// WIDGET "PROBLEMS BY SEVERITY"
-
-.by-severity-widget {
-
-	> div {
-		color: darken($font-color, 85%);
-	}
-
-	.by-severity-count {
 		color: $font-color;
 	}
 }

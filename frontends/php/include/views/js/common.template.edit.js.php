@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,13 +19,20 @@
 **/
 
 
-class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
+?>
+<script type="text/javascript">
+	/**
+	 * @see init.js add.popup event
+	 */
+	function addPopupValues(data) {
+		if (!isset('object', data) || data.object !== 'hostid') {
+			return false;
+		}
 
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
+		for (var i = 0, len = data.values.length; i < len; i++) {
+			create_var(data.parentId, 'add_templates[' + data.values[i].id + ']', data.values[i].id, false);
+		}
 
-		$this->setExValidationRules(
-			['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))
-		]);
+		submitFormWithParam(data.parentId, "add_template", "1");
 	}
-}
+</script>
