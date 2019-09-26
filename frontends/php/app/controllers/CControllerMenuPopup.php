@@ -583,19 +583,30 @@ class CControllerMenuPopup extends CController {
 				$menu_data['description_enabled'] = false;
 			}
 
+			if ($db_trigger['url'] !== '') {
+				$url = CHtmlUrlValidator::validate($db_trigger['url'])
+					? $db_trigger['url']
+					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
+							false, false)).'\');';
+				$name = _('Trigger URL');
+				$menu_data['urls'] = [compact('url', 'name')];
+			}
+
 			if (array_key_exists('eventid', $data)) {
+				$menu_data += ['urls' => []];
 				$menu_data['eventid'] = $data['eventid'];
+				$event_urls = API::Event()->get([
+					'output' => ['urls'],
+					'eventids' => $data['eventid']
+				])[0];
+
+				if ($event_urls) {
+					$menu_data['urls'] = array_merge($menu_data['urls'], $event_urls['urls']);
+				}
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
 				$menu_data['acknowledge'] = $data['acknowledge'];
-			}
-
-			if ($db_trigger['url'] !== '') {
-				$menu_data['url'] = CHtmlUrlValidator::validate($db_trigger['url'])
-					? $db_trigger['url']
-					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
-							false, false)).'\');';
 			}
 
 			return $menu_data;

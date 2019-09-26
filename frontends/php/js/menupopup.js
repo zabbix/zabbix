@@ -660,18 +660,23 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	// url
-	if (typeof options.url !== 'undefined' && options.url.length > 0) {
-		items[items.length] = {
-			label: t('URL'),
-			url: options.url
-		};
-	}
-
 	sections[sections.length] = {
 		label: t('S_TRIGGER'),
 		items: items
 	};
+
+	// urls
+	if ('urls' in options) {
+		sections[sections.length] = {
+			label: t('URLS'),
+			items: options.urls.map(function(url) {
+				return {
+					url: url.url,
+					label: url.name
+				}
+			})
+		};
+	}
 
 	// items
 	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
