@@ -58,10 +58,10 @@ class CSvgGraphHelper {
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
-		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics);
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
+		// Load aggregated Data for each dataset.
+		self::getMetricsAggregatedData($metrics);
 
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_TYPE_SHORT) ? $options['legend_lines'] * 18 : 0;
@@ -139,11 +139,7 @@ class CSvgGraphHelper {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
-			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval']);
-
-			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE
-					|| $aggregate_interval == null || $aggregate_interval <= 0) {
-				$metric['options']['aggregate_function'] = GRAPH_AGGREGATE_NONE;
+			if ($metric['options']['aggregate_function'] == GRAPH_AGGREGATE_NONE) {
 				continue;
 			}
 
@@ -168,7 +164,7 @@ class CSvgGraphHelper {
 					'items' => [],
 					'points' => []
 				]);
-				$metric['options']['aggregate_interval'] = $aggregate_interval;
+				$metric['options']['aggregate_interval'] = timeUnitToSeconds($metric['options']['aggregate_interval']);
 
 				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
 					$dataset_metrics[$dataset_num] = $metric_num;

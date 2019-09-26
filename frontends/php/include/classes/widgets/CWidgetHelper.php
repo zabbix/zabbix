@@ -1096,7 +1096,7 @@ class CWidgetHelper {
 			$values[] = [];
 		}
 
-		foreach (array_values($values) as $i => $value) {
+		foreach ($values as $i => $value) {
 			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
 		}
 

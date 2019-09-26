@@ -53,7 +53,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_AGGREGATE_NONE, GRAPH_AGGREGATE_MIN, GRAPH_AGGREGATE_MAX, GRAPH_AGGREGATE_AVG, GRAPH_AGGREGATE_COUNT, GRAPH_AGGREGATE_SUM, GRAPH_AGGREGATE_FIRST, GRAPH_AGGREGATE_LAST])],
-			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR],
+			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
 			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])]
 		]]);
 
@@ -61,19 +61,18 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	}
 
 	/**
-	 * Get dataset fields value. If no value is set, will set to default value.
+	 * Set field values for the datasets.
 	 *
 	 * @return mixed
 	 */
-	public function getValue() {
-		$data_sets = ($this->value === null) ? $this->default : $this->value;
+	public function setValue($value) {
+		$data_sets = [];
 
-		foreach ($data_sets as &$data_set) {
-			$data_set += self::getDefaults();
+		foreach ((array) $value as &$data_set) {
+			$data_sets[] = $data_set + self::getDefaults();
 		}
-		unset($data_set);
 
-		return $data_sets;
+		return parent::setValue($data_sets);
 	}
 
 	/**
