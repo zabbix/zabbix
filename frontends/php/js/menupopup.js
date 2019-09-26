@@ -672,7 +672,8 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			items: options.urls.map(function(url) {
 				return {
 					url: url.url,
-					label: url.name
+					label: url.name,
+					target: '_blank'
 				}
 			})
 		};
@@ -1333,6 +1334,10 @@ jQuery(function($) {
 
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
+
+				if ('target' in options) {
+					link.attr('target', options.target);
+				}
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {
