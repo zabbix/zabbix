@@ -2754,7 +2754,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		token_search = ZBX_TOKEN_SEARCH_BASIC;
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 		return res;
+	}
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -3132,8 +3135,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -3343,8 +3346,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
