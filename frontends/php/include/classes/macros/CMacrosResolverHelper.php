@@ -631,4 +631,24 @@ class CMacrosResolverHelper {
 
 		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
 	}
+
+	/**
+	 * Return associative array of mediatypes urls with resolved {EVENT.TAG} macro in form
+	 * ['mediatypeid' => .. 'eventid' => .. 'url' => .. 'name' => ..] where key will be 'mediatypeid' value.
+	 *
+	 * @param array  $tags                      Array of event tags.
+	 * @param int    $tags[]['eventid']         Event tag eventid.
+	 * @param string $tags[]['tag']             Event tag tag field value.
+	 * @param string $tags[]['value']           Event tag value field value.
+	 * @param array  $urls                   Array of mediatype urls.
+	 * @param int    $urls[]['mediatypeid']  Media type mediatypeid.
+	 * @param string $urls[]['url']          Media type url field value.
+	 * @param string $urls[]['url_name']     Media type url_name field value.
+	 * @return array
+	 */
+	public static function resolveMediaTypeUrls(array $tags, array $urls) {
+		self::init();
+
+		return self::$macrosResolver->resolveMediaTypeUrls($tags, $urls);
+	}
 }
