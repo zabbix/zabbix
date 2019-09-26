@@ -332,8 +332,8 @@ int	init_builtin_counter_indexes(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* get buffer holding a text list of perf. counter indexes and English counter names */
-	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used) */
+	/* Get buffer holding a list of performance counter indexes and English counter names. */
+	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used).          */
 	if (NULL == (counter_text = saved_ptr = get_all_counter_eng_names(L"Counter")))
 		goto out;
 

@@ -129,7 +129,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[16]; /* 16 is enough to store instance name string (group and index) */
-	int				gidx, cpu_groups, cpus_per_group, numa_nodes;
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #endif
@@ -173,6 +172,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 	else
 	{
+		int	gidx, cpu_groups, cpus_per_group, numa_nodes;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "more than 64 CPUs, using \"Processor Information\" counter");
 
 		cpe.szObjectName = get_counter_name(get_builtin_counter_index(PCI_PROCESSOR_INFORMATION));

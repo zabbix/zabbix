@@ -217,6 +217,7 @@ finish:
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
+	int	cpu_num;
 
 	if (1 < request->nparam)
 	{
@@ -231,7 +232,13 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, get_cpu_num_win32());
+	if (0 >= (cpu_num = get_cpu_num_win32()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Error getting number of CPUs."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	SET_UI64_RESULT(result, cpu_num);
 
 	return SYSINFO_RET_OK;
 }
