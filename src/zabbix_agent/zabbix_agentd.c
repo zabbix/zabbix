@@ -53,6 +53,7 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
+char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
 char	*CONFIG_USER			= NULL;
@@ -417,7 +418,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 	for (i = 0; NULL != longopts[i].name; i++)
 	{
-		ch = longopts[i].val;
+		ch = (char)longopts[i].val;
 
 		if ('h' == ch || 'V' == ch)
 			continue;
@@ -743,7 +744,7 @@ fail:
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-	char	*active_hosts = NULL;
+	static char	*active_hosts;
 
 	struct cfg_line	cfg[] =
 	{
@@ -814,6 +815,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
 #endif
 		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -846,6 +849,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
+	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
@@ -885,6 +889,7 @@ static void	zbx_free_config(void)
 #endif
 #ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
+	zbx_strarr_free(CONFIG_PERF_COUNTERS_EN);
 #endif
 }
 
@@ -1004,7 +1009,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	load_perf_counters(CONFIG_PERF_COUNTERS);
+	load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #endif
 	zbx_free_config();
 
@@ -1250,7 +1255,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 
-			load_perf_counters(CONFIG_PERF_COUNTERS);
+			load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
 #else
 			zbx_set_common_signal_handlers();
 #endif

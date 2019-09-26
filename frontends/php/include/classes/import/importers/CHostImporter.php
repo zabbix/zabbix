@@ -36,6 +36,7 @@ class CHostImporter extends CImporter {
 	public function import(array $hosts) {
 		$hostsToCreate = [];
 		$hostsToUpdate = [];
+		$templateLinkage = [];
 
 		foreach ($hosts as $host) {
 			// preserve host related templates to massAdd them later
@@ -52,7 +53,8 @@ class CHostImporter extends CImporter {
 
 			$host = $this->resolveHostReferences($host);
 
-			if (array_key_exists('hostid', $host) && $this->options['hosts']['updateExisting']) {
+			if (array_key_exists('hostid', $host) && ($this->options['hosts']['updateExisting']
+					|| $this->options['process_hosts'])) {
 				$hostsToUpdate[] = $host;
 			}
 			else if ($this->options['hosts']['createMissing']) {
@@ -63,8 +65,6 @@ class CHostImporter extends CImporter {
 				$hostsToCreate[] = $host;
 			}
 		}
-
-		$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
 
 		// create/update hosts
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
@@ -84,8 +84,13 @@ class CHostImporter extends CImporter {
 			}
 		}
 
-		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
-			API::Host()->update($hostsToUpdate);
+		if ($hostsToUpdate) {
+			if ($this->options['hosts']['updateExisting']) {
+				$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
+
+				API::Host()->update($hostsToUpdate);
+			}
+
 			foreach ($hostsToUpdate as $host) {
 				$this->processedHostIds[$host['host']] = $host['hostid'];
 

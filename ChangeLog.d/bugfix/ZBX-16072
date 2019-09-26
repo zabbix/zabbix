@@ -1,1 +1,0 @@
-A......... [ZBX-16072] added more strict validation of host, template and proxy names to prohibit leading and trailing spaces (Ivo)
