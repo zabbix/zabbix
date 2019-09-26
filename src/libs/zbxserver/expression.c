@@ -2754,10 +2754,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 		token_search = ZBX_TOKEN_SEARCH_BASIC;
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 		return res;
-	}
 
 	zbx_vector_uint64_create(&hostids);
 
