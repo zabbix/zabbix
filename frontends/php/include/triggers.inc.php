@@ -759,13 +759,14 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
-			'time_from' => $problem_options['time_from']
+			'time_from' => $problem_options['time_from'],
+			'sortfield' => 'eventid'
 		]);
 
 		$objectids = [];
 
 		foreach ($problems as $problem) {
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
+			if ($triggers[$problem['objectid']]['priority'] <= $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
 				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
 				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
