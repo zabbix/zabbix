@@ -1751,42 +1751,69 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
  *             names     - [OUT] column names                                 *
  *             field     - [IN/OUT] field                                     *
  *             end       - [IN] end of field                                  *
- *             num       - [IN/OUT] field number                              *
+ *             num       - [IN] field number                                  *
+ *             num_max   - [IN] current maximum number of fields              *
  *             field_esc - [OUT] pointer to quoted field                      *
- *             header    - [IN] header line status                            *
+ *             header    - [IN] header line                                   *
+ *             errmsg    - [OUT] error message                                *
+ *                                                                            *
+ * Return value: SUCCEED - the field was added successfully                   *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static void	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***names, char **field, char *end,
-		unsigned int *num, char **field_esc, unsigned int header)
+static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***names, char **field, char *end,
+		unsigned int num, unsigned int num_max, char **field_esc, unsigned int header, char **errmsg)
 {
 	char	**fld_names = *names;
+	int	ret = SUCCEED;
 
-	*end = '\0';
+	if ('\0' != *end)
+		*end = '\0';
 
-	if (2 > header)
+	if (0 == num_max || (0 == header && num >= num_max))
 	{
-		fld_names = zbx_realloc(fld_names, (*num + 1) * sizeof(char*));
-		fld_names[*num] = NULL;
+		fld_names = zbx_realloc(fld_names, (num + 1) * sizeof(char*));
+		*names = fld_names;
 
 		if (1 == header)
-			fld_names[*num] = zbx_strdup(NULL, (*field != NULL ? *field : ""));
-		else
-			fld_names[*num] = zbx_dsprintf(fld_names[*num], "%u", *num + 1);
+		{
+			unsigned int	i;
 
-		*names = fld_names;
+			for (i = 0; i < num; i++)
+			{
+				if (0 == strcmp(fld_names[i], *field))
+				{
+					*errmsg = zbx_strdup(*errmsg, "duplicated column names");
+					ret = FAIL;
+					goto out;
+				}
+			}
+
+			fld_names[num] = zbx_strdup(NULL, (*field != NULL ? *field : ""));
+		}
+		else
+			fld_names[num] = zbx_dsprintf(NULL, "%u", num + 1);
+	}
+	else if (0 < num_max && num >= num_max && 1 == header)
+	{
+		*errmsg = zbx_strdup(*errmsg, "data row contains more fields than header row");
+		ret = FAIL;
+		goto out;
 	}
 
-	if (1 != header)
+	if (0 == header || 0 < num_max)
 	{
-		if (0 == *num)
+		if (0 == num)
 			zbx_json_addobject(json, NULL);
 
-		zbx_json_addstring(json, fld_names[*num], (*field != NULL ? *field : ""), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, fld_names[num], (*field != NULL ? *field : ""), ZBX_JSON_TYPE_STRING);
 	}
 
-	(*num)++;
+out:
 	*field = NULL;
 	zbx_free(*field_esc);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1809,19 +1836,21 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 #define CSV_STATE_DELIM		1
 #define CSV_STATE_FIELD_QUOTED	2
 
-	unsigned int	fld_num = 0, fld_num_first = 0, state, hdr_line;
-	char		delim = ',', quote = '\0', *field = NULL, *field_esc = NULL, **field_names = NULL, *data;
+	unsigned int	fld_num = 0, fld_num_max = 0, hdr_line, state = CSV_STATE_DELIM;
+	char		delim = ',', quote = '\0', *field = NULL, *field_esc = NULL, **field_names = NULL, *data,
+			*value_out = NULL, *err = NULL, empty[] = "";
 	struct zbx_json	json;
-	char		*value_out = NULL;
+	size_t		data_len;
 	int		ret = SUCCEED;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
 	data = value->data.str;
+	data_len = strlen(data);
 
 #define CSV_SEP_LINE	"sep="
-	if (ZBX_CONST_STRLEN(CSV_SEP_LINE) < strlen(data) &&
+	if (ZBX_CONST_STRLEN(CSV_SEP_LINE) < data_len &&
 			0 == zbx_strncasecmp(data, CSV_SEP_LINE, ZBX_CONST_STRLEN(CSV_SEP_LINE)))
 	{
 		char	*nl;
@@ -1866,7 +1895,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	hdr_line = ('1' == *params ? 1 : 0);
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (state = CSV_STATE_DELIM; '\0' != *data; data++)
+	do
 	{
 		if (CSV_STATE_FIELD_QUOTED != state)
 		{
@@ -1876,47 +1905,47 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 				if ('\n' != *(++data) && '\0' != *data)
 				{
-					*errmsg = zbx_strdup(*errmsg,
-							"cannot convert CSV data to JSON: unsupported line break");
+					err = zbx_strdup(err, "unsupported line break");
 					ret = FAIL;
 					goto out;
 				}
 			}
 
-			if ('\n' == *data)
+			if ('\n' == *data || '\0' == *data)
 			{
-				if (0 == fld_num_first)
-				{
-					fld_num_first = fld_num + 1;
-				}
-				else if (fld_num + 1 != fld_num_first)
-				{
-					*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unequal "
-							"number of fields in rows");
-					ret = FAIL;
+				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
+						fld_num, fld_num_max, &field_esc, hdr_line, &err)))
 					goto out;
+
+				fld_num++;
+
+				if (0 < fld_num_max)
+				{
+					for (; fld_num < fld_num_max; fld_num++)
+					{
+						field = empty;
+
+						if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json,
+								&field_names, &field, empty + 1, fld_num, fld_num_max,
+								&field_esc, hdr_line, &err)))
+							goto out;
+					}
 				}
 
-				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data, &fld_num,
-						&field_esc, hdr_line);
-				zbx_json_close(&json);
+				if (fld_num > fld_num_max)
+					fld_num_max = fld_num;
 
 				fld_num = 0;
-				hdr_line = 2;
+				zbx_json_close(&json);
 				state = CSV_STATE_DELIM;
 			}
 			else if (delim == *data)
 			{
-				if (0 != fld_num_first && fld_num_first <= fld_num)
-				{
-					*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unequal "
-							"number of fields in rows");
-					ret = FAIL;
+				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
+						fld_num, fld_num_max, &field_esc, hdr_line, &err)))
 					goto out;
-				}
 
-				item_preproc_csv_to_json_add_field(&json, &field_names, &field, data, &fld_num,
-						&field_esc, hdr_line);
+				fld_num++;
 				state = CSV_STATE_DELIM;
 			}
 			else if ('\0' != quote && quote == *data)
@@ -1957,9 +1986,8 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 			}
 			else
 			{
-				*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unexpected "
-						"character after quoted field");
 				zbx_free(field_esc);
+				err = zbx_strdup(err, "unexpected character after quoted field");
 				ret = FAIL;
 				goto out;
 			}
@@ -1968,44 +1996,33 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 		{
 			field = data;
 		}
-	}
+	} while (value->data.str + data_len > data++);
 
 	if (CSV_STATE_FIELD_QUOTED == state)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unclosed quoted field");
 		zbx_free(field_esc);
+		err = zbx_strdup(err, "unclosed quoted field");
 		ret = FAIL;
-		goto out;
-	}
-
-	if (CSV_STATE_FIELD == state)
-	{
-		if (fld_num + 1 != fld_num_first)
-		{
-			*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: unequal number of fields in "
-					"rows");
-			ret = FAIL;
-			goto out;
-		}
-
-		item_preproc_csv_to_json_add_field(&json, &field_names, &field, data, &fld_num,
-				&field_esc, hdr_line);
-		zbx_json_close(&json);
 	}
 
 out:
-	value_out = zbx_strdup(NULL, json.buffer);
+	for (fld_num = 0; fld_num < fld_num_max; fld_num++)
+		zbx_free(field_names[fld_num]);
+
+	if (FAIL == ret)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV data to JSON: %s", err);
+		zbx_free(err);
+	}
+	else
+		value_out = zbx_strdup(NULL, json.buffer);
+
 	zbx_json_free(&json);
-
-	for (state = 0; state < fld_num_first; state++)
-		zbx_free(field_names[state]);
-
 	zbx_free(field_names);
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, value_out);
 
 	return ret;
-
 #undef CSV_STATE_FIELD
 #undef CSV_STATE_DELIM
 #undef CSV_STATE_FIELD_QUOTED
