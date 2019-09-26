@@ -659,7 +659,6 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $groupids
  * @param string $application
- * @param int    $style                               Table display style: either hosts on top or on the left.
  * @param array  $host_options
  * @param array  $trigger_options
  * @param array  $problem_options
@@ -669,8 +668,8 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []) {
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,

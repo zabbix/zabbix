@@ -123,7 +123,6 @@ $type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
 if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
-$viewStyle = CProfile::get('web.overview.view_style', STYLE_TOP);
 
 $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 
@@ -144,7 +143,7 @@ $page_filter = new CPageFilter([
 
 $data = [
 	'type' => $type,
-	'view_style' => $viewStyle,
+	'view_style' => CProfile::get('web.overview.view_style', STYLE_TOP),
 	'config' => $config,
 	'pageFilter' => $page_filter,
 	'groupid' => $page_filter->groupid,
@@ -203,8 +202,8 @@ if ($type == SHOW_TRIGGERS) {
 
 		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
 
-		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-			$host_options, $trigger_options, $problem_options
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $host_options,
+			$trigger_options, $problem_options
 		);
 	}
 	else {
