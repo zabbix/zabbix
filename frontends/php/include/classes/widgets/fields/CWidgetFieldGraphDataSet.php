@@ -160,6 +160,11 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				'name' => $this->name.'.timeshift.'.$index,
 				'value' => $val['timeshift']
 			];
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+				'name' => $this->name.'.aggregate_function.'.$index,
+				'value' => $val['aggregate_function']
+			];
 			if (array_key_exists('width', $val)) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -186,13 +191,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 					'name' => $this->name.'.missingdatafunc.'.$index,
 					'value' => $val['missingdatafunc']
-				];
-			}
-			if (array_key_exists('aggregate_function', $val)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.aggregate_function.'.$index,
-					'value' => $val['aggregate_function']
 				];
 			}
 			if (array_key_exists('aggregate_interval', $val)) {
