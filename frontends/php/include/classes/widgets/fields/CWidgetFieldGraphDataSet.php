@@ -63,7 +63,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	/**
 	 * Set field values for the datasets.
 	 *
-	 * @return mixed
+	 * @return $this
 	 */
 	public function setValue($value) {
 		$data_sets = [];
