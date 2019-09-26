@@ -40,9 +40,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
-	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,							null],
+	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN(STYLE_LEFT.','.STYLE_TOP),	null],
+	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN(SHOW_TRIGGERS.','.SHOW_DATA), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
