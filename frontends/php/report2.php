@@ -231,28 +231,29 @@ elseif (hasRequest('filter_hostid')) {
 	CArrayHelper::sort($groups, ['name']);
 
 	if (!array_key_exists($filter_groupid, $groups)) {
-		$filter_groupid = '0';
+		$filter_groupid = 0;
 	}
 
-	$filter_groupid_combo = (new CComboBox('filter_groupid', $filter_groupid, 'javascript: submit();'))
+	$filter_groupid_combobox = (new CComboBox('filter_groupid', $filter_groupid, 'javascript: submit();'))
 		->setAttribute('autofocus', 'autofocus')
 		->addItem(0, _('all'));
 
 	foreach ($groups as $groupid => $group) {
-		$filter_groupid_combo->addItem($groupid, $group['name']);
+		$filter_groupid_combobox->addItem($groupid, $group['name']);
 	}
 
-	if ($filter_groupid !== '0') {
+	if ($filter_groupid == 0) {
+		$filter_groupids = null;
+	}
+	else {
 		$filter_groupids = [$filter_groupid];
 		$parent = $groups[$filter_groupid]['name'].'/';
+
 		foreach ($groups as $groupid => $group) {
 			if (strpos($group['name'], $parent) === 0) {
 				$filter_groupids[] = $groupid;
 			}
 		}
-	}
-	else {
-		$filter_groupids = null;
 	}
 
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
@@ -267,14 +268,14 @@ elseif (hasRequest('filter_hostid')) {
 		CArrayHelper::sort($templates, ['name']);
 
 		if (!array_key_exists($filter_hostid, $templates)) {
-			$filter_hostid = '0';
+			$filter_hostid = 0;
 		}
 
-		$filter_hostid_combo = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
+		$filter_hostid_combobox = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
 			->addItem(0, _('all'));
 
 		foreach ($templates as $templateid => $template) {
-			$filter_hostid_combo->addItem($templateid, $template['name']);
+			$filter_hostid_combobox->addItem($templateid, $template['name']);
 		}
 
 		// Sanitize $tpl_triggerid and prepare "Template Trigger" combo box.
@@ -283,7 +284,7 @@ elseif (hasRequest('filter_hostid')) {
 			'output' => ['description'],
 			'selectHosts' => ['name'],
 			'selectItems' => ['status'],
-			'templateids' => ($filter_hostid !== '0') ? $filter_hostid : null,
+			'templateids' => ($filter_hostid == 0) ? null : $filter_hostid,
 			'groupids' => $filter_groupids,
 			'templated' => true,
 			'filter' => ['status' => TRIGGER_STATUS_ENABLED, 'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
@@ -302,16 +303,17 @@ elseif (hasRequest('filter_hostid')) {
 		}
 
 		if (!array_key_exists($tpl_triggerid, $triggers)) {
-			$tpl_triggerid = '0';
+			$tpl_triggerid = 0;
 		}
 
-		$tpl_triggerid_combo = (new CComboBox('tpl_triggerid', $tpl_triggerid, 'javascript: submit()'))
+		$tpl_triggerid_combobox = (new CComboBox('tpl_triggerid', $tpl_triggerid, 'javascript: submit()'))
 			->addItem(0, _('all'));
 
 		$tpl_triggerids = [];
+
 		foreach ($triggers as $triggerid => $trigger) {
-			$tpl_triggerid_combo->addItem($triggerid,
-				(($filter_hostid === '0') ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
+			$tpl_triggerid_combobox->addItem($triggerid,
+				(($filter_hostid == 0) ? $trigger['hosts'][0]['name'].NAME_DELIMITER : '').$trigger['description']
 			);
 
 			$tpl_triggerids[$triggerid] = true;
@@ -328,20 +330,22 @@ elseif (hasRequest('filter_hostid')) {
 		CArrayHelper::sort($host_groups, ['name']);
 
 		if (!array_key_exists($hostgroupid, $host_groups)) {
-			$hostgroupid = '0';
+			$hostgroupid = 0;
 		}
 
-		$hostgroupid_combo = (new CComboBox('hostgroupid', $hostgroupid, 'javascript: submit()'))
+		$hostgroupid_combobox = (new CComboBox('hostgroupid', $hostgroupid, 'javascript: submit()'))
 			->addItem(0, _('all'));
 
 		foreach ($host_groups as $groupid => $group) {
-			$hostgroupid_combo->addItem($groupid, $group['name']);
+			$hostgroupid_combobox->addItem($groupid, $group['name']);
 		}
 
 		$hostgroupids = [];
-		if ($hostgroupid !== '0') {
+
+		if ($hostgroupid != 0) {
 			$hostgroupids[$hostgroupid] = true;
 			$parent = $host_groups[$hostgroupid]['name'].'/';
+
 			foreach ($host_groups as $groupid => $group) {
 				if (strpos($group['name'], $parent) === 0) {
 					$hostgroupids[$groupid] = true;
@@ -351,8 +355,9 @@ elseif (hasRequest('filter_hostid')) {
 
 		// Gather all templated triggers, originating from host templates, which belong to requested template groups.
 
-		$templated_triggers_all = ($tpl_triggerid !== '0') ? [$tpl_triggerid => true] : $tpl_triggerids;
+		$templated_triggers_all = ($tpl_triggerid == 0) ? $tpl_triggerids : [$tpl_triggerid => true];
 		$templated_triggers_new = $templated_triggers_all;
+
 		while ($templated_triggers_new) {
 			$templated_triggers_new = API::Trigger()->get([
 				'output' => ['triggerid'],
@@ -368,10 +373,10 @@ elseif (hasRequest('filter_hostid')) {
 			// Select monitored host triggers, derived from templates and belonging to the requested groups.
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'value'],
-				'expandDescription' => true,
 				'selectHosts' => ['name'],
+				'expandDescription' => true,
 				'monitored' => true,
-				'groupids' => $hostgroupid !== '0' ? array_keys($hostgroupids) : null,
+				'groupids' => ($hostgroupid == 0) ? null : array_keys($hostgroupids),
 				'filter' => ['templateid' => array_keys($templated_triggers_all)],
 				'limit' => $config['search_limit'] + 1
 			]);
@@ -382,10 +387,10 @@ elseif (hasRequest('filter_hostid')) {
 		}
 
 		$filter_column
-			->addRow(_('Template group'), $filter_groupid_combo)
-			->addRow(_('Template'), $filter_hostid_combo)
-			->addRow(_('Template trigger'), $tpl_triggerid_combo)
-			->addRow(_('Host group'), $hostgroupid_combo);
+			->addRow(_('Template group'), $filter_groupid_combobox)
+			->addRow(_('Template'), $filter_hostid_combobox)
+			->addRow(_('Template trigger'), $tpl_triggerid_combobox)
+			->addRow(_('Host group'), $hostgroupid_combobox);
 	}
 	// Report by host.
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
@@ -401,30 +406,30 @@ elseif (hasRequest('filter_hostid')) {
 		CArrayHelper::sort($hosts, ['name']);
 
 		if (!array_key_exists($filter_hostid, $hosts)) {
-			$filter_hostid = '0';
+			$filter_hostid = 0;
 		}
 
 		// Select monitored host triggers, derived from templates and belonging to the requested groups.
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'expression', 'value'],
-			'expandDescription' => true,
 			'selectHosts' => ['name'],
+			'expandDescription' => true,
 			'monitored' => true,
 			'groupids' => $filter_groupids,
-			'hostids' => $filter_hostid !== '0' ? [$filter_hostid] : null,
+			'hostids' => ($filter_hostid == 0) ? null : [$filter_hostid],
 			'limit' => $config['search_limit'] + 1
 		]);
 
-		$hosts_cmb_box = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
+		$hosts_combobox = (new CComboBox('filter_hostid', $filter_hostid, 'javascript: submit();'))
 			->addItem(0, _('all'));
 
 		foreach ($hosts as $hostid => $host) {
-			$hosts_cmb_box->addItem($hostid, $host['name']);
+			$hosts_combobox->addItem($hostid, $host['name']);
 		}
 
 		$filter_column
-			->addRow(_('Host group'), $filter_groupid_combo)
-			->addRow(_('Host'), $hosts_cmb_box);
+			->addRow(_('Host group'), $filter_groupid_combobox)
+			->addRow(_('Host'), $hosts_combobox);
 	}
 
 	// Now just prepare needed data.
