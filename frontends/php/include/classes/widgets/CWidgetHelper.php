@@ -1096,15 +1096,8 @@ class CWidgetHelper {
 			$values[] = [];
 		}
 
-		$i = 0;
-
-		foreach ($values as $value) {
-			// Take default values for missing fields. This can happen if particular field is disabled.
-			$value += CWidgetFieldGraphDataSet::getDefaults();
-
+		foreach (array_values($values) as $i => $value) {
 			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
-
-			$i++;
 		}
 
 		// Add 'Add' button under accordion.
