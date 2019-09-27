@@ -105,7 +105,7 @@
 		});
 
 		$('#show_event_menu').change(function() {
-			$('#event_menu_url, #event_menu_name').attr('disabled', !$(this).is(':checked'));
+			$('#event_menu_url, #event_menu_name').attr('readonly', !$(this).is(':checked'));
 			$('[for=event_menu_url], [for=event_menu_name]')
 				.toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
 		});

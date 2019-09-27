@@ -235,7 +235,7 @@ $mediatype_formlist
 			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CTextBox('event_menu_name', $data['event_menu_name'], false, $max_length['event_menu_name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_url_name'
 	)
@@ -243,7 +243,7 @@ $mediatype_formlist
 			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		(new CTextBox('event_menu_url', $data['event_menu_url'], false, $max_length['event_menu_url']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setEnabled($data['save_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+		->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_event_menu_url'
 	)
