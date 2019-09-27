@@ -30,6 +30,13 @@ class CImportDataAdapter {
 	protected $data;
 
 	/**
+	 * Object used for converting older import versions.
+	 *
+	 * @var CConverterChain
+	 */
+	protected $converterChain;
+
+	/**
 	 * Current import version.
 	 *
 	 * @var string
@@ -37,11 +44,26 @@ class CImportDataAdapter {
 	protected $currentVersion;
 
 	/**
+	 * @param string            $currentVersion     current import version
+	 * @param CConverterChain   $converterChain     object used for converting older import versions
+	 */
+	public function __construct($currentVersion, CConverterChain $converterChain) {
+		$this->currentVersion = $currentVersion;
+		$this->converterChain = $converterChain;
+	}
+
+	/**
 	 * Set the data and initialize the adapter.
 	 *
 	 * @param array $data   import data
 	 */
 	public function load(array $data) {
+		$version = $data['zabbix_export']['version'];
+
+		if ($this->currentVersion != $version) {
+			$data = $this->converterChain->convert($data, $version);
+		}
+
 		$this->data = $data['zabbix_export'];
 	}
 
@@ -94,6 +116,16 @@ class CImportDataAdapter {
 						}
 
 						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
+					}
+				}
+
+				if (array_key_exists('inventory', $host)) {
+					if (array_key_exists('inventory_mode', $host['inventory'])) {
+						$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+						unset($host['inventory']['inventory_mode']);
+					}
+					else {
+						$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
 					}
 				}
 

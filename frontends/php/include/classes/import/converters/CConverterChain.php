@@ -20,43 +20,47 @@
 
 
 /**
- * Convert net.tcp.service to net.udp.service
+ * An object that can perform a sequential conversion using an array of conversions.
  */
-class C20ItemKeyConverter extends CConverter {
+class CConverterChain  {
 
 	/**
-	 * Item key parser.
+	 * Converters to use.
 	 *
-	 * @var CItemKey
+	 * @var CConverter[]
 	 */
-	protected $item_key_parser;
+	protected $converters = [];
 
-	public function __construct() {
-		$this->item_key_parser = new CItemKey();
+	/**
+	 * Convert the data starting from the converter given in $startFrom.
+	 *
+	 * @param mixed     $data
+	 * @param string    $startFrom
+	 *
+	 * @return mixed
+	 */
+	public function convert($data, $startFrom) {
+		$convert = false;
+		foreach ($this->converters as $key => $converter) {
+			if ($key === $startFrom) {
+				$convert = true;
+			}
+
+			if ($convert) {
+				$data = $converter->convert($data);
+			}
+		}
+
+		return $data;
 	}
 
 	/**
-	 * Convert item key
+	 * Add a new converter to the chain.
 	 *
-	 * @param string	$value	item key
-	 *
-	 * @return string			converted item key
+	 * @param string $name
+	 * @param CConverter $converter
 	 */
-	public function convert($value) {
-		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {
-			return $value;
-		}
-
-		if ($this->item_key_parser->getKey() !== 'net.tcp.service'
-				&& $this->item_key_parser->getKey() !== 'net.tcp.service.perf') {
-			return $value;
-		}
-
-		if ($this->item_key_parser->getParamsNum() == 0 || $this->item_key_parser->getParam(0) !== 'ntp') {
-			return $value;
-		}
-
-		return substr_replace($value, 'udp', 4, 3);
+	public function addConverter($name, CConverter $converter) {
+		$this->converters[$name] = $converter;
 	}
-
 }

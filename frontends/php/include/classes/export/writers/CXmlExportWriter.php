@@ -133,8 +133,7 @@ class CXmlExportWriter extends CExportWriter {
 			'shapes' => 'shape',
 			'lines' => 'line',
 			'headers' => 'header',
-			'lld_macro_paths' => 'lld_macro_path',
-			'tls_accept' => 'option'
+			'lld_macro_paths' => 'lld_macro_path'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

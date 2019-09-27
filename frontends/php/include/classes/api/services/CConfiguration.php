@@ -144,37 +144,20 @@ class CConfiguration extends CApiService {
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$data = $importReader->read($params['source']);
 
-		$importValidatorFactory = new CImportValidatorFactory($params['format']);
+		$data = (new CXmlValidator())->validate($data, $params['format']);
+
 		$importConverterFactory = new CImportConverterFactory();
 
-		$data = (new CXmlValidator)->validate($data, $params['format']);
+		$converterChain = new CConverterChain();
+		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
+		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
+		$converterChain->addConverter('3.0', $importConverterFactory->getObject('3.0'));
+		$converterChain->addConverter('3.2', $importConverterFactory->getObject('3.2'));
+		$converterChain->addConverter('3.4', $importConverterFactory->getObject('3.4'));
+		$converterChain->addConverter('4.0', $importConverterFactory->getObject('4.0'));
+		$converterChain->addConverter('4.2', $importConverterFactory->getObject('4.2'));
 
-		foreach (['1.0', '2.0', '3.0', '3.2', '3.4', '4.0', '4.2'] as $version) {
-			if ($data['zabbix_export']['version'] !== $version) {
-				continue;
-			}
-
-			$data = $importConverterFactory
-				->getObject($version)
-				->convert($data);
-			$data = (new CXmlValidator)->validate($data, $params['format']);
-		}
-
-		// Get schema for converters.
-		$schema = $importValidatorFactory
-			->getObject(ZABBIX_EXPORT_VERSION)
-			->getSchema();
-
-		// Convert human readable import constants to values Zabbix API can work with.
-		$data = (new CConstantImportConverter($schema))->convert($data);
-
-		// Add default values in place of missed tags.
-		$data = (new CDefaultValuesImportConverter($schema))->convert($data);
-
-		// Normalize array keys.
-		$data = (new CArrayKeysImportConverter($schema))->convert($data);
-
-		$adapter = new CImportDataAdapter();
+		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($data);
 
 		$configurationImport = new CConfigurationImport(

@@ -140,33 +140,36 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			$schema = (new CImportValidatorFactory('xml'))
-				->getObject(ZABBIX_EXPORT_VERSION)
-				->getSchema();
-
 			$simple_triggers = [];
-			if ($this->data['triggers']) {
-				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers']);
-			}
 
 			if ($this->data['groups']) {
-				$this->builder->buildGroups($schema['rules']['groups'], $this->data['groups']);
+				$this->builder->buildGroups($this->data['groups']);
+			}
+
+			if ($this->data['triggers']) {
+				foreach ($this->data['triggers'] as $triggerid => $trigger) {
+					if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+							&& $trigger['items'][0]['templateid'] == 0) {
+						$simple_triggers[] = $trigger;
+						unset($this->data['triggers'][$triggerid]);
+					}
+				}
 			}
 
 			if ($this->data['templates']) {
-				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'], $simple_triggers);
+				$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
 			}
 
 			if ($this->data['hosts']) {
-				$this->builder->buildHosts($schema['rules']['hosts'], $this->data['hosts'], $simple_triggers);
+				$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
 			}
 
 			if ($this->data['triggers']) {
-				$this->builder->buildTriggers($schema['rules']['triggers'], $this->data['triggers']);
+				$this->builder->buildTriggers($this->data['triggers']);
 			}
 
 			if ($this->data['graphs']) {
-				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
+				$this->builder->buildGraphs($this->data['graphs']);
 			}
 
 			if ($this->data['screens']) {
@@ -182,7 +185,7 @@ class CConfigurationExport {
 			}
 
 			if ($this->data['valueMaps']) {
-				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
+				$this->builder->buildValueMaps($this->data['valueMaps']);
 			}
 
 			return $this->writer->write($this->builder->getExport());
@@ -557,7 +560,7 @@ class CConfigurationExport {
 		]);
 
 		$itemids = [];
-		foreach ($hosts as $host_data) {
+		foreach ($hosts as $hostid => $host_data) {
 			foreach ($host_data['items'] as $item) {
 				$itemids[$item['itemid']] = $item['key_'];
 			}
