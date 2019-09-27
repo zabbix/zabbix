@@ -668,7 +668,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	// urls
 	if ('urls' in options) {
 		sections[sections.length] = {
-			label: t('URLS'),
+			label: t('Links'),
 			items: options.urls.map(function(url) {
 				return {
 					url: url.url,

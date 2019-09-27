@@ -2678,14 +2678,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Return associative array of mediatypes urls with resolved {EVENT.TAG} macro in form
 	 * ['mediatypeid' => .. 'eventid' => .. 'url' => .. 'name' => ..] where key will be 'mediatypeid' value.
 	 *
-	 * @param array  $events_tags                      Array of event tags.
-	 * @param int    $events_tags[]['eventid']         Event tag eventid.
-	 * @param string $events_tags[]['tag']             Event tag tag field value.
-	 * @param string $events_tags[]['value']           Event tag value field value.
-	 * @param array  $mediatype_urls                   Array of mediatype urls.
-	 * @param int    $mediatype_urls[]['mediatypeid']  Media type mediatypeid.
-	 * @param string $mediatype_urls[]['url']          Media type url field value.
-	 * @param string $mediatype_urls[]['url_name']     Media type url_name field value.
+	 * @param array  $events_tags                          Array of event tags.
+	 * @param int    $events_tags[]['eventid']             Event tag eventid.
+	 * @param string $events_tags[]['tag']                 Event tag tag field value.
+	 * @param string $events_tags[]['value']               Event tag value field value.
+	 * @param array  $mediatype_urls                       Array of mediatype urls.
+	 * @param int    $mediatype_urls[]['mediatypeid']      Media type mediatypeid.
+	 * @param string $mediatype_urls[]['event_menu_url']   Media type url field value.
+	 * @param string $mediatype_urls[]['event_menu_name']  Media type url_name field value.
 	 * @return array
 	 */
 	public function resolveMediaTypeUrls(array $events_tags, array $mediatypes_urls) {
@@ -2695,7 +2695,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$pos_match = [];
 		$tags = [];
 		$mediatypes_urls = array_filter($mediatypes_urls, function ($url) {
-			return $url['url'] !== '' && $url['url_name'] !== '';
+			return $url['event_menu_url'] !== '' && $url['event_menu_name'] !== '';
 		});
 
 		if (!$mediatypes_urls) {
@@ -2707,7 +2707,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($mediatypes_urls as $url) {
-			foreach (['url', 'url_name'] as $field) {
+			foreach (['event_menu_url', 'event_menu_name'] as $field) {
 				if (array_key_exists($url[$field], $pos_match)) {
 					continue;
 				}
@@ -2741,8 +2741,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$url = [
 					'mediatypeid' => $mediatype_url['mediatypeid'],
 					'eventid' => $eventid,
-					'url' => $mediatype_url['url'],
-					'name' => $mediatype_url['url_name']
+					'url' => $mediatype_url['event_menu_url'],
+					'name' => $mediatype_url['event_menu_name']
 				];
 
 				$diff_url = array_key_exists($url['url'], $match_tag)

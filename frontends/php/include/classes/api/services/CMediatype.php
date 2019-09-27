@@ -472,7 +472,8 @@ class CMediatype extends CApiService {
 		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'name', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name'
+				'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+				'event_menu_name'
 			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
@@ -693,10 +694,14 @@ class CMediatype extends CApiService {
 				case MEDIA_TYPE_WEBHOOK:
 					$validated_data += [
 						'script' => $db_mediatype['script'],
-						'save_tags' => $db_mediatype['save_tags'],
+						'show_event_menu' => $db_mediatype['show_event_menu'],
 						'parameters' => []
 					];
 					$params = [];
+
+					if ($validated_data['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+						unset($validated_data['event_menu_url'], $validated_data['event_menu_name']);
+					}
 
 					foreach ($validated_data['parameters'] as $index => $param) {
 						if (array_key_exists($param['name'], $params)) {
@@ -831,9 +836,10 @@ class CMediatype extends CApiService {
 	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
 	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['save_tags']            Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
+	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
 	 * @param string    $mediatypes['description']          Media type description.
 	 *
 	 * @return array
@@ -896,9 +902,10 @@ class CMediatype extends CApiService {
 	 * @param array     $mediatypes['parameters']           Array of webhook parameters arrays
 	 *                                                      ['name' => .. 'value' => .. ]
 	 * @param string    $mediatypes['timeout']              Webhook javascript HTTP request timeout.
-	 * @param string    $mediatypes['save_tags']            Webhook HTTP response should be saved as tags.
-	 * @param string    $mediatypes['url']                  Webhook additional info in frontend, supports received tags.
-	 * @param string    $mediatypes['url_name']	            Webhook 'url' visual name.
+	 * @param string    $mediatypes['process_tags']         Webhook HTTP response should be saved as tags.
+	 * @param string    $mediatypes['show_event_menu']      Indicates presence of entry in event.get "urls" objects list.
+	 * @param string    $mediatypes['event_menu_url']       Webhook additional info in frontend, supports received tags.
+	 * @param string    $mediatypes['event_menu_name']	    Webhook 'url' visual name.
 	 * @param string    $mediatypes['description']          Media type description.
 	 *
 	 * @return array
@@ -915,8 +922,8 @@ class CMediatype extends CApiService {
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
-				'attempt_interval', 'content_type', 'script', 'timeout', 'save_tags', 'url', 'url_name',
-				'description'
+				'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
+				'event_menu_url', 'event_menu_name', 'description'
 			],
 			'filter' => ['mediatypeid' => zbx_objectValues($mediatypes, 'mediatypeid')],
 			'preservekeys' => true
@@ -934,7 +941,7 @@ class CMediatype extends CApiService {
 				'gsm_modem'
 			],
 			MEDIA_TYPE_WEBHOOK => [
-				'script', 'timeout', 'save_tags', 'url', 'url_name', 'parameters'
+				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'parameters'
 			]
 		];
 		$default_values['parameters'] = [];
@@ -946,14 +953,6 @@ class CMediatype extends CApiService {
 			unset($mediatype['mediatypeid']);
 
 			if ($type == MEDIA_TYPE_WEBHOOK) {
-				if (array_key_exists('save_tags', $mediatype)
-						&& $mediatype['save_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
-					$mediatype = [
-						'url' => $default_values['url'],
-						'url_name' => $default_values['url_name'],
-					] + $mediatype;
-				}
-
 				if (array_key_exists('parameters', $mediatype)) {
 					$params = [];
 
@@ -1179,18 +1178,22 @@ class CMediatype extends CApiService {
 					'length' => DB::getFieldLength('media_type', 'timeout'),
 					'in' => '1:60'
 				],
-				'save_tags' => [
+				'process_tags' => [
 					'type' => API_INT32,
-					'in' => implode(',', [MEDIA_TYPE_TAGS_DISABLED, MEDIA_TYPE_TAGS_ENABLED])
+					'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])
 				],
-				'url' => [
+				'show_event_menu' => [
+					'type' => API_INT32,
+					'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])
+				],
+				'event_menu_url' => [
 					// Should be checked as string not as url because it can contain maros tags.
 					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url')
+					'length' => DB::getFieldLength('media_type', 'event_menu_url')
 				],
-				'url_name' => [
+				'event_menu_name' => [
 					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'url_name')
+					'length' => DB::getFieldLength('media_type', 'event_menu_name')
 				],
 				'parameters' => [
 					'type' => API_OBJECTS,

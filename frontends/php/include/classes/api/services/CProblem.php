@@ -519,10 +519,11 @@ class CProblem extends CApiService {
 		// Resolve webhook urls.
 		if ($options['output'] !== API_OUTPUT_EXTEND && $this->outputIsRequested('urls', $options['output'])) {
 			$mediatype_urls = API::getApiService()->select('media_type', [
-				'output' => ['url', 'url_name', 'mediatypeid'],
+				'output' => ['event_menu_url', 'event_menu_name', 'mediatypeid'],
 				'filter' => [
 					'type' => MEDIA_TYPE_WEBHOOK,
-					'status' => MEDIA_TYPE_STATUS_ACTIVE
+					'status' => MEDIA_TYPE_STATUS_ACTIVE,
+					'show_event_menu' => ZBX_EVENT_MENU_SHOW
 				],
 				'preservekeys' => true
 			]);
