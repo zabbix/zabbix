@@ -1755,6 +1755,7 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
  *             num_max   - [IN] current maximum number of fields              *
  *             field_esc - [OUT] pointer to quoted field                      *
  *             header    - [IN] header line                                   *
+ *             output_sz - [IN/OUT] predicted size of JSON array              *
  *             errmsg    - [OUT] error message                                *
  *                                                                            *
  * Return value: SUCCEED - the field was added successfully                   *
@@ -1762,13 +1763,20 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
  *                                                                            *
  ******************************************************************************/
 static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***names, char **field, char *end,
-		unsigned int num, unsigned int num_max, char **field_esc, unsigned int header, char **errmsg)
+		unsigned int num, unsigned int num_max, char **field_esc, unsigned int header, size_t *output_sz,
+		char **errmsg)
 {
 	char	**fld_names = *names;
+	size_t	fld_sz;
 	int	ret = SUCCEED;
 
-	if ('\0' != *end)
+	if (NULL != *field)
+	{
 		*end = '\0';
+		fld_sz = strlen(*field);
+	}
+	else
+		fld_sz = 0;
 
 	if (0 == num_max || (0 == header && num >= num_max))
 	{
@@ -1804,7 +1812,21 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 	if (0 == header || 0 < num_max)
 	{
 		if (0 == num)
+		{
 			zbx_json_addobject(json, NULL);
+			*output_sz += 5;	/* adding size of "":"" */
+		}
+		else
+			*output_sz += 6;	/* adding size of "":"", */
+
+		*output_sz += fld_sz + strlen(fld_names[num]);
+
+		if (ZBX_MAX_RECV_DATA_SIZE < *output_sz)
+		{
+			*errmsg = zbx_strdup(*errmsg, "input data is too large");
+			ret = FAIL;
+			goto out;
+		}
 
 		zbx_json_addstring(json, fld_names[num], (*field != NULL ? *field : ""), ZBX_JSON_TYPE_STRING);
 	}
@@ -1838,9 +1860,9 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 	unsigned int	fld_num = 0, fld_num_max = 0, hdr_line, state = CSV_STATE_DELIM;
 	char		delim = ',', quote = '\0', *field = NULL, *field_esc = NULL, **field_names = NULL, *data,
-			*value_out = NULL, *err = NULL, empty[] = "";
+			*value_out = NULL, *err = NULL;
 	struct zbx_json	json;
-	size_t		data_len;
+	size_t		data_len, output_sz = 2;
 	int		ret = SUCCEED;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -1913,36 +1935,33 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 			if ('\n' == *data || '\0' == *data)
 			{
-				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
-						fld_num, fld_num_max, &field_esc, hdr_line, &err)))
-					goto out;
+				output_sz += (0 < fld_num_max ? 3 : 2); /* adding size of {}, or {} */
 
-				fld_num++;
-
-				if (0 < fld_num_max)
+				if (1 == hdr_line || 0 != fld_num)
 				{
-					for (; fld_num < fld_num_max; fld_num++)
+					do
 					{
-						field = empty;
-
 						if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json,
-								&field_names, &field, empty + 1, fld_num, fld_num_max,
-								&field_esc, hdr_line, &err)))
+								&field_names, &field, data, fld_num, fld_num_max,
+								&field_esc, hdr_line, &output_sz, &err)))
 							goto out;
-					}
+					} while (++fld_num < fld_num_max && 1 == hdr_line);
+
+					if (fld_num > fld_num_max)
+						fld_num_max = fld_num;
+
+					fld_num = 0;
 				}
+				else
+					zbx_json_addobject(&json, NULL);
 
-				if (fld_num > fld_num_max)
-					fld_num_max = fld_num;
-
-				fld_num = 0;
 				zbx_json_close(&json);
 				state = CSV_STATE_DELIM;
 			}
 			else if (delim == *data)
 			{
 				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
-						fld_num, fld_num_max, &field_esc, hdr_line, &err)))
+						fld_num, fld_num_max, &field_esc, hdr_line, &output_sz, &err)))
 					goto out;
 
 				fld_num++;
