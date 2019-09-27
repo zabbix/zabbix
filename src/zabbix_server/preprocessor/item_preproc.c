@@ -1766,7 +1766,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 		unsigned int num, unsigned int num_max, char **field_esc, unsigned int header, size_t *output_sz,
 		size_t **fld_names_sz, char **errmsg)
 {
-	char	**fld_names = *names;
+	char	**fld_names = *names, empty[] = "";
 	size_t	fld_sz;
 	int	ret = SUCCEED;
 
@@ -1776,7 +1776,10 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 		fld_sz = strlen(*field);
 	}
 	else
+	{
+		*field = empty;
 		fld_sz = 0;
+	}
 
 	if (0 == num_max || (0 == header && num >= num_max))
 	{
@@ -1798,7 +1801,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 				}
 			}
 
-			fld_names[num] = zbx_strdup(NULL, (*field != NULL ? *field : ""));
+			fld_names[num] = zbx_strdup(NULL, *field);
 		}
 		else
 			fld_names[num] = zbx_dsprintf(NULL, "%u", num + 1);
@@ -1831,7 +1834,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 			goto out;
 		}
 
-		zbx_json_addstring(json, fld_names[num], (*field != NULL ? *field : ""), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, fld_names[num], *field, ZBX_JSON_TYPE_STRING);
 	}
 
 out:
