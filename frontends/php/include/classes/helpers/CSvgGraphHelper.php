@@ -207,7 +207,7 @@ class CSvgGraphHelper {
 						}
 					}
 				}
-				ksort($metric_points);
+				ksort($metric_points, SORT_NUMERIC);
 
 				switch ($metric['options']['aggregate_function']) {
 					case GRAPH_AGGREGATE_MIN:
