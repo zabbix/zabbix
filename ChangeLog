@@ -1,6 +1,9 @@
 Changes for 4.4.0beta1
 
 New features:
+..F....... [ZBXNEXT-5434] added support of {EVENT.ID} macro in trigger URL (talbergs, vmurzins)
+..F.....S. [ZBXNEXT-5197] increased maximum dependent item count to 9999 (atumilovics)
+...G...... [ZBXNEXT-2946] added new key "wmi.getall" to collect all required wmi properties in a json document (MVekslers)
 ..F....... [ZBX-7341] reworked template linking interface (rlataria)
 ..F.I..... [ZBXNEXT-5330] added new filtering option in "Host availability" widget (rlataria)
 ...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
