@@ -165,7 +165,7 @@ class CSvgGraphHelper {
 					'points' => []
 				]);
 				$metric['options']['aggregate_interval'] =
-					(int)timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+					(int) timeUnitToSeconds($metric['options']['aggregate_interval'], true);
 
 				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
 					$dataset_metrics[$dataset_num] = $metric_num;
