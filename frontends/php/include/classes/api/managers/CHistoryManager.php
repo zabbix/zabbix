@@ -591,7 +591,7 @@ class CHistoryManager {
 							$sql_select[] = 'MIN(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_LAST:
-							$sql_select[] = 'value as value, MAX(clock) AS clock';
+							$sql_select[] = 'MAX(clock) AS clock';
 							break;
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
@@ -611,7 +611,7 @@ class CHistoryManager {
 							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_SUM:
-							$sql_select[] = '(value_avg * num) as value, MAX(clock) AS clock';
+							$sql_select[] = '(value_avg * num) AS value, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
