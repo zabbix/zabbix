@@ -1,6 +1,7 @@
 /.buildpath
 /.project
 /.settings
+/.idea
 Makefile
 Makefile.in
 !/build/win32/**/Makefile

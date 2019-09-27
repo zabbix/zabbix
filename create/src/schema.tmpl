@@ -1223,11 +1223,11 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|alias		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|os		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|alias		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|os		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|os_full	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|os_short	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|os_short	|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|serialno_a	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|serialno_b	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|0
@@ -1688,4 +1688,4 @@ UNIQUE		|1		|tls_psk_identity
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4030032	|4030032
+ROW		|4030036	|4030036

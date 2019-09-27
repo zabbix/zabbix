@@ -37,6 +37,17 @@ $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts = [$field_groupids->getPostJS()];
 
+// Interface type.
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['interface_type']),
+	CWidgetHelper::getCheckBoxList($fields['interface_type'], [
+		INTERFACE_TYPE_AGENT => _('Zabbix agent'),
+		INTERFACE_TYPE_SNMP => _('SNMP'),
+		INTERFACE_TYPE_JMX => _('JMX'),
+		INTERFACE_TYPE_IPMI => _('IPMI')
+	])
+);
+
 // Layout.
 $form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
 

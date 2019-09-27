@@ -1,6 +1,11 @@
 Changes for 4.4.0beta1
 
 New features:
+..F....... [ZBXNEXT-5434] added support of {EVENT.ID} macro in trigger URL (talbergs, vmurzins)
+..F.....S. [ZBXNEXT-5197] increased maximum dependent item count to 9999 (atumilovics)
+...G...... [ZBXNEXT-2946] added new key "wmi.getall" to collect all required wmi properties in a json document (MVekslers)
+..F....... [ZBX-7341] reworked template linking interface (rlataria)
+..F.I..... [ZBXNEXT-5330] added new filtering option in "Host availability" widget (rlataria)
 ...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 ....I..... [ZBXNEXT-5406] updated widgets on default dashboards (vmurzins)
 ..F..J.... [ZBXNEXT-4209] added jmx.get[<discovery mode>,<object name pattern>] key for JMX LLD (atumilovics)
@@ -8,6 +13,8 @@ New features:
 ..F....PS. [ZBXNEXT-4033] added possibility to return multiple columns (and rows) from SQL ODBC (akozlovs)
 
 Bug fixes:
+....I..... [ZBX-16465] fixed Zabbix database schema creation failure on MariaDB (vso)
+..F....... [ZBX-16654] fixed undefined index error in discovered host update form (gcalenko)
 ..F....... [ZBX-16645] fixed suggested selection font weight for new item (vasilijs)
 .......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
 .......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
