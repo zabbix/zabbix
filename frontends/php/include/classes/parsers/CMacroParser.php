@@ -84,6 +84,7 @@ class CMacroParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 		$this->macro = '';
+		$this->reference = null;
 
 		$p = $pos;
 
@@ -135,12 +136,13 @@ class CMacroParser extends CParser {
 
 			case self::REFERENCE_ALPHANUMERIC:
 				$this->reference = '';
+
 				$pattern_quoted = '"(?:\\\\["\\\\]|[^"\\\\])*"';
 				$pattern_unquoted = '[A-Za-z0-9_]+';
 				$pattern = '\.(?P<ref>'.$pattern_quoted.'|'.$pattern_unquoted.')';
 
 				if (preg_match('/^'.$pattern.'/', substr($source, $pos), $matches)) {
-					$this->reference = (isset($matches['ref'][0]) && $matches['ref'][0] === '"')
+					$this->reference = ($matches['ref'][0] === '"')
 						? str_replace(['\\"', '\\\\'], ['"', '\\'], substr($matches['ref'], 1, -1))
 						: $matches['ref'];
 					$p += strlen($matches[0]);
