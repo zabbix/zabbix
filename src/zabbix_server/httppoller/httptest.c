@@ -730,6 +730,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		db_httpstep.name = row[2];
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
+		db_httpstep.required = zbx_strdup(NULL, row[6]);
+		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
+
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 		http_substitute_variables(httptest, &db_httpstep.url);
@@ -767,11 +770,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			goto httpstep_error;
 		}
 
-		db_httpstep.required = zbx_strdup(NULL, row[6]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
-		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
 		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 				&db_httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
