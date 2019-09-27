@@ -1093,7 +1093,7 @@ class CWidgetHelper {
 		$values = $field->getValue();
 
 		if (!$values) {
-			$values[] = [];
+			$values[] = CWidgetFieldGraphDataSet::getDefaults();
 		}
 
 		foreach ($values as $i => $value) {

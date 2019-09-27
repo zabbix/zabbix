@@ -68,7 +68,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	public function setValue($value) {
 		$data_sets = [];
 
-		foreach ((array) $value as &$data_set) {
+		foreach ((array) $value as $data_set) {
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
