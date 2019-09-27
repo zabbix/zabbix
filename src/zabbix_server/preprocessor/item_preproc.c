@@ -1971,7 +1971,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 				fld_num++;
 				state = CSV_STATE_DELIM;
 			}
-			else if ('\0' != quote && quote == *data)
+			else if ('\0' != quote && quote == *data && CSV_STATE_DELIM == state)
 			{
 				state = CSV_STATE_FIELD_QUOTED;
 			}
