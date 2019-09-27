@@ -31,7 +31,7 @@
 				$textarea
 					.on('input keydown paste', function(e) {
 						if (e.which === 13) {
-                            var $submit = $(this).closest('form').find(':submit:visible');
+							var $submit = $(this).closest('form').find(':submit:visible');
 
 							if ($submit.length === 0) {
 								$(this).closest('form').submit();
