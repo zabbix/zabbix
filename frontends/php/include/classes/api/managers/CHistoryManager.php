@@ -408,11 +408,11 @@ class CHistoryManager {
 	 * @param int    $time_from  minimal timestamp (seconds) to get data from
 	 * @param int    $time_to    maximum timestamp (seconds) to get data from
 	 * @param string $function   function for data aggregation
-	 * @param string $interval   graph width in pixels (is not required for pie charts)
+	 * @param string $interval   aggregation interval in seconds
 	 *
 	 * @return array    history value aggregation for graphs
 	 */
-	public function getGraphAggregationByInterval(array $items, $time_from, $time_to, $function, $interval = null) {
+	public function getGraphAggregationByInterval(array $items, $time_from, $time_to, $function, $interval) {
 		$grouped_items = self::getItemsGroupedByStorage($items);
 
 		$results = [];
@@ -481,19 +481,17 @@ class CHistoryManager {
 			'size' => 0
 		];
 
-		$step = timeUnitToSeconds($interval, true);
-
 		// Clock value is divided by 1000 as it is stored as milliseconds.
-		$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.step))';
+		$formula = '((doc[\'clock\'].date.getMillis()/1000) - ((doc[\'clock\'].date.getMillis()/1000)%params.interval))';
 
 		$query['aggs']['group_by_itemid']['aggs'] = [
 			'group_by_script' => [
 				'terms' => [
-					'size' => (($time_to - $time_from) / $step) + 1,
+					'size' => (($time_to - $time_from) / $interval) + 1,
 					'script' => [
 						'inline' => $formula,
 						'params' => [
-							'step' => (int)$step
+							'interval' => $interval
 						]
 					]
 				],
