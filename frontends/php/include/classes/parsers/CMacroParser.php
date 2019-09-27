@@ -35,7 +35,7 @@ class CMacroParser extends CParser {
 	/**
 	 * Reference value.
 	 *
-	 * @var null|int|string
+	 * @var int|string
 	 */
 	private $reference;
 
@@ -84,7 +84,6 @@ class CMacroParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 		$this->macro = '';
-		$this->reference = null;
 
 		$p = $pos;
 
@@ -126,16 +125,16 @@ class CMacroParser extends CParser {
 
 		switch ($this->options['ref_type']) {
 			case self::REFERENCE_NUMERIC:
+				$this->reference = 0;
+
 				if (isset($source[$p]) && $source[$p] >= '1' && $source[$p] <= '9') {
 					$this->reference = (int) $source[$p];
 					$p++;
 				}
-				else {
-					$this->reference = 0;
-				}
 				break;
 
 			case self::REFERENCE_ALPHANUMERIC:
+				$this->reference = '';
 				$pattern_quoted = '"(?:\\\\["\\\\]|[^"\\\\])*"';
 				$pattern_unquoted = '[A-Za-z0-9_]+';
 				$pattern = '\.(?P<ref>'.$pattern_quoted.'|'.$pattern_unquoted.')';
@@ -164,7 +163,7 @@ class CMacroParser extends CParser {
 	/**
 	 * Returns reference value.
 	 *
-	 * @return null|int|string
+	 * @return int|string
 	 */
 	public function getReference() {
 		return $this->reference;
