@@ -564,6 +564,8 @@ zbx_uint32_t	zbx_alerter_serialize_results(unsigned char **data, zbx_am_result_t
 		zbx_am_result_t	*result = results[i];
 
 		zbx_serialize_prepare_value(data_len, result->alertid);
+		zbx_serialize_prepare_value(data_len, result->eventid);
+		zbx_serialize_prepare_value(data_len, result->mediatypeid);
 		zbx_serialize_prepare_value(data_len, result->status);
 		zbx_serialize_prepare_value(data_len, result->retries);
 		zbx_serialize_prepare_str_len(data_len, result->value, value_len);
@@ -576,6 +578,8 @@ zbx_uint32_t	zbx_alerter_serialize_results(unsigned char **data, zbx_am_result_t
 		}
 		ptr = *data + data_offset;
 		ptr += zbx_serialize_value(ptr, result->alertid);
+		ptr += zbx_serialize_value(ptr, result->eventid);
+		ptr += zbx_serialize_value(ptr, result->mediatypeid);
 		ptr += zbx_serialize_value(ptr, result->status);
 		ptr += zbx_serialize_value(ptr, result->retries);
 		ptr += zbx_serialize_str(ptr, result->value, value_len);
@@ -600,6 +604,8 @@ void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t 
 		result = (zbx_am_result_t *)zbx_malloc(NULL, sizeof(zbx_am_result_t));
 
 		data += zbx_deserialize_value(data, &result->alertid);
+		data += zbx_deserialize_value(data, &result->eventid);
+		data += zbx_deserialize_value(data, &result->mediatypeid);
 		data += zbx_deserialize_value(data, &result->status);
 		data += zbx_deserialize_value(data, &result->retries);
 		data += zbx_deserialize_str(data, &result->value, len);

@@ -105,6 +105,8 @@ zbx_am_db_alert_t;
 typedef struct
 {
 	zbx_uint64_t	alertid;
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	mediatypeid;
 	int		retries;
 	int		status;
 	char		*value;

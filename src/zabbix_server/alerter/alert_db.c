@@ -22,7 +22,9 @@
 #include "zbxself.h"
 #include "log.h"
 #include "db.h"
+#include "dbcache.h"
 #include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "alert_manager.h"
 #include "alert_db.h"
 #include "alerter_protocol.h"
@@ -440,6 +442,131 @@ out:
 	return alerts_num;
 }
 
+static int	am_db_compare_tags(const void *d1, const void *d2)
+{
+	zbx_tag_t	*tag1 = *(zbx_tag_t **)d1;
+	zbx_tag_t	*tag2 = *(zbx_tag_t **)d2;
+	int		ret;
+
+	if (0 != (ret = strcmp(tag1->tag, tag2->tag)))
+		return ret;
+
+	return strcmp(tag1->value, tag2->value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: am_db_add_event_tags                                             *
+ *                                                                            *
+ * Purpose: adds event tags to sql query                                      *
+ *                                                                            *
+ * Comments: The event tags are in json object fotmat.*
+ *                                                                            *
+ ******************************************************************************/
+static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *db_problem, zbx_uint64_t eventid,
+		const char *params)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	struct zbx_json_parse	jp;
+	const char		*pnext = NULL;
+	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
+	zbx_vector_ptr_t	tags;
+	zbx_tag_t		*tag, tag_local = {.tag = key, .value = value};
+	int			i, index, problem = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tags:%s", __func__, eventid, params);
+
+	result = DBselect("select e.eventid,e.source,e.value,p.eventid"
+			" from events e left join problem p"
+				" on p.eventid=e.eventid"
+			" where e.eventid=" ZBX_FS_UI64, eventid);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot add event tags: event " ZBX_FS_UI64 " was removed", eventid);
+		goto out;
+	}
+
+	if (EVENT_SOURCE_TRIGGERS != atoi(row[1]) || EVENT_STATUS_PROBLEM != atoi(row[2]))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "tags can be added only for problem trigger events");
+		goto out;
+	}
+
+	if (SUCCEED != DBis_null(row[3]))
+		problem = 1;
+
+	if (FAIL == zbx_json_open(params, &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned event tags: %s", zbx_json_strerror());
+		return;
+	}
+
+	zbx_vector_ptr_create(&tags);
+
+	while (NULL != (pnext = zbx_json_pair_next(&jp, pnext, key, sizeof(key))))
+	{
+		if (NULL == zbx_json_decodevalue(pnext, value, sizeof(value), NULL))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "invalid tag value starting with %s", pnext);
+			continue;
+		}
+
+		zbx_ltrim(key, ZBX_WHITESPACE);
+		zbx_ltrim(value, ZBX_WHITESPACE);
+
+		if (TAG_NAME_LEN < zbx_strlen_utf8(key))
+			key[zbx_strlen_utf8_nchars(key, TAG_NAME_LEN)] = '\0';
+		if (TAG_VALUE_LEN < zbx_strlen_utf8(value))
+			value[zbx_strlen_utf8_nchars(value, TAG_VALUE_LEN)] = '\0';
+
+		zbx_rtrim(key, ZBX_WHITESPACE);
+		zbx_rtrim(value, ZBX_WHITESPACE);
+
+		if (FAIL == zbx_vector_ptr_search(&tags, &tag_local, am_db_compare_tags))
+		{
+			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, key);
+			tag->value = zbx_strdup(NULL, value);
+			zbx_vector_ptr_append(&tags, tag);
+		}
+	}
+
+	/* remove duplicate tags */
+	if (0 != tags.values_num)
+	{
+		DBfree_result(result);
+		result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, eventid);
+		while (NULL != (row = DBfetch(result)))
+		{
+			tag_local.tag = row[0];
+			tag_local.value = row[1];
+
+			if (FAIL != (index = zbx_vector_ptr_search(&tags, &tag_local, am_db_compare_tags)))
+			{
+				zbx_free_tag(tags.values[index]);
+				zbx_vector_ptr_remove_noorder(&tags, index);
+			}
+		}
+	}
+
+	for (i = 0; i < tags.values_num; i++)
+	{
+		tag = (zbx_tag_t *)tags.values[i];
+		zbx_db_insert_add_values(db_event, __UINT64_C(0), eventid, tag->tag, tag->value);
+		if (0 != problem)
+			zbx_db_insert_add_values(db_problem, __UINT64_C(0), eventid, tag->tag, tag->value);
+	}
+
+	zbx_vector_ptr_clear_ext(&tags, (zbx_clean_func_t)zbx_free_tag);
+	zbx_vector_ptr_destroy(&tags);
+out:
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: am_db_flush_results                                              *
@@ -456,6 +583,8 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 	zbx_am_result_t		**results;
 	int			results_num;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_RESULTS, NULL, 0);
 	if (SUCCEED != zbx_ipc_socket_read(&amdb->am, &message))
 	{
@@ -467,18 +596,22 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 	if (0 != results_num)
 	{
-		int 	i;
-		char	*sql;
-		size_t	sql_alloc = results_num * 128, sql_offset = 0;
+		int 		i;
+		char		*sql;
+		size_t		sql_alloc = results_num * 128, sql_offset = 0;
+		zbx_db_insert_t	db_event, db_problem;
 
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		DBbegin();
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
 
 		for (i = 0; i < results_num; i++)
 		{
-			zbx_am_result_t	*result = results[i];
+			zbx_am_db_mediatype_t	*mediatype;
+			zbx_am_result_t		*result = results[i];
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update alerts set status=%d,retries=%d", result->status, result->retries);
@@ -491,6 +624,13 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			}
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
 					result->alertid);
+
+			if (NULL != (mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid)) &&
+					0 != mediatype->save_tags && NULL != result->value)
+			{
+				am_db_update_event_tags(&db_event, &db_problem, result->eventid, result->value);
+			}
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			zbx_free(result->value);
@@ -502,12 +642,22 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 		if (16 < sql_offset)
 			DBexecute("%s", sql);
 
+		zbx_db_insert_autoincrement(&db_event, "eventtagid");
+		zbx_db_insert_execute(&db_event);
+		zbx_db_insert_clean(&db_event);
+
+		zbx_db_insert_autoincrement(&db_problem, "problemtagid");
+		zbx_db_insert_execute(&db_problem);
+		zbx_db_insert_clean(&db_problem);
+
 		DBcommit();
 		zbx_free(sql);
 	}
 
 	zbx_free(results);
 	zbx_ipc_message_clean(&message);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() flushed:%d", __func__, results_num);
 
 	return results_num;
 }
@@ -526,6 +676,9 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 	zbx_am_db_mediatype_t	*mediatype;
 	time_t			now;
 	zbx_vector_uint64_t	dropids;
+	int			num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&dropids);
 	now = time(NULL);
@@ -550,7 +703,10 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 		zbx_free(data);
 	}
 
+	num = dropids.values_num;
 	zbx_vector_uint64_destroy(&dropids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, num);
 }
 
 /******************************************************************************
@@ -572,7 +728,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	zbx_vector_ptr_t	medias, mediatypes;
 	unsigned char		*data;
 	zbx_uint32_t		data_len;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
