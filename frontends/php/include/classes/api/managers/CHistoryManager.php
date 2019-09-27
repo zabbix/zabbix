@@ -625,10 +625,8 @@ class CHistoryManager {
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 				}
 
-				$step = timeUnitToSeconds($interval, true);
-
 				// Required for 'group by' support of Oracle.
-				$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $step);
+				$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $interval);
 				$sql_select[] = $calc_field.' AS tick';
 				$sql_group_by[] = $calc_field;
 
