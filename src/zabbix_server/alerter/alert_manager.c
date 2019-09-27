@@ -1472,7 +1472,6 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 					mediatype->gsm_modem);
 			break;
 		case MEDIA_TYPE_EXEC:
-			zabbix_log(LOG_LEVEL_DEBUG, "[WDN] exec");
 			command = ZBX_IPC_ALERTER_EXEC;
 			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
 			{
