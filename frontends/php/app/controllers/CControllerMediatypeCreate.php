@@ -41,9 +41,10 @@ class CControllerMediatypeCreate extends CController {
 			'webhook_params' =>			'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
-			'receive_tags' =>			'in '.MEDIA_TYPE_TAGS_DISABLED.','.MEDIA_TYPE_TAGS_ENABLED,
-			'url' =>					'db media_type.url',
-			'url_name' =>				'db media_type.url_name',
+			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
+			'show_event_menu' =>		'in '.ZBX_EVENT_MENU_HIDE.','.ZBX_EVENT_MENU_SHOW,
+			'event_menu_url' =>			'db media_type.event_menu_url',
+			'event_menu_name' =>		'db media_type.event_menu_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
@@ -126,8 +127,11 @@ class CControllerMediatypeCreate extends CController {
 				break;
 
 			case MEDIA_TYPE_WEBHOOK:
-				$mediatype['save_tags'] = MEDIA_TYPE_TAGS_DISABLED;
-				$this->getInputs($mediatype, ['script', 'timeout', 'save_tags', 'url', 'url_name']);
+				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
+				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
+				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+					'event_menu_name'
+				]);
 				$params = $this->getInput('webhook_params', []);
 
 				if (array_key_exists('name', $params) && array_key_exists('value', $params)) {
@@ -139,8 +143,8 @@ class CControllerMediatypeCreate extends CController {
 					);
 				}
 
-				if ($mediatype['save_tags'] == MEDIA_TYPE_TAGS_DISABLED) {
-					unset($mediatype['url'], $mediatype['url_name']);
+				if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+					unset($mediatype['event_menu_url'], $mediatype['event_menu_name']);
 				}
 				break;
 		}

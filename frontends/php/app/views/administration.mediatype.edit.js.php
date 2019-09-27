@@ -18,10 +18,11 @@
 
 			$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #passwd, #smtp_verify_peer, ' +
 					'#smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_path, ' +
-					'#exec_params_table, #content_type, #row_webhook_params, #row_webhook_webhook, ' +
-					'#row_webhook_timeout, #row_webhook_tags, #row_webhook_url, #row_webhook_url_name')
+					'#exec_params_table, #content_type')
 				.closest('li')
 				.hide();
+
+			$('li[id^="row_webhook"]').hide();
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
@@ -47,8 +48,7 @@
 					break;
 
 				case '<?= MEDIA_TYPE_WEBHOOK ?>':
-					$('#row_webhook_params, #row_webhook_webhook, #row_webhook_timeout, #row_webhook_tags, ' +
-						'#row_webhook_url, #row_webhook_url_name').show();
+					$('li[id^="row_webhook_"]').show();
 					setMaxSessionsType(media_type);
 
 					break;
@@ -104,12 +104,13 @@
 			toggleAuthenticationOptions();
 		});
 
-		$('#save_tags').change(function() {
-			$('#url, #url_name').attr('disabled', !$(this).is(':checked'));
-			$('[for=url], [for=url_name]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
+		$('#show_event_menu').change(function() {
+			$('#event_menu_url, #event_menu_name').attr('disabled', !$(this).is(':checked'));
+			$('[for=event_menu_url], [for=event_menu_name]')
+				.toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
 		});
 
-		$('#web_params_table').dynamicRows({ template: '#webhook_params_row' });
+		$('#webhook_params_table').dynamicRows({ template: '#webhook_params_row' });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.

@@ -142,7 +142,7 @@ else {
 $max_length = $data['max_length'];
 
 $web_params_table = (new CTable())
-	->setId('web_params_table')
+	->setId('webhook_params_table')
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
@@ -198,13 +198,13 @@ $mediatype_formlist
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
 	)
-	->addRow(new CLabel(_('Webhook parameters'), 'row_webhook_params'),
+	->addRow(new CLabel(_('Webhook parameters'), $web_params_table->getId()),
 		(new CDiv($web_params_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row_webhook_params'
 	)
-	->addRow((new CLabel(_('Webhook script'), 'row_webhook_webhook'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Webhook script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['script'], [
 			'title' => _('JavaScript'),
 			'placeholder' => _('script'),
@@ -215,30 +215,37 @@ $mediatype_formlist
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
-		'row_webhook_webhook'
+		'row_webhook_script'
 	)
-	->addRow(new CLabel(_('Timeout'), 'row_webhook_timeout'),
+	->addRow(new CLabel(_('Timeout'), 'timeout'),
 		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_webhook_timeout'
 	)
-	->addRow(new CLabel(_('Save tags'), 'row_webhook_tags'),
-		(new CCheckBox('save_tags', MEDIA_TYPE_TAGS_ENABLED))
-			->setChecked($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
+	->addRow(new CLabel(_('Process tags'), 'process_tags'),
+		(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
+			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED),
 		'row_webhook_tags'
 	)
-	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
-		(new CTextBox('url', $data['url'], false, $max_length['url']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setEnabled($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED)
-			->setAriaRequired(),
-		'row_webhook_url'
+	->addRow(new CLabel(_('Include event menu entry'), 'show_event_menu'),
+		(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
+			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+		'row_webhook_show_event_menu'
 	)
-	->addRow((new CLabel(_('URL name'), 'url_name'))->setAsteriskMark($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED),
-		(new CTextBox('url_name', $data['url_name'], false, $max_length['url_name']))
+	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+		(new CTextBox('event_menu_name', $data['event_menu_name'], false, $max_length['event_menu_name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setEnabled($data['save_tags'] == MEDIA_TYPE_TAGS_ENABLED)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_url_name'
+	)
+	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))
+			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+		(new CTextBox('event_menu_url', $data['event_menu_url'], false, $max_length['event_menu_url']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setEnabled($data['save_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+			->setAriaRequired(),
+		'row_webhook_event_menu_url'
 	)
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
