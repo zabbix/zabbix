@@ -516,7 +516,7 @@ out:
  *             timeout - [IN] the script execution timeout in seconds         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_set_timeout(zbx_es_t *es, int timeout)
+void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
 {
 	es->env->timeout = timeout;
 }
