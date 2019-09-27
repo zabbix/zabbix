@@ -181,27 +181,6 @@ in:
 out:
   offset: 0
 ---
-test case: Decode fail '1.0bad'
-in:
-  data: '1.0bad'
-  size: 1024
-out:
-  offset: 0
----
-test case: Decode fail '+1'
-in:
-  data: '+1'
-  size: 1024
-out:
-  offset: 0
----
-test case: Decode fail '1.2.3'
-in:
-  data: '1.2.3'
-  size: 1024
-out:
-  offset: 0
----
 test case: Decode success '1'
 in:
   data: '1'

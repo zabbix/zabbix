@@ -184,29 +184,6 @@ static int	json_parse_array(const char *start, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: json_is_valid_number_ending                                      *
- *                                                                            *
- * Purpose: Checks if specified character is valid JSON number value ending   *
- *          Valid number endings: zero: "123"                                 *
- *                                comma: "[123,456]"                          *
- *                                whitespace or newline: "[123 ]"             *
- *                                closing brackets: "[123]" or "{"id":123}"   *
- *                                                                            *
- * Parameters: c - [IN] the JSON number value ending character                *
- *                                                                            *
- * Return value: 1 - specified character is valid number ending.              *
- *               0 - otherwise                                                *
- *                                                                            *
- * Author: Andrejs Tumilovics                                                 *
- *                                                                            *
- ******************************************************************************/
-static int json_is_valid_number_ending(char c)
-{
-	return ('\0' == c || ',' == c || 0 != isspace(c) || ']' == c || '}' == c);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: json_parse_number                                                *
  *                                                                            *
  * Purpose: Parses JSON number value                                          *
@@ -232,12 +209,12 @@ static int	json_parse_number(const char *start, char **error)
 
 	first_digit = *ptr;
 
-	while (0 == json_is_valid_number_ending(*ptr))
+	while ('\0' != *ptr)
 	{
 		if ('.' == *ptr)
 		{
 			if (0 != point)
-				return json_error("invalid numeric value format", start, error);/* 1.2.3 */
+				break;
 			point = 1;
 		}
 		else if (0 == isdigit((unsigned char)*ptr))
@@ -258,27 +235,24 @@ static int	json_parse_number(const char *start, char **error)
 
 	if ('e' == *ptr || 'E' == *ptr)
 	{
-		if (0 != json_is_valid_number_ending(*(++ptr)))
+		if ('\0' == *(++ptr))
 			return json_error("unexpected end of numeric value", NULL, error);
 
 		if ('+' == *ptr || '-' == *ptr)
 		{
-			if (0 != json_is_valid_number_ending(*(++ptr)))
+			if ('\0' == *(++ptr))
 				return json_error("unexpected end of numeric value", NULL, error);
 		}
 
 		if (0 == isdigit((unsigned char)*ptr))
 			return json_error("invalid power value of number in E notation", ptr, error);
 
-		while (0 == json_is_valid_number_ending(*(++ptr)))
+		while ('\0' != *(++ptr))
 		{
 			if (0 == isdigit((unsigned char)*ptr))
 				break;
 		}
 	}
-
-	if ( 0 == json_is_valid_number_ending(*ptr) )
-		return json_error("invalid numeric value format", start, error);
 
 	return (int)(ptr - start);
 }
