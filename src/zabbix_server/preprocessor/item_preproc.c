@@ -1764,7 +1764,7 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
  ******************************************************************************/
 static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***names, char **field, char *end,
 		unsigned int num, unsigned int num_max, char **field_esc, unsigned int header, size_t *output_sz,
-		char **errmsg)
+		size_t **fld_names_sz, char **errmsg)
 {
 	char	**fld_names = *names;
 	size_t	fld_sz;
@@ -1781,6 +1781,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 	if (0 == num_max || (0 == header && num >= num_max))
 	{
 		fld_names = zbx_realloc(fld_names, (num + 1) * sizeof(char*));
+		*fld_names_sz = zbx_realloc(*fld_names_sz, (num + 1) * sizeof(size_t));
 		*names = fld_names;
 
 		if (1 == header)
@@ -1801,6 +1802,8 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 		}
 		else
 			fld_names[num] = zbx_dsprintf(NULL, "%u", num + 1);
+
+		*(*fld_names_sz + num) = strlen(fld_names[num]);
 	}
 	else if (0 < num_max && num >= num_max && 1 == header)
 	{
@@ -1819,7 +1822,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 		else
 			*output_sz += 6;	/* adding size of "":"", */
 
-		*output_sz += fld_sz + strlen(fld_names[num]);
+		*output_sz += fld_sz + *(*fld_names_sz + num);
 
 		if (ZBX_MAX_RECV_DATA_SIZE < *output_sz)
 		{
@@ -1862,7 +1865,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	char		delim = ',', quote = '\0', *field = NULL, *field_esc = NULL, **field_names = NULL, *data,
 			*value_out = NULL, *err = NULL;
 	struct zbx_json	json;
-	size_t		data_len, output_sz = 2;
+	size_t		data_len, output_sz = 2, *fld_names_sz = NULL;
 	int		ret = SUCCEED;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -1943,7 +1946,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 					{
 						if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json,
 								&field_names, &field, data, fld_num, fld_num_max,
-								&field_esc, hdr_line, &output_sz, &err)))
+								&field_esc, hdr_line, &output_sz, &fld_names_sz, &err)))
 							goto out;
 					} while (++fld_num < fld_num_max && 1 == hdr_line);
 
@@ -1961,7 +1964,8 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 			else if (delim == *data)
 			{
 				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json, &field_names, &field, data,
-						fld_num, fld_num_max, &field_esc, hdr_line, &output_sz, &err)))
+						fld_num, fld_num_max, &field_esc, hdr_line, &output_sz, &fld_names_sz,
+						&err)))
 					goto out;
 
 				fld_num++;
@@ -2034,12 +2038,15 @@ out:
 		zbx_free(err);
 	}
 	else
+	{
 		value_out = zbx_strdup(NULL, json.buffer);
+		zbx_variant_clear(value);
+		zbx_variant_set_str(value, value_out);
+	}
 
 	zbx_json_free(&json);
 	zbx_free(field_names);
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
+	zbx_free(fld_names_sz);
 
 	return ret;
 #undef CSV_STATE_FIELD
