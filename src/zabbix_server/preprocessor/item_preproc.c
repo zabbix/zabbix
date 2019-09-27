@@ -1943,7 +1943,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 			{
 				output_sz += (0 < fld_num_max ? 3 : 2); /* adding size of {}, or {} */
 
-				if (1 == hdr_line || 0 != fld_num)
+				if (CSV_STATE_FIELD == state || 1 == hdr_line || 0 != fld_num)
 				{
 					do
 					{
