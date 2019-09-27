@@ -34,21 +34,19 @@ class CTextAreaFlexible extends CTextArea {
 		'add_post_js' => true,
 		'maxlength' => 255,
 		'readonly' => false,
-		'submit' => false,
 		'rows' => 1
 	];
 
 	/**
 	 * CTextAreaFlexible constructor.
 	 *
-	 * @param string       $name
-	 * @param string       $value                   (optional)
-	 * @param array        $options                 (optional)
-	 * @param bool         $options['add_post_js']  (optional)
-	 * @param int          $options['maxlength']    (optional)
-	 * @param bool         $options['readonly']     (optional)
-	 * @param bool|string  $options['submit']       (optional)  false | 'form' | button id
-	 * @param int          $options['rows']         (optional)
+	 * @param string $name
+	 * @param string $value                   (optional)
+	 * @param array  $options                 (optional)
+	 * @param bool   $options['add_post_js']  (optional)
+	 * @param int    $options['maxlength']    (optional)
+	 * @param bool   $options['readonly']     (optional)
+	 * @param int    $options['rows']         (optional)
 	 */
 	public function __construct($name, $value = '', array $options = []) {
 		$this->options = array_merge($this->options, $options);
@@ -81,6 +79,6 @@ class CTextAreaFlexible extends CTextArea {
 	 * @return string  Javascript code.
 	 */
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getId().'").textareaFlexible('.json_encode($this->options).');';
+		return 'jQuery("#'.$this->getId().'").textareaFlexible();';
 	}
 }

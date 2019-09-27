@@ -31,12 +31,18 @@
 				$textarea
 					.on('input keydown paste', function(e) {
 						if (e.which === 13) {
-							if (settings.submit === 'form') {
+                            var $submit = $(this).closest('form').find(':submit:visible');
+
+							if ($submit.length === 0) {
 								$(this).closest('form').submit();
 							}
-							else if (typeof(settings.submit) === 'string') {
-								$('#' + settings.submit).click();
+							else if ($submit.length === 1) {
+								$submit.click();
 							}
+							else {
+								$submit.filter('[name = update]').click();
+							}
+
 							return false;
 						}
 
