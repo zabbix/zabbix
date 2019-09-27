@@ -1923,6 +1923,9 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	hdr_line = ('1' == *params ? 1 : 0);
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
+	if ('\0' == *data)
+		goto out;
+
 	do
 	{
 		if (CSV_STATE_FIELD_QUOTED != state)
