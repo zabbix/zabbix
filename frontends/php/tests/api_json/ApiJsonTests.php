@@ -45,6 +45,7 @@ require_once dirname(__FILE__).'/testWebScenario.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testDependentItems.php';
+require_once dirname(__FILE__).'/testExportIntegration.php';
 
 class ApiJsonTests {
 	public static function suite() {
@@ -76,6 +77,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testWebScenario');
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testDiscoveryRule');
+		$suite->addTestSuite('testExportIntegration');
 
 		return $suite;
 	}

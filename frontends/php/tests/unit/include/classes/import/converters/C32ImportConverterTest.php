@@ -355,6 +355,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60;30/1-5,08:00-12:00',
 									'history' => '0',
 									'trends' => '0',
+									'preprocessing' => '',
 									'jmx_endpoint' => '',
 									'master_item' => []
 								],
@@ -365,7 +366,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_MULTIPLIER,
+											'type' => (string) ZBX_PREPROC_MULTIPLIER,
 											'params' => '10'
 										]
 									],
@@ -379,7 +380,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_OCT2DEC,
+											'type' => (string) ZBX_PREPROC_OCT2DEC,
 											'params' => ''
 										]
 									],
@@ -393,11 +394,11 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_HEX2DEC,
+											'type' => (string) ZBX_PREPROC_HEX2DEC,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_DELTA_SPEED,
+											'type' => (string) ZBX_PREPROC_DELTA_SPEED,
 											'params' => ''
 										]
 									],
@@ -411,15 +412,15 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_BOOL2DEC,
+											'type' => (string) ZBX_PREPROC_BOOL2DEC,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_DELTA_VALUE,
+											'type' => (string) ZBX_PREPROC_DELTA_VALUE,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_MULTIPLIER,
+											'type' => (string) ZBX_PREPROC_MULTIPLIER,
 											'params' => '100'
 										]
 									],
@@ -431,6 +432,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60',
 									'history' => '90d',
 									'trends' => '365d',
+									'preprocessing' => '',
 									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 									'master_item' => []
 								]
@@ -446,6 +448,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60;30/1-5,08:00-12:00',
 											'history' => '0',
 											'trends' => '0',
+											'preprocessing' => '',
 											'jmx_endpoint' => '',
 											'master_item_prototype' => []
 										],
@@ -456,7 +459,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_MULTIPLIER,
+													'type' => (string) ZBX_PREPROC_MULTIPLIER,
 													'params' => '10'
 												]
 											],
@@ -470,7 +473,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_OCT2DEC,
+													'type' => (string) ZBX_PREPROC_OCT2DEC,
 													'params' => ''
 												]
 											],
@@ -484,11 +487,11 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_HEX2DEC,
+													'type' => (string) ZBX_PREPROC_HEX2DEC,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_DELTA_SPEED,
+													'type' => (string) ZBX_PREPROC_DELTA_SPEED,
 													'params' => ''
 												]
 											],
@@ -502,15 +505,15 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_BOOL2DEC,
+													'type' => (string) ZBX_PREPROC_BOOL2DEC,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_DELTA_VALUE,
+													'type' => (string) ZBX_PREPROC_DELTA_VALUE,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_MULTIPLIER,
+													'type' => (string) ZBX_PREPROC_MULTIPLIER,
 													'params' => '100'
 												]
 											],
@@ -522,6 +525,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60',
 											'history' => '90d',
 											'trends' => '365d',
+											'preprocessing' => '',
 											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 											'master_item_prototype' => []
 										]
@@ -584,6 +588,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60;30/1-5,08:00-12:00',
 									'history' => '0',
 									'trends' => '0',
+									'preprocessing' => '',
 									'jmx_endpoint' => '',
 									'master_item' => []
 								],
@@ -594,7 +599,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_MULTIPLIER,
+											'type' => (string) ZBX_PREPROC_MULTIPLIER,
 											'params' => '10'
 										]
 									],
@@ -608,7 +613,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_OCT2DEC,
+											'type' => (string) ZBX_PREPROC_OCT2DEC,
 											'params' => ''
 										]
 									],
@@ -622,11 +627,11 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_HEX2DEC,
+											'type' => (string) ZBX_PREPROC_HEX2DEC,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_DELTA_SPEED,
+											'type' => (string) ZBX_PREPROC_DELTA_SPEED,
 											'params' => ''
 										]
 									],
@@ -640,15 +645,15 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'trends' => '365d',
 									'preprocessing' => [
 										[
-											'type' => ZBX_PREPROC_BOOL2DEC,
+											'type' => (string) ZBX_PREPROC_BOOL2DEC,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_DELTA_VALUE,
+											'type' => (string) ZBX_PREPROC_DELTA_VALUE,
 											'params' => ''
 										],
 										[
-											'type' => ZBX_PREPROC_MULTIPLIER,
+											'type' => (string) ZBX_PREPROC_MULTIPLIER,
 											'params' => '100'
 										]
 									],
@@ -660,6 +665,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 									'delay' => '60',
 									'history' => '90d',
 									'trends' => '365d',
+									'preprocessing' => '',
 									'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 									'master_item' => []
 								]
@@ -675,6 +681,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60',
 											'history' => '0',
 											'trends' => '0',
+											'preprocessing' => '',
 											'jmx_endpoint' => '',
 											'master_item_prototype' => []
 										],
@@ -685,7 +692,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_MULTIPLIER,
+													'type' => (string) ZBX_PREPROC_MULTIPLIER,
 													'params' => '10'
 												]
 											],
@@ -699,7 +706,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_OCT2DEC,
+													'type' => (string) ZBX_PREPROC_OCT2DEC,
 													'params' => ''
 												]
 											],
@@ -713,11 +720,11 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_HEX2DEC,
+													'type' => (string) ZBX_PREPROC_HEX2DEC,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_DELTA_SPEED,
+													'type' => (string) ZBX_PREPROC_DELTA_SPEED,
 													'params' => ''
 												]
 											],
@@ -731,15 +738,15 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'trends' => '365d',
 											'preprocessing' => [
 												[
-													'type' => ZBX_PREPROC_BOOL2DEC,
+													'type' => (string) ZBX_PREPROC_BOOL2DEC,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_DELTA_VALUE,
+													'type' => (string) ZBX_PREPROC_DELTA_VALUE,
 													'params' => ''
 												],
 												[
-													'type' => ZBX_PREPROC_MULTIPLIER,
+													'type' => (string) ZBX_PREPROC_MULTIPLIER,
 													'params' => '100'
 												]
 											],
@@ -751,6 +758,7 @@ class C32ImportConverterTest extends CImportConverterTest {
 											'delay' => '60',
 											'history' => '90d',
 											'trends' => '365d',
+											'preprocessing' => '',
 											'jmx_endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi',
 											'master_item_prototype' => []
 										]

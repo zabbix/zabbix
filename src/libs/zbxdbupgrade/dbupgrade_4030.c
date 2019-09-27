@@ -502,6 +502,13 @@ static int	DBpatch_4030035(void)
 	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
+static int	DBpatch_4030036(void)
+{
+	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("interface", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -543,4 +550,5 @@ DBPATCH_ADD(4030032, 0, 1)
 DBPATCH_ADD(4030033, 0, 1)
 DBPATCH_ADD(4030034, 0, 1)
 DBPATCH_ADD(4030035, 0, 1)
+DBPATCH_ADD(4030036, 0, 1)
 DBPATCH_END()
