@@ -45,7 +45,7 @@ class CControllerMediatypeEdit extends CController {
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'webhook_params' =>			'array',
+			'parameters' =>				'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
 			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
@@ -139,7 +139,7 @@ class CControllerMediatypeEdit extends CController {
 			'show_event_menu' => $db_defaults['show_event_menu'],
 			'event_menu_url' => $db_defaults['event_menu_url'],
 			'event_menu_name' => $db_defaults['event_menu_name'],
-			'webhook_params' => [
+			'parameters' => [
 				['name' => 'URL', 'value'=> ''],
 				['name' => 'To', 'value' => '{ALERT.SENDTO}'],
 				['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
@@ -197,7 +197,7 @@ class CControllerMediatypeEdit extends CController {
 					$data['show_event_menu'] = $this->mediatype['show_event_menu'];
 					$data['event_menu_url'] = $this->mediatype['event_menu_url'];
 					$data['event_menu_name'] = $this->mediatype['event_menu_name'];
-					$data['webhook_params'] = $this->mediatype['parameters'];
+					$data['parameters'] = $this->mediatype['parameters'];
 					break;
 			}
 
@@ -213,15 +213,15 @@ class CControllerMediatypeEdit extends CController {
 		]);
 
 		if ($this->hasInput('form_refresh')) {
-			$data['webhook_params'] = [];
-			$params = $this->getInput('webhook_params', ['name' => [], 'value' => []]);
-			$name = reset($params['name']);
-			$value = reset($params['value']);
+			$data['parameters'] = [];
+			$parameters = $this->getInput('parameters', ['name' => [], 'value' => []]);
+			$name = reset($parameters['name']);
+			$value = reset($parameters['value']);
 
 			while ($name !== false) {
-				$data['webhook_params'][] = compact('name', 'value');
-				$name = next($params['name']);
-				$value = next($params['value']);
+				$data['parameters'][] = compact('name', 'value');
+				$name = next($parameters['name']);
+				$value = next($parameters['value']);
 			}
 		}
 

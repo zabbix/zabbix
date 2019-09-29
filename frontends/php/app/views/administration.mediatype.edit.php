@@ -139,8 +139,8 @@ else {
 }
 
 // MEDIA_TYPE_WEBHOOK
-$web_params_table = (new CTable())
-	->setId('webhook_params_table')
+$parameters_table = (new CTable())
+	->setId('parameters_table')
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
@@ -148,12 +148,12 @@ $web_params_table = (new CTable())
 	])
 	->setAttribute('style', 'width: 100%;');
 
-foreach ($data['webhook_params'] as $param) {
-	$web_params_table->addRow([
-		(new CTextBox('webhook_params[name][]', $param['name'], false, DB::getFieldLength('media_type_param', 'name')))
+foreach ($data['parameters'] as $parameter) {
+	$parameters_table->addRow([
+		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('webhook_params[value][]', $param['value'], false,
+		(new CTextBox('parameters[value][]', $parameter['value'], false,
 			DB::getFieldLength('media_type_param', 'value')
 		))
 			->setAttribute('style', 'width: 100%;')
@@ -167,13 +167,13 @@ foreach ($data['webhook_params'] as $param) {
 }
 
 $row_template = (new CTag('script', true))
-	->setId('webhook_params_row')
+	->setId('parameters_row')
 	->setAttribute('type', 'text/x-jquery-tmpl')
 	->addItem(new CRow([
-		(new CTextBox('webhook_params[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+		(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('webhook_params[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+		(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
 		(new CButton('', _('Remove')))
@@ -185,7 +185,7 @@ $row_template = (new CTag('script', true))
 
 $widget->addItem($row_template);
 
-$web_params_table->addRow([(new CButton('webhook_param_add', _('Add')))
+$parameters_table->addRow([(new CButton('parameter_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
@@ -198,11 +198,11 @@ $mediatype_formlist
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
 	)
-	->addRow(new CLabel(_('Webhook parameters'), $web_params_table->getId()),
-		(new CDiv($web_params_table))
+	->addRow(new CLabel(_('Webhook parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-		'row_webhook_params'
+		'row_webhook_parameters'
 	)
 	->addRow((new CLabel(_('Webhook script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['script'], [

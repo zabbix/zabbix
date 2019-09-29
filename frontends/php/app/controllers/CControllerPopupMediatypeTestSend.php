@@ -28,7 +28,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 			'sendto' =>			'string|not_empty',
 			'subject' =>		'string',
 			'message' =>		'string',
-			'webhook_params' =>	'array'
+			'parameters' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateMediaType();
@@ -107,8 +107,8 @@ class CControllerPopupMediatypeTestSend extends CController {
 		if ($this->getInput('type') == MEDIA_TYPE_WEBHOOK ) {
 			$params = [];
 
-			foreach ($this->getInput('webhook_params', []) as $param) {
-				$params[$param['name']] = $param['value'];
+			foreach ($this->getInput('parameters', []) as $parameter) {
+				$params[$parameter['name']] = $parameter['value'];
 			}
 		}
 		else {

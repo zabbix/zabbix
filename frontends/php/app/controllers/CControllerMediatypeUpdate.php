@@ -39,7 +39,7 @@ class CControllerMediatypeUpdate extends CController {
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
-			'webhook_params' =>			'array',
+			'parameters' =>				'array',
 			'script' => 				'db media_type.script',
 			'timeout' => 				'db media_type.timeout',
 			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
@@ -146,14 +146,14 @@ class CControllerMediatypeUpdate extends CController {
 				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name'
 				]);
-				$params = $this->getInput('webhook_params', []);
+				$parameters = $this->getInput('parameters', []);
 
-				if (array_key_exists('name', $params) && array_key_exists('value', $params)) {
+				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 					$mediatype['parameters'] = array_map(function ($name, $value) {
 							return compact('name', 'value');
 						},
-						$params['name'],
-						$params['value']
+						$parameters['name'],
+						$parameters['value']
 					);
 				}
 

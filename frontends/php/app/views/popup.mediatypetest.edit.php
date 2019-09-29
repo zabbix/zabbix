@@ -24,13 +24,13 @@ $form_list = (new CFormList());
 if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
 	$i = 0;
 
-	foreach ($data['webhook_params'] as $param) {
-		$fieldid = 'webhook_params['.$i.']';
+	foreach ($data['parameters'] as $parameter) {
+		$fieldid = 'parameters['.$i.']';
 		$form_list
 			->addItem()
-			->addRow(new CLabel($param['name'], $fieldid.'[value]'), [
-				new CVar($fieldid.'[name]', $param['name']),
-				(new CTextBox($fieldid.'[value]', $param['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->addRow(new CLabel($parameter['name'], $fieldid.'[value]'), [
+				new CVar($fieldid.'[name]', $parameter['name']),
+				(new CTextBox($fieldid.'[value]', $parameter['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			]);
 		$i++;
 	}
