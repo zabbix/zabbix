@@ -147,14 +147,7 @@ class CControllerMediatypeEdit extends CController {
 			],
 			'description' => '',
 			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type'],
-			'max_length' => [
-				'event_menu_url' => DB::getFieldLength('media_type', 'event_menu_url'),
-				'script' => DB::getFieldLength('media_type', 'script'),
-				'event_menu_name' => DB::getFieldLength('media_type', 'event_menu_name'),
-				'params_key' => DB::getFieldLength('media_type_param', 'name'),
-				'params_value' => DB::getFieldLength('media_type_param', 'value')
-			]
+			'content_type' => $db_defaults['content_type']
 		];
 
 		// get values from the dabatase

@@ -139,8 +139,6 @@ else {
 }
 
 // MEDIA_TYPE_WEBHOOK
-$max_length = $data['max_length'];
-
 $web_params_table = (new CTable())
 	->setId('webhook_params_table')
 	->setHeader([
@@ -152,10 +150,12 @@ $web_params_table = (new CTable())
 
 foreach ($data['webhook_params'] as $param) {
 	$web_params_table->addRow([
-		(new CTextBox('webhook_params[name][]', $param['name'], false, $max_length['params_key']))
+		(new CTextBox('webhook_params[name][]', $param['name'], false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('webhook_params[value][]', $param['value'], false, $max_length['params_value']))
+		(new CTextBox('webhook_params[value][]', $param['value'], false,
+			DB::getFieldLength('media_type_param', 'value')
+		))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
 		(new CButton('', _('Remove')))
@@ -170,10 +170,10 @@ $row_template = (new CTag('script', true))
 	->setId('webhook_params_row')
 	->setAttribute('type', 'text/x-jquery-tmpl')
 	->addItem(new CRow([
-		(new CTextBox('webhook_params[name][]', '', false, $max_length['params_key']))
+		(new CTextBox('webhook_params[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
-		(new CTextBox('webhook_params[value][]', '', false, $max_length['params_value']))
+		(new CTextBox('webhook_params[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
 			->setAttribute('style', 'width: 100%;')
 			->removeId(),
 		(new CButton('', _('Remove')))
@@ -211,7 +211,7 @@ $mediatype_formlist
 			'placeholder_textarea' => 'return value',
 			'grow' => 'auto',
 			'rows' => 0,
-			'maxlength' => $max_length['script']
+			'maxlength' => DB::getFieldLength('media_type', 'script')
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired(),
@@ -233,7 +233,9 @@ $mediatype_formlist
 	)
 	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))
 			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
-		(new CTextBox('event_menu_name', $data['event_menu_name'], false, $max_length['event_menu_name']))
+		(new CTextBox('event_menu_name', $data['event_menu_name'], false,
+			DB::getFieldLength('media_type', 'event_menu_name')
+		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
@@ -241,9 +243,11 @@ $mediatype_formlist
 	)
 	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))
 			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
-		(new CTextBox('event_menu_url', $data['event_menu_url'], false, $max_length['event_menu_url']))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
+		(new CTextBox('event_menu_url', $data['event_menu_url'], false,
+			DB::getFieldLength('media_type', 'event_menu_url')
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_event_menu_url'
 	)

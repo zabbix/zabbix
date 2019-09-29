@@ -50,7 +50,6 @@
 				case '<?= MEDIA_TYPE_WEBHOOK ?>':
 					$('li[id^="row_webhook_"]').show();
 					setMaxSessionsType(media_type);
-
 					break;
 			}
 		});
