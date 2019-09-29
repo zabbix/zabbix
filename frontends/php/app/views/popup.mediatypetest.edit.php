@@ -27,7 +27,6 @@ if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
 	foreach ($data['parameters'] as $parameter) {
 		$fieldid = 'parameters['.$i.']';
 		$form_list
-			->addItem()
 			->addRow(new CLabel($parameter['name'], $fieldid.'[value]'), [
 				new CVar($fieldid.'[name]', $parameter['name']),
 				(new CTextBox($fieldid.'[value]', $parameter['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
