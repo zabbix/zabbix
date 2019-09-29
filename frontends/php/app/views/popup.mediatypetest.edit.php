@@ -68,7 +68,6 @@ $form = (new CForm())
 	->setName('mediatypetest_form')
 	->addVar('action', 'popup.mediatypetest.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
-	->addVar('type', $data['type'])
 	->addItem([
 		$form_list,
 		(new CInput('submit', 'submit'))->addStyle('display: none;')

@@ -21,10 +21,11 @@
 
 class CControllerPopupMediatypeTestSend extends CController {
 
+	private $metiatype;
+
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
-			'type' =>			'int32',
 			'sendto' =>			'string|not_empty',
 			'subject' =>		'string',
 			'message' =>		'string',
@@ -58,18 +59,20 @@ class CControllerPopupMediatypeTestSend extends CController {
 	 * @return bool
 	 */
 	protected function validateMediaType() {
-		$mediatype = API::MediaType()->get([
+		$mediatypes = API::MediaType()->get([
 			'output' => ['type', 'status'],
 			'mediatypeids' => $this->getInput('mediatypeid'),
 		]);
 
-		if (!$mediatype) {
+		if (!$mediatypes) {
 			error(_('No permissions to referred object or it does not exist!'));
 
 			return false;
 		}
 
-		if ($mediatype[0]['status'] != MEDIA_STATUS_ACTIVE) {
+		$this->mediatype = $mediatypes[0];
+
+		if ($this->mediatype['status'] != MEDIA_STATUS_ACTIVE) {
 			error(_('Cannot test disabled media type.'));
 
 			return false;
@@ -77,7 +80,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 		$ret = true;
 
-		if ($mediatype[0]['type'] != MEDIA_TYPE_EXEC && $mediatype[0]['type'] != MEDIA_TYPE_WEBHOOK) {
+		if ($this->mediatype['type'] != MEDIA_TYPE_EXEC && $this->mediatype['type'] != MEDIA_TYPE_WEBHOOK) {
 			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
 				'message' =>	'string|not_empty'
 			]);
@@ -88,7 +91,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 
 			$ret = !$validator->isError();
 
-			if ($ret && $mediatype[0]['type'] == MEDIA_TYPE_EMAIL) {
+			if ($ret && $this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
 				$email_validator = new CEmailValidator();
 				$ret = $email_validator->validate($this->getInput('sendto'));
 
@@ -104,7 +107,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		if ($this->getInput('type') == MEDIA_TYPE_WEBHOOK ) {
+		if ($this->mediatype['type'] == MEDIA_TYPE_WEBHOOK ) {
 			$params = [];
 
 			foreach ($this->getInput('parameters', []) as $parameter) {
