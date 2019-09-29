@@ -1162,54 +1162,20 @@ class CMediatype extends CApiService {
 	protected function getValidationRules() {
 		return [
 			'fields' => [
-				'description' => [
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'description')
-				]
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')]
 			],
 			MEDIA_TYPE_WEBHOOK => [
-				'script' => [
-					'type' => API_STRING_UTF8,
-					'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('media_type', 'script')
-				],
-				'timeout' => [
-					'type' => API_TIME_UNIT,
-					'length' => DB::getFieldLength('media_type', 'timeout'),
-					'in' => '1:60'
-				],
-				'process_tags' => [
-					'type' => API_INT32,
-					'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])
-				],
-				'show_event_menu' => [
-					'type' => API_INT32,
-					'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])
-				],
-				'event_menu_url' => [
-					// Should be checked as string not as url because it can contain maros tags.
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'event_menu_url')
-				],
-				'event_menu_name' => [
-					'type' => API_STRING_UTF8,
-					'length' => DB::getFieldLength('media_type', 'event_menu_name')
-				],
-				'parameters' => [
-					'type' => API_OBJECTS,
-					'fields' => [
-						'name' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_REQUIRED | API_NOT_EMPTY,
-							'length' => DB::getFieldLength('media_type_param', 'name')
-						],
-						'value' => [
-							'type' => API_STRING_UTF8,
-							'flags' => API_REQUIRED,
-							'length' => DB::getFieldLength('media_type_param', 'value')
-						]
-					]
-				]
+				'script' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
+				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
+				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
+				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
+				// Should be checked as string not as url because it can contain maros tags.
+				'event_menu_url' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
+				'event_menu_name' =>	[ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
+				'parameters' =>			['type' => API_OBJECTS, 'fields' => [
+					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
+					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('media_type_param', 'value')]
+				]]
 			]
 		];
 	}
