@@ -230,6 +230,7 @@ class CWidgetConfig {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
 				case WIDGET_GRAPH_PROTOTYPE:
+				case WIDGET_URL:
 					return false;
 
 				case WIDGET_PROBLEMS_BY_SV:
