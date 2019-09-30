@@ -25,7 +25,7 @@ class CControllerMediatypeUpdate extends CController {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
-			'description' =>			'db media_type.description|not_empty',
+			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -93,7 +93,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description', 'maxsessions', 'maxattempts', 'attempt_interval']);
+		$this->getInputs($mediatype, ['mediatypeid', 'type', 'name', 'maxsessions', 'maxattempts', 'attempt_interval']);
 		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_ACTIVE);
 
 		switch ($mediatype['type']) {
@@ -136,7 +136,7 @@ class CControllerMediatypeUpdate extends CController {
 		$result = API::Mediatype()->update($mediatype);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['description'].']');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['name'].']');
 		}
 
 		$result = DBend($result);

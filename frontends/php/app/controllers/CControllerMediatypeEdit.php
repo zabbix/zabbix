@@ -31,7 +31,7 @@ class CControllerMediatypeEdit extends CController {
 		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
 			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
-			'description' =>			'db media_type.description',
+			'name' =>					'db media_type.name',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -79,10 +79,10 @@ class CControllerMediatypeEdit extends CController {
 
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
-				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
-					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions',
-					'maxattempts', 'attempt_interval', 'content_type'
+				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
+					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
+					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
+					'attempt_interval', 'content_type'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -105,7 +105,7 @@ class CControllerMediatypeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
-			'description' => '',
+			'name' => '',
 			'smtp_server' => 'mail.example.com',
 			'smtp_port' => $db_defaults['smtp_port'],
 			'smtp_helo' => 'example.com',
@@ -132,7 +132,7 @@ class CControllerMediatypeEdit extends CController {
 		if ($this->hasInput('mediatypeid')) {
 			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
 			$data['type'] = $this->mediatype['type'];
-			$data['description'] = $this->mediatype['description'];
+			$data['name'] = $this->mediatype['name'];
 			$data['smtp_server'] = $this->mediatype['smtp_server'];
 			$data['smtp_port'] = $this->mediatype['smtp_port'];
 			$data['smtp_helo'] = $this->mediatype['smtp_helo'];
@@ -172,29 +172,10 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		// overwrite with input variables
-		$this->getInputs($data, [
-			'type',
-			'description',
-			'smtp_server',
-			'smtp_port',
-			'smtp_helo',
-			'smtp_email',
-			'smtp_security',
-			'smtp_verify_peer',
-			'smtp_verify_host',
-			'smtp_authentication',
-			'exec_params',
-			'exec_path',
-			'gsm_modem',
-			'smtp_username',
-			'passwd',
-			'status',
-			'maxsessions',
-			'maxattempts',
-			'attempt_interval',
-			'maxsessionsType',
-			'form_refresh',
-			'content_type'
+		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
+			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params', 'exec_path', 'gsm_modem',
+			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
+			'form_refresh', 'content_type'
 		]);
 
 		$response = new CControllerResponseData($data);

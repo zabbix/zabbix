@@ -5213,66 +5213,42 @@ table.preprocessing-test-results .rel-container {
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 
-.host-avail-widget {
-  width: 100%;
-  height: 100%;
-  table-layout: fixed; }
-  .host-avail-widget td {
-    line-height: 18px;
-    overflow: hidden;
-    padding: 0 10px;
-    vertical-align: middle; }
-  .host-avail-widget .host-avail-count {
-    font-size: 16px; }
-  .host-avail-widget.host-avail-layout-horizontal {
-    min-width: 305px; }
-    .host-avail-widget.host-avail-layout-horizontal td {
-      height: 100%;
-      text-align: center; }
-    .host-avail-widget.host-avail-layout-horizontal .host-avail-count {
-      display: block; }
-  .host-avail-widget.host-avail-layout-vertical td {
+.totals-list:not(.list-table) {
+  display: flex;
+  height: 100%; }
+.totals-list > div {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  line-height: 18px;
+  overflow: hidden;
+  padding: 0 10px;
+  position: relative; }
+.totals-list .count {
+  font-size: 16px; }
+.totals-list.totals-list-horizontal > div {
+  flex-direction: column;
+  justify-content: center;
+  min-width: 55px;
+  text-align: center; }
+.totals-list.totals-list-vertical {
+  flex-direction: column; }
+  .totals-list.totals-list-vertical > div {
+    min-height: 21px;
     padding-top: 3px; }
-  .host-avail-widget.host-avail-layout-vertical .host-avail-count {
+  .totals-list.totals-list-vertical .count {
     margin-right: 5px; }
-  .host-avail-widget .host-avail-true {
-    background: #86cc89; }
-  .host-avail-widget .host-avail-false {
-    background: #e45959; }
-  .host-avail-widget .host-avail-unknown {
-    background: #97aab3; }
-  .host-avail-widget .host-avail-total {
-    background: transparent; }
 
-.by-severity-widget {
-  height: 100%;
-  display: flex; }
-  .by-severity-widget > div {
-    flex: 1;
-    align-items: center;
-    display: flex;
-    line-height: 18px;
-    overflow: hidden;
-    padding: 0 10px;
-    position: relative; }
-  .by-severity-widget .by-severity-count {
-    font-size: 16px; }
-  .by-severity-widget.by-severity-layout-horizontal > div {
-    flex-direction: column;
-    justify-content: center;
-    min-width: 55px;
-    text-align: center; }
-  .by-severity-widget.by-severity-layout-vertical {
-    flex-direction: column; }
-    .by-severity-widget.by-severity-layout-vertical > div {
-      min-height: 26px;
-      padding-top: 3px; }
-    .by-severity-widget.by-severity-layout-vertical .by-severity-count {
-      margin-right: 5px; }
-
-#preprocessing_div {
-  display: block;
-  max-width: 940px; }
+.host-avail-widget td:not(:first-child) {
+  border-left: 1px dotted #333; }
+.host-avail-widget .host-avail-true {
+  background: #86cc89; }
+.host-avail-widget .host-avail-false {
+  background: #e45959; }
+.host-avail-widget .host-avail-unknown {
+  background: #97aab3; }
+.host-avail-widget .host-avail-total {
+  background: transparent; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */
@@ -6027,12 +6003,16 @@ td.inactive-bg {
     border: none !important;
     top: 0; }
 
-.host-avail-widget tr {
-  border-top: 1px solid #444; }
-.host-avail-widget.host-avail-layout-horizontal td:not(:last-of-type) {
-  border-right: 1px solid #444; }
-.host-avail-widget .host-avail-count {
+.totals-list > div {
+  border-top: 1px solid #444;
+  color: #fff; }
+.totals-list .count {
   font-weight: bold; }
+.totals-list.totals-list-horizontal > div:not(:last-of-type) {
+  border-right: 1px solid #444; }
+
+.host-avail-widget td:not(:first-child) {
+  border-left: 1px solid #444; }
 .host-avail-widget .host-avail-true,
 .host-avail-widget .host-avail-false,
 .host-avail-widget .host-avail-unknown,
@@ -6040,14 +6020,8 @@ td.inactive-bg {
   background: transparent; }
 
 .by-severity-widget > div {
-  border-top: 1px solid #444;
-  color: #fff;
   min-width: 65px;
   padding-left: 42px; }
   .by-severity-widget > div:after {
     top: 50%;
     transform: translateY(-50%); }
-.by-severity-widget .by-severity-count {
-  font-weight: bold; }
-.by-severity-widget.by-severity-layout-horizontal > div:not(:last-of-type) {
-  border-right: 1px solid #444; }
