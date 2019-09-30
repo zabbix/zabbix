@@ -501,54 +501,53 @@ class CProblem extends CApiService {
 			unset($row);
 		}
 
-		$tags = [];
-
-		if ($options['selectTags'] != API_OUTPUT_COUNT
-				&& ($options['selectTags'] !== null || $this->outputIsRequested('urls', $options['output']))) {
-			$fields = ($options['selectTags'] === API_OUTPUT_EXTEND || $this->outputIsRequested('urls', $options['output']))
-				? ['tag', 'value', 'eventid', 'problemtagid']
-				: $this->outputExtend($options['selectTags'], ['eventid', 'problemtagid']);
-
-			$tags = API::getApiService()->select('problem_tag', [
-				'output' => $this->outputExtend($fields, ['eventid', 'problemtagid']),
-				'filter' => ['eventid' => $eventids],
-				'preservekeys' => true
-			]);
-		}
-
 		// Resolve webhook urls.
-		if ($options['output'] !== API_OUTPUT_EXTEND && $this->outputIsRequested('urls', $options['output'])) {
-			$mediatype_urls = API::getApiService()->select('media_type', [
-				'output' => ['event_menu_url', 'event_menu_name', 'mediatypeid'],
+		if ($this->outputIsRequested('urls', $options['output'])) {
+			$tags = DB::select('problem_tag', [
+				'output' => ['eventid', 'tag', 'value'],
+				'filter' => ['eventid' => $eventids]
+			]);
+
+			$urls = DB::select('media_type', [
+				'output' => ['mediatypeid', 'event_menu_url', 'event_menu_name'],
 				'filter' => [
 					'type' => MEDIA_TYPE_WEBHOOK,
 					'status' => MEDIA_TYPE_STATUS_ACTIVE,
 					'show_event_menu' => ZBX_EVENT_MENU_SHOW
-				],
-				'preservekeys' => true
+				]
 			]);
 
-			if ($mediatype_urls) {
-				$urls = CMacrosResolverHelper::resolveMediaTypeUrls($tags, $mediatype_urls);
-				$relation_map = $this->createRelationMap($urls, 'eventid', 'mediatypeid');
-				$urls = $this->unsetExtraFields($urls, ['eventid', 'mediatypeid'], []);
-				$result = $relation_map->mapMany($result, $urls, 'urls');
-			}
+			$urls = CMacrosResolverHelper::resolveMediaTypeUrls($tags, $urls);
+
+			$relation_map = $this->createRelationMap($urls, 'eventid', 'mediatypeid');
+			$urls = $this->unsetExtraFields($urls, ['eventid', 'mediatypeid'], []);
+			$result = $relation_map->mapMany($result, $urls, 'urls');
 		}
 
 		// Adding event tags.
 		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$fields = ['tag', 'value'];
-
-			if (is_array($options['selectTags'])) {
-				$fields = array_intersect($fields, $options['selectTags']);
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$options['selectTags'] = ['tag', 'value'];
 			}
 
-			if ($fields) {
-				$relation_map = $this->createRelationMap($tags, 'eventid', 'problemtagid');
-				$tags = $this->unsetExtraFields($tags, ['problemtagid', 'eventid', 'tag', 'value'], $fields);
-				$result = $relation_map->mapMany($result, $tags, 'tags');
+			$tags_options = [
+				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
+				'filter' => ['eventid' => $eventids]
+			];
+			$tags = DBselect(DB::makeSql('problem_tag', $tags_options));
+
+			foreach ($result as &$event) {
+				$event['tags'] = [];
 			}
+			unset($event);
+
+			while ($tag = DBfetch($tags)) {
+				$event = &$result[$tag['eventid']];
+
+				unset($tag['problemtagid'], $tag['eventid']);
+				$event['tags'][] = $tag;
+			}
+			unset($event);
 		}
 
 		return $result;
