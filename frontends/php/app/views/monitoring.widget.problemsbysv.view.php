@@ -26,9 +26,10 @@ $data['backurl'] = (new CUrl('zabbix.php'))
 if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
 	$table = makeSeverityTotals($data)
 		->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
+		->addClass(ZBX_STYLE_TOTALS_LIST)
 		->addClass(($data['filter']['layout'] == STYLE_HORIZONTAL)
-			? ZBX_STYLE_BY_SEVERITY_LAYOUT_HORIZONTAL
-			: ZBX_STYLE_BY_SEVERITY_LAYOUT_VERTICAL
+			? ZBX_STYLE_TOTALS_LIST_HORIZONTAL
+			: ZBX_STYLE_TOTALS_LIST_VERTICAL
 		);
 }
 else {
@@ -62,6 +63,7 @@ else {
 		);
 
 	$table = makeSeverityTable($data, $hide_empty_groups, $groupurl)
+		->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
 		->setHeader($header)
 		->setHeadingColumn(0);
 }

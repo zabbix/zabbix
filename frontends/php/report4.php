@@ -57,13 +57,13 @@ $currentYear = date('Y');
 // fetch media types
 $media_types = [];
 $db_media_types = API::MediaType()->get([
-	'output' => ['description'],
+	'output' => ['name'],
 	'preservekeys' => true
 ]);
 
-CArrayHelper::sort($db_media_types, ['description']);
+CArrayHelper::sort($db_media_types, ['name']);
 foreach ($db_media_types as $mediatypeid => $db_media_type) {
-	$media_types[$mediatypeid] = $db_media_type['description'];
+	$media_types[$mediatypeid] = $db_media_type['name'];
 }
 
 $widget = (new CWidget())->setTitle(_('Notifications'));
@@ -90,8 +90,8 @@ else {
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));
 
-	foreach ($media_types as $media_type_id => $media_type_description) {
-		$cmbMedia->addItem($media_type_id, $media_type_description);
+	foreach ($media_types as $media_type_id => $name) {
+		$cmbMedia->addItem($media_type_id, $name);
 
 		// we won't need other media types in the future, if only one was selected
 		if ($media_type > 0 && $media_type != $media_type_id) {
@@ -282,10 +282,10 @@ else {
 		echo BR();
 
 		$links = [];
-		foreach ($media_types as $id => $description) {
+		foreach ($media_types as $id => $name) {
 			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
-				? $description
-				: new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
+				? $name
+				: new CLink($name, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
 		}
 		array_pop($links);

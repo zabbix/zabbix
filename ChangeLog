@@ -1,6 +1,29 @@
+Changes for 4.4.0beta1
+
+New features:
+..F.....S. [ZBXNEXT-5434] added support of {EVENT.ID} macro in trigger URL (talbergs, vmurzins)
+..F.....S. [ZBXNEXT-5197] increased maximum dependent item count to 29999 (atumilovics)
+...G...... [ZBXNEXT-2946] added new key "wmi.getall" to collect all required wmi properties in a json document (MVekslers)
+..F....... [ZBX-7341] reworked template linking interface (rlataria)
+..F.I..... [ZBXNEXT-5330] added new filtering option in "Host availability" widget (rlataria)
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
+....I..... [ZBXNEXT-5406] updated widgets on default dashboards (vmurzins)
+..F..J.... [ZBXNEXT-4209] added jmx.get[<discovery mode>,<object name pattern>] key for JMX LLD (atumilovics)
+...G...... [ZBXNEXT-5453] added Zabbix agent 2 (akozlovs, Andris, asestakovs, MVekslers, viktors, vso, wiper)
+..F....PS. [ZBXNEXT-4033] added possibility to return multiple columns (and rows) from SQL ODBC (akozlovs)
+
+Bug fixes:
+....I..... [ZBX-16465] fixed Zabbix database schema creation failure on MariaDB (vso)
+..F....... [ZBX-16654] fixed undefined index error in discovered host update form (gcalenko)
+..F....... [ZBX-16645] fixed suggested selection font weight for new item (vasilijs)
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
+
+--------------------------------------------------------------------------------
 Changes for 4.4.0alpha3
 
 New features:
+A.F.I...S. [ZBXNEXT-5426] renamed media type field "description" to "name" (Sasha)
 A.F.I...S. [ZBXNEXT-5416] dropped support of "Jabber" and "Ez Texting" media types (Sasha)
 A.F....... [ZBXNEXT-5252] added new dashboard widget "Graph prototype" (averza)
 A.FGI..PS. [ZBXNEXT-3497,ZBXNEXT-5291] added support of PSK-based encryption in autoregistration (Andris, Sasha, vasilijs)
@@ -41,6 +64,7 @@ A......... [ZBX-16398] fixed selection of discovered services by dservice.get "d
 ..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
 ..F....... [ZBX-16502] fixed user edit form having a disabled and hidden fields when alias is the same as guest user (Ivo)
 ..F....... [ZBX-16507] fixed vertical scrollbar in kiosk mode when focusinig widgets with hidden headers (averza)
+........S. [ZBX-16524] fixed failed query error when aggregate checks are used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.0alpha2
@@ -105,11 +129,14 @@ Bug fixes:
 Changes for 4.2.7rc1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 .......PS. [ZBX-16511] added source IP address to unknown request log warning message (atumilovics)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16546] fixed broken items mass update form preprocessing tab checkbox markup in firefox (rlataria)
@@ -663,10 +690,13 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.13rc1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
+.......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)
 ..F....... [ZBX-16452] fixed inconsistency in show legend, working time and triggers for graphs in screens and dashboard (averza)

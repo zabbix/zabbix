@@ -432,6 +432,76 @@ out:
 	return ret;
 }
 
+static int	DBpatch_4030028(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBdrop_index("media_type", "media_type_1");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_4030029(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 100, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBrename_field("media_type", "description", &field);
+}
+
+static int	DBpatch_4030030(void)
+{
+#ifdef HAVE_IBM_DB2
+	return DBcreate_index("media_type", "media_type_1", "name", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_4030031(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set value_str='name'"
+			" where value_str='description'"
+				" and idx='web.media_types.php.sort'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_4030032(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030033(void)
+{
+	const ZBX_FIELD	field = {"alias", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030034(void)
+{
+	const ZBX_FIELD	field = {"os", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030035(void)
+{
+	const ZBX_FIELD	field = {"os_short", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -465,5 +535,12 @@ DBPATCH_ADD(4030024, 0, 1)
 DBPATCH_ADD(4030025, 0, 1)
 DBPATCH_ADD(4030026, 0, 1)
 DBPATCH_ADD(4030027, 0, 1)
-
+DBPATCH_ADD(4030028, 0, 1)
+DBPATCH_ADD(4030029, 0, 1)
+DBPATCH_ADD(4030030, 0, 1)
+DBPATCH_ADD(4030031, 0, 1)
+DBPATCH_ADD(4030032, 0, 1)
+DBPATCH_ADD(4030033, 0, 1)
+DBPATCH_ADD(4030034, 0, 1)
+DBPATCH_ADD(4030035, 0, 1)
 DBPATCH_END()

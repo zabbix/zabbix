@@ -380,7 +380,7 @@ INDEX		|2		|itemid
 TABLE|media_type|mediatypeid|ZBX_DATA
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|description	|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|smtp_server	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|smtp_helo	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|smtp_email	|t_varchar(255)	|''	|NOT NULL	|0
@@ -399,7 +399,7 @@ FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
 FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
 FIELD		|content_type	|t_integer	|'1'	|NOT NULL	|0
-UNIQUE		|1		|description
+UNIQUE		|1		|name
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0
@@ -1223,11 +1223,11 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|alias		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|os		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|alias		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|os		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|os_full	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|os_short	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|os_short	|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|serialno_a	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|serialno_b	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|0
@@ -1688,4 +1688,4 @@ UNIQUE		|1		|tls_psk_identity
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4030027	|4030027
+ROW		|4030035	|4030035

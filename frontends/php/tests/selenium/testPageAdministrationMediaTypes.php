@@ -138,10 +138,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$table->query('link:Name')->one()->click();
 			$this->page->waitUntilReady();
 			// Get all media names from DB and check result on frontend.
-			$names = CDBHelper::getAll('SELECT description FROM media_type ORDER BY LOWER(description) '.$sorting);
+			$names = CDBHelper::getAll('SELECT name FROM media_type ORDER BY LOWER(name) '.$sorting);
 			$result = [];
 			foreach ($names as $name) {
-				$result[] = $name['description'];
+				$result[] = $name['name'];
 			}
 			$this->assertTableDataColumn($result);
 		}
@@ -170,7 +170,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->AssertTrue($row->query('button:Test')->one()->isEnabled(false));
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-				' AND description='.CDBHelper::escape($media_name)
+				' AND name='.CDBHelper::escape($media_name)
 		));
 
 		// Enable media type.
@@ -183,7 +183,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->AssertTrue($row->query('button:Test')->one()->isEnabled());
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-				' AND description='.CDBHelper::escape($media_name)
+				' AND name='.CDBHelper::escape($media_name)
 		));
 	}
 
@@ -195,7 +195,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'rows' => [
 						'Name' => 'Email'
 					],
-					'db_description' => 'Email',
+					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
 			],
@@ -205,7 +205,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'rows' => [
 						['Name' => 'SMS']
 					],
-					'db_description' => ['SMS']
+					'db_name' => ['SMS']
 				]
 			],
 			// Select all.
@@ -255,7 +255,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
+					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 		else {
@@ -299,7 +299,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
+					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 		else {
@@ -543,7 +543,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT NULL'.
 				' FROM media_type'.
-				' WHERE description IN ('.CDBHelper::escape($data['db_description']).')'
+				' WHERE name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 	}

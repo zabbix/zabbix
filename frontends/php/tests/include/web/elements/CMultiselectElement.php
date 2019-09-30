@@ -273,4 +273,11 @@ class CMultiselectElement extends CElement {
 
 		return $this->type($labels);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->getSelected();
+	}
 }
