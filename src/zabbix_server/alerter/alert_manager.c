@@ -1081,7 +1081,6 @@ static char	*am_create_db_alert_message(void)
  ******************************************************************************/
 static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 {
-	static int		lastsent;
 	int			now;
 	zbx_am_media_t		*media;
 	zbx_am_mediatype_t	*mediatype;
@@ -1090,9 +1089,6 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 	zbx_hashset_iter_t	iter;
 	const char		*alert_subject = "Zabbix database is not available.";
 	char			*alert_message;
-
-	if ((now = time(NULL)) < lastsent + ZBX_WATCHDOG_ALERT_FREQUENCY)
-		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() recipients:%d", __func__, manager->watchdog.num_data);
 
@@ -1127,8 +1123,6 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 
 		zbx_free(alert_message);
 	}
-
-	lastsent = now;
 }
 
 /******************************************************************************
@@ -1915,10 +1909,13 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		{
 			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 			DBclose();
-
+			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)
 		{
+			if (0 == time_watchdog)
+				zabbix_log(LOG_LEVEL_ERR, "database connection lost");
+
 			if (time_watchdog + ZBX_WATCHDOG_ALERT_FREQUENCY <= now)
 			{
 				am_queue_watchdog_alerts(&manager);
