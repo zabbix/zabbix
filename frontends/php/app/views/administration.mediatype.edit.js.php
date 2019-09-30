@@ -22,7 +22,7 @@
 				.closest('li')
 				.hide();
 
-			$('li[id^="row_webhook"]').hide();
+			$('li[id^="row_webhook_"]').hide();
 
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
@@ -109,7 +109,7 @@
 				.toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', $(this).is(':checked'));
 		});
 
-		$('#webhook_params_table').dynamicRows({ template: '#webhook_params_row' });
+		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
