@@ -208,9 +208,9 @@ class CMediatype extends CApiService {
 
 		$simple_interval_parser = new CSimpleIntervalParser();
 
-		$mediatype_rules = $this->getValidationRules();
-
+		$i = 0;
 		foreach ($mediatypes as $mediatype) {
+			$i++;
 			// Check if media type already exists.
 			$db_mediatype = API::getApiService()->select('media_type', [
 				'output' => ['name'],
@@ -224,12 +224,6 @@ class CMediatype extends CApiService {
 
 			// Check additional fields and values depeding on type.
 			$this->checkRequiredFieldsByType($mediatype);
-
-			$validation_rules = $mediatype_rules['fields'];
-			$validation_rules += array_key_exists($mediatype['type'], $mediatype_rules)
-				? $mediatype_rules[$mediatype['type']]
-				: [];
-			$validated_data = array_intersect_key($mediatype, $validation_rules);
 
 			switch ($mediatype['type']) {
 				case MEDIA_TYPE_EMAIL:
@@ -343,28 +337,15 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
-
-				case MEDIA_TYPE_WEBHOOK:
-					$params = [];
-
-					foreach ($validated_data['parameters'] as $index => $param) {
-						if (array_key_exists($param['name'], $params)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', '/parameters/'.$index.'/name',
-									_s('value "%1$s" already exists', $param['name'])
-							));
-						}
-
-						$params[$param['name']] = true;
-					}
-					break;
 			}
 
-			if ($validation_rules && !CApiInputValidator::validate([
-					'type' => API_OBJECT,
-					'fields' => $validation_rules], $validated_data, '', $error)) {
+			$api_input_rules = $this->getValidationRules($mediatype['type'], 'create');
+			$validated_data = array_intersect_key($mediatype, $api_input_rules['fields']);
+
+			if (!CApiInputValidator::validate($api_input_rules, $validated_data, '/'.($i + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
+			$mediatype = $validated_data + $mediatype;
 
 			// Validate optional 'status' field.
 			if (array_key_exists('status', $mediatype)) {
@@ -533,9 +514,9 @@ class CMediatype extends CApiService {
 			);
 		}
 
-		$mediatype_rules = $this->getValidationRules();
-
+		$i = 0;
 		foreach ($mediatypes as $mediatype) {
+			$i++;
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
 
 			// Recheck mandatory fields if type changed.
@@ -563,14 +544,6 @@ class CMediatype extends CApiService {
 
 				// Populate "type" field from DB, since it is not set and is required for further validation.
 				$mediatype['type'] = $db_mediatype['type'];
-			}
-
-			$validation_rules = $mediatype_rules['fields'];
-			$validated_data = [];
-
-			if (array_key_exists($mediatype['type'], $mediatype_rules)) {
-				$validation_rules += $mediatype_rules[$mediatype['type']];
-				$validated_data = array_intersect_key($mediatype, $validation_rules);
 			}
 
 			switch ($mediatype['type']) {
@@ -690,36 +663,26 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
-
-				case MEDIA_TYPE_WEBHOOK:
-					$validated_data += [
-						'script' => $db_mediatype['script'],
-						'show_event_menu' => $db_mediatype['show_event_menu'],
-						'parameters' => []
-					];
-					$params = [];
-
-					if ($validated_data['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-						unset($validated_data['event_menu_url'], $validated_data['event_menu_name']);
-					}
-
-					foreach ($validated_data['parameters'] as $index => $param) {
-						if (array_key_exists($param['name'], $params)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', '/parameters/'.$index.'/name',
-									_s('value "%1$s" already exists', $param['name'])
-							));
-						}
-
-						$params[$param['name']] = true;
-					}
-					break;
 			}
 
-			if ($validation_rules && !CApiInputValidator::validate([
-					'type' => API_OBJECT,
-					'fields' => $validation_rules], $validated_data, '', $error)) {
+			$api_input_rules = $this->getValidationRules($mediatype['type'], 'update');
+			$validated_data = array_intersect_key($mediatype, $api_input_rules['fields']);
+
+			if (!CApiInputValidator::validate($api_input_rules, $validated_data, '/'.$i, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+			$mediatype = $validated_data + $mediatype;
+
+			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+				if (array_key_exists('show_event_menu', $mediatype)
+						&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+					if (!array_key_exists('event_menu_url', $mediatype)) {
+						$mediatype['event_menu_url'] = '';
+					}
+					if (!array_key_exists('event_menu_name', $mediatype)) {
+						$mediatype['event_menu_name'] = '';
+					}
+				}
 			}
 
 			// Validate optional 'status' field and only when status is changed.
@@ -1154,29 +1117,38 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * Get media type validation rules, return array where validation rules are store in 'fields' key and media type
-	 * specific validation rules are stored in key having value of media type 'type' field.
+	 * Get incomplete media type validation rules.
+	 *
+	 * @param int    $type
+	 * @param string $method
 	 *
 	 * @return array
 	 */
-	protected function getValidationRules() {
-		return [
-			'fields' => [
-				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')]
-			],
-			MEDIA_TYPE_WEBHOOK => [
-				'script' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
+	protected function getValidationRules($type, $method) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'description')]
+		]];
+
+		if ($type == MEDIA_TYPE_WEBHOOK) {
+			$api_input_rules['fields'] += [
+				'script' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'script')],
 				'timeout' =>			['type' => API_TIME_UNIT, 'length' => DB::getFieldLength('media_type', 'timeout'), 'in' => '1:60'],
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
 				// Should be checked as string not as url because it can contain maros tags.
 				'event_menu_url' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
-				'event_menu_name' =>	[ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
-				'parameters' =>			['type' => API_OBJECTS, 'fields' => [
+				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
+				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('media_type_param', 'value')]
 				]]
-			]
-		];
+			];
+		}
+
+		if ($method === 'create') {
+			$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+		}
+
+		return $api_input_rules;
 	}
 }
