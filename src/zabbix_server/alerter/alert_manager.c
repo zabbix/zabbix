@@ -775,6 +775,8 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->retries = db_alert->retries;
 	alert->nextsend = 0;
 
+	zbx_free(db_alert);
+
 	return alert;
 }
 
@@ -1715,9 +1717,6 @@ static void	am_queue_alerts(zbx_am_t *manager, zbx_ipc_message_t *message, int n
 		am_push_alert(alertpool, alert);
 		am_push_alertpool(mediatype, alertpool);
 		am_push_mediatype(manager, mediatype);
-
-		/* the alerts[i] string fields were moved to alert */
-		zbx_free(alerts[i]);
 	}
 
 	zbx_free(alerts);
