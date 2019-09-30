@@ -245,7 +245,7 @@ duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 
 	duk_push_string(ctx, request->data);
 
-    return 1;
+	return 1;
 }
 
 /******************************************************************************
