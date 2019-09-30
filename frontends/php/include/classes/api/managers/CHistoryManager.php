@@ -570,6 +570,10 @@ class CHistoryManager {
 				$sql_select = ['itemid'];
 				$sql_group_by = ['itemid'];
 
+				$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $interval);
+				$sql_select[] = $calc_field.' AS tick';
+				$sql_group_by[] = $calc_field;
+
 				if ($source === 'history') {
 					switch ($function) {
 						case GRAPH_AGGREGATE_MIN:
@@ -612,6 +616,7 @@ class CHistoryManager {
 							break;
 						case GRAPH_AGGREGATE_SUM:
 							$sql_select[] = '(value_avg * num) AS value, MAX(clock) AS clock';
+							$sql_group_by = array_merge($sql_group_by, ['value_avg', 'num']);
 							break;
 						case GRAPH_AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
@@ -622,10 +627,6 @@ class CHistoryManager {
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 				}
-
-				$calc_field = zbx_dbcast_2bigint('clock').'-'.zbx_sql_mod(zbx_dbcast_2bigint('clock'), $interval);
-				$sql_select[] = $calc_field.' AS tick';
-				$sql_group_by[] = $calc_field;
 
 				$sql = 'SELECT '.implode(', ', $sql_select).
 					' FROM '.$sql_from.
