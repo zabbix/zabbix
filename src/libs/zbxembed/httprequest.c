@@ -208,7 +208,6 @@ duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 	zbx_es_httprequest_t	*request;
 	const char		*url, *contents = NULL;
 	CURLcode		err;
-	duk_ret_t		ret;
 
 	url = duk_to_string(ctx, 0);
 	if (0 == duk_is_null_or_undefined(ctx, 1))
