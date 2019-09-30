@@ -677,16 +677,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &buffer,
 			MACRO_TYPE_COMMON, NULL, 0);
 
+	/* Explicitly initialize the name to avoid the potential usage of uninitialized values when: */
+	/* 1) compile without libCURL support */
+	/* 2) update interval is invalid */
+	db_httpstep.name = NULL;
+
 	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
 	{
 		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
 		goto httptest_error;
 	}
-
-	/* Explicitly initialize the name. If we compile without libCURL support, */
-	/* we avoid the potential usage of uninitialized values. */
-	db_httpstep.name = NULL;
 
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -814,12 +815,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* headers defined in a step overwrite headers defined in scenario */
 		if (NULL != httpstep.headers && '\0' != *httpstep.headers)
+		{
 			add_http_headers(httpstep.headers, &headers_slist, &header_cookie);
+			err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
+			zbx_free(header_cookie);
+		}
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
+		{
 			add_http_headers(httptest->headers, &headers_slist, &header_cookie);
-
-		err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
-		zbx_free(header_cookie);
+			err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
+			zbx_free(header_cookie);
+		}
 
 		if (CURLE_OK != err)
 		{
