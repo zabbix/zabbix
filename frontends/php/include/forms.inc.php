@@ -1368,6 +1368,7 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				);
 				break;
 
+			// ZBX-16642
 			case ZBX_PREPROC_CSV_TO_JSON:
 				$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
 					? $step['params'][2]

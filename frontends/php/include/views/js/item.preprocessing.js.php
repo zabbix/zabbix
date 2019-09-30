@@ -115,7 +115,18 @@
 					params.push($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
 				}
 				if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
-					params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+					// ZBX-16642
+					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
+						if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).prop('checked')) {
+							params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+						}
+						else {
+							params.push(0);
+						}
+					}
+					else {
+						params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+					}
 				}
 
 				steps.push($.extend({
@@ -303,7 +314,9 @@
 				var step_nums = [];
 				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
 					var str = $(this).attr('name');
+					console.log(str);
 					step_nums.push(str.substr(14, str.length - 21));
+					console.log(step_nums);
 				});
 
 				openPreprocessingTestDialog(step_nums, true, this);

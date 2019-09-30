@@ -658,6 +658,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					$step['params'] = implode("\n", $step['params']);
 					break;
 
+				// ZBX-16642
 				case ZBX_PREPROC_CSV_TO_JSON:
 					if (!array_key_exists(2, $step['params'])) {
 						$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
@@ -1213,6 +1214,7 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 								$step['params'] = implode("\n", $step['params']);
 								break;
 
+							// ZBX-16642
 							case ZBX_PREPROC_CSV_TO_JSON:
 								if (!array_key_exists(2, $step['params'])) {
 									$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
