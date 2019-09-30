@@ -886,7 +886,6 @@ output {
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
 			height: 22px;
-			line-height: 1;
 			vertical-align: middle;
 			white-space: nowrap;
 
@@ -908,11 +907,14 @@ output {
 				&:last-of-type {
 					margin-right: 12px;
 				}
+
+				~ .link-action {
+					max-width: calc(100% - 32px);
+				}
 			}
 
 			.rel-container {
 				display: inline;
-				line-height: 18px;
 
 				span {
 					margin: 0;
