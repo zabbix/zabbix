@@ -17,26 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXEMBED_H
-#define ZABBIX_ZBXEMBED_H
+#ifndef ZABBIX_EMBED_H
+#define ZABBIX_EMBED_H
 
-typedef struct zbx_es_env zbx_es_env_t;
+#include "common.h"
+#include "duktape.h"
 
-typedef struct
+struct zbx_es_env
 {
-	zbx_es_env_t	*env;
-}
-zbx_es_t;
+	duk_context	*ctx;
+	size_t		total_alloc;
+	time_t		start_time;
 
-void	zbx_es_init(zbx_es_t *es);
-void	zbx_es_destroy(zbx_es_t *es);
-int	zbx_es_init_env(zbx_es_t *es, char **error);
-int	zbx_es_destroy_env(zbx_es_t *es, char **error);
-int	zbx_es_is_env_initialized(zbx_es_t *es);
-int	zbx_es_fatal_error(zbx_es_t *es);
-int	zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
-int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **output,
-	char **error);
-void	zbx_es_set_timeout(zbx_es_t *es, int timeout);
+	char		*error;
+	int		rt_error_num;
+	int		fatal_error;
+	int		timeout;
 
-#endif /* ZABBIX_ZBXEMBED_H */
+	jmp_buf		loc;
+};
+
+#endif /* ZABBIX_EMBED_H */

@@ -19,7 +19,10 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxjson.h"
 #include "zbxembed.h"
+#include "embed.h"
+#include "httprequest.h"
 
 #include "duktape.h"
 
@@ -30,20 +33,6 @@
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
 #define ZBX_ES_MAX_CONSEQUENT_RT_ERROR	3
-
-struct zbx_es_env
-{
-	duk_context	*ctx;
-	size_t		total_alloc;
-	time_t		start_time;
-
-	char		*error;
-	int		rt_error_num;
-	int		fatal_error;
-	int		timeout;
-
-	jmp_buf		loc;
-};
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 #define ZBX_ES_SCRIPT_FOOTER	"\n}"
@@ -218,18 +207,30 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		goto out;
 	}
 
+	/* initialize logger */
+	duk_push_c_function(es->env->ctx, es_log, 2);
+	duk_put_global_string(es->env->ctx, "zabbix_log");
+
 	/* remove Duktape object */
 	duk_push_global_object(es->env->ctx);
 	duk_del_prop_string(es->env->ctx, -1, "Duktape");
 	duk_pop(es->env->ctx);
 
-	/* initialize logger */
-	duk_push_c_function(es->env->ctx, es_log, 2);
-	duk_put_global_string(es->env->ctx, "zabbix_log");
+	/* put environment object to be accessible from duktape C calls */
+	duk_push_global_stash(es->env->ctx);
+	duk_push_pointer(es->env->ctx, (void *)es->env);
+	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
+	{
+		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
+		duk_pop(es->env->ctx);
+		return FAIL;
+	}
 
+	/* initialize CurlHttpRequest prototype */
+	if (FAIL == zbx_es_init_httprequest(es, &error))
+		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
-
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
