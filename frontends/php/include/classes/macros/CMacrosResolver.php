@@ -2675,105 +2675,82 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Return associative array of mediatypes urls with resolved {EVENT.TAG} macro in form
-	 * ['mediatypeid' => .. 'eventid' => .. 'url' => .. 'name' => ..] where key will be 'mediatypeid' value.
+	 * Return associative array of urls with resolved {EVENT.TAGS.*} macro in form
+	 * [<eventid> => ['urls' => [['url' => .. 'name' => ..], ..]]].
 	 *
-	 * @param array  $events_tags                          Array of event tags.
-	 * @param int    $events_tags[]['eventid']             Event tag eventid.
-	 * @param string $events_tags[]['tag']                 Event tag tag field value.
-	 * @param string $events_tags[]['value']               Event tag value field value.
-	 * @param array  $mediatype_urls                       Array of mediatype urls.
-	 * @param int    $mediatype_urls[]['mediatypeid']      Media type mediatypeid.
-	 * @param string $mediatype_urls[]['event_menu_url']   Media type url field value.
-	 * @param string $mediatype_urls[]['event_menu_name']  Media type url_name field value.
+	 * @param array  $events                                Array of event tags.
+	 * @param string $events[<eventid>]['tags'][]['tag']    Event tag tag field value.
+	 * @param string $events[<eventid>]['tags'][]['value']  Event tag value field value.
+	 * @param array  $urls                                  Array of mediatype urls.
+	 * @param string $urls[]['event_menu_url']              Media type url field value.
+	 * @param string $urls[]['event_menu_name']             Media type url_name field value.
+	 *
 	 * @return array
 	 */
-	public function resolveMediaTypeUrls(array $events_tags, array $mediatypes_urls) {
-		$options = ['macros_an' => ['{EVENT.TAGS}']];
-		$result = [];
-		$match_tag = [];
-		$pos_match = [];
-		$tags = [];
-		$mediatypes_urls = array_filter($mediatypes_urls, function ($url) {
-			return $url['event_menu_url'] !== '' && $url['event_menu_name'] !== '';
-		});
+	public function resolveMediaTypeUrls(array $events, array $urls) {
+		$macros = [
+			'event' => []
+		];
+		$types = [
+			'macros_an' => [
+				'event' => ['{EVENT.TAGS}']
+			]
+		];
 
-		if (!$mediatypes_urls) {
-			return $result;
-		}
+		$urls = CArrayHelper::renameObjectsKeys($urls, ['event_menu_url' => 'url', 'event_menu_name' => 'name']);
+		$url_macros = [];
 
-		foreach ($events_tags as $tag) {
-			$tags[$tag['eventid']][] = $tag;
-		}
+		foreach ($urls as $index => $url) {
+			$matched_macros = $this->extractMacros([$url['url'], $url['name']], $types);
+			$url_macros[$index] = [];
 
-		foreach ($mediatypes_urls as $url) {
-			foreach (['event_menu_url', 'event_menu_name'] as $field) {
-				if (array_key_exists($url[$field], $pos_match)) {
-					continue;
-				}
+			foreach ($matched_macros['macros_an']['event'] as $token => $data) {
+				$url_macros[$index][$token] = true;
 
-				$matches = $this->getMacroPositions($url[$field], $options);
+				foreach ($events as $eventid => $event) {
+					$macro_values[$eventid][$token] = null;
 
-				if ($matches) {
-					$pos_match[$url[$field]] = $matches ? array_reverse($matches, true) : [];
-					$macroses = $this->extractMacros([$url[$field]], $options);
-					$macroses = reset($macroses['macros_an']);
-					$matches = [];
-
-					foreach ($macroses as $match => $macro) {
-						$matches[$match] = $macro['f_num'];
-					}
-
-					$match_tag[$url[$field]] = $matches;
+					$macros['event'][$eventid][$data['f_num']][$token] = true;
 				}
 			}
 		}
 
-		foreach ($tags as $eventid => $event_tags) {
-			CArrayHelper::sort($event_tags, ['tag', 'value']);
-			$tag_value = [];
+		foreach ($events as $eventid => $event) {
+			if (!array_key_exists($eventid, $macros['event'])) {
+				continue;
+			}
 
-			foreach ($event_tags as $tag) {
+			CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+			$tag_value = [];
+			foreach ($event['tags'] as $tag) {
 				$tag_value += [$tag['tag'] => $tag['value']];
 			}
 
-			foreach ($mediatypes_urls as $mediatype_url) {
-				$url = [
-					'mediatypeid' => $mediatype_url['mediatypeid'],
-					'eventid' => $eventid,
-					'url' => $mediatype_url['event_menu_url'],
-					'name' => $mediatype_url['event_menu_name']
-				];
-
-				$diff_url = array_key_exists($url['url'], $match_tag)
-					? array_diff($match_tag[$url['url']], array_keys($tag_value))
-					: [];
-				$diff_name = array_key_exists($url['name'], $match_tag)
-					? array_diff($match_tag[$url['name']], array_keys($tag_value))
-					: [];
-
-				if ($diff_url || $diff_name) {
-					continue;
-				}
-
-				if (array_key_exists($url['url'], $match_tag)) {
-					foreach ($pos_match[$url['url']] as $pos => $match) {
-						$tag = $match_tag[$url['url']][$match];
-						$url['url'] = substr_replace($url['url'], $tag_value[$tag], $pos, strlen($match));
+			foreach ($macros['event'][$eventid] as $f_num => $tokens) {
+				if (array_key_exists($f_num, $tag_value)) {
+					foreach ($tokens as $token => $foo) {
+						$macro_values[$eventid][$token] = $tag_value[$f_num];
 					}
 				}
-
-				if (array_key_exists($url['name'], $match_tag)) {
-					foreach ($pos_match[$url['name']] as $pos => $match) {
-						$tag = $match_tag[$url['name']][$match];
-						$url['name'] = substr_replace($url['name'], $tag_value[$tag], $pos, strlen($match));
-					}
-				}
-
-				$result[$url['mediatypeid']] = $url;
 			}
 		}
 
-		return $result;
+		$types = $this->transformToPositionTypes($types);
+
+		foreach ($events as $eventid => $event) {
+			foreach ($urls as $index => $url) {
+				foreach ($url_macros[$index] as $macro => $foo) {
+					if ($macro_values[$eventid][$macro] === null) {
+						continue 2;
+					}
+				}
+
+				$events[$eventid]['urls'][] =
+					str_replace(array_keys($macro_values[$eventid]), $macro_values[$eventid], $url);
+			}
+		}
+
+		return $events;
 	}
 }

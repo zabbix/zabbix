@@ -503,13 +503,27 @@ class CProblem extends CApiService {
 
 		// Resolve webhook urls.
 		if ($this->outputIsRequested('urls', $options['output'])) {
-			$tags = DB::select('problem_tag', [
+			$tags_options = [
 				'output' => ['eventid', 'tag', 'value'],
 				'filter' => ['eventid' => $eventids]
-			]);
+			];
+			$tags = DBselect(DB::makeSql('problem_tag', $tags_options));
+
+			$events = [];
+
+			foreach ($result as $event) {
+				$events[$event['eventid']]['tags'] = [];
+			}
+
+			while ($tag = DBfetch($tags)) {
+				$events[$tag['eventid']]['tags'][] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
 
 			$urls = DB::select('media_type', [
-				'output' => ['mediatypeid', 'event_menu_url', 'event_menu_name'],
+				'output' => ['event_menu_url', 'event_menu_name'],
 				'filter' => [
 					'type' => MEDIA_TYPE_WEBHOOK,
 					'status' => MEDIA_TYPE_STATUS_ACTIVE,
@@ -517,11 +531,11 @@ class CProblem extends CApiService {
 				]
 			]);
 
-			$urls = CMacrosResolverHelper::resolveMediaTypeUrls($tags, $urls);
+			$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
 
-			$relation_map = $this->createRelationMap($urls, 'eventid', 'mediatypeid');
-			$urls = $this->unsetExtraFields($urls, ['eventid', 'mediatypeid'], []);
-			$result = $relation_map->mapMany($result, $urls, 'urls');
+			foreach ($events as $eventid => $event) {
+				$result[$eventid]['urls'] = $event['urls'];
+			}
 		}
 
 		// Adding event tags.

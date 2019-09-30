@@ -633,22 +633,21 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Return associative array of mediatypes urls with resolved {EVENT.TAG} macro in form
-	 * ['mediatypeid' => .. 'eventid' => .. 'url' => .. 'name' => ..] where key will be 'mediatypeid' value.
+	 * Return associative array of urls with resolved {EVENT.TAGS.*} macro in form
+	 * [<eventid> => ['urls' => [['url' => .. 'name' => ..], ..]]].
 	 *
-	 * @param array  $tags                       Array of event tags.
-	 * @param int    $tags[]['eventid']          Event tag eventid.
-	 * @param string $tags[]['tag']              Event tag tag field value.
-	 * @param string $tags[]['value']            Event tag value field value.
-	 * @param array  $urls                       Array of mediatype urls.
-	 * @param int    $urls[]['mediatypeid']      Media type mediatypeid.
-	 * @param string $urls[]['event_menu_url']   Media type url field value.
-	 * @param string $urls[]['event_menu_name']  Media type url_name field value.
+	 * @param array  $events                                Array of event tags.
+	 * @param string $events[<eventid>]['tags'][]['tag']    Event tag tag field value.
+	 * @param string $events[<eventid>]['tags'][]['value']  Event tag value field value.
+	 * @param array  $urls                                  Array of mediatype urls.
+	 * @param string $urls[]['event_menu_url']              Media type url field value.
+	 * @param string $urls[]['event_menu_name']             Media type url_name field value.
+	 *
 	 * @return array
 	 */
-	public static function resolveMediaTypeUrls(array $tags, array $urls) {
+	public static function resolveMediaTypeUrls(array $events, array $urls) {
 		self::init();
 
-		return self::$macrosResolver->resolveMediaTypeUrls($tags, $urls);
+		return self::$macrosResolver->resolveMediaTypeUrls($events, $urls);
 	}
 }
