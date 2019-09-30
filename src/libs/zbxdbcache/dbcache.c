@@ -4462,6 +4462,8 @@ void	DCupdate_hosts_availability(void)
 		{
 			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		}
+		else
+			continue;
 
 		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
