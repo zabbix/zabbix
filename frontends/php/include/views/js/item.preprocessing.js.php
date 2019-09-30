@@ -314,9 +314,7 @@
 				var step_nums = [];
 				$('select[name^="preprocessing"][name$="[type]"]', $preprocessing).each(function() {
 					var str = $(this).attr('name');
-					console.log(str);
 					step_nums.push(str.substr(14, str.length - 21));
-					console.log(step_nums);
 				});
 
 				openPreprocessingTestDialog(step_nums, true, this);
