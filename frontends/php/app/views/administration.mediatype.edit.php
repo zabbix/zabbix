@@ -231,23 +231,21 @@ $mediatype_formlist
 			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
 		'row_webhook_show_event_menu'
 	)
-	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))
-			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))->setAsteriskMark(),
 		(new CTextBox('event_menu_name', $data['event_menu_name'], false,
 			DB::getFieldLength('media_type', 'event_menu_name')
 		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_url_name'
 	)
-	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))
-			->setAsteriskMark($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))->setAsteriskMark(),
 		(new CTextBox('event_menu_url', $data['event_menu_url'], false,
 			DB::getFieldLength('media_type', 'event_menu_url')
 		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($data['show_event_menu'] != ZBX_EVENT_MENU_SHOW)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 			->setAriaRequired(),
 		'row_webhook_event_menu_url'
 	)

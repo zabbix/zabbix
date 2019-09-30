@@ -142,10 +142,6 @@ class CControllerMediatypeCreate extends CController {
 						$parameters['value']
 					);
 				}
-
-				if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-					unset($mediatype['event_menu_url'], $mediatype['event_menu_name']);
-				}
 				break;
 		}
 
