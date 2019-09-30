@@ -77,7 +77,7 @@ typedef struct
 	int			maxsessions;
 	int			maxattempts;
 	unsigned char		content_type;
-	unsigned char		save_tags;
+	unsigned char		process_tags;
 	time_t			last_access;
 }
 zbx_am_db_mediatype_t;

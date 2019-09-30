@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ALERT_DB_H
-#define ZABBIX_ALERT_DB_H
+#ifndef ZABBIX_ALERT_SYNCER_H
+#define ZABBIX_ALERT_SYNCER_H
 
 
-ZBX_THREAD_ENTRY(alert_db_thread, args);
+ZBX_THREAD_ENTRY(alert_syncer_thread, args);
 
 
 #endif

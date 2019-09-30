@@ -334,7 +334,7 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 		zbx_serialize_prepare_value(data_len, mt->content_type);
 		zbx_serialize_prepare_str_len(data_len, mt->script, script_len);
 		zbx_serialize_prepare_str_len(data_len, mt->timeout, timeout_len);
-		zbx_serialize_prepare_value(data_len, mt->save_tags);
+		zbx_serialize_prepare_value(data_len, mt->process_tags);
 
 		while (data_len > data_alloc - data_offset)
 		{
@@ -363,7 +363,7 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 		ptr += zbx_serialize_value(ptr, mt->content_type);
 		ptr += zbx_serialize_str(ptr, mt->script, script_len);
 		ptr += zbx_serialize_str(ptr, mt->timeout, timeout_len);
-		(void)zbx_serialize_value(ptr, mt->save_tags);
+		(void)zbx_serialize_value(ptr, mt->process_tags);
 
 		data_offset += data_len;
 	}
@@ -405,7 +405,7 @@ void	zbx_alerter_deserialize_mediatypes(const unsigned char *data, zbx_am_db_med
 		data += zbx_deserialize_value(data, &mt->content_type);
 		data += zbx_deserialize_str(data, &mt->script, len);
 		data += zbx_deserialize_str(data, &mt->timeout, len);
-		data += zbx_deserialize_value(data, &mt->save_tags);
+		data += zbx_deserialize_value(data, &mt->process_tags);
 
 		(*mediatypes)[i] = mt;
 	}

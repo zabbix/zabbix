@@ -199,7 +199,7 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_LLDMANAGER_FORKS;
 		case ZBX_PROCESS_TYPE_LLDWORKER:
 			return CONFIG_LLDWORKER_FORKS;
-		case ZBX_PROCESS_TYPE_ALERTDB:
+		case ZBX_PROCESS_TYPE_ALERTSYNCER:
 			return CONFIG_ALERTDB_FORKS;
 	}
 

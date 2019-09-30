@@ -47,8 +47,7 @@
 #define ZBX_ALERTPOOL_SOURCE(id) (id >> 48)
 
 #define ZBX_AM_MEDIATYPE_FLAG_NONE	0x00
-#define ZBX_AM_MEDIATYPE_FLAG_TAGS	0x01
-#define ZBX_AM_MEDIATYPE_FLAG_REMOVE	0x02
+#define ZBX_AM_MEDIATYPE_FLAG_REMOVE	0x01
 
 #define ZBX_DB_PING_FREQUENCY		SEC_PER_MIN
 
@@ -349,7 +348,7 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
  *                                                                            *
  ******************************************************************************/
 static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediatype, const char *script,
-		const char *timeout, int save_tags)
+		const char *timeout)
 {
 	if (FAIL == is_time_suffix(timeout, &mediatype->timeout, ZBX_LENGTH_UNLIMITED))
 	{
@@ -374,8 +373,6 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
 	}
 
 	mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_NONE;
-	if (0 != save_tags)
-		mediatype->flags |= ZBX_AM_MEDIATYPE_FLAG_TAGS;
 }
 
 /******************************************************************************
@@ -394,7 +391,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
 		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char content_type,
-		const char *script, const char *timeout, int save_tags)
+		const char *script, const char *timeout)
 {
 	zbx_am_mediatype_t	*mediatype;
 
@@ -441,7 +438,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, int
 	}
 
 	if (MEDIA_TYPE_WEBHOOK == mediatype->type)
-		zbx_am_update_webhook(manager, mediatype, script, timeout, save_tags);
+		zbx_am_update_webhook(manager, mediatype, script, timeout);
 }
 
 /******************************************************************************
@@ -1083,7 +1080,6 @@ static char	*am_create_db_alert_message(void)
  ******************************************************************************/
 static void	am_queue_watchdog_alerts(zbx_am_t *manager)
 {
-	int			now;
 	zbx_am_media_t		*media;
 	zbx_am_mediatype_t	*mediatype;
 	zbx_am_alertpool_t	*alertpool;
@@ -1666,7 +1662,7 @@ static void	am_update_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
 				mt->exec_path, mt->gsm_modem, mt->username, mt->passwd, mt->smtp_port, mt->smtp_security,
 				mt->smtp_verify_peer, mt->smtp_verify_host, mt->smtp_authentication, mt->exec_params,
 				mt->maxsessions, mt->maxattempts, mt->attempt_interval, mt->content_type,
-				mt->script, mt->timeout, mt->save_tags);
+				mt->script, mt->timeout);
 
 		zbx_am_db_mediatype_clear(mt);
 		zbx_free(mt);

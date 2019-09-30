@@ -43,7 +43,7 @@
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
-#include "alerter/alert_db.h"
+#include "alerter/alert_syncer.h"
 #include "dbsyncer/dbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
@@ -428,7 +428,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	}
 	else if (local_server_num <= (server_count += CONFIG_ALERTDB_FORKS))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_ALERTDB;
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTSYNCER;
 		*local_process_num = local_server_num - server_count + CONFIG_ALERTDB_FORKS;
 	}
 	else
@@ -1216,8 +1216,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_LLDWORKER:
 				zbx_thread_start(lld_worker_thread, &thread_args, &threads[i]);
 				break;
-			case ZBX_PROCESS_TYPE_ALERTDB:
-				zbx_thread_start(alert_db_thread, &thread_args, &threads[i]);
+			case ZBX_PROCESS_TYPE_ALERTSYNCER:
+				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}

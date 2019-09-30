@@ -26,7 +26,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "alert_manager.h"
-#include "alert_db.h"
+#include "alert_syncer.h"
 #include "alerter_protocol.h"
 
 #define ZBX_POLL_INTERVAL	1
@@ -254,7 +254,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, const char *exec_params,
 		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char content_type,
-		const char *script, const char *timeout, int save_tags)
+		const char *script, const char *timeout, int process_tags)
 {
 	zbx_am_db_mediatype_t	*mediatype;
 	int			ret = FAIL;
@@ -294,7 +294,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 	ZBX_UPDATE_VALUE(mediatype->maxattempts, maxattempts, ret);
 	ZBX_UPDATE_VALUE(mediatype->content_type, content_type, ret);
 
-	ZBX_UPDATE_VALUE(mediatype->save_tags, save_tags, ret);
+	ZBX_UPDATE_VALUE(mediatype->process_tags, process_tags, ret);
 
 	return SUCCEED == ret ? mediatype : NULL;
 }
@@ -331,7 +331,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 			"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
 				"exec_params,maxsessions,maxattempts,attempt_interval,content_type,script,timeout,"
-				"save_tags"
+				"process_tags"
 			" from media_type"
 			" where");
 
@@ -632,7 +632,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 					result->alertid);
 
 			if (NULL != (mediatype = zbx_hashset_search(&amdb->mediatypes, &result->mediatypeid)) &&
-					0 != mediatype->save_tags && NULL != result->value)
+					0 != mediatype->process_tags && NULL != result->value)
 			{
 				am_db_update_event_tags(&db_event, &db_problem, result->eventid, result->value);
 			}
@@ -792,7 +792,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, medias_num);
 }
 
-ZBX_THREAD_ENTRY(alert_db_thread, args)
+ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
 	double		sec1, sec2;
 	int		alerts_num, sleeptime, nextcheck, freq_watchdog, time_watchdog = 0, time_cleanup = 0,
