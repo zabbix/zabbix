@@ -1043,7 +1043,7 @@ class CWidgetHelper {
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregate by'),
+							->addRow(_('Aggregate'),
 								(new CRadioButtonList(
 									$field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
