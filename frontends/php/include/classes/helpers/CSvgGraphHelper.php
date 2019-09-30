@@ -221,12 +221,10 @@ class CSvgGraphHelper {
 						break;
 					case GRAPH_AGGREGATE_AVG:
 						foreach ($metric_points as $tick => $point) {
-							if ($point['count']) {
-								$metric['points'][] = [
-									'clock' => $tick,
-									'value' => array_sum($point['value']) / array_sum($point['count'])
-								];
-							}
+							$metric['points'][] = [
+								'clock' => $tick,
+								'value' => array_sum($point['value']) / count($point['value'])
+							];
 						}
 						break;
 					case GRAPH_AGGREGATE_COUNT:

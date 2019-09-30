@@ -454,7 +454,7 @@ class CHistoryManager {
 				$aggs['value'] = ['max' => ['field' => 'value']];
 				break;
 			case GRAPH_AGGREGATE_AVG:
-				$aggs['value'] = ['sum' => ['field' => 'value']];
+				$aggs['value'] = ['avg' => ['field' => 'value']];
 				break;
 			case GRAPH_AGGREGATE_SUM:
 				$aggs['value'] = ['sum' => ['field' => 'value']];
@@ -579,7 +579,7 @@ class CHistoryManager {
 							$sql_select[] = 'MAX(value) AS value, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_AVG:
-							$sql_select[] = 'COUNT(*) AS count, SUM(value) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'AVG(value) AS value, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_COUNT:
 							$sql_select[] = 'COUNT(*) AS count, MAX(clock) AS clock';
@@ -605,7 +605,7 @@ class CHistoryManager {
 							$sql_select[] = 'MAX(value_max) AS value, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_AVG:
-							$sql_select[] = 'SUM(num) AS count, SUM(value_avg) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'AVG(value_avg) AS value, MAX(clock) AS clock';
 							break;
 						case GRAPH_AGGREGATE_COUNT:
 							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
