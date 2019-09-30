@@ -635,10 +635,9 @@ class CHistoryManager {
 					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
-					$sql = 'SELECT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
+					$sql = 'SELECT DISTINCT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
 						' FROM '.$sql_from.' AS h'.
-						' JOIN('.$sql.') AS hi ON h.itemid = hi.itemid AND h.clock = hi.clock'.
-						' GROUP BY itemid, tick';
+						' JOIN('.$sql.') AS hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
 				}
 
 				$sql_result = DBselect($sql);
