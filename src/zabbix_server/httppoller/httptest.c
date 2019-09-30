@@ -677,7 +677,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &buffer,
 			MACRO_TYPE_COMMON, NULL, 0);
 
-	/* Explicitly initialize the name to avoid the potential usage of uninitialized values when: */
+	/* Avoid the potential usage of uninitialized values when: */
 	/* 1) compile without libCURL support */
 	/* 2) update interval is invalid */
 	db_httpstep.name = NULL;
