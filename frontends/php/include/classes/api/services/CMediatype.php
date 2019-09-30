@@ -673,18 +673,6 @@ class CMediatype extends CApiService {
 			}
 			$mediatype = $validated_data + $mediatype;
 
-			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-				if (array_key_exists('show_event_menu', $mediatype)
-						&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-					if (!array_key_exists('event_menu_url', $mediatype)) {
-						$mediatype['event_menu_url'] = '';
-					}
-					if (!array_key_exists('event_menu_name', $mediatype)) {
-						$mediatype['event_menu_name'] = '';
-					}
-				}
-			}
-
 			// Validate optional 'status' field and only when status is changed.
 			if (array_key_exists('status', $mediatype) && $db_mediatype['status'] != $mediatype['status']) {
 				$status_validator = new CLimitedSetValidator([
@@ -813,22 +801,21 @@ class CMediatype extends CApiService {
 		$this->validateCreate($mediatypes);
 
 		$mediatypeids = DB::insert('media_type', $mediatypes);
-		$webhook_params = [];
+		$ins_media_type_param = [];
 
-		foreach ($mediatypes as $i => &$mediatype) {
+		foreach ($mediatypes as $i => $mediatype) {
 			$mediatypeid = $mediatypeids[$i];
-			$mediatype['mediatypeid'] = $mediatypeid;
+			$mediatypes[$i]['mediatypeid'] = $mediatypeid;
 
 			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('parameters', $mediatype)) {
-				foreach ($mediatype['parameters'] as $param) {
-					$webhook_params[] = compact('mediatypeid') + $param;
+				foreach ($mediatype['parameters'] as $parameter) {
+					$ins_media_type_param[] = ['mediatypeid' => $mediatypeid] + $parameter;
 				}
 			}
 		}
-		unset($mediatype);
 
-		if ($webhook_params) {
-			DB::insertBatch('media_type_param', $webhook_params);
+		if ($ins_media_type_param) {
+			DB::insertBatch('media_type_param', $ins_media_type_param);
 		}
 
 		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypes);
@@ -926,6 +913,18 @@ class CMediatype extends CApiService {
 					$webhooks_params[$mediatypeid] = $params;
 					unset($mediatype['parameters']);
 				}
+
+				if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+					if (array_key_exists('show_event_menu', $mediatype)
+							&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+						if (!array_key_exists('event_menu_url', $mediatype)) {
+							$mediatype['event_menu_url'] = '';
+						}
+						if (!array_key_exists('event_menu_name', $mediatype)) {
+							$mediatype['event_menu_name'] = '';
+						}
+					}
+				}
 			}
 
 			if ($type != $db_type) {
@@ -945,9 +944,9 @@ class CMediatype extends CApiService {
 		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 		if ($webhooks_params) {
-			$ins_webhook_params = [];
-			$del_webhook_params = [];
-			$upd_webhook_params = [];
+			$ins_media_type_param = [];
+			$del_media_type_param = [];
+			$upd_media_type_param = [];
 			$db_webhooks_params = DB::select('media_type_param', [
 				'output' => ['mediatype_paramid', 'mediatypeid', 'name', 'value'],
 				'filter' => ['mediatypeid' => array_keys($webhooks_params)]
@@ -957,13 +956,13 @@ class CMediatype extends CApiService {
 				$mediatypeid = $param['mediatypeid'];
 
 				if (!array_key_exists($mediatypeid, $webhooks_params)) {
-					$del_webhook_params[] = $param['mediatype_paramid'];
+					$del_media_type_param[] = $param['mediatype_paramid'];
 				}
 				elseif (!array_key_exists($param['name'], $webhooks_params[$mediatypeid])) {
-					$del_webhook_params[] = $param['mediatype_paramid'];
+					$del_media_type_param[] = $param['mediatype_paramid'];
 				}
 				elseif ($webhooks_params[$mediatypeid][$param['name']] !== $param['value']) {
-					$upd_webhook_params[] = [
+					$upd_media_type_param[] = [
 						'values' => ['value' => $webhooks_params[$mediatypeid][$param['name']]],
 						'where' => ['mediatype_paramid' => $param['mediatype_paramid']]
 					];
@@ -978,20 +977,20 @@ class CMediatype extends CApiService {
 
 			foreach ($webhooks_params as $mediatypeid => $params) {
 				foreach ($params as $name => $value) {
-					$ins_webhook_params[] = compact('mediatypeid', 'name', 'value');
+					$ins_media_type_param[] = compact('mediatypeid', 'name', 'value');
 				}
 			}
 
-			if ($del_webhook_params) {
-				DB::delete('media_type_param', ['mediatype_paramid' => array_keys(array_flip($del_webhook_params))]);
+			if ($del_media_type_param) {
+				DB::delete('media_type_param', ['mediatype_paramid' => array_keys(array_flip($del_media_type_param))]);
 			}
 
-			if ($upd_webhook_params) {
-				DB::update('media_type_param', $upd_webhook_params);
+			if ($upd_media_type_param) {
+				DB::update('media_type_param', $upd_media_type_param);
 			}
 
-			if ($ins_webhook_params) {
-				DB::insert('media_type_param', $ins_webhook_params);
+			if ($ins_media_type_param) {
+				DB::insert('media_type_param', $ins_media_type_param);
 			}
 		}
 
@@ -1024,11 +1023,12 @@ class CMediatype extends CApiService {
 
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
-			'filter' => ['mediatypeid' => $mediatypeids],
+			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
 
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
+
 		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MEDIA_TYPE, $db_mediatypes);
 
 		return ['mediatypeids' => $mediatypeids];
@@ -1095,20 +1095,19 @@ class CMediatype extends CApiService {
 		}
 
 		if ($this->outputIsRequested('parameters', $options['output'])) {
-			foreach ($result as &$mediatype) {
-				$mediatype['parameters'] = [];
+			foreach ($result as $mediatypeid => $mediatype) {
+				$result[$mediatypeid]['parameters'] = [];
 			}
-			unset($mediatype);
 
-			$mediatype_params = DB::select('media_type_param', [
+			$parameters = DB::select('media_type_param', [
 				'output' => ['mediatypeid', 'name', 'value'],
 				'filter' => ['mediatypeid' => array_keys($result)]
 			]);
 
-			foreach ($mediatype_params as $param) {
-				$result[$param['mediatypeid']]['parameters'][] = [
-					'name' => $param['name'],
-					'value' => $param['value']
+			foreach ($parameters as $parameter) {
+				$result[$parameter['mediatypeid']]['parameters'][] = [
+					'name' => $parameter['name'],
+					'value' => $parameter['value']
 				];
 			}
 		}
