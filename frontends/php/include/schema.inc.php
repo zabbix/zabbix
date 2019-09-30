@@ -1861,19 +1861,25 @@ return [
 				'length' => 32,
 				'default' => '30s',
 			],
-			'save_tags' => [
+			'process_tags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
 			],
-			'url' => [
+			'show_event_menu' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'event_menu_url' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => '',
 			],
-			'url_name' => [
+			'event_menu_name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -7180,30 +7186,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid',
-			],
-		],
-	],
-	'task_event_tag' => [
-		'key' => 'taskid',
-		'fields' => [
-			'taskid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'task',
-				'ref_field' => 'taskid',
-			],
-			'eventid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'events',
-				'ref_field' => 'eventid',
-			],
-			'tags' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => '',
 			],
 		],
 	],

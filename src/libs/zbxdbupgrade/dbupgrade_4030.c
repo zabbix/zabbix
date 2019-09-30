@@ -490,33 +490,40 @@ static int	DBpatch_4030033(void)
 
 static int	DBpatch_4030034(void)
 {
-	const ZBX_FIELD	field = {"save_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"process_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030035(void)
 {
-	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"show_event_menu", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030036(void)
 {
-	const ZBX_FIELD	field = {"url_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"event_menu_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030037(void)
 {
-	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"event_menu_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030038(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_4030039(void)
 {
 	const ZBX_TABLE table =
 		{"media_type_param", "mediatype_paramid", 0,
@@ -533,46 +540,23 @@ static int	DBpatch_4030038(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4030039(void)
+static int	DBpatch_4030040(void)
 {
 	return DBcreate_index("media_type_param", "media_type_param_1", "mediatypeid", 0);
 }
 
-static int	DBpatch_4030040(void)
+static int	DBpatch_4030041(void)
 {
 	const ZBX_FIELD	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_param", 1, &field);
 }
 
-static int	DBpatch_4030041(void)
+static int	DBpatch_4030042(void)
 {
 	const ZBX_FIELD	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("alerts", &field);
-}
-
-static int	DBpatch_4030042(void)
-{
-	const ZBX_TABLE table =
-		{"task_event_tag", "taskid", 0,
-			{
-				{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-				{"tags", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_4030043(void)
-{
-	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("task_event_tag", 1, &field);
 }
 
 #endif
@@ -623,6 +607,5 @@ DBPATCH_ADD(4030039, 0, 1)
 DBPATCH_ADD(4030040, 0, 1)
 DBPATCH_ADD(4030041, 0, 1)
 DBPATCH_ADD(4030042, 0, 1)
-DBPATCH_ADD(4030043, 0, 1)
 
 DBPATCH_END()
