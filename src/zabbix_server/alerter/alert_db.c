@@ -468,7 +468,7 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	struct zbx_json_parse	jp;
+	struct zbx_json_parse	jp, jp_tags;
 	const char		*pnext = NULL;
 	char			key[TAG_NAME_LEN * 4 + 1], value[TAG_VALUE_LEN * 4 + 1];
 	zbx_vector_ptr_t	tags;
@@ -499,13 +499,19 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 
 	if (FAIL == zbx_json_open(params, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned event tags: %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned result: %s", zbx_json_strerror());
+		return;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TAGS, &jp_tags))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned result: missing tags field");
 		return;
 	}
 
 	zbx_vector_ptr_create(&tags);
 
-	while (NULL != (pnext = zbx_json_pair_next(&jp, pnext, key, sizeof(key))))
+	while (NULL != (pnext = zbx_json_pair_next(&jp_tags, pnext, key, sizeof(key))))
 	{
 		if (NULL == zbx_json_decodevalue(pnext, value, sizeof(value), NULL))
 		{
