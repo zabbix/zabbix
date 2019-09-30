@@ -477,7 +477,7 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " tags:%s", __func__, eventid, params);
 
-	result = DBselect("select e.eventid,e.source,e.value,p.eventid"
+	result = DBselect("select e.source,p.eventid"
 			" from events e left join problem p"
 				" on p.eventid=e.eventid"
 			" where e.eventid=" ZBX_FS_UI64, eventid);
@@ -488,13 +488,13 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 		goto out;
 	}
 
-	if (EVENT_SOURCE_TRIGGERS != atoi(row[1]) || EVENT_STATUS_PROBLEM != atoi(row[2]))
+	if (EVENT_SOURCE_TRIGGERS != atoi(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "tags can be added only for problem trigger events");
 		goto out;
 	}
 
-	if (SUCCEED != DBis_null(row[3]))
+	if (SUCCEED != DBis_null(row[1]))
 		problem = 1;
 
 	if (FAIL == zbx_json_open(params, &jp))
