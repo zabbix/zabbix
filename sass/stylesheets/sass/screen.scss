@@ -3337,7 +3337,13 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-// Dashboard, widgets and iterators
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
 
 .dashbrd-grid-container {
 	position: relative;
@@ -3420,6 +3426,14 @@ $form-icon-btn: (
 			.dashbrd-grid-new-widget-label::before {
 				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
 			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
 		}
 	}
 }
@@ -3511,7 +3525,6 @@ $form-icon-btn: (
 		}
 
 		tbody tr {
-
 			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
@@ -3537,15 +3550,15 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-mask {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	bottom: .25rem;
 	display: none;
 }
 
 .dashbrd-grid-widget {
-
 	&.dashbrd-grid-widget-hidden-header {
-
 		.dashbrd-grid-widget-head {
 			height: 0;
 			transition: height .3s, margin-top .3s, box-shadow .3s;
@@ -3556,25 +3569,22 @@ $form-icon-btn: (
 			padding-top: 8px;
 		}
 
-		&.dashbrd-grid-widget-focus, &:hover {
-
+		&.dashbrd-grid-widget-focus {
 			.dashbrd-grid-widget-head {
 				height: 2rem;
 				margin-top: -2rem;
-				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
 			}
 		}
 	}
 
-	&.dashbrd-grid-widget-focus, &:hover {
-
+	&.dashbrd-grid-widget-focus {
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
 		}
 	}
 
 	&.ui-resizable-resizing.resizing-top {
-
 		.dashbrd-grid-widget-container {
 			top: auto;
 			bottom: 0;
@@ -3582,7 +3592,6 @@ $form-icon-btn: (
 	}
 
 	&.ui-resizable-resizing.resizing-left {
-
 		.dashbrd-grid-widget-container {
 			left: auto;
 			right: 0;
@@ -3617,8 +3626,10 @@ $form-icon-btn: (
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
 	background-color: $ui-bg-color;
-	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 	opacity: 0;
+
+	// Transition for opacity is set for best border disappearance on different themes.
+	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -3710,15 +3721,15 @@ $form-icon-btn: (
 
 .dashbrd-grid-iterator-mask {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	bottom: .25rem;
 	display: none;
 }
 
 .dashbrd-grid-iterator {
-
 	&.iterator-too-small {
-
 		.dashbrd-grid-iterator-too-small {
 			display: flex;
 		}
@@ -3728,12 +3739,11 @@ $form-icon-btn: (
 		}
 	}
 
-	&.dashbrd-grid-iterator-focus, &:hover {
-
+	&.dashbrd-grid-iterator-focus {
 		.dashbrd-grid-iterator-head {
 			margin-top: -2rem;
 			height: 2rem;
-			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
+			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
@@ -3741,7 +3751,6 @@ $form-icon-btn: (
 		}
 
 		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
-
 			.dashbrd-grid-iterator-head {
 				margin-top: -4rem;
 				height: 4rem;
@@ -3750,7 +3759,6 @@ $form-icon-btn: (
 	}
 
 	&.ui-resizable-resizing.resizing-top {
-
 		.dashbrd-grid-iterator-container {
 			top: auto;
 			bottom: 0;
@@ -3758,7 +3766,6 @@ $form-icon-btn: (
 	}
 
 	&.ui-resizable-resizing.resizing-left {
-
 		.dashbrd-grid-iterator-container {
 			left: auto;
 			right: 0;
@@ -3766,7 +3773,6 @@ $form-icon-btn: (
 	}
 
 	&.iterator-alt-content {
-
 		.dashbrd-grid-iterator-content {
 			position: absolute;
 			top: .25rem;
@@ -3791,7 +3797,6 @@ $form-icon-btn: (
 					}
 
 					tbody tr {
-
 						&:last-child th, &:last-child td {
 							border-bottom: 1px solid $table-border-color;
 
@@ -3811,64 +3816,30 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-container.dashbrd-mode-edit {
-
-	$resizing_background_color: darken($body-bg-color, 6%);
-
 	.dashbrd-grid-widget-actions {
 		@include opacity(1);
 	}
 
-	.dashbrd-grid-widget.ui-resizable-resizing {
-		background-color: $resizing_background_color;
-	}
+	&.dashbrd-positioning {
+		// No lazy transitions while dragging or resizing.
 
-	.dashbrd-grid-iterator-head {
-		margin-top: 0;
-		height: 2rem;
-		border-bottom: 1px solid $ui-border-color;
-		box-shadow: 0 6px 8px -2px rgba(128,128,128,0.15);
-		transition: none;
-		z-index: 7;
-	}
-
-	.dashbrd-grid-iterator-content {
-		// Not to see the placeholder through while dragging the iterator.
-		// Will conflict with floating headers, if moved outside the dashbrd-mode-edit section.
-		background-color: $body-bg-color;
-	}
-
-	.dashbrd-grid-iterator {
-
-		&.dashbrd-grid-iterator-focus, &:hover {
-
-			.dashbrd-grid-iterator-head {
-				opacity: 0;
+		.dashbrd-grid-widget {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					transition: none;
+				}
 			}
 		}
 
-		&.ui-resizable-resizing {
-			background-color: $resizing_background_color;
-
-			// Fix for Opera, for disappearing iterator headers while resizing.
-			.dashbrd-grid-iterator-head {
-				opacity: 1;
-			}
-
-			.dashbrd-grid-iterator-content {
-				background-color: $resizing_background_color;
+		.dashbrd-grid-iterator {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					transition: none;
+				}
 			}
 		}
 
-		&.iterator-alt-content {
-
-			.dashbrd-grid-iterator-content {
-				padding-top: 2rem;
-				background-color: $ui-bg-color;
-			}
-		}
-	}
-
-	&.dashbrd-resizing {
+		// No widget interactivity while dragging or resizing.
 
 		.dashbrd-grid-widget-mask {
 			display: block;
@@ -3879,39 +3850,157 @@ $form-icon-btn: (
 		}
 	}
 
-	&:not(.dashbrd-resizing) {
+	.dashbrd-grid-widget {
+		.ui-resizable-handle {
+			visibility: hidden;
+		}
 
-		.dashbrd-grid-iterator {
+		&.dashbrd-grid-widget-focus .ui-resizable-handle {
+			visibility: visible;
+		}
 
-			&.dashbrd-grid-iterator-focus, &:hover {
-
-				.dashbrd-grid-iterator-head {
-					opacity: 1;
+		&.ui-resizable-resizing {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					margin-top: 0;
+					height: 0;
+					box-shadow: none;
 				}
+			}
+		}
+
+		&.ui-draggable-dragging {
+			.ui-resizable-handle {
+				visibility: hidden;
+			}
+
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					margin-top: -2rem;
+					height: 2rem;
+					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+					opacity: 0.5;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			z-index: 1000;
+
+			&::before {
+				content: '';
+				display: block;
+				position: absolute;
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
+				background-color: rgba(darken($body-bg-color, 6%), .75);
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
+			}
+
+			.dashbrd-grid-widget-head {
+				border-color: darken($ui-border-color, 6%);
+			}
+
+			.dashbrd-grid-widget-content {
+				border-color: darken($ui-border-color, 6%);
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		.ui-resizable-handle {
+			visibility: hidden;
+		}
+
+		&.dashbrd-grid-iterator-focus .ui-resizable-handle {
+			visibility: visible;
+		}
+
+		&.ui-resizable-resizing {
+			.dashbrd-grid-iterator-head {
+				margin-top: 0;
+				height: 0;
+				box-shadow: none;
+				opacity: 0;
+			}
+		}
+
+		&.ui-draggable-dragging {
+			.ui-resizable-handle {
+				visibility: hidden;
+			}
+
+			.dashbrd-grid-iterator-head {
+				margin-top: -2rem;
+				height: 2rem;
+				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				opacity: 0.5;
+			}
+
+			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
+				.dashbrd-grid-iterator-head {
+					margin-top: -4rem;
+					height: 4rem;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			z-index: 1000;
+
+			&::before {
+				content: '';
+				display: block;
+				position: absolute;
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
+				background-color: rgba(darken($body-bg-color, 6%), .75);
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
+			}
+
+			.dashbrd-grid-iterator-head {
+				border-color: darken($ui-border-color, 6%);
+			}
+
+			.dashbrd-grid-iterator-content {
+				.dashbrd-grid-widget {
+					.dashbrd-grid-widget-head {
+						border-color: darken($ui-border-color, 6%);
+					}
+
+					.dashbrd-grid-widget-content {
+						border-color: darken($ui-border-color, 6%);
+					}
+				}
+
+				.dashbrd-grid-iterator-placeholder > div {
+					border-color: darken($ui-border-color, 6%);
+				}
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: 1px solid darken($ui-border-color, 8%);
+				border-top: 0;
 			}
 		}
 	}
 
 	.dashbrd-grid-widget-placeholder {
-		border-color: darken($body-bg-color, 6%) !important;
-		background-color: darken($body-bg-color, 6%) !important;
 		position: absolute;
 		z-index: 999;
-	}
 
-	.dashbrd-grid-widget-set-size {
-		.dashbrd-grid-new-widget-label {
-			&::before {
-				background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
-			}
+		& > div {
+			position: absolute;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			bottom: .25rem;
+			background-color: darken($body-bg-color, 6%) !important;
 		}
-	}
-
-	.dashbrd-grid-widget-draggable {
-		border-color: $action-border-color !important;
-		border-bottom-color: darken($action-border-color, 1%) !important;
-		@include box-shadow(0 4px 20px 0 $action-shadow-color);
-		z-index: 1000;
 	}
 }
 
