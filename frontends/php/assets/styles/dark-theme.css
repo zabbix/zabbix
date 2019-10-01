@@ -587,11 +587,13 @@ output {
       background-position: -165px -624px; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-']:not(.icon-description) {
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
     background-color: #2b2b2b; }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wzrd-action {
     background-color: transparent; }
   .list-table.compact-view .link-action {
@@ -623,8 +625,9 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
-    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
-      margin-right: 12px; }
+    .list-table.compact-view td [class*='icon-depend-'] {
+      width: 12px;
+      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {

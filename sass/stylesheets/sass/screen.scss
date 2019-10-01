@@ -833,11 +833,13 @@ output {
 
 					&:not(.row-selected):not(:hover) {
 						td {
-							[class*='icon-']:not(.icon-description) {
+							[class*='icon-'] {
 								@include border-radius(2px);
 								background-color: $ui-bg-color;
 							}
 
+							[class*='icon-depend-'],
+							.icon-description,
 							.icon-wzrd-action {
 								background-color: transparent;
 							}
@@ -897,10 +899,8 @@ output {
 			}
 
 			[class*='icon-depend-'] {
-				&,
-				&:last-of-type {
-					margin-right: 12px;
-				}
+				width: 12px;
+				margin-right: 0;
 			}
 
 			.rel-container {
