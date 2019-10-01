@@ -500,13 +500,13 @@ static void	am_db_update_event_tags(zbx_db_insert_t *db_event, zbx_db_insert_t *
 	if (FAIL == zbx_json_open(params, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned result: %s", zbx_json_strerror());
-		return;
+		goto out;
 	}
 
 	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TAGS, &jp_tags))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process returned result: missing tags field");
-		return;
+		goto out;
 	}
 
 	zbx_vector_ptr_create(&tags);
