@@ -93,6 +93,7 @@ duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 			curl_slist_free_all(request->headers);
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
+		zbx_free(request->data);
 		zbx_free(request);
 
 		duk_push_pointer(ctx, NULL);
