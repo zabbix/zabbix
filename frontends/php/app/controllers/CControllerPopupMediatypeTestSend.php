@@ -113,6 +113,8 @@ class CControllerPopupMediatypeTestSend extends CController {
 			foreach ($this->getInput('parameters', []) as $parameter) {
 				$params[$parameter['name']] = $parameter['value'];
 			}
+
+			$params = compact('params');
 		}
 		else {
 			$params = [
@@ -122,7 +124,6 @@ class CControllerPopupMediatypeTestSend extends CController {
 			];
 		}
 
-		$params = compact('params');
 		$params['mediatypeid'] = $this->getInput('mediatypeid');
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testMediaType($params, CWebUser::getSessionCookie());
