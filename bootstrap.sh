@@ -8,15 +8,21 @@ usage()
 	exit 1
 }
 
-[ $# -gt 1 ] && usage
+case $# in
+	0)
+		# disable tests
+		rm -f m4/conf_tests.m4 || exit $?
+		;;
+	1)
+		[ $1 = "tests" ] || usage
 
-if [ $# -eq 1 ]; then
-	[ $1 = "tests" ] || usage
-
-	cp -f tests/conf_tests.m4 m4/ || exit $?
-else
-	[ -f m4/conf_tests.m4 ] && rm -f m4/conf_tests.m4
-fi
+		# enable tests
+		cp -f tests/conf_tests.m4 m4/ || exit $?
+		;;
+	*)
+		usage
+		;;
+esac
 
 aclocal -I m4
 autoconf
@@ -24,6 +30,4 @@ autoheader
 automake -a
 automake
 
-if [ "x$1" != "xtests" ] && [ -f m4/conf_tests.m4 ]; then
-	rm -f m4/conf_tests.m4
-fi
+rm -f m4/conf_tests.m4
