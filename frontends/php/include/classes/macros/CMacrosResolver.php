@@ -2748,15 +2748,18 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$events[$eventid]['urls'] = [];
 
 			foreach ($urls as $index => $url) {
-				foreach ($url_macros[$index] as $macro => $foo) {
-					if ($macro_values[$eventid][$macro] === null) {
-						continue 2;
+				if ($url_macros[$index]) {
+					foreach ($url_macros[$index] as $macro => $foo) {
+						if ($macro_values[$eventid][$macro] === null) {
+							continue 2;
+						}
+					}
+
+					foreach (['url', 'name'] as $field) {
+						$url[$field] = strtr($url[$field], $macro_values[$eventid]);
 					}
 				}
 
-				foreach (['url', 'name'] as $field) {
-					$url[$field] = strtr($url[$field], $macro_values[$eventid]);
-				}
 				$events[$eventid]['urls'][] = $url;
 			}
 		}
