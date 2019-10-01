@@ -497,10 +497,15 @@ static int	DBpatch_4030035(void)
 
 static int	DBpatch_4030036(void)
 {
-	return DBrename_table("host_inventory", "host_inventory_tmp");
+	return DBdrop_foreign_key("host_inventory");
 }
 
 static int	DBpatch_4030037(void)
+{
+	return DBrename_table("host_inventory", "host_inventory_tmp");
+}
+
+static int	DBpatch_4030038(void)
 {
 	/* Store columns on overflow pages to respect row size limit of 8126 bytes on MariaDB. */
 	/* Columns can only be stored on overflow pages if they are 256 bytes or longer.       */
@@ -587,7 +592,7 @@ static int	DBpatch_4030037(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4030038(void)
+static int	DBpatch_4030039(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into host_inventory (select * from host_inventory_tmp)"))
@@ -598,12 +603,12 @@ static int	DBpatch_4030038(void)
 	return FAIL;
 }
 
-static int	DBpatch_4030039(void)
+static int	DBpatch_4030040(void)
 {
 	return DBdrop_table("host_inventory_tmp");
 }
 
-static int	DBpatch_4030040(void)
+static int	DBpatch_4030041(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -656,5 +661,6 @@ DBPATCH_ADD(4030037, 0, 1)
 DBPATCH_ADD(4030038, 0, 1)
 DBPATCH_ADD(4030039, 0, 1)
 DBPATCH_ADD(4030040, 0, 1)
+DBPATCH_ADD(4030041, 0, 1)
 
 DBPATCH_END()
