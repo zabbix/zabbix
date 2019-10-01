@@ -85,9 +85,9 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		$('#tbl_macros')
-			.dynamicRows({template: <?= $data['show_inherited_macros']
-				? "'#macro-row-tmpl-inherited'"
-				: "'#macro-row-tmpl'" ?>})
+			.dynamicRows({remove_next_sibling: <?= (int) $data['show_inherited_macros'] ?>,
+				template: <?= $data['show_inherited_macros'] ? "'#macro-row-tmpl-inherited'" : "'#macro-row-tmpl'" ?>
+			})
 			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
 				if ($(this).hasClass('macro')) {
 					macroToUpperCase(this);
