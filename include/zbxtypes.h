@@ -23,7 +23,11 @@
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)
 #else
-#	define ZBX_THREAD_LOCAL
+#	if defined(__GNUC__) || defined(__clang__)
+#		define ZBX_THREAD_LOCAL __thread
+#	else
+#		define ZBX_THREAD_LOCAL
+#	endif
 #endif
 
 #define	ZBX_FS_DBL		"%lf"

@@ -474,6 +474,34 @@ static int	DBpatch_4030031(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_4030032(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030033(void)
+{
+	const ZBX_FIELD	field = {"alias", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030034(void)
+{
+	const ZBX_FIELD	field = {"os", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
+static int	DBpatch_4030035(void)
+{
+	const ZBX_FIELD	field = {"os_short", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -511,5 +539,8 @@ DBPATCH_ADD(4030028, 0, 1)
 DBPATCH_ADD(4030029, 0, 1)
 DBPATCH_ADD(4030030, 0, 1)
 DBPATCH_ADD(4030031, 0, 1)
-
+DBPATCH_ADD(4030032, 0, 1)
+DBPATCH_ADD(4030033, 0, 1)
+DBPATCH_ADD(4030034, 0, 1)
+DBPATCH_ADD(4030035, 0, 1)
 DBPATCH_END()

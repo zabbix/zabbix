@@ -377,22 +377,22 @@ INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1032, 1001, 'dependent.item.proto.1.2.2.2'  , 18, 'dependent.item.proto.1.2.2.2'  , 1, '90d', 0, 1024, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params, description, posts, headers,           flags) VALUES (1033, 1001, 'item.proto.1'                  ,  2, 'item.proto.1'                  , 1, '90d', 0, NULL, NULL, '', '', '', '',        2);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type,          status, master_itemid, templateid, params, description, posts, headers, lifetime, flags) VALUES (1034, 1001, 'dependent.discovery.rule.1.1'  , 18, 'dependent.discovery.rule.1.1'  , 4,        0, 1001, NULL, '', '', '', '', '30d', 1);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5001, 1017, 1018);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5002, 1017, 1019);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5003, 1017, 1020);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5004, 1017, 1021);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5005, 1017, 1022);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5006, 1017, 1023);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5007, 1017, 1024);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5008, 1017, 1025);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5009, 1017, 1026);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5010, 1017, 1027);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5011, 1017, 1028);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5012, 1017, 1029);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5013, 1017, 1030);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5014, 1017, 1031);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5015, 1017, 1032);
-INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (5016, 1017, 1033);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15001, 1017, 1018);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15002, 1017, 1019);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15003, 1017, 1020);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15004, 1017, 1021);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15005, 1017, 1022);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15006, 1017, 1023);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15007, 1017, 1024);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15008, 1017, 1025);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15009, 1017, 1026);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15010, 1017, 1027);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15011, 1017, 1028);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15012, 1017, 1029);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15013, 1017, 1030);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15014, 1017, 1031);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15015, 1017, 1032);
+INSERT INTO item_discovery (itemdiscoveryid, parent_itemid, itemid) VALUES (15016, 1017, 1033);
 
 -- dependent items: dependent.items.template.1.1
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1002, 'dependent.items.template.1.1', 'dependent.items.template.1.1', 3, '');

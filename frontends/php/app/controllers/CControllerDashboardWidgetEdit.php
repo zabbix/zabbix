@@ -26,6 +26,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'name' => 'string',
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'prev_type' => 'in '.implode(',', array_keys(CWidgetConfig::getKnownWidgetTypes())),
 			'fields' => 'json'
 		];
 
@@ -52,7 +53,14 @@ class CControllerDashboardWidgetEdit extends CController {
 		$known_widget_types = CWidgetConfig::getKnownWidgetTypes();
 		natsort($known_widget_types);
 
-		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
+		if ($this->hasInput('type') && $this->hasInput('prev_type')
+				&& $this->getInput('type') !== $this->getInput('prev_type')) {
+			CProfile::update('web.dashbrd.last_widget_type', $this->getInput('type'), PROFILE_TYPE_STR);
+		}
+
+		$type = $this->getInput('type',
+			CProfile::get('web.dashbrd.last_widget_type', array_keys($known_widget_types)[0])
+		);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
 		// Transforms corrupted data to default values.
 		$form->validate();
@@ -142,27 +150,27 @@ class CControllerDashboardWidgetEdit extends CController {
 		$prototype_graphids = [];
 
 		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldMultiselectGroup) {
+			if ($field instanceof CWidgetFieldMsGroup) {
 				$key = 'groups';
 				$var = 'groupids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectHost) {
+			elseif ($field instanceof CWidgetFieldMsHost) {
 				$key = 'hosts';
 				$var = 'hostids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectItem) {
+			elseif ($field instanceof CWidgetFieldMsItem) {
 				$key = 'items';
 				$var = 'itemids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectGraph) {
+			elseif ($field instanceof CWidgetFieldMsGraph) {
 				$key = 'graphs';
 				$var = 'graphids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectItemPrototype) {
+			elseif ($field instanceof CWidgetFieldMsItemPrototype) {
 				$key = 'item_prototypes';
 				$var = 'prototype_itemids';
 			}
-			elseif ($field instanceof CWidgetFieldMultiselectGraphPrototype) {
+			elseif ($field instanceof CWidgetFieldMsGraphPrototype) {
 				$key = 'graph_prototypes';
 				$var = 'prototype_graphids';
 			}
