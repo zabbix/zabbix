@@ -760,6 +760,43 @@ class CMediatype extends CApiService {
 	}
 
 	/**
+	 * Validates the event_menu_* input parameters.
+	 *
+	 * @param array $mediatype
+	 * @param array $db_mediatype
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateEventMenu(array $mediatype, array $db_mediatype = null) {
+		if ($db_mediatype === null) {
+			$db_mediatype = DB::getDefaults('media_type');
+		}
+
+		foreach (['show_event_menu', 'event_menu_url', 'event_menu_name'] as $field_name) {
+			if (!array_key_exists($field_name, $mediatype)) {
+				$mediatype[$field_name] = $db_mediatype[$field_name];
+			}
+		}
+
+		foreach (['event_menu_url', 'event_menu_name'] as $field_name) {
+			if ($mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+				if ($mediatype[$field_name] !== '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
+					);
+				}
+			}
+			else {
+				if ($mediatype[$field_name] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
+					);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Add Media types.
 	 *
 	 * @param array		$mediatypes							multidimensional array with media types data
@@ -807,10 +844,14 @@ class CMediatype extends CApiService {
 			$mediatypeid = $mediatypeids[$i];
 			$mediatypes[$i]['mediatypeid'] = $mediatypeid;
 
-			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK && array_key_exists('parameters', $mediatype)) {
-				foreach ($mediatype['parameters'] as $parameter) {
-					$ins_media_type_param[] = ['mediatypeid' => $mediatypeid] + $parameter;
+			if ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
+				if (array_key_exists('parameters', $mediatype)) {
+					foreach ($mediatype['parameters'] as $parameter) {
+						$ins_media_type_param[] = ['mediatypeid' => $mediatypeid] + $parameter;
+					}
 				}
+
+				$this->validateEventMenu($mediatype);
 			}
 		}
 
@@ -898,7 +939,8 @@ class CMediatype extends CApiService {
 
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeid = $mediatype['mediatypeid'];
-			$db_type = $db_mediatypes[$mediatypeid]['type'];
+			$db_mediatype = $db_mediatypes[$mediatypeid];
+			$db_type = $db_mediatype['type'];
 			$type = array_key_exists('type', $mediatype) ? $mediatype['type'] : $db_type;
 			unset($mediatype['mediatypeid']);
 
@@ -924,6 +966,8 @@ class CMediatype extends CApiService {
 							$mediatype['event_menu_name'] = '';
 						}
 					}
+
+					$this->validateEventMenu($mediatype, $db_mediatype);
 				}
 			}
 
