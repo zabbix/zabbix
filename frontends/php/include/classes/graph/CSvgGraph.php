@@ -232,7 +232,7 @@ class CSvgGraph extends CSvg {
 			$min_value = null;
 			$max_value = null;
 
-			if ($metric['points']) {
+			if (array_key_exists('points', $metric)) {
 				$metrics_for_each_axes[$metric['options']['axisy']]++;
 
 				foreach ($metric['points'] as $point) {
@@ -265,7 +265,7 @@ class CSvgGraph extends CSvg {
 			}
 
 			$this->metrics[$i] = [
-				'name' => $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'],
+				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
 				'units' => $metric['units'],
 				'host' => $metric['hosts'][0],
