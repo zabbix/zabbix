@@ -366,7 +366,7 @@
 						break;
 				}
 			})
-			.on('change', 'input[type*="text"][name*="params"]', function() {
+			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());
 			})
 			.on('change', 'input[name*="on_fail"]', function() {
