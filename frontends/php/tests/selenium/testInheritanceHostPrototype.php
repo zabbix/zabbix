@@ -90,21 +90,6 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
-		//Check layout at Host Inventory tab.
-		$this->zbxTestTabSwitch('Inventory');
-		for ($i = 0; $i < 3; $i++) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@disabled]');
-		}
-
-		//Check layout at Encryption tab.
-		$this->zbxTestTabSwitch('Encryption');
-		foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2', 'tls_in_none', 'tls_in_cert', 'tls_in_psk'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@disabled]');
-		}
-
-		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
-
-		// Macro tab check must be after IPMI tab (this must be changed when ZBX-14609 will CLOSED).
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
@@ -134,6 +119,20 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->assertEquals(count($macros), count($this->webDriver->findElements(
 				WebDriverBy::xpath('//textarea[@class="textarea-flexible macro"]')
 		)));
+
+		// Check layout at Host Inventory tab.
+		$this->zbxTestTabSwitch('Inventory');
+		for ($i = 0; $i < 3; $i++) {
+			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@disabled]');
+		}
+
+		// Check layout at Encryption tab.
+		$this->zbxTestTabSwitch('Encryption');
+		foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2', 'tls_in_none', 'tls_in_cert', 'tls_in_psk'] as $id) {
+			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@disabled]');
+		}
+
+		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
 	}
 
 	public static function getCreateData() {
