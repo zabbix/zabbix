@@ -848,13 +848,6 @@ output {
 		}
 
 		.link-action {
-			display: inline-block;
-			max-width: calc(100% - 20px);
-			height: 16px;
-			line-height: 18px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			vertical-align: top;
 			color: $font-color;
 
 			&.red {
@@ -886,6 +879,7 @@ output {
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, 0.1);
 			color: $font-color;
 			height: 22px;
+			line-height: 1;
 			vertical-align: middle;
 			white-space: nowrap;
 
@@ -907,14 +901,9 @@ output {
 				&:last-of-type {
 					margin-right: 12px;
 				}
-
-				~ .link-action {
-					max-width: calc(100% - 32px);
-				}
 			}
 
 			.rel-container {
-				display: inline;
 
 				span {
 					margin: 0;
@@ -946,7 +935,7 @@ output {
 				display: inline-block;
 				height: 12px;
 				width: 12px;
-				margin: 0 1px 2px 2px !important;
+				margin: 3px 1px 2px 2px !important;
 
 				&::before {
 					height: 12px;
@@ -965,6 +954,27 @@ output {
 
 			.icon-description {
 				margin-left: 2px;
+			}
+		}
+
+		.action-container {
+			display: flex;
+			width: 100%;
+			height: 18px;
+			line-height: 18px;
+
+			.rel-container {
+				display: flex;
+			}
+
+			.link-action {
+				height: 16px;
+				@extend %overflow-ellipsis;
+			}
+
+			.separator,
+			[class*='icon-'] {
+				flex-shrink: 0;
 			}
 		}
 	}
@@ -1146,6 +1156,10 @@ output {
 	.latest-values,
 	.opdata {
 		max-width: 300px;
+	}
+
+	.separator {
+		margin-right: 4px;
 	}
 }
 
@@ -3042,8 +3056,8 @@ button[disabled] {
 
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 

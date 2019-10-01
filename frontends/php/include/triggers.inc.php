@@ -2336,7 +2336,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			}
 
 			if ($trigger_hosts) {
-				$trigger_hosts[] = ', ';
+				$trigger_hosts[] = (new CSpan(','))->addClass('separator');
 			}
 			$trigger_hosts[] = $host_name;
 		}

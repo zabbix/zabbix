@@ -71,7 +71,7 @@
 
 		$(document).on({
 			mouseenter: function() {
-				if ($(this).width() > $(this).parent('td').width()) {
+				if ($(this)[0].scrollWidth > $(this)[0].offsetWidth) {
 					$(this).attr({title: $(this).text()});
 				}
 			},

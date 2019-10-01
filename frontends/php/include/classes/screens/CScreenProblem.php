@@ -1115,8 +1115,12 @@ class CScreenProblem extends CScreenBase {
 					$show_recovery_data ? $cell_r_clock : null,
 					$show_recovery_data ? $cell_status : null,
 					$cell_info,
-					$triggers_hosts[$trigger['triggerid']],
-					$description,
+					$this->data['filter']['compact_view']
+						? (new CDiv($triggers_hosts[$trigger['triggerid']]))->addClass('action-container')
+						: $triggers_hosts[$trigger['triggerid']],
+					$this->data['filter']['compact_view']
+						? (new CDiv($description))->addClass('action-container')
+						: $description,
 					$opdata,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
