@@ -187,9 +187,10 @@ else {
 			}
 		}
 
+		$table->addRow($row, 'form_row');
 
 		if ($data['show_inherited_macros']) {
-			$description_row = (new CRow([
+			$table->addRow((new CRow([
 				(new CCol(
 					(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 						->setMaxlength(DB::getFieldLength('hostmacro' , 'description'))
@@ -197,19 +198,9 @@ else {
 						->setAttribute('placeholder', _('description'))
 						->setReadonly($data['readonly'] || !($macro['type'] & ZBX_PROPERTY_OWN))
 				))
+					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 					->setColSpan(8)
-			]))->addClass('form_row');
-
-			$table->addRow((new CRow((new CCol((new CTable())
-				->addRow($row)
-				->addRow($description_row)
-			))
-				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-				->addStyle('padding: 0px')
-			)), 'form_row');
-		}
-		else {
-			$table->addRow($row, 'form_row');
+			]))->addClass('form_row'));
 		}
 	}
 
