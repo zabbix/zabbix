@@ -956,19 +956,12 @@ class CMediatype extends CApiService {
 					unset($mediatype['parameters']);
 				}
 
-				if ($type == MEDIA_TYPE_WEBHOOK) {
-					if (array_key_exists('show_event_menu', $mediatype)
-							&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
-						if (!array_key_exists('event_menu_url', $mediatype)) {
-							$mediatype['event_menu_url'] = '';
-						}
-						if (!array_key_exists('event_menu_name', $mediatype)) {
-							$mediatype['event_menu_name'] = '';
-						}
-					}
-
-					$this->validateEventMenu($mediatype, $db_mediatype);
+				if (array_key_exists('show_event_menu', $mediatype)
+						&& $mediatype['show_event_menu'] == ZBX_EVENT_MENU_HIDE) {
+					$mediatype += ['event_menu_url' => '', 'event_menu_name' => ''];
 				}
+
+				$this->validateEventMenu($mediatype, $db_mediatype);
 			}
 
 			if ($type != $db_type) {
