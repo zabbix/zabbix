@@ -477,36 +477,69 @@ static int	DBpatch_4030031(void)
 /* skip patches that altered table instead of creating new one and copying contents as this fails on newer MariaDB */
 static int	DBpatch_4030032(void)
 {
+#ifdef HAVE_MYSQL
 	return SUCCEED;
+#else
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+#endif
 }
 
 static int	DBpatch_4030033(void)
 {
+#ifdef HAVE_MYSQL
 	return SUCCEED;
+#else
+	const ZBX_FIELD	field = {"alias", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+#endif
 }
 
 static int	DBpatch_4030034(void)
 {
+#ifdef HAVE_MYSQL
 	return SUCCEED;
+#else
+	const ZBX_FIELD	field = {"os", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+#endif
 }
 
 static int	DBpatch_4030035(void)
 {
+#ifdef HAVE_MYSQL
 	return SUCCEED;
+#else
+	const ZBX_FIELD	field = {"os_short", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("host_inventory", &field, NULL);
+#endif
 }
 
 static int	DBpatch_4030036(void)
 {
+#ifdef HAVE_MYSQL
 	return DBdrop_foreign_key("host_inventory", 1);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030037(void)
 {
+#ifdef HAVE_MYSQL
 	return DBrename_table("host_inventory", "host_inventory_tmp");
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030038(void)
 {
+#ifdef HAVE_MYSQL
 	/* Store columns on overflow pages to respect row size limit of 8126 bytes on MariaDB. */
 	/* Columns can only be stored on overflow pages if they are 256 bytes or longer.       */
 	const ZBX_TABLE table =
@@ -590,10 +623,14 @@ static int	DBpatch_4030038(void)
 			};
 
 	return DBcreate_table(&table);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030039(void)
 {
+#ifdef HAVE_MYSQL
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into host_inventory (select * from host_inventory_tmp)"))
 	{
@@ -601,18 +638,29 @@ static int	DBpatch_4030039(void)
 	}
 
 	return FAIL;
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030040(void)
 {
+#ifdef HAVE_MYSQL
 	return DBdrop_table("host_inventory_tmp");
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030041(void)
 {
+#ifdef HAVE_MYSQL
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_inventory", 1, &field);
+#else
+	return SUCCEED;
+#endif
 }
 
 static int	DBpatch_4030042(void)
