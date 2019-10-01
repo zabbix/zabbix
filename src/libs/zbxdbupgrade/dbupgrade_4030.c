@@ -497,7 +497,7 @@ static int	DBpatch_4030035(void)
 
 static int	DBpatch_4030036(void)
 {
-	return DBdrop_foreign_key("host_inventory");
+	return DBdrop_foreign_key("host_inventory", 1);
 }
 
 static int	DBpatch_4030037(void)
