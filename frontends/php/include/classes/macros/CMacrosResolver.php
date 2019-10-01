@@ -2736,8 +2736,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$types = $this->transformToPositionTypes($types);
-
 		foreach ($events as $eventid => $event) {
 			foreach ($urls as $index => $url) {
 				foreach ($url_macros[$index] as $macro => $foo) {
@@ -2746,8 +2744,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 				}
 
-				$events[$eventid]['urls'][] =
-					str_replace(array_keys($macro_values[$eventid]), $macro_values[$eventid], $url);
+				foreach (['url', 'name'] as $field) {
+					$url[$field] = strtr($url[$field], $macro_values[$eventid]);
+				}
+				$events[$eventid]['urls'][] = $url;
 			}
 		}
 
