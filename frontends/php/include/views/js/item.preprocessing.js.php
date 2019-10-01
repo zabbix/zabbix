@@ -117,7 +117,7 @@
 				if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
 					// ZBX-16642
 					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
-						if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).prop('checked')) {
+						if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
 							params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
 						}
 						else {
@@ -366,7 +366,7 @@
 						break;
 				}
 			})
-			.on('change', 'input[name*="params"]', function() {
+			.on('change', 'input[type*="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());
 			})
 			.on('change', 'input[name*="on_fail"]', function() {
