@@ -441,7 +441,7 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_WEBHOOK
+	MEDIA_TYPE_WEBHOOK = 4
 }
 zbx_media_type_t;
 
