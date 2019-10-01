@@ -33,6 +33,8 @@
 						if (e.which === 13) {
 							var $submit = $(this).closest('form').find(':submit');
 
+							$(this).trigger('blur');
+
 							if ($submit.length === 0) {
 								$(this).closest('form').submit();
 							}
