@@ -86,6 +86,17 @@ class C20ImportConverter extends CConverter {
 			if (array_key_exists('discovery_rules', $host)) {
 				$host['discovery_rules'] = $this->convertDiscoveryRules($host['discovery_rules']);
 			}
+
+			if (!array_key_exists('description', $host)) {
+				$host['description'] = '';
+			}
+
+			$host['tls_connect'] = (string) CXmlConstantValue::NO_ENCRYPTION;
+			$host['tls_accept'] = (string) CXmlConstantValue::NO_ENCRYPTION;
+			$host['tls_issuer'] = '';
+			$host['tls_subject'] = '';
+			$host['tls_psk_identity'] = '';
+			$host['tls_psk'] = '';
 		}
 		unset($host);
 
@@ -110,6 +121,10 @@ class C20ImportConverter extends CConverter {
 			if (array_key_exists('screens', $template)) {
 				$template['screens'] = $this->convertScreens($template['screens']);
 			}
+
+			if (!array_key_exists('description', $template)) {
+				$template['description'] = '';
+			}
 		}
 		unset($template);
 
@@ -126,7 +141,7 @@ class C20ImportConverter extends CConverter {
 	protected function convertItems(array $items) {
 		foreach ($items as &$item) {
 			if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
-				$item['status'] = ITEM_STATUS_ACTIVE;
+				$item['status'] = (string) ITEM_STATUS_ACTIVE;
 			}
 
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
@@ -145,8 +160,13 @@ class C20ImportConverter extends CConverter {
 	 */
 	protected function convertHostInterfaces(array $interfaces) {
 		foreach ($interfaces as &$interface) {
-			if (!array_key_exists('bulk', $interface) && $interface['type'] == INTERFACE_TYPE_SNMP) {
-				$interface['bulk'] = SNMP_BULK_ENABLED;
+			if (!array_key_exists('bulk', $interface)) {
+				if ($interface['type'] == INTERFACE_TYPE_SNMP) {
+					$interface['bulk'] = (string) SNMP_BULK_ENABLED;
+				}
+				else {
+					$interface['bulk'] = (string) SNMP_BULK_DISABLED;
+				}
 			}
 		}
 		unset($interface);
@@ -205,10 +225,10 @@ class C20ImportConverter extends CConverter {
 	protected function convertScreenItems(array $screen_items) {
 		foreach ($screen_items as &$screen_item) {
 			if ($screen_item['rowspan'] == 0) {
-				$screen_item['rowspan'] = 1;
+				$screen_item['rowspan'] = (string) 1;
 			}
 			if ($screen_item['colspan'] == 0) {
-				$screen_item['colspan'] = 1;
+				$screen_item['colspan'] = (string) 1;
 			}
 
 			if (zbx_is_int($screen_item['resourcetype'])) {
@@ -220,6 +240,9 @@ class C20ImportConverter extends CConverter {
 						break;
 				}
 			}
+
+			$screen_item['application'] = '';
+			$screen_item['max_columns'] = '';
 		}
 		unset($screen_item);
 
@@ -273,7 +296,7 @@ class C20ImportConverter extends CConverter {
 	protected function convertDiscoveryRules(array $discovery_rules) {
 		foreach ($discovery_rules as &$discovery_rule) {
 			if ($discovery_rule['status'] == ITEM_STATUS_NOTSUPPORTED) {
-				$discovery_rule['status'] = ITEM_STATUS_ACTIVE;
+				$discovery_rule['status'] = (string) ITEM_STATUS_ACTIVE;
 			}
 
 			if (in_array($discovery_rule['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
@@ -308,6 +331,7 @@ class C20ImportConverter extends CConverter {
 	protected function convertItemPrototypes(array $item_prototypes) {
 		foreach ($item_prototypes as &$item_prototype) {
 			$item_prototype['key'] = $this->itemKeyConverter->convert($item_prototype['key']);
+			$item_prototype['application_prototypes'] = '';
 		}
 		unset($item_prototype);
 
@@ -385,7 +409,7 @@ class C20ImportConverter extends CConverter {
 		// string filters were exported as "{#MACRO}:regex"
 		if (is_string($filter)) {
 			$new_filter = [
-				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 				'formula' => '',
 				'conditions' => []
 			];
@@ -396,7 +420,7 @@ class C20ImportConverter extends CConverter {
 				$new_filter['conditions'][] = [
 					'macro' => $macro,
 					'value' => $value,
-					'operator' => CONDITION_OPERATOR_REGEXP
+					'operator' => (string) CONDITION_OPERATOR_REGEXP
 				];
 			}
 

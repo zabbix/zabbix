@@ -34,7 +34,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 		$source = $this->createSource([
 			'hosts' => [
 				[
-					'name' => 'Template 1',
+					'name' => 'Template 1'
 				],
 				[
 					'name' => 'Template 2',
@@ -55,25 +55,35 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'host' => 'Host 1',
+					'name' => 'Host 1',
 					'status' => HOST_STATUS_NOT_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				[
 					'host' => 'Host 2',
+					'name' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 			],
 			'templates' => [
 				[
 					'template' => 'Template 1',
+					'name' => 'Template 1',
 				],
 				[
-					'template' => 'Template 2'
+					'template' => 'Template 2',
+					'name' => 'Template 2'
 				],
 			]
 		]);
@@ -132,13 +142,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'host' => 'host1',
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				[
 					'host' => 'host2',
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -151,9 +166,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'name' => 'Linux server'
 						],
 					],
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host3',
+					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -166,11 +185,15 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'name' => 'My group'
 						],
 					],
+					'proxy' => [
+						'name' => ''
+					]
 				],
 			],
 			'templates' => [
 				[
 					'template' => 'template',
+					'name' => 'template',
 					'groups' => [
 						[
 							'name' => 'Templates'
@@ -209,16 +232,24 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'host' => 'host1',
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				[
 					'host' => 'host2',
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 			]
@@ -245,10 +276,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
+							'description' => 'item1'
 						],
 						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
+							'description' => 'item2'
 						]
 					]
 				],
@@ -271,6 +304,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
+							'description' => 'item1'
 						]
 					]
 				],
@@ -285,6 +319,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
+							'description' => 'item1'
 						]
 					]
 				],
@@ -299,26 +334,31 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
-							'snmp_port' => '1'
+							'snmp_port' => '1',
+							'description' => 'item1'
 						],
 						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
-							'snmp_port' => '2'
+							'snmp_port' => '2',
+							'description' => 'item2'
 						],
 						[
 							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
-							'snmp_port' => '3'
+							'snmp_port' => '3',
+							'description' => 'item3'
 						],
 						[
 							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
-							'snmp_port' => '1'
+							'snmp_port' => '1',
+							'description' => 'item4'
 						],
 						[
 							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
+							'description' => 'item5'
 						],
 					]
 				],
@@ -329,6 +369,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item1',
+							'description' => 'item1',
 						]
 					]
 				]
@@ -338,14 +379,19 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'host' => 'host1',
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				// host with an agent interface
 				[
 					'host' => 'host2',
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -365,26 +411,48 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_ZABBIX,
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item1',
+							'name' => 'item1',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SIMPLE,
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item2',
+							'name' => 'item2',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				// missing interface data
 				[
 					'host' => 'host3',
+					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				// host with an IPMI interface
 				[
 					'host' => 'host4',
+					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -404,13 +472,24 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item1',
+							'name' => 'item1',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				// host with an IPMI interface, fallback to "ip"
 				[
 					'host' => 'host5',
+					'name' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -430,13 +509,24 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_IPMI,
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item1',
+							'name' => 'item1',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				// host with SNMP interfaces
 				[
 					'host' => 'host6',
+					'name' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -474,31 +564,65 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'key' => 'item1',
 							'type' => ITEM_TYPE_SNMPV1,
-							'snmp_port' => '1',
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item1',
+							'name' => 'item1',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item2',
 							'type' => ITEM_TYPE_SNMPV2C,
-							'snmp_port' => '2',
-							'interface_ref' => 'if1'
+							'interface_ref' => 'if1',
+							'description' => 'item2',
+							'name' => 'item2',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item3',
 							'type' => ITEM_TYPE_SNMPV3,
-							'snmp_port' => '3',
-							'interface_ref' => 'if2'
+							'interface_ref' => 'if2',
+							'description' => 'item3',
+							'name' => 'item3',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item4',
 							'type' => ITEM_TYPE_SNMPV1,
-							'snmp_port' => '1',
-							'interface_ref' => 'if0'
+							'interface_ref' => 'if0',
+							'description' => 'item4',
+							'name' => 'item4',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
+							'description' => 'item5',
+							'name' => 'item5',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				// missing item type
@@ -511,7 +635,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item1',
+							'description' => 'item1',
+							'name' => 'item1',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						]
+					],
+					'name' => 'host7',
+					'proxy' => [
+						'name' => ''
 					]
 				]
 			]
@@ -620,6 +755,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				[
@@ -627,6 +766,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_MANUAL
+					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
 					]
 				],
 				[
@@ -702,6 +845,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'poc_2_cell' => 'poc 2 cell',
 						'poc_2_screen' => 'poc 2 screen',
 						'poc_2_notes' => 'poc 2 notes',
+					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
 					]
 				]
 			]
@@ -728,14 +875,16 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item',
+							'description' => 'item',
 						],
 						[
 							'key' => 'item',
+							'description' => 'item',
 							'applications' => []
 						],
 						[
-							'description' => 'My item',
 							'key' => 'ftp,1',
+							'description' => 'My item',
 							'applications' => [
 								'Application 1',
 								'Application 2',
@@ -749,10 +898,11 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item',
+							'description' => 'item',
 						],
 						[
-							'description' => 'My item',
 							'key' => 'ftp,1',
+							'description' => 'My item',
 							'applications' => [
 								'Application 1',
 								'Application 2',
@@ -771,6 +921,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host1',
@@ -778,7 +932,11 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-					'items' => []
+					'items' => [],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host1',
@@ -789,10 +947,24 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item',
+							'description' => 'item',
+							'name' => 'item',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						],
 						[
 							'key' => 'item',
-							'applications' => []
+							'applications' => [],
+							'description' => 'item',
+							'name' => 'item',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						],
 						[
 							'name' => 'My item',
@@ -804,7 +976,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 								[
 									'name' => 'Application 2'
 								]
-							]
+							],
+							'description' => 'My item',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						]
 					],
 					'applications' => [
@@ -814,15 +992,28 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'name' => 'Application 2'
 						]
+					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
 					]
 				]
 			],
 			'templates' => [
 				[
 					'template' => 'template',
+					'name' => 'template',
 					'items' => [
 						[
 							'key' => 'item',
+							'description' => 'item',
+							'name' => 'item',
+							'port' => '',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						],
 						[
 							'name' => 'My item',
@@ -834,7 +1025,14 @@ class C10ImportConverterTest extends CImportConverterTest {
 								[
 									'name' => 'Application 2'
 								]
-							]
+							],
+							'description' => 'My item',
+							'port' => '',
+							'valuemap' => [],
+							'inventory_link' => '',
+							'snmpv3_contextname' => '',
+							'snmpv3_authprotocol' => '',
+							'snmpv3_privprotocol' => '',
 						]
 					],
 					'applications' => [
@@ -860,12 +1058,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 				],
 				[
-					'name' => 'host1',
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'triggers' => ''
 				],
 				[
-					'name' => 'host2',
+					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'triggers' => [
 						[
@@ -884,7 +1082,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					]
 				],
 				[
-					'name' => 'host3',
+					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
 					'triggers' => [
 						[
@@ -920,7 +1118,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'Macro trigger',
-					'expression' => '{host2:item.last(0)}>0&{host2:item.last(0)}>0'
+					'expression' => '{host3:item.last(0)}>0&{host3:item.last(0)}>0'
 				],
 				[
 					'name' => 'My trigger 2',
@@ -934,13 +1132,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-				],
-				[
-					'host' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
-					'inventory' => [
-						'inventory_mode' => HOST_INVENTORY_DISABLED
-					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
@@ -948,6 +1143,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host3',
@@ -955,11 +1154,27 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host3',
+					'proxy' => [
+						'name' => ''
+					]
+				],
+				[
+					'host' => 'host4',
+					'status' => HOST_STATUS_MONITORED,
+					'inventory' => [
+						'inventory_mode' => HOST_INVENTORY_DISABLED
+					],
+					'name' => 'host4',
+					'proxy' => [
+						'name' => ''
+					]
 				]
 			],
 			'templates' => [
 				[
 					'template' => 'template',
+					'name' => 'template'
 				]
 			]
 		]);
@@ -1014,6 +1229,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
@@ -1021,6 +1240,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 			]
 		]);
@@ -1090,6 +1313,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
@@ -1097,6 +1324,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host3',
@@ -1104,6 +1335,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host3',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 			]
 		]);
@@ -1211,6 +1446,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host1',
@@ -1218,14 +1457,20 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 			],
 			'templates' => [
 				[
-					'template' => 'template1'
+					'template' => 'template1',
+					'name' => 'template1'
 				],
 				[
-					'template' => 'template2'
+					'template' => 'template2',
+					'name' => 'template2'
 				],
 			],
 		]);
@@ -1281,17 +1526,26 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host1',
+					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-					'templates' => []
+					'templates' => [],
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
+					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
@@ -1303,6 +1557,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'name' => 'template2'
 						],
+					],
+					'proxy' => [
+						'name' => ''
 					]
 				]
 			],
@@ -1316,7 +1573,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'name' => 'template2'
 						],
-					]
+					],
+					'name' => 'template',
 				]
 			]
 		]);
@@ -1553,6 +1811,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host1',
@@ -1560,6 +1822,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
@@ -1567,6 +1833,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host3',
@@ -1574,11 +1844,16 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host3',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 			],
 			'templates' => [
 				[
 					'template' => 'template',
+					'name' => 'template'
 				]
 			]
 		]);
@@ -1629,6 +1904,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
+					'name' => 'host1',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host2',
@@ -1636,7 +1915,11 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-					'macros' => ''
+					'macros' => '',
+					'name' => 'host2',
+					'proxy' => [
+						'name' => ''
+					]
 				],
 				[
 					'host' => 'host3',
@@ -1649,6 +1932,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'macro' => '{$MACRO}',
 							'value' => 'value',
 						]
+					],
+					'name' => 'host3',
+					'proxy' => [
+						'name' => ''
 					]
 				]
 			],
@@ -1660,7 +1947,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'macro' => '{$MACRO}',
 							'value' => 'value',
 						]
-					]
+					],
+					'name' => 'template'
 				]
 			]
 		]);
@@ -1732,10 +2020,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 
 		$expectedResult = $this->createExpectedResult([
 			'maps' => [
-				[],
+				[
+					'background' => ''
+				],
 				[
 					'selements' => [],
 					'links' => [],
+					'background' => ''
 				],
 				[
 					'selements' => [
@@ -1774,7 +2065,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 								]
 							]
 						]
-					]
+					],
+					'background' => ''
 				]
 			]
 		]);
@@ -1824,12 +2116,14 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'screen_items' => [
 						[
-							'resource' => '0'
+							'resource' => '0',
+							'sort_triggers' => ''
 						],
 						[
 							'resource' => [
 								'key' => 'itemkey',
 							],
+							'sort_triggers' => ''
 						]
 					]
 				]

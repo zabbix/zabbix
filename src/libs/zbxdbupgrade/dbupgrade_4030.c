@@ -700,6 +700,13 @@ static int	DBpatch_4030052(void)
 	return DBadd_field("alerts", &field);
 }
 
+static int	DBpatch_4030053(void)
+{
+	const ZBX_FIELD	field =  {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("interface", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -758,5 +765,6 @@ DBPATCH_ADD(4030049, 0, 1)
 DBPATCH_ADD(4030050, 0, 1)
 DBPATCH_ADD(4030051, 0, 1)
 DBPATCH_ADD(4030052, 0, 1)
+DBPATCH_ADD(4030053, 0, 1)
 
 DBPATCH_END()
