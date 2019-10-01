@@ -1,6 +1,18 @@
+Changes for 4.4.0rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.4.0beta1
 
 New features:
+..F.....S. [ZBXNEXT-5434] added support of {EVENT.ID} macro in trigger URL (talbergs, vmurzins)
+..F.....S. [ZBXNEXT-5197] increased maximum dependent item count to 29999 (atumilovics)
+...G...... [ZBXNEXT-2946] added new key "wmi.getall" to collect all required wmi properties in a json document (MVekslers)
+..F....... [ZBX-7341] reworked template linking interface (rlataria)
+..F.I..... [ZBXNEXT-5330] added new filtering option in "Host availability" widget (rlataria)
 ...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 ....I..... [ZBXNEXT-5406] updated widgets on default dashboards (vmurzins)
 ..F..J.... [ZBXNEXT-4209] added jmx.get[<discovery mode>,<object name pattern>] key for JMX LLD (atumilovics)
@@ -8,6 +20,8 @@ New features:
 ..F....PS. [ZBXNEXT-4033] added possibility to return multiple columns (and rows) from SQL ODBC (akozlovs)
 
 Bug fixes:
+....I..... [ZBX-16465] fixed Zabbix database schema creation failure on MariaDB (vso)
+..F....... [ZBX-16654] fixed undefined index error in discovered host update form (gcalenko)
 ..F....... [ZBX-16645] fixed suggested selection font weight for new item (vasilijs)
 .......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
 .......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
@@ -57,6 +71,7 @@ A......... [ZBX-16398] fixed selection of discovered services by dservice.get "d
 ..F....... [ZBX-16370] fixed link indicator coloring in network maps (vasilijs)
 ..F....... [ZBX-16502] fixed user edit form having a disabled and hidden fields when alias is the same as guest user (Ivo)
 ..F....... [ZBX-16507] fixed vertical scrollbar in kiosk mode when focusinig widgets with hidden headers (averza)
+........S. [ZBX-16524] fixed failed query error when aggregate checks are used (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.0alpha2

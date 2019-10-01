@@ -476,54 +476,82 @@ static int	DBpatch_4030031(void)
 
 static int	DBpatch_4030032(void)
 {
-	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("media_type", &field);
+	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_4030033(void)
 {
-	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"alias", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("media_type", &field);
+	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_4030034(void)
 {
-	const ZBX_FIELD	field = {"process_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"os", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("media_type", &field);
+	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_4030035(void)
 {
-	const ZBX_FIELD	field = {"show_event_menu", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"os_short", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("media_type", &field);
+	return DBmodify_field_type("host_inventory", &field, NULL);
 }
 
 static int	DBpatch_4030036(void)
 {
-	const ZBX_FIELD	field = {"event_menu_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030037(void)
 {
-	const ZBX_FIELD	field = {"event_menu_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"timeout", "30s", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030038(void)
 {
-	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"process_tags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_4030039(void)
+{
+	const ZBX_FIELD	field = {"show_event_menu", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_4030040(void)
+{
+	const ZBX_FIELD	field = {"event_menu_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_4030041(void)
+{
+	const ZBX_FIELD	field = {"event_menu_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_4030042(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_4030043(void)
 {
 	const ZBX_TABLE table =
 		{"media_type_param", "mediatype_paramid", 0,
@@ -540,19 +568,19 @@ static int	DBpatch_4030039(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_4030040(void)
+static int	DBpatch_4030044(void)
 {
 	return DBcreate_index("media_type_param", "media_type_param_1", "mediatypeid", 0);
 }
 
-static int	DBpatch_4030041(void)
+static int	DBpatch_4030045(void)
 {
 	const ZBX_FIELD	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("media_type_param", 1, &field);
 }
 
-static int	DBpatch_4030042(void)
+static int	DBpatch_4030046(void)
 {
 	const ZBX_FIELD	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
@@ -607,5 +635,9 @@ DBPATCH_ADD(4030039, 0, 1)
 DBPATCH_ADD(4030040, 0, 1)
 DBPATCH_ADD(4030041, 0, 1)
 DBPATCH_ADD(4030042, 0, 1)
+DBPATCH_ADD(4030043, 0, 1)
+DBPATCH_ADD(4030044, 0, 1)
+DBPATCH_ADD(4030045, 0, 1)
+DBPATCH_ADD(4030046, 0, 1)
 
 DBPATCH_END()

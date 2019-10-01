@@ -160,13 +160,12 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait($data['group']);
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
-		$this->zbxTestLaunchOverlayDialog('Templates');
 
 		foreach ($data['templates'] as $template) {
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
+			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 			$this->zbxTestClickLinkTextWait($template['name']);
-			$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestWaitForPageToLoad();
 		}
 
@@ -330,11 +329,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Templates');
 		if (array_key_exists('templates', $data)) {
 			foreach ($data['templates'] as $template) {
-				$this->zbxTestClickButtonMultiselect('add_templates_');
+				$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 				$this->zbxTestLaunchOverlayDialog('Templates');
 				$this->zbxTestDropdownSelectWait('groupid', $template['group']);
 				$this->zbxTestClickLinkTextWait($template['name']);
-				$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 				$this->zbxTestWaitForPageToLoad();
 			}
 		}
@@ -451,11 +449,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Change template.
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestClickButtonMultiselect('add_templates_');
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
-			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 		}
 
 		// Change inventory mode.
