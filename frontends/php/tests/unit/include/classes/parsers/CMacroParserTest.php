@@ -123,6 +123,7 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 			['{EVENT.TAGS."Te\\st test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS.test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS.}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS."Test}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS"Test test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
 			['{EVENT.TAGS1."Test test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail]

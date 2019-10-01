@@ -98,7 +98,9 @@ class CMacroParser extends CParser {
 		}
 		$p += $this->set_parser->getLength();
 
-		$this->parseReference($source, $p);
+		if (!$this->parseReference($source, $p)) {
+			return self::PARSE_FAIL;
+		}
 
 		if (!isset($source[$p]) || $source[$p] !== '}') {
 			$this->reference = null;
@@ -135,8 +137,6 @@ class CMacroParser extends CParser {
 				break;
 
 			case self::REFERENCE_ALPHANUMERIC:
-				$this->reference = '';
-
 				$pattern_quoted = '"(?:\\\\["\\\\]|[^"\\\\])*"';
 				$pattern_unquoted = '[A-Za-z0-9_]+';
 				$pattern = '\.(?P<ref>'.$pattern_quoted.'|'.$pattern_unquoted.')';
@@ -147,10 +147,15 @@ class CMacroParser extends CParser {
 						: $matches['ref'];
 					$p += strlen($matches[0]);
 				}
+				else {
+					return false;
+				}
 				break;
 		}
 
 		$pos = $p;
+
+		return true;
 	}
 
 	/**
