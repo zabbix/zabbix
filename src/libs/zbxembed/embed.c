@@ -23,6 +23,7 @@
 #include "zbxembed.h"
 #include "embed.h"
 #include "httprequest.h"
+#include "zabbix.h"
 
 #include "duktape.h"
 
@@ -120,13 +121,6 @@ static void	es_free(void *udata, void *ptr)
 	}
 }
 
-static duk_ret_t	es_log(duk_context *ctx)
-{
-	zabbix_log(duk_to_int(ctx, 0), "%s", duk_to_string(ctx, 1));
-
-	return 0;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_es_check_timeout                                             *
@@ -207,9 +201,8 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		goto out;
 	}
 
-	/* initialize logger */
-	duk_push_c_function(es->env->ctx, es_log, 2);
-	duk_put_global_string(es->env->ctx, "zabbix_log");
+	/* initialize Zabbix object */
+	zbx_es_init_zabbix(es, error);
 
 	/* remove Duktape object */
 	duk_push_global_object(es->env->ctx);
