@@ -56,7 +56,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'SMS'
 					],
-					'result' => ['SMS', 'SMS via IP']
+					'result' => ['SMS']
 				]
 			],
 			[
@@ -72,7 +72,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'result' => ['Email', 'Jabber', 'SMS', 'SMS via IP']
+					'result' => ['Email', 'SMS']
 				]
 			],
 			[
@@ -138,10 +138,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$table->query('link:Name')->one()->click();
 			$this->page->waitUntilReady();
 			// Get all media names from DB and check result on frontend.
-			$names = CDBHelper::getAll('SELECT description FROM media_type ORDER BY LOWER(description) '.$sorting);
+			$names = CDBHelper::getAll('SELECT name FROM media_type ORDER BY LOWER(name) '.$sorting);
 			$result = [];
 			foreach ($names as $name) {
-				$result[] = $name['description'];
+				$result[] = $name['name'];
 			}
 			$this->assertTableDataColumn($result);
 		}
@@ -170,7 +170,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->AssertTrue($row->query('button:Test')->one()->isEnabled(false));
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-				' AND description='.CDBHelper::escape($media_name)
+				' AND name='.CDBHelper::escape($media_name)
 		));
 
 		// Enable media type.
@@ -183,7 +183,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->AssertTrue($row->query('button:Test')->one()->isEnabled());
 		// Check result in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-				' AND description='.CDBHelper::escape($media_name)
+				' AND name='.CDBHelper::escape($media_name)
 		));
 	}
 
@@ -195,7 +195,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'rows' => [
 						'Name' => 'Email'
 					],
-					'db_description' => 'Email',
+					'db_name' => 'Email',
 					'used_by_action' => 'Trigger action 3'
 				]
 			],
@@ -203,10 +203,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'rows' => [
-						['Name' => 'Jabber'],
 						['Name' => 'SMS']
 					],
-					'db_description' => ['Jabber', 'SMS']
+					'db_name' => ['SMS']
 				]
 			],
 			// Select all.
@@ -256,7 +255,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
+					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 		else {
@@ -300,7 +299,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'SELECT NULL'.
 				' FROM media_type'.
 				' WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-					' AND description IN ('.CDBHelper::escape($data['db_description']).')'
+					' AND name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 		else {
@@ -409,25 +408,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'error' => 'Incorrect value for field "message": cannot be empty.'
 				]
 			],
-			// Jabber media type.
-			[
-				[
-					'name' => 'Jabber',
-					'form' => [
-						'Send to' => '0',
-						'Subject' => 'new subject',
-						'Message' => 'new message'
-					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
-				]
-			],
 			// SMS media type.
 			[
 				[
@@ -435,23 +415,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => 'abcd',
 						'Message' => 'new message'
-					],
-					'error' => [
-						'Connection to Zabbix server "localhost" refused. Possible reasons:',
-						'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-						'2. Security environment (for example, SELinux) is blocking the connection;',
-						'3. Zabbix server daemon not running;',
-						'4. Firewall is blocking TCP connection.',
-						'Connection refused'
-					]
-				]
-			],
-			// 	Ez Texting media type.
-			[
-				[
-					'name' => 'SMS via IP',
-					'form' => [
-						'Send to' => '12345'
 					],
 					'error' => [
 						'Connection to Zabbix server "localhost" refused. Possible reasons:',
@@ -574,11 +537,13 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$this->assertTrue($message->isGood());
-			$this->assertEquals('Media types deleted', $message->getTitle());
+			$this->assertEquals((count($data['rows']) === 1) ? 'Media type deleted' : 'Media types deleted',
+				$message->getTitle()
+			);
 			$this->assertEquals(0, CDBHelper::getCount(
 				'SELECT NULL'.
 				' FROM media_type'.
-				' WHERE description IN ('.CDBHelper::escape($data['db_description']).')'
+				' WHERE name IN ('.CDBHelper::escape($data['db_name']).')'
 			));
 		}
 	}

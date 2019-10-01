@@ -28,12 +28,21 @@ class CWidgetFormHostAvail extends CWidgetForm {
 		parent::__construct($data, WIDGET_HOST_AVAIL);
 
 		// Host groups.
-		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
+		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
 		}
 		$this->fields[$field_groups->getName()] = $field_groups;
+
+		// Interface type.
+		$field_interface_type = new CWidgetFieldCheckBoxList('interface_type', _('Interface type'));
+
+		if (array_key_exists('interface_type', $this->data)) {
+			$field_interface_type->setValue($this->data['interface_type']);
+		}
+
+		$this->fields[$field_interface_type->getName()] = $field_interface_type;
 
 		// Layout.
 		$field_layout = (new CWidgetFieldRadioButtonList('layout', _('Layout'), [

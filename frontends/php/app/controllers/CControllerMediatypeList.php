@@ -27,7 +27,7 @@ class CControllerMediatypeList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>			'in description,type',
+			'sort' =>			'in name,type',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>		'in 1',
 			'filter_set' =>		'in 1',
@@ -50,7 +50,7 @@ class CControllerMediatypeList extends CController {
 	}
 
 	protected function doAction() {
-		$sortField = $this->getInput('sort', CProfile::get('web.media_types.php.sort', 'description'));
+		$sortField = $this->getInput('sort', CProfile::get('web.media_types.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.media_types.php.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.media_types.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.media_types.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
@@ -83,11 +83,11 @@ class CControllerMediatypeList extends CController {
 
 		// get media types
 		$data['mediatypes'] = API::Mediatype()->get([
-			'output' => ['mediatypeid', 'description', 'type', 'smtp_server', 'smtp_helo', 'smtp_email',
-				'exec_path', 'gsm_modem', 'username', 'status'
+			'output' => ['mediatypeid', 'name', 'type', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
+				'gsm_modem', 'username', 'status'
 			],
 			'search' => [
-				'description' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']

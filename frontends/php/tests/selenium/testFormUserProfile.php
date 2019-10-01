@@ -520,18 +520,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				'send_to' => 'test@zabbix.com',
 				'period' => 'test',
 				'error_msg' => 'Field "When active" is not correct: a time period is expected'
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'type' => 'Jabber',
-				'send_to' => 'testmacro@zabbix.com',
-				'period' => '{$WORKING_HOURS}',
-			]],
-			[[
-				'expected' => TEST_GOOD,
-				'type' => 'SMS via IP',
-				'send_to' => 'testperiod@zabbix.com',
-				'period' => '1-7,00:00-24:00',
 			]]
 		];
 	}

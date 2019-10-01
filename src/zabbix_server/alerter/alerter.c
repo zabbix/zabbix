@@ -143,42 +143,6 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_jabber                                           *
- *                                                                            *
- * Purpose: processes jabber alert                                            *
- *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
- *                                                                            *
- ******************************************************************************/
-static void	alerter_process_jabber(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
-{
-#ifdef HAVE_JABBER
-	zbx_uint64_t	alertid;
-	char		*sendto, *subject, *message, *username, *password;
-	int		ret;
-	char		error[MAX_STRING_LEN];
-
-	zbx_alerter_deserialize_jabber(ipc_message->data, &alertid, &sendto, &subject, &message, &username, &password);
-
-	/* Jabber uses its own timeouts */
-	ret = send_jabber(username, password, sendto, subject, message, error, sizeof(error));
-	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
-
-	zbx_free(sendto);
-	zbx_free(subject);
-	zbx_free(message);
-	zbx_free(username);
-	zbx_free(password);
-#else
-	ZBX_UNUSED(ipc_message);
-	alerter_send_result(socket, FAIL, "Zabbix server was compiled without Jabber support");
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: alerter_process_sms                                              *
  *                                                                            *
  * Purpose: processes SMS alert                                               *
@@ -208,38 +172,6 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 /******************************************************************************
  *                                                                            *
- * Function: alerter_process_eztexting                                        *
- *                                                                            *
- * Purpose: processes eztexting alert                                         *
- *                                                                            *
- * Parameters: socket      - [IN] the connections socket                      *
- *             ipc_message - [IN] the ipc message with media type and alert   *
- *                                data                                        *
- *                                                                            *
- ******************************************************************************/
-static void	alerter_process_eztexting(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
-{
-	zbx_uint64_t	alertid;
-	char		*sendto, *message, *username, *password, *exec_path;
-	int		ret;
-	char		error[MAX_STRING_LEN];
-
-	zbx_alerter_deserialize_eztexting(ipc_message->data, &alertid, &sendto, &message, &username, &password,
-			&exec_path);
-
-	/* Ez Texting uses its own timeouts */
-	ret = send_ez_texting(username, password, sendto, message, exec_path, error, sizeof(error));
-	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
-
-	zbx_free(sendto);
-	zbx_free(message);
-	zbx_free(username);
-	zbx_free(password);
-	zbx_free(exec_path);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: alerter_process_exec                                             *
  *                                                                            *
  * Purpose: processes script alert                                            *
@@ -258,7 +190,6 @@ static void	alerter_process_exec(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 
 	zbx_alerter_deserialize_exec(ipc_message->data, &alertid, &command);
 
-	/* Ez Texting uses its own timeouts */
 	ret = execute_script_alert(command, error, sizeof(error));
 	alerter_send_result(socket, ret, (SUCCEED == ret ? NULL : error));
 
@@ -346,14 +277,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			case ZBX_IPC_ALERTER_EMAIL:
 				alerter_process_email(&alerter_socket, &message);
 				break;
-			case ZBX_IPC_ALERTER_JABBER:
-				alerter_process_jabber(&alerter_socket, &message);
-				break;
 			case ZBX_IPC_ALERTER_SMS:
 				alerter_process_sms(&alerter_socket, &message);
-				break;
-			case ZBX_IPC_ALERTER_EZTEXTING:
-				alerter_process_eztexting(&alerter_socket, &message);
 				break;
 			case ZBX_IPC_ALERTER_EXEC:
 				alerter_process_exec(&alerter_socket, &message);

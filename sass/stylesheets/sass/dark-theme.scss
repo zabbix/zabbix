@@ -198,6 +198,100 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
+
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		&.dashbrd-grid-widget-focus {
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+			}
+		}
+	}
+}
+
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+		}
+	}
+}
+
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-widget {
+		&.ui-draggable-dragging {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashbrd-grid-widget-head {
+				border-color: $ui-border-color;
+			}
+
+			.dashbrd-grid-widget-content {
+				border-color: $ui-border-color;
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		&.ui-draggable-dragging {
+			.dashbrd-grid-iterator-head {
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashbrd-grid-iterator-head {
+				border-color: $ui-border-color;
+			}
+
+			.dashbrd-grid-iterator-content {
+				.dashbrd-grid-widget {
+					.dashbrd-grid-widget-head {
+						border-color: $ui-border-color;
+					}
+
+					.dashbrd-grid-widget-content {
+						border-color: $ui-border-color;
+					}
+				}
+
+				.dashbrd-grid-iterator-placeholder > div {
+					border-color: $ui-border-color;
+				}
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: none;
+			}
+		}
+	}
+
+	.dashbrd-grid-widget-placeholder > div {
+		background-color: darken($ui-bg-color, 3%) !important;
+	}
+}
+
 // GRAPH AND MAP
 .btn-back-map-container {
 	.btn-back-map {
@@ -254,25 +348,23 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+.totals-list {
+	color: darken($font-color, 85%);
+}
+
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
-	color: darken($font-color, 85%);
+
+	&.list-table {
+		color: darken($font-color, 85%);
+
+		tbody th {
+			color: $font-color;
+		}
+	}
 
 	.host-avail-total {
-		color: $font-color;
-	}
-}
-
-// WIDGET "PROBLEMS BY SEVERITY"
-
-.by-severity-widget {
-
-	> div {
-		color: darken($font-color, 85%);
-	}
-
-	.by-severity-count {
 		color: $font-color;
 	}
 }

@@ -1546,8 +1546,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 			zbx_date2str(event->clock), zbx_time2str(event->clock),
 			zbx_age2str(time(NULL) - event->clock));
 
-	result = DBselect("select a.clock,a.alerttype,a.status,mt.description,a.sendto"
-				",a.error,a.esc_step,a.userid,a.message"
+	result = DBselect("select a.clock,a.alerttype,a.status,mt.name,a.sendto,a.error,a.esc_step,a.userid,a.message"
 			" from alerts a"
 			" left join media_type mt"
 				" on mt.mediatypeid=a.mediatypeid"
@@ -1586,9 +1585,9 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 		}
 		else
 		{
-			const char	*description, *send_to, *user_name;
+			const char	*media_type_name, *send_to, *user_name;
 
-			description = (SUCCEED == DBis_null(row[3]) ? "" : row[3]);
+			media_type_name = (SUCCEED == DBis_null(row[3]) ? "" : row[3]);
 
 			if (SUCCEED == user_permit)
 			{
@@ -1602,7 +1601,7 @@ static void	get_escalation_history(zbx_uint64_t actionid, const DB_EVENT *event,
 			}
 
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s %s \"%s\"",
-					description,	/* media type description */
+					media_type_name,
 					send_to,	/* historical recipient */
 					user_name);	/* alert user full name */
 		}
@@ -3132,8 +3131,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -3343,8 +3342,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
-					replace_to = zbx_strdup(replace_to, c_event->trigger.url);
-					substitute_simple_macros(NULL, c_event, NULL, NULL, NULL, NULL, NULL, NULL,
+					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
@@ -3931,6 +3930,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_ID))
+				{
+					get_event_value(m, event, &replace_to, userid);
 				}
 			}
 		}
