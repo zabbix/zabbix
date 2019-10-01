@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0rc1');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030041);
+define('ZABBIX_DB_VERSION',		4030052);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -633,10 +633,15 @@ define('MEDIA_STATUS_DISABLED',	1);
 
 define('MEDIA_TYPE_STATUS_ACTIVE',		0);
 define('MEDIA_TYPE_STATUS_DISABLED',	1);
+define('ZBX_MEDIA_TYPE_TAGS_DISABLED',	0);
+define('ZBX_MEDIA_TYPE_TAGS_ENABLED',	1);
+define('ZBX_EVENT_MENU_HIDE',	0);
+define('ZBX_EVENT_MENU_SHOW',	1);
 
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
+define('MEDIA_TYPE_WEBHOOK',	4);
 
 define('SMTP_CONNECTION_SECURITY_NONE',		0);
 define('SMTP_CONNECTION_SECURITY_STARTTLS',	1);
@@ -1270,16 +1275,17 @@ define('API_LLD_MACRO',			29);
 define('API_PSK',				30);
 
 // flags
-define('API_REQUIRED',				0x0001);
-define('API_NOT_EMPTY',				0x0002);
-define('API_ALLOW_NULL',			0x0004);
-define('API_NORMALIZE',				0x0008);
-define('API_DEPRECATED',			0x0010);
-define('API_ALLOW_USER_MACRO',		0x0020);
-define('API_ALLOW_COUNT',			0x0040);
-define('API_ALLOW_LLD_MACRO',		0x0080);
-define('API_REQUIRED_LLD_MACRO',	0x0100);
+define('API_REQUIRED',					0x0001);
+define('API_NOT_EMPTY',					0x0002);
+define('API_ALLOW_NULL',				0x0004);
+define('API_NORMALIZE',					0x0008);
+define('API_DEPRECATED',				0x0010);
+define('API_ALLOW_USER_MACRO',			0x0020);
+define('API_ALLOW_COUNT',				0x0040);
+define('API_ALLOW_LLD_MACRO',			0x0080);
+define('API_REQUIRED_LLD_MACRO',		0x0100);
 define('API_TIME_UNIT_WITH_YEAR',	0x0200);
+define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

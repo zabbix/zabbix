@@ -38,9 +38,12 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			['{$USER_URL_MACRO}?a=1',			[], true],
 			['http://{$USER_URL_MACRO}?a=1',	[], true],
 			['http://{$USER_URL_MACRO}',		[], true],
+			['http://{{{$USER_URL_MACRO}',		[], true],
+			['http://{$MACRO{$MACRO}}',			[], true],
 			['ftp://user@host:21',				[], true],
 			['{$USER_URL_MACRO}',				['allow_user_macro' => false], false],
 			['protocol://{$INVALID!MACRO}',		[], false],
+			['{$MACRO{',						[], false],
 			['',								[], false],
 			['javascript:alert(]',				[], false],
 			['/chart_bar.php?a=1&b=2',			[], false],
@@ -54,7 +57,9 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 			['{INVENTORY.URL.A1}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER], true],
 			['{INVENTORY.URL.A}',				['allow_inventory_macro' => INVENTORY_URL_MACRO_NONE], false],
 			['{INVENTORY.URL.A}',				['allow_user_macro' => false], false],
-			['http://localhost?host={HOST.NAME}', ['allow_user_macro' => false], true]
+			['http://localhost?host={HOST.NAME}', ['allow_user_macro' => false], true],
+			['text{EVENT.TAGS."JIRAID"}text',	['allow_event_tags_macro' => true], true],
+			['text{EVENT.TAGS."JIRAID"}text',	[], false]
 		];
 	}
 
@@ -62,6 +67,6 @@ class CHtmlUrlValidatorTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider providerValidateURL
 	 */
 	public function test_validateURL($url, $options, $expected) {
-		$this->assertEquals(CHtmlUrlValidator::validate($url, $options), $expected);
+		$this->assertSame($expected, CHtmlUrlValidator::validate($url, $options));
 	}
 }

@@ -20,6 +20,37 @@
 
 
 class CAudit {
+	/**
+	 * Supported resources list, every record contains:
+	 * resource id field name
+	 * resource name field name
+	 * resource table name
+	 */
+	static private $supported_type = [
+		AUDIT_RESOURCE_ACTION => 			['actionid', 'name', 'actions'],
+		AUDIT_RESOURCE_APPLICATION =>		['applicationid', 'name', 'applications'],
+		AUDIT_RESOURCE_AUTOREGISTRATION =>	['configid', null, 'config'],
+		AUDIT_RESOURCE_CORRELATION =>		['correlationid', 'name', 'correlation'],
+		AUDIT_RESOURCE_DASHBOARD =>			['dashboardid', 'name', 'dashboard'],
+		AUDIT_RESOURCE_DISCOVERY_RULE =>	['druleid', 'name', 'drules'],
+		AUDIT_RESOURCE_GRAPH =>				['graphid', 'name', 'graphs'],
+		AUDIT_RESOURCE_GRAPH_PROTOTYPE =>	['graphid', 'name', 'graphs'],
+		AUDIT_RESOURCE_HOST_GROUP =>		['groupid', 'name', 'groups'],
+		AUDIT_RESOURCE_HOST_PROTOTYPE =>	['hostid', 'host', 'hosts'],
+		AUDIT_RESOURCE_ICON_MAP =>			['iconmapid', 'name', 'icon_map'],
+		AUDIT_RESOURCE_ITEM =>				['itemid', 'name', 'items'],
+		AUDIT_RESOURCE_ITEM_PROTOTYPE =>	['itemid', 'name', 'items'],
+		AUDIT_RESOURCE_MACRO =>				['globalmacroid', 'macro', 'globalmacro'],
+		AUDIT_RESOURCE_MEDIA_TYPE =>		['mediatypeid', 'name', 'media_type'],
+		AUDIT_RESOURCE_PROXY =>				['proxyid', 'host', 'hosts'],
+		AUDIT_RESOURCE_SCENARIO =>			['httptestid', 'name', 'httptest'],
+		AUDIT_RESOURCE_SCRIPT =>			['scriptid', 'name', 'scripts'],
+		AUDIT_RESOURCE_TRIGGER =>			['triggerid', 'description', 'triggers'],
+		AUDIT_RESOURCE_TRIGGER_PROTOTYPE =>	['triggerid', 'description', 'triggers'],
+		AUDIT_RESOURCE_USER =>				['userid', 'alias', 'users'],
+		AUDIT_RESOURCE_USER_GROUP =>		['usrgrpid', 'name', 'usrgrp'],
+		AUDIT_RESOURCE_VALUE_MAP =>			['valuemapid', 'name', 'valuemaps']
+	];
 
 	/**
 	 * Add simple audit record.
@@ -57,127 +88,11 @@ class CAudit {
 			'config' => ['tls_psk_identity' => true, 'tls_psk' => true]
 		];
 
-		switch ($resourcetype) {
-			case AUDIT_RESOURCE_ACTION:
-				$field_name_resourceid = 'actionid';
-				$field_name_resourcename = 'name';
-				$table_name = 'actions';
-				break;
-
-			case AUDIT_RESOURCE_APPLICATION:
-				$field_name_resourceid = 'applicationid';
-				$field_name_resourcename = 'name';
-				$table_name = 'applications';
-				break;
-
-			case AUDIT_RESOURCE_AUTOREGISTRATION:
-				$field_name_resourceid = 'configid';
-				$field_name_resourcename = null;
-				$table_name = 'config';
-				break;
-
-			case AUDIT_RESOURCE_CORRELATION:
-				$field_name_resourceid = 'correlationid';
-				$field_name_resourcename = 'name';
-				$table_name = 'correlation';
-				break;
-
-			case AUDIT_RESOURCE_DASHBOARD:
-				$field_name_resourceid = 'dashboardid';
-				$field_name_resourcename = 'name';
-				$table_name = 'dashboard';
-				break;
-
-			case AUDIT_RESOURCE_DISCOVERY_RULE:
-				$field_name_resourceid = 'druleid';
-				$field_name_resourcename = 'name';
-				$table_name = 'drules';
-				break;
-
-			case AUDIT_RESOURCE_GRAPH:
-			case AUDIT_RESOURCE_GRAPH_PROTOTYPE:
-				$field_name_resourceid = 'graphid';
-				$field_name_resourcename = 'name';
-				$table_name = 'graphs';
-				break;
-
-			case AUDIT_RESOURCE_HOST_PROTOTYPE:
-				$field_name_resourceid = 'hostid';
-				$field_name_resourcename = 'host';
-				$table_name = 'hosts';
-				break;
-
-			case AUDIT_RESOURCE_HOST_GROUP:
-				$field_name_resourceid = 'groupid';
-				$field_name_resourcename = 'name';
-				$table_name = 'groups';
-				break;
-
-			case AUDIT_RESOURCE_ICON_MAP:
-				$field_name_resourceid = 'iconmapid';
-				$field_name_resourcename = 'name';
-				$table_name = 'icon_map';
-				break;
-
-			case AUDIT_RESOURCE_ITEM:
-			case AUDIT_RESOURCE_ITEM_PROTOTYPE:
-				$field_name_resourceid = 'itemid';
-				$field_name_resourcename = 'name';
-				$table_name = 'items';
-				break;
-
-			case AUDIT_RESOURCE_MACRO:
-				$field_name_resourceid = 'globalmacroid';
-				$field_name_resourcename = 'macro';
-				$table_name = 'globalmacro';
-				break;
-
-			case AUDIT_RESOURCE_PROXY:
-				$field_name_resourceid = 'proxyid';
-				$field_name_resourcename = 'host';
-				$table_name = 'hosts';
-				break;
-
-			case AUDIT_RESOURCE_SCENARIO:
-				$field_name_resourceid = 'httptestid';
-				$field_name_resourcename = 'name';
-				$table_name = 'httptest';
-				break;
-
-			case AUDIT_RESOURCE_SCRIPT:
-				$field_name_resourceid = 'scriptid';
-				$field_name_resourcename = 'name';
-				$table_name = 'scripts';
-				break;
-
-			case AUDIT_RESOURCE_TRIGGER:
-			case AUDIT_RESOURCE_TRIGGER_PROTOTYPE:
-				$field_name_resourceid = 'triggerid';
-				$field_name_resourcename = 'description';
-				$table_name = 'triggers';
-				break;
-
-			case AUDIT_RESOURCE_USER:
-				$field_name_resourceid = 'userid';
-				$field_name_resourcename = 'alias';
-				$table_name = 'users';
-				break;
-
-			case AUDIT_RESOURCE_USER_GROUP:
-				$field_name_resourceid = 'usrgrpid';
-				$field_name_resourcename = 'name';
-				$table_name = 'usrgrp';
-				break;
-
-			case AUDIT_RESOURCE_VALUE_MAP:
-				$field_name_resourceid = 'valuemapid';
-				$field_name_resourcename = 'name';
-				$table_name = 'valuemaps';
-				break;
-
-			default:
-				return;
+		if (!array_key_exists($resourcetype, self::$supported_type)) {
+			return;
 		}
+
+		list($field_name_resourceid, $field_name_resourcename, $table_name) = self::$supported_type[$resourcetype];
 
 		$clock = time();
 		$ip = substr($ip, 0, 39);

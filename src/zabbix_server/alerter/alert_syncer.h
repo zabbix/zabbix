@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,20 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ALERT_SYNCER_H
+#define ZABBIX_ALERT_SYNCER_H
 
-function media_type2str($type = null) {
-	$types = [
-		MEDIA_TYPE_EMAIL => _('Email'),
-		MEDIA_TYPE_EXEC => _('Script'),
-		MEDIA_TYPE_SMS => _('SMS'),
-		MEDIA_TYPE_WEBHOOK => _('Webhook')
-	];
+ZBX_THREAD_ENTRY(alert_syncer_thread, args);
 
-	if ($type === null) {
-		natsort($types);
-
-		return $types;
-	}
-
-	return $types[$type];
-}
+#endif

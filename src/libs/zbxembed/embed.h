@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -18,20 +17,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_EMBED_H
+#define ZABBIX_EMBED_H
 
-function media_type2str($type = null) {
-	$types = [
-		MEDIA_TYPE_EMAIL => _('Email'),
-		MEDIA_TYPE_EXEC => _('Script'),
-		MEDIA_TYPE_SMS => _('SMS'),
-		MEDIA_TYPE_WEBHOOK => _('Webhook')
-	];
+#include "common.h"
+#include "duktape.h"
 
-	if ($type === null) {
-		natsort($types);
+struct zbx_es_env
+{
+	duk_context	*ctx;
+	size_t		total_alloc;
+	time_t		start_time;
 
-		return $types;
-	}
+	char		*error;
+	int		rt_error_num;
+	int		fatal_error;
+	int		timeout;
 
-	return $types[$type];
-}
+	jmp_buf		loc;
+};
+
+#endif /* ZABBIX_EMBED_H */

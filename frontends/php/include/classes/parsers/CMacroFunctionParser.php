@@ -39,7 +39,7 @@ class CMacroFunctionParser extends CParser {
 	private $function_parser;
 
 	/**
-	 * @param array $macros  the list of macros, for example ['{ITEM.VALUE}', '{ITEM.LASTVALUE}']
+	 * @param array $macros   The list of macros, for example ['{ITEM.VALUE}', '{ITEM.LASTVALUE}'].
 	 * @param array $options
 	 */
 	public function __construct(array $macros, array $options = []) {

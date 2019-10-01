@@ -1634,7 +1634,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_EVENT_TAGS_MACRO, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1653,7 +1653,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$options = ['allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO)];
+		$options = [
+			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
+		];
 
 		if ($data !== '' && CHtmlUrlValidator::validate($data, $options) === false) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));

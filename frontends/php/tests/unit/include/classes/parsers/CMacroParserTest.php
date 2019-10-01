@@ -22,92 +22,111 @@
 class CMacroParserTest extends PHPUnit_Framework_TestCase {
 
 	public function testProvider() {
+		$fail = [
+			'rc' => CParser::PARSE_FAIL,
+			'match' => '',
+			'macro' => '',
+			'ref' => null
+		];
+
 		return [
-			[[], '{HOST.HOST}', 0, [
+			['{HOST.HOST}', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{HOST.HOST}',
+					'macro' => 'HOST.HOST',
+					'ref'	=> null
+				]
+			],
+			['chunk{HOST.HOST}', 5, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{HOST.HOST}',
+					'macro' => 'HOST.HOST',
+					'ref'	=> null
+				]
+			],
+			['chunk{HOST.HOST}chunk2', 5, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{HOST.HOST}',
+					'macro' => 'HOST.HOST',
+					'ref'	=> null
+				]
+			],
+			['', 0, [], $fail],
+			['{}', 0, [], $fail],
+			['{', 0, [], $fail],
+			['{{HOST.HOST}abc', 0, [], $fail],
+			['{HOST.HOST', 0, [], $fail],
+			['{EVENT.TAGS."Test test"}', 0, [], $fail],
+			['{EVENT.TAGS.test}', 0, [], $fail],
+			['{EVENT.TAGS.}', 0, [], $fail],
+			['{EVENT.TAGS1}', 0, [], $fail],
+			['{EVENT.TAG}', 0, [], $fail],
+
+			['{HOST.HOST}', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST}',
 				'macro' => 'HOST.HOST',
-				'n' => 0
+				'ref'	=> 0
 			]],
-			[[], 'chunk{HOST.HOST}', 5, [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '{HOST.HOST}',
-				'macro' => 'HOST.HOST',
-				'n' => 0
-			]],
-			[[], 'chunk{HOST.HOST}chunk2', 5, [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => '{HOST.HOST}',
-				'macro' => 'HOST.HOST',
-				'n' => 0
-			]],
-			[['allow_reference' => true], '{HOST.HOST}', 0, [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '{HOST.HOST}',
-				'macro' => 'HOST.HOST',
-				'n' => 0
-			]],
-			[['allow_reference' => true], '{HOST.HOST2}', 0, [
+			['{HOST.HOST2}', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{HOST.HOST2}',
 				'macro' => 'HOST.HOST',
-				'n' => 2
+				'ref'	=> 2
 			]],
+			['{HOST.HOST', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
+			['{HOST.HOST1', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
+			['{HOST.HOST0}', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
+			['{HOST.HOST.test0}', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
+			['{5}', 0, ['ref_type' => CMacroParser::REFERENCE_NUMERIC], $fail],
 
-			[[], '', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS."Test test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Test test"}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> 'Test test'
 			]],
-			[[], '{}', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS."Тест"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Тест"}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> 'Тест'
 			]],
-			[[], '{', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS."Test\"\\\\ test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."Test\"\\\\ test"}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> 'Test"\\ test'
 			]],
-			[[], '{{HOST.HOST}abc', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS.""}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS.""}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> ''
 			]],
-			[[], '{HOST.HOST', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS.test}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS.test}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> 'test'
 			]],
-			[['allow_reference' => true], '{HOST.HOST', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
+			['{EVENT.TAGS."{\"\\\\\"}"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{EVENT.TAGS."{\"\\\\\"}"}',
+				'macro' => 'EVENT.TAGS',
+				'ref'	=> '{"\\"}'
 			]],
-			[['allow_reference' => true], '{HOST.HOST1', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
-			]],
-			[['allow_reference' => true], '{HOST.HOST0}', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
-			]],
-			[['allow_reference' => true], '{5}', 0, [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'macro' => '',
-				'n' => 0
-			]]
+			['{EVENT.TAGS.$%%^}%&test}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS."Te\\st test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS.test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS.}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS."Test}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS"Test test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail],
+			['{EVENT.TAGS1."Test test"}', 0, ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC], $fail]
 		];
 	}
 
@@ -118,14 +137,14 @@ class CMacroParserTest extends PHPUnit_Framework_TestCase {
 	 * @param int    $pos
 	 * @param array  $expected
 	*/
-	public function testParse($options, $source, $pos, $expected) {
-		$macro_parser = new CMacroParser(['{HOST.HOST}', '{HOST.IP}', '{ITEM.VALUE}'], $options);
+	public function testParse($source, $pos, $options, $expected) {
+		$macro_parser = new CMacroParser(['{HOST.HOST}', '{HOST.IP}', '{ITEM.VALUE}', '{EVENT.TAGS}'], $options);
 
 		$this->assertSame($expected, [
 			'rc' => $macro_parser->parse($source, $pos),
 			'match' => $macro_parser->getMatch(),
 			'macro' => $macro_parser->getMacro(),
-			'n' => $macro_parser->getN()
+			'ref' => $macro_parser->getReference()
 		]);
 		$this->assertSame(strlen($expected['match']), $macro_parser->getLength());
 	}
