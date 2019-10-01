@@ -669,13 +669,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	if ('urls' in options) {
 		sections[sections.length] = {
 			label: t('Links'),
-			items: options.urls.map(function(url) {
-				return {
-					url: url.url,
-					label: url.name,
-					target: '_blank'
-				}
-			})
+			items: options.urls
 		};
 	}
 

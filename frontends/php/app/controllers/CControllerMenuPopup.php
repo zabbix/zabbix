@@ -572,8 +572,7 @@ class CControllerMenuPopup extends CController {
 				'triggerid' => $data['triggerid'],
 				'items' => $items,
 				'showEvents' => $show_events,
-				'configuration' =>
-					in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 			];
 
 			if (!$options['show_description']) {
@@ -584,25 +583,41 @@ class CControllerMenuPopup extends CController {
 			}
 
 			if ($db_trigger['url'] !== '') {
-				$url = CHtmlUrlValidator::validate($db_trigger['url'])
-					? $db_trigger['url']
-					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
-							false, false)).'\');';
-				$name = _('Trigger URL');
-				$menu_data['urls'] = [compact('url', 'name')];
+				$menu_data['urls'][] = [
+					'label' => _('Trigger URL'),
+					'url' => $db_trigger['url']
+				];
 			}
 
 			if (array_key_exists('eventid', $data)) {
-				$menu_data += ['urls' => []];
 				$menu_data['eventid'] = $data['eventid'];
-				$event_urls = API::Event()->get([
+
+				$events = API::Event()->get([
 					'output' => ['urls'],
 					'eventids' => $data['eventid']
-				])[0];
+				]);
 
-				if ($event_urls) {
-					$menu_data['urls'] = array_merge($menu_data['urls'], $event_urls['urls']);
+				if ($events) {
+					foreach ($events[0]['urls'] as $url) {
+						$menu_data['urls'][] = [
+							'label' => $url['name'],
+							'url' => $url['url'],
+							'target' => '_blank'
+						];
+					}
 				}
+			}
+
+			if (array_key_exists('urls', $menu_data)) {
+				foreach ($menu_data['urls'] as &$url) {
+					if (!CHtmlUrlValidator::validate($url['url'])) {
+						$url['url'] = 'javascript: alert(\''.
+							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
+						'\');';
+						unset($url['target']);
+					}
+				}
+				unset($url);
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
