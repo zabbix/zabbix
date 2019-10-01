@@ -2737,6 +2737,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($events as $eventid => $event) {
+			$events[$eventid]['urls'] = [];
+
 			foreach ($urls as $index => $url) {
 				foreach ($url_macros[$index] as $macro => $foo) {
 					if ($macro_values[$eventid][$macro] === null) {
