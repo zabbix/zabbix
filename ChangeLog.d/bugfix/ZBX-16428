@@ -1,1 +1,1 @@
-...G...... [ZBX-16428] fixed SIGBUS crash when mmap memoryis not accessible (atumilovics)
+...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)

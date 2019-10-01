@@ -55,7 +55,7 @@ static void remove_sigbus_handler()
 {
 	struct sigaction act;
 
-	if (0 == sigbus_handler_set)
+	if (0 != sigbus_handler_set)
 	{
 		act.sa_handler = SIG_DFL;
 		act.sa_flags = SA_NODEFER;
