@@ -589,13 +589,6 @@ static int	DBpatch_4030037(void)
 
 static int	DBpatch_4030038(void)
 {
-	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("host_inventory", 2, &field);
-}
-
-static int	DBpatch_4030039(void)
-{
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into host_inventory (select * from host_inventory_tmp)"))
 	{
@@ -605,9 +598,16 @@ static int	DBpatch_4030039(void)
 	return FAIL;
 }
 
-static int	DBpatch_4030040(void)
+static int	DBpatch_4030039(void)
 {
 	return DBdrop_table("host_inventory_tmp");
+}
+
+static int	DBpatch_4030040(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_inventory", 1, &field);
 }
 
 #endif
