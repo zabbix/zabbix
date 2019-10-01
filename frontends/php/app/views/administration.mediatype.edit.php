@@ -198,13 +198,13 @@ $mediatype_formlist
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
 	)
-	->addRow(new CLabel(_('Webhook parameters'), $parameters_table->getId()),
+	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
 		(new CDiv($parameters_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 		'row_webhook_parameters'
 	)
-	->addRow((new CLabel(_('Webhook script'), 'script'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
 		(new CMultilineInput('script', $data['script'], [
 			'title' => _('JavaScript'),
 			'placeholder' => _('script'),
