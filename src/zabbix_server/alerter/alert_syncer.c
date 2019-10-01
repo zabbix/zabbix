@@ -737,7 +737,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	result = DBselect_once(
+	result = DBselect(
 			"select m.mediaid,m.mediatypeid,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
