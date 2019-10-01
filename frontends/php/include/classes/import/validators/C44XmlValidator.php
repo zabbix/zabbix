@@ -1671,6 +1671,30 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
+			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
+				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MEDIA_TYPE_EMAIL, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS]],
+					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
+					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
+					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
+					'smtp_email' =>				['type' => XML_STRING, 'default' => ''],
+					'smtp_security' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::STARTTLS => CXmlConstantName::STARTTLS, CXmlConstantValue::SSL_OR_TLS => CXmlConstantName::SSL_OR_TLS]],
+					'smtp_verify_host' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'smtp_verify_peer' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => [CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE, CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD]],
+					'username' =>				['type' => XML_STRING, 'default' => ''],
+					'password' =>				['type' => XML_STRING, 'default' => ''],
+					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
+					'script_name' =>			['type' => XML_STRING, 'default' => ''],
+					'parameters' =>				['type' => XML_STRING, 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']],
+					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
+					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
+					'attempts' =>				['type' => XML_STRING, 'default' => '3'],
+					'attempt_interval' =>		['type' => XML_STRING, 'default' => '10s']
+				]]
+			]],
 			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
 				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -2186,5 +2210,34 @@ class C44XmlValidator {
 		}
 
 		return $data['filter'];
+	}
+
+	/**
+	 * Converts script parameters to a string.
+	 *
+	 * @param array|string $data  Import data.
+	 *
+	 * @throws Exception if input is invalid.
+	 *
+	 * @return string
+	 */
+	public function scriptParameterPreprocessor($data) {
+		if (is_string($data) && $data !== '') {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'parameters', _('an array is expected')));
+		}
+
+		return is_array($data) ? implode("\n", $data)."\n" : '';
+	}
+
+	/**
+	 * Converts script parameters to an array.
+	 *
+	 * @param array  $data               Export data.
+	 * @param string $data['parameters]  Script parameters.
+	 *
+	 * @return array
+	 */
+	public function scriptParameterExport(array $data) {
+		return explode("\n", substr($data['parameters'], 0, -1));
 	}
 }

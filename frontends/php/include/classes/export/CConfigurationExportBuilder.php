@@ -196,6 +196,18 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format media types.
+	 *
+	 * @param array $schema       Tag schema from validation class.
+	 * @param array $media_types  Export data.
+	 */
+	public function buildMediaTypes(array $schema, array $media_types) {
+		$media_types = $this->formatMediaTypes($media_types);
+
+		$this->data['media_types'] = $this->build($schema, $media_types, 'media_types');
+	}
+
+	/**
 	 * Format valuemaps.
 	 *
 	 * @param array $schema     Tag schema from validation class.
@@ -389,6 +401,44 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'value' => $mapping['value'],
 				'newvalue' => $mapping['newvalue']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format media types.
+	 *
+	 * @param array $media_types
+	 */
+	protected function formatMediaTypes(array $media_types) {
+		$result = [];
+
+		CArrayHelper::sort($media_types, ['name']);
+
+		foreach ($media_types as $media_type) {
+			$result[] = [
+				'name' => $media_type['name'],
+				'type' => $media_type['type'],
+				'smtp_server' => $media_type['smtp_server'],
+				'smtp_port' => $media_type['smtp_port'],
+				'smtp_helo' => $media_type['smtp_helo'],
+				'smtp_email' => $media_type['smtp_email'],
+				'smtp_security' => $media_type['smtp_security'],
+				'smtp_verify_host' => $media_type['smtp_verify_host'],
+				'smtp_verify_peer' => $media_type['smtp_verify_peer'],
+				'smtp_authentication' => $media_type['smtp_authentication'],
+				'username' => $media_type['username'],
+				'password' => $media_type['passwd'],
+				'content_type' => $media_type['content_type'],
+				'script_name' => $media_type['exec_path'],
+				'parameters' => $media_type['exec_params'],
+				'gsm_modem' => $media_type['gsm_modem'],
+				'status' => $media_type['status'],
+				'max_sessions' => $media_type['maxsessions'],
+				'attempts' => $media_type['maxattempts'],
+				'attempt_interval' => $media_type['attempt_interval']
 			];
 		}
 
