@@ -81,7 +81,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
  * Purpose: CurlHttpRequest destructor                                        *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_dtor(duk_context *ctx)
+static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 
@@ -204,7 +204,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
  *             http_request - [IN] the HTTP request (GET, PUT, POST, DELETE)  *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
+static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
 {
 	zbx_es_httprequest_t	*request;
 	const char		*url, *contents = NULL;
@@ -256,7 +256,7 @@ duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request)
  * Purpose: CurlHttpRequest.Get method                                        *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_get(duk_context *ctx)
+static duk_ret_t	es_httprequest_get(duk_context *ctx)
 {
 	return es_httprequest_query(ctx, "GET");
 }
@@ -268,7 +268,7 @@ duk_ret_t	es_httprequest_get(duk_context *ctx)
  * Purpose: CurlHttpRequest.Put method                                        *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_put(duk_context *ctx)
+static duk_ret_t	es_httprequest_put(duk_context *ctx)
 {
 	return es_httprequest_query(ctx, "PUT");
 }
@@ -280,7 +280,7 @@ duk_ret_t	es_httprequest_put(duk_context *ctx)
  * Purpose: CurlHttpRequest.Post method                                       *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_post(duk_context *ctx)
+static duk_ret_t	es_httprequest_post(duk_context *ctx)
 {
 	return es_httprequest_query(ctx, "POST");
 }
@@ -292,7 +292,7 @@ duk_ret_t	es_httprequest_post(duk_context *ctx)
  * Purpose: CurlHttpRequest.Delete method                                     *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_delete(duk_context *ctx)
+static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 {
 	return es_httprequest_query(ctx, "DELETE");
 }
@@ -304,7 +304,7 @@ duk_ret_t	es_httprequest_delete(duk_context *ctx)
  * Purpose: CurlHttpRequest.Status method                                     *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_httprequest_status(duk_context *ctx)
+static duk_ret_t	es_httprequest_status(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
 	long				response_code;
@@ -336,7 +336,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
 
-	duk_error(ctx, DUK_RET_TYPE_ERROR, "missing cURL library");
+	return duk_error(ctx, DUK_RET_TYPE_ERROR, "missing cURL library");
 }
 
 static const duk_function_list_entry	httprequest_methods[] = {

@@ -32,7 +32,7 @@
  * Purpose: Curlzabbix destructor                                        *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_zabbix_dtor(duk_context *ctx)
+static duk_ret_t	es_zabbix_dtor(duk_context *ctx)
 {
 	ZBX_UNUSED(ctx);
 	return 0;
@@ -64,7 +64,7 @@ static duk_ret_t	es_zabbix_ctor(duk_context *ctx)
  * Purpose: Curlzabbix.Status method                                     *
  *                                                                            *
  ******************************************************************************/
-duk_ret_t	es_zabbix_log(duk_context *ctx)
+static duk_ret_t	es_zabbix_log(duk_context *ctx)
 {
 	zabbix_log(duk_to_int(ctx, 0), "%s", duk_to_string(ctx, 1));
 	return 0;
