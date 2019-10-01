@@ -813,16 +813,21 @@ function convert_units($options = []) {
 /**
  * Convert time format with suffixes to seconds.
  * Examples:
- *		10m = 600
- *		3d = 10800
- *		-10m = -600
+ *        10m = 600
+ *        3d = 259200
+ *        -10m = -600
  *
  * @param string $time
+ * @param bool $with_year
  *
  * @return null|string
  */
-function timeUnitToSeconds($time) {
-	preg_match('/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.ZBX_TIME_SUFFIXES.'])?$/', $time, $matches);
+function timeUnitToSeconds($time, $with_year = false) {
+	preg_match(
+		'/^(?<sign>[\-+])?(?<number>(\d)+)(?<suffix>['.
+		($with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).'])?$/',
+		$time, $matches
+	);
 
 	$is_negative = (array_key_exists('sign', $matches) && $matches['sign'] === '-');
 
@@ -848,6 +853,12 @@ function timeUnitToSeconds($time) {
 				break;
 			case 'w':
 				$sec = bcmul($time, SEC_PER_WEEK);
+				break;
+			case 'M':
+				$sec = bcmul($time, SEC_PER_MONTH);
+				break;
+			case 'y':
+				$sec = bcmul($time, SEC_PER_YEAR);
 				break;
 		}
 	}

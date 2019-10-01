@@ -966,6 +966,20 @@ define('TAG_EVAL_TYPE_OR',		2);
 define('TAG_OPERATOR_LIKE',		0);
 define('TAG_OPERATOR_EQUAL',	1);
 
+define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
+
+define('GRAPH_AGGREGATE_NONE',	0);
+define('GRAPH_AGGREGATE_MIN',	1);
+define('GRAPH_AGGREGATE_MAX',	2);
+define('GRAPH_AGGREGATE_AVG',	3);
+define('GRAPH_AGGREGATE_COUNT',	4);
+define('GRAPH_AGGREGATE_SUM',	5);
+define('GRAPH_AGGREGATE_FIRST',	6);
+define('GRAPH_AGGREGATE_LAST',	7);
+
+define('GRAPH_AGGREGATE_BY_ITEM',		0);
+define('GRAPH_AGGREGATE_BY_DATASET',	1);
+
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
 define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
@@ -1122,6 +1136,7 @@ define('ZBX_EOL_CRLF',	1);
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
+define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'smhdwMy');
 
 // preg
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
@@ -1269,7 +1284,8 @@ define('API_ALLOW_USER_MACRO',			0x0020);
 define('API_ALLOW_COUNT',				0x0040);
 define('API_ALLOW_LLD_MACRO',			0x0080);
 define('API_REQUIRED_LLD_MACRO',		0x0100);
-define('API_ALLOW_EVENT_TAGS_MACRO',	0x0200);
+define('API_TIME_UNIT_WITH_YEAR',	0x0200);
+define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

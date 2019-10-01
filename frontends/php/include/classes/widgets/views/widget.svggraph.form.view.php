@@ -161,16 +161,16 @@ $scripts[] =
 					'var name = jQuery(this).multiSelect("getOption", "name");'.
 					'if (name !== null) {'.
 						'jQuery(this).multiSelect("modify", {'.
-							'name: name.replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
+							'name: name.replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
 						'});'.
 					'}'.
 				'});'.
 
 				'jQuery(\'[name^="\' + var_prefix + \'["]\', this).filter(function() {'.
-					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z]+\]/);'.
+					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z_]+\]/);'.
 				'}).each(function() {'.
 					'jQuery(this).attr("name", '.
-						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
+						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
 					');'.
 				'});'.
 			'});'.
