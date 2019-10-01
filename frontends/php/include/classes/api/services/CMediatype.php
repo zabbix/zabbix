@@ -1135,17 +1135,17 @@ class CMediatype extends CApiService {
 				'process_tags' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_TYPE_TAGS_DISABLED, ZBX_MEDIA_TYPE_TAGS_ENABLED])],
 				'show_event_menu' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_EVENT_MENU_HIDE, ZBX_EVENT_MENU_SHOW])],
 				// Should be checked as string not as url because it can contain maros tags.
-				'event_menu_url' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
+				'event_menu_url' =>		['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO, 'length' => DB::getFieldLength('media_type', 'event_menu_url')],
 				'event_menu_name' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'event_menu_name')],
 				'parameters' =>			['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 					'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type_param', 'name')],
 					'value' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('media_type_param', 'value')]
 				]]
 			];
-		}
 
-		if ($method === 'create') {
-			$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+			if ($method === 'create') {
+				$api_input_rules['fields']['script']['flags'] |= API_REQUIRED;
+			}
 		}
 
 		return $api_input_rules;
