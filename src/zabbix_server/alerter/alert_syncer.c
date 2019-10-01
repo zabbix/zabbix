@@ -764,6 +764,9 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	}
 	DBfree_result(result);
 
+	if (0 == medias.values_num)
+		goto out;
+
 	/* update media types used for watchdog alerts */
 
 	zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -784,9 +787,10 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 	medias_num = medias.values_num;
 
+	zbx_vector_ptr_clear_ext(&medias, (zbx_clean_func_t)zbx_am_media_free);
+out:
 	zbx_vector_ptr_destroy(&mediatypes);
 	zbx_vector_uint64_destroy(&mediatypeids);
-	zbx_vector_ptr_clear_ext(&medias, (zbx_clean_func_t)zbx_am_media_free);
 	zbx_vector_ptr_destroy(&medias);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, medias_num);
