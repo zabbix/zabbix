@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>3.4</version>
+   <version>4.2</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -11,7 +11,9 @@
       <template>
          <template>Template Module ICMP Ping</template>
          <name>Template Module ICMP Ping</name>
-         <description>Template Module ICMP Ping version: 0.15</description>
+         <description>Template Module ICMP Ping&#13;
+&#13;
+Template tooling version used: 0.30</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -64,6 +66,24 @@
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <output_format>0</output_format>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
                <master_item/>
             </item>
             <item>
@@ -105,6 +125,24 @@
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <output_format>0</output_format>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
                <master_item/>
             </item>
             <item>
@@ -146,6 +184,24 @@
                <logtimefmt/>
                <preprocessing/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <output_format>0</output_format>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
                <master_item/>
             </item>
          </items>
@@ -163,6 +219,7 @@
          </macros>
          <templates/>
          <screens/>
+         <tags/>
       </template>
    </templates>
    <graphs/>
@@ -234,5 +291,19 @@ Last three attempts returned timeout.  Please check device connectivity.</descri
          <tags/>
       </trigger>
    </triggers>
-   <value_maps/>
+   <value_maps>
+      <value_map>
+         <name>Service state</name>
+         <mappings>
+            <mapping>
+               <value>0</value>
+               <newvalue>Down</newvalue>
+            </mapping>
+            <mapping>
+               <value>1</value>
+               <newvalue>Up</newvalue>
+            </mapping>
+         </mappings>
+      </value_map>
+   </value_maps>
 </zabbix_export>
