@@ -315,7 +315,9 @@ $tranStrings = [
 
 if (empty($_GET['files'])) {
 	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
+		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+		$path = rtrim(substr($path, 0, strrpos($path, '/') + 1), '/');
+		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']).';path='.$path);
 	}
 
 	$files = [

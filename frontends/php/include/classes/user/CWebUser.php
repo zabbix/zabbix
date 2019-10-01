@@ -164,9 +164,12 @@ class CWebUser {
 	 * @param string $sessionId		Session ID string
 	 */
 	public static function setSessionCookie($sessionId) {
+		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+		$path = rtrim(substr($path, 0, strrpos($path, '/') + 1), '/');
+
 		$autoLogin = self::isGuest() ? false : (bool) self::$data['autologin'];
 
-		zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0);
+		zbx_setcookie(ZBX_SESSION_NAME, $sessionId,  $autoLogin ? strtotime('+1 month') : 0, $path);
 	}
 
 	/**

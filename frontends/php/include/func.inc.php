@@ -100,8 +100,8 @@ function get_cookie($name, $default_value = null) {
 	return $default_value;
 }
 
-function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
+function zbx_setcookie($name, $value, $time = null, $path = null) {
+	setcookie($name, $value, isset($time) ? $time : 0, $path, null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
