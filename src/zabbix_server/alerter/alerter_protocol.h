@@ -56,7 +56,7 @@ typedef struct
 	zbx_uint64_t		mediatypeid;
 
 	/* media type data */
-	int			type;
+	unsigned char		type;
 	char			*smtp_server;
 	char			*smtp_helo;
 	char			*smtp_email;
@@ -143,11 +143,21 @@ zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alert
 
 void	zbx_alerter_deserialize_exec(const unsigned char *data, zbx_uint64_t *alertid, char **command);
 
-zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, const char *sendto,
-		const char *subject, const char *message, const char *params);
+zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, unsigned char type,
+		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,
+		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
+		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
+		unsigned char smtp_authentication, const char *exec_params, int maxsessions, int maxattempts,
+		const char *attempt_interval, unsigned char content_type, const char *script, const char *timeout,
+		const char *sendto, const char *subject, const char *message, const char *params);
 
-void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, char **sendto,
-		char **subject, char **message, char **params);
+void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid,
+		unsigned char *type, char **smtp_server, char **smtp_helo, char **smtp_email, char **exec_path,
+		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
+		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
+		unsigned char *smtp_authentication, char **exec_params, int *maxsessions, int *maxattempts,
+		char **attempt_interval, unsigned char *content_type, char **script, char **timeout,
+		char **sendto, char **subject, char **message, char **params);
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
 		int timeout, const char *params);
