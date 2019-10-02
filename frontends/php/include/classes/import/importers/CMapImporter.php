@@ -190,13 +190,15 @@ class CMapImporter extends CImporter {
 					'icon_maintenance' => 'iconid_maintenance',
 				];
 				foreach ($icons as $element => $field) {
-					if (!empty($selement[$element])) {
-						$image = getImageByIdent($selement[$element]);
-						if (!$image) {
-							throw new Exception(_s('Cannot find icon "%1$s" used in map "%2$s".',
-								$selement[$element]['name'], $map['name']));
+					if (array_key_exists($element, $selement)) {
+						if (array_key_exists('name', $selement[$element]) && $selement[$element]['name'] !== '') {
+							$image = getImageByIdent($selement[$element]);
+							if (!$image) {
+								throw new Exception(_s('Cannot find icon "%1$s" used in map "%2$s".',
+									$selement[$element]['name'], $map['name']));
+							}
+							$selement[$field] = $image['imageid'];
 						}
-						$selement[$field] = $image['imageid'];
 					}
 				}
 			}
@@ -245,25 +247,29 @@ class CMapImporter extends CImporter {
 	 */
 	protected function resolveMapElementReferences(array $maps) {
 		foreach ($maps as &$map) {
-			if (isset($map['iconmap']) && $map['iconmap']) {
-				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+			if (array_key_exists('iconmap', $map)) {
+				if (array_key_exists('name', $map['iconmap']) && $map['iconmap']['name'] !== '') {
+					$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
 
-				if (!$map['iconmapid']) {
-					throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
-						$map['iconmap']['name'], $map['name']
-					));
+					if (!$map['iconmapid']) {
+						throw new Exception(_s('Cannot find icon map "%1$s" used in map "%2$s".',
+							$map['iconmap']['name'], $map['name']
+						));
+					}
 				}
 			}
 
-			if (isset($map['background']) && $map['background']) {
-				$image = getImageByIdent($map['background']);
+			if (array_key_exists('background', $map)) {
+				if (array_key_exists('name', $map['background']) && $map['background']['name'] !== '') {
+					$image = getImageByIdent($map['background']);
 
-				if (!$image) {
-					throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
-						$map['background']['name'], $map['name']
-					));
+					if (!$image) {
+						throw new Exception(_s('Cannot find background image "%1$s" used in map "%2$s".',
+							$map['background']['name'], $map['name']
+						));
+					}
+					$map['backgroundid'] = $image['imageid'];
 				}
-				$map['backgroundid'] = $image['imageid'];
 			}
 		}
 		unset($map);
