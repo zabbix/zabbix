@@ -1284,7 +1284,7 @@ define('API_ALLOW_USER_MACRO',			0x0020);
 define('API_ALLOW_COUNT',				0x0040);
 define('API_ALLOW_LLD_MACRO',			0x0080);
 define('API_REQUIRED_LLD_MACRO',		0x0100);
-define('API_TIME_UNIT_WITH_YEAR',	0x0200);
+define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 
 // JSON error codes.
