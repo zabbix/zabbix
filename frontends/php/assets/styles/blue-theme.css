@@ -647,7 +647,8 @@ output {
     .list-table.compact-view .action-container .rel-container {
       display: flex; }
     .list-table.compact-view .action-container .link-action {
-      height: 16px; }
+      height: 16px;
+      min-width: 1em; }
     .list-table.compact-view .action-container .separator,
     .list-table.compact-view .action-container [class*='icon-'] {
       flex-shrink: 0; }
