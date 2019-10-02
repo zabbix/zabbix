@@ -1426,7 +1426,7 @@ output {
 %timeline-dot {
 	content: '';
 	position: absolute;
-	z-index: 100;
+	z-index: 70;
 	display: block;
 	width: 4px;
 	height: 4px;
@@ -3474,7 +3474,7 @@ $form-icon-btn: (
 	 * For floating headers to appear over other widgets.
 	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	 */
-	z-index: 3;
+	z-index: 80;
 
 	h4 {
 		flex-grow: 1;

@@ -949,7 +949,7 @@ output {
 .timeline-dot::after, .timeline-dot-big::after {
   content: '';
   position: absolute;
-  z-index: 100;
+  z-index: 70;
   display: block;
   width: 4px;
   height: 4px;
@@ -2393,7 +2393,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
    * For floating headers to appear over other widgets.
    * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
    */
-  z-index: 3; }
+  z-index: 80; }
   .dashbrd-grid-widget-head h4 {
     flex-grow: 1;
     margin-top: .5rem;
