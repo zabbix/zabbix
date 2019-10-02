@@ -6157,6 +6157,58 @@ a.overlay-close-btn {
 	}
 }
 
+.is-loading::after {
+	@include border-radius(50%);
+	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+	background-color: rgba($ui-bg-color, .8);
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
+	animation: load 0.6s infinite linear;
+	z-index: 1;
+	z-index: 1;
+	content: '';
+}
+
+.is-loading::before {
+	background-color: rgba($ui-bg-color, .8);
+	content: 'loading'; /* For screen-reader */
+	text-indent: 100%; /* For screen-reader */
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+}
+
+.is-loading {
+	pointer-events: none;
+}
+
+.dashbrd-grid-widget-content.is-loading::before,
+.dashbrd-grid-iterator-content.is-loading::before {
+	top: .25rem;
+	bottom: .25rem;
+	left: .25rem;
+	right: .25rem;
+	margin: 1px;
+}
+
+button.is-loading::after {
+	width: 10px;
+	height: 10px;
+	@include box-shadow (0 0 0 3px rgba($ui-bg-color, .8));
+}
+
 .preloader-container {
 	z-index: 10;
 	padding: 7px;
