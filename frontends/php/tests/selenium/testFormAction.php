@@ -1144,9 +1144,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestDropdownHasOptions('new_operation_opmessage_mediatypeid', [
 					'- All -',
 					'Email',
-					'Jabber',
-					'SMS',
-					'SMS via IP'
+					'SMS'
 			]);
 
 			$this->zbxTestTextPresent('Default message');
@@ -2018,11 +2016,11 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('item_1');
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
-		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'Jabber');
+		$this->zbxTestDropdownSelect('new_operation_opmessage_mediatypeid', 'SMS');
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
-			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
-			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+			"Send message to users: Admin (Zabbix Administrator) via SMS ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'new_operation')]");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//button[contains(@onclick, 'add_operation')]"));
@@ -2058,8 +2056,8 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command');
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
-			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
-			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+			"Send message to users: Admin (Zabbix Administrator) via SMS ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
 			"Run remote commands on current host ".
 			"Run remote commands on hosts: Simple form test host ".
@@ -2078,8 +2076,8 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestInputType('new_operation_opcommand_command', 'command ssh');
 		$this->zbxTestClickXpathWait("//div[@id='operationTab']//button[contains(@onclick, 'add_operation')]");
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
-			"Send message to users: Admin (Zabbix Administrator) via Jabber ".
-			"Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+			"Send message to users: Admin (Zabbix Administrator) via SMS ".
+			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
 			"Run remote commands on current host ".
 			"Run remote commands on hosts: Simple form test host ".

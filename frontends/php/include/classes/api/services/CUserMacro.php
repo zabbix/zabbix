@@ -267,8 +267,9 @@ class CUserMacro extends CApiService {
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-			'macro' =>	['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
-			'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'value')]
+			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'macro')],
+			'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('globalmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -293,7 +294,7 @@ class CUserMacro extends CApiService {
 			$upd_globalmacro = [];
 
 			// strings
-			foreach (['macro', 'value'] as $field_name) {
+			foreach (['macro', 'value', 'description'] as $field_name) {
 				if (array_key_exists($field_name, $globalmacro)
 						&& $globalmacro[$field_name] !== $db_globalmacro[$field_name]) {
 					$upd_globalmacro[$field_name] = $globalmacro[$field_name];
@@ -353,14 +354,15 @@ class CUserMacro extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['globalmacroid'], ['macro']], 'fields' => [
 			'globalmacroid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('globalmacro', 'macro')],
-			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')]
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'value')],
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('globalmacro', 'description')]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $globalmacros, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_globalmacros = DB::select('globalmacro', [
-			'output' => ['globalmacroid', 'macro', 'value'],
+			'output' => ['globalmacroid', 'macro', 'value', 'description'],
 			'globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'),
 			'preservekeys' => true
 		]);

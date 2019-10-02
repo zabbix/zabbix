@@ -261,7 +261,7 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			]),
 			'mediatypes' => API::MediaType()->get([
-				'output' => ['description', 'maxattempts'],
+				'output' => ['name', 'maxattempts'],
 				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])
@@ -575,20 +575,20 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
 			return getSeverityCell($severity, null, [
-				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_UNACK:
 			return getSeverityCell($severity, null, [
-				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
 			return getSeverityCell($severity, $data['severity_names'], [
 				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
-					->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 

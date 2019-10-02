@@ -41,7 +41,7 @@ check_fields($fields);
  */
 if (hasRequest('update')) {
 	$dbMacros = API::UserMacro()->get([
-		'output' => ['globalmacroid', 'macro', 'value'],
+		'output' => ['globalmacroid', 'macro', 'value', 'description'],
 		'globalmacro' => true,
 		'preservekeys' => true
 	]);
@@ -50,7 +50,8 @@ if (hasRequest('update')) {
 
 	// remove empty new macro lines
 	foreach ($macros as $idx => $macro) {
-		if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
+		if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
+				&& $macro['description'] === '') {
 			unset($macros[$idx]);
 		}
 	}
@@ -65,7 +66,8 @@ if (hasRequest('update')) {
 			unset($macros[$idx], $dbMacros[$macro['globalmacroid']]);
 
 			// if the macro is unchanged - skip it
-			if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']) {
+			if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+					&& $dbMacro['description'] === $macro['description']) {
 				continue;
 			}
 
@@ -113,14 +115,14 @@ if (hasRequest('form_refresh')) {
 }
 else {
 	$data['macros'] = API::UserMacro()->get([
-		'output' => ['globalmacroid', 'macro', 'value'],
+		'output' => ['globalmacroid', 'macro', 'value', 'description'],
 		'globalmacro' => true
 	]);
 	$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 }
 
 if (!$data['macros']) {
-	$data['macros'][] = ['macro' => '', 'value' => ''];
+	$data['macros'][] = ['macro' => '', 'value' => '', 'description' => ''];
 }
 
 (new CView('administration.general.macros.edit', $data))->render()->show();

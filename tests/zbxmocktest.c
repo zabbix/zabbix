@@ -24,10 +24,11 @@
 
 /* unresolved symbols needed for linking */
 
-unsigned char	program_type		= 0;
-unsigned char	process_type		= 0;
-int		process_num		= 0;
-int		server_num		= 0;
+unsigned char	program_type	= 0;
+
+ZBX_THREAD_LOCAL unsigned char	process_type		= 0;
+ZBX_THREAD_LOCAL int		process_num		= 0;
+ZBX_THREAD_LOCAL int		server_num		= 0;
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -174,6 +175,7 @@ char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
 char	**CONFIG_PERF_COUNTERS		= NULL;
+char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
 void	zbx_on_exit(int ret)

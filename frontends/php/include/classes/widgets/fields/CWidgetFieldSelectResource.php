@@ -48,13 +48,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 				$this->srcfld1 = 'sysmapid';
 				$this->srcfld2 = 'name';
 				break;
-
-			case WIDGET_FIELD_SELECT_RES_GRAPH:
-				$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
-				$this->srctbl = 'graphs';
-				$this->srcfld1 = 'graphid';
-				$this->srcfld2 = 'name';
-				break;
 		}
 
 		$this->dstfld1 = $name;
@@ -97,11 +90,6 @@ class CWidgetFieldSelectResource extends CWidgetField {
 			'dstfld2' => $this->dstfld2,
 			'dstfrm' => $dstfrm
 		];
-
-		if ($this->resource_type == WIDGET_FIELD_SELECT_RES_GRAPH) {
-			$popup_options['real_hosts'] = '1';
-			$popup_options['with_graphs'] = '1';
-		}
 
 		return $popup_options;
 	}

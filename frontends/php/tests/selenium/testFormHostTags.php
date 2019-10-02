@@ -161,7 +161,7 @@ class testFormHostTags extends CWebTest {
 
 		$this->page->login()->open('hosts.php');
 		$this->query('button:Create host')->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 		$form->fill([
 			'Host name' => $data['host_name'],
 			'Groups' => 'Zabbix servers'
@@ -272,7 +272,7 @@ class testFormHostTags extends CWebTest {
 
 		$this->page->login()->open('hosts.php');
 		$this->query('link:'.$this->update_host)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 
 		$form->selectTab('Tags');
 		$this->fillTags($data['tags']);
@@ -316,7 +316,7 @@ class testFormHostTags extends CWebTest {
 
 		$this->page->login()->open('hosts.php');
 		$this->query('link:'.$this->clone_host)->waitUntilPresent()->one()->click();
-		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 		$form->getField('Host name')->fill($new_name);
 
 		$form->selectTab('Tags');
@@ -346,7 +346,7 @@ class testFormHostTags extends CWebTest {
 	private function checkTagFields($data) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host_name']));
 		$this->page->open('hosts.php?form=update&hostid='.$id.'&groupid=0');
-		$form = $this->query('id:hostForm')->waitUntilPresent()->asForm()->one();
+		$form = $this->query('id:hostsForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Tags');
 		$this->assertTags($data['tags']);
 	}

@@ -660,18 +660,18 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	// url
-	if (typeof options.url !== 'undefined' && options.url.length > 0) {
-		items[items.length] = {
-			label: t('URL'),
-			url: options.url
-		};
-	}
-
 	sections[sections.length] = {
 		label: t('S_TRIGGER'),
 		items: items
 	};
+
+	// urls
+	if ('urls' in options) {
+		sections[sections.length] = {
+			label: t('Links'),
+			items: options.urls
+		};
+	}
 
 	// items
 	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
@@ -968,8 +968,8 @@ jQuery(function($) {
 
 			opener.attr('data-expanded', 'true');
 
-			// Close other action menus.
-			$('.menu-popup-top').not('#' + id).menuPopup('close');
+			// Close other action menus and prevent focus jumping before opening a new popup.
+			$('.menu-popup-top').not('#' + id).menuPopup('close', null, false);
 
 			if (menuPopup.length > 0) {
 				var display = menuPopup.css('display');
@@ -1089,8 +1089,10 @@ jQuery(function($) {
 		},
 		close: function(trigger_elmnt, return_focus) {
 			var menuPopup = $(this);
+
 			if (!menuPopup.is(trigger_elmnt) && menuPopup.has(trigger_elmnt).length === 0) {
 				menuPopup.data('is-active', false);
+
 				$(trigger_elmnt).removeAttr('data-expanded');
 				menuPopup.fadeOut(0);
 
@@ -1101,7 +1103,13 @@ jQuery(function($) {
 					.off('click', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
-				removeFromOverlaysStack('menu-popup', return_focus);
+				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
+
+				if (overlay !== null && typeof overlay['element'] !== undefined) {
+					// Remove expanded attribute of the original opener.
+					$(overlay['element']).removeAttr('data-expanded');
+				}
+
 				menuPopup.remove();
 			}
 		}
@@ -1320,6 +1328,10 @@ jQuery(function($) {
 
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
+
+				if ('target' in options) {
+					link.attr('target', options.target);
+				}
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {

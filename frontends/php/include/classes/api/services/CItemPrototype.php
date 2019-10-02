@@ -757,7 +757,7 @@ class CItemPrototype extends CItemGeneral {
 				'url' => '',
 				'query_fields' => '',
 				'timeout' => $defaults['timeout'],
-				'status_codes' => '',
+				'status_codes' => $defaults['status_codes'],
 				'follow_redirects' => $defaults['follow_redirects'],
 				'request_method' => $defaults['request_method'],
 				'allow_traps' => $defaults['allow_traps'],

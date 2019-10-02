@@ -646,7 +646,12 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_urls) {
-			$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$trigger['eventid'] = $problem['eventid'];
+				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
+			}
+			unset($problem);
 		}
 
 		// get additional data
@@ -708,7 +713,7 @@ class CScreenProblem extends CScreenBase {
 
 		$data['mediatypes'] = $actions['mediatypeids']
 			? API::Mediatype()->get([
-				'output' => ['description', 'maxattempts'],
+				'output' => ['name', 'maxattempts'],
 				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])

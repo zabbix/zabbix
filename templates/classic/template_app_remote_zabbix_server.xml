@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.2</version>
-    <date>2019-02-05T08:12:23Z</date>
+    <date>2019-10-01T13:43:45Z</date>
     <groups>
         <group>
             <name>Templates/Applications</name>
@@ -268,6 +268,74 @@
                         <step>
                             <type>12</type>
                             <params>$.data.process['alert manager'].busy.avg</params>
+                            <error_handler>0</error_handler>
+                            <error_handler_params/>
+                        </step>
+                    </preprocessing>
+                    <jmx_endpoint/>
+                    <timeout>3s</timeout>
+                    <url/>
+                    <query_fields/>
+                    <posts/>
+                    <status_codes>200</status_codes>
+                    <follow_redirects>1</follow_redirects>
+                    <post_type>0</post_type>
+                    <http_proxy/>
+                    <headers/>
+                    <retrieve_mode>0</retrieve_mode>
+                    <request_method>0</request_method>
+                    <output_format>0</output_format>
+                    <allow_traps>0</allow_traps>
+                    <ssl_cert_file/>
+                    <ssl_key_file/>
+                    <ssl_key_password/>
+                    <verify_peer>0</verify_peer>
+                    <verify_host>0</verify_host>
+                    <master_item>
+                        <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Utilization of alert syncer internal processes, in %</name>
+                    <type>18</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>process.alert_syncer.avg.busy</key>
+                    <delay>0</delay>
+                    <history>1w</history>
+                    <trends>365d</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>%</units>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zabbix server</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                    <preprocessing>
+                        <step>
+                            <type>12</type>
+                            <params>$.data.process['alert syncer'].busy.avg</params>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
                         </step>
@@ -3349,7 +3417,7 @@
                     </screen_items>
                 </screen>
             </screens>
-	    <tags/>
+            <tags/>
         </template>
     </templates>
     <triggers>
@@ -3460,6 +3528,22 @@
             <status>0</status>
             <priority>2</priority>
             <description>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.alert_syncer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.alert_syncer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix alert syncer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
             <type>0</type>
             <manual_close>0</manual_close>
             <dependencies/>
@@ -4355,6 +4439,18 @@
                     <item>
                         <host>Template App Remote Zabbix server</host>
                         <key>process.lld_worker.avg.busy</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>14</sortorder>
+                    <drawtype>0</drawtype>
+                    <color>8000FF</color>
+                    <yaxisside>0</yaxisside>
+                    <calc_fnc>2</calc_fnc>
+                    <type>0</type>
+                    <item>
+                        <host>Template App Remote Zabbix server</host>
+                        <key>process.alert_syncer.avg.busy</key>
                     </item>
                 </graph_item>
             </graph_items>

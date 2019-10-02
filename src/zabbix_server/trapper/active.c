@@ -38,6 +38,8 @@ extern unsigned char	program_type;
  * Parameters: host          - [IN] name of the host to be added or updated   *
  *             ip            - [IN] IP address of the host                    *
  *             port          - [IN] port of the host                          *
+ *             connection_type - [IN] ZBX_TCP_SEC_UNENCRYPTED,                *
+ *                             ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT    *
  *             host_metadata - [IN] host metadata                             *
  *             flag          - [IN] flag describing interface type            *
  *             interface     - [IN] interface value if flag is not default    *
@@ -45,13 +47,13 @@ extern unsigned char	program_type;
  * Comments: helper function for get_hostid_by_host                           *
  *                                                                            *
  ******************************************************************************/
-static void	db_register_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface)
+static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
 {
 	char		dns[INTERFACE_DNS_LEN_MAX];
 	char		ip_addr[INTERFACE_IP_LEN_MAX];
-	const char		*p;
-	const char		*p_ip, *p_dns;
+	const char	*p;
+	const char	*p_ip, *p_dns;
 
 	p_ip = ip;
 	p_dns = dns;
@@ -62,7 +64,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 		p_ip = p = interface;
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
-	if (ZBX_CONN_DEFAULT == flag || ZBX_CONN_IP  == flag)
+	if (ZBX_CONN_DEFAULT == flag || ZBX_CONN_IP == flag)
 	{
 		if (0 == strncmp("::ffff:", p, 7) && SUCCEED == is_ip4(p + 7))
 			p += 7;
@@ -80,11 +82,58 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	DBbegin();
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		DBregister_host(0, host, p_ip, p_dns, port, host_metadata, (unsigned short)flag, (int)time(NULL));
+	{
+		DBregister_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
+				(int)time(NULL));
+	}
 	else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		DBproxy_register_host(host, p_ip, p_dns, port, host_metadata, (unsigned short)flag);
+		DBproxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag);
 
 	DBcommit();
+}
+
+static int	zbx_autoreg_check_permissions(const char *host, const char *ip, unsigned short port,
+		const zbx_socket_t *sock)
+{
+	zbx_config_t	cfg;
+	int		ret = FAIL;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT);
+
+	if (0 == (cfg.autoreg_tls_accept & sock->connection_type))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
+				" port:%hu): connection type \"%s\" is not allowed for autoregistration",
+				sock->peer, host, ip, port, zbx_tcp_connection_type_name(sock->connection_type));
+		goto out;
+	}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || (defined(HAVE_OPENSSL) && defined(HAVE_OPENSSL_WITH_PSK))
+	if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (0 == (ZBX_PSK_FOR_AUTOREG & zbx_tls_get_psk_usage()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
+					" port:%hu): connection used PSK which is not configured for autoregistration",
+					sock->peer, host, ip, port);
+			goto out;
+		}
+
+		ret = SUCCEED;
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type)
+	{
+		ret = SUCCEED;
+	}
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+#else
+	ret = SUCCEED;
+#endif
+out:
+	zbx_config_clean(&cfg);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -229,7 +278,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
 				(old_flag_v != flag))
 		{
-			db_register_host(host, ip, port, host_metadata, flag, interface);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
 		}
 
 		if (HOST_STATUS_MONITORED != atoi(row[1]))
@@ -244,7 +293,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	else
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
-		db_register_host(host, ip, port, host_metadata, flag, interface);
+
+		if (SUCCEED == zbx_autoreg_check_permissions(host, ip, port, sock))
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
 	}
 done:
 	DBfree_result(result);
@@ -496,13 +547,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, i;
+	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
-	zbx_conn_flags_t		flag = ZBX_CONN_DEFAULT;
+	zbx_conn_flags_t	flag = ZBX_CONN_DEFAULT;
+	zbx_config_t		cfg;
 
 	zbx_vector_ptr_t	regexps;
 	zbx_vector_str_t	names;
@@ -568,7 +620,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, error))
 		goto error;
 
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp)) ||
+			FAIL == (version = zbx_get_component_version(tmp)))
+	{
+		version = ZBX_COMPONENT_VERSION(4, 2);
+	}
+
 	zbx_vector_uint64_create(&itemids);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 	get_list_of_active_checks(hostid, &itemids);
 
@@ -580,13 +639,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		DC_ITEM		*dc_items;
 		int		*errcodes, now, delay;
-		zbx_config_t	cfg;
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
 
@@ -605,7 +662,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
+			if (ZBX_COMPONENT_VERSION(4,4) > version && ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == cfg.refresh_unsupported)
 					continue;
@@ -617,17 +674,29 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
+
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			substitute_key_macros(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
-			if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
+
+			if (ZBX_COMPONENT_VERSION(4,4) > version)
 			{
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
-						dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+				if (0 != strcmp(dc_items[i].key, dc_items[i].key_orig))
+				{
+					zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
+							dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
+				}
+
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			}
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
+			else
+			{
+				zbx_json_adduint64(&json, ZBX_PROTO_TAG_ITEMID, dc_items[i].itemid);
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, dc_items[i].delay, ZBX_JSON_TYPE_STRING);
+			}
+
 			/* The agent expects ALWAYS to have lastlogsize and mtime tags. */
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);
@@ -639,17 +708,19 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_free(dc_items[i].key);
 		}
 
-		zbx_config_clean(&cfg);
-
 		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
 	}
 
-	zbx_vector_uint64_destroy(&itemids);
-
 	zbx_json_close(&json);
+
+	if (ZBX_COMPONENT_VERSION(4,4) <= version)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, cfg.refresh_unsupported);
+
+	zbx_config_clean(&cfg);
+	zbx_vector_uint64_destroy(&itemids);
 
 	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
 

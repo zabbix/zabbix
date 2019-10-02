@@ -139,7 +139,14 @@ $multiselect-selected-bg-color: #222;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-// DASHBOARD
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
+
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -167,6 +174,64 @@ $multiselect-selected-bg-color: #222;
 		&::before {
 			background: url(../img/icon-sprite.svg) no-repeat -457px -888px;
 		}
+	}
+}
+
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		&.dashbrd-grid-widget-focus {
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 -6px 8px -2px #000;
+		}
+	}
+}
+
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-widget {
+		&.ui-draggable-dragging {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					box-shadow: 0 -6px 8px -2px #000;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px #000;
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		&.ui-draggable-dragging {
+			.dashbrd-grid-iterator-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px #000;
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: none;
+			}
+		}
+	}
+
+	.dashbrd-grid-widget-placeholder > div {
+		background-color: lighten($ui-bg-color, 12%) !important;
 	}
 }
 
@@ -224,6 +289,8 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -397px -657px,
+	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -395px -623px,
 	widget-action: url(../img/icon-sprite.svg) no-repeat -318px -618px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -318px -654px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -318px -690px,
@@ -1139,23 +1206,31 @@ td.inactive-bg {
 	}
 }
 
+.totals-list {
+
+	> div {
+		border-top: 1px solid $ui-border-color;
+		color: $font-color;
+	}
+
+	.count {
+		font-weight: bold;
+	}
+
+	&.totals-list-horizontal {
+
+		> div:not(:last-of-type) {
+			border-right: 1px solid $ui-border-color;
+		}
+	}
+}
+
 // WIDGET "HOST AVAILABILITY"
 
 .host-avail-widget {
 
-	tr {
-		border-top: 1px solid $ui-border-color;
-	}
-
-	&.host-avail-layout-horizontal {
-
-		td:not(:last-of-type) {
-			border-right: 1px solid $ui-border-color;
-		}
-	}
-
-	.host-avail-count {
-		font-weight: bold;
+	td:not(:first-child) {
+		border-left: 1px solid $ui-border-color;
 	}
 
 	.host-avail-true,
@@ -1171,25 +1246,12 @@ td.inactive-bg {
 .by-severity-widget {
 
 	> div {
-		border-top: 1px solid $ui-border-color;
-		color: $font-color;
 		min-width: 65px;
 		padding-left: 42px;
 
 		&:after {
 			top: 50%;
 			transform: translateY(-50%);
-		}
-	}
-
-	.by-severity-count {
-		font-weight: bold;
-	}
-
-	&.by-severity-layout-horizontal {
-
-		> div:not(:last-of-type) {
-			border-right: 1px solid $ui-border-color;
 		}
 	}
 }

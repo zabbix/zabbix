@@ -19,7 +19,11 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxjson.h"
 #include "zbxembed.h"
+#include "embed.h"
+#include "httprequest.h"
+#include "zabbix.h"
 
 #include "duktape.h"
 
@@ -30,19 +34,6 @@
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
 #define ZBX_ES_MAX_CONSEQUENT_RT_ERROR	3
-
-struct zbx_es_env
-{
-	duk_context	*ctx;
-	size_t		total_alloc;
-	time_t		start_time;
-
-	char		*error;
-	int		rt_error_num;
-	int		fatal_error;
-
-	jmp_buf		loc;
-};
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 #define ZBX_ES_SCRIPT_FOOTER	"\n}"
@@ -141,7 +132,7 @@ int	zbx_es_check_timeout(void *udata)
 {
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 
-	if (time(NULL) - env->start_time > ZBX_ES_TIMEOUT)
+	if (time(NULL) - env->start_time > env->timeout)
 		return 1;
 
 	return 0;
@@ -210,11 +201,29 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		goto out;
 	}
 
+	/* initialize Zabbix object */
+	zbx_es_init_zabbix(es, error);
+
 	/* remove Duktape object */
 	duk_push_global_object(es->env->ctx);
 	duk_del_prop_string(es->env->ctx, -1, "Duktape");
 	duk_pop(es->env->ctx);
 
+	/* put environment object to be accessible from duktape C calls */
+	duk_push_global_stash(es->env->ctx);
+	duk_push_pointer(es->env->ctx, (void *)es->env);
+	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
+	{
+		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
+		duk_pop(es->env->ctx);
+		return FAIL;
+	}
+
+	/* initialize CurlHttpRequest prototype */
+	if (FAIL == zbx_es_init_httprequest(es, error))
+		goto out;
+
+	es->env->timeout = ZBX_ES_TIMEOUT;
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -489,4 +498,19 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_es_set_timeout                                               *
+ *                                                                            *
+ * Purpose: sets script execution timeout                                     *
+ *                                                                            *
+ * Parameters: es      - [IN] the embedded scripting engine                   *
+ *             timeout - [IN] the script execution timeout in seconds         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_es_set_timeout(zbx_es_t *es, int timeout)
+{
+	es->env->timeout = timeout;
 }

@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/common.template.edit.js.php';
+
 $widget = (new CWidget())->setTitle(_('Templates'));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
@@ -43,6 +45,7 @@ if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
+	->setId('templatesForm')
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
@@ -154,7 +157,7 @@ if ($data['form'] === 'full_clone') {
 		$templateList->addRow(_('Items'), $listBox);
 	}
 
-// Triggers
+	// Triggers
 	$hostTriggers = API::Trigger()->get([
 		'inherited' => false,
 		'hostids' => $data['templateid'],
@@ -175,7 +178,7 @@ if ($data['form'] === 'full_clone') {
 		$templateList->addRow(_('Triggers'), $listBox);
 	}
 
-// Graphs
+	// Graphs
 	$hostGraphs = API::Graph()->get([
 		'inherited' => false,
 		'hostids' => $data['templateid'],
@@ -243,7 +246,7 @@ if ($data['form'] === 'full_clone') {
 			$templateList->addRow(_('Item prototypes'), $listBox);
 		}
 
-// Trigger prototypes
+		// Trigger prototypes
 		$hostTriggerPrototypes = API::TriggerPrototype()->get([
 			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
@@ -264,7 +267,7 @@ if ($data['form'] === 'full_clone') {
 			$templateList->addRow(_('Trigger prototypes'), $listBox);
 		}
 
-// Graph prototypes
+		// Graph prototypes
 		$hostGraphPrototypes = API::GraphPrototype()->get([
 			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
@@ -379,39 +382,24 @@ foreach ($data['linkedTemplates'] as $template) {
 	$disableids[] = $template['templateid'];
 }
 
+$linkedTemplateTable->addRow([
+	(new CSimpleButton(_('Add')))
+		->onClick('return PopUp("popup.generic",'.CJs::encodeJson([
+			'dstfrm' => $frmHost->getName(),
+			'dstfld1' =>  $frmHost->getName(),
+			'srctbl' => 'templates',
+			'srcfld1' => 'hostid',
+			'templated_hosts' => '1',
+			'popup_type' => 'templates',
+			'multiselect' => 1,
+			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
+			'disableids' => $disableids
+		]).', null, this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]);
+
 $tmplList->addRow(_('Linked templates'),
 	(new CDiv($linkedTemplateTable))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-// create new linked template table
-$newTemplateTable = (new CTable())
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'add_templates[]',
-			'object_name' => 'templates',
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $frmHost->getName(),
-					'dstfld1' => 'add_templates_',
-					'excludeids' => $data['templateid'] != 0 ? [$data['templateid']] : [],
-					'disableids' => $disableids
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->onClick('javascript: submitFormWithParam("'.$frmHost->getName().'", "add_template", "1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$tmplList->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
-	(new CDiv($newTemplateTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -429,7 +417,7 @@ $divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 // macros
 if (!$macros) {
-	$macro = ['macro' => '', 'value' => ''];
+	$macro = ['macro' => '', 'value' => '', 'description' => ''];
 	if ($data['show_inherited_macros']) {
 		$macro['type'] = ZBX_PROPERTY_OWN;
 	}
