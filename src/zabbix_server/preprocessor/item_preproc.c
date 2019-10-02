@@ -1778,9 +1778,6 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 	{
 		unsigned int	i;
 
-		fld_names = zbx_realloc(fld_names, (num + 1) * sizeof(char*));
-		*names = fld_names;
-
 		for (i = 0; i < num; i++)
 		{
 			if (0 == strcmp(fld_names[i], field))
@@ -1791,7 +1788,9 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 			}
 		}
 
+		fld_names = zbx_realloc(fld_names, (num + 1) * sizeof(char*));
 		fld_names[num] = zbx_strdup(NULL, field);
+		*names = fld_names;
 	}
 	else
 	{
@@ -2053,6 +2052,9 @@ out:
 
 	if (1 == hdr_line)
 	{
+		if (0 == fld_num_max)
+			fld_num_max = fld_num;
+
 		for (fld_num = 0; fld_num < fld_num_max; fld_num++)
 			zbx_free(field_names[fld_num]);
 
