@@ -135,7 +135,8 @@ if (hasRequest('macros')) {
 
 	// remove empty new macro lines
 	foreach ($_REQUEST['macros'] as $idx => $macro) {
-		if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === '') {
+		if (!array_key_exists('hostmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
+				&& $macro['description'] === '') {
 			unset($_REQUEST['macros'][$idx]);
 		}
 	}

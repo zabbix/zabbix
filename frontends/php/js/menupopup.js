@@ -660,18 +660,18 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 		};
 	}
 
-	// url
-	if (typeof options.url !== 'undefined' && options.url.length > 0) {
-		items[items.length] = {
-			label: t('URL'),
-			url: options.url
-		};
-	}
-
 	sections[sections.length] = {
 		label: t('S_TRIGGER'),
 		items: items
 	};
+
+	// urls
+	if ('urls' in options) {
+		sections[sections.length] = {
+			label: t('Links'),
+			items: options.urls
+		};
+	}
 
 	// items
 	if (typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
@@ -1328,6 +1328,10 @@ jQuery(function($) {
 
 			if (typeof options.url !== 'undefined') {
 				link.attr('href', options.url);
+
+				if ('target' in options) {
+					link.attr('target', options.target);
+				}
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {

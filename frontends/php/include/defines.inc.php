@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'4.4.0beta1');
+define('ZABBIX_VERSION',		'4.4.0rc1');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030035);
+define('ZABBIX_DB_VERSION',		4030055);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -444,7 +444,7 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
-define('ZBX_ITEM_DELAY_DEFAULT',			'30s');
+define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
 
@@ -470,7 +470,7 @@ define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 
 define('ZBX_DEPENDENT_ITEM_MAX_LEVELS',	3);
-define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	999);
+define('ZBX_DEPENDENT_ITEM_MAX_COUNT',	29999);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
 define('ITEM_VALUE_TYPE_STR',		1); // aka Character
@@ -556,12 +556,16 @@ define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
 define('ZBX_PREPROC_SCRIPT',				21);
 define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
 define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
+define('ZBX_PREPROC_CSV_TO_JSON',			24);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
 define('ZBX_PREPROC_FAIL_DISCARD_VALUE',	1);
 define('ZBX_PREPROC_FAIL_SET_VALUE',		2);
 define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
+
+define('ZBX_PREPROC_CSV_NO_HEADER',	0);
+define('ZBX_PREPROC_CSV_HEADER',	1);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -633,10 +637,15 @@ define('MEDIA_STATUS_DISABLED',	1);
 
 define('MEDIA_TYPE_STATUS_ACTIVE',		0);
 define('MEDIA_TYPE_STATUS_DISABLED',	1);
+define('ZBX_MEDIA_TYPE_TAGS_DISABLED',	0);
+define('ZBX_MEDIA_TYPE_TAGS_ENABLED',	1);
+define('ZBX_EVENT_MENU_HIDE',	0);
+define('ZBX_EVENT_MENU_SHOW',	1);
 
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
+define('MEDIA_TYPE_WEBHOOK',	4);
 
 define('SMTP_CONNECTION_SECURITY_NONE',		0);
 define('SMTP_CONNECTION_SECURITY_STARTTLS',	1);
@@ -961,6 +970,20 @@ define('TAG_EVAL_TYPE_OR',		2);
 define('TAG_OPERATOR_LIKE',		0);
 define('TAG_OPERATOR_EQUAL',	1);
 
+define('GRAPH_AGGREGATE_DEFAULT_INTERVAL',	'1h');
+
+define('GRAPH_AGGREGATE_NONE',	0);
+define('GRAPH_AGGREGATE_MIN',	1);
+define('GRAPH_AGGREGATE_MAX',	2);
+define('GRAPH_AGGREGATE_AVG',	3);
+define('GRAPH_AGGREGATE_COUNT',	4);
+define('GRAPH_AGGREGATE_SUM',	5);
+define('GRAPH_AGGREGATE_FIRST',	6);
+define('GRAPH_AGGREGATE_LAST',	7);
+
+define('GRAPH_AGGREGATE_BY_ITEM',		0);
+define('GRAPH_AGGREGATE_BY_DATASET',	1);
+
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
 define('GRAPH_YAXIS_TYPE_ITEM_VALUE',	2);
@@ -1117,6 +1140,7 @@ define('ZBX_EOL_CRLF',	1);
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
+define('ZBX_TIME_SUFFIXES_WITH_YEAR', 'smhdwMy');
 
 // preg
 define('ZBX_PREG_PRINT', '^\x00-\x1F');
@@ -1255,15 +1279,17 @@ define('API_LLD_MACRO',			29);
 define('API_PSK',				30);
 
 // flags
-define('API_REQUIRED',				0x0001);
-define('API_NOT_EMPTY',				0x0002);
-define('API_ALLOW_NULL',			0x0004);
-define('API_NORMALIZE',				0x0008);
-define('API_DEPRECATED',			0x0010);
-define('API_ALLOW_USER_MACRO',		0x0020);
-define('API_ALLOW_COUNT',			0x0040);
-define('API_ALLOW_LLD_MACRO',		0x0080);
-define('API_REQUIRED_LLD_MACRO',	0x0100);
+define('API_REQUIRED',					0x0001);
+define('API_NOT_EMPTY',					0x0002);
+define('API_ALLOW_NULL',				0x0004);
+define('API_NORMALIZE',					0x0008);
+define('API_DEPRECATED',				0x0010);
+define('API_ALLOW_USER_MACRO',			0x0020);
+define('API_ALLOW_COUNT',				0x0040);
+define('API_ALLOW_LLD_MACRO',			0x0080);
+define('API_REQUIRED_LLD_MACRO',		0x0100);
+define('API_TIME_UNIT_WITH_YEAR',		0x0200);
+define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

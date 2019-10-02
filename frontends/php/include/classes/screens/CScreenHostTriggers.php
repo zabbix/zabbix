@@ -263,8 +263,8 @@ class CScreenHostTriggers extends CScreenBase {
 				$host_name,
 				(new CCol([
 					(new CLinkAction($problem['name']))
-						->setHint(make_popup_eventlist(['comments' => $problem['comments']] + $trigger,
-							$problem['eventid'], $back_url
+						->setHint(make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
+							'triggerid' => $trigger['triggerid']], $problem['eventid'], $back_url
 						))
 				]))->addClass(getSeverityStyle($problem['severity'])),
 				$clock,

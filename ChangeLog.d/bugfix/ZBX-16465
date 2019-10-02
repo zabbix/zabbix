@@ -1,1 +1,1 @@
-....I..... [ZBX-16465] fixed Zabbix database schema creation failure on MariaDB (vso)
+....I..... [ZBX-16465] fixed Zabbix database upgrade failure on MariaDB (vso)

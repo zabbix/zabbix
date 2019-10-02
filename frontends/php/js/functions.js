@@ -502,13 +502,13 @@ function overlayDialogueDestroy(dialogueid, xhr) {
 
 		jQuery('[data-dialogueid='+dialogueid+']').remove();
 
-		if (!jQuery('[data-dialogueid]').length) {
-			jQuery('body').css({'overflow': ''});
-			jQuery('body[style=""]').removeAttr('style');
-		}
-
 		removeFromOverlaysStack(dialogueid);
 		jQuery.publish('overlay.close', {dialogueid: dialogueid});
+
+		if (!jQuery('[data-dialogueid]').length) {
+			jQuery('body').css('overflow', jQuery('body').data('overflow'));
+			jQuery('body').removeData('overflow');
+		}
 	}
 }
 
@@ -553,6 +553,11 @@ function getOverlayDialogueId() {
  * @return {bool}
  */
 function overlayDialogue(params, trigger_elmnt, xhr) {
+	if (!jQuery('[data-dialogueid]').length) {
+		jQuery('body').data('overflow', jQuery('body').css('overflow'));
+		jQuery('body').css('overflow', 'hidden');
+	}
+
 	var button_focused = null,
 		cancel_action = null,
 		submit_btn = null,
@@ -730,8 +735,6 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 			center_overlay_dialog();
 		}
 	});
-
-	jQuery('body').css({'overflow': 'hidden'});
 
 	if (button_focused !== null) {
 		button_focused.focus();

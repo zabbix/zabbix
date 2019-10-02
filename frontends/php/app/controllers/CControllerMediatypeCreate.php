@@ -38,10 +38,18 @@ class CControllerMediatypeCreate extends CController {
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
+			'parameters' =>				'array',
+			'script' => 				'db media_type.script',
+			'timeout' => 				'db media_type.timeout',
+			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
+			'show_event_menu' =>		'in '.ZBX_EVENT_MENU_HIDE.','.ZBX_EVENT_MENU_SHOW,
+			'event_menu_url' =>			'db media_type.event_menu_url',
+			'event_menu_name' =>		'db media_type.event_menu_name',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
+			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML
 		];
@@ -84,7 +92,9 @@ class CControllerMediatypeCreate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['type', 'name', 'status', 'maxsessions', 'maxattempts', 'attempt_interval']);
+		$this->getInputs($mediatype, ['type', 'name', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
+			'description'
+		]);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
@@ -115,17 +125,27 @@ class CControllerMediatypeCreate extends CController {
 				$this->getInputs($mediatype, ['gsm_modem']);
 				$mediatype['maxsessions'] = 1;
 				break;
-		}
 
-		DBstart();
+			case MEDIA_TYPE_WEBHOOK:
+				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
+				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
+				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+					'event_menu_name'
+				]);
+				$parameters = $this->getInput('parameters', []);
+
+				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
+					$mediatype['parameters'] = array_map(function ($name, $value) {
+							return compact('name', 'value');
+						},
+						$parameters['name'],
+						$parameters['value']
+					);
+				}
+				break;
+		}
 
 		$result = API::Mediatype()->create($mediatype);
-
-		if ($result) {
-			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediatype['name'].']');
-		}
-
-		$result = DBend($result);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.list&uncheck=1');

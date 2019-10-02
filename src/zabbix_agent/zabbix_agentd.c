@@ -278,6 +278,7 @@ int	CONFIG_PREPROCMAN_FORKS		= 0;
 int	CONFIG_PREPROCESSOR_FORKS	= 0;
 int	CONFIG_LLDMANAGER_FORKS		= 0;
 int	CONFIG_LLDWORKER_FORKS		= 0;
+int	CONFIG_ALERTDB_FORKS		= 0;
 
 char	*opt = NULL;
 
@@ -1250,6 +1251,8 @@ int	main(int argc, char **argv)
 
 			while (0 == WSACleanup())
 				;
+
+			zbx_co_uninitialize();
 #endif
 #ifndef _WINDOWS
 			zbx_unload_modules();

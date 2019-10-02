@@ -1751,9 +1751,13 @@ void	zbx_export_events(void)
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_HOSTS);
 
 		zbx_hashset_iter_reset(&hosts, &iter);
+
 		while (NULL != (host = (DC_HOST *)zbx_hashset_iter_next(&iter)))
 		{
-			zbx_json_addstring(&json, NULL, host->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&json,NULL);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, host->host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, host->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json);
 			zbx_vector_uint64_append(&hostids, host->hostid);
 		}
 

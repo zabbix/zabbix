@@ -1075,6 +1075,43 @@ class CWidgetHelper {
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
+							->addRow(_('Aggregation function'),
+								(new CComboBox(
+									$field_name.'['.$row_num.'][aggregate_function]',
+									(int) $value['aggregate_function'], null,
+									[
+										GRAPH_AGGREGATE_NONE => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_NONE),
+										GRAPH_AGGREGATE_MIN => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MIN),
+										GRAPH_AGGREGATE_MAX => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_MAX),
+										GRAPH_AGGREGATE_AVG => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_AVG),
+										GRAPH_AGGREGATE_COUNT => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_COUNT),
+										GRAPH_AGGREGATE_SUM => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_SUM),
+										GRAPH_AGGREGATE_FIRST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_FIRST),
+										GRAPH_AGGREGATE_LAST => graph_item_aggr_fnc2str(GRAPH_AGGREGATE_LAST)
+									]
+								))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+									->onChange('changeDataSetAggregateFunction(this);')
+							)
+							->addRow(_('Aggregation interval'),
+								(new CTextBox(
+									$field_name.'['.$row_num.'][aggregate_interval]',
+									$value['aggregate_interval']
+								))
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+							->addRow(_('Aggregate'),
+								(new CRadioButtonList(
+									$field_name.'['.$row_num.'][aggregate_grouping]',
+									(int) $value['aggregate_grouping'])
+								)
+									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
+									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
+									->setEnabled($value['aggregate_function'] != GRAPH_AGGREGATE_NONE)
+									->setModern(true)
+							)
 					))
 						->addClass(ZBX_STYLE_COLUMN_50),
 				]))
@@ -1115,18 +1152,11 @@ class CWidgetHelper {
 		$values = $field->getValue();
 
 		if (!$values) {
-			$values[] = [];
+			$values[] = CWidgetFieldGraphDataSet::getDefaults();
 		}
 
-		$i = 0;
-
-		foreach ($values as $value) {
-			// Take default values for missing fields. This can happen if particular field is disabled.
-			$value += CWidgetFieldGraphDataSet::getDefaults();
-
+		foreach ($values as $i => $value) {
 			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
-
-			$i++;
 		}
 
 		// Add 'Add' button under accordion.
@@ -1180,6 +1210,14 @@ class CWidgetHelper {
 						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
 						'break;'.
 				'}'.
+			'};',
+
+			'function changeDataSetAggregateFunction(obj) {'.
+				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
+				'var no_aggregation = (jQuery(obj).val() == '.GRAPH_AGGREGATE_NONE.');'.
+				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
+				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
 			'};',
 
 			// Initialize dynamic rows.
