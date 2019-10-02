@@ -70,11 +70,11 @@ function itemPreprocessingTest(form) {
 			}
 
 			jQuery('<span>')
-				.addClass('preloader')
+				.addClass('is-loading')
 				.insertAfter(jQuery('.submit-test-btn'))
 				.css({
-					'display': 'inline-block',
-					'margin': '0 10px -8px'
+					'position': 'relative',
+					'margin-right': '30px'
 				});
 
 			jQuery('.submit-test-btn')
@@ -116,7 +116,7 @@ function itemPreprocessingTest(form) {
 				jQuery('#prev_value, #prev_time').prop('disabled', false);
 			}
 
-			jQuery('.preloader').remove();
+			jQuery('.is-loading').remove();
 			jQuery('.submit-test-btn')
 				.prop('disabled', false)
 				.show();
