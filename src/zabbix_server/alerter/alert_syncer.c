@@ -393,8 +393,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 	zbx_vector_uint64_create(&mediatypeids);
 	zbx_vector_ptr_create(&mediatypes);
 
-	am_db_get_alerts(&alerts);
-	if (0 == alerts.values_num)
+	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
 		goto out;
 
 	for (i = 0; i < alerts.values_num; i++)
