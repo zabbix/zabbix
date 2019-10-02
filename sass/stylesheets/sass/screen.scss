@@ -6173,7 +6173,6 @@ a.overlay-close-btn {
 	border-bottom: 2px solid #0275b8;
 	animation: load 0.6s infinite linear;
 	z-index: 1;
-	z-index: 1;
 	content: '';
 }
 
@@ -6223,23 +6222,23 @@ button.is-loading::after {
 	background-color: rgba($ui-bg-color, .8);
 	@include border-radius(50%);
 	@include transform(translateY(-50%));
+}
 
-	&.menu-popup-preloader {
-		@include border-radius(0);
-		@include box-shadow(0 4px 20px 0 $action-shadow-color);
-		@include transform(none);
-		background: $action-preloader-bg-color;
-		border: 1px solid $action-border-color;
-		height: 120px;
-		width: 120px;
-		position: fixed;
-		right: auto;
-		bottom: auto;
-		display: flex;
-		align-items: center;
-		margin: 0;
-		z-index: 1010;
-	}
+.menu-popup-preloader {
+	@include border-radius(0);
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+	@include transform(none);
+	background: $action-preloader-bg-color;
+	border: 1px solid $action-border-color;
+	height: 120px;
+	width: 120px;
+	position: fixed;
+	right: auto;
+	bottom: auto;
+	display: flex;
+	align-items: center;
+	margin: 0;
+	z-index: 1010;
 }
 
 .preloader {

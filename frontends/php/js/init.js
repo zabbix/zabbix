@@ -186,9 +186,8 @@ jQuery(function($) {
 	function createMenuPopupPreloader() {
 		return $('<div>', {
 			'id': 'menu-popup-preloader',
-			'class': 'preloader-container menu-popup-preloader'
+			'class': 'is-loading menu-popup-preloader'
 		})
-			.append($('<div>').addClass('preloader'))
 			.appendTo($('body'))
 			.on('click', function(e) {
 				e.stopPropagation();
