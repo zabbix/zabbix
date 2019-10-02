@@ -210,7 +210,8 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		if (16 < sql_offset)
 			ret = (ZBX_DB_OK <= DBexecute("%s", sql) ? SUCCEED : FAIL);
 	}
-	DBcommit();
+	ret = (ZBX_DB_OK == DBcommit() ? SUCCEED : FAIL);
+
 	zbx_vector_uint64_destroy(&alertids);
 	zbx_free(sql);
 
