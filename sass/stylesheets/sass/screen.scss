@@ -1133,6 +1133,19 @@ output {
 	.opdata {
 		max-width: 300px;
 	}
+
+	.action-container {
+		display: flex;
+		width: 100%;
+
+		.label {
+			@extend %overflow-ellipsis;
+		}
+
+		[class*='icon-'] {
+			flex-shrink: 0;
+		}
+	}
 }
 
 .table-paging {
@@ -7096,7 +7109,7 @@ ul.checkbox-list {
 	}
 }
 .icon-description {
-	margin-left: 5px;
+	margin: 0 0 0 5px;
 
 	&::after {
 		content: '?';

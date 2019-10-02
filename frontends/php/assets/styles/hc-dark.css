@@ -721,6 +721,11 @@ output {
   .list-table .latest-values,
   .list-table .opdata {
     max-width: 300px; }
+  .list-table .action-container {
+    display: flex;
+    width: 100%; }
+    .list-table .action-container [class*='icon-'] {
+      flex-shrink: 0; }
 
 .table-paging {
   text-align: center;
@@ -4326,7 +4331,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.list-table .action-container .label, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -5036,7 +5041,7 @@ ul.checkbox-list.col-3 > li {
   background-position: -524px -245px; }
 
 .icon-description {
-  margin-left: 5px; }
+  margin: 0 0 0 5px; }
   .icon-description::after {
     content: '?';
     color: #000; }
