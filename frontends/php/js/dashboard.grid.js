@@ -3563,17 +3563,14 @@
 					dataType: 'json',
 					beforeSend: function() {
 						body.empty()
+							.addClass('is-loading')
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
 								.css({
 									'width': '544px',
 									'height': '68px',
 									'max-width': '100%'
-								})
-								.append($('<div>')
-									.addClass('preloader-container')
-									.append($('<div>').addClass('preloader'))
-								));
+								}))
 					}
 				})
 					.done(function(response) {
@@ -3611,6 +3608,8 @@
 						}
 
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
+
+						body.removeClass('is-loading');
 					});
 			});
 		},

@@ -6179,7 +6179,7 @@ a.overlay-close-btn {
 .is-loading::before {
 	background-color: rgba($ui-bg-color, .8);
 	content: 'loading'; /* For screen-reader */
-	text-indent: 100%; /* For screen-reader */
+	text-indent: 200%; /* For screen-reader, for IE 200% instead of 100% */
 	overflow: hidden;
 	position: absolute;
 	top: 0;
@@ -6191,6 +6191,11 @@ a.overlay-close-btn {
 
 .is-loading {
 	pointer-events: none;
+}
+
+.overlay-dialogue.modal .overlay-dialogue-body.is-loading {
+	position: relative;
+	overflow: hidden;
 }
 
 .dashbrd-grid-widget-content.is-loading::before,
