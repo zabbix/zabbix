@@ -1783,7 +1783,7 @@ static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***nam
 			if (0 == strcmp(fld_names[i], field))
 			{
 				*errmsg = zbx_dsprintf(*errmsg,
-						"cannot convert CSV to JSON: duplicated column name: %s", field);
+						"cannot convert CSV to JSON: duplicated column name \"%s\"", field);
 				return FAIL;
 			}
 		}
@@ -2020,7 +2020,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 			else
 			{
 				*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: delimiter character or "
-						"end of line are not detected after quoted field: %.*s",
+						"end of line are not detected after quoted field \"%.*s\"",
 						(int)(data - field), field);
 				ret = FAIL;
 				goto out;
@@ -2041,8 +2041,7 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 
 	if (CSV_STATE_FIELD_QUOTED == state)
 	{
-
-		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: unclosed quoted field: %s", field);
+		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: unclosed quoted field \"%s\"", field);
 		ret = FAIL;
 	}
 
