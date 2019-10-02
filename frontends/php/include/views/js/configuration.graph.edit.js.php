@@ -358,7 +358,7 @@
 				var preview_chart = $('#previewChart'),
 					src = new Curl('chart3.php');
 
-				if (preview_chart.find('.preloader').length) {
+				if (preview_chart.find('.is-loading').length) {
 					return false;
 				}
 
@@ -402,7 +402,8 @@
 					image.remove();
 				}
 
-				preview_chart.append($('<div>').addClass('preloader'));
+				preview_chart.append($('<div>', {css: {'position': 'relative', 'min-height': '50px'}})
+					.addClass('is-loading'));
 
 				$('<img />')
 					.attr('src', src.getUrl())
