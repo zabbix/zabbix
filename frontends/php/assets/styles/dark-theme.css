@@ -758,6 +758,11 @@ output {
   .list-table .latest-values,
   .list-table .opdata {
     max-width: 300px; }
+  .list-table .action-container {
+    display: flex;
+    width: 100%; }
+    .list-table .action-container [class*='icon-'] {
+      flex-shrink: 0; }
 
 .table-paging {
   text-align: center;
@@ -4435,7 +4440,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.list-table .action-container .label, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -5045,7 +5050,8 @@ ul.checkbox-list.col-3 > li {
 .icon-problem-recovery,
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
-.icon-actions-number-red {
+.icon-actions-number-red,
+.icon-description {
   display: inline-block;
   position: relative;
   height: 18px;
@@ -5068,7 +5074,8 @@ ul.checkbox-list.col-3 > li {
   .icon-problem-recovery::before,
   .icon-actions-number-gray::before,
   .icon-actions-number-yellow::before,
-  .icon-actions-number-red::before {
+  .icon-actions-number-red::before,
+  .icon-description::before {
     content: '';
     display: inline-block;
     position: absolute;
@@ -5079,7 +5086,8 @@ ul.checkbox-list.col-3 > li {
     background-image: url(../img/icon-sprite.svg);
     background-repeat: no-repeat; }
 
-[data-count][class*='icon-']::after {
+[data-count][class*='icon-']::after,
+.icon-description::after {
   position: absolute;
   content: attr(data-count);
   text-align: center;
@@ -5140,6 +5148,14 @@ ul.checkbox-list.col-3 > li {
   color: #f2f2f2; }
 .icon-actions-number-red::before {
   background-position: -524px -245px; }
+
+.icon-description {
+  margin: 0 0 0 5px; }
+  .icon-description::after {
+    content: '?';
+    color: #2b2b2b; }
+  .icon-description::before {
+    background-position: -474px -245px; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
@@ -5374,6 +5390,9 @@ table.preprocessing-test-results .rel-container {
   background-position: -649px -245px; }
 
 .icon-actions-number-gray[data-count]::after {
+  color: #f2f2f2; }
+
+.icon-description::after {
   color: #f2f2f2; }
 
 .totals-list {
