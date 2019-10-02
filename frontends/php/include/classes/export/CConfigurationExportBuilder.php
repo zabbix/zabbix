@@ -1062,7 +1062,8 @@ class CConfigurationExportBuilder {
 		foreach ($macros as $macro) {
 			$result[] = [
 				'macro' => $macro['macro'],
-				'value' => $macro['value']
+				'value' => $macro['value'],
+				'description' => $macro['description']
 			];
 		}
 

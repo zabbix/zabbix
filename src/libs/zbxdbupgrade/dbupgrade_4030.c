@@ -707,6 +707,20 @@ static int	DBpatch_4030053(void)
 	return DBset_default("interface", &field);
 }
 
+static int	DBpatch_4030054(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("globalmacro", &field);
+}
+
+static int	DBpatch_4030055(void)
+{
+	const ZBX_FIELD	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(4030)
@@ -766,5 +780,7 @@ DBPATCH_ADD(4030050, 0, 1)
 DBPATCH_ADD(4030051, 0, 1)
 DBPATCH_ADD(4030052, 0, 1)
 DBPATCH_ADD(4030053, 0, 1)
+DBPATCH_ADD(4030054, 0, 1)
+DBPATCH_ADD(4030055, 0, 1)
 
 DBPATCH_END()
