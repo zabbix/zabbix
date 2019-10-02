@@ -6193,6 +6193,20 @@ a.overlay-close-btn {
 	pointer-events: none;
 }
 
+.is-loading.delayed-15s {
+	&:before {
+		opacity: 0;
+		animation: fadein 2s ease-in 0.5s normal forwards;
+		animation-delay: 15s;
+	}
+
+	&:after {
+		opacity: 0;
+		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
+		animation-delay: 15s;
+	}
+}
+
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
 	position: relative;
 	overflow: hidden;
