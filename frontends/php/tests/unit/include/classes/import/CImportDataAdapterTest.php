@@ -187,7 +187,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'name' => 'Template App FTP Service'
 					],
 					[
-						'name' => 'Template OS Linux'
+						'name' => 'Template OS Linux by Zabbix agent'
 					]
 				],
 				'macros' => [
@@ -297,7 +297,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 						'name' => 'Template App FTP Service'
 					],
 					[
-						'name' => 'Template OS Linux'
+						'name' => 'Template OS Linux by Zabbix agent'
 					]
 				],
 				'host' => 'export-template',
