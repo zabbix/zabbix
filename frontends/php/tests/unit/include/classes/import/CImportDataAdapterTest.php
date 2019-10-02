@@ -193,11 +193,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'macros' => [
 					[
 						'macro' => '{$MACRO}',
-						'value' => '2'
+						'value' => '2',
+						'description' => ''
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
-						'value' => '1'
+						'value' => '1',
+						'description' => ''
 					]
 				],
 				'interfaces' => [
@@ -285,11 +287,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				'macros' => [
 					[
 						'macro' => '{$MACRO}',
-						'value' => '2'
+						'value' => '2',
+						'description' => ''
 					],
 					[
 						'macro' => '{$SNMP_COMMUNITY}',
-						'value' => '1'
+						'value' => '1',
+						'description' => ''
 					]
 				],
 				'templates' => [
@@ -2126,11 +2130,13 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'macros' => [
 						[
 							'value' => '21',
-							'macro' => '{$PORT.FTP}'
+							'macro' => '{$PORT.FTP}',
+							'description' => ''
 						],
 						[
 							'value' => '22',
-							'macro' => '{$PORT.SSH}'
+							'macro' => '{$PORT.SSH}',
+							'description' => ''
 						]
 					],
 					'host' => 'Template_Linux',
@@ -2660,7 +2666,8 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 					'macros' => [
 						[
 							'value' => '23',
-							'macro' => '{#VALUE}'
+							'macro' => '{#VALUE}',
+							'description' => ''
 						]
 					],
 					'templates' => [
