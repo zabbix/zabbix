@@ -109,7 +109,8 @@
 						.trigger('input');
 					$('#macros_' + macroNum + '_description')
 						.prop('readonly', true)
-						.val($('#macros_' + macroNum + '_inherited_description').val());
+						.val($('#macros_' + macroNum + '_inherited_description').val())
+						.trigger('input');
 					$('#macros_' + macroNum + '_change')
 						.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 				}
