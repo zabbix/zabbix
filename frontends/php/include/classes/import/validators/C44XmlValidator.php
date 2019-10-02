@@ -1400,16 +1400,10 @@ class C44XmlValidator {
 						]]
 					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
-<<<<<<< HEAD
-						'macro' =>				['type' => XML_ARRAY, 'rules' => [
-							'macro' =>				['type' => XML_STRING | XML_REQUIRED],
-							'value' =>				['type' => XML_STRING | XML_REQUIRED],
-							'description' =>		['type' => XML_STRING]
-=======
 						'macro' =>					['type' => XML_ARRAY, 'rules' => [
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
-							'value' =>					['type' => XML_STRING, 'default' => '']
->>>>>>> origin/master
+							'value' =>					['type' => XML_STRING, 'default' => ''],
+							'description' =>			['type' => XML_STRING, 'default' => '']
 						]]
 					]],
 					'screens' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'screen', 'rules' => [
