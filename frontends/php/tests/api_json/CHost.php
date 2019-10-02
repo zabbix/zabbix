@@ -44,7 +44,7 @@ class API_JSON_Host extends CAPITest {
 					],
 					'templates' => [
 						['templateid' => 10047],	/* Template App Zabbix Server */
-						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10050],	/* Template Module Zabbix agent */
 						['templateid' => 10093],	/* Template App FTP Service */
 						['templateid' => 10094],	/* Template App HTTP Service */
 						['templateid' => 10095],	/* Template App HTTPS Service */

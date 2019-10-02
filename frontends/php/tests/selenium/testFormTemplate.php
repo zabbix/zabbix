@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 class testFormTemplate extends CLegacyWebTest {
 	public $template = 'Form test template';
 	public $template_edit_name = 'Template-layout-test-001';
-	public $template_clone = 'Template OS Linux';
+	public $template_clone = 'Template OS Linux by Zabbix agent';
 	public $template_full_delete = 'Inheritance test template';
 
 	public static function create() {
