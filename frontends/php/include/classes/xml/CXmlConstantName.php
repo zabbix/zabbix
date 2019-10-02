@@ -272,6 +272,7 @@ class CXmlConstantName {
 	const EMAIL = 'EMAIL';
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';
+	const WEBHOOK = 'WEBHOOK';
 
 	// const NONE = 'NONE'; // Duplicate.
 	const STARTTLS = 'STARTTLS';

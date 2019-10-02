@@ -438,7 +438,14 @@ class CConfigurationExportBuilder {
 				'status' => $media_type['status'],
 				'max_sessions' => $media_type['maxsessions'],
 				'attempts' => $media_type['maxattempts'],
-				'attempt_interval' => $media_type['attempt_interval']
+				'attempt_interval' => $media_type['attempt_interval'],
+				'script' => $media_type['script'],
+				'timeout' => $media_type['timeout'],
+				'process_tags' => $media_type['process_tags'],
+				'show_event_menu' => $media_type['show_event_menu'],
+				'event_menu_url' => $media_type['event_menu_url'],
+				'event_menu_name' => $media_type['event_menu_name'],
+				'description' => $media_type['description']
 			];
 		}
 

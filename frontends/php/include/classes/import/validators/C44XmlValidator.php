@@ -1674,7 +1674,7 @@ class C44XmlValidator {
 			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MEDIA_TYPE_EMAIL, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS]],
+					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MEDIA_TYPE_EMAIL, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
@@ -1692,7 +1692,14 @@ class C44XmlValidator {
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
 					'attempts' =>				['type' => XML_STRING, 'default' => '3'],
-					'attempt_interval' =>		['type' => XML_STRING, 'default' => '10s']
+					'attempt_interval' =>		['type' => XML_STRING, 'default' => '10s'],
+					'script' => 				['type' => XML_STRING, 'default' => ''],
+					'timeout' => 				['type' => XML_STRING, 'default' => '30s'],
+					'process_tags' => 			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'event_menu_url' => 		['type' => XML_STRING, 'default' => ''],
+					'event_menu_name' => 		['type' => XML_STRING, 'default' => ''],
+					'description' => 			['type' => XML_STRING, 'default' => '']
 				]]
 			]],
 			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
