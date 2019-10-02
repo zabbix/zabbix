@@ -628,6 +628,9 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
 				zbx_free(error_esc);
 			}
+			else
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",error=''");
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
 					result->alertid);
 
