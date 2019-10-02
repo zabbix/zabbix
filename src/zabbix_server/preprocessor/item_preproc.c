@@ -2032,12 +2032,16 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 		}
 
 		if (0 == step)
-			step = 1;
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: invalid UTF-8 character in value");
+			ret = FAIL;
+			goto out;
+		}
 	}
 
 	if (CSV_STATE_FIELD_QUOTED == state)
 	{
-		zbx_free(field_esc);
+
 		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: unclosed quoted field: %s", field);
 		ret = FAIL;
 	}
@@ -2061,6 +2065,7 @@ out:
 		zbx_free(field_names);
 	}
 
+	zbx_free(field_esc);
 	zbx_json_free(&json);
 
 	return ret;
