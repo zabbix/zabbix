@@ -60,7 +60,7 @@ This template was tested on Zabbix 4.2.1 and PostgreSQL vesions 9.6, 10 and 11 o
 
 ## Zabbix configuration
 
-No specific Zabbix configuration is required.
+If PostgreSQL is installed from the `PGDG` repository, then add the path to `pg_isready` to the `PATH` environment variable for `zabbix` user.
 
 ### Macros used
 
