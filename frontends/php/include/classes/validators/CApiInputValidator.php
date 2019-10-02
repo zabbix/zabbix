@@ -1395,8 +1395,9 @@ class CApiInputValidator {
 	 * Time unit validator like "10", "20s", "30m", "4h", "{$TIME}" etc.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
-	 * @param int    $rule['in']      (optional)
+	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                          API_TIME_UNIT_WITH_YEAR
+	 * @param int    $rule['in']     (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1425,7 +1426,8 @@ class CApiInputValidator {
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'negative' => true
+			'negative' => true,
+			'with_year' => ($flags & API_TIME_UNIT_WITH_YEAR)
 		]);
 
 		if ($simple_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
@@ -1632,7 +1634,7 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['length']  (optional)
-	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_NOT_EMPTY
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_EVENT_TAGS_MACRO, API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1651,7 +1653,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$options = ['allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO)];
+		$options = [
+			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
+		];
 
 		if ($data !== '' && CHtmlUrlValidator::validate($data, $options) === false) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('unacceptable URL'));

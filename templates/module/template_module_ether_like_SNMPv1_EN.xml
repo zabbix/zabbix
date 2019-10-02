@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>3.4</version>
+   <version>4.2</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -11,9 +11,12 @@
       <template>
          <template>Template Module EtherLike-MIB SNMPv1</template>
          <name>Template Module EtherLike-MIB SNMPv1</name>
-         <description>Template EtherLike-MIB (duplex control only) version: 0.15&#13;
+         <description>Template EtherLike-MIB (duplex control only)&#13;
+&#13;
 MIBs used:&#13;
-EtherLike-MIB</description>
+EtherLike-MIB&#13;
+&#13;
+Template tooling version used: 0.30</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -77,9 +80,9 @@ EtherLike-MIB</description>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
+                     <delay>1m</delay>
+                     <history>7d</history>
+                     <trends>365d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
                      <allowed_hosts/>
@@ -125,19 +128,37 @@ ifMauType.  This was felt to be sufficiently&#13;
 valuable to justify the redundancy.&#13;
 Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.</description>
                      <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
+                     <applications/>
                      <valuemap>
                         <name>EtherLike-MIB::dot3StatsDuplexStatus</name>
                      </valuemap>
                      <logtimefmt/>
                      <preprocessing/>
                      <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
@@ -162,12 +183,33 @@ Please check autonegotiation settings and cabling</description>
                <graph_prototypes/>
                <host_prototypes/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
+               <lld_macro_paths/>
+               <preprocessing/>
+               <master_item/>
             </discovery_rule>
          </discovery_rules>
          <httptests/>
          <macros/>
          <templates/>
          <screens/>
+         <tags/>
       </template>
    </templates>
    <graphs/>

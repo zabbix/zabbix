@@ -260,11 +260,10 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
-		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClick('update');
@@ -273,6 +272,9 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
+	/**
+	 * @depends testFormHost_TemplateLink
+	 */
 	public function testFormHost_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
@@ -322,11 +324,10 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->host_for_template);
 
 		$this->zbxTestTabSwitch('Templates');
-		$this->zbxTestClickButtonMultiselect('add_templates_');
+		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestClickLinkTextWait('Template OS Linux');
-		$this->zbxTestClickXpathWait("//div[@id='templateTab']//button[contains(@onclick,'add_template')]");
 
 		$this->zbxTestTextPresent('Template OS Linux');
 		$this->zbxTestClickWait('update');
@@ -335,6 +336,9 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
+	/**
+	 * @depends testFormHost_TemplateLinkUpdate
+	 */
 	public function testFormHost_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 

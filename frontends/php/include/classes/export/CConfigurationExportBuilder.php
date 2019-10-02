@@ -44,12 +44,188 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Build XML data.
+	 *
+	 * @param array  $schema    Tag schema from validation class.
+	 * @param array  $data      Export data.
+	 * @param string $main_tag  XML tag (for error reporting).
+	 *
+	 * @return array
+	 */
+	protected function build(array $schema, array $data, $main_tag = null) {
+		$n = 0;
+		$result = [];
+
+		$rules = $schema['rules'];
+
+		if ($schema['type'] & XML_INDEXED_ARRAY) {
+			$rules = $schema['rules'][$schema['prefix']]['rules'];
+		}
+
+		foreach ($data as $row) {
+			$store = [];
+			foreach ($rules as $tag => $val) {
+				$is_required = $val['type'] & XML_REQUIRED;
+				$is_array = $val['type'] & XML_ARRAY;
+				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
+				$has_data = array_key_exists($tag, $row);
+				$default_value = array_key_exists('default', $val) ? $val['default'] : null;
+
+				if (!$default_value && !$has_data) {
+					if ($is_required) {
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag,
+							_s('the tag "%1$s" is missing', $tag)
+						));
+					}
+					continue;
+				}
+
+				$value = $has_data ? $row[$tag] : $default_value;
+
+				if (!$is_required && $has_data && $default_value == $value) {
+					continue;
+				}
+
+				if (($is_indexed_array || $is_array) && $has_data) {
+					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
+					if ($is_required || $temp_store) {
+						$store[$tag] = $temp_store;
+					}
+					continue;
+				}
+
+				if (array_key_exists('export', $val)) {
+					$store[$tag] = call_user_func($val['export'], $row);
+				}
+				else {
+					if (array_key_exists('in', $val)) {
+						if (!array_key_exists($value, $val['in'])) {
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
+								_s('unexpected constant value "%1$s"', $value)
+							));
+						}
+
+						$store[$tag] = $val['in'][$value];
+					}
+					else {
+						$store[$tag] = $value;
+					}
+				}
+			}
+
+			if ($schema['type'] & XML_INDEXED_ARRAY) {
+				$result[$n++] = $store;
+			}
+			else {
+				$result = $store;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Format groups.
 	 *
-	 * @param array $groups
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $groups  Export data.
 	 */
-	public function buildGroups(array $groups) {
-		$this->data['groups'] = $this->formatGroups($groups);
+	public function buildGroups(array $schema, array $groups) {
+		$groups = $this->formatGroups($groups);
+
+		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+	}
+
+	/**
+	 * Format templates.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $templates        Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
+		$templates = $this->formatTemplates($templates, $simple_triggers);
+
+		$this->data['templates'] = $this->build($schema, $templates, 'templates');
+	}
+
+	/**
+	 * Format hosts.
+	 *
+	 * @param array $schema           Tag schema from validation class.
+	 * @param array $hosts            Export data.
+	 * @param array $simple_triggers  Simple triggers.
+	 */
+	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
+		$hosts = $this->formatHosts($hosts, $simple_triggers);
+
+		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
+	}
+
+	/**
+	 * Format triggers.
+	 *
+	 * @param array $schema    Tag schema from validation class.
+	 * @param array $triggers  Export data.
+	 */
+	public function buildTriggers(array $schema, array $triggers) {
+		$triggers = $this->formatTriggers($triggers);
+
+		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
+	}
+
+	/**
+	 * Format graphs.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $graphs  Export data.
+	 */
+	public function buildGraphs(array $schema, array $graphs) {
+		$graphs = $this->formatGraphs($graphs);
+
+		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
+	}
+
+	/**
+	 * Format screens.
+	 *
+	 * @param array $screens
+	 */
+	public function buildScreens(array $screens) {
+		$this->data['screens'] = $this->formatScreens($screens);
+	}
+
+	/**
+	 * Format valuemaps.
+	 *
+	 * @param array $schema     Tag schema from validation class.
+	 * @param array $valuemaps  Export data.
+	 */
+	public function buildValueMaps(array $schema, array $valuemaps) {
+		$valuemaps = $this->formatValueMaps($valuemaps);
+
+		$this->data['value_maps'] = $this->build($schema, $valuemaps, 'value_maps');
+	}
+
+	/**
+	 * Separate simple triggers.
+	 *
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
+	public function extractSimpleTriggers(array &$triggers) {
+		$simple_triggers = [];
+
+		foreach ($triggers as $triggerid => $trigger) {
+			if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
+					&& $trigger['items'][0]['templateid'] == 0) {
+				$simple_triggers[] = $trigger;
+				unset($triggers[$triggerid]);
+			}
+		}
+
+		return $simple_triggers;
 	}
 
 	/**
@@ -58,13 +234,13 @@ class CConfigurationExportBuilder {
 	 * @param array $templates
 	 * @param array $simple_triggers
 	 */
-	public function buildTemplates(array $templates, array $simple_triggers) {
-		$this->data['templates'] = [];
+	protected function formatTemplates(array $templates, array $simple_triggers = null) {
+		$result = [];
 
 		CArrayHelper::sort($templates, ['host']);
 
 		foreach ($templates as $template) {
-			$this->data['templates'][] = [
+			$result[] = [
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
@@ -79,6 +255,8 @@ class CConfigurationExportBuilder {
 				'tags' => $this->formatTags($template['tags'])
 			];
 		}
+
+		return $result;
 	}
 
 	/**
@@ -87,15 +265,15 @@ class CConfigurationExportBuilder {
 	 * @param array $hosts
 	 * @param array $simple_triggers
 	 */
-	public function buildHosts(array $hosts, array $simple_triggers) {
-		$this->data['hosts'] = [];
+	protected function formatHosts(array $hosts, array $simple_triggers = null) {
+		$result = [];
 
 		CArrayHelper::sort($hosts, ['host']);
 
 		foreach ($hosts as $host) {
 			$host = $this->createInterfaceReferences($host);
 
-			$this->data['hosts'][] = [
+			$result[] = [
 				'host' => $host['host'],
 				'name' => $host['name'],
 				'description' => $host['description'],
@@ -119,37 +297,13 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
+				'inventory_mode' => $this->formatHostInventoryMode($host['inventory']),
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags'])
 			];
 		}
-	}
 
-	/**
-	 * Format graphs.
-	 *
-	 * @param array $graphs
-	 */
-	public function buildGraphs(array $graphs) {
-		$this->data['graphs'] = $this->formatGraphs($graphs);
-	}
-
-	/**
-	 * Format triggers.
-	 *
-	 * @param array $triggers
-	 */
-	public function buildTriggers(array $triggers) {
-		$this->data['triggers'] = $this->formatTriggers($triggers);
-	}
-
-	/**
-	 * Format screens.
-	 *
-	 * @param array $screens
-	 */
-	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);
+		return $result;
 	}
 
 	/**
@@ -246,17 +400,19 @@ class CConfigurationExportBuilder {
 	 *
 	 * @param array $valuemaps
 	 */
-	public function buildValueMaps(array $valuemaps) {
-		$this->data['value_maps'] = [];
+	protected function formatValueMaps(array $valuemaps) {
+		$result = [];
 
 		CArrayHelper::sort($valuemaps, ['name']);
 
 		foreach ($valuemaps as $valuemap) {
-			$this->data['value_maps'][] = [
+			$result[] = [
 				'name' => $valuemap['name'],
 				'mappings' => $this->formatMappings($valuemap['mappings'])
 			];
 		}
+
+		return $result;
 	}
 
 	/**
@@ -488,6 +644,17 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format host inventory mode.
+	 *
+	 * @param array $inventory
+	 *
+	 * @return string
+	 */
+	protected function formatHostInventoryMode(array $data) {
+		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
+	}
+
+	/**
 	 * Format host inventory.
 	 *
 	 * @param array $inventory
@@ -495,7 +662,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostInventory(array $inventory) {
-		unset($inventory['hostid']);
+		unset($inventory['hostid'], $inventory['inventory_mode']);
 
 		return $inventory;
 	}

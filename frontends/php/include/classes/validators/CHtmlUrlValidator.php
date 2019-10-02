@@ -29,23 +29,26 @@ class CHtmlUrlValidator {
 	 *
 	 * @static
 	 *
-	 * @param string $url                             URL string to validate.
+	 * @param string $url                              URL string to validate.
 	 * @param array  $options
-	 * @param bool   $options[allow_user_macro]       If set to be true, URLs containing user macros will be considered
-	 *                                                as valid.
-	 * @param int    $options[allow_inventory_macro]  Enables the usage of trigger/host inventory macros:
-	 *                                                 - {INVENTORY.URL.A<1-9>}, {INVENTORY.URL.B<1-9>} and
-	 *                                                   {INVENTORY.URL.C<1-9>} if set to INVENTORY_URL_MACRO_TRIGGER;
-	 *                                                 - {INVENTORY.URL.A}, {INVENTORY.URL.B} and {INVENTORY.URL.C} if
-	 *                                                   set to INVENTORY_URL_MACRO_HOST;
-	 * @param bool   $options[validate_uri_schemes]   Parameter allows to overwrite global switch VALIDATE_URI_SCHEMES
-	 *                                                for specific uses.
+	 * @param bool   $options[allow_user_macro]        If set to be true, URLs containing user macros will be considered
+	 *                                                 as valid.
+	 * @param int    $options[allow_inventory_macro]   Enables the usage of trigger/host inventory macros:
+	 *                                                  - {INVENTORY.URL.A<1-9>}, {INVENTORY.URL.B<1-9>} and
+	 *                                                    {INVENTORY.URL.C<1-9>} if set to INVENTORY_URL_MACRO_TRIGGER;
+	 *                                                  - {INVENTORY.URL.A}, {INVENTORY.URL.B} and {INVENTORY.URL.C} if
+	 *                                                    set to INVENTORY_URL_MACRO_HOST;
+	 * @param bool   $options[allow_event_tags_macro]  If set to be true, URLs containing {EVENT.TAGS.<ref>} macros will
+	 *                                                 be considered as valid.
+	 * @param bool   $options[validate_uri_schemes]    Parameter allows to overwrite global switch VALIDATE_URI_SCHEMES
+	 *                                                 for specific uses.
 	 *
 	 * @return bool
 	 */
 	public static function validate($url, array $options = []) {
 		$options += [
 			'allow_user_macro' => true,
+			'allow_event_tags_macro' => false,
 			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
 			'validate_uri_schemes' => VALIDATE_URI_SCHEMES
 		];
@@ -55,9 +58,11 @@ class CHtmlUrlValidator {
 		}
 
 		if ($options['allow_inventory_macro'] != INVENTORY_URL_MACRO_NONE) {
-			$allowed_macros = ['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'];
-			$parser_options = ['allow_reference' => ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)];
-			$macro_parser = new CMacroParser($allowed_macros, $parser_options);
+			$macro_parser = new CMacroParser(['{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}'], [
+				'ref_type' => ($options['allow_inventory_macro'] == INVENTORY_URL_MACRO_TRIGGER)
+					? CMacroParser::REFERENCE_NUMERIC
+					: CMacroParser::REFERENCE_NONE
+			]);
 
 			// Macros allowed only at the beginning of $url.
 			if ($macro_parser->parse($url, 0) != CParser::PARSE_FAIL) {
@@ -65,11 +70,20 @@ class CHtmlUrlValidator {
 			}
 		}
 
+		if ($options['allow_event_tags_macro'] === true) {
+			$macro_parser = new CMacroParser(['{EVENT.TAGS}'], ['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]);
+
+			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
+				if ($macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
+					return true;
+				}
+			}
+		}
+
 		if ($options['allow_user_macro'] === true) {
 			$user_macro_parser = new CUserMacroParser();
-			$strlen = strlen($url);
 
-			for ($pos = 0; $pos < $strlen; $pos++) {
+			for ($pos = strpos($url, '{'); $pos !== false; $pos = strpos($url, '{', $pos + 1)) {
 				if ($user_macro_parser->parse($url, $pos) != CParser::PARSE_FAIL) {
 					return true;
 				}

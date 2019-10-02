@@ -646,7 +646,12 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($resolve_urls) {
-			$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$trigger['eventid'] = $problem['eventid'];
+				$problem['url'] = CMacrosResolverHelper::resolveTriggerUrl($trigger, $url) ? $url : '';
+			}
+			unset($problem);
 		}
 
 		// get additional data

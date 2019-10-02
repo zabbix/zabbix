@@ -22,7 +22,7 @@
 function getImageByIdent($ident) {
 	zbx_value2array($ident);
 
-	if (!isset($ident['name'])) {
+	if (!array_key_exists('name', $ident) || $ident['name'] === '') {
 		return 0;
 	}
 

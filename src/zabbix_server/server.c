@@ -43,6 +43,7 @@
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
+#include "alerter/alert_syncer.h"
 #include "dbsyncer/dbsyncer.h"
 #include "dbconfig/dbconfig.h"
 #include "discoverer/discoverer.h"
@@ -186,6 +187,7 @@ int	CONFIG_PREPROCMAN_FORKS		= 1;
 int	CONFIG_PREPROCESSOR_FORKS	= 3;
 int	CONFIG_LLDMANAGER_FORKS		= 1;
 int	CONFIG_LLDWORKER_FORKS		= 2;
+int	CONFIG_ALERTDB_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -423,6 +425,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_LLDWORKER;
 		*local_process_num = local_server_num - server_count + CONFIG_LLDWORKER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_ALERTDB_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_ALERTSYNCER;
+		*local_process_num = local_server_num - server_count + CONFIG_ALERTDB_FORKS;
 	}
 	else
 		return FAIL;
@@ -804,7 +811,6 @@ int	main(int argc, char **argv)
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
-
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
@@ -1091,7 +1097,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
 			+ CONFIG_VMWARE_FORKS + CONFIG_TASKMANAGER_FORKS + CONFIG_IPMIMANAGER_FORKS
 			+ CONFIG_ALERTMANAGER_FORKS + CONFIG_PREPROCMAN_FORKS + CONFIG_PREPROCESSOR_FORKS
-			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS;
+			+ CONFIG_LLDMANAGER_FORKS + CONFIG_LLDWORKER_FORKS + CONFIG_ALERTDB_FORKS;
 	threads = (pid_t *)zbx_calloc(threads, threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
 
@@ -1209,6 +1215,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_LLDWORKER:
 				zbx_thread_start(lld_worker_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_ALERTSYNCER:
+				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
