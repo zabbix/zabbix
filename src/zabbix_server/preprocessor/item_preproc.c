@@ -1857,15 +1857,17 @@ static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, ch
 	if (0 == zbx_strncasecmp(data, CSV_SEP_LINE, ZBX_CONST_STRLEN(CSV_SEP_LINE)))
 	{
 		char	*p;
+		size_t	del_sz;
 
 		p = value->data.str + ZBX_CONST_STRLEN(CSV_SEP_LINE);
 
 		if (NULL == (field = strpbrk(p, "\r\n")))
 			field = data + data_len;
 
-		if (0 < (delim_sz = zbx_utf8_char_len(p)) && p + delim_sz == field)
+		if (0 < (del_sz = zbx_utf8_char_len(p)) && p + del_sz == field)
 		{
-			memcpy(delim, p, delim_sz);
+			memcpy(delim, p, del_sz);
+			delim_sz = del_sz;
 
 			if ('\0' == *field)
 				data = field;
