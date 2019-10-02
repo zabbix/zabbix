@@ -23,3 +23,8 @@ int	zbx_item_preproc_xpath(zbx_variant_t *value, const char *params, char **errm
 {
 	return item_preproc_xpath(value, params, errmsg);
 }
+
+int	zbx_item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	return item_preproc_csv_to_json(value, params, errmsg);
+}
