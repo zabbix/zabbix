@@ -777,6 +777,23 @@ output {
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	.action-container {
+		display: flex;
+		width: 100%;
+
+		.label {
+			@extend %overflow-ellipsis;
+		}
+
+		.separator {
+			margin-right: 4px;
+		}
+
+		[class*='icon-'] {
+			flex-shrink: 0;
+		}
+	}
+
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
@@ -838,6 +855,8 @@ output {
 								background-color: $ui-bg-color;
 							}
 
+							[class*='icon-depend-'],
+							.icon-description,
 							.icon-wzrd-action {
 								background-color: transparent;
 							}
@@ -897,10 +916,8 @@ output {
 			}
 
 			[class*='icon-depend-'] {
-				&,
-				&:last-of-type {
-					margin-right: 12px;
-				}
+				width: 12px;
+				margin-right: 0;
 			}
 
 			.rel-container {
@@ -935,8 +952,7 @@ output {
 				display: inline-block;
 				height: 12px;
 				width: 12px;
-				margin: 0 1px 0 2px !important;
-				vertical-align: bottom;
+				margin: 3px 1px 2px 2px !important;
 
 				&::before {
 					height: 12px;
@@ -951,6 +967,28 @@ output {
 				min-height: 12px;
 				margin: 0;
 				position: relative;
+			}
+
+			.icon-description {
+				margin-left: 2px;
+			}
+		}
+
+		.action-container {
+			height: 18px;
+			line-height: 18px;
+
+			.rel-container {
+				display: flex;
+			}
+
+			.link-action {
+				height: 16px;
+				min-width: 1em;
+			}
+
+			.separator {
+				flex-shrink: 0;
 			}
 		}
 	}
@@ -1132,19 +1170,6 @@ output {
 	.latest-values,
 	.opdata {
 		max-width: 300px;
-	}
-
-	.action-container {
-		display: flex;
-		width: 100%;
-
-		.label {
-			@extend %overflow-ellipsis;
-		}
-
-		[class*='icon-'] {
-			flex-shrink: 0;
-		}
 	}
 }
 
@@ -3041,8 +3066,8 @@ button[disabled] {
 
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 

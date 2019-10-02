@@ -557,6 +557,13 @@ output {
   background-color: #000;
   border-collapse: separate;
   border: 1px solid #444; }
+  .list-table .action-container {
+    display: flex;
+    width: 100%; }
+    .list-table .action-container .separator {
+      margin-right: 4px; }
+    .list-table .action-container [class*='icon-'] {
+      flex-shrink: 0; }
   .list-table.compact-view .link-action {
     color: #fff; }
     .list-table.compact-view .link-action.red {
@@ -586,8 +593,9 @@ output {
         line-height: 14px; }
       .list-table.compact-view td [class*='icon-']:last-of-type {
         margin-right: 0; }
-    .list-table.compact-view td [class*='icon-depend-'], .list-table.compact-view td [class*='icon-depend-']:last-of-type {
-      margin-right: 12px; }
+    .list-table.compact-view td [class*='icon-depend-'] {
+      width: 12px;
+      margin-right: 0; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td .tag {
@@ -610,8 +618,7 @@ output {
       display: inline-block;
       height: 12px;
       width: 12px;
-      margin: 0 1px 0 2px !important;
-      vertical-align: bottom; }
+      margin: 3px 1px 2px 2px !important; }
       .list-table.compact-view td .icon-maint::before {
         height: 12px;
         width: 12px;
@@ -622,6 +629,18 @@ output {
       min-height: 12px;
       margin: 0;
       position: relative; }
+    .list-table.compact-view td .icon-description {
+      margin-left: 2px; }
+  .list-table.compact-view .action-container {
+    height: 18px;
+    line-height: 18px; }
+    .list-table.compact-view .action-container .rel-container {
+      display: flex; }
+    .list-table.compact-view .action-container .link-action {
+      height: 16px;
+      min-width: 1em; }
+    .list-table.compact-view .action-container .separator {
+      flex-shrink: 0; }
   .list-table thead th {
     color: #cacaca;
     height: 100%;
@@ -721,11 +740,6 @@ output {
   .list-table .latest-values,
   .list-table .opdata {
     max-width: 300px; }
-  .list-table .action-container {
-    display: flex;
-    width: 100%; }
-    .list-table .action-container [class*='icon-'] {
-      flex-shrink: 0; }
 
 .table-paging {
   text-align: center;
@@ -2050,12 +2064,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
-    background: url(../img/icon-sprite.svg) no-repeat -49px -730px; }
+    background: url(../img/icon-sprite.svg) no-repeat -49px -729px; }
 
 .icon-depend-down {
   margin: 0 18px 0 0; }
   .icon-depend-down::before {
-    background: url(../img/icon-sprite.svg) no-repeat -49px -766px; }
+    background: url(../img/icon-sprite.svg) no-repeat -49px -765px; }
 
 .icon-ackn {
   margin: 0 18px 0 0; }
@@ -5320,12 +5334,12 @@ table.preprocessing-test-results .rel-container {
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
-    background: url(../img/icon-sprite.svg) no-repeat -361px -730px; }
+    background: url(../img/icon-sprite.svg) no-repeat -361px -729px; }
 
 .icon-depend-down {
   margin: 0 18px 0 0; }
   .icon-depend-down::before {
-    background: url(../img/icon-sprite.svg) no-repeat -361px -766px; }
+    background: url(../img/icon-sprite.svg) no-repeat -361px -765px; }
 
 .icon-ackn {
   margin: 0 18px 0 0; }
