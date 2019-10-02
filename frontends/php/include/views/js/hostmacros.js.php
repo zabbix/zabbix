@@ -62,7 +62,8 @@
 						.val($('#macros_' + macroNum + '_type').val() & (~<?= ZBX_PROPERTY_OWN ?>));
 					$('#macros_' + macroNum + '_value')
 						.prop('readonly', true)
-						.val($('#macros_' + macroNum + '_inherited_value').val());
+						.val($('#macros_' + macroNum + '_inherited_value').val())
+						.trigger('input');
 					$('#macros_' + macroNum + '_change')
 						.text(<?= CJs::encodeJson(_x('Change', 'verb')) ?>);
 				}
