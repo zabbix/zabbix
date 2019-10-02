@@ -139,7 +139,7 @@ jQuery(function ($){
 		element.quickranges.removeClass('selected');
 		element.quickranges.filter('[data-label="'+data.label+'"]').addClass('selected');
 
-		element.apply.closest('.ui-tabs-panel').removeClass('in-progress');
+		element.apply.closest('.ui-tabs-panel').removeClass('is-loading is-loading-fadein');
 		ui_disabled = false;
 	}
 
@@ -151,7 +151,7 @@ jQuery(function ($){
 			return;
 		}
 
-		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
+		element.apply.closest('.ui-tabs-panel').addClass('is-loading is-loading-fadein');
 		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 

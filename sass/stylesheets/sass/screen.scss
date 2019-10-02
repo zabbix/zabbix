@@ -6193,16 +6193,24 @@ a.overlay-close-btn {
 	pointer-events: none;
 }
 
-.is-loading.delayed-15s {
+.is-loading.is-loading-fadein {
 	&:before {
 		opacity: 0;
 		animation: fadein 2s ease-in 0.5s normal forwards;
-		animation-delay: 15s;
 	}
 
 	&:after {
 		opacity: 0;
 		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
+	}
+}
+
+.is-loading.is-loading-fadein.delayed-15s {
+	&:before {
+		animation-delay: 15s;
+	}
+
+	&:after {
 		animation-delay: 15s;
 	}
 }
