@@ -1050,7 +1050,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 				if (!isset($itemid)) {
-					$this->zbxTestAssertElementValue('delay', '30s');
+					$this->zbxTestAssertElementValue('delay', '1m');
 				}
 				break;
 			default:
