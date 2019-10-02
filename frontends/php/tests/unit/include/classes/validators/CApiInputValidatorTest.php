@@ -2912,7 +2912,19 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'javascript:{$URL}',
 				'/1/url',
 				'javascript:{$URL}'
-			]
+			],
+			[
+				['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO],
+				'text{EVENT.TAGS."JIRAID"}text',
+				'/1/url',
+				'text{EVENT.TAGS."JIRAID"}text'
+			],
+			[
+				['type' => API_URL],
+				'text{EVENT.TAGS."JIRAID"}text',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL.'
+			],
 		];
 	}
 

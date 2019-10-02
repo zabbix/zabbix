@@ -986,7 +986,7 @@ function isTemplate($hostId) {
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
- *               'name' => 'Template OS Linux'
+ *               'name' => 'Template OS Linux by Zabbix agent'
  *           ),
  *           'global' => array(                     <- optional
  *               'value' => 'global-level value'
@@ -1005,13 +1005,16 @@ function getInheritedMacros(array $hostids) {
 	$global_macros = [];
 
 	$db_global_macros = API::UserMacro()->get([
-		'output' => ['macro', 'value'],
+		'output' => ['macro', 'value', 'description'],
 		'globalmacro' => true
 	]);
 
 	foreach ($db_global_macros as $db_global_macro) {
 		$all_macros[$db_global_macro['macro']] = true;
-		$global_macros[$db_global_macro['macro']] = $db_global_macro['value'];
+		$global_macros[$db_global_macro['macro']] = [
+			'value' => $db_global_macro['value'],
+			'description' => $db_global_macro['description']
+		];
 	}
 
 	// hostid => array('name' => name, 'macros' => array(macro => value), 'templateids' => array(templateid))
@@ -1023,7 +1026,7 @@ function getInheritedMacros(array $hostids) {
 		$db_templates = API::Template()->get([
 			'output' => ['name'],
 			'selectParentTemplates' => ['templateid'],
-			'selectMacros' => ['macro', 'value'],
+			'selectMacros' => ['macro', 'value', 'description'],
 			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
@@ -1045,7 +1048,10 @@ function getInheritedMacros(array $hostids) {
 			 */
 			foreach ($db_template['macros'] as $dbMacro) {
 				if (array_key_exists($dbMacro['macro'], $all_macros)) {
-					$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+					$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+						'value' => $dbMacro['value'],
+						'description' => $dbMacro['description']
+					];
 					$all_macros[$dbMacro['macro']] = true;
 				}
 				else {
@@ -1054,7 +1060,10 @@ function getInheritedMacros(array $hostids) {
 					$tpl_context = $user_macro_parser->getContext();
 
 					if ($tpl_context === null) {
-						$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+						$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+							'value' => $dbMacro['value'],
+							'description' => $dbMacro['description']
+						];
 						$all_macros[$dbMacro['macro']] = true;
 					}
 					else {
@@ -1072,7 +1081,10 @@ function getInheritedMacros(array $hostids) {
 									$all_macros[$global_macro]
 								);
 
-								$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+								$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+									'value' => $dbMacro['value'],
+									'description' => $dbMacro['description']
+								];
 								$all_macros[$dbMacro['macro']] = true;
 								$global_macros[$dbMacro['macro']] = $global_value;
 
@@ -1081,7 +1093,10 @@ function getInheritedMacros(array $hostids) {
 						}
 
 						if (!$match_found) {
-							$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+							$hosts[$hostid]['macros'][$dbMacro['macro']] = [
+								'value' => $dbMacro['value'],
+								'description' => $dbMacro['description']
+							];
 							$all_macros[$dbMacro['macro']] = true;
 						}
 					}
@@ -1109,7 +1124,8 @@ function getInheritedMacros(array $hostids) {
 
 		if (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
-				'value' => $global_macros[$macro]
+				'value' => $global_macros[$macro]['value'],
+				'description' => $global_macros[$macro]['description']
 			];
 		}
 
@@ -1121,7 +1137,8 @@ function getInheritedMacros(array $hostids) {
 			foreach ($templateids as $templateid) {
 				if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
 					$inherited_macro['template'] = [
-						'value' => $hosts[$templateid]['macros'][$macro],
+						'value' => $hosts[$templateid]['macros'][$macro]['value'],
+						'description' => $hosts[$templateid]['macros'][$macro]['description'],
 						'templateid' => $hosts[$templateid]['templateid'],
 						'name' => $hosts[$templateid]['name'],
 						'rights' => PERM_READ
@@ -1184,7 +1201,7 @@ function getInheritedMacros(array $hostids) {
  *           'template' => array(                   <- optional
  *               'value' => 'template-level value'
  *               'templateid' => 10001,
- *               'name' => 'Template OS Linux'
+ *               'name' => 'Template OS Linux by Zabbix agent'
  *           ),
  *           'global' => array(                     <- optional
  *               'value' => 'global-level value'
@@ -1202,9 +1219,14 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 
 	foreach ($inherited_macros as &$inherited_macro) {
 		$inherited_macro['type'] = ZBX_PROPERTY_INHERITED;
-		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
-			? $inherited_macro['template']['value']
-			: $inherited_macro['global']['value'];
+		if (array_key_exists('template', $inherited_macro)) {
+			$inherited_macro['value'] = $inherited_macro['template']['value'];
+			$inherited_macro['description'] = $inherited_macro['template']['description'];
+		}
+		else {
+			$inherited_macro['value'] = $inherited_macro['global']['value'];
+			$inherited_macro['description'] = $inherited_macro['global']['description'];
+		}
 	}
 	unset($inherited_macro);
 

@@ -78,7 +78,7 @@ class CRegexValidatorTest extends CValidatorTest
 			[
 				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'],
 				'asd(',
-				'Incorrect regular expression "asd(": "Compilation failed: missing ) at offset 4".'
+				'Incorrect regular expression "asd(": "Compilation failed: missing closing parenthesis at offset 4".'
 			]
 		];
 	}

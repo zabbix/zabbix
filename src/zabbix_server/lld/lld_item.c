@@ -86,7 +86,7 @@ typedef struct
 }
 zbx_lld_item_prototype_t;
 
-#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	9999
+#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
 
 typedef struct

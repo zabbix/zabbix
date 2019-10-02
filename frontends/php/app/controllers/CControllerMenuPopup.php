@@ -510,10 +510,14 @@ class CControllerMenuPopup extends CController {
 		]);
 
 		if ($db_triggers) {
-			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);
-
 			$db_trigger = reset($db_triggers);
 			$db_trigger['items'] = CMacrosResolverHelper::resolveItemNames($db_trigger['items']);
+
+			if (array_key_exists('eventid', $data)) {
+				$db_trigger['eventid'] = $data['eventid'];
+			}
+
+			$db_trigger['url'] = CMacrosResolverHelper::resolveTriggerUrl($db_trigger, $url) ? $url : '';
 
 			$hosts = [];
 			$show_events = true;
@@ -556,23 +560,42 @@ class CControllerMenuPopup extends CController {
 				'triggerid' => $data['triggerid'],
 				'items' => $items,
 				'showEvents' => $show_events,
-				'configuration' =>
-					in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 			];
 
 			if (array_key_exists('eventid', $data)) {
 				$menu_data['eventid'] = $data['eventid'];
+
+				$events = API::Event()->get([
+					'output' => ['urls'],
+					'eventids' => $data['eventid']
+				]);
+
+				if ($events) {
+					foreach ($events[0]['urls'] as $url) {
+						$menu_data['urls'][] = [
+							'label' => $url['name'],
+							'url' => $url['url'],
+							'target' => '_blank'
+						];
+					}
+				}
+			}
+
+			if (array_key_exists('urls', $menu_data)) {
+				foreach ($menu_data['urls'] as &$url) {
+					if (!CHtmlUrlValidator::validate($url['url'])) {
+						$url['url'] = 'javascript: alert(\''.
+							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
+						'\');';
+						unset($url['target']);
+					}
+				}
+				unset($url);
 			}
 
 			if (array_key_exists('acknowledge', $data)) {
 				$menu_data['acknowledge'] = $data['acknowledge'];
-			}
-
-			if ($db_trigger['url'] !== '') {
-				$menu_data['url'] = CHtmlUrlValidator::validate($db_trigger['url'])
-					? $db_trigger['url']
-					: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.', zbx_jsvalue($db_trigger['url'],
-							false, false)).'\');';
 			}
 
 			return $menu_data;

@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxalerter.a
 libzbxalerter_a_SOURCES = \
 	alerter.c alerter.h \
 	alerter_protocol.c alerter_protocol.h \
-	alert_manager.c alert_manager.h
+	alert_manager.c alert_manager.h \
+	alert_syncer.c alert_syncer.h
 	
 	

@@ -27,7 +27,8 @@ class CSimpleIntervalParser extends CParser {
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
-		'negative' => false
+		'negative' => false,
+		'with_year' => false
 	];
 
 	private $user_macro_parser;
@@ -44,6 +45,9 @@ class CSimpleIntervalParser extends CParser {
 		if (array_key_exists('negative', $options)) {
 			$this->options['negative'] = $options['negative'];
 		}
+		if (array_key_exists('with_year', $options)) {
+			$this->options['with_year'] = $options['with_year'];
+		}
 
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
@@ -57,7 +61,7 @@ class CSimpleIntervalParser extends CParser {
 	/**
 	 * Parse the given source string.
 	 *
-	 * 0..N[smhdw]|{$M}|{#M}|{{#M}.func()}
+	 * 0..N[smhdwMy]|{$M}|{#M}|{{#M}.func()}
 	 *
 	 * @param string $source  Source string that needs to be parsed.
 	 * @param int    $pos     Position offset.
@@ -69,7 +73,11 @@ class CSimpleIntervalParser extends CParser {
 		$minus = $this->options['negative'] ? '-?' : '';
 		$p = $pos;
 
-		if (preg_match('/^('.$minus.'(0|[1-9][0-9]*)['.ZBX_TIME_SUFFIXES.']?)/', substr($source, $p), $matches)) {
+		if (preg_match(
+			'/^('.$minus.'(0|[1-9][0-9]*)['.
+			($this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES).']?)/',
+			substr($source, $p), $matches)
+		) {
 			$p += strlen($matches[0]);
 		}
 		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {

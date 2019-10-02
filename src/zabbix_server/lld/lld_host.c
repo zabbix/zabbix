@@ -28,6 +28,13 @@ typedef struct
 	zbx_uint64_t	hostmacroid;
 	char		*macro;
 	char		*value;
+	char		*description;
+#define ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE		__UINT64_C(0x00000001)
+#define ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION	__UINT64_C(0x00000002)
+#define ZBX_FLAG_LLD_HOSTMACRO_UPDATE									\
+		(ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE | ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION)
+#define ZBX_FLAG_LLD_HOSTMACRO_REMOVE			__UINT64_C(0x00000004)
+	zbx_uint64_t	flags;
 }
 zbx_lld_hostmacro_t;
 
@@ -35,6 +42,7 @@ static void	lld_hostmacro_free(zbx_lld_hostmacro_t *hostmacro)
 {
 	zbx_free(hostmacro->macro);
 	zbx_free(hostmacro->value);
+	zbx_free(hostmacro->description);
 	zbx_free(hostmacro);
 }
 
@@ -82,7 +90,7 @@ typedef struct
 	zbx_vector_uint64_t	new_groupids;		/* host groups which should be added */
 	zbx_vector_uint64_t	lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
-	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added */
+	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added, deleted or updated */
 	zbx_vector_ptr_t	interfaces;
 	char			*host_proto;
 	char			*host;
@@ -1577,7 +1585,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
-			"select hm.macro,hm.value"
+			"select hm.macro,hm.value,hm.description"
 			" from hostmacro hm,items i"
 			" where hm.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
@@ -1589,12 +1597,51 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
 
 		hostmacro->macro = zbx_strdup(NULL, row[0]);
 		hostmacro->value = zbx_strdup(NULL, row[1]);
+		hostmacro->description = zbx_strdup(NULL, row[2]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_hostmacro_make                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
+		const char *value, const char *description)
+{
+	zbx_lld_hostmacro_t	*hostmacro;
+	int			i;
+
+	for (i = 0; i < hostmacros->values_num; i++)
+	{
+		hostmacro = (zbx_lld_hostmacro_t *)hostmacros->values[i];
+
+		/* check if host macro has already been added */
+		if (0 == hostmacro->hostmacroid && 0 == strcmp(hostmacro->macro, macro))
+		{
+			hostmacro->hostmacroid = hostmacroid;
+			if (0 != strcmp(hostmacro->value, value))
+				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE;
+			if (0 != strcmp(hostmacro->description, description))
+				hostmacro->flags |= ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION;
+			return;
+		}
+	}
+
+	/* host macro is present on the host but not in new list, it should be removed */
+	hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
+	hostmacro->hostmacroid = hostmacroid;
+	hostmacro->macro = NULL;
+	hostmacro->value = NULL;
+	hostmacro->description = NULL;
+	hostmacro->flags = ZBX_FLAG_LLD_HOSTMACRO_REMOVE;
+
+	zbx_vector_ptr_append(hostmacros, hostmacro);
 }
 
 /******************************************************************************
@@ -1610,8 +1657,7 @@ static void	lld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hostma
  *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
-		zbx_vector_uint64_t *del_hostmacroids)
+static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1640,6 +1686,9 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->hostmacroid = 0;
 			hostmacro->macro = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->macro);
 			hostmacro->value = zbx_strdup(NULL, ((zbx_lld_hostmacro_t *)hostmacros->values[j])->value);
+			hostmacro->description = zbx_strdup(NULL,
+					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
+			hostmacro->flags = 0x00;
 
 			zbx_vector_ptr_append(&host->new_hostmacros, hostmacro);
 		}
@@ -1654,7 +1703,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostmacroid,hostid,macro,value"
+				"select hostmacroid,hostid,macro,value,description"
 				" from hostmacro"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -1675,35 +1724,11 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 			host = (zbx_lld_host_t *)hosts->values[i];
 
-			for (i = 0; i < host->new_hostmacros.values_num; i++)
-			{
-				hostmacro = (zbx_lld_hostmacro_t *)host->new_hostmacros.values[i];
+			ZBX_STR2UINT64(hostmacroid, row[0]);
 
-				if (0 == strcmp(hostmacro->macro, row[2]))
-					break;
-			}
-
-			if (i == host->new_hostmacros.values_num)
-			{
-				/* host macros which should be deleted */
-				ZBX_STR2UINT64(hostmacroid, row[0]);
-				zbx_vector_uint64_append(del_hostmacroids, hostmacroid);
-			}
-			else
-			{
-				/* host macros which are already added */
-				if (0 == strcmp(hostmacro->value, row[3]))	/* value doesn't changed */
-				{
-					lld_hostmacro_free(hostmacro);
-					zbx_vector_ptr_remove(&host->new_hostmacros, i);
-				}
-				else
-					ZBX_STR2UINT64(hostmacro->hostmacroid, row[0]);
-			}
+			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4]);
 		}
 		DBfree_result(result);
-
-		zbx_vector_uint64_sort(del_hostmacroids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -1835,22 +1860,21 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
  *                                     should be sorted by hostid             *
  *             status           - [IN] initial host status                    *
  *             del_hostgroupids - [IN] host groups which should be deleted    *
- *             del_hostmacroids - [IN] host macros which should be deleted    *
  *                                                                            *
  ******************************************************************************/
 static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
 		const char *ipmi_password, unsigned char status, char inventory_mode, unsigned char tls_connect,
 		unsigned char tls_accept, const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity,
-		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids,
-		const zbx_vector_uint64_t *del_hostmacroids)
+		const char *tls_psk, const zbx_vector_uint64_t *del_hostgroupids)
 {
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
 				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
 	zbx_lld_interface_t	*interface;
-	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids;
+	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids,
+				del_hostmacroids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *value_esc;
 	size_t			sql1_alloc = 0, sql1_offset = 0,
@@ -1863,6 +1887,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_vector_uint64_create(&upd_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_interfaceids);
+	zbx_vector_uint64_create(&del_hostmacroids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1913,14 +1938,16 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			if (0 == hostmacro->hostmacroid)
 				new_hostmacros++;
-			else
+			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE))
 				upd_hostmacros++;
+			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_REMOVE))
+				zbx_vector_uint64_append(&del_hostmacroids, hostmacro->hostmacroid);
 		}
 	}
 
 	if (0 == new_hosts && 0 == new_host_inventories && 0 == upd_hosts && 0 == upd_interfaces &&
 			0 == upd_hostmacros && 0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
-			0 == del_hostgroupids->values_num && 0 == del_hostmacroids->values_num &&
+			0 == del_hostgroupids->values_num && 0 == del_hostmacroids.values_num &&
 			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num &&
 			0 == del_interfaceids.values_num)
 	{
@@ -1961,7 +1988,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	{
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
-		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value", NULL);
+		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
+				"description", NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -2212,23 +2240,33 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		{
 			hostmacro = (zbx_lld_hostmacro_t *)host->new_hostmacros.values[j];
 
-			value_esc = DBdyn_escape_string(hostmacro->value);
-
 			if (0 == hostmacro->hostmacroid)
 			{
 				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid++, host->hostid,
-						hostmacro->macro, hostmacro->value);
+						hostmacro->macro, hostmacro->value, hostmacro->description);
 			}
-			else
+			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE))
 			{
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-						"update hostmacro"
-						" set value='%s'"
-						" where hostmacroid=" ZBX_FS_UI64 ";\n",
-						value_esc, hostmacro->hostmacroid);
-			}
+				const char	*d = "";
 
-			zbx_free(value_esc);
+				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE_VALUE))
+				{
+					value_esc = DBdyn_escape_string(hostmacro->value);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_free(value_esc);
+					d = ",";
+				}
+				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HOSTMACRO_UPDATE_DESCRIPTION))
+				{
+					value_esc = DBdyn_escape_string(hostmacro->description);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdescription='%s'",
+							d, value_esc);
+					zbx_free(value_esc);
+				}
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
+			}
 		}
 	}
 
@@ -2275,7 +2313,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_free(sql1);
 	}
 
-	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids->values_num ||
+	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
 			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num ||
 			0 != del_interfaceids.values_num)
 	{
@@ -2289,11 +2327,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
-		if (0 != del_hostmacroids->values_num)
+		if (0 != del_hostmacroids.values_num)
 		{
+			zbx_vector_uint64_sort(&del_hostmacroids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from hostmacro where");
 			DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "hostmacroid",
-					del_hostmacroids->values, del_hostmacroids->values_num);
+					del_hostmacroids.values, del_hostmacroids.values_num);
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
@@ -2330,6 +2369,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	DBcommit();
 out:
 	zbx_vector_uint64_destroy(&del_interfaceids);
+	zbx_vector_uint64_destroy(&del_hostmacroids);
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
 	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
@@ -3021,7 +3061,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_t	hosts, group_prototypes, groups, interfaces, hostmacros;
 	zbx_vector_uint64_t	groupids;		/* list of host groups which should be added */
 	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
-	zbx_vector_uint64_t	del_hostmacroids;	/* list of host macros which should be deleted */
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password, *tls_issuer, *tls_subject, *tls_psk_identity,
 				*tls_psk;
@@ -3066,7 +3105,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 	zbx_vector_ptr_create(&group_prototypes);
 	zbx_vector_ptr_create(&groups);
 	zbx_vector_uint64_create(&del_hostgroupids);
-	zbx_vector_uint64_create(&del_hostmacroids);
 	zbx_vector_ptr_create(&interfaces);
 	zbx_vector_ptr_create(&hostmacros);
 
@@ -3126,13 +3164,13 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		lld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
 		lld_templates_make(parent_hostid, &hosts);
-		lld_hostmacros_make(&hostmacros, &hosts, &del_hostmacroids);
+
+		lld_hostmacros_make(&hostmacros, &hosts);
 
 		lld_groups_save(&groups, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, status, inventory_mode, tls_connect, tls_accept,
-				tls_issuer, tls_subject, tls_psk_identity, tls_psk, &del_hostgroupids,
-				&del_hostmacroids);
+				tls_issuer, tls_subject, tls_psk_identity, tls_psk, &del_hostgroupids);
 
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
@@ -3146,7 +3184,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		zbx_vector_uint64_clear(&groupids);
 		zbx_vector_uint64_clear(&del_hostgroupids);
-		zbx_vector_uint64_clear(&del_hostmacroids);
 	}
 	DBfree_result(result);
 
@@ -3155,7 +3192,6 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 	zbx_vector_ptr_destroy(&hostmacros);
 	zbx_vector_ptr_destroy(&interfaces);
-	zbx_vector_uint64_destroy(&del_hostmacroids);
 	zbx_vector_uint64_destroy(&del_hostgroupids);
 	zbx_vector_ptr_destroy(&groups);
 	zbx_vector_ptr_destroy(&group_prototypes);

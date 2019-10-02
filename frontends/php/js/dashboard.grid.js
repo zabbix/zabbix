@@ -134,16 +134,6 @@
 				);
 		}
 
-		if (!widget['parent']) {
-			// Do not subscribe on focus change, since child widgets do not receive focus.
-			widget['content_header'].on('focusin focusout', function(event) {
-				if (event.type === 'focusout' && isWidgetPopupActive($obj, data, widget)) {
-					return;
-				}
-				widget['div'].toggleClass(classes['focus'], event.type === 'focusin');
-			});
-		}
-
 		widget['content_body'] = $('<div>', {'class': classes['content']})
 			.toggleClass('no-padding', !widget['iterator'] && !widget['configuration']['padding']);
 
@@ -178,69 +168,208 @@
 
 		$div.append(widget['container'], widget['mask']);
 
-		if (widget['parent']) {
-			// For child widgets of iterators.
-			$div
-				.on('mouseenter', function() {
-					if (widget['parent']['div'].hasClass(iterator_classes['hidden_header'])) {
-						if ($div.position().top === 0) {
-							widget['parent']['div'].addClass('iterator-double-header');
-						}
-						else if (!isWidgetPopupActive($obj, data, widget['parent'])) {
-							widget['parent']['div'].removeClass('iterator-double-header');
-						}
-					}
-				});
-		}
-
-		if (!widget['parent']) {
-			$div.on('focusin', function(event) {
-				data['widgets'].forEach(function(other_widget) {
-					if (other_widget['uniqueid'] === widget['uniqueid']) {
-						return;
-					}
-
-					var classes = other_widget['iterator'] ? iterator_classes : widget_classes;
-					other_widget['div'].removeClass(classes['focus']);
-					if (!other_widget['div'].is(':hover')) {
-						other_widget['div'].removeClass('iterator-double-header');
-					}
-				});
+		widget['content_header']
+			.on('focusin', function() {
+				enterWidget($obj, data, widget);
+			})
+			.on('focusout', function(event) {
+				if (!widget['content_header'].has(event.relatedTarget).length) {
+					leaveWidget($obj, data, widget);
+				}
+			})
+			.on('focusin focusout', function() {
+				// Skip mouse events caused by animations which were caused by focus change.
+				data['options']['mousemove_waiting'] = true;
 			});
-		}
 
-		if (widget['iterator']) {
-			$div.on('mouseleave focusout', function(event) {
-				if (!isWidgetPopupActive($obj, data, widget)) {
-					if (event.type === 'mouseleave' || !isIteratorFirstRowHovered(widget)) {
-						$div.removeClass('iterator-double-header');
-					}
+		$div
+			.on('mousemove', function() {
+				enterWidget($obj, data, widget);
+
+				delete data['options']['mousemove_waiting'];
+			})
+			.on('mouseleave', function() {
+				if (!data['options']['mousemove_waiting']) {
+					leaveWidget($obj, data, widget);
 				}
 			});
-		}
-
-		if (data['options']['kioskmode']) {
-			$div.on('mouseenter mouseleave focusin focusout', function() {
-				slideKiosk($obj, data);
-			});
-		}
 
 		return $div;
 	}
 
-	function isIteratorFirstRowHovered(iterator) {
-		for (var i = 0; i < iterator['children'].length; i++) {
-			if (iterator['children'][i]['div'].is(':hover') && iterator['children'][i]['div'].position().top === 0) {
-				return true;
-			}
+	/**
+	 * Find out if widgets should react on mouse and focus events.
+	 *
+	 * @param {object} $obj  Dashboard container jQuery object.
+	 * @param {object} data  Dashboard data and options object.
+	 *
+	 * @returns {boolean}
+	 */
+	function isDashboardFrozen($obj, data) {
+		// Edit widget dialogue active?
+		if (data['options']['config_dialogue_active']) {
+			return true;
 		}
 
-		return false;
+		var result = false;
+		data['widgets'].forEach(function(widget) {
+			// Widget popup open (refresh rate)?
+			if (widget['content_header'].find('[data-expanded="true"]').length > 0
+					// Widget being dragged or resized in dashboard edit mode?
+					|| widget['div'].hasClass('ui-draggable-dragging')
+					|| widget['div'].hasClass('ui-resizable-resizing')) {
+				result = true;
+			}
+		});
+
+		return result;
 	}
 
-	function isWidgetPopupActive($obj, data, widget) {
-		return widget['content_header'].find('[data-expanded="true"]').length
-			|| data['options']['config_dialogue_active'];
+	/**
+	 * Focus specified widget or iterator and blur all other widgets.
+	 * If child widget of iterator is specified, blur all other child widgets of iterator.
+	 * This top-level function should be called by mouse and focus event handlers.
+	 *
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function enterWidget($obj, data, widget) {
+		var focus_class = widget['iterator'] ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus';
+
+		if (widget['div'].hasClass(focus_class)) {
+			return;
+		}
+
+		if (isDashboardFrozen($obj, data)) {
+			return;
+		}
+
+		if (widget['parent']) {
+			doLeaveWidgetsOfIteratorExcept(widget['parent'], widget);
+			doEnterWidgetOfIterator(widget);
+		}
+		else {
+			doLeaveWidgetsExcept($obj, data, widget);
+			doEnterWidget($obj, data, widget);
+		}
+
+		slideKiosk($obj, data);
+	}
+
+	/**
+	 * Blur specified widget or iterator. If iterator is specified, blur it's focused child widget as well.
+	 * This top-level function should be called by mouse and focus event handlers.
+	 *
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function leaveWidget($obj, data, widget) {
+		var focus_class = widget['iterator'] ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus';
+
+		if (!widget['div'].hasClass(focus_class)) {
+			return;
+		}
+
+		if (isDashboardFrozen($obj, data)) {
+			return;
+		}
+
+		doLeaveWidget($obj, data, widget);
+
+		slideKiosk($obj, data);
+	}
+
+	/**
+	 * Focus specified top-level widget or iterator. If iterator is specified, focus it's hovered child widget as well.
+	 *
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function doEnterWidget($obj, data, widget) {
+		widget['div'].addClass(widget['iterator'] ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
+
+		if (widget['iterator']) {
+			var child_hovered = null;
+			widget['children'].forEach(function(child) {
+				if (child['div'].is(':hover')) {
+					child_hovered = child;
+				}
+			});
+
+			if (child_hovered !== null) {
+				doEnterWidgetOfIterator(child_hovered);
+			}
+		}
+	}
+
+	/**
+	 * Focus specified child widget of iterator.
+	 *
+	 * @param {object} widget  Dashboard widget object.
+	 */
+	function doEnterWidgetOfIterator(widget) {
+		widget['div'].addClass('dashbrd-grid-widget-focus');
+
+		if (widget['parent']['div'].hasClass('dashbrd-grid-iterator-hidden-header')) {
+			widget['parent']['div'].toggleClass('iterator-double-header', widget['div'].position().top == 0);
+		}
+	}
+
+	/**
+	 * Blur all top-level widgets and iterators, except the specified one.
+	 *
+	 * @param {object} $obj           Dashboard container jQuery object.
+	 * @param {object} data           Dashboard data and options object.
+	 * @param {object} except_widget  Dashboard widget object.
+	 */
+	function doLeaveWidgetsExcept($obj, data, except_widget) {
+		data['widgets'].forEach(function(widget) {
+			if (except_widget !== undefined && widget.uniqueid === except_widget.uniqueid) {
+				return;
+			}
+
+			doLeaveWidget($obj, data, widget);
+		});
+	}
+
+	/**
+	 * Blur specified top-level widget or iterator. If iterator is specified, blur it's focused child widget as well.
+	 *
+	 * @param {object} $obj           Dashboard container jQuery object.
+	 * @param {object} data           Dashboard data and options object.
+	 * @param {object} except_widget  Dashboard widget object.
+	 */
+	function doLeaveWidget($obj, data, widget) {
+		if (widget['content_header'].has(document.activeElement).length) {
+			document.activeElement.blur();
+		}
+
+		if (widget['iterator']) {
+			doLeaveWidgetsOfIteratorExcept(widget);
+			widget['div'].removeClass('iterator-double-header');
+		}
+
+		widget['div'].removeClass(widget['iterator'] ? 'dashbrd-grid-iterator-focus' : 'dashbrd-grid-widget-focus');
+	}
+
+	/**
+	 * Blur all child widgets of iterator, except the specified one.
+	 *
+	 * @param {object} $obj           Dashboard container jQuery object.
+	 * @param {object} data           Dashboard data and options object.
+	 * @param {object} except_widget  Dashboard widget object.
+	 */
+	function doLeaveWidgetsOfIteratorExcept(iterator, except_child) {
+		iterator['children'].forEach(function(child) {
+			if (except_child !== undefined && child.uniqueid === except_child.uniqueid) {
+				return;
+			}
+
+			child['div'].removeClass('dashbrd-grid-widget-focus');
+		});
 	}
 
 	/**
@@ -256,37 +385,32 @@
 				'hidden_header': 'dashbrd-grid-widget-hidden-header'
 			};
 
-		// Calculate the dashboard offset (0, 1 or 2 lines) based on currenntly shown widget headers.
+		// Calculate the dashboard offset (0, 1 or 2 lines) based on focused widget.
 
 		var slide_lines = 0;
 
-		data['widgets'].each(function(widget) {
-			if (widget['div'].position().top !== 0) {
-				return;
+		for (var index = 0; index < data['widgets'].length; index++) {
+			var widget = data['widgets'][index],
+				classes = widget['iterator'] ? iterator_classes : widget_classes;
+
+			if (!widget['div'].hasClass(classes['focus'])) {
+				continue;
 			}
 
-			var classes = widget['iterator'] ? iterator_classes : widget_classes,
-				hover = widget['div'].is(':hover'),
-				focus = widget['div'].hasClass(classes['focus']),
-				popup = isWidgetPopupActive($obj, data, widget);
-
-			if (!hover && !focus && !popup) {
-				return;
+			// Focused widget not on the first row of dashboard?
+			if (widget['div'].position().top != 0) {
+				break;
 			}
 
 			if (widget['iterator']) {
-				slide_lines = Math.max(1, slide_lines);
+				slide_lines = widget['div'].hasClass('iterator-double-header') ? 2 : 1;
+			}
+			else if (widget['div'].hasClass(classes['hidden_header'])) {
+				slide_lines = 1;
+			}
 
-				if (widget['div'].hasClass('iterator-double-header')) {
-					slide_lines = Math.max(2, slide_lines);
-				}
-			}
-			else {
-				if (widget['div'].hasClass(classes['hidden_header'])) {
-					slide_lines = Math.max(1, slide_lines);
-				}
-			}
-		});
+			break;
+		}
 
 		// Apply the calculated dashboard offset (0, 1 or 2 lines) slowly.
 
@@ -323,6 +447,30 @@
 				delete data['options']['kiosk_slide_timeout'];
 			}, 2000);
 		}
+	}
+
+	function setWidgetViewMode(widget, view_mode) {
+		if (widget['view_mode'] == view_mode) {
+			return;
+		}
+
+		widget['view_mode'] = view_mode;
+
+		var hidden_header_class = widget['iterator']
+				? 'dashbrd-grid-iterator-hidden-header'
+				: 'dashbrd-grid-widget-hidden-header';
+
+		if (widget['iterator']) {
+			if (view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL) {
+				widget['div'].removeClass('iterator-double-header');
+			}
+
+			widget['children'].forEach(function(child) {
+				setWidgetViewMode(child, view_mode);
+			});
+		}
+
+		widget['div'].toggleClass(hidden_header_class, view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER);
 	}
 
 	function updateIteratorPager(iterator) {
@@ -390,9 +538,9 @@
 	/**
 	 * Set height of dashboard container DOM element.
 	 *
-	 * @param {object} $obj         Dashboard container jQuery object.
-	 * @param {object} data         Dashboard data and options object.
-	 * @param {integer} min_rows    Minimal desired rows count.
+	 * @param {object} $obj       Dashboard container jQuery object.
+	 * @param {object} data       Dashboard data and options object.
+	 * @param {integer} min_rows  Minimal desired rows count.
 	 */
 	function resizeDashboardGrid($obj, data, min_rows) {
 		data['options']['rows'] = 0;
@@ -426,7 +574,7 @@
 	/**
 	 * Calculate minimal required height of dashboard container.
 	 *
-	 * @param {object} $obj    Dashboard container DOM element.
+	 * @param {object} $obj  Dashboard container jQuery object.
 	 *
 	 * @returns {integer}
 	 */
@@ -449,8 +597,7 @@
 	}
 
 	function calcDivPosition($obj, data, $div) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = $div.position(),
+		var	pos = $div.position(),
 			cell_w = data['cell-width'],
 			cell_h = data['options']['widget-height'];
 
@@ -511,7 +658,6 @@
 		data['pos-action'] = action;
 		data['cell-width'] = getCurrentCellWidth(data);
 		data['placeholder'].css('visibility', (action === 'resize') ? 'hidden' : 'visible').show();
-		widget['div'].addClass('dashbrd-grid-widget-draggable');
 		data.new_widget_placeholder.container.hide();
 		resetCurrentPositions(data['widgets']);
 	}
@@ -532,8 +678,8 @@
 	/**
 	 * Check is there collision between two position objects.
 	 *
-	 * @param {object} pos1   Object with position and dimension.
-	 * @param {object} pos2   Object with position and dimension.
+	 * @param {object} pos1  Object with position and dimension.
+	 * @param {object} pos2  Object with position and dimension.
 	 *
 	 * @returns {boolean}
 	 */
@@ -975,8 +1121,8 @@
 	 * Rearrange widgets. Modifies widget.current_pos if desired size is greater than allowed by resize.
 	 *
 	 * @param {array}  data
-	 * @param {array}  data.widgets    Array of widgets objects.
-	 * @param {object} widget          Moved widget object.
+	 * @param {array}  data.widgets  Array of widgets objects.
+	 * @param {object} widget        Moved widget object.
 	 */
 	function realignResize(data, widget) {
 		var axis,
@@ -1094,7 +1240,7 @@
 		});
 	}
 
-	function checkWidgetOverlap(data, widget) {
+	function checkWidgetOverlap(data) {
 		resetCurrentPositions(data['widgets']);
 
 		$.each(data['widgets'], function() {
@@ -1110,9 +1256,9 @@
 	/**
 	 * User action handler for resize of widget.
 	 *
-	 * @param {object} $obj  Dashboard DOM element.
-	 * @param {object} $div  Widget DOM element.
-	 * @param {object} data  Dashboard data object.
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
 	 */
 	function doWidgetResize($obj, data, widget) {
 		var	pos = calcDivPosition($obj, data, widget['div']),
@@ -1153,13 +1299,12 @@
 	/**
 	 * User action handler for drag of widget.
 	 *
-	 * @param {object} $obj  Dasboard DOM element.
-	 * @param {object} $div  Widget DOM element.
-	 * @param {object} data  Dashboard data object.
+	 * @param {object} $obj    Dashboard container jQuery object.
+	 * @param {object} data    Dashboard data and options object.
+	 * @param {object} widget  Dashboard widget object.
 	 */
-	function doWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div),
-			pos = calcDivPosition($obj, data, $div),
+	function doWidgetPositioning($obj, data, widget) {
+		var	pos = calcDivPosition($obj, data, widget['div']),
 			rows = 0,
 			overflow = false;
 
@@ -1199,13 +1344,9 @@
 		setDivPosition(data['placeholder'], data, pos);
 	}
 
-	function stopWidgetPositioning($obj, $div, data) {
-		var	widget = getWidgetByTarget(data['widgets'], $div);
-
+	function stopWidgetPositioning($obj, data, widget) {
 		data['placeholder'].hide();
 		data['pos-action'] = '';
-
-		$div.removeClass('dashbrd-grid-widget-draggable');
 
 		$.each(data['widgets'], function() {
 			// Check if position of widget changed
@@ -1228,7 +1369,8 @@
 			// should be present only while dragging
 			delete this['current_pos'];
 		});
-		setDivPosition($div, data, widget['pos']);
+
+		setDivPosition(widget['div'], data, widget['pos']);
 		resizeDashboardGrid($obj, data);
 	}
 
@@ -1239,6 +1381,8 @@
 			scroll: true,
 			scrollSensitivity: data.options['widget-height'],
 			start: function() {
+				$obj.addClass('dashbrd-positioning');
+
 				data.calculated = {
 					'left-max': $obj.width() - widget['div'].width(),
 					'top-max': data.options['max-rows'] * data.options['widget-height'] - widget['div'].height()
@@ -1262,7 +1406,7 @@
 					top: Math.max(0, Math.min(ui.position.top, data.calculated['top-max']))
 				};
 
-				doWidgetPositioning($obj, widget['div'], data);
+				doWidgetPositioning($obj, data, widget);
 			},
 			stop: function() {
 				delete data.calculated;
@@ -1275,10 +1419,16 @@
 				});
 
 				setResizableState('enable', data.widgets, '');
-				stopWidgetPositioning($obj, widget['div'], data);
+				stopWidgetPositioning($obj, data, widget);
+
+				if (widget['iterator'] && !widget['div'].is(':hover')) {
+					widget['div'].removeClass('iterator-double-header');
+				}
 
 				data['options']['rows'] = data['options']['rows_actual'];
 				resizeDashboardGrid($obj, data, data['options']['rows_actual']);
+
+				$obj.removeClass('dashbrd-positioning');
 			}
 		});
 	}
@@ -1301,19 +1451,18 @@
 
 		widget['div'].resizable({
 			handles: handles,
-			autoHide: true,
 			scroll: false,
 			minWidth: getCurrentCellWidth(data),
 			minHeight: data['options']['widget-min-rows'] * data['options']['widget-height'],
 			start: function(event) {
-				$obj.addClass('dashbrd-resizing');
+				doLeaveWidgetsExcept($obj, data, widget);
+				doEnterWidget($obj, data, widget);
+
+				$obj.addClass('dashbrd-positioning');
 
 				var handle_class = event.currentTarget.className;
 				data['resizing_top'] = handle_class.match(/(^|\s)ui-resizable-(n|ne|nw)($|\s)/) !== null;
 				data['resizing_left'] = handle_class.match(/(^|\s)ui-resizable-(w|sw|nw)($|\s)/) !== null;
-
-				// Hide all other widget resize handles which may appear on fast mouse movement.
-				$obj.find('.ui-resizable-handle').not(widget['div'].find('.ui-resizable-handle')).hide();
 
 				data.widgets.each(function(box) {
 					delete box.affected_axis;
@@ -1354,6 +1503,12 @@
 					ui.position.top = 0;
 				}
 
+				if (data['resizing_top']) {
+					ui.position.top += Math.max(0,
+						ui.size.height - data['options']['widget-max-rows'] * data['options']['widget-height']
+					);
+				}
+
 				widget['div'].css({
 					'left': ui.position.left,
 					'top': ui.position.top,
@@ -1361,6 +1516,7 @@
 						data['cell-width'] * data['options']['max-columns'] - ui.position.left
 					),
 					'max-height': Math.min(ui.size.height,
+						data['options']['widget-max-rows'] * data['options']['widget-height'],
 						data['options']['max-rows'] * data['options']['widget-height'] - ui.position.top
 					)
 				});
@@ -1373,15 +1529,14 @@
 				});
 			},
 			stop: function() {
+				doLeaveWidget($obj, data, widget);
+
 				delete widget.prev_pos;
 
 				setResizableState('enable', data.widgets, widget.uniqueid);
-				stopWidgetPositioning($obj, widget['div'], data);
+				stopWidgetPositioning($obj, data, widget);
 
 				widget['container'].removeAttr('style');
-
-				// Hide resize handles if mouse button was released outside dashboard container area.
-				widget['div'].find('.ui-resizable-handle').hide();
 
 				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
 				if (SF) {
@@ -1414,7 +1569,7 @@
 					}
 				});
 
-				$obj.removeClass('dashbrd-resizing');
+				$obj.removeClass('dashbrd-positioning');
 			}
 		});
 	}
@@ -1543,18 +1698,16 @@
 	}
 
 	function addIteratorPlaceholders($obj, data, iterator, count) {
-		var $placeholders = $('.dashbrd-grid-iterator-placeholder', iterator['content_body']);
+		$('.dashbrd-grid-iterator-placeholder', iterator['content_body']).remove();
 
-		// Reusing placeholders not to disturb animations.
-		$placeholders.slice(count).remove();
-		for (var index = $placeholders.length; index < count; index++) {
+		for (var index = 0; index < count; index++) {
 			iterator['content_body'].append($('<div>', {'class': 'dashbrd-grid-iterator-placeholder'})
 				.append('<div>')
 				.on('mouseenter', function() {
 					// Set single-line header for the iterator.
 					iterator['div'].removeClass('iterator-double-header');
 
-					if (data['options']['kioskmode'] && iterator['div'].position().top === 0) {
+					if (data['options']['kioskmode'] && iterator['div'].position().top == 0) {
 						slideKiosk($obj, data);
 					}
 				})
@@ -1633,14 +1786,11 @@
 			child['configuration'] = {};
 		}
 
-		// New child widgets will have mormal headers, if in edit mode.
-		var view_mode = data['options']['edit_mode'] ? ZBX_WIDGET_VIEW_MODE_NORMAL : iterator['view_mode'];
-
 		child = $.extend({
 			'widgetid': '',
 			'type': '',
 			'header': '',
-			'view_mode': view_mode,
+			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
 			'preloader_fadespeed': 500,
 			'update_paused': false,
@@ -2128,6 +2278,14 @@
 				else {
 					// No errors, proceed with update.
 					overlayDialogueDestroy('widgetConfg');
+
+					// Set view mode of a reusable widget early to escape focus flickering.
+					if (widget !== null && widget['type'] === type) {
+						setWidgetViewMode(widget, view_mode);
+
+						doLeaveWidgetsExcept($obj, data, widget);
+						doEnterWidget($obj, data, widget);
+					}
 				}
 			})
 			.then(function() {
@@ -2211,8 +2369,6 @@
 
 							// New widget is last element in data['widgets'] array.
 							widget = data['widgets'].slice(-1)[0];
-
-							// Edit mode may change size of the widget, so it comes before the update.
 							setWidgetModeEdit($obj, data, widget);
 							updateWidgetContent($obj, data, widget);
 
@@ -2224,8 +2380,10 @@
 					// In case of EDIT widget, if type has not changed, update the widget.
 
 					widget['header'] = name;
-					widget['view_mode'] = view_mode;
 					widget['fields'] = fields;
+
+					// View mode was just set after the overlayDialogueDestroy was called in first 'then' section.
+
 					applyWidgetConfiguration($obj, data, widget, configuration);
 					doAction('afterUpdateWidgetConfig', $obj, data, null);
 					updateWidgetDynamic($obj, data, widget);
@@ -2260,8 +2418,6 @@
 
 					// New widget is last element in data['widgets'] array.
 					widget = data['widgets'].slice(-1)[0];
-
-					// Edit mode may change size of the widget, so it comes before the update.
 					setWidgetModeEdit($obj, data, widget);
 					updateWidgetContent($obj, data, widget);
 				}
@@ -2275,12 +2431,11 @@
 	}
 
 	function findEmptyPosition($obj, data, type) {
-		var pos_type = (typeof type === 'undefined') ? Object.keys(data.widget_defaults)[0] : type,
-			pos = {
+		var pos = {
 				'x': 0,
 				'y': 0,
-				'width': data.widget_defaults[pos_type].size.width,
-				'height': data.widget_defaults[pos_type].size.height
+				'width': data.widget_defaults[type].size.width,
+				'height': data.widget_defaults[type].size.height
 			};
 
 		// Go y by row and try to position widget in each space.
@@ -2657,6 +2812,9 @@
 
 				data.add_widget_dimension = $.extend(data.add_widget_dimension, pos);
 
+				// Hide widget headers, not to interfere with the new widget placeholder.
+				doLeaveWidgetsExcept($obj, data);
+
 				data.new_widget_placeholder.container
 					.css({
 						position: 'absolute',
@@ -2679,14 +2837,7 @@
 		$('.btn-widget-action', widget['content_header']).parent('li').hide();
 		$('.btn-widget-delete', widget['content_header']).parent('li').show();
 
-		if (widget['iterator']) {
-			widget['div'].removeClass('dashbrd-grid-iterator-hidden-header');
-			widget['children'].forEach(function(child) {
-				child['div'].removeClass('dashbrd-grid-widget-hidden-header');
-			});
-		}
-		else {
-			widget['div'].removeClass('dashbrd-grid-widget-hidden-header');
+		if (!widget['iterator']) {
 			removeWidgetInfoButtons(widget['content_header']);
 		}
 
@@ -2894,25 +3045,24 @@
 	/**
 	 * Show message if dashboard free space exhausted.
 	 *
-	 * @param {object} data  Data from dashboard grid.
+	 * @param {object} data  Dashboard data and options object.
 	 */
 	function showMessageExhausted(data) {
 		data.dialogue.body.children('.msg-warning').remove();
 		data.dialogue.body.prepend(makeMessageBox(
 			'warning', t('Cannot add widget: not enough free space on the dashboard.'), null, false
 		));
-		data.dialogue.div.find('.dialogue-widget-save').prop('disabled', true);
 	}
 
 	/**
 	 * Performs action added by addAction function.
 	 *
 	 * @param {string} hook_name  Name of trigger that is currently being called.
-	 * @param {object} $obj       Dashboard grid object.
-	 * @param {object} data       Data from dashboard grid.
+	 * @param {object} $obj       Dashboard container jQuery object.
+	 * @param {object} data       Dashboard data and options object.
 	 * @param {object} widget     Current widget object (can be null for generic actions).
 	 *
-	 * @return int                Number of triggers, that were called.
+	 * @returns {int}  Number of triggers, that were called.
 	 */
 	function doAction(hook_name, $obj, data, widget) {
 		if (typeof data['triggers'][hook_name] === 'undefined') {
@@ -3010,7 +3160,8 @@
 
 			return this.each(function() {
 				var	$this = $(this),
-					new_widget_placeholder = createNewWidgetPlaceholder();
+					new_widget_placeholder = createNewWidgetPlaceholder(),
+					placeholder = $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).append($('<div>')).hide();
 
 				if (options['editable']) {
 					if (options['kioskmode']) {
@@ -3033,7 +3184,7 @@
 					new_widget_placeholder.container.addClass('disabled');
 				}
 
-				$this.append(new_widget_placeholder.container);
+				$this.append(new_widget_placeholder.container, placeholder);
 
 				$this.data('dashboardGrid', {
 					dashboard: {},
@@ -3041,7 +3192,7 @@
 					widget_defaults: {},
 					widgets: [],
 					triggers: {},
-					placeholder: $('<div>', {'class': 'dashbrd-grid-widget-placeholder'}).hide().appendTo($this),
+					placeholder: placeholder,
 					new_widget_placeholder: new_widget_placeholder,
 					widget_relation_submissions: [],
 					widget_relations: {
@@ -3169,7 +3320,7 @@
 				setDivPosition(widget_local['div'], data, widget_local['pos']);
 
 				if (data['pos-action'] !== 'updateWidgetConfig') {
-					checkWidgetOverlap(data, widget_local);
+					checkWidgetOverlap(data);
 					resizeDashboardGrid($this, data);
 				}
 
@@ -3372,9 +3523,10 @@
 					// Take values from form.
 					fields = form.serializeJSON();
 					ajax_data['type'] = fields['type'];
+					ajax_data['prev_type'] = data.dialogue['widget_type'];
 					delete fields['type'];
 
-					if (data.dialogue['widget_type'] === ajax_data['type']) {
+					if (ajax_data['prev_type'] === ajax_data['type']) {
 						ajax_data['name'] = fields['name'];
 						ajax_data['view_mode'] = (fields['show_header'] == 1)
 							? ZBX_WIDGET_VIEW_MODE_NORMAL
@@ -3399,8 +3551,6 @@
 					// Get default config for new widget.
 					fields = {};
 				}
-
-				data.dialogue['widget_type'] = ajax_data['type'];
 
 				if (Object.keys(fields).length != 0) {
 					ajax_data['fields'] = JSON.stringify(fields);
@@ -3427,6 +3577,7 @@
 					}
 				})
 					.done(function(response) {
+						data.dialogue['widget_type'] = response.type;
 						body.empty();
 						body.append(response.body);
 						if (typeof response.debug !== 'undefined') {
@@ -3444,10 +3595,14 @@
 							updateWidgetConfig($this, data, widget);
 						});
 
-						// Enable save button after successful form update.
-						$('.dialogue-widget-save', footer).prop('disabled', false);
-					})
-					.always(function() {
+						if (widget === null && !findEmptyPosition($this, data, data.dialogue['widget_type'])) {
+							showMessageExhausted(data);
+						}
+						else {
+							// Enable save button after successful form update.
+							$('.dialogue-widget-save', footer).prop('disabled', false);
+						}
+
 						if (data.dialogue['widget_type'] === 'svggraph') {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
 						}
@@ -3455,10 +3610,6 @@
 							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
 						}
 
-						if (data.dialogue.widget === null
-								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
-							showMessageExhausted(data);
-						}
 						overlayDialogueOnLoad(true, jQuery('[data-dialogueid="widgetConfg"]'));
 					});
 			});
@@ -3558,10 +3709,10 @@
 		/**
 		 * Pushes received data in data buffer and calls sharing method.
 		 *
-		 * @param object widget  data origin widget
-		 * @param string data_name  string to identify data shared
+		 * @param {object} widget     Data origin widget
+		 * @param {string} data_name  String to identify data shared
 		 *
-		 * @returns boolean		indicates either there was linked widget that was related to data origin widget
+		 * @returns {boolean}  Indicates either there was linked widget that was related to data origin widget
 		 */
 		widgetDataShare: function(widget, data_name) {
 			var args = Array.prototype.slice.call(arguments, 2),
@@ -3691,20 +3842,20 @@
 		},
 
 		/**
-		 * Add action, that will be performed on $hook_name trigger
+		 * Add action, that will be performed on $hook_name trigger.
 		 *
-		 * @param string hook_name  name of trigger, when $function_to_call should be called
-		 * @param string function_to_call  name of function in global scope that will be called
-		 * @param string uniqueid  identifier of widget, that added this action
-		 * @param array options  any key in options is optional
-		 * @param array options['parameters']  array of parameters with which the function will be called
-		 * @param array options['grid']  mark, what data from grid should be passed to $function_to_call.
-		 *								If is empty, parameter 'grid' will not be added to function_to_call params.
-		 * @param string options['grid']['widget']  should contain 1. Will add widget object.
-		 * @param string options['grid']['data']  should contain '1'. Will add dashboard grid data object.
-		 * @param string options['grid']['obj']  should contain '1'. Will add dashboard grid object ($this).
-		 * @param int options['priority']  order, when it should be called, compared to others. Default = 10
-		 * @param int options['trigger_name']  unique name. There can be only one trigger with this name for each hook.
+		 * @param {string} hook_name                  Name of trigger, when $function_to_call should be called.
+		 * @param {string} function_to_call           Name of function in global scope that will be called.
+		 * @param {string} uniqueid                   Identifier of widget, that added this action.
+		 * @param {array}  options                    Any key in options is optional.
+		 * @param {array}  options['parameters']      Array of parameters with which the function will be called.
+		 * @param {array}  options['grid']            Mark, what data from grid should be passed to $function_to_call.
+		 *                                            If is empty, parameter 'grid' will not be added to function_to_call params.
+		 * @param {string} options['grid']['widget']  Should contain 1. Will add widget object.
+		 * @param {string} options['grid']['data']    Should contain '1'. Will add dashboard grid data object.
+		 * @param {string} options['grid']['obj']     Should contain '1'. Will add dashboard grid object ($this).
+		 * @param {int}    options['priority']        Order, when it should be called, compared to others. Default = 10.
+		 * @param {int}    options['trigger_name']    Unique name. There can be only one trigger with this name for each hook.
 		 */
 		addAction: function(hook_name, function_to_call, uniqueid, options) {
 			this.each(function() {

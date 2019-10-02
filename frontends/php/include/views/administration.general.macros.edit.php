@@ -36,7 +36,7 @@ $widget = (new CWidget())
 $table = (new CTable())
 	->setId('tbl_macros')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
-	->setHeader([_('Macro'), '', _('Value'), '']);
+	->setHeader([_('Macro'), '', _('Value'), _('Description'), '']);
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
@@ -53,6 +53,11 @@ foreach ($data['macros'] as $i => $macro) {
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
+	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
+		->setAttribute('placeholder', _('description'));
+
 	$button_cell = [
 		(new CButton('macros['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -66,6 +71,7 @@ foreach ($data['macros'] as $i => $macro) {
 		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		'&rArr;',
 		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 }

@@ -440,7 +440,8 @@ typedef enum
 {
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
-	MEDIA_TYPE_SMS
+	MEDIA_TYPE_SMS,
+	MEDIA_TYPE_WEBHOOK = 4
 }
 zbx_media_type_t;
 
@@ -536,7 +537,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_PREPROCESSOR	27
 #define ZBX_PROCESS_TYPE_LLDMANAGER	28
 #define ZBX_PROCESS_TYPE_LLDWORKER	29
-#define ZBX_PROCESS_TYPE_COUNT		30	/* number of process types */
+#define ZBX_PROCESS_TYPE_ALERTSYNCER	30
+#define ZBX_PROCESS_TYPE_COUNT		31	/* number of process types */
 #define ZBX_PROCESS_TYPE_UNKNOWN	255
 const char	*get_process_type_string(unsigned char process_type);
 int		get_process_type_by_name(const char *proc_type_str);
@@ -1461,6 +1463,7 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 #define ZBX_PREPROC_SCRIPT			21
 #define ZBX_PREPROC_PROMETHEUS_PATTERN		22
 #define ZBX_PREPROC_PROMETHEUS_TO_JSON		23
+#define ZBX_PREPROC_CSV_TO_JSON			24
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0

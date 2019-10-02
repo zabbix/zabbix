@@ -234,6 +234,7 @@ class CWidgetConfig {
 					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
 
 				case WIDGET_GRAPH_PROTOTYPE:
+				case WIDGET_URL:
 					return false;
 
 				default:

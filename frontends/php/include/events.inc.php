@@ -397,7 +397,7 @@ function make_small_eventlist($startEvent, $backurl) {
  *
  * @param array  $trigger                    An array of trigger data.
  * @param string $trigger['triggerid']       Trigger ID to select events.
- * @param string $trigger['description']     Trigger description.
+ * @param string $trigger['comments']        Trigger description.
  * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
  * @param string $backurl                    URL to return to.

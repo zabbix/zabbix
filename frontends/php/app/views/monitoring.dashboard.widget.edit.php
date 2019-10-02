@@ -27,6 +27,7 @@ $form = $widget_view['form'];
 $form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
 
 $output = [
+	'type' => $data['dialogue']['type'],
 	'body' => $form->toString()
 ];
 

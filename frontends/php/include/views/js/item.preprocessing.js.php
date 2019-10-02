@@ -66,6 +66,21 @@
 	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+			->setAttribute('placeholder', '#{placeholder_0}')
+			->setWidth('#{width_0}')
+			->setAttribute('maxlength', 1).
+		(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+			->setAttribute('placeholder', '#{placeholder_1}')
+			->setWidth('#{width_1}')
+			->setAttribute('maxlength', 1).
+		(new CCheckBox('preprocessing[#{rowNum}][params][2]', '#{chkbox_value}'))
+			->setLabel('#{chkbox_label}')
+			->setChecked('#{chkbox_default}')
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		/**
@@ -98,6 +113,20 @@
 				}
 				if ($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).length) {
 					params.push($('[name="preprocessing[' + num + '][params][1]"]', $preprocessing).val());
+				}
+				if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).length) {
+					// ZBX-16642
+					if (type == <?= ZBX_PREPROC_CSV_TO_JSON ?>) {
+						if ($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).is(':checked')) {
+							params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+						}
+						else {
+							params.push(0);
+						}
+					}
+					else {
+						params.push($('[name="preprocessing[' + num + '][params][2]"]', $preprocessing).val());
+					}
 				}
 
 				steps.push($.extend({
@@ -133,6 +162,8 @@
 		function makeParameterInput(index, type) {
 			var preproc_param_single_tmpl = new Template($('#preprocessing-steps-parameters-single-tmpl').html()),
 				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
+				preproc_param_custom_width_chkbox_tmpl =
+					new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html()),
 				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html());
 
 			switch (type) {
@@ -219,6 +250,18 @@
 						placeholder: <?= CJs::encodeJson(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>
+					}));
+
+				case '<?= ZBX_PREPROC_CSV_TO_JSON ?>':
+					return $(preproc_param_custom_width_chkbox_tmpl.evaluate({
+						rowNum: index,
+						width_0: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
+						width_1: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
+						placeholder_0: ',',
+						placeholder_1: '"',
+						chkbox_label: <?= CJs::encodeJson(_('With header row')) ?>,
+						chkbox_value: <?= ZBX_PREPROC_CSV_HEADER ?>,
+						chkbox_default: true
 					}));
 
 				default:
@@ -323,7 +366,7 @@
 						break;
 				}
 			})
-			.on('change', 'input[name*="params"]', function() {
+			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());
 			})
 			.on('change', 'input[name*="on_fail"]', function() {

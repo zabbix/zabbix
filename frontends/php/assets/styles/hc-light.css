@@ -557,6 +557,13 @@ output {
   background-color: #fff;
   border-collapse: separate;
   border: 1px solid #9f9f9f; }
+  .list-table .action-container {
+    display: flex;
+    width: 100%; }
+    .list-table .action-container .separator {
+      margin-right: 4px; }
+    .list-table .action-container [class*='icon-'] {
+      flex-shrink: 0; }
   .list-table.compact-view .link-action {
     color: #000; }
     .list-table.compact-view .link-action.red {
@@ -625,8 +632,6 @@ output {
     .list-table.compact-view td .icon-description {
       margin-left: 2px; }
   .list-table.compact-view .action-container {
-    display: flex;
-    width: 100%;
     height: 18px;
     line-height: 18px; }
     .list-table.compact-view .action-container .rel-container {
@@ -634,8 +639,7 @@ output {
     .list-table.compact-view .action-container .link-action {
       height: 16px;
       min-width: 1em; }
-    .list-table.compact-view .action-container .separator,
-    .list-table.compact-view .action-container [class*='icon-'] {
+    .list-table.compact-view .action-container .separator {
       flex-shrink: 0; }
   .list-table thead th {
     color: #333;
@@ -736,8 +740,6 @@ output {
   .list-table .latest-values,
   .list-table .opdata {
     max-width: 300px; }
-  .list-table .separator {
-    margin-right: 4px; }
 
 .table-paging {
   text-align: center;
@@ -2292,6 +2294,13 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 9px 5px;
   width: 100%; }
 
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
 .dashbrd-grid-container {
   position: relative;
   margin: -4px;
@@ -2353,6 +2362,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       background-color: rgba(255, 255, 255, 0.7); }
       .dashbrd-grid-new-widget-placeholder.disabled .dashbrd-grid-widget-new-box .dashbrd-grid-new-widget-label::before {
         background: url(../img/icon-sprite.svg) no-repeat -122px -284px; }
+
+.dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
+  background: url(../img/icon-sprite.svg) no-repeat -345px -888px; }
 
 .dashbrd-grid-widget {
   position: absolute; }
@@ -2432,8 +2444,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-widget-mask {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: .25rem;
+  left: .25rem;
+  right: .25rem;
+  bottom: .25rem;
   display: none; }
 
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
@@ -2442,11 +2456,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
   padding-top: 8px; }
-.dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head, .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header:hover .dashbrd-grid-widget-head {
+.dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head {
   height: 2rem;
   margin-top: -2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
-.dashbrd-grid-widget.dashbrd-grid-widget-focus .dashbrd-grid-widget-actions, .dashbrd-grid-widget:hover .dashbrd-grid-widget-actions {
+.dashbrd-grid-widget.dashbrd-grid-widget-focus .dashbrd-grid-widget-actions {
   opacity: 1;
   filter: alpha(opacity=100); }
 .dashbrd-grid-widget.ui-resizable-resizing.resizing-top .dashbrd-grid-widget-container {
@@ -2481,8 +2495,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 1px solid #9f9f9f;
   border-bottom: 0;
   background-color: #fff;
-  transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
   opacity: 0;
+  transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
   z-index: 3; }
   .dashbrd-grid-iterator-head h4 {
     flex-grow: 1;
@@ -2547,21 +2561,23 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .dashbrd-grid-iterator-mask {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: .25rem;
+  left: .25rem;
+  right: .25rem;
+  bottom: .25rem;
   display: none; }
 
 .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-too-small {
   display: flex; }
 .dashbrd-grid-iterator.iterator-too-small .dashbrd-grid-iterator-content {
   display: none; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
+.dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head {
   margin-top: -2rem;
   height: 2rem;
   box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
   opacity: 1;
   transition: margin-top .3s, height .3s, box-shadow .3s; }
-.dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head, .dashbrd-grid-iterator:hover.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+.dashbrd-grid-iterator.dashbrd-grid-iterator-focus.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
   margin-top: -4rem;
   height: 4rem; }
 .dashbrd-grid-iterator.ui-resizable-resizing.resizing-top .dashbrd-grid-iterator-container {
@@ -2592,48 +2608,97 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-actions {
   opacity: 1;
   filter: alpha(opacity=100); }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing {
-  background-color: #f0f0f0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-head {
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+  transition: none; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+  transition: none; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-widget-mask {
+  display: block; }
+.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-positioning .dashbrd-grid-iterator-mask {
+  display: block; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget .ui-resizable-handle {
+  visibility: hidden; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.dashbrd-grid-widget-focus .ui-resizable-handle {
+  visibility: visible; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
   margin-top: 0;
+  height: 0;
+  box-shadow: none; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .ui-resizable-handle {
+  visibility: hidden; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-head {
+  margin-top: -2rem;
   height: 2rem;
-  border-bottom: 1px solid #9f9f9f;
-  box-shadow: 0 6px 8px -2px rgba(128, 128, 128, 0.15);
-  transition: none;
-  z-index: 7; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator-content {
-  background-color: #fff; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
+  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+  opacity: 0.5; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging {
+  z-index: 1000; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: .25rem;
+    left: .25rem;
+    right: .25rem;
+    bottom: .25rem;
+    background-color: rgba(240, 240, 240, 0.75);
+    box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-head {
+    border-color: #909090; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-resizable-resizing .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget.ui-draggable-dragging .dashbrd-grid-widget-content {
+    border-color: #909090; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator .ui-resizable-handle {
+  visibility: hidden; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .ui-resizable-handle {
+  visibility: visible; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
+  margin-top: 0;
+  height: 0;
+  box-shadow: none;
   opacity: 0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing {
-  background-color: #f0f0f0; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head {
-    opacity: 1; }
-  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content {
-    background-color: #f0f0f0; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.iterator-alt-content .dashbrd-grid-iterator-content {
-  padding-top: 2rem;
-  background-color: #fff; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-widget-mask {
-  display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit.dashbrd-resizing .dashbrd-grid-iterator-mask {
-  display: block; }
-.dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator.dashbrd-grid-iterator-focus .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit:not(.dashbrd-resizing) .dashbrd-grid-iterator:hover .dashbrd-grid-iterator-head {
-  opacity: 1; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .ui-resizable-handle {
+  visibility: hidden; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+  margin-top: -2rem;
+  height: 2rem;
+  box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+  opacity: 0.5; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging.dashbrd-grid-iterator-hidden-header.iterator-double-header .dashbrd-grid-iterator-head {
+  margin-top: -4rem;
+  height: 4rem; }
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging {
+  z-index: 1000; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing::before, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: .25rem;
+    left: .25rem;
+    right: .25rem;
+    bottom: .25rem;
+    background-color: rgba(240, 240, 240, 0.75);
+    box-shadow: 0 4px 20px 2px rgba(0, 0, 0, 0.15); }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-head {
+    border-color: #909090; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-head {
+    border-color: #909090; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-widget .dashbrd-grid-widget-content {
+    border-color: #909090; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-content .dashbrd-grid-iterator-placeholder > div {
+    border-color: #909090; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+    border: 1px solid #8b8b8b;
+    border-top: 0; }
 .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder {
-  border-color: #f0f0f0 !important;
-  background-color: #f0f0f0 !important;
   position: absolute;
   z-index: 999; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
-  background: url(../img/icon-sprite.svg) no-repeat -345px -888px; }
-.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-draggable {
-  border-color: #383838 !important;
-  border-bottom-color: #353535 !important;
-  -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  z-index: 1000; }
+  .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-widget-placeholder > div {
+    position: absolute;
+    top: .25rem;
+    left: .25rem;
+    right: .25rem;
+    bottom: .25rem;
+    background-color: #f0f0f0 !important; }
 
 @-webkit-keyframes zoom-in-out {
   0% {
@@ -4343,7 +4408,7 @@ tr.cursor-move td * {
 .cursor-pointer {
   cursor: pointer; }
 
-.list-table.compact-view .action-container .link-action, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.list-table .action-container .label, .dashbrd-grid-widget-head h4, .dashbrd-grid-iterator-head h4, .menu-popup .menu-popup-item, .menu-popup h3, .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -5053,7 +5118,7 @@ ul.checkbox-list.col-3 > li {
   background-position: -524px -245px; }
 
 .icon-description {
-  margin-left: 5px; }
+  margin: 0 0 0 5px; }
   .icon-description::after {
     content: '?';
     color: #fff; }
@@ -5219,6 +5284,13 @@ table.preprocessing-test-results .rel-container {
   /* for IE11 only. Fixed cell height if table has 100% height */
   .host-avail-widget td {
     height: 100%; } }
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-new-box,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-position,
 .dashbrd-grid-new-widget-placeholder .dashbrd-grid-widget-set-size {
@@ -5233,6 +5305,9 @@ table.preprocessing-test-results .rel-container {
 
 .dashbrd-grid-widget-set-size .dashbrd-grid-new-widget-label::before {
   background: url(../img/icon-sprite.svg) no-repeat -401px -888px; }
+
+.dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-resizable-resizing .dashbrd-grid-iterator-mask, .dashbrd-grid-container.dashbrd-mode-edit .dashbrd-grid-iterator.ui-draggable-dragging .dashbrd-grid-iterator-mask {
+  border: none; }
 
 .icon-maint {
   margin: 0 18px 0 0; }
