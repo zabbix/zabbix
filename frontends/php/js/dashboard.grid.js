@@ -1590,27 +1590,20 @@
 	}
 
 	function showPreloader(widget) {
-		if (typeof widget['preloader_div'] === 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].addClass('iterator-loading');
-			}
-
-			widget['preloader_div'] = $('<div>')
-				.addClass('preloader-container')
-				.append($('<div>').addClass('preloader'));
-
-			widget['div'].append(widget['preloader_div']);
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').addClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').addClass('is-loading');
 		}
 	}
 
 	function hidePreloader(widget) {
-		if (typeof widget['preloader_div'] !== 'undefined') {
-			if (widget['iterator']) {
-				widget['div'].removeClass('iterator-loading');
-			}
-
-			widget['preloader_div'].remove();
-			delete widget['preloader_div'];
+		if (widget['iterator']) {
+			widget['div'].find('.dashbrd-grid-iterator-content').removeClass('is-loading');
+		}
+		else {
+			widget['div'].find('.dashbrd-grid-widget-content').removeClass('is-loading');
 		}
 	}
 
