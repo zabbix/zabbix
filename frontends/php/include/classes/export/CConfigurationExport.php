@@ -1114,7 +1114,7 @@ class CConfigurationExport {
 				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type',
 				'exec_path', 'exec_params', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
 				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
-				'description'
+				'description', 'parameters'
 			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true

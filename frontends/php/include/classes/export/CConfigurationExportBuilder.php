@@ -433,7 +433,9 @@ class CConfigurationExportBuilder {
 				'password' => $media_type['passwd'],
 				'content_type' => $media_type['content_type'],
 				'script_name' => $media_type['exec_path'],
-				'parameters' => $media_type['exec_params'],
+				'parameters' => ($media_type['type'] == MEDIA_TYPE_WEBHOOK)
+					? $media_type['parameters']
+					: $media_type['exec_params'],
 				'gsm_modem' => $media_type['gsm_modem'],
 				'status' => $media_type['status'],
 				'max_sessions' => $media_type['maxsessions'],

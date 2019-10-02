@@ -1674,7 +1674,7 @@ class C44XmlValidator {
 			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MEDIA_TYPE_EMAIL, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
+					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
@@ -1687,7 +1687,7 @@ class C44XmlValidator {
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
-					'parameters' =>				['type' => XML_STRING, 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']],
+					'parameters' =>				['type' => 0, 'default' => '', 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
@@ -1920,6 +1920,23 @@ class C44XmlValidator {
 	}
 
 	/**
+	 * Validate media type "parameters" tag.
+	 *
+	 * @param string $data         Import data.
+	 * @param array  $parent_data  Data's parent array.
+	 * @param string $path         XML path.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
+	public function validateMediaTypeParameters($data, array $parent_data, $path) {
+		$rules = $this->getMediaTypeParametersExtendedRules($parent_data);
+
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+	}
+
+	/**
 	 * Transforms tags containing zero into an empty array.
 	 *
 	 * @param mixed $value
@@ -2081,6 +2098,30 @@ class C44XmlValidator {
 	}
 
 	/**
+	 * Get extended validation rules for media type "parameters" tag.
+	 *
+	 * @param array $data  Import data.
+	 *
+	 * @return array
+	 */
+	public function getMediaTypeParametersExtendedRules(array $data) {
+		if ($data['type'] === CXmlConstantValue::MEDIA_TYPE_SCRIPT) {
+			return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
+		}
+
+		if ($data['type'] === CXmlConstantValue::MEDIA_TYPE_WEBHOOK) {
+			return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+				'parameter' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'value' =>					['type' => XML_STRING | XML_REQUIRED]
+				]]
+			]];
+		}
+
+		return ['type' => XML_STRING, 'default' => ''];
+	}
+
+	/**
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
@@ -2197,6 +2238,25 @@ class C44XmlValidator {
 		}
 
 		return is_array($consts[$data['tls_accept']]) ? $consts[$data['tls_accept']] : [$consts[$data['tls_accept']]];
+	}
+
+	/**
+	 * Export transformation for media type "parameters" tag.
+	 *
+	 * @param array $data  Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
+	public function mediaTypeParametersExport(array $data) {
+		if ($data['type'] == CXmlConstantValue::MEDIA_TYPE_SCRIPT) {
+			return $this->scriptParameterExport($data);
+		}
+
+		if ($data['type'] == CXmlConstantValue::MEDIA_TYPE_WEBHOOK) {
+			return $data['parameters'];
+		}
 	}
 
 	/**
