@@ -37,7 +37,7 @@ static void sigbus_handler(int signal)
 	siglongjmp(sigbus_jmp_buf, signal);
 }
 
-static void install_sigbus_handler()
+static void install_sigbus_handler(void)
 {
 	struct sigaction act;
 
@@ -51,7 +51,7 @@ static void install_sigbus_handler()
 	}
 }
 
-static void remove_sigbus_handler()
+static void remove_sigbus_handler(void)
 {
 	struct sigaction act;
 
@@ -134,13 +134,13 @@ static size_t	get_chassis_type(char *buf, int bufsize, int type)
 	return zbx_snprintf(buf, bufsize, " %s", chassis_types[type]);
 }
 
-static int	get_dmi_info(char *buf, int bufsize, int flags)
+static int	get_dmi_info(char *buf, int bufsize, volatile int flags)
 {
-	int		ret = SYSINFO_RET_FAIL, fd, offset = 0;
-	unsigned char	*smbuf = NULL, *data;
-	size_t		len, page, page_offset;
-	void		*mmp = NULL;
-	static long	pagesize = 0;
+	volatile int		ret = SYSINFO_RET_FAIL, fd, offset = 0;
+	unsigned char	*volatile smbuf = NULL, *data;
+	void		*volatile mmp = NULL;
+	volatile size_t	len, page, page_offset;
+	static size_t	pagesize = 0;
 	static int	smbios_status = SMBIOS_STATUS_UNKNOWN;
 	static size_t	smbios_len, smbios;	/* length and address of SMBIOS table (if found) */
 
@@ -167,7 +167,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 	else if (-1 != (fd = open(DEV_MEM, O_RDONLY)))
 	{
 		if (SMBIOS_STATUS_UNKNOWN == smbios_status &&	/* look for SMBIOS table only once */
-			-1 != (pagesize = sysconf(_SC_PAGESIZE)))
+			(size_t)-1 != (pagesize = sysconf(_SC_PAGESIZE)))
 		{
 			/* on some platforms mmap() result does not indicate that address is not available, */
 			/* but then SIGBUS is raised accessing the memory */
@@ -188,7 +188,7 @@ static int	get_dmi_info(char *buf, int bufsize, int flags)
 
 				for(page_offset = 0; page_offset < pagesize; page_offset += 16)
 				{
-					data = (char *)mmp + page_offset;
+					data = (unsigned char *)mmp + page_offset;
 
 					if (0 == strncmp((char *)data, "_DMI_", 5))	/* entry point found */
 					{
