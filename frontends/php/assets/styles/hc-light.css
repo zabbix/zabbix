@@ -4206,90 +4206,7 @@ a.link-action {
   .input-color-picker input[type="text"] {
     padding-left: 25px; }
 
-.in-progress {
-  position: relative; }
-  .in-progress img {
-    user-select: none;
-    -ms-user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none; }
-  .in-progress:before {
-    z-index: 3;
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(255, 255, 255, 0.6);
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    animation: fadein 2s ease-in 0.5s normal forwards; }
-  .in-progress.delayed-15s:before {
-    animation-delay: 15s; }
-  .in-progress:after {
-    z-index: 3;
-    content: '';
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    margin: -12px 0 0 -12px;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ccd5d9;
-    border-bottom: 2px solid #0275b8;
-    opacity: 0;
-    animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear; }
-  .in-progress.delayed-15s:after {
-    animation-delay: 15s; }
-
-.preloader-container {
-  z-index: 10;
-  padding: 7px;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  top: 50%;
-  left: 0;
-  right: 0;
-  margin: auto;
-  position: absolute;
-  background-color: rgba(255, 255, 255, 0.8);
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%); }
-  .preloader-container.menu-popup-preloader {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-    -webkit-transform: none;
-    -moz-transform: none;
-    -ms-transform: none;
-    transform: none;
-    background: #fff;
-    border: 1px solid #383838;
-    height: 120px;
-    width: 120px;
-    position: fixed;
-    right: auto;
-    bottom: auto;
-    display: flex;
-    align-items: center;
-    margin: 0;
-    z-index: 1010; }
-
-.preloader {
+.is-loading::after {
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
@@ -4299,10 +4216,81 @@ a.link-action {
   background-color: rgba(255, 255, 255, 0.8);
   width: 20px;
   height: 20px;
-  margin: 0 auto;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   border: 2px solid #ccd5d9;
   border-bottom: 2px solid #0275b8;
-  animation: load 0.6s infinite linear; }
+  animation: load 0.6s infinite linear;
+  z-index: 1;
+  content: ''; }
+
+.is-loading::before {
+  background-color: rgba(255, 255, 255, 0.8);
+  content: 'loading';
+  /* For screen-reader */
+  text-indent: 200%;
+  /* For screen-reader, for IE 200% instead of 100% */
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1; }
+
+.is-loading {
+  pointer-events: none; }
+
+.is-loading.is-loading-fadein:before {
+  opacity: 0;
+  animation: fadein 2s ease-in 0.5s normal forwards; }
+.is-loading.is-loading-fadein:after {
+  opacity: 0;
+  animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear; }
+
+.is-loading.is-loading-fadein.delayed-15s:before {
+  animation-delay: 15s; }
+.is-loading.is-loading-fadein.delayed-15s:after {
+  animation-delay: 15s; }
+
+.overlay-dialogue.modal .overlay-dialogue-body.is-loading {
+  position: relative;
+  overflow: hidden; }
+
+.dashbrd-grid-widget-content.is-loading::before,
+.dashbrd-grid-iterator-content.is-loading::before {
+  top: .25rem;
+  bottom: .25rem;
+  left: .25rem;
+  right: .25rem;
+  margin: 1px; }
+
+.menu-popup-preloader {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+  -webkit-transform: none;
+  -moz-transform: none;
+  -ms-transform: none;
+  transform: none;
+  background: #fff;
+  border: 1px solid #383838;
+  height: 120px;
+  width: 120px;
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  z-index: 1010; }
 
 @keyframes load {
   to {
