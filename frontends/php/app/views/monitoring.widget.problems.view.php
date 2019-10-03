@@ -155,7 +155,6 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
 
 		// operational data
-		$opdata = null;
 		if ($trigger['opdata'] === '') {
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
 				$opdata = (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
