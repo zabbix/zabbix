@@ -2118,7 +2118,7 @@ class C44XmlValidator {
 				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 					'parameter' => ['type' => XML_ARRAY, 'rules' => [
 						'name' => ['type' => XML_STRING | XML_REQUIRED],
-						'value' => ['type' => XML_STRING | XML_REQUIRED]
+						'value' => ['type' => XML_STRING, 'default' => '']
 					]]
 				]];
 
