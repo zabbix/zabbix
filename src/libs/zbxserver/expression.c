@@ -3379,6 +3379,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, &replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
+				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
@@ -3503,6 +3518,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
+				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
 			{
@@ -3577,6 +3607,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
@@ -3699,6 +3744,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
+				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
 					EVENT_OBJECT_LLDRULE == c_event->object)
@@ -3811,6 +3871,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->sendto);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->subject);
+				}
+				else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
+				{
+					if (NULL != alert)
+						replace_to = zbx_strdup(replace_to, alert->message);
 				}
 			}
 		}
