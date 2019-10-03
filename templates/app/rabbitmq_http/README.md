@@ -45,7 +45,6 @@ No specific Zabbix configuration is required.
 |{$RABBITMQ.API.PORT}|<p>The port of RabbitMQ API endpoint</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 |{$RABBITMQ.API.USER}|<p>-</p>|`zbx_monitor`|
-|{$RABBITMQ.CONN.MAX.WARN}|<p>Maximum RabbitMQ connections for trigger expression</p>|`1000`|
 |{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}|<p>Filter of discoverable exchanges</p>|`.*`|
 |{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}|<p>Filter to exclude discovered exchanges</p>|`CHANGE_IF_NEEDED`|
 
@@ -84,9 +83,9 @@ There are no template links in this template.
 |RabbitMQ|RabbitMQ: Messages publish_out|<p>Count of messages published from this overview into queues</p>|DEPENDENT|rabbitmq.overview.messages.publish_out<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.publish_out`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Messages publish_out per second|<p>Rate of messages published from this overview into queues per second,0,rabbitmq,total msgs pub out rate</p>|DEPENDENT|rabbitmq.overview.messages.publish_out.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.publish_out_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Messages returned unroutable|<p>Count of messages returned to publisher as unroutable</p>|DEPENDENT|rabbitmq.overview.messages.return_unroutable<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.return_unroutable`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
-|RabbitMQ|RabbitMQ: Messages returned unroutable|<p>Rate of messages returned to publisher as unroutable per second</p>|DEPENDENT|rabbitmq.overview.messages.return_unroutable.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.return_unroutable_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
-|RabbitMQ|RabbitMQ: Messages returned unroutable|<p>Count of subset of messages in deliver_get which had the redelivered flag set</p>|DEPENDENT|rabbitmq.overview.messages.redeliver<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
-|RabbitMQ|RabbitMQ: Messages returned unroutable|<p>Rate of subset of messages in deliver_get which had the redelivered flag set per second</p>|DEPENDENT|rabbitmq.overview.messages.redeliver.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
+|RabbitMQ|RabbitMQ: Messages returned unroutable per second|<p>Rate of messages returned to publisher as unroutable per second</p>|DEPENDENT|rabbitmq.overview.messages.return_unroutable.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.return_unroutable_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
+|RabbitMQ|RabbitMQ: Messages returned redeliver|<p>Count of subset of messages in deliver_get which had the redelivered flag set</p>|DEPENDENT|rabbitmq.overview.messages.redeliver<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
+|RabbitMQ|RabbitMQ: Messages returned redeliver per second|<p>Rate of subset of messages in deliver_get which had the redelivered flag set per second</p>|DEPENDENT|rabbitmq.overview.messages.redeliver.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.message_stats.redeliver_details.rate`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged|<p>Number of messages delivered to clients and acknowledged</p>|DEPENDENT|rabbitmq.exchange.messages.ack["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages acknowledged per second|<p>Rate of messages delivered to clients and acknowledged per second</p>|DEPENDENT|rabbitmq.exchange.messages.ack.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.ack_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages confirmed|<p>Count of messages confirmed</p>|DEPENDENT|rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#EXCHANGE}" && @.vhost == "{#VHOST}" && @.type =="{#TYPE}")].message_stats.confirm.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
@@ -110,8 +109,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Total number of connections is too high (over {$RABBITMQ.CONN.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:rabbitmq.overview.object_totals.connections.min(5m)}>{$RABBITMQ.CONN.MAX.WARN}`|WARNING||
-|RabbitMQ: Failed to fetch overview data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:rabbitmq.get_overview.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p>|
+|RabbitMQ: Failed to fetch overview data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes</p>|`{TEMPLATE_NAME:rabbitmq.get_overview.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p>|
 
 ## Feedback
 
@@ -187,8 +185,8 @@ There are no template links in this template.
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
 |RabbitMQ|RabbitMQ: Healthcheck|<p>Runs basic healthchecks in the current node. Checks that the rabbit application is running, channels and queues can be listed successfully, and that no alarms are in effect.</p>|HTTP_AGENT|rabbitmq.healthcheck<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p><p>- BOOL_TO_DECIMAL|
-|RabbitMQ|RabbitMQ: Management version|<p>Version of the management plugin in use</p>|DEPENDENT|rabbitmq.overview.management_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
-|RabbitMQ|RabbitMQ: Rabbitmq version|<p>Version of RabbitMQ on the node which processed this request</p>|DEPENDENT|rabbitmq.overview.rabbitmq_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.rabbitmq_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
+|RabbitMQ|RabbitMQ: Management plugin version|<p>Version of the management plugin in use</p>|DEPENDENT|rabbitmq.node.overview.management_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.management_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
+|RabbitMQ|RabbitMQ: RabbitMQ version|<p>Version of RabbitMQ on the node which processed this request</p>|DEPENDENT|rabbitmq.node.overview.rabbitmq_version<p>**Preprocessing**:</p><p>- JSONPATH: `$.rabbitmq_version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
 |RabbitMQ|RabbitMQ: Used file descriptors|<p>Used file descriptors</p>|DEPENDENT|rabbitmq.node.fd_used<p>**Preprocessing**:</p><p>- JSONPATH: `$.fd_used`</p>|
 |RabbitMQ|RabbitMQ: Free disk space|<p>Current free disk space</p>|DEPENDENT|rabbitmq.node.disk_free<p>**Preprocessing**:</p><p>- JSONPATH: `$.disk_free`</p>|
 |RabbitMQ|RabbitMQ: Disk free limit|<p>Disk free space limit in bytes</p>|DEPENDENT|rabbitmq.node.disk_free_limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.disk_free_limit`</p>|
@@ -222,7 +220,7 @@ There are no template links in this template.
 |RabbitMQ|RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages published per second|<p>Rate per second of messages published</p>|DEPENDENT|rabbitmq.queue.messages.publish.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.publish_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered|<p>Count of subset of messages in deliver_get which had the redelivered flag set</p>|DEPENDENT|rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
 |RabbitMQ|RabbitMQ: Queue {#VHOST}/{#QUEUE}: Messages redelivered per second|<p>Rate per second of subset of messages in deliver_get which had the redelivered flag set</p>|DEPENDENT|rabbitmq.queue.messages.redeliver.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].message_stats.redeliver_details.rate.first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p>|
-|Zabbix_raw_items|RabbitMQ: Get overview|<p>The HTTP API endpoint that returns cluster-wide metrics</p>|HTTP_AGENT|rabbitmq.get_overview|
+|Zabbix_raw_items|RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics</p>|HTTP_AGENT|rabbitmq.get_node_overview|
 |Zabbix_raw_items|RabbitMQ: Get nodes|<p>The HTTP API endpoint that returns nodes metrics</p>|HTTP_AGENT|rabbitmq.get_nodes|
 |Zabbix_raw_items|RabbitMQ: Get queues|<p>The HTTP API endpoint that returns queues metrics</p>|HTTP_AGENT|rabbitmq.get_queues|
 
@@ -230,17 +228,17 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|RabbitMQ: Node healthcheck failed|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/monitoring.html#health-checks</p>|`{TEMPLATE_NAME:rabbitmq.healthcheck.last(0)}=0`|AVERAGE||
-|RabbitMQ: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>RabbitMQ version has changed. Ack to close.</p>|`{TEMPLATE_NAME:rabbitmq.overview.rabbitmq_version.diff()}=1 and {TEMPLATE_NAME:rabbitmq.overview.rabbitmq_version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
-|RabbitMQ: Number of network partitions is too high (more than 0 for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:rabbitmq.node.partitions.min(5m)}>0`|WARNING||
+|RabbitMQ: Node healthcheck failed|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/monitoring.html#health-checks</p>|`{TEMPLATE_NAME:rabbitmq.healthcheck.last()}=0`|AVERAGE||
+|RabbitMQ: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>RabbitMQ version has changed. Ack to close.</p>|`{TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.diff()}=1 and {TEMPLATE_NAME:rabbitmq.node.overview.rabbitmq_version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|RabbitMQ: Number of network partitions is too high (more than 0 for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/partitions.html#detecting</p>|`{TEMPLATE_NAME:rabbitmq.node.partitions.min(5m)}>0`|WARNING||
 |RabbitMQ: Node is not running|<p>Last value: {ITEM.LASTVALUE1}.</p><p>RabbitMQ node is not running</p>|`{TEMPLATE_NAME:rabbitmq.node.running.max(5m)}=0`|AVERAGE|<p>**Depends on**:</p><p>- RabbitMQ: Service is down</p>|
-|RabbitMQ: Memory alarm (Memory usage threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/memory.html</p>|`{TEMPLATE_NAME:rabbitmq.node.mem_alarm.last(0)}=1`|AVERAGE||
-|RabbitMQ: Free disk space alarm (Free space threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/disk-alarms.html</p>|`{TEMPLATE_NAME:rabbitmq.node.disk_free_alarm.last(0)}=1`|AVERAGE||
+|RabbitMQ: Memory alarm (Memory usage threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/memory.html</p>|`{TEMPLATE_NAME:rabbitmq.node.mem_alarm.last()}=1`|AVERAGE||
+|RabbitMQ: Free disk space alarm (Free space threshold has been reached)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>https://www.rabbitmq.com/disk-alarms.html</p>|`{TEMPLATE_NAME:rabbitmq.node.disk_free_alarm.last()}=1`|AVERAGE||
 |RabbitMQ: has been restarted (uptime < 10m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The RabbitMQ uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:rabbitmq.node.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
 |RabbitMQ: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
 |RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$RABBITMQ.API.PORT}"].min(5m)}>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p>|
 |RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"].min(5m)}>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|WARNING||
-|RabbitMQ: Failed to fetch overview data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:rabbitmq.get_overview.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p>|
+|RabbitMQ: Failed to fetch nodes data (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:rabbitmq.get_nodes.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Service is down</p>|
 
 ## Feedback
 
