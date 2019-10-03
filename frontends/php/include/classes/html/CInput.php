@@ -21,6 +21,13 @@
 
 class CInput extends CTag {
 
+	/**
+	 * Enabled or disabled state of input field.
+	 *
+	 * @var bool
+	 */
+	protected $enabled = true;
+
 	public function __construct($type = 'text', $name = 'textbox', $value = '') {
 		parent::__construct('input');
 		$this->setType($type);
@@ -55,12 +62,15 @@ class CInput extends CTag {
 	 * @param bool $value
 	 */
 	public function setEnabled($value) {
+		$this->enabled = $value;
+
 		if ($value) {
 			$this->removeAttribute('disabled');
 		}
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+
 		return $this;
 	}
 }

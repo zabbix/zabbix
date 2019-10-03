@@ -134,14 +134,13 @@ class CMenuPopupHelper {
 	 * Prepare data for Ajax trigger menu popup.
 	 *
 	 * @param string $triggerid
-	 * @param string $eventid                 (optional) Mandatory for Acknowledge and Description menus.
+	 * @param string $eventid                 (optional) Mandatory for Acknowledge menu.
 	 * @param array  $acknowledge             Acknowledge link parameters (optional).
 	 * @param string $acknowledge['backurl']
-	 * @param bool   $show_description
 	 *
 	 * @return array
 	 */
-	public static function getTrigger($triggerid, $eventid = 0, array $acknowledge = [], $show_description = true) {
+	public static function getTrigger($triggerid, $eventid = 0, array $acknowledge = []) {
 		$data = [
 			'type' => 'trigger',
 			'data' => [
@@ -155,10 +154,6 @@ class CMenuPopupHelper {
 
 		if ($acknowledge) {
 			$data['data']['acknowledge'] = $acknowledge;
-		}
-
-		if ($show_description === false) {
-			$data['data']['show_description'] = '0';
 		}
 
 		return $data;

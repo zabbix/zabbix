@@ -570,7 +570,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * Get menu popup trigger section data.
  *
  * @param {string} options['triggerid']               Trigger ID.
- * @param {string} options['eventid']                 (optional) Required for Acknowledge and Description sections.
+ * @param {string} options['eventid']                 (optional) Required for Acknowledge section.
  * @param {object} options['items']                   Link to trigger item history page (optional).
  * @param {string} options['items'][]['name']         Item name.
  * @param {object} options['items'][]['params']       Item URL parameters ("name" => "value").
@@ -578,8 +578,6 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {string} options['acknowledge']['backurl']  Return URL.
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
- * @param {bool}   options['show_description']        Show Description item in context menu. Default: true.
- * @param {bool}   options['description_enabled']     Show Description item enabled. Default: true.
  * @param {string} options['url']                     Trigger URL link (optional).
  * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
  *
@@ -620,31 +618,6 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			label: t('Acknowledge'),
 			url: url.getUrl()
 		};
-	}
-
-	// description
-	if (typeof options.show_description === 'undefined' || options.show_description !== false) {
-		var trigger_descr = {
-			label: t('Description')
-		};
-
-		if (typeof options.description_enabled === 'undefined' || options.description_enabled !== false) {
-			trigger_descr.clickCallback = function() {
-				var	popup_options = {triggerid: options.triggerid};
-
-				if (typeof options.eventid !== 'undefined') {
-					popup_options.eventid = options.eventid;
-				}
-
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-				return PopUp('popup.trigdesc.view', popup_options, null, trigger_elmnt);
-			}
-		}
-		else {
-			trigger_descr.disabled = true;
-		}
-		items[items.length] = trigger_descr;
 	}
 
 	// configuration

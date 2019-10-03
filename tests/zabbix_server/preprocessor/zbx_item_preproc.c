@@ -78,6 +78,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_PROMETHEUS_PATTERN;
 	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_TO_JSON"))
 		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
+	if (0 == strcmp(str, "ZBX_PREPROC_CSV_TO_JSON"))
+		return ZBX_PREPROC_CSV_TO_JSON;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;

@@ -637,8 +637,8 @@ class CHistoryManager {
 
 				if ($function == GRAPH_AGGREGATE_FIRST || $function == GRAPH_AGGREGATE_LAST) {
 					$sql = 'SELECT DISTINCT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
-						' FROM '.$sql_from.' AS h'.
-						' JOIN('.$sql.') AS hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
+						' FROM '.$sql_from.' h'.
+						' JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
 				}
 
 				$sql_result = DBselect($sql);

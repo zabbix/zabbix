@@ -506,7 +506,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'checkbox' => true,
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => 'New test {#MACRO}',
-					'template' => 'Template OS Windows',
+					'template' => 'Template OS Windows by Zabbix agent',
 					'inventory' => 'Automatic'
 				]
 			],

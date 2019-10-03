@@ -21,7 +21,7 @@
 define('ZABBIX_VERSION',		'4.4.0rc1');
 define('ZABBIX_API_VERSION',	'4.4.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030053);
+define('ZABBIX_DB_VERSION',		4030055);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -556,12 +556,16 @@ define('ZBX_PREPROC_THROTTLE_TIMED_VALUE',	20);
 define('ZBX_PREPROC_SCRIPT',				21);
 define('ZBX_PREPROC_PROMETHEUS_PATTERN',	22);
 define('ZBX_PREPROC_PROMETHEUS_TO_JSON',	23);
+define('ZBX_PREPROC_CSV_TO_JSON',			24);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
 define('ZBX_PREPROC_FAIL_DISCARD_VALUE',	1);
 define('ZBX_PREPROC_FAIL_SET_VALUE',		2);
 define('ZBX_PREPROC_FAIL_SET_ERROR',		3);
+
+define('ZBX_PREPROC_CSV_NO_HEADER',	0);
+define('ZBX_PREPROC_CSV_HEADER',	1);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -1284,7 +1288,7 @@ define('API_ALLOW_USER_MACRO',			0x0020);
 define('API_ALLOW_COUNT',				0x0040);
 define('API_ALLOW_LLD_MACRO',			0x0080);
 define('API_REQUIRED_LLD_MACRO',		0x0100);
-define('API_TIME_UNIT_WITH_YEAR',	0x0200);
+define('API_TIME_UNIT_WITH_YEAR',		0x0200);
 define('API_ALLOW_EVENT_TAGS_MACRO',	0x0400);
 
 // JSON error codes.
@@ -1614,6 +1618,7 @@ define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
+define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
 define('ZBX_STYLE_ICON_INFO', 'icon-info');
 define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');

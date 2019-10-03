@@ -1050,6 +1050,123 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Only one Prometheus step is allowed.'
+			],
+			'Test empty preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => '',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			'Test invalid (null) preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => null,
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			'Test invalid (false) preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => false,
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": cannot be empty.'
+			],
+			'Test invalid (array) preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => [],
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			'Test invalid (too many) preprocessing parameters for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\n\n\n",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+			'Test missing third preprocessing parameter for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\n",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": third parameter is expected.'
+			],
+			'Test first preprocessing parameter (too long) for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "xx\n\n1",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": value of first parameter is too long.'
+			],
+			'Test second preprocessing parameter (too long) for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => ",\nyy\n1",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": value of second parameter is too long.'
+			],
+			'Test third preprocessing parameter (incorrect value) for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\n\n",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "params": value of third parameter must be one of '.ZBX_PREPROC_CSV_NO_HEADER.', '.ZBX_PREPROC_CSV_HEADER.'.'
 			]
 		];
 	}
@@ -1266,6 +1383,58 @@ class testDiscoveryRule extends CAPITest {
 			'Test valid empty preprocessing' => [
 				'discoveryrule' => [
 					'preprocessing' => []
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_CSV_TO_JSON having empty first two parameters' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\n\n1",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_CSV_TO_JSON having empty first parameter' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\ny\n1",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_CSV_TO_JSON having empty second parameter' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "x\n\n1",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_CSV_TO_JSON having all parameters' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => ",\n\"\n0",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
 				],
 				'expected_error' => null
 			]

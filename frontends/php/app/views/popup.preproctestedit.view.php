@@ -64,9 +64,16 @@ $result_table = (new CTable())
 foreach ($data['steps'] as $i => $step) {
 	$form
 		->addVar('steps['.$i.'][type]', $step['type'])
-		->addVar('steps['.$i.'][params]', $step['params'])
 		->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
 		->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
+
+	// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
+	if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+		$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
+	}
+	else {
+		$form->addVar('steps['.$i.'][params]', $step['params']);
+	}
 
 	$result_table->addRow([
 		$step['num'].':',

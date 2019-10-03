@@ -263,9 +263,9 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
 
-		$this->zbxTestTextPresent('Template OS Linux');
+		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
 		$this->zbxTestClick('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -278,7 +278,7 @@ class testFormHost extends CLegacyWebTest {
 	public function testFormHost_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
-		$template = 'Template OS Linux';
+		$template = 'Template OS Linux by Zabbix agent';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -327,9 +327,9 @@ class testFormHost extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 		$this->zbxTestLaunchOverlayDialog('Templates');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->zbxTestClickLinkTextWait('Template OS Linux');
+		$this->zbxTestClickLinkTextWait('Template OS Linux by Zabbix agent');
 
-		$this->zbxTestTextPresent('Template OS Linux');
+		$this->zbxTestTextPresent('Template OS Linux by Zabbix agent');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -342,7 +342,7 @@ class testFormHost extends CLegacyWebTest {
 	public function testFormHost_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
-		$template = 'Template OS Linux';
+		$template = 'Template OS Linux by Zabbix agent';
 		$host = 'Template linkage test host';
 
 		$sql = 'select hostid from hosts where host='.zbx_dbstr($host).' and status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';

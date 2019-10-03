@@ -158,6 +158,7 @@ tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxdbcache/is_item_processed_by_server
+tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
