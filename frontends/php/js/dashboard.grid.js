@@ -1608,7 +1608,7 @@
 	}
 
 	function startPreloader(widget) {
-		if (typeof widget['preloader_timeoutid'] !== 'undefined' || typeof widget['preloader_div'] !== 'undefined') {
+		if (typeof widget['preloader_timeoutid'] !== 'undefined' || widget['div'].find('.is-loading').length) {
 			return;
 		}
 
