@@ -102,8 +102,8 @@ jQuery(function($) {
 		 */
 		resize: function() {
 			return this.each(function() {
-				var $obj = $(this);
-				var ms = $(this).data('multiSelect');
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
 
 				resizeAllSelectedTexts($obj, ms.options, ms.values);
 			});
@@ -118,8 +118,8 @@ jQuery(function($) {
 		 */
 		addData: function(item) {
 			return this.each(function() {
-				var $obj = $(this);
-				var ms = $(this).data('multiSelect');
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
@@ -140,8 +140,8 @@ jQuery(function($) {
 		 */
 		clean: function() {
 			return this.each(function() {
-				var $obj = $(this);
-				var ms = $(this).data('multiSelect');
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
 
 				for (var id in ms.values.selected) {
 					removeSelected(id, $obj, ms.values, ms.options);
@@ -159,8 +159,8 @@ jQuery(function($) {
 		disable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
-					ms = $obj.data('multiSelect');
+					ms = $obj.data('multiSelect'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS);
 
 				if (ms.options.disabled === false) {
 					$obj.attr('aria-disabled', true);
@@ -183,8 +183,8 @@ jQuery(function($) {
 		enable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS),
-					ms = $(this).data('multiSelect');
+					ms = $obj.data('multiSelect'),
+					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS);
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
