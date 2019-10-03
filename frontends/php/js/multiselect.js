@@ -197,7 +197,6 @@ jQuery(function($) {
 						setSearchFieldVisibility(false, $obj, ms.options);
 					}
 
-					ms.values.isAvailableOpened = true;
 					ms.options.disabled = false;
 				}
 			});
@@ -276,7 +275,6 @@ jQuery(function($) {
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
-					isAvailableOpened: false,
 					selected: {},
 					available: {}
 				}
@@ -364,7 +362,7 @@ jQuery(function($) {
 		$obj.append($available)
 			.focusout(function() {
 				setTimeout(function() {
-					if (!values.isAvailableOpened && $('.available', $obj).is(':visible')) {
+					if ($available.is(':visible') && !$available.is(':hover')) {
 						hideAvailable($obj);
 					}
 				}, 200);
@@ -716,13 +714,7 @@ jQuery(function($) {
 				.append($('<ul>', {
 					'class': 'multiselect-suggest',
 					'aria-hidden': true
-				}))
-				.mouseenter(function() {
-					values.isAvailableOpened = true;
-				})
-				.mouseleave(function() {
-					values.isAvailableOpened = false;
-				});
+				}));
 
 			$.each(data, function (i, item) {
 				if (typeof values.available[item.id] !== 'undefined') {
