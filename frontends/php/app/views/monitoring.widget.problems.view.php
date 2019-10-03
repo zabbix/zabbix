@@ -176,7 +176,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			);
 
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
-				$opdata = (new CCol())
+				$opdata = (new CCol($opdata))
 					->addClass('opdata')
 					->addClass(ZBX_STYLE_WORDWRAP);
 			}
@@ -238,28 +238,6 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				->addClass(ZBX_STYLE_RIGHT)
 		];
 	}
-
-//	// operational data
-//	$opdata = null;
-//	if ($data['fields']['show_opdata']) {
-//		$opdata = ($trigger['opdata'] !== '')
-//			? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-//				[
-//					'triggerid' => $trigger['triggerid'],
-//					'expression' => $trigger['expression'],
-//					'opdata' => $trigger['opdata'],
-//					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-//					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-//				],
-//				[
-//					'events' => true,
-//					'html' => true
-//				]
-//			)))
-//				->addClass('opdata')
-//				->addClass(ZBX_STYLE_WORDWRAP)
-//			: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
-//	}
 
 	// Create acknowledge url.
 	$problem_update_url = (new CUrl('zabbix.php'))
