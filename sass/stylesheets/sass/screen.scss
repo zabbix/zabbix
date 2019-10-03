@@ -6194,6 +6194,11 @@ a.overlay-close-btn {
 	align-items: center;
 	margin: 0;
 	z-index: 1010;
+	padding: 7px;
+}
+
+.is-loading.menu-popup-preloader::before {
+	background: $action-preloader-bg-color;
 }
 
 @keyframes load {
