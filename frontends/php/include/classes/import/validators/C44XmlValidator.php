@@ -2109,14 +2109,11 @@ class C44XmlValidator {
 	public function getMediaTypeParametersExtendedRules(array $data) {
 		switch ($data['type']) {
 			case CXmlConstantName::SCRIPT:
-				return [
-					'type' => XML_STRING,
-					'default' => '',
-					'preprocessor' => [$this, 'scriptParameterPreprocessor'],
-					'export' => [$this, 'scriptParameterExport']
-				];
+			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
+				return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
 
 			case CXmlConstantName::WEBHOOK:
+			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
 				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 					'parameter' => ['type' => XML_ARRAY, 'rules' => [
 						'name' => ['type' => XML_STRING | XML_REQUIRED],
