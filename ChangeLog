@@ -730,6 +730,7 @@ Changes for 4.0.14rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-15897] fixed overall health check in Template HP iLO SNMPv2 (vitaly)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.13
