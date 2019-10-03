@@ -58,7 +58,7 @@ class CControllerProblemView extends CController {
 			'filter_show_timeline' =>	'in 1',
 			'filter_details' =>			'in 1',
 			'filter_highlight_row' =>	'in 1',
-			'filter_show_opdata' =>		'in 1',
+			'filter_show_opdata' =>		'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
 			'filter_tag_name_format' =>	'in '.PROBLEMS_TAG_NAME_FULL.','.PROBLEMS_TAG_NAME_SHORTENED.','.PROBLEMS_TAG_NAME_NONE,
 			'filter_tag_priority' =>	'string',
 			'from' =>					'range_time',

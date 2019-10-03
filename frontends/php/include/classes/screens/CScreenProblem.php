@@ -335,7 +335,9 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$show_opdata = (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1);
+					$show_opdata = (array_key_exists('show_opdata', $filter)
+							&& $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE);
+
 					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
 
 					if ($show_opdata) {
@@ -598,7 +600,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		// resolve macros
-		if ($filter['details'] == 1 || $filter['show_opdata'] == 1) {
+		if ($filter['details'] == 1 || $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
@@ -613,7 +615,7 @@ class CScreenProblem extends CScreenBase {
 			]);
 
 			// Sort items.
-			if ($filter['show_opdata'] == 1) {
+			if ($filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
 
 				foreach ($data['triggers'] as &$trigger) {
@@ -813,7 +815,10 @@ class CScreenProblem extends CScreenBase {
 			$triggers_hosts = getTriggersHostsList($data['triggers']);
 		}
 
-		$show_opdata = ($this->data['filter']['show_opdata'] && !$this->data['filter']['compact_view']);
+
+		$show_opdata = $this->data['filter']['compact_view']
+			? OPERATIONAL_DATA_SHOW_NONE
+			: $this->data['filter']['show_opdata'];
 
 		if ($this->data['action'] === 'problem.view') {
 			$url_form = clone $url;
@@ -921,7 +926,9 @@ class CScreenProblem extends CScreenBase {
 						_('Info'),
 						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
 						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-						$this->data['filter']['show_opdata'] ? _('Operational data') : null,
+						($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
+							? _('Operational data')
+							: null,
 						_('Duration'),
 						_('Ack'),
 						_('Actions'),
@@ -1049,6 +1056,40 @@ class CScreenProblem extends CScreenBase {
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
+
+				$opdata = null;
+				if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+
+					if ($trigger['opdata'] === '') {
+						if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+							$opdata = (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
+						}
+					}
+					else {
+						$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
+							[
+								'triggerid' => $trigger['triggerid'],
+								'expression' => $trigger['expression'],
+								'opdata' => $trigger['opdata'],
+								'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+								'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+							],
+							[
+								'events' => true,
+								'html' => true
+							]
+						)))
+							->addClass('opdata')
+							->addClass(ZBX_STYLE_WORDWRAP);
+
+						if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM) {
+							$description[] = ' (';
+							$description[] = $opdata;
+							$description[] = ')';
+						}
+					}
+				}
+
 				$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
 				if ($this->data['filter']['details'] == 1) {
@@ -1092,27 +1133,6 @@ class CScreenProblem extends CScreenBase {
 					->addClass($acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT);
 
-				$opdata = null;
-				if ($show_opdata) {
-					$opdata = ($trigger['opdata'] !== '')
-						? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-							[
-								'triggerid' => $trigger['triggerid'],
-								'expression' => $trigger['expression'],
-								'opdata' => $trigger['opdata'],
-								'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-								'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-							],
-							[
-								'events' => true,
-								'html' => true
-							]
-						)))
-							->addClass('opdata')
-							->addClass(ZBX_STYLE_WORDWRAP)
-						: (new CCol(self::getLatestValues($trigger['items'])))->addClass('latest-values');
-				}
-
 				// Add table row.
 				$table->addRow(array_merge($row, [
 					new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']),
@@ -1126,7 +1146,7 @@ class CScreenProblem extends CScreenBase {
 					$this->data['filter']['compact_view']
 						? (new CDiv($description))->addClass('action-container')
 						: $description,
-					$opdata,
+					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 					($problem['r_eventid'] != 0)
 						? zbx_date2age($problem['clock'], $problem['r_clock'])
 						: zbx_date2age($problem['clock']),
@@ -1157,7 +1177,7 @@ class CScreenProblem extends CScreenBase {
 			_('Status'),
 			_('Host'),
 			_('Problem'),
-			$show_opdata ? _('Operational data') : null,
+			($show_opdata != OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
 			_('Ack'),
 			_('Actions'),
@@ -1192,9 +1212,14 @@ class CScreenProblem extends CScreenBase {
 
 			// operational data
 			$opdata = null;
-			if ($show_opdata) {
-				$opdata = ($trigger['opdata'] !== '')
-					? CMacrosResolverHelper::resolveTriggerOpdata(
+			if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+				if ($trigger['opdata'] === '') {
+					if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+						$opdata = self::getLatestValues($trigger['items'], false);
+					}
+				}
+				else {
+					$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
 						[
 							'triggerid' => $trigger['triggerid'],
 							'expression' => $trigger['expression'],
@@ -1203,8 +1228,8 @@ class CScreenProblem extends CScreenBase {
 							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
 						],
 						['events' => true]
-					)
-					: self::getLatestValues($trigger['items'], false);
+					);
+				}
 			}
 
 			$actions_performed = [];
@@ -1227,8 +1252,10 @@ class CScreenProblem extends CScreenBase {
 					: '',
 				$value_str,
 				implode(', ', $hosts),
-				$problem['name'],
-				$opdata,
+				($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '')
+					? $problem['name'].' ('.$opdata.')'
+					: $problem['name'],
+				($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 				($problem['r_eventid'] != 0)
 					? zbx_date2age($problem['clock'], $problem['r_clock'])
 					: zbx_date2age($problem['clock']),
