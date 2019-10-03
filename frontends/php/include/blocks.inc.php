@@ -821,7 +821,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 					],
 					[
 						'events' => true,
-						'html' => $show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY
+						'html' => true
 					]
 				);
 
@@ -848,9 +848,9 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
 			getSeverityCell($problem['severity'], null,
-				$problem['name'].(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
-					? ' ('.$opdata.')'
-					: ''
+				(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
+					? (new CCol([$problem['name'], ' (', $opdata, ')']))
+					: $problem['name']
 				)
 			),
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
