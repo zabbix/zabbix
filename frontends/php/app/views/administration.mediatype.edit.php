@@ -223,12 +223,14 @@ $mediatype_formlist
 	)
 	->addRow(new CLabel(_('Process tags'), 'process_tags'),
 		(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
-			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED),
+			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+			->setUncheckedValue(ZBX_MEDIA_TYPE_TAGS_DISABLED),
 		'row_webhook_tags'
 	)
 	->addRow(new CLabel(_('Include event menu entry'), 'show_event_menu'),
 		(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
-			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW),
+			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setUncheckedValue(ZBX_EVENT_MENU_HIDE),
 		'row_webhook_show_event_menu'
 	)
 	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))->setAsteriskMark(),

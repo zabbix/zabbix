@@ -287,7 +287,7 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 	ptr += zbx_serialize_str(ptr, attempt_interval, attempt_interval_len);
 	ptr += zbx_serialize_value(ptr, content_type);
 	ptr += zbx_serialize_str(ptr, script, script_len);
-	ptr += zbx_serialize_str(ptr, timeout, timeout_len);
+	(void)zbx_serialize_str(ptr, timeout, timeout_len);
 
 	*data_offset += data_len;
 }
@@ -428,7 +428,7 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	zbx_serialize_prepare_value(data_offset, mediatypes_num);
-	ptr += zbx_serialize_value(ptr, mediatypes_num);
+	(void)zbx_serialize_value(ptr, mediatypes_num);
 
 	for (i = 0; i < mediatypes_num; i++)
 	{
@@ -474,7 +474,7 @@ zbx_uint32_t	zbx_alerter_serialize_alerts(unsigned char **data, zbx_am_db_alert_
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	zbx_serialize_prepare_value(data_offset, alerts_num);
-	ptr += zbx_serialize_value(ptr, alerts_num);
+	(void)zbx_serialize_value(ptr, alerts_num);
 
 	for (i = 0; i < alerts_num; i++)
 	{
@@ -556,7 +556,7 @@ zbx_uint32_t	zbx_alerter_serialize_medias(unsigned char **data, zbx_am_media_t *
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	zbx_serialize_prepare_value(data_offset, medias_num);
-	ptr += zbx_serialize_value(ptr, medias_num);
+	(void)zbx_serialize_value(ptr, medias_num);
 
 	for (i = 0; i < medias_num; i++)
 	{
@@ -611,7 +611,7 @@ zbx_uint32_t	zbx_alerter_serialize_results(unsigned char **data, zbx_am_result_t
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	zbx_serialize_prepare_value(data_offset, results_num);
-	ptr += zbx_serialize_value(ptr, results_num);
+	(void)zbx_serialize_value(ptr, results_num);
 
 	for (i = 0; i < results_num; i++)
 	{
@@ -678,7 +678,7 @@ zbx_uint32_t	zbx_alerter_serialize_ids(unsigned char **data, zbx_uint64_t *ids, 
 
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_alloc);
 	zbx_serialize_prepare_value(data_offset, ids_num);
-	ptr += zbx_serialize_value(ptr, ids_num);
+	(void)zbx_serialize_value(ptr, ids_num);
 
 	for (i = 0; i < ids_num; i++)
 	{
