@@ -1847,6 +1847,10 @@ define('PROBLEMS_TAG_NAME_FULL',      0);
 define('PROBLEMS_TAG_NAME_SHORTENED', 1);
 define('PROBLEMS_TAG_NAME_NONE',      2);
 
+define('OPERATIONAL_DATA_SHOW_NONE',         0);
+define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
+define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
+
 // HTTP headers
 /*
  * Value of HTTP X-Frame-options header.
