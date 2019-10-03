@@ -159,16 +159,15 @@ jQuery(function($) {
 		disable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					ms = $obj.data('multiSelect'),
-					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS);
+					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === false) {
 					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
-					$('.multiselect-button > button', $wrapper).prop('disabled', true);
-					$('input[type=text]', $wrapper).remove();
+					$('.multiselect-button > button', $obj).prop('disabled', true);
+					$('input[type=text]', $obj).remove();
 					cleanAvailable($obj, ms.values);
-					$('.available', $wrapper).remove();
+					$('.available', $obj).remove();
 
 					ms.options.disabled = true;
 				}
@@ -183,14 +182,13 @@ jQuery(function($) {
 		enable: function() {
 			return this.each(function() {
 				var $obj = $(this),
-					ms = $obj.data('multiSelect'),
-					$wrapper = $obj.parent('.'+ZBX_STYLE_CLASS);
+					ms = $obj.data('multiSelect');
 
 				if (ms.options.disabled === true) {
 					var $input = makeMultiSelectInput($obj);
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $wrapper).prop('disabled', false);
+					$('.multiselect-button > button', $obj).prop('disabled', false);
 					$obj.append($input);
 					makeSuggsetionsBlock($obj);
 
