@@ -849,7 +849,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			$triggers_hosts[$trigger['triggerid']],
 			getSeverityCell($problem['severity'], null,
 				(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
-					? (new CCol([$problem['name'], ' (', $opdata, ')']))
+					? [$problem['name'], ' (', $opdata, ')']
 					: $problem['name']
 				)
 			),
