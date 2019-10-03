@@ -143,6 +143,7 @@ class CControllerMediatypeUpdate extends CController {
 			case MEDIA_TYPE_WEBHOOK:
 				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
 				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
+				$mediatype['parameters'] = [];
 				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name'
 				]);
