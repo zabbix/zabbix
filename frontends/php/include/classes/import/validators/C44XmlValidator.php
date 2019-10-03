@@ -1687,7 +1687,7 @@ class C44XmlValidator {
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
-					'parameters' =>				['type' => 0, 'default' => '', 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
+					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
@@ -2105,20 +2105,26 @@ class C44XmlValidator {
 	 * @return array
 	 */
 	public function getMediaTypeParametersExtendedRules(array $data) {
-		if ($data['type'] === CXmlConstantValue::MEDIA_TYPE_SCRIPT) {
-			return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
-		}
+		switch ($data['type']) {
+			case CXmlConstantName::SCRIPT:
+				return [
+					'type' => XML_STRING,
+					'default' => '',
+					'preprocessor' => [$this, 'scriptParameterPreprocessor'],
+					'export' => [$this, 'scriptParameterExport']
+				];
 
-		if ($data['type'] === CXmlConstantValue::MEDIA_TYPE_WEBHOOK) {
-			return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-				'parameter' =>				['type' => XML_ARRAY, 'rules' => [
-					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'value' =>					['type' => XML_STRING | XML_REQUIRED]
-				]]
-			]];
-		}
+			case CXmlConstantName::WEBHOOK:
+				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+					'parameter' => ['type' => XML_ARRAY, 'rules' => [
+						'name' => ['type' => XML_STRING | XML_REQUIRED],
+						'value' => ['type' => XML_STRING | XML_REQUIRED]
+					]]
+				]];
 
-		return ['type' => XML_STRING, 'default' => ''];
+			default:
+				return ['type' => XML_STRING, 'default' => ''];
+		}
 	}
 
 	/**
@@ -2250,12 +2256,15 @@ class C44XmlValidator {
 	 * @return array
 	 */
 	public function mediaTypeParametersExport(array $data) {
-		if ($data['type'] == CXmlConstantValue::MEDIA_TYPE_SCRIPT) {
-			return $this->scriptParameterExport($data);
-		}
+		switch ($data['type']) {
+			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
+				return $this->scriptParameterExport($data);
 
-		if ($data['type'] == CXmlConstantValue::MEDIA_TYPE_WEBHOOK) {
-			return $data['parameters'];
+			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
+				return $data['parameters'];
+
+			default:
+				return [];
 		}
 	}
 

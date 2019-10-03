@@ -579,18 +579,18 @@ class CControllerMenuPopup extends CController {
 				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 			];
 
-			if (!$options['show_description']) {
-				$menu_data['show_description'] = false;
-			}
-			else if (!$options['description_enabled']) {
-				$menu_data['description_enabled'] = false;
-			}
-
 			if ($db_trigger['url'] !== '') {
 				$menu_data['urls'][] = [
 					'label' => _('Trigger URL'),
 					'url' => $db_trigger['url']
 				];
+			}
+
+			if (!$options['show_description']) {
+				$menu_data['show_description'] = false;
+			}
+			else if (!$options['description_enabled']) {
+				$menu_data['description_enabled'] = false;
 			}
 
 			if (array_key_exists('eventid', $data)) {

@@ -443,11 +443,9 @@ class CImportDataAdapter {
 			];
 
 			foreach ($this->data['media_types'] as $media_type) {
-				if ($media_type['type'] == MEDIA_TYPE_EXEC) {
-					$keys['parameters'] = 'exec_params';
-				}
-
-				$media_types[] = CArrayHelper::renameKeys($media_type, $keys);
+				$media_types[] = CArrayHelper::renameKeys($media_type,
+					$keys + (($media_type['type'] == MEDIA_TYPE_EXEC) ? ['parameters' => 'exec_params'] : [])
+				);
 			}
 		}
 
