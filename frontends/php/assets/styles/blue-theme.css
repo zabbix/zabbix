@@ -4693,7 +4693,7 @@ ul.checkbox-list.col-3 > li {
 .preprocessing-list {
   display: block;
   max-width: 930px;
-  min-width: 730px; }
+  min-width: 800px; }
   .preprocessing-list > li {
     display: block;
     position: relative; }
@@ -4733,8 +4733,8 @@ ul.checkbox-list.col-3 > li {
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
   .preprocessing-list .step-name {
-    flex: 0 0 240px;
-    max-width: 240px; }
+    flex: 0 0 290px;
+    max-width: 290px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
   .preprocessing-list .step-on-fail {
