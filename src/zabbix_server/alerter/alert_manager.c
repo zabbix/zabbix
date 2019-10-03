@@ -1940,7 +1940,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	zbx_am_alerter_t	*alerter;
-	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, freq_watchdog, time_ping = 0,
+	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
 				time_mediatype = 0;
 	double			time_stat, time_idle = 0, time_now, sec;
 
@@ -1964,9 +1964,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
-		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
