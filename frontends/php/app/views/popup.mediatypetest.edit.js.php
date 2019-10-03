@@ -38,11 +38,11 @@ function mediatypeTestSend(formname) {
 	$form_fields.prop('disabled', true);
 
 	jQuery('<span></span>')
-		.addClass('preloader')
+		.addClass('is-loading')
 		.insertAfter($submit_btn)
 		.css({
-			'display': 'inline-block',
-			'margin': '0 10px -8px'
+			'position': 'relative',
+			'margin-right': '30px'
 		});
 
 	$submit_btn
@@ -62,7 +62,7 @@ function mediatypeTestSend(formname) {
 
 			$form_fields.prop('disabled', false);
 
-			jQuery('.preloader').remove();
+			jQuery('.is-loading').remove();
 			$submit_btn
 				.prop('disabled', false)
 				.show();
