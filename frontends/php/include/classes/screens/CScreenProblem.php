@@ -1082,10 +1082,10 @@ class CScreenProblem extends CScreenBase {
 							]
 						)))
 							->addClass('opdata')
-							->addClass(ZBX_STYLE_NOWRAP);
+							->addClass(ZBX_STYLE_WORDWRAP);
 
 						if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM) {
-							$description[] = '&nbsp;(';
+							$description[] = ' (';
 							$description[] = $opdata;
 							$description[] = ')';
 						}

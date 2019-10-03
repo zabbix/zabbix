@@ -46,6 +46,8 @@ else {
 	$header = [$header_time];
 }
 
+$show_opdata = $data['fields']['show_opdata'];
+
 $table = (new CTableInfo())
 	->setHeader(array_merge($header, [
 		$show_recovery_data ? _('Recovery time') : null,
@@ -57,7 +59,7 @@ $table = (new CTableInfo())
 			' &bullet; ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
-		$data['fields']['show_opdata'] ? _('Operational data') : null,
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 		_('Duration'),
 		_('Ack'),
 		_('Actions'),
@@ -149,8 +151,42 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
 	}
 
+	$opdata = null;
+	if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+
+		// operational data
+		$opdata = null;
+		if ($trigger['opdata'] === '') {
+			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+				$opdata = (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+			}
+		} else {
+			$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
+				[
+					'triggerid' => $trigger['triggerid'],
+					'expression' => $trigger['expression'],
+					'opdata' => $trigger['opdata'],
+					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+				],
+				[
+					'events' => true,
+					'html' => $show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY
+				]
+			);
+
+			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+				$opdata = (new CCol())
+					->addClass('opdata')
+					->addClass(ZBX_STYLE_WORDWRAP);
+			}
+		}
+	}
+
 	$description = (new CCol([
-		(new CLinkAction($problem['name']))
+		(new CLinkAction($problem['name'].
+			($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '' ? ' ('.$opdata.')' : ''))
+		)
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
 						'triggerid' => $trigger['triggerid']], $eventid, $backurl, $show_timeline,
@@ -203,27 +239,27 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		];
 	}
 
-	// operational data
-	$opdata = null;
-	if ($data['fields']['show_opdata']) {
-		$opdata = ($trigger['opdata'] !== '')
-			? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-				[
-					'triggerid' => $trigger['triggerid'],
-					'expression' => $trigger['expression'],
-					'opdata' => $trigger['opdata'],
-					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-				],
-				[
-					'events' => true,
-					'html' => true
-				]
-			)))
-				->addClass('opdata')
-				->addClass(ZBX_STYLE_WORDWRAP)
-			: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
-	}
+//	// operational data
+//	$opdata = null;
+//	if ($data['fields']['show_opdata']) {
+//		$opdata = ($trigger['opdata'] !== '')
+//			? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+//				[
+//					'triggerid' => $trigger['triggerid'],
+//					'expression' => $trigger['expression'],
+//					'opdata' => $trigger['opdata'],
+//					'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+//					'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+//				],
+//				[
+//					'events' => true,
+//					'html' => true
+//				]
+//			)))
+//				->addClass('opdata')
+//				->addClass(ZBX_STYLE_WORDWRAP)
+//			: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+//	}
 
 	// Create acknowledge url.
 	$problem_update_url = (new CUrl('zabbix.php'))
@@ -238,7 +274,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		$opdata,
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
 		(new CCol(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 			->addClass(ZBX_STYLE_NOWRAP),
 		(new CLink($problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No'), $problem_update_url))

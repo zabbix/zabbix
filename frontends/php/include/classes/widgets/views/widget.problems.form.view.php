@@ -93,6 +93,9 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
 );
 
+// Show operational data.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_opdata']), CWidgetHelper::getRadioButtonList($fields['show_opdata']));
+
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 	CWidgetHelper::getCheckBox($fields['show_suppressed'])
@@ -102,9 +105,6 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 $form_list->addRow(CWidgetHelper::getLabel($fields['unacknowledged']),
 	CWidgetHelper::getCheckBox($fields['unacknowledged'])
 );
-
-// Show operational data.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_opdata']), CWidgetHelper::getCheckBox($fields['show_opdata']));
 
 // Sort entries by.
 $form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
