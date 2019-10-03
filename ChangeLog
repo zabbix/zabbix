@@ -1,6 +1,7 @@
 Changes for 4.4.0rc1
 
 New features:
+A.F.I...S. [ZBXNEXT-5386] added support of the webhook media type (gcalenko, Sasha, wiper)
 ..F....... [ZBXNEXT-5482] implemented option to show opdata with problem name (ashubin, vmurzins)
 .........T [ZBXNEXT-4746] added "Template Server Cisco UCS SNMPv2" template (vitaly)
 A.F....... [ZBXNEXT-5372] added support of XML import/export for media types (agriscenko)
