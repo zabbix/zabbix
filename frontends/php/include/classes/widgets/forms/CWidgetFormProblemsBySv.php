@@ -113,7 +113,7 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		$field_show_opdata = (new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [
 			OPERATIONAL_DATA_SHOW_NONE => _('None'),
 			OPERATIONAL_DATA_SHOW_SEPARATELY => _('Separately'),
-			OPERATIONAL_DATA_SHOW_WITH_PROBLEM => _('Next to problem name')
+			OPERATIONAL_DATA_SHOW_WITH_PROBLEM => _('With problem name')
 		]))
 			->setDefault(OPERATIONAL_DATA_SHOW_NONE)
 			->setModern(true);

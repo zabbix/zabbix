@@ -292,7 +292,7 @@ if ($data['action'] == 'problem.view') {
 			(new CRadioButtonList('filter_show_opdata', (int) $data['filter']['show_opdata']))
 				->addValue(_('None'), OPERATIONAL_DATA_SHOW_NONE)
 				->addValue(_('Separately'), OPERATIONAL_DATA_SHOW_SEPARATELY)
-				->addValue(_('Next to problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM)
+				->addValue(_('With problem name'), OPERATIONAL_DATA_SHOW_WITH_PROBLEM)
 				->setModern(true)
 				->setEnabled($data['filter']['compact_view'] == 0)
 		])
