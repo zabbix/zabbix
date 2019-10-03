@@ -346,7 +346,7 @@ class CScreenProblem extends CScreenBase {
 							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
 					}
 
-					if ($resolve_comments || $resolve_urls || $show_opdata  || $details) {
+					if ($resolve_comments || $resolve_urls || $show_opdata || $details) {
 						$options['output'][] = 'expression';
 					}
 
