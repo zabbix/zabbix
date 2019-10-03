@@ -1,6 +1,7 @@
 Changes for 4.4.0rc1
 
 New features:
+.........T [ZBXNEXT-4746] added "Template Server Cisco UCS SNMPv2" template (vitaly)
 A.F....... [ZBXNEXT-5372] added support of XML import/export for media types (agriscenko)
 A........T [ZBXNEXT-5480] removed linux, windows, zabbix-agent and mysql 'classic' templates from XML and tmpl files, updated conf/zabbix_agentd/userparameter_mysql.conf to match new mysql template (vitaly)
 ..F....... [ZBXNEXT-5404] added trigger description to Event details and as icon to Monitoring->Problems (agriscenko)
