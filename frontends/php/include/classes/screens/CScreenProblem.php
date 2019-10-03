@@ -1057,8 +1057,6 @@ class CScreenProblem extends CScreenBase {
 				$description[] = (new CLinkAction($problem['name']))
 					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
-				$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
-
 				$opdata = null;
 				if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
 
@@ -1091,6 +1089,8 @@ class CScreenProblem extends CScreenBase {
 						}
 					}
 				}
+
+				$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();
