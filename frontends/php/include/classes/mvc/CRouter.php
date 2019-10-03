@@ -76,6 +76,7 @@ class CRouter {
 		'discovery.view'				=> ['CControllerDiscoveryView',						'layout.htmlpage',		'monitoring.discovery.view'],
 		'export.valuemaps.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.hosts.xml'				=> ['CControllerExportXml',							'layout.xml',			null],
+		'export.mediatypes.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.screens.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.sysmaps.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.templates.xml'			=> ['CControllerExportXml',							'layout.xml',			null],

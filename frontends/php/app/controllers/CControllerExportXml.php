@@ -36,6 +36,10 @@ class CControllerExportXml extends CController {
 				$fields['hosts'] = 'required|array_db hosts.hostid';
 				break;
 
+			case 'export.mediatypes.xml':
+				$fields['mediatypeids'] = 'required|array_db media_type.mediatypeid';
+				break;
+
 			case 'export.screens.xml':
 				$fields['screens'] = 'required|array_db screens.screenid';
 				break;
@@ -65,6 +69,7 @@ class CControllerExportXml extends CController {
 
 	protected function checkPermissions() {
 		switch ($this->getInput('action')) {
+			case 'export.mediatypes.xml':
 			case 'export.valuemaps.xml':
 				return (CWebUser::$data['type'] >= USER_TYPE_SUPER_ADMIN);
 
@@ -91,6 +96,10 @@ class CControllerExportXml extends CController {
 
 			case 'export.hosts.xml':
 				$export = new CConfigurationExport(['hosts' => $this->getInput('hosts', [])]);
+				break;
+
+			case 'export.mediatypes.xml':
+				$export = new CConfigurationExport(['mediaTypes' => $this->getInput('mediatypeids', [])]);
 				break;
 
 			case 'export.screens.xml':

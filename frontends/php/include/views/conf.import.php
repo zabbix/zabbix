@@ -44,6 +44,7 @@ $user_type = CWebUser::getType();
 
 if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
+	$titles['mediaTypes'] = _('Media types');
 	$titles['valueMaps'] = _('Value mappings');
 }
 

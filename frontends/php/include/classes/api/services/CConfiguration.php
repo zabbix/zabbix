@@ -37,6 +37,7 @@ class CConfiguration extends CApiService {
 				'hosts' =>		['type' => API_IDS],
 				'images' =>		['type' => API_IDS],
 				'maps' =>		['type' => API_IDS],
+				'mediaTypes' =>	['type' => API_IDS],
 				'screens' =>	['type' => API_IDS],
 				'templates' =>	['type' => API_IDS],
 				'valueMaps' =>	['type' => API_IDS]
@@ -107,6 +108,10 @@ class CConfiguration extends CApiService {
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
 				'maps' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				]],
+				'mediaTypes' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
