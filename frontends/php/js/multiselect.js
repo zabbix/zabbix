@@ -102,10 +102,10 @@ jQuery(function($) {
 		 */
 		resize: function() {
 			return this.each(function() {
-				var obj = $(this);
+				var $obj = $(this);
 				var ms = $(this).data('multiSelect');
 
-				resizeAllSelectedTexts(obj, ms.options, ms.values);
+				resizeAllSelectedTexts($obj, ms.options, ms.values);
 			});
 		},
 
@@ -118,18 +118,18 @@ jQuery(function($) {
 		 */
 		addData: function(item) {
 			return this.each(function() {
-				var obj = $(this);
+				var $obj = $(this);
 				var ms = $(this).data('multiSelect');
 
 				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
 					for (var id in ms.values.selected) {
-						removeSelected(id, obj, ms.values, ms.options);
+						removeSelected(id, $obj, ms.values, ms.options);
 					}
 
 					cleanAvailable(item, ms.values);
 				}
-				addSelected(item, obj, ms.values, ms.options);
+				addSelected(item, $obj, ms.values, ms.options);
 			});
 		},
 
@@ -140,14 +140,14 @@ jQuery(function($) {
 		 */
 		clean: function() {
 			return this.each(function() {
-				var obj = $(this);
+				var $obj = $(this);
 				var ms = $(this).data('multiSelect');
 
 				for (var id in ms.values.selected) {
-					removeSelected(id, obj, ms.values, ms.options);
+					removeSelected(id, $obj, ms.values, ms.options);
 				}
 
-				cleanAvailable(obj, ms.values);
+				cleanAvailable($obj, ms.values);
 			});
 		},
 
@@ -264,17 +264,17 @@ jQuery(function($) {
 		options = $.extend({}, defaults, options);
 
 		return this.each(function() {
-			var obj = $(this);
+			var $obj = $(this);
 
-			options = $.extend({}, {
-				required: (typeof obj.attr('aria-required') !== 'undefined') ? obj.attr('aria-required') : false
-			}, options);
+			$.extend(options, {
+				required: (typeof $obj.attr('aria-required') !== 'undefined') ? $obj.attr('aria-required') : false
+			});
 
 			var ms = {
 				options: options,
 				values: {
 					search: '',
-					width: parseInt(obj.css('width')),
+					width: parseInt($obj.css('width')),
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
@@ -284,50 +284,46 @@ jQuery(function($) {
 				}
 			};
 
-			obj.removeAttr('aria-required');
+			$obj.removeAttr('aria-required');
 
 			// store the configuration in the elements data
-			obj.data('multiSelect', ms);
+			$obj.data('multiSelect', ms);
 
 			var values = ms.values;
 
 			// add wrap
-			obj.wrap(jQuery('<div>', {
+			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
 				css: options.styles
 			}));
 
 			// selected
-			var selected_div = $('<div>', {
-				'class': 'selected'
-			});
-			var selected_ul = $('<ul>', {
-				'class': 'multiselect-list'
-			});
+			var selected_div = $('<div>', {'class': 'selected'}),
+				selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
-			obj.append(selected_div.append(selected_ul));
+			$obj.append(selected_div.append(selected_ul));
 
 			if (options.disabled) {
 				selected_ul.addClass('disabled');
 			}
 			else {
-				obj.append(makeMultiSelectInput(obj));
+				$obj.append(makeMultiSelectInput($obj));
 			}
 
 			// available
 			if (!options.disabled) {
-				makeSuggsetionsBlock(obj);
+				makeSuggsetionsBlock($obj);
 			}
 
 			// preload data
 			if (empty(options.data)) {
-				setDefaultValue(obj, options);
+				setDefaultValue($obj, options);
 			}
 			else {
-				loadSelected(options.data, obj, values, options);
+				loadSelected(options.data, $obj, values, options);
 			}
 
-			cleanLastSearch(obj);
+			cleanLastSearch($obj);
 
 			// draw popup link
 			if (options.popup.parameters != null) {
@@ -351,7 +347,7 @@ jQuery(function($) {
 					return PopUp('popup.generic', popup_options, null, event.target);
 				});
 
-				obj.parent().append($('<div>', {
+				$obj.parent().append($('<div>', {
 					'class': 'multiselect-button'
 				}).append(popupButton));
 			}
@@ -607,9 +603,9 @@ jQuery(function($) {
 		return $input;
 	}
 
-	function setDefaultValue(obj, options) {
+	function setDefaultValue($obj, options) {
 		if (!empty(options.defaultValue)) {
-			obj.append($('<input>', {
+			$obj.append($('<input>', {
 				type: 'hidden',
 				name: options.name,
 				value: options.defaultValue,
@@ -618,20 +614,20 @@ jQuery(function($) {
 		}
 	}
 
-	function removeDefaultValue(obj, options) {
+	function removeDefaultValue($obj, options) {
 		if (!empty(options.defaultValue)) {
-			$('input[data-default="1"]', obj).remove();
+			$('input[data-default="1"]', $obj).remove();
 		}
 	}
 
-	function loadSelected(data, obj, values, options) {
+	function loadSelected(data, $obj, values, options) {
 		$.each(data, function(i, item) {
-			addSelected(item, obj, values, options);
+			addSelected(item, $obj, values, options);
 		});
 	}
 
-	function loadAvailable(data, obj, values, options) {
-		cleanAvailable(obj, values);
+	function loadAvailable(data, $obj, values, options) {
+		cleanAvailable($obj, values);
 
 		// add new
 		if (options.addNew) {
@@ -712,13 +708,13 @@ jQuery(function($) {
 				text: options.labels['No matches found']
 			})
 			.click(function() {
-				$('input[type="text"]', obj).focus();
+				$('input[type="text"]', $obj).focus();
 			});
 
-			$('.available', obj).append(div);
+			$('.available', $obj).append(div);
 		}
 		else {
-			$('.available', obj)
+			$('.available', $obj)
 				.append($('<ul>', {
 					'class': 'multiselect-suggest',
 					'aria-hidden': true
@@ -735,14 +731,14 @@ jQuery(function($) {
 					if (found == 0) {
 						preselected = (item.prefix || '') + item.name;
 					}
-					addAvailable(item, obj, values, options);
+					addAvailable(item, $obj, values, options);
 					found++;
 				}
 			});
 		}
 
 		if (found > 0) {
-			$('[aria-live]', obj).text(
+			$('[aria-live]', $obj).text(
 				(values.isMoreMatchesFound
 					? sprintf(t('More than %1$d matches for %2$s found'), found, values.search)
 					: sprintf(t('%1$d matches for %2$s found'), found, values.search)) +
@@ -750,7 +746,7 @@ jQuery(function($) {
 			);
 		}
 		else {
-			$('[aria-live]', obj).text(options.labels['No matches found']);
+			$('[aria-live]', $obj).text(options.labels['No matches found']);
 		}
 
 		// write more matches found label
@@ -760,25 +756,25 @@ jQuery(function($) {
 				text: options.labels['More matches found...']
 			})
 			.click(function() {
-				$('input[type="text"]', obj).focus();
+				$('input[type="text"]', $obj).focus();
 			});
 
-			$('.available', obj).prepend(div);
+			$('.available', $obj).prepend(div);
 		}
 
-		showAvailable(obj, values);
+		showAvailable($obj, values);
 	}
 
-	function addSelected(item, obj, values, options) {
+	function addSelected(item, $obj, values, options) {
 		if (typeof values.selected[item.id] === 'undefined') {
-			removeDefaultValue(obj, options);
+			removeDefaultValue($obj, options);
 			values.selected[item.id] = item;
 
 			var prefix = (item.prefix || ''),
 				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
 
 			// add hidden input
-			obj.append($('<input>', {
+			$obj.append($('<input>', {
 				type: 'hidden',
 				name: (options.addNew && item.isNew) ? options.name + '[new]' : options.name,
 				value: item.id,
@@ -801,7 +797,7 @@ jQuery(function($) {
 						.addClass('subfilter-disable-btn')
 						.on('click', function() {
 							if (!options.disabled && !item_disabled) {
-								removeSelected(item.id, obj, values, options);
+								removeSelected(item.id, $obj, values, options);
 							}
 						}))
 			);
@@ -814,49 +810,49 @@ jQuery(function($) {
 				li.addClass('disabled');
 			}
 
-			$('.selected ul', obj).append(li);
+			$('.selected ul', $obj).append(li);
 
-			resizeSelectedText(li, obj);
+			resizeSelectedText(li, $obj);
 
 			// set readonly
-			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
-				setSearchFieldVisibility(false, obj, options);
+			if (options.selectedLimit != 0 && $('.selected li', $obj).length >= options.selectedLimit) {
+				setSearchFieldVisibility(false, $obj, options);
 			}
 		}
 	}
 
-	function removeSelected(id, obj, values, options) {
+	function removeSelected(id, $obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', obj).remove();
-		$('input[value="' + id + '"]', obj).remove();
+		$('.selected li[data-id="' + id + '"]', $obj).remove();
+		$('input[value="' + id + '"]', $obj).remove();
 
 		delete values.selected[id];
 
 		// remove readonly
-		if ($('.selected li', obj).length == 0) {
-			setDefaultValue(obj, options);
+		if ($('.selected li', $obj).length == 0) {
+			setDefaultValue($obj, options);
 		}
 
 		// clean
-		cleanAvailable(obj, values);
-		cleanLastSearch(obj);
+		cleanAvailable($obj, values);
+		cleanLastSearch($obj);
 
-		if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-			setSearchFieldVisibility(true, obj, options);
-			$('input[type="text"]', obj).focus();
+		if (options.selectedLimit == 0 || $('.selected li', $obj).length < options.selectedLimit) {
+			setSearchFieldVisibility(true, $obj, options);
+			$('input[type="text"]', $obj).focus();
 		}
 	}
 
-	function addAvailable(item, obj, values, options) {
+	function addAvailable(item, $obj, values, options) {
 		var li = $('<li>', {
 			'data-id': item.id,
 			'data-label': (item.prefix || '') + item.name
 		})
 		.click(function() {
-			select(item.id, obj, values, options);
+			select(item.id, $obj, values, options);
 		})
 		.hover(function() {
-			$('.available li.suggest-hover', obj).removeClass('suggest-hover');
+			$('.available li.suggest-hover', $obj).removeClass('suggest-hover');
 			li.addClass('suggest-hover');
 		});
 
@@ -898,29 +894,29 @@ jQuery(function($) {
 			}));
 		}
 
-		$('.available ul', obj).append(li);
+		$('.available ul', $obj).append(li);
 	}
 
-	function select(id, obj, values, options) {
+	function select(id, $obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[id], $obj, values, options);
 
-			hideAvailable(obj);
-			cleanAvailable(obj, values);
-			cleanLastSearch(obj);
+			hideAvailable($obj);
+			cleanAvailable($obj, values);
+			cleanLastSearch($obj);
 
-			if (options.selectedLimit == 0 || $('.selected li', obj).length < options.selectedLimit) {
-				$('input[type="text"]', obj).focus();
+			if (options.selectedLimit == 0 || $('.selected li', $obj).length < options.selectedLimit) {
+				$('input[type="text"]', $obj).focus();
 			}
 		}
 	}
 
-	function showAvailable(obj, values) {
-		var available = $('.available', obj),
+	function showAvailable($obj, values) {
+		var available = $('.available', $obj),
 			available_paddings = available.outerWidth() - available.width();
 
 		available.css({
-			'width': obj.outerWidth() - available_paddings,
+			'width': $obj.outerWidth() - available_paddings,
 			'left': -1
 		});
 
@@ -929,8 +925,8 @@ jQuery(function($) {
 
 		if (objectLength(values.available) != 0) {
 			// remove selected item selected state
-			if ($('.selected li.selected', obj).length > 0) {
-				$('.selected li.selected', obj).removeClass('selected');
+			if ($('.selected li.selected', $obj).length > 0) {
+				$('.selected li.selected', $obj).removeClass('selected');
 			}
 
 			// pre-select first available
@@ -943,30 +939,30 @@ jQuery(function($) {
 		}
 	}
 
-	function hideAvailable(obj) {
-		$('.available', obj).fadeOut(0);
+	function hideAvailable($obj) {
+		$('.available', $obj).fadeOut(0);
 	}
 
-	function cleanAvailable(obj, values) {
-		$('.multiselect-matches', obj).remove();
-		$('.available ul', obj).remove();
+	function cleanAvailable($obj, values) {
+		$('.multiselect-matches', $obj).remove();
+		$('.available ul', $obj).remove();
 		values.available = {};
 		values.isMoreMatchesFound = false;
 	}
 
-	function cleanLastSearch(obj) {
-		$('input[type="text"]', obj).data('lastSearch', '').val('');
+	function cleanLastSearch($obj) {
+		$('input[type="text"]', $obj).data('lastSearch', '').val('');
 	}
 
-	function cleanSearchInput(obj) {
-		$('input[type="text"]', obj).val('');
+	function cleanSearchInput($obj) {
+		$('input[type="text"]', $obj).val('');
 	}
 
-	function resizeSelectedText(li, obj) {
+	function resizeSelectedText(li, $obj) {
 		var	li_margins = li.outerWidth(true) - li.width(),
 			span = $('span.subfilter-enabled', li),
 			span_paddings = span.outerWidth(true) - span.width(),
-			max_width = $('.selected ul', obj).width() - li_margins - span_paddings,
+			max_width = $('.selected ul', $obj).width() - li_margins - span_paddings,
 			text = $('span:first-child', span);
 
 		if (text.width() > max_width) {
@@ -979,8 +975,8 @@ jQuery(function($) {
 		}
 	}
 
-	function resizeAllSelectedTexts(obj, options, values) {
-		$('.selected li', obj).each(function() {
+	function resizeAllSelectedTexts($obj, options, values) {
+		$('.selected li', $obj).each(function() {
 			var li = $(this),
 				id = li.data('id'),
 				span = $('span.subfilter-enabled', li),
@@ -992,24 +988,24 @@ jQuery(function($) {
 			// rewrite previous text to original
 			text.text(t);
 
-			resizeSelectedText(li, obj);
+			resizeSelectedText(li, $obj);
 		});
 	}
 
-	function scrollAvailable(obj) {
-		var	selected = $('.available li.suggest-hover', obj),
-			available = $('.available', obj);
+	function scrollAvailable($obj) {
+		var	selected = $('.available li.suggest-hover', $obj),
+			available = $('.available', $obj);
 
 		if (selected.length > 0) {
 			var	available_height = available.height(),
 				selected_top = 0,
 				selected_height = selected.outerHeight(true);
 
-			if ($('.multiselect-matches', obj)) {
-				selected_top += $('.multiselect-matches', obj).outerHeight(true);
+			if ($('.multiselect-matches', $obj)) {
+				selected_top += $('.multiselect-matches', $obj).outerHeight(true);
 			}
 
-			$('.available li', obj).each(function() {
+			$('.available li', $obj).each(function() {
 				var item = $(this);
 				if (item.hasClass('suggest-hover')) {
 					return false;
@@ -1062,11 +1058,11 @@ jQuery(function($) {
 			: null;
 	}
 
-	function objectLength(obj) {
+	function objectLength($obj) {
 		var length = 0;
 
-		for (var key in obj) {
-			if (obj.hasOwnProperty(key)) {
+		for (var key in $obj) {
+			if ($obj.hasOwnProperty(key)) {
 				length++;
 			}
 		}
