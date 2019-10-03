@@ -372,8 +372,6 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
 			return;
 		}
 	}
-
-	mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_NONE;
 }
 
 /******************************************************************************
@@ -383,7 +381,7 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
  * Parameters: manager     - [IN] the alert manager                           *
- *             mediatypeid - [IN] the media type identifier                   *
+ *             ...         - [IN] media type properties                       *
  *                                                                            *
  ******************************************************************************/
 static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type,
@@ -1786,8 +1784,8 @@ static void	am_drop_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
 
 		if (0 == mediatype->refcount)
 			am_remove_mediatype(manager, mediatype);
-
-		mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_REMOVE;
+		else
+			mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_REMOVE;
 	}
 
 	zbx_free(ids);
