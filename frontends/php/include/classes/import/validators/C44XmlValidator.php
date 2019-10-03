@@ -47,7 +47,8 @@ class C44XmlValidator {
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
 		CXmlConstantValue::PROMETHEUS_PATTERN => CXmlConstantName::PROMETHEUS_PATTERN,
-		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON
+		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
@@ -59,7 +60,8 @@ class C44XmlValidator {
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
 		CXmlConstantValue::DISCARD_UNCHANGED_HEARTBEAT => CXmlConstantName::DISCARD_UNCHANGED_HEARTBEAT,
 		CXmlConstantValue::JAVASCRIPT => CXmlConstantName::JAVASCRIPT,
-		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON
+		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
+		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -746,7 +748,7 @@ class C44XmlValidator {
 							]],
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
@@ -1322,7 +1324,7 @@ class C44XmlValidator {
 							]],
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
-									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
+									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
 									'params' =>					['type' => XML_STRING | XML_REQUIRED],
 									'error_handler' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
 									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
@@ -1673,6 +1675,37 @@ class C44XmlValidator {
 					]]
 				]]
 			]],
+			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
+				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => [CXmlConstantValue::MEDIA_TYPE_EMAIL => CXmlConstantName::EMAIL, CXmlConstantValue::MEDIA_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::MEDIA_TYPE_SMS => CXmlConstantName::SMS, CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK]],
+					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
+					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
+					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],
+					'smtp_email' =>				['type' => XML_STRING, 'default' => ''],
+					'smtp_security' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::STARTTLS => CXmlConstantName::STARTTLS, CXmlConstantValue::SSL_OR_TLS => CXmlConstantName::SSL_OR_TLS]],
+					'smtp_verify_host' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'smtp_verify_peer' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => [CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE, CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD]],
+					'username' =>				['type' => XML_STRING, 'default' => ''],
+					'password' =>				['type' => XML_STRING, 'default' => ''],
+					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
+					'script_name' =>			['type' => XML_STRING, 'default' => ''],
+					'parameters' =>				['type' => 0, 'default' => '', 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
+					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
+					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
+					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
+					'attempts' =>				['type' => XML_STRING, 'default' => '3'],
+					'attempt_interval' =>		['type' => XML_STRING, 'default' => '10s'],
+					'script' => 				['type' => XML_STRING, 'default' => ''],
+					'timeout' => 				['type' => XML_STRING, 'default' => '30s'],
+					'process_tags' => 			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'show_event_menu' => 		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'event_menu_url' => 		['type' => XML_STRING, 'default' => ''],
+					'event_menu_name' => 		['type' => XML_STRING, 'default' => ''],
+					'description' => 			['type' => XML_STRING, 'default' => '']
+				]]
+			]],
 			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
 				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1891,6 +1924,23 @@ class C44XmlValidator {
 	}
 
 	/**
+	 * Validate media type "parameters" tag.
+	 *
+	 * @param string $data         Import data.
+	 * @param array  $parent_data  Data's parent array.
+	 * @param string $path         XML path.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
+	public function validateMediaTypeParameters($data, array $parent_data, $path) {
+		$rules = $this->getMediaTypeParametersExtendedRules($parent_data);
+
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
+	}
+
+	/**
 	 * Transforms tags containing zero into an empty array.
 	 *
 	 * @param mixed $value
@@ -2052,6 +2102,33 @@ class C44XmlValidator {
 	}
 
 	/**
+	 * Get extended validation rules for media type "parameters" tag.
+	 *
+	 * @param array $data  Import data.
+	 *
+	 * @return array
+	 */
+	public function getMediaTypeParametersExtendedRules(array $data) {
+		switch ($data['type']) {
+			case CXmlConstantName::SCRIPT:
+			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
+				return ['type' => XML_STRING, 'default' => '', 'preprocessor' => [$this, 'scriptParameterPreprocessor'], 'export' => [$this, 'scriptParameterExport']];
+
+			case CXmlConstantName::WEBHOOK:
+			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
+				return ['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+					'parameter' => ['type' => XML_ARRAY, 'rules' => [
+						'name' => ['type' => XML_STRING | XML_REQUIRED],
+						'value' => ['type' => XML_STRING, 'default' => '']
+					]]
+				]];
+
+			default:
+				return ['type' => XML_STRING, 'default' => ''];
+		}
+	}
+
+	/**
 	 * Convert tls_accept tag to normal value.
 	 * Used in CXmlValidGeneral.
 	 *
@@ -2171,6 +2248,28 @@ class C44XmlValidator {
 	}
 
 	/**
+	 * Export transformation for media type "parameters" tag.
+	 *
+	 * @param array $data  Export data.
+	 *
+	 * @throws Exception if the element is invalid.
+	 *
+	 * @return array
+	 */
+	public function mediaTypeParametersExport(array $data) {
+		switch ($data['type']) {
+			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
+				return $this->scriptParameterExport($data);
+
+			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
+				return $data['parameters'];
+
+			default:
+				return [];
+		}
+	}
+
+	/**
 	 * Import check for filter tag.
 	 * API validation throws an error when filter tag is an empty array.
 	 *
@@ -2188,5 +2287,34 @@ class C44XmlValidator {
 		}
 
 		return $data['filter'];
+	}
+
+	/**
+	 * Converts script parameters to a string.
+	 *
+	 * @param array|string $data  Import data.
+	 *
+	 * @throws Exception if input is invalid.
+	 *
+	 * @return string
+	 */
+	public function scriptParameterPreprocessor($data) {
+		if (is_string($data) && $data !== '') {
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'parameters', _('an array is expected')));
+		}
+
+		return is_array($data) ? implode("\n", $data)."\n" : '';
+	}
+
+	/**
+	 * Converts script parameters to an array.
+	 *
+	 * @param array  $data               Export data.
+	 * @param string $data['parameters]  Script parameters.
+	 *
+	 * @return array
+	 */
+	public function scriptParameterExport(array $data) {
+		return explode("\n", substr($data['parameters'], 0, -1));
 	}
 }

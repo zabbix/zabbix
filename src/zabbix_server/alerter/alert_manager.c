@@ -371,9 +371,8 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
 		{
 			return;
 		}
+		mediatype->script = zbx_strdup(mediatype->script, script);
 	}
-
-	mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_NONE;
 }
 
 /******************************************************************************
@@ -383,7 +382,7 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
  * Purpose: updates media type object, creating one if necessary              *
  *                                                                            *
  * Parameters: manager     - [IN] the alert manager                           *
- *             mediatypeid - [IN] the media type identifier                   *
+ *             ...         - [IN] media type properties                       *
  *                                                                            *
  ******************************************************************************/
 static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, unsigned char type,
@@ -528,6 +527,9 @@ static void am_remove_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 	zbx_free(mediatype->gsm_modem);
 	zbx_free(mediatype->username);
 	zbx_free(mediatype->passwd);
+	zbx_free(mediatype->script);
+	zbx_free(mediatype->script_bin);
+
 	zbx_binary_heap_destroy(&mediatype->queue);
 	zbx_hashset_remove_direct(&manager->mediatypes, mediatype);
 }
@@ -1786,8 +1788,8 @@ static void	am_drop_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
 
 		if (0 == mediatype->refcount)
 			am_remove_mediatype(manager, mediatype);
-
-		mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_REMOVE;
+		else
+			mediatype->flags = ZBX_AM_MEDIATYPE_FLAG_REMOVE;
 	}
 
 	zbx_free(ids);
@@ -1940,7 +1942,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
 	zbx_am_alerter_t	*alerter;
-	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, freq_watchdog, time_ping = 0,
+	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
 				time_mediatype = 0;
 	double			time_stat, time_idle = 0, time_now, sec;
 
@@ -1964,9 +1966,6 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 	/* initialize statistics */
 	time_stat = zbx_time();
-
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
-		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 

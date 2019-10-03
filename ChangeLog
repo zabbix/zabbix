@@ -1,10 +1,12 @@
 Changes for 4.4.0rc1
 
 New features:
+.........T [ZBXNEXT-4746] added "Template Server Cisco UCS SNMPv2" template (vitaly)
+A.F....... [ZBXNEXT-5372] added support of XML import/export for media types (agriscenko)
 A........T [ZBXNEXT-5480] removed linux, windows, zabbix-agent and mysql 'classic' templates from XML and tmpl files, updated conf/zabbix_agentd/userparameter_mysql.conf to match new mysql template (vitaly)
 ..F....... [ZBXNEXT-5404] added trigger description to Event details and as icon to Monitoring->Problems (agriscenko)
 ..F....... [ZBXNEXT-3391] added item description icon to Monitoring->Latest data (agriscenko)
-..F.....S. [ZBXNEXT-3970] added csv to json preprocessing option (asestakovs, Ivo)
+A.F.....S. [ZBXNEXT-3970] added CSV to JSON preprocessing option (asestakovs, Ivo)
 A.F....... [ZBXNEXT-5228] simplified import/export by removing required from XML / JSON tags (rlataria)
 ..F....... [ZBXNEXT-5425] added aggregation functions for graphs (ashubin)
 A.F.I...ST [ZBXNEXT-4166] added user macro and host macro description (talbergs, viktors)
@@ -148,6 +150,13 @@ Bug fixes:
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 ..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
 ..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.8rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.2.7
@@ -714,6 +723,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.14rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.13

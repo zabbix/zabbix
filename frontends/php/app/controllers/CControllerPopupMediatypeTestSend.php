@@ -114,7 +114,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 				$params[$parameter['name']] = $parameter['value'];
 			}
 
-			$params = compact('params');
+			$params = ['parameters' => $params];
 		}
 		else {
 			$params = [

@@ -4810,7 +4810,7 @@ Template tooling version used: 0.30</description>
                <name>Template Module Linux network interfaces by Zabbix agent active</name>
             </template>
             <template>
-               <name>Template Module Zabbix agent</name>
+               <name>Template Module Zabbix agent active</name>
             </template>
          </templates>
          <screens>
