@@ -171,7 +171,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 				],
 				[
 					'events' => true,
-					'html' => $show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY
+					'html' => true
 				]
 			);
 
@@ -183,13 +183,11 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	$description = (new CCol([
-		(new CLinkAction($problem['name'].
-			($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '' ? ' ('.$opdata.')' : ''))
-		)
+	$problem_link = [
+		(new CLinkAction($problem['name']))
 			->setHint(
 				make_popup_eventlist(['comments' => $problem['comments'], 'url' => $problem['url'],
-						'triggerid' => $trigger['triggerid']], $eventid, $backurl, $show_timeline,
+					'triggerid' => $trigger['triggerid']], $eventid, $backurl, $show_timeline,
 					$data['fields']['show_tags'], $data['fields']['tags'], $data['fields']['tag_name_format'],
 					$data['fields']['tag_priority']
 				)
@@ -197,7 +195,13 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 				$problem['name'], getSeverityName($problem['severity'], $data['config'])
 			))
-	]));
+	];
+
+	if ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata) {
+		$problem_link = array_merge($problem_link, [' (', $opdata, ')']);
+	}
+
+	$description = (new CCol($problem_link));
 
 	$description_style = getSeverityStyle($problem['severity']);
 
