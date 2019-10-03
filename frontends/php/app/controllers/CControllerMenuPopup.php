@@ -563,6 +563,13 @@ class CControllerMenuPopup extends CController {
 				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 			];
 
+			if ($db_trigger['url'] !== '') {
+				$menu_data['urls'][] = [
+					'label' => _('Trigger URL'),
+					'url' => $db_trigger['url']
+				];
+			}
+
 			if (array_key_exists('eventid', $data)) {
 				$menu_data['eventid'] = $data['eventid'];
 
