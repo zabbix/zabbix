@@ -309,6 +309,33 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 	}
 
 	/**
+	 * Test that a correct error message is generated when setting an object name.
+	 *
+	 * @dataProvider invalidValuesWithObjectsProvider()
+	 *
+	 * @param array 	$params
+	 * @param mixed 	$value
+	 * @param string 	$expectedError
+	 */
+	public function testValidateInvalidWithObject(array $params, $value, $expectedError) {
+		// We have no tests because messages in this validator are hardcoded for now.
+		$this->markTestIncomplete();
+	}
+
+	public function invalidValuesWithObjectsProvider() {
+		return [
+			[
+				[],
+				[
+					'conditiontype' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
+					'operator' => CONDITION_OPERATOR_EQUAL
+				],
+				'Incorrect value for field "value": cannot be empty.'
+			]
+		];
+	}
+
+	/**
 	 * Create and return a validator object using the given params.
 	 *
 	 * @param array $params
