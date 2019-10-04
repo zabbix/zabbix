@@ -1,6 +1,7 @@
 Changes for 4.4.0rc1
 
 New features:
+.D........ [ZBXNEXT-5485] removed TimescaleDB experimental status (kalimulin)
 A.F.I...S. [ZBXNEXT-5386] added support of the webhook media type (gcalenko, Sasha, wiper)
 ..F....... [ZBXNEXT-5482] implemented option to show opdata with problem name (ashubin, vmurzins)
 .........T [ZBXNEXT-4746] added "Template Server Cisco UCS SNMPv2" template (vitaly)
