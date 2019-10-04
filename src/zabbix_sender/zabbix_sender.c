@@ -264,7 +264,7 @@ static void	send_signal_handler(int sig)
 	else if (SIGPIPE == sig)
 		LOG_INTERRUPT_WARNING(SIGPIPE);
 	else
-		zabbix_log(LOG_LEVEL_TRACE, "signal %d while executing operation", sig);
+		zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
 
 #undef LOG_INTERRUPT_WARNING
 
