@@ -19,7 +19,7 @@
 **/
 
 
-class CActionCondValidatorTest extends CValidatorTest {
+class CEventCorrCondValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
 		return [
