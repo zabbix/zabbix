@@ -268,7 +268,7 @@ static void	send_signal_handler(int sig)
 
 #undef LOG_INTERRUPT_WARNING
 
-        /* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
+	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
 	_exit(FAIL);
 }
