@@ -314,10 +314,11 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
+	require_once dirname(__FILE__).'/include/classes/core/CSession.php';
+
 	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-		$path = rtrim(substr($path, 0, strrpos($path, '/') + 1), '/');
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']).';path='.$path);
+		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']).';path='.
+			CSession::getDefaultCookiePath());
 	}
 
 	$files = [
