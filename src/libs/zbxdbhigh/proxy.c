@@ -2077,9 +2077,13 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, (zbx_host_availability_t *)hosts.values[i]))
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_host_availability_t *)hosts.values[i]))
+			{
+				continue;
+			}
 
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
