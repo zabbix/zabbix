@@ -25,10 +25,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testPageDashboard extends CLegacyWebTest {
 
-	public $graphCpu = 'CPU load';
-	public $graphCpuId = 524;
+	public $graphCpu = 'CPU usage';
+	public $graphCpuId = 910;
 	public $graphMemory = 'Memory usage';
-	public $graphMemoryId = 534;
+	public $graphMemoryId = 919;
 	public $screenClock = 'Test screen (clock)';
 	public $screenClockId = 200001;
 	public $mapTest = 'Test map 1';
