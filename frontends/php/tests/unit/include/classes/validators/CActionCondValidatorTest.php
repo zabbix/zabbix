@@ -32,31 +32,31 @@ class CActionCondValidatorTest extends CValidatorTest {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TEMPLATE,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_PROXY,
-				'value' => 1,
+				'value' => ['1'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
