@@ -249,22 +249,26 @@ static char		*ZABBIX_KEY_VALUE = NULL;
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
 {
+#define LOG_INTERRUPT_WARNING(i) zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #i " while executing operation")
+
 	if (SIGALRM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
+		LOG_INTERRUPT_WARNING(SIGALRM);
 	else if (SIGINT == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "interrupt while executing operation");
+		LOG_INTERRUPT_WARNING(SIGINT);
 	else if (SIGQUIT == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "dump core while executing operation");
+		LOG_INTERRUPT_WARNING(SIGQUIT);
 	else if (SIGTERM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "termination while executing operation");
+		LOG_INTERRUPT_WARNING(SIGTERM);
 	else if (SIGHUP == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "hangup while executing operation");
+		LOG_INTERRUPT_WARNING(SIGHUP);
 	else if (SIGPIPE == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "broken pipe while executing operation");
+		LOG_INTERRUPT_WARNING(SIGPIPE);
 	else
 		zabbix_log(LOG_LEVEL_TRACE, "signal %d while executing operation", sig);
 
-	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
+#undef LOG_INTERRUPT_WARNING
+
+        /* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
 	_exit(FAIL);
 }
