@@ -137,14 +137,6 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-					'operator' => '',
-					'tag' => ''
-				],
-				'Incorrect value for "operator" field.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
 					'operator' => CONDITION_OPERATOR_EQUAL,
 					'tag' => ''
 				],
@@ -153,42 +145,10 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 			[[],
 				[
 					'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG,
-					'operator' => '',
-					'tag' => ''
-				],
-				'Incorrect value for "operator" field.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG,
 					'operator' => CONDITION_OPERATOR_EQUAL,
 					'tag' => ''
 				],
 				'Incorrect value for field "tag": cannot be empty.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-					'operator' => '',
-					'groupids' => ''
-				],
-				'Incorrect value for "operator" field.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-					'operator' => CONDITION_OPERATOR_LIKE,
-					'groupids' => ''
-				],
-				'Incorrect value for "operator" field.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-					'operator' => CONDITION_OPERATOR_NOT_LIKE,
-					'groupids' => ''
-				],
-				'Incorrect value for "operator" field.'
 			],
 			[[],
 				[
@@ -205,15 +165,6 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 					'groupids' => ['0']
 				],
 				'Incorrect value for field "groupid": cannot be empty.'
-			],
-			[[],
-				[
-					'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
-					'operator' => '',
-					'oldtag' => '',
-					'newtag' => ''
-				],
-				'Incorrect value for "operator" field.'
 			],
 			[[],
 				[

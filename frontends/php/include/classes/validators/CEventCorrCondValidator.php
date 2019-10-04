@@ -40,19 +40,13 @@ class CEventCorrCondValidator extends CValidator {
 		switch ($condition['type']) {
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-				if ($operator != CONDITION_OPERATOR_EQUAL) {
-					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
-				}
-				elseif (zbx_empty($tag)) {
+				if (zbx_empty($tag)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
 				}
 				break;
 
 			case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-				if ($operator != CONDITION_OPERATOR_EQUAL && $operator != CONDITION_OPERATOR_NOT_EQUAL) {
-					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
-				}
-				elseif (!is_array($groupids) || zbx_empty($groupids)) {
+				if (!is_array($groupids) || zbx_empty($groupids)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'groupid', _('cannot be empty')));
 				}
 				else {
@@ -68,10 +62,7 @@ class CEventCorrCondValidator extends CValidator {
 				break;
 
 			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-				if ($operator != CONDITION_OPERATOR_EQUAL) {
-					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
-				}
-				elseif (zbx_empty($oldtag)) {
+				if (zbx_empty($oldtag)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'oldtag', _('cannot be empty')));
 				}
 				elseif (zbx_empty($newtag)) {
