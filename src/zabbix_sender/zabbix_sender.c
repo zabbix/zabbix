@@ -251,8 +251,18 @@ static void	send_signal_handler(int sig)
 {
 	if (SIGALRM == sig)
 		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
+	else if (SIGINT == sig)
+		zabbix_log(LOG_LEVEL_WARNING, "interrupt while executing operation");
+	else if (SIGQUIT == sig)
+		zabbix_log(LOG_LEVEL_WARNING, "dump core while executing operation");
+	else if (SIGTERM == sig)
+		zabbix_log(LOG_LEVEL_WARNING, "termination while executing operation");
+	else if (SIGHUP == sig)
+		zabbix_log(LOG_LEVEL_WARNING, "hangup while executing operation");
 	else if (SIGPIPE == sig)
 		zabbix_log(LOG_LEVEL_WARNING, "broken pipe while executing operation");
+	else
+		zabbix_log(LOG_LEVEL_TRACE, "signal %d while executing operation", sig);
 
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
