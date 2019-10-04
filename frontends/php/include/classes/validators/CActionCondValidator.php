@@ -18,13 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CActionCondValidator extends CValidator {
 
 	/**
 	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
 	 *
-	 *
-	 * @param $condition
+	 * @param array $condition
 	 *
 	 * @return bool
 	 */
@@ -49,9 +49,6 @@ class CActionCondValidator extends CValidator {
 		$discoveryObjectValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_object2str())
 		]);
-		$triggerValueValidator = new CLimitedSetValidator([
-			'values' => array_keys(trigger_value2str())
-		]);
 		$eventTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventType())
 		]);
@@ -60,53 +57,125 @@ class CActionCondValidator extends CValidator {
 		// validate condition values depending on condition type
 		switch ($condition['conditiontype']) {
 			case CONDITION_TYPE_HOST_GROUP:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_TEMPLATE:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_TRIGGER:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_HOST:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_DRULE:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(
+						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+					);
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_DCHECK:
 				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(
+						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_PROXY:
-				if (!$conditionValue) {
-					$this->setError(_('Empty action condition.'));
+				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				else {
+					foreach ($conditionValue as $value) {
+						if ($value == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+							);
+							break;
+						}
+					}
 				}
 				break;
 
 			case CONDITION_TYPE_DOBJECT:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(
+						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
+					);
 				}
 				elseif (!$discoveryObjectValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition discovery object.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Incorrect action condition discovery object.')
+						)
+					);
 				}
 				break;
 
@@ -114,14 +183,14 @@ class CActionCondValidator extends CValidator {
 				$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 				if ($time_period_parser->parse($conditionValue) != CParser::PARSE_SUCCESS) {
-					$this->setError(_('Invalid time period.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('Invalid time period.')));
 				}
 				break;
 
 			case CONDITION_TYPE_DHOST_IP:
 				$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$ip_range_parser->parse($conditionValue)) {
 					$this->setError(_s('Invalid action condition: %1$s.', $ip_range_parser->getError()));
@@ -130,52 +199,88 @@ class CActionCondValidator extends CValidator {
 
 			case CONDITION_TYPE_DSERVICE_TYPE:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$discoveryCheckTypeValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition discovery check.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Incorrect action condition discovery check.')
+						)
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_DSERVICE_PORT:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!validate_port_list($conditionValue)) {
-					$this->setError(_s('Incorrect action condition port "%1$s".', $conditionValue));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_s('Incorrect action condition port "%1$s".', $conditionValue)
+						)
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_DSTATUS:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$discoveryObjectStatusValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition discovery status.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Incorrect action condition discovery status.')
+						)
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_SUPPRESSED:
 				if (!zbx_empty($conditionValue)) {
-					$this->setError(_('Action condition value must be empty.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Action condition value must be empty.')
+						)
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_TRIGGER_SEVERITY:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$triggerSeverityValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition trigger severity.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Incorrect action condition trigger severity.')
+						)
+					);
 				}
 				break;
 
 			case CONDITION_TYPE_EVENT_TYPE:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$eventTypeValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition event type.'));
+					$this->setError(
+						_s(
+							'Incorrect value for field "%1$s": %2$s.',
+							'value',
+							_('Incorrect action condition event type.')
+						)
+					);
 				}
 				break;
 
@@ -187,14 +292,22 @@ class CActionCondValidator extends CValidator {
 			case CONDITION_TYPE_HOST_METADATA:
 			case CONDITION_TYPE_EVENT_TAG:
 				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;
 
 			case CONDITION_TYPE_EVENT_TAG_VALUE:
-				if (!is_string($condition['value']) || $condition['value'] === '' ||
-						!is_string($condition['value2']) || $condition['value2'] === '') {
-					$this->setError(_('Empty action condition.'));
+				if (!is_string($condition['value2']) || $condition['value2'] === '') {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value2', _('cannot be empty')));
+				}
+				elseif (!is_string($condition['value'])) {
+					$this->setError(
+						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
+					);
+				}
+				elseif (($condition['operator'] == CONDITION_OPERATOR_LIKE
+						|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE) && $condition['value'] === '') {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;
 

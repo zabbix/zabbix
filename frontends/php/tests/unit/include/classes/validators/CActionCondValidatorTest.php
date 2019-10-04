@@ -178,84 +178,84 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TEMPLATE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DRULE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DCHECK,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_PROXY,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => 100,
 				],
-				'Incorrect action condition discovery object.'
+				'Incorrect value for field "value": Incorrect action condition discovery object.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => '',
 				],
-				'Invalid time period.'
+				'Incorrect value for field "value": Invalid time period.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => 'QQQQQQ',
 				],
-				'Invalid time period.'
+				'Incorrect value for field "value": Invalid time period.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
@@ -304,119 +304,119 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => 100,
 				],
-				'Incorrect action condition discovery check.'
+				'Incorrect value for field "value": Incorrect action condition discovery check.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '3mdn-jiwiw',
 				],
-				'Incorrect action condition port "3mdn-jiwiw".'
+				'Incorrect value for field "value": Incorrect action condition port "3mdn-jiwiw".'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => 100,
 				],
-				'Incorrect action condition discovery status.'
+				'Incorrect value for field "value": Incorrect action condition discovery status.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
 					'value' => 123,
 				],
-				'Action condition value must be empty.'
+				'Incorrect value for field "value": Action condition value must be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => 100,
 				],
-				'Incorrect action condition trigger severity.'
+				'Incorrect value for field "value": Incorrect action condition trigger severity.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => 100,
 				],
-				'Incorrect action condition event type.'
+				'Incorrect value for field "value": Incorrect action condition event type.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DUPTIME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_DVALUE,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_APPLICATION,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_NAME,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 					'value' => '',
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			],
 			// invalid condition type
 			[[],
@@ -452,7 +452,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
 				],
-				'Empty action condition.'
+				'Incorrect value for field "value": cannot be empty.'
 			]
 		];
 	}

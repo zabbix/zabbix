@@ -1,0 +1,105 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CEventCorrCondValidator extends CValidator {
+
+	/**
+	 * Returns true if the given $value is valid, or set's an error and returns false otherwise.
+	 *
+	 * @param array $condition
+	 *
+	 * @return bool
+	 */
+	public function validate($condition) {
+		$operator = array_key_exists('operator', $condition) ? $condition['operator'] : null;
+		$tag = array_key_exists('tag', $condition) ? $condition['tag'] : null;
+		$oldtag = array_key_exists('oldtag', $condition) ? $condition['oldtag'] : null;
+		$newtag = array_key_exists('newtag', $condition) ? $condition['newtag'] : null;
+		$value = array_key_exists('value', $condition) ? $condition['value'] : null;
+		$groupids = array_key_exists('groupids', $condition) ? $condition['groupids'] : null;
+
+		// validate condition values depending on condition type
+		switch ($condition['type']) {
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+				if ($operator != CONDITION_OPERATOR_EQUAL) {
+					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
+				}
+				elseif (zbx_empty($tag)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
+				}
+				break;
+
+			case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+				if ($operator != CONDITION_OPERATOR_EQUAL && $operator != CONDITION_OPERATOR_NOT_EQUAL) {
+					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
+				}
+				elseif (!is_array($groupids) || zbx_empty($groupids)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'groupid', _('cannot be empty')));
+				}
+				else {
+					foreach ($groupids as $groupid) {
+						if ($groupid == 0) {
+							$this->setError(
+								_s('Incorrect value for field "%1$s": %2$s.', 'groupid', _('cannot be empty'))
+							);
+							break;
+						}
+					}
+				}
+				break;
+
+			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+				if ($operator != CONDITION_OPERATOR_EQUAL) {
+					$this->setError(_s('Incorrect value for "%1$s" field.', 'operator'));
+				}
+				elseif (zbx_empty($oldtag)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'oldtag', _('cannot be empty')));
+				}
+				elseif (zbx_empty($newtag)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'newtag', _('cannot be empty')));
+				}
+				break;
+
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+				if (zbx_empty($tag)) {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
+				}
+				elseif (!is_string($value)) {
+					$this->setError(
+						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
+					);
+				}
+				elseif (($condition['operator'] == CONDITION_OPERATOR_LIKE
+						|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE) && $value === '') {
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
+				}
+				break;
+
+			default:
+				$this->setError(_('Incorrect condition type.'));
+		}
+
+		// If no error is not set, return true.
+		return !(bool) $this->getError();
+	}
+}
