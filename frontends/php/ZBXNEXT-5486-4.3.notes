@@ -1,0 +1,52 @@
+| ch  | menu              | {method} | action              | view                             | CC                            |
+|     |                   |          |                     |                                  |                               |
+| [ ] | gui               | GET      | gui.edit            | administration.gui.edit          | CControllerGuiEdit            |
+| [ ] | gui               | POST     | gui.update          | {redir:^edit}                    | CControllerGuiUpdate          |
+|     |                   |          |                     |                                  |                               |
+| [x] | auto registration | GET      | autoreg.edit        | administration.autoreg.edit      | CControllerAutoregEdit        |
+| [x] | auto registration | POST     | autoreg.update      | {redir:^edit}                    | CControllerAutoregUpdate      |
+|     |                   |          |                     |                                  |                               |
+| [ ] | housekeeping      | GET      | housekeeping.edit   | administration.autoreg.edit      | CControllerHousekeepingEdit   |
+| [ ] | housekeeping      | POST     | housekeeping.reset  | {redir:^edit}                    | CControllerHousekeepingReset  |
+| [ ] | housekeeping      | POST     | housekeeping.update | {redir:^edit}                    | CControllerHousekeepingUpdate |
+|     |                   |          |                     |                                  |                               |
+| [ ] | images            | GET      | image.list          | administration.image.list        | CControllerImageList          | imagetype
+| [ ] | images            | GET      | image.edit          | administration.image.edit        | CControllerImageEdit          | imagetype OR imageid (create OR edit)
+| [ ] | images            | POST     | image.update        | {redir:^list^edit}               | CControllerImageUpdate        | imageid
+| [ ] | images            | POST     | image.delete        | {redir:^list}                    | CControllerImageDelete        | imageid
+|     |                   |          |                     |                                  |                               |
+| [ ] | icon mapping      | GET      | iconmap.list        | administration.iconmap.list      | CControllerIconMapList        |
+| [ ] | icon mapping      | GET      | iconmap.edit        | administration.iconmap.edit      | CControllerIconMapEdit        | iconmapid? (OR create)
+| [ ] | icon mapping      | POST     | iconmap.update      | {redir:^list^edit}               | CControllerIconMapEdit        | iconmapid? (OR create)
+| [ ] | icon mapping      | POST     | iconmap.clone       | {redir:^edit}                    | CControllerIconMapClone       | iconmapid
+| [ ] | icon mapping      | POST     | iconmap.delete      | {redir:^list^edit}               | CControllerIconMapDelete      | iconmapid
+|     |                   |          |                     |                                  |                               |
+| [ ] | regular expr      | GET      | regex.list          | administration.regex.list        | CControllerRegExList          |
+| [ ] | regular expr      | GET      | regex.edit          | administration.regex.edit        | CControllerRegExEdit          | regexid? (OR create)
+| [ ] | regular expr      | POST     | regex.update        | {redir:^list^edit}               | CControllerRegExUpdate        | regexid? (OR create)
+| [ ] | regular expr      | POST     | regex.delete        | {redir:^list}                    | CControllerRegExDelete        | regexids[]
+| [ ] | regular expr      | POST     | regex.clone         | {redir:^edit}                    | CControllerRegExClone         | regexid
+| [ ] | regular expr      | POST     | regex.test          | {json-layout}                    | CControllerRegExTest          | expressions[] test_string
+|     |                   |          |                     |                                  |                               |
+| [ ] | macros            | GET      | macros.edit         | administration.macros.edit       | CControllerMacrosEdit         |
+| [ ] | macros            | POST     | macros.update       | {redir:^edit}                    | CControllerMacrosUpdate       |
+|     |                   |          |                     |                                  |                               |
+| [ ] | value mappings    | GET      | valuemap.list       | administration.valuemap.list     | CControllerValuemapList       |
+| [ ] | value mappings    | GET      | valuemap.edit       | administration.valuemap.edit     | CControllerValuemapEdit       | valuemapid? (OR create)
+| [ ] | value mappings    | POST     | valuemap.update     | {redir:^list^edit}               | CControllerValuemapUpdate     | valuemapid? (OR create)
+| [ ] | value mappings    | POST     | valuemap.delete     | {redir:^list}                    | CControllerValuemapDelete     | valuemapids[]
+| [ ] | value mappings    | POST     | valuemap.clone      | {redir:^edit}                    | CControllerValuemapClone      | valuemapid
+|     |                   |          |                     |                                  |                               |
+| [ ] | workingtime       | GET      | workingtime.edit    | administration.workingtime.edit  | CControllerWorkingTimeEdit    |
+| [ ] | workingtime       | POST     | workingtime.update  | {redir:^edit}                    | CControllerWorkingTimeUpdate  |
+|     |                   |          |                     |                                  |                               |
+| [ ] | trig severities   | GET      | trigseverity.edit   | administration.trigseverity.edit | CControllerTrigSeverityEdit   |
+| [ ] | trig severities   | POST     | trigseverity.update | {redir:^edit}                    | CControllerTrigSeverityUpdate |
+| [ ] | trig severities   | POST     | trigseverity.reset  | {redir:^edit}                    | CControllerTrigSeverityReset  |
+|     |                   |          |                     |                                  |                               |
+| [ ] | trig display      | GET      | trigdisplay.edit    | administration.trigdisplay.edit  | CControllerTrigDisplayEdit    |
+| [ ] | trig display      | POST     | trigdisplay.update  | {redir:^edit}                    | CControllerTrigDisplayUpdate  |
+| [ ] | trig display      | POST     | trigdisplay.reset   | {redir:^edit}                    | CControllerTrigDisplayReset   |
+|     |                   |          |                     |                                  |                               |
+| [ ] | other             | GET      | miscconfig.edit     | administration.miscconfig.edit   | CControllerMiscConfigEdit     |
+| [ ] | other             | POST     | miscconfig.update   | {redir:^edit}                    | CControllerMiscConfigUpdate   |
