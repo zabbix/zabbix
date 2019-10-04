@@ -81,7 +81,7 @@ class CSession {
 	public static function getDefaultCookiePath() {
 		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-		return rtrim(substr($path, 0, strrpos($path, '/') + 1), '/');
+		return rtrim(substr($path, 0, strrpos($path, '/')), '/');
 	}
 
 	/**
