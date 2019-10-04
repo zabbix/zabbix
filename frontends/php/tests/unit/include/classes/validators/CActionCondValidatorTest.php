@@ -234,21 +234,21 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => 100,
 				],
-				'Incorrect value for field "value": Incorrect action condition discovery object.'
+				'Incorrect action condition discovery object.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => '',
 				],
-				'Incorrect value for field "value": Invalid time period.'
+				'Invalid time period.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => 'QQQQQQ',
 				],
-				'Incorrect value for field "value": Invalid time period.'
+				'Invalid time period.'
 			],
 			[[],
 				[
@@ -311,7 +311,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => 100,
 				],
-				'Incorrect value for field "value": Incorrect action condition discovery check.'
+				'Incorrect action condition discovery check.'
 			],
 			[[],
 				[
@@ -325,7 +325,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '3mdn-jiwiw',
 				],
-				'Incorrect value for field "value": Incorrect action condition port "3mdn-jiwiw".'
+				'Incorrect action condition port "3mdn-jiwiw".'
 			],
 			[[],
 				[
@@ -339,14 +339,14 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => 100,
 				],
-				'Incorrect value for field "value": Incorrect action condition discovery status.'
+				'Incorrect action condition discovery status.'
 			],
 			[[],
 				[
 					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
 					'value' => 123,
 				],
-				'Incorrect value for field "value": Action condition value must be empty.'
+				'Action condition value must be empty.'
 			],
 			[[],
 				[
@@ -360,7 +360,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => 100,
 				],
-				'Incorrect value for field "value": Incorrect action condition trigger severity.'
+				'Incorrect action condition trigger severity.'
 			],
 			[[],
 				[
@@ -374,7 +374,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => 100,
 				],
-				'Incorrect value for field "value": Incorrect action condition event type.'
+				'Incorrect action condition event type.'
 			],
 			[[],
 				[

@@ -169,13 +169,7 @@ class CActionCondValidator extends CValidator {
 					);
 				}
 				elseif (!$discoveryObjectValidator->validate($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Incorrect action condition discovery object.')
-						)
-					);
+					$this->setError(_('Incorrect action condition discovery object.'));
 				}
 				break;
 
@@ -183,7 +177,7 @@ class CActionCondValidator extends CValidator {
 				$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 
 				if ($time_period_parser->parse($conditionValue) != CParser::PARSE_SUCCESS) {
-					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('Invalid time period.')));
+					$this->setError(_('Invalid time period.'));
 				}
 				break;
 
@@ -202,13 +196,7 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$discoveryCheckTypeValidator->validate($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Incorrect action condition discovery check.')
-						)
-					);
+					$this->setError(_('Incorrect action condition discovery check.'));
 				}
 				break;
 
@@ -217,13 +205,7 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!validate_port_list($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_s('Incorrect action condition port "%1$s".', $conditionValue)
-						)
-					);
+					$this->setError(_s('Incorrect action condition port "%1$s".', $conditionValue));
 				}
 				break;
 
@@ -232,25 +214,13 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$discoveryObjectStatusValidator->validate($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Incorrect action condition discovery status.')
-						)
-					);
+					$this->setError(_('Incorrect action condition discovery status.'));
 				}
 				break;
 
 			case CONDITION_TYPE_SUPPRESSED:
 				if (!zbx_empty($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Action condition value must be empty.')
-						)
-					);
+					$this->setError(_('Action condition value must be empty.'));
 				}
 				break;
 
@@ -259,13 +229,7 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$triggerSeverityValidator->validate($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Incorrect action condition trigger severity.')
-						)
-					);
+					$this->setError(_('Incorrect action condition trigger severity.'));
 				}
 				break;
 
@@ -274,13 +238,7 @@ class CActionCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				elseif (!$eventTypeValidator->validate($conditionValue)) {
-					$this->setError(
-						_s(
-							'Incorrect value for field "%1$s": %2$s.',
-							'value',
-							_('Incorrect action condition event type.')
-						)
-					);
+					$this->setError(_('Incorrect action condition event type.'));
 				}
 				break;
 
