@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.2</version>
+   <version>4.4</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -16,7 +16,7 @@ https://httpd.apache.org/docs/current/mod/mod_status.html&#13;
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache&#13;
 &#13;
-Template tooling version used: 0.29</description>
+Template tooling version used: 0.32</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -32,46 +32,83 @@ Template tooling version used: 0.29</description>
          </applications>
          <items>
             <item>
+               <name>Apache: Total bytes</name>
+               <type>DEPENDENT</type>
+               <key>apache.bytes</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>B</units>
+               <description>Total bytes served</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$["Total kBytes"]</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Bytes per second</name>
+               <type>DEPENDENT</type>
+               <key>apache.bytes.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>Bps</units>
+               <description>Calculated as change rate for 'Total bytes' stat.&#13;
+BytesPerSec is not used, as it counts average since last Apache server start.</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$["Total kBytes"]</params>
+                  </step>
+                  <step>
+                     <type>MULTIPLIER</type>
+                     <params>1024</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
                <name>Apache: Get status</name>
-               <type>19</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>HTTP_AGENT</type>
                <key>apache.get_status</key>
-               <delay>1m</delay>
                <history>1h</history>
                <trends>0</trends>
-               <status>0</status>
-               <value_type>4</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
+               <value_type>TEXT</value_type>
                <description>Getting data from a machine-readable version of the Apache status page.&#13;
 https://httpd.apache.org/docs/current/mod/mod_status.html</description>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Zabbix raw items</name>
                   </application>
                </applications>
-               <valuemap/>
-               <logtimefmt/>
                <preprocessing>
                   <step>
-                     <type>21</type>
+                     <type>JAVASCRIPT</type>
                      <params>// Convert Apache status to JSON
 var lines = value.split("\n");
 var fields = {},
@@ -112,61 +149,464 @@ output.Workers = {
  
 // Return JSON string
 return JSON.stringify(output);</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
                <url>{$APACHE.STATUS.SCHEME}://{HOST.CONN}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}</url>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>2</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+               <retrieve_mode>BOTH</retrieve_mode>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata(30m)}=1</expression>
+                     <name>Apache: Failed to fetch status page (or no data for 30m)</name>
+                     <priority>WARNING</priority>
+                     <description>Zabbix has not received data for items for the last 30 minutes.</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Apache: Service is down</name>
+                           <expression>{Template App Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Apache: Total requests</name>
+               <type>DEPENDENT</type>
+               <key>apache.requests</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>A total number of accesses</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$["Total Accesses"]</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Requests per second</name>
+               <type>DEPENDENT</type>
+               <key>apache.requests.rate</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <description>Calculated as change rate for 'Total requests' stat.&#13;
+ReqPerSec is not used, as it counts average since last Apache server start.</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$["Total Accesses"]</params>
+                  </step>
+                  <step>
+                     <type>CHANGE_PER_SECOND</type>
+                     <params/>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Uptime</name>
+               <type>DEPENDENT</type>
+               <key>apache.uptime</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <units>uptime</units>
+               <description>Service uptime in seconds</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.ServerUptimeSeconds</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}&lt;10m</expression>
+                     <name>Apache: has been restarted (uptime &lt; 10m)</name>
+                     <priority>INFO</priority>
+                     <description>Uptime is less than 10 minutes</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Apache: Version</name>
+               <type>DEPENDENT</type>
+               <key>apache.version</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>Service version</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.ServerVersion</params>
+                  </step>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <recovery_mode>NONE</recovery_mode>
+                     <name>Apache: Version has changed (new version: {ITEM.VALUE})</name>
+                     <priority>INFO</priority>
+                     <description>Apache version has changed. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Apache: Total workers busy</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers_total.busy</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Total number of busy worker threads/processes</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.BusyWorkers</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Total workers idle</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers_total.idle</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Total number of idle worker threads/processes</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.IdleWorkers</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers idle cleanup</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.cleanup</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in cleanup state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.cleanup</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers closing connection</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.closing</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in closing state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.closing</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers DNS lookup</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.dnslookup</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in dnslookup state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.dnslookup</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers finishing</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.finishing</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in finishing state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.finishing</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers keepalive (read)</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.keepalive</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in keepalive state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.keepalive</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers logging</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.logging</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in logging state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.logging</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers reading request</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.reading</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in reading state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.reading</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers sending reply</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.sending</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in sending state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.sending</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers slot with no current process</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.slot</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of slots with no current process</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.slot</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers starting up</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.starting</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in starting state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.starting</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Workers waiting for connection</name>
+               <type>DEPENDENT</type>
+               <key>apache.workers.waiting</key>
+               <delay>0</delay>
+               <history>7d</history>
+               <description>Number of workers in waiting state</description>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.Workers.waiting</params>
+                  </step>
+               </preprocessing>
+               <master_item>
+                  <key>apache.get_status</key>
+               </master_item>
+            </item>
+            <item>
+               <name>Apache: Service response time</name>
+               <type>SIMPLE</type>
+               <key>net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]</key>
+               <history>7d</history>
+               <value_type>FLOAT</value_type>
+               <units>s</units>
+               <applications>
+                  <application>
+                     <name>Apache</name>
+                  </application>
+               </applications>
+               <triggers>
+                  <trigger>
+                     <expression>{min(5m)}&gt;{$APACHE.RESPONSE_TIME.MAX.WARN}</expression>
+                     <name>Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)</name>
+                     <priority>WARNING</priority>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Apache: Service is down</name>
+                           <expression>{Template App Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Apache: Service ping</name>
-               <type>3</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>SIMPLE</type>
                <key>net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]</key>
-               <delay>1m</delay>
                <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Apache</name>
@@ -175,1895 +615,172 @@ return JSON.stringify(output);</params>
                <valuemap>
                   <name>Service state</name>
                </valuemap>
-               <logtimefmt/>
                <preprocessing>
                   <step>
-                     <type>20</type>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>10m</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Apache: Service response time</name>
-               <type>3</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]</key>
-               <delay>1m</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>0</value_type>
-               <allowed_hosts/>
-               <units>s</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Apache: Total bytes</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.bytes</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>0</value_type>
-               <allowed_hosts/>
-               <units>B</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Total bytes served</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$["Total kBytes"]</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>1</type>
-                     <params>1024</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Bytes per second</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.bytes.rate</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>0</value_type>
-               <allowed_hosts/>
-               <units>Bps</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$["Total kBytes"]</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>1</type>
-                     <params>1024</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>10</type>
-                     <params/>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Requests per second</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.requests.rate</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>0</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Calculated as change rate for 'Total requests' stat.&#13;
-ReqPerSec is not used, as it counts average since last Apache server start.</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$["Total Accesses"]</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>10</type>
-                     <params/>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Total requests</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.requests</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>A total number of accesses</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$["Total Accesses"]</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Uptime</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.uptime</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units>uptime</units>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Service uptime in seconds</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.ServerUptimeSeconds</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Version</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.version</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Service version</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.ServerVersion</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Total workers busy</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers_total.busy</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Total number of busy worker threads/processes</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.BusyWorkers</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Total workers idle</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers_total.idle</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Total number of idle worker threads/processes</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.IdleWorkers</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers closing connection</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.closing</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in closing state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.closing</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers DNS lookup</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.dnslookup</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in dnslookup state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.dnslookup</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers finishing</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.finishing</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in finishing state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.finishing</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers idle cleanup</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.cleanup</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in cleanup state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.cleanup</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers keepalive (read)</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.keepalive</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in keepalive state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.keepalive</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers logging</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.logging</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in logging state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.logging</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers reading request</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.reading</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in reading state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.reading</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers sending reply</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.sending</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in sending state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.sending</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers slot with no current process</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.slot</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of slots with no current process</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.slot</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers starting up</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.starting</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in starting state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.starting</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
-            </item>
-            <item>
-               <name>Apache: Workers waiting for connection</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>apache.workers.waiting</key>
-               <delay>0</delay>
-               <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>Number of workers in waiting state</description>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Apache</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.Workers.waiting</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item>
-                  <key>apache.get_status</key>
-               </master_item>
+               <triggers>
+                  <trigger>
+                     <expression>{last()}=0</expression>
+                     <name>Apache: Service is down</name>
+                     <priority>AVERAGE</priority>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
          <discovery_rules>
             <discovery_rule>
                <name>Event MPM discovery</name>
-               <type>18</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>DEPENDENT</type>
                <key>apache.mpm.event.discovery</key>
                <delay>0</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
                <description>Additional metrics if event MPM is used&#13;
 https://httpd.apache.org/docs/current/mod/event.html</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>Apache: Connections async closing</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>apache.connections[async_closing{#SINGLETON}]</key>
+                     <name>Apache: Bytes per request</name>
+                     <type>DEPENDENT</type>
+                     <key>apache.bytes[per_request{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Number of async connections in closing state (only applicable to event MPM)</description>
-                     <inventory_link>0</inventory_link>
+                     <value_type>FLOAT</value_type>
+                     <units>B</units>
+                     <description>Average number of client requests per second</description>
                      <applications>
                         <application>
                            <name>Apache</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>12</type>
-                           <params>$.ConnsAsyncClosing</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
+                           <type>JSONPATH</type>
+                           <params>$.BytesPerReq</params>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
+                     <master_item>
+                        <key>apache.get_status</key>
+                     </master_item>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Apache: Connections async closing</name>
+                     <type>DEPENDENT</type>
+                     <key>apache.connections[async_closing{#SINGLETON}]</key>
+                     <delay>0</delay>
+                     <history>7d</history>
+                     <description>Number of async connections in closing state (only applicable to event MPM)</description>
+                     <applications>
+                        <application>
+                           <name>Apache</name>
+                        </application>
+                     </applications>
+                     <preprocessing>
+                        <step>
+                           <type>JSONPATH</type>
+                           <params>$.ConnsAsyncClosing</params>
+                        </step>
+                     </preprocessing>
                      <master_item>
                         <key>apache.get_status</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Apache: Connections async keep alive</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
+                     <type>DEPENDENT</type>
                      <key>apache.connections[async_keep_alive{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>Number of async connections in keep-alive state (only applicable to event MPM)</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Apache</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>12</type>
+                           <type>JSONPATH</type>
                            <params>$.ConnsAsyncKeepAlive</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
                      <master_item>
                         <key>apache.get_status</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Apache: Connections async writing</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
+                     <type>DEPENDENT</type>
                      <key>apache.connections[async_writing{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>Number of async connections in writing state (only applicable to event MPM)</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Apache</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>12</type>
+                           <type>JSONPATH</type>
                            <params>$.ConnsAsyncWriting</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
                      <master_item>
                         <key>apache.get_status</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Apache: Connections total</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
+                     <type>DEPENDENT</type>
                      <key>apache.connections[total{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>Number of total connections</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Apache</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>12</type>
+                           <type>JSONPATH</type>
                            <params>$.ConnsTotal</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item>
-                        <key>apache.get_status</key>
-                     </master_item>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Apache: Bytes per request</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>apache.bytes[per_request{#SINGLETON}]</key>
-                     <delay>0</delay>
-                     <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
-                     <units>B</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Average number of client requests per second</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Apache</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>12</type>
-                           <params>$.BytesPerReq</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
                      <master_item>
                         <key>apache.get_status</key>
                      </master_item>
                   </item_prototype>
                   <item_prototype>
                      <name>Apache: Number of async processes</name>
-                     <type>18</type>
-                     <snmp_community/>
-                     <snmp_oid/>
+                     <type>DEPENDENT</type>
                      <key>apache.process[num{#SINGLETON}]</key>
                      <delay>0</delay>
                      <history>7d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>Number of async processes</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Apache</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>12</type>
+                           <type>JSONPATH</type>
                            <params>$.Processes</params>
-                           <error_handler>0</error_handler>
-                           <error_handler_params/>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
                      <master_item>
                         <key>apache.get_status</key>
                      </master_item>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes/>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Apache: Current async connections{#SINGLETON}</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>0</ymin_type_1>
-                     <ymax_type_1>0</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>0</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template App Apache by HTTP</host>
                               <key>apache.connections[async_closing{#SINGLETON}]</key>
@@ -2071,11 +788,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </graph_item>
                         <graph_item>
                            <sortorder>1</sortorder>
-                           <drawtype>0</drawtype>
                            <color>2774A4</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template App Apache by HTTP</host>
                               <key>apache.connections[async_keep_alive{#SINGLETON}]</key>
@@ -2083,11 +796,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </graph_item>
                         <graph_item>
                            <sortorder>2</sortorder>
-                           <drawtype>0</drawtype>
                            <color>F63100</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template App Apache by HTTP</host>
                               <key>apache.connections[async_writing{#SINGLETON}]</key>
@@ -2095,11 +804,8 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                         </graph_item>
                         <graph_item>
                            <sortorder>3</sortorder>
-                           <drawtype>2</drawtype>
+                           <drawtype>BOLD_LINE</drawtype>
                            <color>A54F10</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template App Apache by HTTP</host>
                               <key>apache.connections[total{#SINGLETON}]</key>
@@ -2109,29 +815,10 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                   </graph_prototype>
                   <graph_prototype>
                      <name>Apache: Current async processes{#SINGLETON}</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>0</ymin_type_1>
-                     <ymax_type_1>0</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template App Apache by HTTP</host>
                               <key>apache.process[num{#SINGLETON}]</key>
@@ -2140,65 +827,43 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <host_prototypes/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <lld_macro_paths/>
-               <preprocessing>
-                  <step>
-                     <type>12</type>
-                     <params>$.ServerMPM</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-                  <step>
-                     <type>21</type>
-                     <params>return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
                <master_item>
                   <key>apache.get_status</key>
                </master_item>
+               <preprocessing>
+                  <step>
+                     <type>JSONPATH</type>
+                     <params>$.ServerMPM</params>
+                  </step>
+                  <step>
+                     <type>JAVASCRIPT</type>
+                     <params>return JSON.stringify(value === 'event' ? [{'{#SINGLETON}': ''}] : []);</params>
+                  </step>
+               </preprocessing>
             </discovery_rule>
          </discovery_rules>
-         <httptests/>
          <macros>
             <macro>
                <macro>{$APACHE.RESPONSE_TIME.MAX.WARN}</macro>
                <value>10</value>
+               <description>Maximum Apache response time in seconds for trigger expression</description>
             </macro>
             <macro>
                <macro>{$APACHE.STATUS.PATH}</macro>
                <value>server-status?auto</value>
+               <description>The URL path</description>
             </macro>
             <macro>
                <macro>{$APACHE.STATUS.PORT}</macro>
                <value>80</value>
+               <description>The port of Apache status page</description>
             </macro>
             <macro>
                <macro>{$APACHE.STATUS.SCHEME}</macro>
                <value>http</value>
+               <description>Request scheme which may be http or https</description>
             </macro>
          </macros>
-         <templates/>
          <screens>
             <screen>
                <name>Apache performance</name>
@@ -2207,28 +872,33 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                <screen_items>
                   <screen_item>
                      <resourcetype>0</resourcetype>
-                     <width>500</width>
-                     <height>100</height>
-                     <x>0</x>
-                     <y>0</y>
-                     <colspan>1</colspan>
-                     <rowspan>1</rowspan>
-                     <elements>25</elements>
-                     <valign>0</valign>
-                     <halign>0</halign>
                      <style>0</style>
-                     <url/>
-                     <dynamic>0</dynamic>
-                     <sort_triggers>0</sort_triggers>
                      <resource>
                         <name>Apache: Requests per second</name>
                         <host>Template App Apache by HTTP</host>
                      </resource>
-                     <max_columns>3</max_columns>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
                      <application/>
+                     <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Apache: Workers total</name>
+                        <host>Template App Apache by HTTP</host>
+                     </resource>
                      <width>500</width>
                      <height>100</height>
                      <x>1</x>
@@ -2238,19 +908,19 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <elements>25</elements>
                      <valign>0</valign>
                      <halign>0</halign>
-                     <style>0</style>
-                     <url/>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <resource>
-                        <name>Apache: Workers total</name>
-                        <host>Template App Apache by HTTP</host>
-                     </resource>
-                     <max_columns>3</max_columns>
+                     <url/>
                      <application/>
+                     <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Apache: Current async connections{#SINGLETON}</name>
+                        <host>Template App Apache by HTTP</host>
+                     </resource>
                      <width>500</width>
                      <height>100</height>
                      <x>0</x>
@@ -2260,19 +930,19 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <elements>25</elements>
                      <valign>0</valign>
                      <halign>0</halign>
-                     <style>0</style>
-                     <url/>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <resource>
-                        <name>Apache: Current async connections{#SINGLETON}</name>
-                        <host>Template App Apache by HTTP</host>
-                     </resource>
-                     <max_columns>3</max_columns>
+                     <url/>
                      <application/>
+                     <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>20</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Apache: Current async processes{#SINGLETON}</name>
+                        <host>Template App Apache by HTTP</host>
+                     </resource>
                      <width>500</width>
                      <height>100</height>
                      <x>1</x>
@@ -2282,19 +952,19 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <elements>25</elements>
                      <valign>0</valign>
                      <halign>0</halign>
-                     <style>0</style>
-                     <url/>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <resource>
-                        <name>Apache: Current async processes{#SINGLETON}</name>
-                        <host>Template App Apache by HTTP</host>
-                     </resource>
-                     <max_columns>3</max_columns>
+                     <url/>
                      <application/>
+                     <max_columns>3</max_columns>
                   </screen_item>
                   <screen_item>
                      <resourcetype>0</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Apache: Worker states</name>
+                        <host>Template App Apache by HTTP</host>
+                     </resource>
                      <width>500</width>
                      <height>100</height>
                      <x>0</x>
@@ -2304,49 +974,24 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
                      <elements>25</elements>
                      <valign>0</valign>
                      <halign>0</halign>
-                     <style>0</style>
-                     <url/>
                      <dynamic>0</dynamic>
                      <sort_triggers>0</sort_triggers>
-                     <resource>
-                        <name>Apache: Worker states</name>
-                        <host>Template App Apache by HTTP</host>
-                     </resource>
-                     <max_columns>3</max_columns>
+                     <url/>
                      <application/>
+                     <max_columns>3</max_columns>
                   </screen_item>
                </screen_items>
             </screen>
          </screens>
-         <tags/>
       </template>
    </templates>
    <graphs>
       <graph>
          <name>Apache: Requests per second</name>
-         <width>900</width>
-         <height>200</height>
-         <yaxismin>0</yaxismin>
-         <yaxismax>100</yaxismax>
-         <show_work_period>1</show_work_period>
-         <show_triggers>1</show_triggers>
-         <type>0</type>
-         <show_legend>1</show_legend>
-         <show_3d>0</show_3d>
-         <percent_left>0.0000</percent_left>
-         <percent_right>0.0000</percent_right>
-         <ymin_type_1>0</ymin_type_1>
-         <ymax_type_1>0</ymax_type_1>
-         <ymin_item_1>0</ymin_item_1>
-         <ymax_item_1>0</ymax_item_1>
          <graph_items>
             <graph_item>
-               <sortorder>0</sortorder>
-               <drawtype>5</drawtype>
+               <drawtype>GRADIENT_LINE</drawtype>
                <color>1A7C11</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.requests.rate</key>
@@ -2355,74 +1000,10 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
          </graph_items>
       </graph>
       <graph>
-         <name>Apache: Workers total</name>
-         <width>900</width>
-         <height>200</height>
-         <yaxismin>0</yaxismin>
-         <yaxismax>100</yaxismax>
-         <show_work_period>1</show_work_period>
-         <show_triggers>1</show_triggers>
-         <type>1</type>
-         <show_legend>1</show_legend>
-         <show_3d>0</show_3d>
-         <percent_left>0.0000</percent_left>
-         <percent_right>0.0000</percent_right>
-         <ymin_type_1>0</ymin_type_1>
-         <ymax_type_1>0</ymax_type_1>
-         <ymin_item_1>0</ymin_item_1>
-         <ymax_item_1>0</ymax_item_1>
-         <graph_items>
-            <graph_item>
-               <sortorder>0</sortorder>
-               <drawtype>0</drawtype>
-               <color>1A7C11</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
-               <item>
-                  <host>Template App Apache by HTTP</host>
-                  <key>apache.workers_total.busy</key>
-               </item>
-            </graph_item>
-            <graph_item>
-               <sortorder>1</sortorder>
-               <drawtype>0</drawtype>
-               <color>2774A4</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
-               <item>
-                  <host>Template App Apache by HTTP</host>
-                  <key>apache.workers_total.idle</key>
-               </item>
-            </graph_item>
-         </graph_items>
-      </graph>
-      <graph>
          <name>Apache: Worker states</name>
-         <width>900</width>
-         <height>200</height>
-         <yaxismin>0</yaxismin>
-         <yaxismax>100</yaxismax>
-         <show_work_period>1</show_work_period>
-         <show_triggers>1</show_triggers>
-         <type>0</type>
-         <show_legend>1</show_legend>
-         <show_3d>0</show_3d>
-         <percent_left>0.0000</percent_left>
-         <percent_right>0.0000</percent_right>
-         <ymin_type_1>0</ymin_type_1>
-         <ymax_type_1>0</ymax_type_1>
-         <ymin_item_1>0</ymin_item_1>
-         <ymax_item_1>0</ymax_item_1>
          <graph_items>
             <graph_item>
-               <sortorder>0</sortorder>
-               <drawtype>0</drawtype>
                <color>1A7C11</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.dnslookup</key>
@@ -2430,11 +1011,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>1</sortorder>
-               <drawtype>0</drawtype>
                <color>2774A4</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.cleanup</key>
@@ -2442,11 +1019,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>2</sortorder>
-               <drawtype>0</drawtype>
                <color>F63100</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.logging</key>
@@ -2454,11 +1027,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>3</sortorder>
-               <drawtype>0</drawtype>
                <color>A54F10</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.reading</key>
@@ -2466,11 +1035,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>4</sortorder>
-               <drawtype>0</drawtype>
                <color>FC6EA3</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.sending</key>
@@ -2478,11 +1043,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>5</sortorder>
-               <drawtype>0</drawtype>
                <color>6C59DC</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.starting</key>
@@ -2490,11 +1051,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>6</sortorder>
-               <drawtype>0</drawtype>
                <color>AC8C14</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.closing</key>
@@ -2502,11 +1059,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>7</sortorder>
-               <drawtype>0</drawtype>
                <color>611F27</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.finishing</key>
@@ -2514,11 +1067,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>8</sortorder>
-               <drawtype>0</drawtype>
                <color>F230E0</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.keepalive</key>
@@ -2526,11 +1075,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>9</sortorder>
-               <drawtype>0</drawtype>
                <color>FFAD40</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.slot</key>
@@ -2538,11 +1083,7 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
             <graph_item>
                <sortorder>10</sortorder>
-               <drawtype>0</drawtype>
                <color>40CDFF</color>
-               <yaxisside>0</yaxisside>
-               <calc_fnc>2</calc_fnc>
-               <type>0</type>
                <item>
                   <host>Template App Apache by HTTP</host>
                   <key>apache.workers.waiting</key>
@@ -2550,104 +1091,28 @@ https://httpd.apache.org/docs/current/mod/event.html</description>
             </graph_item>
          </graph_items>
       </graph>
+      <graph>
+         <name>Apache: Workers total</name>
+         <type>STACKED</type>
+         <graph_items>
+            <graph_item>
+               <color>1A7C11</color>
+               <item>
+                  <host>Template App Apache by HTTP</host>
+                  <key>apache.workers_total.busy</key>
+               </item>
+            </graph_item>
+            <graph_item>
+               <sortorder>1</sortorder>
+               <color>2774A4</color>
+               <item>
+                  <host>Template App Apache by HTTP</host>
+                  <key>apache.workers_total.idle</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
    </graphs>
-   <triggers>
-      <trigger>
-         <expression>{Template App Apache by HTTP:apache.get_status.nodata(30m)}=1</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Apache: Failed to fetch status page (or no data for 30m)</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Zabbix has not received data for items for the last 30 minutes.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies>
-            <dependency>
-               <name>Apache: Service is down</name>
-               <expression>{Template App Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
-               <recovery_expression/>
-            </dependency>
-         </dependencies>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template App Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Apache: Service is down</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template App Apache by HTTP:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}&gt;{$APACHE.RESPONSE_TIME.MAX.WARN}</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>2</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies>
-            <dependency>
-               <name>Apache: Service is down</name>
-               <expression>{Template App Apache by HTTP:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0</expression>
-               <recovery_expression/>
-            </dependency>
-         </dependencies>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template App Apache by HTTP:apache.uptime.last()}&lt;10m</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Apache: has been restarted (uptime &lt; 10m)</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-The Apache uptime is less than 10 minutes</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template App Apache by HTTP:apache.version.diff()}=1 and {Template App Apache by HTTP:apache.version.strlen()}&gt;0</expression>
-         <recovery_mode>2</recovery_mode>
-         <recovery_expression/>
-         <name>Apache: Version has changed (new version: {ITEM.VALUE})</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Apache version has changed. Ack to close.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-   </triggers>
    <value_maps>
       <value_map>
          <name>Service state</name>
