@@ -320,7 +320,7 @@ The current operational state of the interface.&#13;
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>This trigger expression works as follows:&#13;
 1. Can be triggered if operations status is down.&#13;
@@ -378,7 +378,7 @@ and&#13;
                      <recovery_expression>({Template Module Interfaces Windows SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&gt;0 and {Template Module Interfaces Windows SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].prev()}&gt;0) or&#13;
 ({Template Module Interfaces Windows SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
-                     <opdata>Current reported speed: {ITEM.VALUE1}</opdata>
+                     <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
                      <manual_close>YES</manual_close>
@@ -398,7 +398,7 @@ and&#13;
                      <recovery_expression>{Template Module Interfaces Windows SNMPv2:net.if.in[ifInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces Windows SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
 {Template Module Interfaces Windows SNMPv2:net.if.out[ifOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces Windows SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
-                     <opdata>In: {ITEM.VALUE1}, out: {ITEM.VALUE3}, speed: {ITEM.VALUE2}</opdata>
+                     <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <manual_close>YES</manual_close>
                      <dependencies>
@@ -416,7 +416,7 @@ or {Template Module Interfaces Windows SNMPv2:net.if.out.errors[ifOutErrors.{#SN
                      <recovery_expression>{Template Module Interfaces Windows SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Interfaces Windows SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
-                     <opdata>errors in: {ITEM.VALUE1}, errors out: {ITEM.VALUE2}</opdata>
+                     <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
                      <manual_close>YES</manual_close>

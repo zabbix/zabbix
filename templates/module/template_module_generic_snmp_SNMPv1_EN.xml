@@ -242,7 +242,7 @@ The time (in hundredths of a second) since the network management portion of the
                   <trigger>
                      <expression>{max({$SNMP.TIMEOUT})}=0</expression>
                      <name>No SNMP data collection</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>SNMP is not available for polling. Please check device connectivity and SNMP settings.</description>
                      <dependencies>

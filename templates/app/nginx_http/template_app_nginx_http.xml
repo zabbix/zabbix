@@ -171,7 +171,7 @@ if (a) {
                   <trigger>
                      <expression>{min(5m)} &gt; {$NGINX.DROP_RATE.MAX.WARN}</expression>
                      <name>Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)</name>
-                     <opdata>Current rate: {ITEM.VALUE1}</opdata>
+                     <opdata>Current rate: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</description>
                      <dependencies>

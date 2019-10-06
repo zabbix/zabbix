@@ -182,7 +182,7 @@ and are waiting to be executed.</description>
                   <trigger>
                      <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                      <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                     <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                     <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                </triggers>
@@ -313,7 +313,7 @@ and are waiting to be executed.</description>
                      <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
 (({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -325,7 +325,7 @@ and are waiting to be executed.</description>
                      <expression>{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
 (({Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Windows filesystems by Zabbix agent:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -1056,7 +1056,7 @@ A typical Event ID 2019 is recorded in the system event log.</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>This trigger expression works as follows:&#13;
 1. Can be triggered if operations status is down.&#13;
@@ -1111,7 +1111,7 @@ and&#13;
                      <recovery_expression>({Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].change()}&gt;0 and {Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].prev()}&gt;0) or&#13;
 ({Template Module Windows network by Zabbix agent:net.if.status["{#IFNAME}"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
-                     <opdata>Current reported speed: {ITEM.VALUE1}</opdata>
+                     <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
                      <manual_close>YES</manual_close>
@@ -1131,7 +1131,7 @@ and&#13;
                      <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()} and&#13;
 {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}"].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Windows network by Zabbix agent:net.if.speed["{#IFNAME}"].last()}</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
-                     <opdata>In: {ITEM.VALUE1}, out: {ITEM.VALUE3}, speed: {ITEM.VALUE2}</opdata>
+                     <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <manual_close>YES</manual_close>
                      <dependencies>
@@ -1149,7 +1149,7 @@ or {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",error
                      <recovery_expression>{Template Module Windows network by Zabbix agent:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Windows network by Zabbix agent:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
-                     <opdata>errors in: {ITEM.VALUE1}, errors out: {ITEM.VALUE2}</opdata>
+                     <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
                      <manual_close>YES</manual_close>
@@ -1794,7 +1794,7 @@ Template tooling version used: 0.32</description>
       <trigger>
          <expression>{Template Module Windows memory by Zabbix agent:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Windows memory by Zabbix agent:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
-         <opdata>Free: {ITEM.VALUE1}, total: {ITEM.VALUE2}</opdata>
+         <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>

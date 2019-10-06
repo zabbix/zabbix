@@ -87,14 +87,14 @@ Template tooling version used: 0.32</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS},eq)}=1</expression>
                            <name>{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the device for faults</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS},ne)}=1</expression>
                            <name>{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the device for faults</description>
                            <dependencies>
@@ -154,14 +154,14 @@ Template tooling version used: 0.32</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                            <name>{#DISKARRAY_LOCATION}: Disk array controller is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>Please check the device for faults</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_WARN_STATUS:"degraded"},eq)}=1</expression>
                            <name>{#DISKARRAY_LOCATION}: Disk array controller is in warning state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the device for faults</description>
                            <dependencies>
@@ -174,7 +174,7 @@ Template tooling version used: 0.32</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_ARRAY_OK_STATUS:"operable"},ne)}=1</expression>
                            <name>{#DISKARRAY_LOCATION}: Disk array controller is not in optimal state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the device for faults</description>
                            <dependencies>
@@ -223,14 +223,14 @@ Cisco UCS equipment:Fan:operState managed object property</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                            <name>{#FAN_LOCATION}: Fan is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the fan unit</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_WARN_STATUS:"degraded"},eq)}=1</expression>
                            <name>{#FAN_LOCATION}: Fan is in warning state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the fan unit</description>
                            <dependencies>
@@ -335,14 +335,14 @@ Cisco UCS storage:LocalDisk:diskState managed object property.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_FAIL_STATUS:"failed"},eq)}=1</expression>
                            <name>{#DISK_LOCATION}: Physical disk failed</name>
-                           <opdata>Current status: {ITEM.VALUE1}</opdata>
+                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>Please check physical disk for warnings or errors</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_CRIT_STATUS:"bad"},eq)}=1 or {count(#1,{$DISK_CRIT_STATUS:"predictiveFailure"},eq)}=1</expression>
                            <name>{#DISK_LOCATION}: Physical disk error</name>
-                           <opdata>Current status: {ITEM.VALUE1}</opdata>
+                           <opdata>Current status: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check physical disk for warnings or errors</description>
                            <dependencies>
@@ -387,14 +387,14 @@ Cisco UCS equipment:Psu:operState managed object property</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                            <name>{#PSU_LOCATION}: Power supply is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the power supply unit for errors</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_WARN_STATUS:"degraded"},eq)}=1</expression>
                            <name>{#PSU_LOCATION}: Power supply is in warning state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the power supply unit for errors</description>
                            <dependencies>
@@ -438,7 +438,7 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -454,7 +454,7 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -463,7 +463,7 @@ Cisco UCS processor:EnvStats:temperature managed object property</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
                            <name>{#SENSOR_LOCATION}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -500,7 +500,7 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -516,7 +516,7 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -525,7 +525,7 @@ Cisco UCS compute:RackUnitMbTempStats:ioh1Temp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.IOH: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -552,7 +552,7 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -568,7 +568,7 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -577,7 +577,7 @@ Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Ambient: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -604,7 +604,7 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -620,7 +620,7 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -629,7 +629,7 @@ Cisco UCS compute:RackUnitMbTempStats:frontTemp managed object property</descrip
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Front: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -656,7 +656,7 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -672,7 +672,7 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -681,7 +681,7 @@ Cisco UCS compute:RackUnitMbTempStats:rearTemp managed object property</descript
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
                            <name>{#SENSOR_LOCATION}.Rear: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -777,14 +777,14 @@ Cisco UCS compute:RackUnit:operState managed object property</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$HEALTH_CRIT_STATUS:"computeFailed"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"configFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"unconfigFailure"},eq)}=1 or {count(#1,{$HEALTH_CRIT_STATUS:"inoperable"},eq)}=1</expression>
                            <name>{#UNIT_LOCATION}: System status is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>Please check the device for errors</description>
                         </trigger_prototype>
                         <trigger_prototype>
                            <expression>{count(#1,{$HEALTH_WARN_STATUS:"testFailed"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"thermalProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"powerProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"voltageProblem"},eq)}=1 or {count(#1,{$HEALTH_WARN_STATUS:"diagnosticsFailed"},eq)}=1</expression>
                            <name>{#UNIT_LOCATION}: System status is in warning state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check the device for warnings</description>
                            <dependencies>
@@ -875,7 +875,7 @@ Cisco UCS storage:LocalLun:presence managed object property</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$VDISK_OK_STATUS:"equipped"},ne)}=1</expression>
                            <name>{#VDISK_LOCATION}: Virtual disk is not in OK state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check virtual disk for warnings or errors</description>
                         </trigger_prototype>

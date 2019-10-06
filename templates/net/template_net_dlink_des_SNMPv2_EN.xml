@@ -83,7 +83,7 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                   <trigger>
                      <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                      <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                     <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                     <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                   </trigger>
                </triggers>
@@ -115,7 +115,7 @@ The unit of time is 1 minute. The value will be between 0% (idle) and 100%(very 
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <recovery_mode>NONE</recovery_mode>
                      <name>Firmware has changed</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>Firmware version has changed. Ack to close</description>
                      <manual_close>YES</manual_close>
@@ -255,7 +255,7 @@ speed-high  : Fan spin using the highest speed.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                            <name>#{#SNMPVALUE}: Fan is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the fan unit</description>
                         </trigger_prototype>
@@ -362,7 +362,7 @@ disconnect : The power unit is not connected.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <name>#{#SNMPVALUE}: Power supply is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the power supply unit for errors</description>
                         </trigger_prototype>
@@ -400,7 +400,7 @@ The shelf current temperature.</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                            <name>#{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -416,7 +416,7 @@ The shelf current temperature.</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                            <name>#{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -425,7 +425,7 @@ The shelf current temperature.</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                            <name>#{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>

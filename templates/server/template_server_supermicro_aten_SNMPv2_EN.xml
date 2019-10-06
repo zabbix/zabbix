@@ -125,7 +125,7 @@ This string should include the name of the manufacturer, the product name and th
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                            <name>{#SENSOR_DESCR}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -141,7 +141,7 @@ This string should include the name of the manufacturer, the product name and th
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                            <name>{#SENSOR_DESCR}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -150,7 +150,7 @@ This string should include the name of the manufacturer, the product name and th
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                            <name>{#SENSOR_DESCR}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>

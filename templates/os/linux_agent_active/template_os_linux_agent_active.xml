@@ -531,7 +531,7 @@ return (100 - value)</params>
                   <trigger>
                      <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                      <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                     <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                     <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <dependencies>
                         <dependency>
@@ -762,7 +762,7 @@ and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15]
                         <trigger_prototype>
                            <expression>{min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}</expression>
                            <name>{#FSNAME}: Running out of free inodes (free &lt; {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</name>
-                           <opdata>Free inodes: {ITEM.VALUE1}%</opdata>
+                           <opdata>Free inodes: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>It may become impossible to write to disk if there are no index nodes left.&#13;
 As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</description>
@@ -770,7 +770,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <trigger_prototype>
                            <expression>{min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}</expression>
                            <name>{#FSNAME}: Running out of free inodes (free &lt; {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)</name>
-                           <opdata>Free inodes: {ITEM.VALUE1}%</opdata>
+                           <opdata>Free inodes: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>It may become impossible to write to disk if there are no index nodes left.&#13;
 As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</description>
@@ -829,7 +829,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
 (({Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;5G or {Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -841,7 +841,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <expression>{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
 (({Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},total].last()}-{Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},used].last()})&lt;10G or {Template Module Linux filesystems by Zabbix agent active:vfs.fs.size[{#FSNAME},pused].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -1630,7 +1630,7 @@ return newvalue;</params>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
                            <name>Interface {#IFNAME}: Link down</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>This trigger expression works as follows:&#13;
 1. Can be triggered if operations status is down.&#13;
@@ -1680,7 +1680,7 @@ and&#13;
                      <recovery_expression>({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].change()}&gt;0 and {Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/type"].prev()}&gt;0) or&#13;
 ({Template Module Linux network interfaces by Zabbix agent active:vfs.file.contents["/sys/class/net/{#IFNAME}/operstate"].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}: Ethernet has changed to lower speed than it was before</name>
-                     <opdata>Current reported speed: {ITEM.VALUE1}</opdata>
+                     <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
                      <manual_close>YES</manual_close>
@@ -1699,7 +1699,7 @@ or {Template Module Linux network interfaces by Zabbix agent active:net.if.out["
                      <recovery_expression>{Template Module Linux network interfaces by Zabbix agent active:net.if.in["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
 and {Template Module Linux network interfaces by Zabbix agent active:net.if.out["{#IFNAME}",errors].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
                      <name>Interface {#IFNAME}: High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
-                     <opdata>errors in: {ITEM.VALUE1}, errors out: {ITEM.VALUE2}</opdata>
+                     <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
                      <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
                      <manual_close>YES</manual_close>
@@ -2088,7 +2088,7 @@ Template tooling version used: 0.32</description>
       <trigger>
          <expression>{Template Module Linux memory by Zabbix agent active:system.swap.size[,pfree].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory by Zabbix agent active:system.swap.size[,total].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
-         <opdata>Free: {ITEM.VALUE1}, total: {ITEM.VALUE2}</opdata>
+         <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
@@ -2105,7 +2105,7 @@ Template tooling version used: 0.32</description>
       <trigger>
          <expression>{Template Module Linux memory by Zabbix agent active:vm.memory.size[available].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory by Zabbix agent active:vm.memory.size[total].last()}&gt;0</expression>
          <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-         <opdata>Available: {ITEM.VALUE1}, total: {ITEM.VALUE2}</opdata>
+         <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
@@ -2113,7 +2113,7 @@ Template tooling version used: 0.32</description>
 and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg5].last()}&gt;0&#13;
 and {Template Module Linux CPU by Zabbix agent active:system.cpu.load[all,avg15].last()}&gt;0</expression>
          <name>Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)</name>
-         <opdata>Load averages(1m 5m 15m): ({ITEM.VALUE1} {ITEM.VALUE3} {ITEM.VALUE4}), # of CPUs: {ITEM.VALUE2}</opdata>
+         <opdata>Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
          <description>Per CPU load average is too high. Your system may be slow to respond.</description>
       </trigger>

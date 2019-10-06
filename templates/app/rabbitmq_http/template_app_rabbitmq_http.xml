@@ -1410,7 +1410,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{last()}=0</expression>
                      <name>RabbitMQ: Node healthcheck failed</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
                      <description>https://www.rabbitmq.com/monitoring.html#health-checks</description>
                   </trigger>
@@ -1471,7 +1471,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{last()}=1</expression>
                      <name>RabbitMQ: Free disk space alarm (Free space threshold has been reached)</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
                      <description>https://www.rabbitmq.com/disk-alarms.html</description>
                   </trigger>
@@ -1554,7 +1554,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{last()}=1</expression>
                      <name>RabbitMQ: Memory alarm (Memory usage threshold has been reached)</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
                      <description>https://www.rabbitmq.com/memory.html</description>
                   </trigger>
@@ -1701,7 +1701,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{min(5m)}&gt;0</expression>
                      <name>RabbitMQ: Number of network partitions is too high (more than 0 for 5m)</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>https://www.rabbitmq.com/partitions.html#detecting</description>
                   </trigger>
@@ -1761,7 +1761,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{max(5m)}=0</expression>
                      <name>RabbitMQ: Node is not running</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
                      <description>RabbitMQ node is not running</description>
                      <dependencies>
@@ -2312,7 +2312,7 @@ Template tooling version used: 0.32</description>
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}</expression>
                            <name>RabbitMQ: Too many messages in queue (over {$RABBITMQ.MESSAGES.MAX.WARN} for 5m)</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>

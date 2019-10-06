@@ -63,7 +63,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{min(5m)}&gt;{$ICMP_LOSS_WARN} and {min(5m)}&lt;100</expression>
                      <name>High ICMP ping loss</name>
-                     <opdata>Loss: {ITEM.VALUE1}</opdata>
+                     <opdata>Loss: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <dependencies>
                         <dependency>
@@ -90,7 +90,7 @@ Template tooling version used: 0.32</description>
                   <trigger>
                      <expression>{avg(5m)}&gt;{$ICMP_RESPONSE_TIME_WARN}</expression>
                      <name>High ICMP ping response time</name>
-                     <opdata>Value: {ITEM.VALUE1}s</opdata>
+                     <opdata>Value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <dependencies>
                         <dependency>

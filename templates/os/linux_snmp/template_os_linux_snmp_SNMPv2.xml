@@ -611,7 +611,7 @@ return (100 - value)
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                            <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -819,7 +819,7 @@ If having problems collecting this item make sure access to UCD-SNMP-MIB is allo
                         <trigger_prototype>
                            <expression>{min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}</expression>
                            <name>{#FSNAME}: Running out of free inodes (free &lt; {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)</name>
-                           <opdata>Free inodes: {ITEM.VALUE1}%</opdata>
+                           <opdata>Free inodes: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>It may become impossible to write to disk if there are no index nodes left.&#13;
 As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</description>
@@ -827,7 +827,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <trigger_prototype>
                            <expression>{min(5m)}&lt;{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}</expression>
                            <name>{#FSNAME}: Running out of free inodes (free &lt; {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)</name>
-                           <opdata>Free inodes: {ITEM.VALUE1}%</opdata>
+                           <opdata>Free inodes: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>It may become impossible to write to disk if there are no index nodes left.&#13;
 As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.</description>
@@ -907,7 +907,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <expression>{Template Module Linux filesystems SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
 (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module Linux filesystems SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -919,7 +919,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <expression>{Template Module Linux filesystems SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
 (({Template Module Linux filesystems SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module Linux filesystems SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {Template Module Linux filesystems SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -1457,7 +1457,7 @@ Template tooling version used: 0.32</description>
       <trigger>
          <expression>{Template Module Linux memory SNMPv2:system.swap.pfree[snmp].min(5m)}&lt;{$SWAP.PFREE.MIN.WARN} and {Template Module Linux memory SNMPv2:system.swap.total[memTotalSwap.0].last()}&gt;0</expression>
          <name>High swap space usage ( less than {$SWAP.PFREE.MIN.WARN}% free)</name>
-         <opdata>Free: {ITEM.VALUE1}, total: {ITEM.VALUE2}</opdata>
+         <opdata>Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>WARNING</priority>
          <description>This trigger is ignored, if there is no swap configured</description>
          <dependencies>
@@ -1474,7 +1474,7 @@ Template tooling version used: 0.32</description>
       <trigger>
          <expression>{Template Module Linux memory SNMPv2:vm.memory.available[snmp].min(5m)}&lt;{$MEMORY.AVAILABLE.MIN} and {Template Module Linux memory SNMPv2:vm.memory.total[memTotalReal.0].last()}&gt;0</expression>
          <name>Lack of available memory ( &lt; {$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</name>
-         <opdata>Available: {ITEM.VALUE1}, total: {ITEM.VALUE2}</opdata>
+         <opdata>Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
       </trigger>
       <trigger>
@@ -1482,7 +1482,7 @@ Template tooling version used: 0.32</description>
 and {Template Module Linux CPU SNMPv2:system.cpu.load.avg5[laLoad.2].last()}&gt;0&#13;
 and {Template Module Linux CPU SNMPv2:system.cpu.load.avg15[laLoad.3].last()}&gt;0</expression>
          <name>Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)</name>
-         <opdata>Load averages(1m 5m 15m): ({ITEM.VALUE1} {ITEM.VALUE3} {ITEM.VALUE4}), # of CPUs: {ITEM.VALUE2}</opdata>
+         <opdata>Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}</opdata>
          <priority>AVERAGE</priority>
          <description>Per CPU load average is too high. Your system may be slow to respond.</description>
       </trigger>

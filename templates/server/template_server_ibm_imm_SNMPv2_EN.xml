@@ -148,14 +148,14 @@ Indicates status of system health for the system in which the IMM resides. Value
                   <trigger>
                      <expression>{count(#1,{$HEALTH_DISASTER_STATUS},eq)}=1</expression>
                      <name>System is in unrecoverable state!</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>Please check the device for faults</description>
                   </trigger>
                   <trigger>
                      <expression>{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                      <name>System status is in critical state</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>Please check the device for errors</description>
                      <dependencies>
@@ -168,7 +168,7 @@ Indicates status of system health for the system in which the IMM resides. Value
                   <trigger>
                      <expression>{count(#1,{$HEALTH_WARN_STATUS},eq)}=1</expression>
                      <name>System status is in warning state</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>Please check the device for warnings</description>
                      <dependencies>
@@ -240,7 +240,7 @@ A description of the fan component status.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_OK_STATUS},ne)}=1</expression>
                            <name>{#FAN_DESCR}: Fan is not in normal state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>INFO</priority>
                            <description>Please check the fan unit</description>
                         </trigger_prototype>
@@ -293,7 +293,7 @@ disk module FRU name.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$DISK_OK_STATUS},ne)}=1</expression>
                            <name>{#SNMPINDEX}: Physical disk is not in OK state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>Please check physical disk for warnings or errors</description>
                         </trigger_prototype>
@@ -331,7 +331,7 @@ A description of the power module status.</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_OK_STATUS},ne)}=1</expression>
                            <name>{#PSU_DESCR}: Power supply is not in normal state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>INFO</priority>
                            <description>Please check the power supply unit for errors</description>
                         </trigger_prototype>
@@ -380,7 +380,7 @@ Temperature readings of testpoint: {#SNMPVALUE}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                            <name>{#SNMPVALUE}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -396,7 +396,7 @@ Temperature readings of testpoint: {#SNMPVALUE}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                            <name>{#SNMPVALUE}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -405,7 +405,7 @@ Temperature readings of testpoint: {#SNMPVALUE}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                            <name>{#SNMPVALUE}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -453,7 +453,7 @@ Temperature readings of testpoint: Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Ambient"}-3</recovery_expression>
                            <name>Ambient: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -469,7 +469,7 @@ Temperature readings of testpoint: Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Ambient"}-3</recovery_expression>
                            <name>Ambient: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -478,7 +478,7 @@ Temperature readings of testpoint: Ambient</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Ambient"}+3</recovery_expression>
                            <name>Ambient: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Ambient"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -526,7 +526,7 @@ Temperature readings of testpoint: CPU</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                            <name>CPU: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -542,7 +542,7 @@ Temperature readings of testpoint: CPU</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                            <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -551,7 +551,7 @@ Temperature readings of testpoint: CPU</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
                            <name>CPU: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>

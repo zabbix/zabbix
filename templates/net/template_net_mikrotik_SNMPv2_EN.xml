@@ -87,7 +87,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"Device"}-3</recovery_expression>
                      <name>Device: Temperature is above warning threshold: &gt;{$TEMP_WARN:"Device"}</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <dependencies>
@@ -103,7 +103,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"Device"}-3</recovery_expression>
                      <name>Device: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"Device"}</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                   </trigger>
@@ -112,7 +112,7 @@ Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</description>
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"Device"}+3</recovery_expression>
                      <name>Device: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"Device"}</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>AVERAGE</priority>
                   </trigger>
                </triggers>
@@ -145,7 +145,7 @@ Current firmware version</description>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <recovery_mode>NONE</recovery_mode>
                      <name>Firmware has changed</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>INFO</priority>
                      <description>Firmware version has changed. Ack to close</description>
                      <manual_close>YES</manual_close>
@@ -350,7 +350,7 @@ The average, over the last minute, of the percentage of time that this processor
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                            <name>#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -412,7 +412,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:"CPU"}-3</recovery_expression>
                            <name>CPU: Temperature is above warning threshold: &gt;{$TEMP_WARN:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -428,7 +428,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:"CPU"}-3</recovery_expression>
                            <name>CPU: Temperature is above critical threshold: &gt;{$TEMP_CRIT:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -437,7 +437,7 @@ Since temperature of CPU is not available on all Mikrotik hardware, this is done
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:"CPU"}+3</recovery_expression>
                            <name>CPU: Temperature is too low: &lt;{$TEMP_CRIT_LOW:"CPU"}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -541,7 +541,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <expression>{Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and&#13;
 (({Template Net Mikrotik SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMPv2:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;5G or {Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>Disk-{#SNMPINDEX}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>AVERAGE</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.&#13;
  Second condition should be one of the following:&#13;
@@ -553,7 +553,7 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <expression>{Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and&#13;
 (({Template Net Mikrotik SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Net Mikrotik SNMPv2:vfs.fs.used[hrStorageSize.{#SNMPINDEX}].last()})&lt;10G or {Template Net Mikrotik SNMPv2:vfs.fs.pused[hrStorageSize.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <name>Disk-{#SNMPINDEX}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)</name>
-                     <opdata>Space used: {ITEM.VALUE3} of {ITEM.VALUE2} ({ITEM.VALUE1})</opdata>
+                     <opdata>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})</opdata>
                      <priority>WARNING</priority>
                      <description>Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}.&#13;
  Second condition should be one of the following:&#13;

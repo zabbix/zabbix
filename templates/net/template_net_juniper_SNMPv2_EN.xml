@@ -150,7 +150,7 @@ front panel module.</description>
                   <trigger>
                      <expression>{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                      <name>System status is in critical state</name>
-                     <opdata>Current state: {ITEM.VALUE1}</opdata>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                      <priority>HIGH</priority>
                      <description>Please check the device for errors</description>
                   </trigger>
@@ -238,7 +238,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                         <trigger_prototype>
                            <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
                            <name>{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
-                           <opdata>Current utilization: {ITEM.VALUE1}</opdata>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -333,7 +333,7 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                            <name>{#SNMPVALUE}: Fan is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the fan unit</description>
                         </trigger_prototype>
@@ -374,7 +374,7 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <name>{#SNMPVALUE}: Power supply is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the power supply unit for errors</description>
                         </trigger_prototype>
@@ -424,7 +424,7 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                            <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>WARNING</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                            <dependencies>
@@ -440,7 +440,7 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -449,7 +449,7 @@ The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                            <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>

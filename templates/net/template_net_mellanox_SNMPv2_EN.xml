@@ -185,7 +185,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
                            <name>{#SENSOR_INFO}: Fan is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the fan unit</description>
                         </trigger_prototype>
@@ -233,7 +233,7 @@ The operational status of the sensor {#SENSOR_INFO}</description>
                         <trigger_prototype>
                            <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
                            <name>{#ENT_NAME}: Power supply is in critical state</name>
-                           <opdata>Current state: {ITEM.VALUE1}</opdata>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                            <description>Please check the power supply unit for errors</description>
                         </trigger_prototype>
@@ -315,7 +315,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
                            <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>HIGH</priority>
                            <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                         </trigger_prototype>
@@ -324,7 +324,7 @@ entPhySensorScale, and entPhySensorPrecision objects must also be examined.</des
                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                            <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
                            <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                           <opdata>Current value: {ITEM.VALUE1}</opdata>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                            <priority>AVERAGE</priority>
                         </trigger_prototype>
                      </trigger_prototypes>
@@ -338,7 +338,7 @@ or&#13;
                      <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>{Template Net Mellanox SNMPv2:sensor.temp.value[entPhySensorValue.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
                      <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                     <opdata>Current value: {ITEM.VALUE1}</opdata>
+                     <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
                      <priority>WARNING</priority>
                      <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
                      <dependencies>
