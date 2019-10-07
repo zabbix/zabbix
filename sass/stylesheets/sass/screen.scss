@@ -4094,7 +4094,10 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		max-width: 1024px;
-		min-width: 650px;
+
+		&.modal-popup-generic {
+			min-width: 650px;
+		}
 	}
 
 	.hintbox-scrollable {
@@ -4321,6 +4324,7 @@ $form-icon-btn: (
 	resize: none;
 	word-break: break-all;
 	white-space: normal;
+	height: 24px;
 }
 
 // Map widget back to parent button.
@@ -7058,31 +7062,6 @@ table.preprocessing-test-results {
 #preprocessing_div {
 	display: block;
 	max-width: 940px;
-}
-
-.condition-container {
-	display: flex;
-	flex: 1;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	align-items: stretch;
-	justify-items: flex-start;
-	justify-content: flex-start;
-
-	.condition-column {
-		display: none;
-		margin: 0 5px;
-		line-height: 22px;
-	}
-
-	.condition-column:first-of-type {
-		margin-left: 0;
-	}
-
-	.condition-column-active,
-	.condition-column-select {
-		display: block;
-	}
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {

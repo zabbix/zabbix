@@ -1474,7 +1474,8 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 // configuration -> maps default add icon name
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
-define('ZBX_POPUP_CONDITION_TYPE_CORRELATION', 0);
+// Condition popup types.
+define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
 

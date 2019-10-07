@@ -41,7 +41,9 @@
 							$textarea.val(new_value);
 						}
 
-						$textarea.height(0).innerHeight($textarea[0].scrollHeight);
+						if (new_value !== '') {
+							return $textarea.height(0).innerHeight($textarea[0].scrollHeight);
+						}
 					})
 					.trigger('input');
 			});
@@ -52,8 +54,7 @@
 
 				$textarea
 					.val('')
-					.height(0)
-					.innerHeight($textarea[0].scrollHeight);
+					.css('height', '');
 			});
 		}
 	};

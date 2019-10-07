@@ -125,17 +125,9 @@ $action_tab->addRow(_('Type of calculation'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
-			'condition_type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
-			'allowed_conditions' => $data['allowedConditions'],
-			'severities' => [
-				'severity_name_0' => $data['config']['severity_name_0'],
-				'severity_name_1' => $data['config']['severity_name_1'],
-				'severity_name_2' => $data['config']['severity_name_2'],
-				'severity_name_3' => $data['config']['severity_name_3'],
-				'severity_name_4' => $data['config']['severity_name_4'],
-				'severity_name_5' => $data['config']['severity_name_5']
-			]
+		->onClick('return PopUp("popup.action.condition",'.CJs::encodeJson([
+			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
+			'source' => $data['eventsource']
 		]).', null, this);')
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
@@ -905,9 +897,9 @@ if (!empty($data['new_operation'])) {
 
 		$operationConditionsTable->addRow([
 			(new CSimpleButton(_('Add')))
-				->onClick('return PopUp("popup.condition",'.CJs::encodeJson([
-					'condition_type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-					'allowed_conditions' => get_opconditions_by_eventsource($data['eventsource'])
+				->onClick('return PopUp("popup.operation.condition",'.CJs::encodeJson([
+					'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
+					'source' => $data['eventsource']
 				]).', null, this);')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]);
