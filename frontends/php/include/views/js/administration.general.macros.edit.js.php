@@ -31,13 +31,22 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		function init_fields() {
-			$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').on('change keydown', function(e) {
-				if (e.type === 'change' || e.which === 13) {
-					if ($(this).hasClass('macro')) {
-						macroToUpperCase(this);
-					}
+			$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').not('.initialized-field').each(function() {
+				var $obj = $(this);
+
+				$obj.addClass('initialized-field');
+
+				if ($obj.hasClass('macro')) {
+					$obj.on('change keydown', function(e) {
+						if (e.type === 'change' || e.which === 13) {
+							macroToUpperCase(this);
+						}
+						$obj.textareaFlexible();
+					});
 				}
-				$(this).textareaFlexible();
+				else {
+					$obj.textareaFlexible();
+				}
 			});
 		}
 
