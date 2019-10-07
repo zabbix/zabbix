@@ -29,11 +29,9 @@
 				var $textarea = $(this);
 
 				$textarea
-					.on('input keydown paste', function(e) {
+					.on('input keydown paste blur', function(e) {
 						if (e.which === 13) {
 							var $submit = $(this).closest('form').find(':submit');
-
-							$(this).trigger('blur');
 
 							if ($submit.length === 0) {
 								$(this).closest('form').submit();

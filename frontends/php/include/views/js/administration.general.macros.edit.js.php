@@ -30,6 +30,17 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
+		function init_fields() {
+			$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').on('change keydown', function(e) {
+				if (e.type === 'change' || e.which === 13) {
+					if ($(this).hasClass('macro')) {
+						macroToUpperCase(this);
+					}
+				}
+				$(this).textareaFlexible();
+			});
+		}
+
 		$('#tbl_macros')
 			.on('click', 'button.element-table-remove', function() {
 				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
@@ -40,15 +51,9 @@
 				}
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
-			.on('click', 'button.element-table-add', function() {
-				$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			})
-			.on('blur', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', function() {
-				if ($(this).hasClass('macro')) {
-					macroToUpperCase(this);
-				}
-				$(this).trigger('input');
-			});
+			.on('click', 'button.element-table-add', init_fields);
+
+		init_fields();
 
 		$('#update').click(function() {
 			var removedCount = $(this).data('removedCount');
