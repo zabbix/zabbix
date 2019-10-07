@@ -21,36 +21,36 @@
 (function($) {
 	'use strict';
 
+	function update(e) {
+		var $textarea = $(this);
+
+		if (e.which === 13) {
+			var $form = $(this).closest('form'),
+				$submit = $form.find('button:submit:first');
+
+			if ($submit.length) {
+				$submit.click();
+			}
+			else {
+				$form.submit();
+			}
+
+			return false;
+		}
+
+		var old_value = $textarea.val(),
+			new_value = old_value.replace(/\r?\n/gi, ''),
+			scroll_pos = $(window).scrollTop();
+
+		if (old_value.length !== new_value.length) {
+			$textarea.val(new_value);
+		}
+
+		$textarea.height(0).innerHeight($textarea[0].scrollHeight);
+		$(window).scrollTop(scroll_pos);
+	}
+
 	var methods = {
-		run: function(e) {
-			var $textarea = $(this);
-
-			if (e.which === 13) {
-				var $form = $(this).closest('form'),
-					$submit = $form.find('button:submit:first');
-
-				if ($submit.length) {
-					$submit.click();
-				}
-				else {
-					$form.submit();
-				}
-
-				return false;
-			}
-
-			var old_value = $textarea.val(),
-				new_value = old_value.replace(/\r?\n/gi, ''),
-				scroll_pos = $(window).scrollTop();
-
-			if (old_value.length !== new_value.length) {
-				$textarea.val(new_value);
-			}
-
-			$textarea.height(0).innerHeight($textarea[0].scrollHeight);
-			$(window).scrollTop(scroll_pos);
-		},
-
 		init: function(options) {
 			var settings = $.extend({}, options);
 
@@ -58,8 +58,8 @@
 				var $textarea = $(this);
 
 				$textarea
-					.off('input keydown paste', methods.run)
-					.on('input keydown paste', methods.run)
+					.off('input keydown paste', update)
+					.on('input keydown paste', update)
 					.trigger('input');
 			});
 		}
