@@ -22,6 +22,35 @@
 	'use strict';
 
 	var methods = {
+		run: function(e) {
+			var $textarea = $(this);
+
+			if (e.which === 13) {
+				var $form = $(this).closest('form'),
+					$submit = $form.find('button:submit:first');
+
+				if ($submit.length) {
+					$submit.click();
+				}
+				else {
+					$form.submit();
+				}
+
+				return false;
+			}
+
+			var old_value = $textarea.val(),
+				new_value = old_value.replace(/\r?\n/gi, ''),
+				scroll_pos = $(window).scrollTop();
+
+			if (old_value.length !== new_value.length) {
+				$textarea.val(new_value);
+			}
+
+			$textarea.height(0).innerHeight($textarea[0].scrollHeight);
+			$(window).scrollTop(scroll_pos);
+		},
+
 		init: function(options) {
 			var settings = $.extend({}, options);
 
@@ -29,34 +58,8 @@
 				var $textarea = $(this);
 
 				$textarea
-					.on('input keydown paste blur', function(e) {
-						if (e.which === 13) {
-							var $submit = $(this).closest('form').find(':submit');
-
-							if ($submit.length === 0) {
-								$(this).closest('form').submit();
-							}
-							else if ($submit.length === 1) {
-								$submit[0].click();
-							}
-							else {
-								$submit.filter('[name = update]').click();
-							}
-
-							return false;
-						}
-
-						var old_value = $textarea.val(),
-							new_value = old_value.replace(/\r?\n/gi, ''),
-							scrollsave = $(window).scrollTop();
-
-						if (old_value.length !== new_value.length) {
-							$textarea.val(new_value);
-						}
-
-						$textarea.height(0).innerHeight($textarea[0].scrollHeight);
-						$(window).scrollTop(scrollsave);
-					})
+					.off('input keydown paste', methods.run)
+					.on('input keydown paste', methods.run)
 					.trigger('input');
 			});
 		}
