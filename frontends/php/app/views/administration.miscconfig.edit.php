@@ -19,10 +19,8 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.miscconfig.edit.js.php');
-
 $widget = (new CWidget())
-	->setTitle(_('miscconfig.edit :data-demo: '.$data['demo']))
+	->setTitle(_('Other configuration parameters'))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
@@ -36,15 +34,47 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'miscconfig.edit')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-$widget
-	->addItem($form)
-	->show();
+$from_list = new CFormList();
+
+$discovery_group = new CComboBox('discovery_groupid', $data['discovery_groupid']);
+foreach ($data['discovery_groups'] as $group) {
+	$discovery_group->addItem($group['groupid'], $group['name']);
+}
+
+$alert_user_group = new CComboBox('alert_usrgrpid', $data['alert_usrgrpid']);
+$alert_user_group->addItem(0, _('None'));
+foreach ($data['alert_usrgrps'] as $usrgrp) {
+	$alert_user_group->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
+}
+
+$from_list
+	->addRow((new CLabel(_('Refresh unsupported items'), 'refresh_unsupported'))->setAsteriskMark(),
+		(new CTextBox('refresh_unsupported', $data['refresh_unsupported']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired()
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Group for discovered hosts'), $discovery_group)
+	->addRow(_('Default host inventory mode'),
+		(new CRadioButtonList('default_inventory_mode', (int) $data['default_inventory_mode']))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setModern(true)
+	)
+	->addRow(_('User group for database down message'), $alert_user_group)
+	->addRow(_('Log unmatched SNMP traps'),
+		(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
+	);
+
+$form = (new CForm())
+	->setName('otherForm')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addItem(
+		(new CTabView())
+			->addTab('other', _('Other parameters'), $from_list)
+			->setFooter(makeFormFooter(new CSubmit('update', _('Update'))))
+	);
+
+$widget->addItem($form)->show();

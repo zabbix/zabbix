@@ -26,8 +26,14 @@ class CControllerGuiEdit extends CController {
 	}
 
 	protected function checkInput() {
+		$themes = array_keys(Z::getThemes());
 		$fields = [
-			'demo' => ''
+			'default_theme'           => 'db config.default_theme',
+			'dropdown_first_entry'    => 'db config.dropdown_first_entry',
+			'dropdown_first_remember' => 'db config.dropdown_first_remember',
+			'search_limit'            => 'db config.search_limit',
+			'max_in_table'            => 'db config.max_in_table',
+			'server_check_interval'   => 'db config.server_check_interval'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +50,18 @@ class CControllerGuiEdit extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
 		$data = [
-			'demo' => __FILE__
+			'default_theme' => $config['default_theme'],
+			'dropdown_first_entry' => $config['dropdown_first_entry'],
+			'dropdown_first_remember' => $config['dropdown_first_remember'],
+			'search_limit' => $config['search_limit'],
+			'max_in_table' => $config['max_in_table'],
+			'server_check_interval' => $config['server_check_interval']
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerGuiEdit'));
+		$response->setTitle(_('Configuration of GUI'));
 		$this->setResponse($response);
 	}
 }

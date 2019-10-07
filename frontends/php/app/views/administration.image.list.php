@@ -19,32 +19,90 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.image.list.js.php');
-
 $widget = (new CWidget())
-	->setTitle(_('image.list :data-demo: '.$data['demo']))
+	->setTitle(_('Images'))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
+			->setAction((new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->getUrl()
+			)
 			->addItem((new CList())
 				->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
 					->setArgument('action', 'image.list')
 					->getUrl()
 				))
+				->addItem([
+					new CLabel(_('Type'), 'imagetype'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					new CComboBox('imagetype', (new CUrl('zabbix.php'))
+							->setArgument('action', 'image.list')
+							->setArgument('imagetype', $data['imagetype'])
+							->getUrl(), 'redirect(this.options[this.selectedIndex].value);', [
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'image.list')
+							->setArgument('imagetype', IMAGE_TYPE_ICON)
+							->getUrl() => _('Icon'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'image.list')
+							->setArgument('imagetype', IMAGE_TYPE_BACKGROUND)
+							->getUrl() => _('Background'),
+					])
+				])
+				->addItem(
+					new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON)
+						? _('Create icon')
+						: _('Create background'))
+				)
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'image.list')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+if (!$data['images']) {
+	$widget->addItem(new CTableInfo());
+}
+else {
+	$image_table = (new CDiv())
+		->addClass(ZBX_STYLE_TABLE)
+		->addClass(ZBX_STYLE_ADM_IMG);
 
-$widget
-	->addItem($form)
-	->show();
+	$count = 0;
+	$image_row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+	foreach ($data['images'] as $image) {
+		$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
+			? new CLink(
+				new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'),
+				'image.php?imageid='.$image['imageid']
+			)
+			: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
+
+		$image_row->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_CELL)
+				->addItem([
+					$img,
+					BR(),
+					new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid'])
+				])
+		);
+
+		if ((++$count % 5) == 0) {
+			$image_table->addItem($image_row);
+			$image_row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+		}
+	}
+
+	if (($count % 5) != 0) {
+		$image_table->addItem($image_row);
+	}
+
+	$widget->addItem(
+		(new CForm())->addItem(
+			(new CTabView())->addTab('image', null, $image_table)
+		)
+	);
+}
+
+$widget->show();

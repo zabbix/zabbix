@@ -44,12 +44,49 @@ class CControllerValuemapList extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
+		$sortfield = getRequest('sort', CProfile::get('web.valuemap.list.sort', 'name'));
+		$sortorder = getRequest('sortorder', CProfile::get('web.valuemap.list.sortorder', ZBX_SORT_UP));
+
+		CProfile::update('web.valuemap.list.sort', $sortfield, PROFILE_TYPE_STR);
+		CProfile::update('web.valuemap.list.sortorder', $sortorder, PROFILE_TYPE_STR);
+
 		$data = [
-			'demo' => __FILE__
+			'sort' => $sortfield,
+			'sortorder' => $sortorder
 		];
 
+		$data['valuemaps'] = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'selectMappings' => ['value', 'newvalue'],
+			'sortfield' => $sortfield,
+			'limit' => $config['search_limit'] + 1
+		]);
+
+		order_result($data['valuemaps'], $sortfield, $sortorder);
+		$data['paging'] = getPagingLine($data['valuemaps'], $sortorder, new CUrl('adm.valuemapping.php'));
+
+		foreach ($data['valuemaps'] as &$valuemap) {
+			order_result($valuemap['mappings'], 'value');
+
+			$valuemap['used_in_items'] =
+				(bool) API::Item()->get([
+					'output' => [],
+					'webitems' => true,
+					'filter' => ['valuemapid' => $valuemap['valuemapid']],
+					'limit' => 1
+				])
+				|| (bool) API::ItemPrototype()->get([
+					'output' => [],
+					'filter' => ['valuemapid' => $valuemap['valuemapid']],
+					'limit' => 1
+				]);
+		}
+		unset($valuemap);
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerValuemapList'));
+		$response->setTitle(_('Configuration of value mapping'));
 		$this->setResponse($response);
 	}
 }

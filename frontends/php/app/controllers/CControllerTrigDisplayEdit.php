@@ -44,12 +44,24 @@ class CControllerTrigDisplayEdit extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
 		$data = [
-			'demo' => __FILE__
+			'custom_color' => $config['custom_color'],
+			'problem_unack_color' => $config['problem_unack_color'],
+			'problem_ack_color' => $config['problem_ack_color'],
+			'ok_unack_color' => $config['ok_unack_color'],
+			'ok_ack_color' => $config['ok_ack_color'],
+			'problem_unack_style' => $config['problem_unack_style'],
+			'problem_ack_style' => $config['problem_ack_style'],
+			'ok_unack_style' => $config['ok_unack_style'],
+			'ok_ack_style' => $config['ok_ack_style'],
+			'ok_period' => $config['ok_period'],
+			'blink_period' => $config['blink_period']
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerTrigDisplayEdit'));
+		$response->setTitle(_('Configuration of trigger displaying options'));
 		$this->setResponse($response);
 	}
 }

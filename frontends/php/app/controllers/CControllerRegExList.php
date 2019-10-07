@@ -19,6 +19,8 @@
 **/
 
 
+
+require_once dirname(__FILE__).'/../../include/regexp.inc.php';
 class CControllerRegExList extends CController {
 
 	protected function init() {
@@ -45,11 +47,30 @@ class CControllerRegExList extends CController {
 
 	protected function doAction() {
 		$data = [
-			'demo' => __FILE__
+			'regexps' => [],
+			'regexpids' => []
 		];
 
+		$dbRegExp = DBselect('SELECT re.* FROM regexps re');
+
+		while ($regExp = DBfetch($dbRegExp)) {
+			$regExp['expressions'] = [];
+
+			$data['regexps'][$regExp['regexpid']] = $regExp;
+			$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
+		}
+
+		order_result($data['regexps'], 'name');
+
+		$data['db_exps'] = DBfetchArray(DBselect(
+			'SELECT e.*'.
+			' FROM expressions e'.
+			' WHERE '.dbConditionInt('e.regexpid', $data['regexpids']).
+			' ORDER BY e.expression_type'
+		));
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerRegExList'));
+		$response->setTitle(_('Configuration of regular expressions'));
 		$this->setResponse($response);
 	}
 }

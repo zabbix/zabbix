@@ -44,12 +44,25 @@ class CControllerTrigSeverityEdit extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
 		$data = [
-			'demo' => __FILE__
+			'severity_name_0' => $config['severity_name_0'],
+			'severity_color_0' => $config['severity_color_0'],
+			'severity_name_1' => $config['severity_name_1'],
+			'severity_color_1' => $config['severity_color_1'],
+			'severity_name_2' => $config['severity_name_2'],
+			'severity_color_2' => $config['severity_color_2'],
+			'severity_name_3' => $config['severity_name_3'],
+			'severity_color_3' => $config['severity_color_3'],
+			'severity_name_4' => $config['severity_name_4'],
+			'severity_color_4' => $config['severity_color_4'],
+			'severity_name_5' => $config['severity_name_5'],
+			'severity_color_5' => $config['severity_color_5']
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerTrigSeverityEdit'));
+		$response->setTitle(_('Configuration of trigger severities'));
 		$this->setResponse($response);
 	}
 }

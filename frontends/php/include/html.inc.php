@@ -759,24 +759,28 @@ function makePageFooter($with_version = true) {
  * @return CComboBox
  */
 function makeAdministrationGeneralMenu($selected) {
-	$autoreg_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'autoreg.edit')
-		->getUrl();
+	$sections = [
+		'gui.edit' => _('GUI'),
+		'autoreg.edit' => _('Auto registration'),
+		'housekeeping.edit' => _('Housekeeping'),
+		'image.list' => _('Images'),
+		'iconmap.list' => _('Icon mapping'),
+		'regex.list' => _('Regular expressions'),
+		'macros.edit' => _('Macros'),
+		'valuemap.list' => _('Value mapping'),
+		'workingtime.edit' => _('Working time'),
+		'trigseverity.edit' => _('Trigger severities'),
+		'trigdisplay.edit' => _('Trigger displaying options'),
+		'miscconfig.edit' => _('Other')
+	];
 
-	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
-		'adm.gui.php' => _('GUI'),
-		$autoreg_url => _('Auto registration'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]);
+	$combo_box = new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);');
+
+	foreach ($sections as $action => $name) {
+		$combo_box->addItem((new CUrl('zabbix.php'))->setArgument('action', $action)->getUrl(), $name);
+	}
+
+	return $combo_box;
 }
 
 /**

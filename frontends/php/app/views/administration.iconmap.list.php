@@ -19,10 +19,8 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.iconmap.list.js.php');
-
 $widget = (new CWidget())
-	->setTitle(_('iconmap.list :data-demo: '.$data['demo']))
+	->setTitle(_('Icon mapping'))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
@@ -36,15 +34,21 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'iconmap.list')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-$widget
-	->addItem($form)
-	->show();
+$table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')]);
+
+foreach ($data['iconmaps'] as $icon_map) {
+	$row = [];
+	foreach ($icon_map['mappings'] as $mapping) {
+		$row[] = $data['inventory_list'][$mapping['inventory_link']].NAME_DELIMITER.
+				$mapping['expression'].SPACE.'&rArr;'.SPACE.$data['icon_list'][$mapping['iconid']];
+		$row[] = BR();
+	}
+
+	$table->addRow([
+		new CLink($icon_map['name'], 'adm.iconmapping.php?form=update&iconmapid='.$icon_map['iconmapid']),
+		$row
+	]);
+}
+
+$widget->addItem($table)->show();

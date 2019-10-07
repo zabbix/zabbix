@@ -49,7 +49,7 @@ class CControllerHousekeepingUpdate extends CController {
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerHousekeepingUpdate'));
+		$response->setTitle(_('Configuration of housekeeping'));
 		$this->setResponse($response);
 	}
 }

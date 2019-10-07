@@ -27,7 +27,23 @@ class CControllerHousekeepingEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'hk_events_mode'      => 'db config.hk_events_mode',
+			'hk_events_trigger'   => 'db config.hk_events_trigger',
+			'hk_events_internal'  => 'db config.hk_events_internal',
+			'hk_events_discovery' => 'db config.hk_events_discovery',
+			'hk_events_autoreg'   => 'db config.hk_events_autoreg',
+			'hk_services_mode'    => 'db config.hk_services_mode',
+			'hk_services'         => 'db config.hk_services',
+			'hk_audit_mode'       => 'db config.hk_audit_mode',
+			'hk_audit'            => 'db config.hk_audit',
+			'hk_sessions_mode'    => 'db config.hk_sessions_mode',
+			'hk_sessions'         => 'db config.hk_sessions',
+			'hk_history_mode'     => 'db config.hk_history_mode',
+			'hk_history_global'   => 'db config.hk_history_global',
+			'hk_history'          => 'db config.hk_history',
+			'hk_trends_mode'      => 'db config.hk_trends_mode',
+			'hk_trends_global'    => 'db config.hk_trends_global',
+			'hk_trends'           => 'db config.hk_trends',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +60,30 @@ class CControllerHousekeepingEdit extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
 		$data = [
-			'demo' => __FILE__
+			'hk_events_mode'      => $this->getInput('hk_events_mode',      $config['hk_events_mode']),
+			'hk_events_trigger'   => $this->getInput('hk_events_trigger',   $config['hk_events_trigger']),
+			'hk_events_internal'  => $this->getInput('hk_events_internal',  $config['hk_events_internal']),
+			'hk_events_discovery' => $this->getInput('hk_events_discovery', $config['hk_events_discovery']),
+			'hk_events_autoreg'   => $this->getInput('hk_events_autoreg',   $config['hk_events_autoreg']),
+			'hk_services_mode'    => $this->getInput('hk_services_mode',    $config['hk_services_mode']),
+			'hk_services'         => $this->getInput('hk_services',         $config['hk_services']),
+			'hk_audit_mode'       => $this->getInput('hk_audit_mode',       $config['hk_audit_mode']),
+			'hk_audit'            => $this->getInput('hk_audit',            $config['hk_audit']),
+			'hk_sessions_mode'    => $this->getInput('hk_sessions_mode',    $config['hk_sessions_mode']),
+			'hk_sessions'         => $this->getInput('hk_sessions',         $config['hk_sessions']),
+			'hk_history_mode'     => $this->getInput('hk_history_mode',     $config['hk_history_mode']),
+			'hk_history_global'   => $this->getInput('hk_history_global',   $config['hk_history_global']),
+			'hk_history'          => $this->getInput('hk_history',          $config['hk_history']),
+			'hk_trends_mode'      => $this->getInput('hk_trends_mode',      $config['hk_trends_mode']),
+			'hk_trends_global'    => $this->getInput('hk_trends_global',    $config['hk_trends_global']),
+			'hk_trends'           => $this->getInput('hk_trends',           $config['hk_trends'])
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerHousekeepingEdit'));
+		$response->setTitle(_('Configuration of housekeeping'));
 		$this->setResponse($response);
 	}
 }

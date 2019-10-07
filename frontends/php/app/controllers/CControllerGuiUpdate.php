@@ -21,19 +21,34 @@
 
 class CControllerGuiUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
+		$themes = array_keys(Z::getThemes());
 		$fields = [
-			'demo' => ''
+			'default_theme'           => 'required | db config.default_theme | in '.implode(',', $themes),
+			'dropdown_first_entry'    => 'required | db config.dropdown_first_entry | in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,
+			'dropdown_first_remember' => '           db config.dropdown_first_remember | in 1',
+			'search_limit'            => 'required | db config.search_limit | int32 | ge 1',
+			'max_in_table'            => 'required | db config.max_in_table | int32 | ge 1',
+			'server_check_interval'   => '           db config.server_check_interval | in '.SERVER_CHECK_INTERVAL
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->GetValidationError()) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'gui.edit')
+						->getUrl()
+					);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+					$this->setResponse($response);
+					break;
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
@@ -44,12 +59,30 @@ class CControllerGuiUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		DBstart();
+		$result = update_config([
+			'default_theme'           => $this->getInput('default_theme'),
+			'dropdown_first_entry'    => $this->getInput('dropdown_first_entry'),
+			'dropdown_first_remember' => $this->getInput('dropdown_first_remember', 0),
+			'search_limit'            => $this->getInput('search_limit'),
+			'max_in_table'            => $this->getInput('max_in_table'),
+			'server_check_interval'   => $this->getInput('server_check_interval', 0)
+		]);
+		$result = DBend($result);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerGuiUpdate'));
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'gui.edit')
+			->getUrl()
+		);
+
+		if ($result) {
+			$response->setMessageOk(_('Configuration updated'));
+		}
+		else {
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
+		}
+
 		$this->setResponse($response);
 	}
 }

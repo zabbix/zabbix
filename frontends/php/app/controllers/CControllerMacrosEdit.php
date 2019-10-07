@@ -44,12 +44,21 @@ class CControllerMacrosEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$data = [];
+
+		$data['macros'] = API::UserMacro()->get([
+			'output' => ['globalmacroid', 'macro', 'value', 'description'],
+			'globalmacro' => true
+		]);
+
+		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
+
+		if (!$data['macros']) {
+			$data['macros'][] = ['macro' => '', 'value' => '', 'description' => ''];
+		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerMacrosEdit'));
+		$response->setTitle(_('Configuration of macros'));
 		$this->setResponse($response);
 	}
 }

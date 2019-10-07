@@ -44,12 +44,11 @@ class CControllerWorkingTimeEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$config = select_config();
+		$data = ['work_period' => $config['work_period']];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerWorkingTimeEdit'));
+		$response->setTitle(_('Configuration of working time'));
 		$this->setResponse($response);
 	}
 }

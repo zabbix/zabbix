@@ -27,7 +27,7 @@ class CControllerImageList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +44,17 @@ class CControllerImageList extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$data = [];
+		$data['imagetype'] = $this->getInput('imagetype', IMAGE_TYPE_ICON);
+
+		$data['images'] = API::Image()->get([
+			'filter' => ['imagetype' => $data['imagetype']],
+			'output' => ['imageid', 'imagetype', 'name']
+		]);
+		order_result($data['images'], 'name');
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerImageList'));
+		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}
 }

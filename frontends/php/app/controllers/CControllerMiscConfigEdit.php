@@ -44,12 +44,27 @@ class CControllerMiscConfigEdit extends CController {
 	}
 
 	protected function doAction() {
+		$config = select_config();
+
 		$data = [
-			'demo' => __FILE__
+			'refresh_unsupported' => $config['refresh_unsupported'],
+			'discovery_groupid' => $config['discovery_groupid'],
+			'default_inventory_mode' => $config['default_inventory_mode'],
+			'alert_usrgrpid' => $config['alert_usrgrpid'],
+			'snmptrap_logging' => $config['snmptrap_logging']
 		];
 
+		$data['discovery_groups'] = API::HostGroup()->get([
+			'output' => ['groupid', 'name'],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+			'editable' => true
+		]);
+
+		$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM usrgrp u'));
+		order_result($data['alert_usrgrps'], 'name');
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerMiscConfigEdit'));
+		$response->setTitle(_('Other configuration parameters'));
 		$this->setResponse($response);
 	}
 }

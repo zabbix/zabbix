@@ -19,10 +19,8 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.regex.list.js.php');
-
 $widget = (new CWidget())
-	->setTitle(_('regex.list :data-demo: '.$data['demo']))
+	->setTitle(_('Regular expressions'))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
@@ -31,20 +29,57 @@ $widget = (new CWidget())
 					->setArgument('action', 'regex.list')
 					->getUrl()
 				))
+				->addItem(new CSubmit('form', _('New regular expression')))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'regex.list')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+$form = (new CForm())->setName('regularExpressionsForm');
 
-$widget
-	->addItem($form)
-	->show();
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_regexps'))->onClick("checkAll('".$form->getName()."', 'all_regexps', 'regexpids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Name'),
+		_('Expressions')
+	]);
+
+$expressions = [];
+$values = [];
+foreach($data['db_exps'] as $exp) {
+	if (!isset($expressions[$exp['regexpid']])) {
+		$values[$exp['regexpid']] = 1;
+	}
+	else {
+		$values[$exp['regexpid']]++;
+	}
+
+	if (!isset($expressions[$exp['regexpid']])) {
+		$expressions[$exp['regexpid']] = new CTable();
+	}
+
+	$expressions[$exp['regexpid']]->addRow([
+		new CCol($values[$exp['regexpid']]),
+		new CCol(' &raquo; '),
+		new CCol($exp['expression']),
+		new CCol(' ['.expression_type2str($exp['expression_type']).']')
+	]);
+}
+foreach($data['regexps'] as $regexpid => $regexp) {
+	$table->addRow([
+		new CCheckBox('regexpids['.$regexp['regexpid'].']', $regexp['regexpid']),
+		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
+		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
+	]);
+}
+
+$form->addItem([
+	$table,
+	new CActionButtonList('action', 'regexpids', [
+		'regexp.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
+	])
+]);
+
+$widget->addItem($form)->show();

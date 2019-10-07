@@ -45,11 +45,40 @@ class CControllerIconMapList extends CController {
 
 	protected function doAction() {
 		$data = [
-			'demo' => __FILE__
+			'iconmapid' => getRequest('iconmapid'),
+			'icon_list' => [],
+			'inventory_list' => []
 		];
 
+		$icon_list = API::Image()->get([
+			'output' => ['imageid', 'name'],
+			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
+			'preservekeys' => true
+		]);
+		order_result($icon_list, 'name');
+
+		foreach ($icon_list as $icon) {
+			$data['icon_list'][$icon['imageid']] = $icon['name'];
+		}
+
+		reset($icon_list);
+		$data['default_imageid'] = key($icon_list);
+
+		$inventoryFields = getHostInventories();
+		foreach ($inventoryFields as $field) {
+			$data['inventory_list'][$field['nr']] = $field['title'];
+		}
+
+		$data['iconmaps'] = API::IconMap()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => true,
+			'preservekeys' => true,
+			'selectMappings' => API_OUTPUT_EXTEND
+		]);
+		order_result($data['iconmaps'], 'name');
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerIconMapList'));
+		$response->setTitle(_('Configuration of icon mapping'));
 		$this->setResponse($response);
 	}
 }
