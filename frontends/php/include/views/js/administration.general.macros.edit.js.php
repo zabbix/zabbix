@@ -30,8 +30,8 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		function init_fields() {
-			$('#tbl_macros .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').not('.initialized-field').each(function() {
+		function init_fields($parent) {
+			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $parent).not('.initialized-field').each(function() {
 				var $obj = $(this);
 
 				$obj.addClass('initialized-field');
@@ -59,9 +59,11 @@
 				}
 			})
 			.dynamicRows({template: '#macro-row-tmpl'})
-			.on('click', 'button.element-table-add', init_fields);
+			.on('click', 'button.element-table-add', function() {
+				init_fields($('#tbl_macros'));
+			});
 
-		init_fields();
+		init_fields($('#tbl_macros'));
 
 		$('#update').click(function() {
 			var removedCount = $(this).data('removedCount');
