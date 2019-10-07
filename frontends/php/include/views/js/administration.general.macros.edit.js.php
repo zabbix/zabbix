@@ -40,13 +40,12 @@
 					$obj.on('change keydown', function(e) {
 						if (e.type === 'change' || e.which === 13) {
 							macroToUpperCase(this);
+							$obj.textareaFlexible();
 						}
-						$obj.textareaFlexible();
 					});
 				}
-				else {
-					$obj.textareaFlexible();
-				}
+
+				$obj.textareaFlexible();
 			});
 		}
 
