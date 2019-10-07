@@ -3542,6 +3542,7 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-content {
+	position: relative;
 	flex-grow: 1;
 	margin-top: 2rem;
 	padding-bottom: 8px;
@@ -7418,6 +7419,9 @@ table.preprocessing-test-results {
 .totals-list {
 
 	&:not(.list-table) {
+		position: absolute;
+		left: 0;
+		right: 0;
 		display: flex;
 		height: 100%;
 	}
@@ -7486,6 +7490,11 @@ table.preprocessing-test-results {
 	}
 }
 
+#iframe {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
