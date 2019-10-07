@@ -32,7 +32,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-				'value' => ['1'],
+				'value' => ['1', '2'],
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TEMPLATE,
