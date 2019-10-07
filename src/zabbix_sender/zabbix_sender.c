@@ -249,24 +249,24 @@ static char		*ZABBIX_KEY_VALUE = NULL;
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
 {
-#define LOG_INTERRUPT_WARNING(i) zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #i " while executing operation")
 
-	if (SIGALRM == sig)
-		LOG_INTERRUPT_WARNING(SIGALRM);
-	else if (SIGINT == sig)
-		LOG_INTERRUPT_WARNING(SIGINT);
-	else if (SIGQUIT == sig)
-		LOG_INTERRUPT_WARNING(SIGQUIT);
-	else if (SIGTERM == sig)
-		LOG_INTERRUPT_WARNING(SIGTERM);
-	else if (SIGHUP == sig)
-		LOG_INTERRUPT_WARNING(SIGHUP);
-	else if (SIGPIPE == sig)
-		LOG_INTERRUPT_WARNING(SIGPIPE);
-	else
-		zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
+#define CASE_LOG_WARNING(signal) \
+	case signal:							\
+		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
+		break
 
-#undef LOG_INTERRUPT_WARNING
+	switch(sig)
+	{
+		CASE_LOG_WARNING(SIGALRM);
+		CASE_LOG_WARNING(SIGINT);
+		CASE_LOG_WARNING(SIGQUIT);
+		CASE_LOG_WARNING(SIGTERM);
+		CASE_LOG_WARNING(SIGHUP);
+		CASE_LOG_WARNING(SIGPIPE);
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
+	}
+#undef CASE_LOG_WARNING
 
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
 	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
