@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.js'];
+$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'popup.condition.common.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -298,24 +298,7 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 			}
 		}
 
-		$conditionsValid = true;
-		if ($validateConditions) {
-			$filterConditionValidator = new CActionCondValidator();
-			foreach ($validateConditions as $condition) {
-				if (!$filterConditionValidator->validate($condition)) {
-					$conditionsValid = false;
-					break;
-				}
-			}
-		}
-
-		if ($conditionsValid) {
-			$_REQUEST['conditions'] = $validateConditions;
-		}
-		else {
-			error($filterConditionValidator->getError());
-			show_error_message(_('Cannot add action condition'));
-		}
+		$_REQUEST['conditions'] = $validateConditions;
 	}
 }
 elseif (hasRequest('add_opcondition') && hasRequest('new_opcondition')) {

@@ -52,7 +52,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
-				'value' => ['1'],
+				'value' => '1',
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_PROXY,

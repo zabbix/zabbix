@@ -80,8 +80,9 @@ class CEventCorrCondValidator extends CValidator {
 						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
 					);
 				}
-				elseif (($condition['operator'] == CONDITION_OPERATOR_LIKE
-						|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE) && $value === '') {
+				elseif (array_key_exists('operator', $condition) && $value === ''
+					&& ($condition['operator'] == CONDITION_OPERATOR_LIKE
+						|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;

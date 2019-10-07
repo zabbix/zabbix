@@ -122,9 +122,7 @@ class CActionCondValidator extends CValidator {
 
 			case CONDITION_TYPE_DRULE:
 				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
-					$this->setError(
-						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty'))
-					);
+					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				else {
 					foreach ($conditionValue as $value) {
