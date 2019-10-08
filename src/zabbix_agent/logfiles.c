@@ -1990,6 +1990,15 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 								(*s_count)--;
 							}
+							else
+							{
+								/* Did not manage to send the buffer.
+								/* Let's try to resend it in the next active process */
+								/* check instead of attempting to do that immediately */
+								/* until we reach limit of max lines per second. */
+								ret = SUCCEED;
+								goto out;
+							}
 
 							zbx_free(item_value);
 						}
