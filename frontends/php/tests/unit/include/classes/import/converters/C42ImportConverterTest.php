@@ -168,7 +168,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'inventory' => [
-								'inventory_mode' => 1,
+								'inventory_mode' => HOST_INVENTORY_AUTOMATIC,
 								'type' => ''
 							]
 						]
@@ -177,10 +177,29 @@ class C42ImportConverterTest extends CImportConverterTest {
 				[
 					'hosts' => [
 						[
+							'inventory_mode' => CXmlConstantName::AUTOMATIC
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
 							'inventory' => [
-								'type' => ''
+								'inventory_mode' => HOST_INVENTORY_AUTOMATIC,
+								'type' => 'x'
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'type' => 'x'
 							],
-							'inventory_mode' => 1
+							'inventory_mode' => CXmlConstantName::AUTOMATIC
 						]
 					]
 				]
