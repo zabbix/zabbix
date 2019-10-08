@@ -32,7 +32,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestLogin('triggers.php?filter_set=1&filter_hostids[0]='.$hostId);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
-		$this->zbxTestClickLinkTextWait('{HOST.NAME} has just been restarted');
+		$this->zbxTestClickLinkTextWait('Zabbix agent is not available (for {$AGENT.TIMEOUT})');
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
 		$this->zbxTestClick('bnt1');

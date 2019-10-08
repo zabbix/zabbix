@@ -28,7 +28,7 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		parent::__construct($data, WIDGET_PROBLEMS_BY_SV);
 
 		// Host groups.
-		$field_groups = new CWidgetFieldGroup('groupids', _('Host groups'));
+		$field_groups = new CWidgetFieldMsGroup('groupids', _('Host groups'));
 
 		if (array_key_exists('groupids', $this->data)) {
 			$field_groups->setValue($this->data['groupids']);
@@ -37,7 +37,7 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		$this->fields[$field_groups->getName()] = $field_groups;
 
 		// Exclude host groups.
-		$field_exclude_groups = new CWidgetFieldGroup('exclude_groupids', _('Exclude host groups'));
+		$field_exclude_groups = new CWidgetFieldMsGroup('exclude_groupids', _('Exclude host groups'));
 
 		if (array_key_exists('exclude_groupids', $this->data)) {
 			$field_exclude_groups->setValue($this->data['exclude_groupids']);
@@ -46,7 +46,7 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		$this->fields[$field_exclude_groups->getName()] = $field_exclude_groups;
 
 		// Hosts field.
-		$field_hosts = new CWidgetFieldHost('hostids', _('Hosts'));
+		$field_hosts = new CWidgetFieldMsHost('hostids', _('Hosts'));
 
 		if (array_key_exists('hostids', $this->data)) {
 			$field_hosts->setValue($this->data['hostids']);
@@ -109,6 +109,21 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 
 		$this->fields[$field_layout->getName()] = $field_layout;
 
+		// Show operational data.
+		$field_show_opdata = (new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [
+			OPERATIONAL_DATA_SHOW_NONE => _('None'),
+			OPERATIONAL_DATA_SHOW_SEPARATELY => _('Separately'),
+			OPERATIONAL_DATA_SHOW_WITH_PROBLEM => _('With problem name')
+		]))
+			->setDefault(OPERATIONAL_DATA_SHOW_NONE)
+			->setModern(true);
+
+		if (array_key_exists('show_opdata', $this->data)) {
+			$field_show_opdata->setValue($this->data['show_opdata']);
+		}
+
+		$this->fields[$field_show_opdata->getName()] = $field_show_opdata;
+
 		// Show suppressed problems.
 		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
 			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
@@ -131,16 +146,6 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		}
 
 		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
-
-		// Show last values.
-		$field_show_latest_values = (new CWidgetFieldCheckBox('show_latest_values', _('Show latest values')))
-			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
-
-		if (array_key_exists('show_latest_values', $this->data)) {
-			$field_show_latest_values->setValue($this->data['show_latest_values']);
-		}
-
-		$this->fields[$field_show_latest_values->getName()] = $field_show_latest_values;
 
 		// Problem display.
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

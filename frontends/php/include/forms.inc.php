@@ -1177,7 +1177,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	}
 	else {
 		$data['valuemaps'] = API::ValueMap()->get([
-			'output' => ['valemapid', 'name']
+			'output' => ['valuemapid', 'name']
 		]);
 
 		CArrayHelper::sort($data['valuemaps'], ['name']);
@@ -1366,6 +1366,28 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 				$params = $step_param_0->setAttribute('placeholder',
 					_('<metric name>{<label name>="<label value>", ...} == <value>')
 				);
+				break;
+
+			// ZBX-16642
+			case ZBX_PREPROC_CSV_TO_JSON:
+				$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
+					? $step['params'][2]
+					: ZBX_PREPROC_CSV_NO_HEADER;
+
+				$params = [
+					$step_param_0
+						->setAttribute('placeholder', ',')
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						->setAttribute('maxlength', 1),
+					$step_param_1
+						->setAttribute('placeholder', '"')
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						->setAttribute('maxlength', 1),
+					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
+						->setLabel(_('With header row'))
+						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
+						->setReadonly($readonly)
+				];
 				break;
 		}
 
@@ -1764,6 +1786,7 @@ function getTriggerFormData(array $data) {
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $trigger['description'];
+			$data['opdata'] = $trigger['opdata'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];
 			$data['correlation_mode'] = $trigger['correlation_mode'];

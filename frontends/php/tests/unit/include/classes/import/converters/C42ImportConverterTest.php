@@ -137,7 +137,6 @@ class C42ImportConverterTest extends CImportConverterTest {
 							'name' => 'Parent screen 2',
 							'hsize' => 1,
 							'vsize' => 4,
-							'screen_items' => []
 						],
 						[
 							'name' => 'Child screen',

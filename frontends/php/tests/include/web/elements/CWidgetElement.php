@@ -40,21 +40,30 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
+	 * Get header of widget.
+	 *
+	 * @return string
+	 */
+	public function getHeaderText() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
+	}
+
+	/**
 	 * Get content of widget.
 	 *
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
-	 * Check if widget is editable (dashboard is set to edit mode).
+	 * Check if widget is editable (widget edit button is present).
 	 *
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isDisplayed();
+		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isPresent();
 	}
 
 	/**
@@ -63,7 +72,7 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click();
+		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->click(true);
 		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
 	}
 
@@ -77,4 +86,14 @@ class CWidgetElement extends CElement {
 			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
 		};
 	}
+
+	/**
+	 * Delete a widget.
+	 *
+	 * @return boolean
+	 */
+	public function delete() {
+		$this->query("xpath:.//button[@title='Delete']")->one()->click()->waitUntilNotVisible();
+	}
 }
+

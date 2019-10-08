@@ -119,7 +119,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static const char	*decode_type(int q_type)
 {
-	ZBX_THREAD_LOCAL static char	buf[16];
+	static ZBX_THREAD_LOCAL char	buf[16];
 
 	switch (q_type)
 	{

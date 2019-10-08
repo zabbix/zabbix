@@ -11,7 +11,7 @@
 		removeVarsBySelector(null, 'input[id^="user_medias_' + index + '_sendto_"]');
 		jQuery('#user_medias_' + index + '_severity').remove();
 		jQuery('#user_medias_' + index + '_active').remove();
-		jQuery('#user_medias_' + index + '_description').remove();
+		jQuery('#user_medias_' + index + '_name').remove();
 	}
 
 	function autologoutHandler() {

@@ -34,7 +34,7 @@ require_once dirname(__FILE__).'/users.inc.php';
  * @param int    $filter['show_suppressed']    (optional)
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
- * @param int    $filter['show_latest_values'] (optional)
+ * @param int    $filter['show_opdata']        (optional)
  *
  * @return array
  */
@@ -159,10 +159,10 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		];
 
-		if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
+		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			$options['output'] = array_merge(
 				$options['output'],
-				['url', 'expression', 'recovery_mode','recovery_expression']
+				['url', 'expression', 'recovery_mode', 'recovery_expression', 'opdata']
 			);
 		}
 
@@ -261,16 +261,16 @@ function getSystemStatusData(array $filter) {
 				'preservekeys' => true
 			]),
 			'mediatypes' => API::MediaType()->get([
-				'output' => ['description', 'maxattempts'],
+				'output' => ['name', 'maxattempts'],
 				'mediatypeids' => array_keys($actions['mediatypeids']),
 				'preservekeys' => true
 			])
 		];
 
-		if (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1) {
+		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			$maked_data = CScreenProblem::makeData(
 				['problems' => $problems_data, 'triggers' => $data['triggers']],
-				['show' => 0, 'details' => 0, 'show_latest_values' => $filter['show_latest_values']]
+				['show' => 0, 'details' => 0, 'show_opdata' => $filter['show_opdata']]
 			);
 			$data['triggers'] = $maked_data['triggers'];
 		}
@@ -288,6 +288,7 @@ function getSystemStatusData(array $filter) {
  * @param int    $filter['hide_empty_groups']  (optional)
  * @param int    $filter['ext_ack']            (optional)
  * @param int    $filter['show_timeline']      (optional)
+ * @param int    $filter['show_opdata']        (optional)
  * @param array  $data
  * @param array  $data['groups']
  * @param string $data['groups'][]['groupid']
@@ -311,6 +312,7 @@ function getSystemStatusData(array $filter) {
  * @param string $data['triggers'][<triggerid>]['description']
  * @param array  $data['triggers'][<triggerid>]['hosts']
  * @param string $data['triggers'][<triggerid>]['hosts'][]['name']
+ * @param array  $data['triggers'][<triggerid>]['opdata']
  * @param array  $config
  * @param string $config['severity_name_*']
  * @param string $backurl
@@ -573,20 +575,20 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
 			return getSeverityCell($severity, null, [
-				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_UNACK:
 			return getSeverityCell($severity, null, [
-				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
 			return getSeverityCell($severity, $data['severity_names'], [
 				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
-					->addClass(ZBX_STYLE_BY_SEVERITY_COUNT),
+					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
@@ -693,12 +695,14 @@ function make_status_of_zbx() {
  * @param string $triggers[<triggerid>]['description']
  * @param array  $triggers[<triggerid>]['hosts']
  * @param string $triggers[<triggerid>]['hosts'][]['name']
+ * @param string $triggers[<triggerid>]['opdata']
  * @param string $backurl
  * @param array  $actions
  * @param array  $config
  * @param array  $filter
  * @param array  $filter['show_suppressed']  (optional)
  * @param array  $filter['show_timeline']    (optional)
+ * @param array  $filter['show_opdata']      (optional)
  *
  * @return CTableInfo
  */
@@ -710,7 +714,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$header_time = new CColHeader([_('Time'), (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN)]);
 
 	$show_timeline = (array_key_exists('show_timeline', $filter) && $filter['show_timeline']);
-	$show_latest_values = (array_key_exists('show_latest_values', $filter) && $filter['show_latest_values']);
+	$show_opdata = (array_key_exists('show_opdata', $filter)) ? $filter['show_opdata'] : OPERATIONAL_DATA_SHOW_NONE;
 
 	if ($show_timeline) {
 		$header = [
@@ -728,7 +732,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			_('Info'),
 			_('Host'),
 			_('Problem'),
-			$show_latest_values ? _('Latest values') : null,
+			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
 			_('Ack'),
 			_('Actions'),
@@ -797,6 +801,38 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
 		}
 
+		// operational data
+		$opdata = null;
+		if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+
+			if ($trigger['opdata'] === '') {
+				if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+					$opdata = (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+				}
+			}
+			else {
+				$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
+					[
+						'triggerid' => $trigger['triggerid'],
+						'expression' => $trigger['expression'],
+						'opdata' => $trigger['opdata'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					[
+						'events' => true,
+						'html' => true
+					]
+				);
+
+				if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+					$opdata = (new CCol($opdata))
+						->addClass('opdata')
+						->addClass(ZBX_STYLE_WORDWRAP);
+				}
+			}
+		}
+
 		// ack
 		$problem_update_url = (new CUrl('zabbix.php'))
 			->setArgument('action', 'acknowledge.edit')
@@ -811,8 +847,13 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
-			getSeverityCell($problem['severity'], null, $problem['name']),
-			$show_latest_values ? CScreenProblem::getLatestValues($trigger['items']) : null,
+			getSeverityCell($problem['severity'], null,
+				(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
+					? [$problem['name'], ' (', $opdata, ')']
+					: $problem['name']
+				)
+			),
+			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$ack,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],

@@ -20,5 +20,6 @@
 #define ITEM_PREPROC_TEST_H
 
 int	zbx_item_preproc_xpath(zbx_variant_t *value, const char *params, char **errmsg);
+int	zbx_item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 
 #endif

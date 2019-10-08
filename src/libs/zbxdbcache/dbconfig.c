@@ -319,7 +319,8 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_HOST *host)
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_REFRESH_UNSUPPORTED_CHANGED	0x20
 
-static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, int flags, int now, char **error)
+static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, unsigned char new_state,
+		int flags, int now, char **error)
 {
 	zbx_uint64_t	seed;
 
@@ -355,10 +356,21 @@ static int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, unsigned char new_state, i
 
 		if (ITEM_STATE_NORMAL == new_state || 0 == item->schedulable)
 		{
-			/* supported items and items that could not have been scheduled previously, but had their */
-			/* update interval fixed, should be scheduled using their update intervals */
-			item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval, custom_intervals,
-					now);
+			int	disable_until;
+
+			if (0 != (flags & ZBX_HOST_UNREACHABLE) && 0 != (disable_until =
+					DCget_disable_until(item, host)))
+			{
+				item->nextcheck = calculate_item_nextcheck_unreachable(simple_interval,
+						custom_intervals, disable_until);
+			}
+			else
+			{
+				/* supported items and items that could not have been scheduled previously, but had */
+				/* their update interval fixed, should be scheduled using their update intervals */
+				item->nextcheck = calculate_item_nextcheck(seed, item->type, simple_interval,
+						custom_intervals, now);
+			}
 		}
 		else
 		{
@@ -829,9 +841,8 @@ static int	set_hk_opt(int *value, int non_zero, int value_min, const char *value
 
 static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 {
-#define SELECTED_FIELD_COUNT	28
-
 	const ZBX_TABLE	*config_table;
+
 	const char	*selected_fields[] = {"refresh_unsupported", "discovery_groupid", "snmptrap_logging",
 					"severity_name_0", "severity_name_1", "severity_name_2", "severity_name_3",
 					"severity_name_4", "severity_name_5", "hk_events_mode", "hk_events_trigger",
@@ -839,8 +850,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 					"hk_services_mode", "hk_services", "hk_audit_mode", "hk_audit",
 					"hk_sessions_mode", "hk_sessions", "hk_history_mode", "hk_history_global",
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
-					"default_inventory_mode", "db_extension"};	/* sync with zbx_dbsync_compare_config() */
-	const char	*row[SELECTED_FIELD_COUNT];
+					"default_inventory_mode", "db_extension", "autoreg_tls_accept"};	/* sync with zbx_dbsync_compare_config() */
+	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
 	int		j, found = 1, refresh_unsupported, ret;
 	char		**db_row;
@@ -866,12 +877,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 
 		config_table = DBget_table("config");
 
-		for (i = 0; i < SELECTED_FIELD_COUNT; i++)
+		for (i = 0; i < ARRSIZE(selected_fields); i++)
 			row[i] = DBget_field(config_table, selected_fields[i])->default_value;
 	}
 	else
 	{
-		for (i = 0; i < SELECTED_FIELD_COUNT; i++)
+		for (i = 0; i < ARRSIZE(selected_fields); i++)
 			row[i] = db_row[i];
 	}
 
@@ -904,6 +915,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 	config->config->default_inventory_mode = atoi(row[26]);
 	DCstrpool_replace(found, &config->config->db_extension, row[27]);
+	config->config->autoreg_tls_accept = (unsigned char)atoi(row[28]);
 
 	for (j = 0; TRIGGER_SEVERITY_COUNT > j; j++)
 		DCstrpool_replace(found, &config->config->severity_name[j], row[3 + j]);
@@ -993,8 +1005,38 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
+}
 
-#undef SELECTED_FIELD_COUNT
+static void	DCsync_autoreg_config(zbx_dbsync_t *sync)
+{
+	/* sync this function with zbx_dbsync_compare_autoreg_psk() */
+	int		ret;
+	char		**db_row;
+	zbx_uint64_t	rowid;
+	unsigned char	tag;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &db_row, &tag)))
+	{
+		switch (tag)
+		{
+			case ZBX_DBSYNC_ROW_ADD:
+			case ZBX_DBSYNC_ROW_UPDATE:
+				zbx_strlcpy(config->autoreg_psk_identity, db_row[0],
+						sizeof(config->autoreg_psk_identity));
+				zbx_strlcpy(config->autoreg_psk, db_row[1], sizeof(config->autoreg_psk));
+				break;
+			case ZBX_DBSYNC_ROW_REMOVE:
+				config->autoreg_psk_identity[0] = '\0';
+				zbx_guaranteed_memset(config->autoreg_psk, 0, sizeof(config->autoreg_psk));
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync)
@@ -2789,7 +2831,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, item->state, flags, now, &error))
+				if (FAIL == DCitem_nextcheck_update(item, host, item->state, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -3158,6 +3200,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		DCstrpool_replace(found, &trigger->expression, row[2]);
 		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
 		DCstrpool_replace(found, &trigger->correlation_tag, row[13]);
+		DCstrpool_replace(found, &trigger->opdata, row[14]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
@@ -3222,6 +3265,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 			zbx_strpool_release(trigger->recovery_expression);
 			zbx_strpool_release(trigger->error);
 			zbx_strpool_release(trigger->correlation_tag);
+			zbx_strpool_release(trigger->opdata);
 
 			zbx_vector_ptr_destroy(&trigger->tags);
 
@@ -4869,6 +4913,8 @@ void	DCsync_configuration(unsigned char mode)
 			maintenance_sync, maintenance_period_sync, maintenance_tag_sync, maintenance_group_sync,
 			maintenance_host_sync, hgroup_host_sync;
 
+	double		autoreg_csec, autoreg_csec2;
+	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -4877,7 +4923,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
-
+	zbx_dbsync_init(&autoreg_config_sync, mode);
 	zbx_dbsync_init(&hosts_sync, mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
@@ -4919,11 +4965,20 @@ void	DCsync_configuration(unsigned char mode)
 		goto out;
 	csec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_autoreg_psk(&autoreg_config_sync))
+		goto out;
+	autoreg_csec = zbx_time() - sec;
+
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_config(&config_sync, &flags);
 	csec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_autoreg_config(&autoreg_config_sync);	/* must be done in the same cache locking with config sync */
+	autoreg_csec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
 	/* sync macro related data, to support macro resolving during configuration sync */
@@ -5237,6 +5292,14 @@ void	DCsync_configuration(unsigned char mode)
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
+
+		total += autoreg_csec;
+		total2 += autoreg_csec2;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, autoreg_csec, autoreg_csec2, autoreg_config_sync.add_num,
+				autoreg_config_sync.update_num, autoreg_config_sync.remove_num);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
@@ -5469,6 +5532,7 @@ void	DCsync_configuration(unsigned char mode)
 	FINISH_SYNC;
 out:
 	zbx_dbsync_clear(&config_sync);
+	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&hosts_sync);
 	zbx_dbsync_clear(&hi_sync);
 	zbx_dbsync_clear(&htmpl_sync);
@@ -6299,9 +6363,11 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *                                                                            *
  * Parameters:                                                                *
  *     psk_identity - [IN] PSK identity to search for ('\0' terminated)       *
- *     psk_buf      - [OUT] output buffer for PSK value                       *
- *     psk_buf_len  - [IN] output buffer size                                 *
- *                                                                            *
+ *     psk_buf      - [OUT] output buffer for PSK value with size             *
+ *                    HOST_TLS_PSK_LEN_MAX                                    *
+ *     psk_usage    - [OUT] 0 - PSK not found, 1 - found in host PSKs,        *
+ *                          2 - found in autoregistration PSK, 3 - found in   *
+ *                          both                                              *
  * Return value:                                                              *
  *     PSK length in bytes if PSK found. 0 - if PSK not found.                *
  *                                                                            *
@@ -6313,24 +6379,87 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
  *     the src/libs/zbxcrypto/tls.c.                                          *
  *                                                                            *
  ******************************************************************************/
-size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len)
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage)
 {
 	const ZBX_DC_PSK	*psk_i;
 	ZBX_DC_PSK		psk_i_local;
 	size_t			psk_len = 0;
+	unsigned char		autoreg_psk_tmp[HOST_TLS_PSK_LEN_MAX];
 
-	RDLOCK_CACHE;
+	*psk_usage = 0;
 
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
+	RDLOCK_CACHE;
+
+	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
-		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, psk_buf_len);
+	{
+		psk_len = zbx_strlcpy((char *)psk_buf, psk_i->tls_psk, HOST_TLS_PSK_LEN_MAX);
+		*psk_usage |= ZBX_PSK_FOR_HOST;
+	}
+
+	/* Does it match autoregistration PSK? */
+	if (0 != strcmp(config->autoreg_psk_identity, (const char *)psk_identity))
+	{
+		UNLOCK_CACHE;
+		return psk_len;
+	}
+
+	if (0 == *psk_usage)	/* only as autoregistration PSK */
+	{
+		psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, HOST_TLS_PSK_LEN_MAX);
+		UNLOCK_CACHE;
+		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
+
+		return psk_len;
+	}
+
+	/* the requested PSK is used as host PSK and as autoregistration PSK */
+	zbx_strlcpy((char *)autoreg_psk_tmp, config->autoreg_psk, sizeof(autoreg_psk_tmp));
 
 	UNLOCK_CACHE;
 
+	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	{
+		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
+		return psk_len;
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
+			" different PSK values, autoregistration will not be allowed", psk_identity);
 	return psk_len;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_autoregistration_psk                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Copy autoregistration PSK identity and value from configuration cache  *
+ *     into caller's buffers                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
+ *     psk_identity_buf_len - [IN] buffer length for PSK identity             *
+ *     psk_buf              - [OUT] buffer for PSK value                      *
+ *     psk_buf_len          - [IN] buffer length for PSK value                *
+ *                                                                            *
+ * Comments: if autoregistration PSK is not configured then empty strings     *
+ *           will be copied into buffers                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
+		unsigned char *psk_buf, size_t psk_buf_len)
+{
+	RDLOCK_CACHE;
+
+	zbx_strlcpy((char *)psk_identity_buf, config->autoreg_psk_identity, psk_identity_buf_len);
+	zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+
+	UNLOCK_CACHE;
+}
 
 static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE *src_interface)
 {
@@ -6696,6 +6825,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
+	dst_trigger->opdata = zbx_strdup(NULL, src_trigger->opdata);
 	dst_trigger->flags = 0;
 
 	dst_trigger->expression = NULL;
@@ -6749,6 +6879,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->description);
 	zbx_free(trigger->correlation_tag);
+	zbx_free(trigger->opdata);
 
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&trigger->tags);
@@ -6791,6 +6922,26 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 	}
 
 	UNLOCK_CACHE;
+}
+
+int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid)
+{
+	const ZBX_DC_HOST	*dc_host;
+	int			ret;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_host = DCfind_host(host)))
+	{
+		*hostid = dc_host->hostid;
+		ret = SUCCEED;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
@@ -7726,7 +7877,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, un
 	int		old_nextcheck;
 
 	old_nextcheck = dc_item->nextcheck;
-	DCitem_nextcheck_update(dc_item, new_state, flags, lastclock, NULL);
+	DCitem_nextcheck_update(dc_item, dc_host, new_state, flags, lastclock, NULL);
 
 	old_poller_type = dc_item->poller_type;
 	DCitem_poller_type_update(dc_item, dc_host, flags);
@@ -10361,11 +10512,12 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
  * Purpose: get global configuration data                                     *
  *                                                                            *
  * Parameters: cfg   - [OUT] the global configuration data                    *
- *             flags - [IN] the flags specifying fields to set,               *
+ *             flags - [IN] the flags specifying fields to get,               *
  *                          see ZBX_CONFIG_FLAGS_ defines                     *
  *                                                                            *
- * Comments: It's recommended to cleanup this structure with zbx_config_clean *
- *           function even if only simple fields are requested.               *
+ * Comments: It's recommended to cleanup 'cfg' structure after use with       *
+ *           zbx_config_clean() function even if only simple fields were      *
+ *           requested.                                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
@@ -10399,6 +10551,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
 		cfg->db_extension = zbx_strdup(NULL, config->config->db_extension);
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT))
+		cfg->autoreg_tls_accept = config->config->autoreg_tls_accept;
 
 	UNLOCK_CACHE;
 
@@ -11451,7 +11606,8 @@ void	zbx_dc_items_update_nextcheck(DC_ITEM *items, zbx_agent_value_t *values, in
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		if (SUCCEED == zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
-			DCitem_nextcheck_update(dc_item, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec, NULL);
+			DCitem_nextcheck_update(dc_item, dc_host, items[i].state, ZBX_ITEM_COLLECTED, values[i].ts.sec,
+					NULL);
 	}
 
 	UNLOCK_CACHE;

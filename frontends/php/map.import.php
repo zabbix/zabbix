@@ -61,6 +61,7 @@ $data = [
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
 		'images' => ['updateExisting' => false, 'createMissing' => true],
+		'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
 	'backurl' => getRequest('backurl', '')
@@ -114,6 +115,12 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			$data['rules']['maps'] = ['updateExisting' => true, 'createMissing' => true];
 
 			$data['backurl'] = 'sysmaps.php';
+			break;
+
+		case 'mediatype':
+			$data['rules']['mediaTypes'] = ['updateExisting' => false, 'createMissing' => true];
+
+			$data['backurl'] = 'zabbix.php?action=mediatype.list';
 			break;
 
 		case 'screen':

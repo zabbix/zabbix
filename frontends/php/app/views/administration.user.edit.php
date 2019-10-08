@@ -56,7 +56,7 @@ if ($data['action'] === 'user.edit') {
 	$user_form_list
 		->addRow((new CLabel(_('Alias'), 'alias'))->setAsteriskMark(),
 			(new CTextBox('alias', $data['alias']))
-				->setReadonly($data['alias'] === ZBX_GUEST_USER)
+				->setReadonly($data['db_user']['alias'] === ZBX_GUEST_USER)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
@@ -115,7 +115,7 @@ if ($data['change_password']) {
 else {
 	$user_form_list->addRow(_('Password'),
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($data['alias'] !== ZBX_GUEST_USER)
+			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
 			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -170,7 +170,7 @@ $user_form_list
 	);
 
 // Append auto-login & auto-logout to form list.
-if ($data['alias'] !== ZBX_GUEST_USER) {
+if ($data['action'] === 'userprofile.edit' || $data['db_user']['alias'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$user_form_list->addRow(_('Auto-login'),
@@ -260,7 +260,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['description'],
+				$media['name'],
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

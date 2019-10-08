@@ -77,8 +77,8 @@ class CDashboardElement extends CElement {
 			$query->waitUntilPresent();
 		}
 
-		if (($widget = $query->asWidget()->one($should_exist)) !== null) {
-			$widget->waitUntilReady();
+		if (($widget = $query->asWidget()->one($should_exist)) !== null && $should_exist) {
+				$widget->waitUntilReady();
 		}
 
 		return $widget;
@@ -133,7 +133,7 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashbrd-edit"]')->one()->isDisplayed()) {
 			$controls->query('id:dashbrd-cancel')->one()->click();
-			$controls->query('xpath:.//nav[@class="dashbrd-edit"]')->waitUntilNotVisible();
+			(new CElementQuery('xpath://nav[@class="dashbrd-edit"]'))->waitUntilNotVisible();
 		}
 
 		return $this;

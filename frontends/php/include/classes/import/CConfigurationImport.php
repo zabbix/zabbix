@@ -65,7 +65,7 @@ class CConfigurationImport {
 	 */
 	public function __construct(array $options = [], CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer) {
-		$this->options = [
+		$default_options = [
 			'groups' => ['createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
@@ -80,10 +80,39 @@ class CConfigurationImport {
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
-		$this->options = array_merge($this->options, $options);
+		$options = array_merge($default_options, $options);
+
+		$object_options = (
+			$options['templateLinkage']['createMissing']
+			|| $options['applications']['createMissing']
+			|| $options['applications']['deleteMissing']
+			|| $options['items']['updateExisting']
+			|| $options['items']['createMissing']
+			|| $options['items']['deleteMissing']
+			|| $options['discoveryRules']['updateExisting']
+			|| $options['discoveryRules']['createMissing']
+			|| $options['discoveryRules']['deleteMissing']
+			|| $options['triggers']['deleteMissing']
+			|| $options['graphs']['deleteMissing']
+			|| $options['httptests']['updateExisting']
+			|| $options['httptests']['createMissing']
+			|| $options['httptests']['deleteMissing']
+		);
+		$options['process_templates'] = (
+			!$options['templates']['updateExisting']
+			&& ($object_options
+				|| $options['templateScreens']['updateExisting']
+				|| $options['templateScreens']['createMissing']
+				|| $options['templateScreens']['deleteMissing']
+			)
+		);
+		$options['process_hosts'] = (!$options['hosts']['updateExisting'] && $object_options);
+
+		$this->options = $options;
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
 	}
@@ -125,6 +154,7 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+		$this->processMediaTypes();
 
 		return true;
 	}
@@ -535,8 +565,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates() {
-		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
+		if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']
+				|| $this->options['process_templates']) {
 			$templates = $this->getFormattedTemplates();
+
 			if ($templates) {
 				$templateImporter = new CTemplateImporter($this->options, $this->referencer,
 					$this->importedObjectContainer
@@ -556,8 +588,10 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts() {
-		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+		if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']
+				|| $this->options['process_hosts']) {
 			$hosts = $this->getFormattedHosts();
+
 			if ($hosts) {
 				$hostImporter = new CHostImporter($this->options, $this->referencer, $this->importedObjectContainer);
 				$hostImporter->import($hosts);
@@ -720,6 +754,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item[$xml_itemkey])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_itemid = $this->referencer->resolveItem($hostId, $item[$xml_itemkey]['key']);
 
 					if ($master_itemid !== false) {
@@ -882,6 +922,10 @@ class CConfigurationImport {
 			}
 		}
 
+		if ($this->options['discoveryRules']['updateExisting']) {
+			$this->deleteMissingPrototypes($allDiscoveryRules);
+		}
+
 		$itemsToCreate = [];
 		$itemsToUpdate = [];
 
@@ -921,6 +965,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item['master_item'])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
 				}
 
@@ -1033,6 +1083,12 @@ class CConfigurationImport {
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+						if (!array_key_exists('key', $prototype[$xml_item_key])) {
+							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+								_('cannot be empty')
+							));
+						}
+
 						$master_itemprototypeid = $this->referencer->resolveItem($hostId,
 							$prototype[$xml_item_key]['key']
 						);
@@ -1487,33 +1543,31 @@ class CConfigurationImport {
 				$graph['ymax_itemid'] = $itemId;
 			}
 
-			if (isset($graph['gitems']) && $graph['gitems']) {
-				foreach ($graph['gitems'] as &$gitem) {
-					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-					$gitem['itemid'] = $gitemHostId
-						? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
-						: false;
+			foreach ($graph['gitems'] as &$gitem) {
+				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				$gitem['itemid'] = $gitemHostId
+					? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+					: false;
 
-					if (!$gitem['itemid']) {
-						throw new Exception(_s(
-							'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
-							$gitem['item']['key'],
-							$gitem['item']['host'],
-							$graph['name']
-						));
-					}
+				if (!$gitem['itemid']) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
+						$gitem['item']['key'],
+						$gitem['item']['host'],
+						$graph['name']
+					));
 				}
-				unset($gitem);
+			}
+			unset($gitem);
 
-				$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+			$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
 
-				if ($graphId) {
-					$graph['graphid'] = $graphId;
-					$graphsToUpdate[] = $graph;
-				}
-				else {
-					$graphsToCreate[] = $graph;
-				}
+			if ($graphId) {
+				$graph['graphid'] = $graphId;
+				$graphsToUpdate[] = $graph;
+			}
+			else {
+				$graphsToCreate[] = $graph;
 			}
 		}
 
@@ -1727,6 +1781,50 @@ class CConfigurationImport {
 			);
 			$screenImporter->delete($screens);
 			$screenImporter->import($screens);
+		}
+	}
+
+	/**
+	 * Import media types.
+	 */
+	protected function processMediaTypes() {
+		if (!$this->options['mediaTypes']['updateExisting'] && !$this->options['mediaTypes']['createMissing']) {
+			return;
+		}
+
+		$all_media_types = $this->getFormattedMediaTypes();
+
+		if (!$all_media_types) {
+			return;
+		}
+
+		$all_media_types = zbx_toHash($all_media_types, 'name');
+
+		$db_media_types = API::MediaType()->get([
+			'output' => ['mediatypeid', 'name'],
+			'filter' => ['name' => array_keys($all_media_types)]
+		]);
+		$db_media_types = zbx_toHash($db_media_types, 'name');
+
+		$upd_media_types = [];
+		$new_media_types = [];
+
+		foreach ($all_media_types as $name => $media_type) {
+			if (array_key_exists($name , $db_media_types)) {
+				$media_type['mediatypeid'] = $db_media_types[$name]['mediatypeid'];
+				$upd_media_types[] = $media_type;
+			}
+			else {
+				$new_media_types[] = $media_type;
+			}
+		}
+
+		if ($this->options['mediaTypes']['createMissing'] && $new_media_types) {
+			API::MediaType()->create($new_media_types);
+		}
+
+		if ($this->options['mediaTypes']['updateExisting'] && $upd_media_types) {
+			API::MediaType()->update($upd_media_types);
 		}
 	}
 
@@ -1981,7 +2079,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Deletes discovery rules and prototypes from DB that are missing in XML.
+	 * Deletes discovery rules from DB that are missing in XML.
 	 *
 	 * @return null
 	 */
@@ -2004,16 +2102,14 @@ class CConfigurationImport {
 
 		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 
-		if ($allDiscoveryRules) {
-			foreach ($allDiscoveryRules as $host => $discoveryRules) {
-				$hostId = $this->referencer->resolveHostOrTemplate($host);
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			$hostId = $this->referencer->resolveHostOrTemplate($host);
 
-				foreach ($discoveryRules as $discoveryRule) {
-					$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+			foreach ($discoveryRules as $discoveryRule) {
+				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
 
-					if ($discoveryRuleId) {
-						$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
-					}
+				if ($discoveryRuleId) {
+					$discoveryRuleIdsXML[$discoveryRuleId] = $discoveryRuleId;
 				}
 			}
 		}
@@ -2034,56 +2130,66 @@ class CConfigurationImport {
 
 		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
 		$this->referencer->refreshItems();
+	}
 
-		$hostPrototypeIdsXML = [];
-		$triggerPrototypeIdsXML = [];
-		$itemPrototypeIdsXML = [];
-		$graphPrototypeIdsXML = [];
+	/**
+	 * Deletes prototypes from DB that are missing in XML.
+	 *
+	 * @param array $all_discovery_rules
+	 */
+	protected function deleteMissingPrototypes(array $all_discovery_rules) {
+		$xml_discoveryids = [];
+		$xml_host_prototypeids = [];
+		$xml_trigger_prototypeids = [];
+		$xml_graph_prototypeids = [];
+		$xml_item_prototypeids = [];
 
-		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			$hostId = $this->referencer->resolveHostOrTemplate($host);
+		foreach ($all_discovery_rules as $host => $discovery_rules) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
 
-			foreach ($discoveryRules as $discoveryRule) {
-				$discoveryRuleId = $this->referencer->resolveItem($hostId, $discoveryRule['key_']);
+			foreach ($discovery_rules as $discovery_rule) {
+				$discoveryid = $this->referencer->resolveItem($hostid, $discovery_rule['key_']);
 
-				if ($discoveryRuleId) {
+				if ($discoveryid) {
+					$xml_discoveryids[$discoveryid] = $discoveryid;
+
 					// gather host prototype IDs to delete
-					foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
-						$hostPrototypeId = $this->referencer->resolveHostPrototype($hostId, $discoveryRuleId,
-							$hostPrototype['host']
+					foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+						$host_prototypeid = $this->referencer->resolveHostPrototype($hostid, $discoveryid,
+							$host_prototype['host']
 						);
 
-						if ($hostPrototypeId) {
-							$hostPrototypeIdsXML[$hostPrototypeId] = $hostPrototypeId;
+						if ($host_prototypeid) {
+							$xml_host_prototypeids[$host_prototypeid] = $host_prototypeid;
 						}
 					}
 
 					// gather trigger prototype IDs to delete
-					foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
-						$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
-							$triggerPrototype['expression'], $triggerPrototype['recovery_expression']
+					foreach ($discovery_rule['trigger_prototypes'] as $trigger_prototype) {
+						$trigger_prototypeid = $this->referencer->resolveTrigger($trigger_prototype['description'],
+							$trigger_prototype['expression'], $trigger_prototype['recovery_expression']
 						);
 
-						if ($triggerPrototypeId) {
-							$triggerPrototypeIdsXML[$triggerPrototypeId] = $triggerPrototypeId;
+						if ($trigger_prototypeid) {
+							$xml_trigger_prototypeids[$trigger_prototypeid] = $trigger_prototypeid;
 						}
 					}
 
 					// gather graph prototype IDs to delete
-					foreach ($discoveryRule['graph_prototypes'] as $graphPrototype) {
-						$graphPrototypeId = $this->referencer->resolveGraph($hostId, $graphPrototype['name']);
+					foreach ($discovery_rule['graph_prototypes'] as $graph_prototype) {
+						$graph_prototypeid = $this->referencer->resolveGraph($hostid, $graph_prototype['name']);
 
-						if ($graphPrototypeId) {
-							$graphPrototypeIdsXML[$graphPrototypeId] = $graphPrototypeId;
+						if ($graph_prototypeid) {
+							$xml_graph_prototypeids[$graph_prototypeid] = $graph_prototypeid;
 						}
 					}
 
 					// gather item prototype IDs to delete
-					foreach ($discoveryRule['item_prototypes'] as $itemPrototype) {
-						$itemPrototypeId = $this->referencer->resolveItem($hostId, $itemPrototype['key_']);
+					foreach ($discovery_rule['item_prototypes'] as $item_prototype) {
+						$item_prototypeid = $this->referencer->resolveItem($hostid, $item_prototype['key_']);
 
-						if ($itemPrototypeId) {
-							$itemPrototypeIdsXML[$itemPrototypeId] = $itemPrototypeId;
+						if ($item_prototypeid) {
+							$xml_item_prototypeids[$item_prototypeid] = $item_prototypeid;
 						}
 					}
 				}
@@ -2091,65 +2197,67 @@ class CConfigurationImport {
 		}
 
 		// delete missing host prototypes
-		$dbHostPrototypeIds = API::HostPrototype()->get([
+		$db_host_prototypes = API::HostPrototype()->get([
 			'output' => ['hostid'],
-			'discoveryids' => $discoveryRuleIdsXML,
+			'discoveryids' => $xml_discoveryids,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$hostPrototypesToDelete = array_diff_key($dbHostPrototypeIds, $hostPrototypeIdsXML);
+		$del_host_prototypes = array_diff_key($db_host_prototypes, $xml_host_prototypeids);
 
-		if ($hostPrototypesToDelete) {
-			API::HostPrototype()->delete(array_keys($hostPrototypesToDelete));
+		if ($del_host_prototypes) {
+			API::HostPrototype()->delete(array_keys($del_host_prototypes));
 		}
 
 		// delete missing trigger prototypes
-		$dbTriggerPrototypeIds = API::TriggerPrototype()->get([
+		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['triggerid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $xml_discoveryids,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$triggerPrototypesToDelete = array_diff_key($dbTriggerPrototypeIds, $triggerPrototypeIdsXML);
+		$del_trigger_prototypes = array_diff_key($db_trigger_prototypes, $xml_trigger_prototypeids);
 
 		// unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them
-		if ($triggerPrototypesToDelete) {
-			API::TriggerPrototype()->delete(array_keys($triggerPrototypesToDelete));
+		if ($del_trigger_prototypes) {
+			API::TriggerPrototype()->delete(array_keys($del_trigger_prototypes));
 		}
 
 		// delete missing graph prototypes
-		$dbGraphPrototypeIds = API::GraphPrototype()->get([
+		$db_graph_prototypes = API::GraphPrototype()->get([
 			'output' => ['graphid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $xml_discoveryids,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$graphPrototypesToDelete = array_diff_key($dbGraphPrototypeIds, $graphPrototypeIdsXML);
+		$del_graph_prototypes = array_diff_key($db_graph_prototypes, $xml_graph_prototypeids);
 
 		// unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them
-		if ($graphPrototypesToDelete) {
-			API::GraphPrototype()->delete(array_keys($graphPrototypesToDelete));
+		if ($del_graph_prototypes) {
+			API::GraphPrototype()->delete(array_keys($del_graph_prototypes));
 		}
 
 		// delete missing item prototypes
-		$dbItemPrototypeIds = API::ItemPrototype()->get([
+		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['itemid'],
-			'hostids' => $processedHostIds,
+			'discoveryids' => $xml_discoveryids,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
 		]);
 
-		$itemPrototypesToDelete = array_diff_key($dbItemPrototypeIds, $itemPrototypeIdsXML);
+		$del_item_prototypes = array_diff_key($db_item_prototypes, $xml_item_prototypeids);
 
-		if ($itemPrototypesToDelete) {
-			API::ItemPrototype()->delete(array_keys($itemPrototypesToDelete));
+		if ($del_item_prototypes) {
+			API::ItemPrototype()->delete(array_keys($del_item_prototypes));
+
+			$this->referencer->refreshGraphs();
 		}
 	}
 
@@ -2402,6 +2510,19 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Get formatted media types.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedMediaTypes() {
+		if (!isset($this->formattedData['mediaTypes'])) {
+			$this->formattedData['mediaTypes'] = $this->adapter->getMediaTypes();
+		}
+
+		return $this->formattedData['mediaTypes'];
+	}
+
+	/**
 	 * Get items keys order tree, to ensure that master item will be inserted or updated before any of it dependent
 	 * item. Returns associative array where key is item index and value is item dependency level.
 	 *
@@ -2608,6 +2729,12 @@ class CConfigurationImport {
 				$traversal_path = [$entity['key_']];
 
 				while ($entity && $entity['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $entity[$master_key_identifier])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_key = $entity[$master_key_identifier]['key'];
 
 					if (array_key_exists($host_key, $resolved_masters_cache)

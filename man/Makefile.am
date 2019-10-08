@@ -18,6 +18,7 @@ man8_MANS = $(agent_MANS) $(proxy_MANS) $(server_MANS)
 
 EXTRA_DIST = \
 	zabbix_agentd.man \
+	zabbix_agent2.man \
 	zabbix_get.man \
 	zabbix_sender.man \
 	zabbix_proxy.man \

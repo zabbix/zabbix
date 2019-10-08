@@ -59,7 +59,7 @@ FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
-FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_authtype	|t_integer	|'-1'	|NOT NULL	|ZBX_PROXY
@@ -67,9 +67,9 @@ FIELD		|ipmi_privilege	|t_integer	|'2'	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_username	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_password	|t_varchar(20)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|ipmi_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|ipmi_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|snmp_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|snmp_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|maintenanceid	|t_id		|	|NULL		|ZBX_NODATA		|2|maintenances	|		|RESTRICT
 FIELD		|maintenance_status|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -79,7 +79,7 @@ FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ipmi_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|snmp_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_disable_until|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_error	|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
@@ -280,7 +280,7 @@ TABLE|interface|interfaceid|ZBX_TEMPLATE
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|main		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
+FIELD		|type		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|ip		|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_PROXY
 FIELD		|dns		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
@@ -380,7 +380,7 @@ INDEX		|2		|itemid
 TABLE|media_type|mediatypeid|ZBX_DATA
 FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|description	|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|smtp_server	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|smtp_helo	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|smtp_email	|t_varchar(255)	|''	|NOT NULL	|0
@@ -399,7 +399,21 @@ FIELD		|maxsessions	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|maxattempts	|t_integer	|'3'	|NOT NULL	|0
 FIELD		|attempt_interval|t_varchar(32)	|'10s'	|NOT NULL	|0
 FIELD		|content_type	|t_integer	|'1'	|NOT NULL	|0
-UNIQUE		|1		|description
+FIELD		|script		|t_shorttext	|''	|NOT NULL	|0
+FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|0
+FIELD		|process_tags	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|show_event_menu|t_integer	|'0'	|NOT NULL	|0
+FIELD		|event_menu_url	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|event_menu_name|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+UNIQUE		|1		|name
+
+TABLE|media_type_param|mediatype_paramid|0
+FIELD		|mediatype_paramid|t_id		|	|NOT NULL	|0
+FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(2048)|''	|NOT NULL	|0
+INDEX		|1		|mediatypeid
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0
@@ -609,6 +623,7 @@ FIELD		|http_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_configured		|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_case_sensitive	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|db_extension	|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|autoreg_tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -632,7 +647,7 @@ FIELD		|recovery_expression|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|correlation_mode|t_integer	|'0'	|NOT NULL	|0
 FIELD		|correlation_tag|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|manual_close	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|details	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|opdata		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
@@ -711,6 +726,7 @@ TABLE|globalmacro|globalmacroid|ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_TEMPLATE
@@ -718,6 +734,7 @@ FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
 FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 UNIQUE		|1		|hostid,macro
 
 TABLE|hosts_groups|hostgroupid|ZBX_TEMPLATE
@@ -995,6 +1012,7 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|alerttype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|p_eventid	|t_id		|	|NULL		|0			|5|events	|eventid
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|6|acknowledges	|acknowledgeid
+FIELD		|parameters	|t_shorttext	|'{}'	|NOT NULL	|0
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
@@ -1153,6 +1171,7 @@ FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|tls_accepted	|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|proxy_hostid
 
@@ -1165,6 +1184,7 @@ FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|tls_accepted	|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|dhosts|dhostid|0
@@ -1220,11 +1240,11 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|alias		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|os		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|alias		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|os		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|os_full	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|os_short	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|os_short	|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|serialno_a	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|serialno_b	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|0
@@ -1676,7 +1696,13 @@ FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|hostid
 
+TABLE|config_autoreg_tls|autoreg_tlsid|ZBX_DATA
+FIELD		|autoreg_tlsid	|t_id		|	|NOT NULL	|0
+FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
+UNIQUE		|1		|tls_psk_identity
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|4030016	|4030016
+ROW		|4040000	|4040000

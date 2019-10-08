@@ -371,7 +371,7 @@ class testFormTrigger extends CLegacyWebTest {
 			'select description'.
 			' from triggers t'.
 			' left join functions f on f.triggerid=t.triggerid'.
-			' where f.itemid=30004 and t.description LIKE \'testFormTrigger%\''
+			' where f.itemid=99102 and t.description LIKE \'testFormTrigger%\''
 		);
 	}
 
@@ -885,7 +885,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
 					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestAssertElementText("//tbody//a[text()='$description']", $description);
-					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[5]", $expression);
+					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);

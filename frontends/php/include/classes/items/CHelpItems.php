@@ -341,6 +341,10 @@ class CHelpItems {
 					'description' => _('Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)')
 				],
 				[
+					'key' => 'wmi.getall[<namespace>,<query>]',
+					'description' => _('Execute WMI query and return the JSON document with all selected objects')
+				],
+				[
 					'key' => 'zabbix.stats[<ip>,<port>]',
 					'description' => _('Returns a JSON object containing Zabbix server or proxy internal metrics.')
 				],
@@ -968,7 +972,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'zabbix[host,discovery,interfaces]',
-					'description' => _('Returns a JSON object describing the host network interfaces configured in Zabbix. Can be used for LLD.')
+					'description' => _('Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD.')
 				],
 				[
 					'key' => 'zabbix[host,<type>,available]',
@@ -1062,7 +1066,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'db.odbc.discovery[<unique short description>,dsn]',
-					'description' => _('Transform SQL query result into a JSON object for low-level discovery.')
+					'description' => _('Transform SQL query result into a JSON array for low-level discovery.')
+				],
+				[
+					'key' => 'db.odbc.get[<unique short description>,dsn]',
+					'description' => _('Transform SQL query result into a JSON array.')
 				]
 			],
 			ITEM_TYPE_JMX => [
@@ -1072,7 +1080,11 @@ class CHelpItems {
 				],
 				[
 					'key' => 'jmx.discovery[<discovery mode>,<object name>]',
-					'description' => _('Return a JSON object describing the MBean objects or their attributes. Can be used for LLD.')
+					'description' => _('Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD.')
+				],
+				[
+					'key' => 'jmx.get[<discovery mode>,<object name>]',
+					'description' => _('Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD.')
 				]
 			]
 		];

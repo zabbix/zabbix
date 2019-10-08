@@ -777,6 +777,23 @@ output {
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
 
+	.action-container {
+		display: flex;
+		width: 100%;
+
+		.label {
+			@extend %overflow-ellipsis;
+		}
+
+		.separator {
+			margin-right: 4px;
+		}
+
+		[class*='icon-'] {
+			flex-shrink: 0;
+		}
+	}
+
 	&.compact-view {
 		tr {
 			&[class*='flh-'] {
@@ -838,6 +855,8 @@ output {
 								background-color: $ui-bg-color;
 							}
 
+							[class*='icon-depend-'],
+							.icon-description,
 							.icon-wzrd-action {
 								background-color: transparent;
 							}
@@ -897,10 +916,8 @@ output {
 			}
 
 			[class*='icon-depend-'] {
-				&,
-				&:last-of-type {
-					margin-right: 12px;
-				}
+				width: 12px;
+				margin-right: 0;
 			}
 
 			.rel-container {
@@ -935,8 +952,7 @@ output {
 				display: inline-block;
 				height: 12px;
 				width: 12px;
-				margin: 0 1px 0 2px !important;
-				vertical-align: bottom;
+				margin: 3px 1px 2px 2px !important;
 
 				&::before {
 					height: 12px;
@@ -951,6 +967,28 @@ output {
 				min-height: 12px;
 				margin: 0;
 				position: relative;
+			}
+
+			.icon-description {
+				margin-left: 2px;
+			}
+		}
+
+		.action-container {
+			height: 18px;
+			line-height: 18px;
+
+			.rel-container {
+				display: flex;
+			}
+
+			.link-action {
+				height: 16px;
+				min-width: 1em;
+			}
+
+			.separator {
+				flex-shrink: 0;
 			}
 		}
 	}
@@ -1112,9 +1150,6 @@ output {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
-		&.latest-value {
-			max-width: 300px;
-		}
 	}
 
 	tbody th {
@@ -1130,6 +1165,11 @@ output {
 		border-bottom: none;
 		color: $font-alt-color;
 		text-align: right;
+	}
+
+	.latest-values,
+	.opdata {
+		max-width: 300px;
 	}
 }
 
@@ -1631,6 +1671,15 @@ output {
 				padding: 0 9px 0 4px;
 				line-height: 18px;
 			}
+
+			&.selected {
+
+				.subfilter-enabled,
+				.subfilter-disable-btn,
+				.subfilter-disable-btn:active {
+					background-color: $multiselect-selected-bg-color;
+				}
+			}
 		}
 	}
 
@@ -1653,6 +1702,18 @@ output {
 		top: 0;
 		bottom: 0;
 		z-index: -1;
+	}
+}
+
+.multiselect-collapsed {
+	&.multiselect-control,
+	.multiselect {
+		overflow: hidden;
+		max-height: 24px;
+
+		input[type="text"] {
+			display: none;
+		}
 	}
 }
 
@@ -2512,6 +2573,8 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
+	iterator-page-previous: url(../img/icon-sprite.svg) no-repeat -85px -657px,
+	iterator-page-next: url(../img/icon-sprite.svg) no-repeat -83px -623px,
 	widget-action: url(../img/icon-sprite.svg) no-repeat -6px -618px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -6px -654px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -6px -689px,
@@ -3003,8 +3066,8 @@ button[disabled] {
 
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 
@@ -3102,7 +3165,8 @@ $form-icon-btn: (
 
 .drag-icon,
 .ui-draggable .dashbrd-widget-head,
-.ui-draggable .dashbrd-grid-widget-head {
+.dashbrd-grid-widget.ui-draggable .dashbrd-grid-widget-head,
+.dashbrd-grid-iterator.ui-draggable .dashbrd-grid-iterator-head {
 	@extend %cursor-drag;
 }
 
@@ -3110,7 +3174,8 @@ $form-icon-btn: (
 
 	.drag-icon,
 	.dashbrd-widget-head,
-	.dashbrd-grid-widget-head {
+	.dashbrd-grid-widget-head,
+	.dashbrd-grid-iterator-head {
 		@extend %cursor-dragging;
 	}
 }
@@ -3310,17 +3375,35 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-// Dashboard
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
+
 .dashbrd-grid-container {
 	position: relative;
 	margin: -4px;
+
+	// For widget sliding headers to appear over the breadcrumbs.
+	z-index: 3;
 }
 
-.dashbrd-grid-widget-placeholder {
-	border-color: darken($body-bg-color, 6%) !important;
-	background-color: darken($body-bg-color, 6%) !important;
-	position: absolute;
-	z-index: 999;
+.layout-kioskmode {
+	// Set the same speed as for the sliding headers of the widgets.
+	transition: margin-top .3s;
+
+	&.kiosk-slide-lines-1 {
+		// Set to the height of the sliding headers of the widgets.
+		margin-top: 2rem;
+	}
+
+	&.kiosk-slide-lines-2 {
+		// Set to double of the height of the sliding headers of the widgets.
+		margin-top: 4rem;
+	}
 }
 
 .dashbrd-grid-new-widget-placeholder {
@@ -3331,7 +3414,7 @@ $form-icon-btn: (
 	width: calc(100% / 6 - .65rem);
 	z-index: 999;
 	color: $font-alt-color;
-	cursor:pointer;
+	cursor: pointer;
 
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -3393,25 +3476,79 @@ $form-icon-btn: (
 	}
 }
 
-.dashbrd-grid-widget-mask {
+.dashbrd-grid-widget {
 	position: absolute;
-	width: 100%;
-	height: 100%;
-	background: transparent;
-	z-index: 80;
-	display: none;
 }
 
-.dashbrd-grid-widget-draggable {
-	border-color: $action-border-color !important;
-	border-bottom-color: darken($action-border-color, 1%) !important;
-	@include box-shadow(0 4px 20px 0 $action-shadow-color);
-	z-index: 1000;
+.dashbrd-grid-widget-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: .25rem;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+}
+
+.dashbrd-grid-widget-head {
+	position: absolute;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	height: 2rem;
+	padding-left: 10px;
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	overflow: hidden;
+	align-items: flex-start;
+	border: 1px solid $ui-border-color;
+	border-bottom: 0;
+	background-color: $ui-bg-color;
+
+	/*
+	 * For floating headers to appear over other widgets.
+	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
+	 */
+	z-index: 3;
+
+	h4 {
+		flex-grow: 1;
+		margin-top: .5rem;
+		color: widget-head-font-color($font-color);
+		font-weight: bold;
+		@extend %overflow-ellipsis;
+	}
+
+	ul {
+		flex-shrink: 0;
+
+		li {
+			float: left;
+			padding: 0;
+
+			select {
+				margin: 4px 0;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-actions {
+	@include opacity(0);
+	@include transition(opacity .2s ease-out);
 }
 
 .dashbrd-grid-widget-content {
-	flex: 1;
+	flex-grow: 1;
+	margin-top: 2rem;
+	padding-bottom: 8px;
 	overflow: auto;
+	border: 1px solid $ui-border-color;
+	background-color: $ui-bg-color;
+
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -3426,7 +3563,6 @@ $form-icon-btn: (
 		}
 
 		tbody tr {
-
 			&:last-child th, &:last-child td {
 				border-bottom: 1px solid $table-border-color;
 
@@ -3443,126 +3579,465 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
 	}
 }
 
-.dashbrd-grid-widget {
-	display: flex;
+.dashbrd-grid-widget-mask {
 	position: absolute;
-
-	.dashbrd-grid-widget-actions {
-		@include opacity(0);
-		@include transition(opacity .2s ease-out);
-	}
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	bottom: .25rem;
+	display: none;
 }
 
-.layout-kioskmode {
-	transition: padding-top .3s 2s;
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		.dashbrd-grid-widget-head {
+			height: 0;
+			transition: height .3s, margin-top .3s, box-shadow .3s;
+		}
 
-	&.widget-mouseenter {
-		padding-top: 40px;
-		transition: padding-top .3s;
+		.dashbrd-grid-widget-content {
+			margin-top: 0;
+			padding-top: 8px;
+		}
+
+		&.dashbrd-grid-widget-focus {
+			.dashbrd-grid-widget-head {
+				height: 2rem;
+				margin-top: -2rem;
+				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+			}
+		}
 	}
-}
 
-.dashbrd-grid-container {
-
-	&.dashbrd-mode-edit .dashbrd-grid-widget,
-	.dashbrd-grid-widget-focus,
-	.dashbrd-grid-widget:hover {
-
+	&.dashbrd-grid-widget-focus {
 		.dashbrd-grid-widget-actions {
 			@include opacity(1);
 		}
 	}
 
-	.dashbrd-grid-widget-focus,
-	.dashbrd-grid-widget:hover {
+	&.ui-resizable-resizing.resizing-top {
+		.dashbrd-grid-widget-container {
+			top: auto;
+			bottom: 0;
+		}
+	}
 
-		&.dashbrd-grid-widget-hidden-header {
-
-			.dashbrd-grid-widget-head {
-				box-shadow: 0 -6px 8px -2px rgba(128,128,128,0.15);
-				transform: translate3d(0, -94%, 0);
-				z-index: 5;
-			}
-
-			.dashbrd-grid-widget-content {
-				z-index: 6;
-			}
+	&.ui-resizable-resizing.resizing-left {
+		.dashbrd-grid-widget-container {
+			left: auto;
+			right: 0;
 		}
 	}
 }
 
-.dashbrd-grid-widget-container {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
-	min-width: 8.33333%;
-	margin: .25rem;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	padding-bottom: 8px;
+.dashbrd-grid-iterator {
+	position: absolute;
 }
 
-.dashbrd-grid-widget-head {
+.dashbrd-grid-iterator-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.dashbrd-grid-iterator-head {
+	position: absolute;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	height: 0;
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	overflow: hidden;
+	padding-left: 10px;
+	box-sizing: border-box;
 	border: 1px solid $ui-border-color;
-	border-bottom: none;
-	margin: -1px -1px 0 -1px;
-	position: relative;
-	padding: 8px 65px 8px 10px;
-	min-height: 17px;
+	border-bottom: 0;
+	background-color: $ui-bg-color;
+	opacity: 0;
+
+	// Transition for opacity is set for best border disappearance on different themes.
+	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
+
+	// Not to loose hovered header while widget underneath is updating.
+	z-index: 3;
 
 	h4 {
-		color: h4-widget-color($font-color);
+		flex-grow: 1;
+		margin-top: .5rem;
+		color: widget-head-font-color($font-color);
 		font-weight: bold;
 		@extend %overflow-ellipsis;
 	}
 
 	ul {
-		position: absolute;
-		top: 0;
-		right: 0;
+		flex-shrink: 0;
 
 		li {
-			display: block;
 			float: left;
 			padding: 0;
+		}
+	}
 
-			select {
-				margin: 4px 0;
+	.dashbrd-grid-iterator-pager {
+		margin: 0 10px;
+		height: 2rem;
+		display: none;
+		flex-direction: row;
+		flex-shrink: 0; // IE11 fix.
+		align-items: center;
+
+		.dashbrd-grid-iterator-pager-info {
+			margin: 2px .5em 0;
+			white-space: nowrap;
+			color: widget-head-font-color($font-color);
+		}
+	}
+
+	&.pager-visible .dashbrd-grid-iterator-pager {
+		display: flex;
+	}
+}
+
+.dashbrd-grid-iterator-content {
+	// To catch vertical resize events correctly.
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	// To allow overflowing of the floating headers of child widgets.
+	overflow: visible;
+
+	transition: margin-top .3s;
+}
+
+.dashbrd-grid-iterator-placeholder {
+	position: absolute;
+	display: flex;
+
+	& > div {
+		margin: .25rem;
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+		border: 1px solid $ui-border-color;
+		background-color: rgba($ui-bg-color, .3);
+	}
+}
+
+.dashbrd-grid-iterator-too-small {
+	position: absolute;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	bottom: .25rem;
+	overflow: hidden;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid $ui-border-color;
+	background-color: $ui-bg-color;
+
+	& > div {
+		padding: 0 10px;
+		text-align: center;
+		color: $font-alt-color;
+	}
+}
+
+.dashbrd-grid-iterator-mask {
+	position: absolute;
+	top: .25rem;
+	left: .25rem;
+	right: .25rem;
+	bottom: .25rem;
+	display: none;
+}
+
+.dashbrd-grid-iterator {
+	&.iterator-too-small {
+		.dashbrd-grid-iterator-too-small {
+			display: flex;
+		}
+
+		.dashbrd-grid-iterator-content {
+			display: none;
+		}
+	}
+
+	&.dashbrd-grid-iterator-focus {
+		.dashbrd-grid-iterator-head {
+			margin-top: -2rem;
+			height: 2rem;
+			box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+			opacity: 1;
+
+			// Not inheriting opacity transition here.
+			transition: margin-top .3s, height .3s, box-shadow .3s;
+		}
+
+		&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
+			.dashbrd-grid-iterator-head {
+				margin-top: -4rem;
+				height: 4rem;
+			}
+		}
+	}
+
+	&.ui-resizable-resizing.resizing-top {
+		.dashbrd-grid-iterator-container {
+			top: auto;
+			bottom: 0;
+		}
+	}
+
+	&.ui-resizable-resizing.resizing-left {
+		.dashbrd-grid-iterator-container {
+			left: auto;
+			right: 0;
+		}
+	}
+
+	&.iterator-alt-content {
+		.dashbrd-grid-iterator-content {
+			position: absolute;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			bottom: .25rem;
+			border: 1px solid $ui-border-color;
+			background-color: $ui-bg-color;
+
+			& > div {
+				padding-top: 8px;
+
+				.list-table {
+					border: none;
+
+					th {
+						@extend %dashbrd-widget-td;
+					}
+
+					td {
+						@extend %dashbrd-widget-td;
+					}
+
+					tbody tr {
+						&:last-child th, &:last-child td {
+							border-bottom: 1px solid $table-border-color;
+
+							&.list-table-footer {
+								border-bottom: none;
+							}
+						}
+					}
+				}
+
+				.msg-good, .msg-bad {
+					margin: 0 10px;
+				}
 			}
 		}
 	}
 }
 
-.dashbrd-grid-widget {
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-widget-actions {
+		@include opacity(1);
+	}
 
-	&.dashbrd-grid-widget-hidden-header {
+	&.dashbrd-positioning {
+		// No lazy transitions while dragging or resizing.
 
-		.dashbrd-grid-widget-container {
-			padding: 8px 0;
-			position: relative;
+		.dashbrd-grid-widget {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					transition: none;
+				}
+			}
 		}
 
-		.dashbrd-grid-widget-head {
-			box-shadow: 0 -6px 8px -2px rgba(128,128,128,0);
-			background-color: $ui-bg-color;
+		.dashbrd-grid-iterator {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					transition: none;
+				}
+			}
+		}
+
+		// No widget interactivity while dragging or resizing.
+
+		.dashbrd-grid-widget-mask {
+			display: block;
+		}
+
+		.dashbrd-grid-iterator-mask {
+			display: block;
+		}
+	}
+
+	.dashbrd-grid-widget {
+		.ui-resizable-handle {
+			visibility: hidden;
+		}
+
+		&.dashbrd-grid-widget-focus .ui-resizable-handle {
+			visibility: visible;
+		}
+
+		&.ui-resizable-resizing {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					margin-top: 0;
+					height: 0;
+					box-shadow: none;
+				}
+			}
+		}
+
+		&.ui-draggable-dragging {
+			.ui-resizable-handle {
+				visibility: hidden;
+			}
+
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					margin-top: -2rem;
+					height: 2rem;
+					box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+					opacity: 0.5;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			z-index: 1000;
+
+			&::before {
+				content: '';
+				display: block;
+				position: absolute;
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
+				background-color: rgba(darken($body-bg-color, 6%), .75);
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
+			}
+
+			.dashbrd-grid-widget-head {
+				border-color: darken($ui-border-color, 6%);
+			}
+
+			.dashbrd-grid-widget-content {
+				border-color: darken($ui-border-color, 6%);
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		.ui-resizable-handle {
+			visibility: hidden;
+		}
+
+		&.dashbrd-grid-iterator-focus .ui-resizable-handle {
+			visibility: visible;
+		}
+
+		&.ui-resizable-resizing {
+			.dashbrd-grid-iterator-head {
+				margin-top: 0;
+				height: 0;
+				box-shadow: none;
+				opacity: 0;
+			}
+		}
+
+		&.ui-draggable-dragging {
+			.ui-resizable-handle {
+				visibility: hidden;
+			}
+
+			.dashbrd-grid-iterator-head {
+				margin-top: -2rem;
+				height: 2rem;
+				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
+				opacity: 0.5;
+			}
+
+			&.dashbrd-grid-iterator-hidden-header.iterator-double-header {
+				.dashbrd-grid-iterator-head {
+					margin-top: -4rem;
+					height: 4rem;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			z-index: 1000;
+
+			&::before {
+				content: '';
+				display: block;
+				position: absolute;
+				top: .25rem;
+				left: .25rem;
+				right: .25rem;
+				bottom: .25rem;
+				background-color: rgba(darken($body-bg-color, 6%), .75);
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .15);
+			}
+
+			.dashbrd-grid-iterator-head {
+				border-color: darken($ui-border-color, 6%);
+			}
+
+			.dashbrd-grid-iterator-content {
+				.dashbrd-grid-widget {
+					.dashbrd-grid-widget-head {
+						border-color: darken($ui-border-color, 6%);
+					}
+
+					.dashbrd-grid-widget-content {
+						border-color: darken($ui-border-color, 6%);
+					}
+				}
+
+				.dashbrd-grid-iterator-placeholder > div {
+					border-color: darken($ui-border-color, 6%);
+				}
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: 1px solid darken($ui-border-color, 8%);
+				border-top: 0;
+			}
+		}
+	}
+
+	.dashbrd-grid-widget-placeholder {
+		position: absolute;
+		z-index: 999;
+
+		& > div {
 			position: absolute;
-			left: 0;
-			right: 0;
-			top: 0;
-			transform: translate3d(0, 0, 0);
-			transition: transform .3s, box-shadow .3s, z-index .3s;
-			z-index: 2;
-		}
-
-		.dashbrd-grid-widget-content {
-			background-color: $ui-bg-color;
-			transition: z-index .3s;
-			z-index: 3;
+			top: .25rem;
+			left: .25rem;
+			right: .25rem;
+			bottom: .25rem;
+			background-color: darken($body-bg-color, 6%) !important;
 		}
 	}
 }
@@ -3818,7 +4293,9 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
 	}
 
@@ -3853,7 +4330,7 @@ $form-icon-btn: (
 	padding: 8px 60px 8px 10px;
 
 	h4 {
-		color: h4-widget-color($font-color);
+		color: widget-head-font-color($font-color);
 		font-weight: bold;
 	}
 
@@ -4080,7 +4557,8 @@ $form-icon-btn: (
 	}
 
 	.msg-bad,
-	.msg-good {
+	.msg-good,
+	.msg-warning {
 		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
@@ -5148,27 +5626,6 @@ a.link-action {
 }
 
 // SEVERITY STATUSES
-
-.na-bg,
-.normal-bg,
-.info-bg,
-.average-bg,
-.warning-bg,
-.high-bg,
-.disaster-bg {
-
-	a {
-		transition: none;
-	}
-
-	&.blink-hidden {
-		background-color: transparent;
-
-		a {
-			color: $font-color;
-		}
-	}
-}
 @if $theme_name == 'blue' or $theme_name == 'dark' {
 	td[class] {
 		+ {
@@ -5214,13 +5671,34 @@ a.link-action {
 	}
 
 	.log-#{$severity-type} {
-		color: darken($color,45%);
+		color: darken($color, 45%);
 		background-color: $color;
 	}
 }
 
+.na-bg,
+.normal-bg,
+.info-bg,
+.average-bg,
+.warning-bg,
+.high-bg,
+.disaster-bg {
+
+	a {
+		transition: none;
+	}
+
+	&.blink-hidden {
+		background-color: transparent;
+
+		a {
+			color: $font-color;
+		}
+	}
+}
+
 .inactive-bg {
-	color: darken($alt-red,45%);
+	color: darken($alt-red, 45%);
 	background-color: $alt-red;
 }
 
@@ -5263,122 +5741,161 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.msg-good {
-	color: $font-color;
-	border: 2px solid $light-green;
+.msg-bad,
+.msg-good,
+.msg-warning {
 	background-color: $ui-bg-color;
+	color: $font-color;
+	border: 2px solid;
+	font-size: $font-top-nav-size;
+	margin-bottom: 10px;
+	padding: 6px 10px 6px 75px;
 	text-align: left;
+	vertical-align: middle;
+	position: relative;
+	@include border-radius(2px);
 
-	@extend %msg;
+	.overlay-close-btn {
+		color: $font-alt-color;
+		font-size: $font-top-nav-size;
+	}
 
 	.link-action {
-		color: darken(desaturate($green, 10%), 20%);
 		margin-right: 10px;
 		font-size: $font-msg-reset-size;
 
 		.arrow-up {
 			border-bottom-color: darken(desaturate($green, 10%), 20%);
 		}
+
 		.arrow-down {
 			border-top-color: darken(desaturate($green, 10%), 20%);
 		}
 	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
-	}
-
-	ul {
-		border-top-color: $light-green;
-	}
-
 	button {
 		background-color: $white;
-		color: darken(desaturate($green, 10%), 20%);
-		border-color: $light-green;
 	}
-}
 
-.msg-good:before {
-	content: "";
-	background-color: $light-green;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
+	&:before {
+		content: "";
+		width: 61px;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+	}
 
-.msg-good:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+	&:after {
+		content: "";
+		background: url(../img/icon-sprite.svg) no-repeat;
+		margin-top: 2px;
+		margin-left: 16px;
+		width: 27px;
+		height: 25px;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
 }
 
 .msg-bad {
-	color: $font-color;
-	border: 2px solid $light-red;
-	background-color: $ui-bg-color;
-	text-align: left;
-
-	@extend %msg;
+	border-color: $msg-bad-border-color;
 
 	.link-action {
-		color: darken(desaturate($red, 10%), 20%);
-		margin-right: 10px;
-		font-size: $font-msg-reset-size;
+		color: $msg-bad-color;
 
 		.arrow-up {
-			border-bottom-color: darken(desaturate($red, 10%), 20%);
+			border-bottom-color: $msg-bad-color;
 		}
-		.arrow-down {
-			border-top-color: darken(desaturate($red, 10%), 20%);
-		}
-	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
+		.arrow-down {
+			border-top-color: $msg-bad-color;
+		}
 	}
 
 	ul {
-		border-top-color: $light-red;
+		border-top-color: $msg-bad-border-color;
 	}
 
 	button {
-		background-color: $white;
-		color: darken(desaturate($red, 10%), 20%);
-		border-color: $light-red;
+		color: $msg-bad-color;
+		border-color: $msg-bad-border-color;
+	}
+
+	&:before {
+		background-color: $msg-bad-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
 	}
 }
 
-.msg-bad:before {
-	content: "";
-	background-color: $light-red;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
+.msg-good {
+	border-color: $msg-good-border-color;
+
+	.link-action {
+		color: $msg-good-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-good-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-good-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-good-border-color;
+	}
+
+	button {
+		color: $msg-good-color;
+		border-color: $msg-good-border-color;
+	}
+
+	&:before {
+		background-color: $msg-good-border-color;
+	}
+
+	&:after {
+		background-position: -122px -244px;
+	}
 }
 
-.msg-bad:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+.msg-warning {
+	border-color: $msg-warning-border-color;
+
+	.link-action {
+		color: $msg-warning-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-warning-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-warning-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-warning-border-color;
+	}
+
+	button {
+		color: $msg-warning-color;
+		border-color: $msg-warning-border-color;
+	}
+
+	&:before {
+		background-color: $msg-warning-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
+	}
 }
 
 .msg-details {
@@ -5432,58 +5949,14 @@ td.inactive-bg {
 	}
 }
 
-%msg {
-	font-size: $font-top-nav-size;
-	padding: 6px 10px 6px 75px;
-	text-align: left;
-	vertical-align: middle;
-	position: relative;
-	margin-bottom: 10px;
-	@include border-radius(2px);
-
-	.overlay-close-btn {
-		font-size: $font-top-nav-size;
-	}
-}
-
-.msg-bad-global {
+.msg-global-footer {
 	display: none;
 	position: fixed;
 	z-index: 10000;
-	text-align: left;
 	right: 0;
 	left: 0;
 	bottom: 0;
-	vertical-align: middle;
-	font-size: $font-top-nav-size;
-	color: $font-color;
-	border: 2px solid $alt-yellow;
-	background-color: $ui-bg-color;
 	margin: 0 10px 0 10px;
-	padding: 6px 10px 6px 75px;
-}
-
-.msg-bad-global:before {
-	content: "";
-	background-color: $alt-yellow;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
-
-.msg-bad-global:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
 }
 
 .msg-global {
@@ -6055,7 +6528,7 @@ svg {
 
 .overrides-options-list {
 	white-space: normal;
-	padding: 0px 0px 10px;
+	padding: 5px 0 8px 0;
 	margin-bottom: 10px;
 	border-bottom: 1px solid $table-border-color;
 
@@ -6129,25 +6602,19 @@ svg {
 		}
 	}
 
+	.list-accordion-item-head,
+	.list-accordion-item-body {
+		padding-bottom: 2px;
+	}
+
 	.list-accordion-item-closed {
+		@extend .multiselect-collapsed;
 		height: 30px;
 
 		.list-accordion-item-body {
 			display: none;
 		}
-
-		.patternselect {
-			overflow: hidden;
-			max-height: 24px;
-			line-height: 24px;
-			padding: 0 5px;
-			height: 24px;
-		}
 	}
-}
-
-.patternselect {
-	line-height: 14px;
 }
 
 ul.checkbox-list {
@@ -6221,13 +6688,13 @@ ul.checkbox-list {
 }
 
 .preprocessing-list {
-	$name-width: 240px;
+	$name-width: 290px;
 	$on-fail-width: 100px;
 	$action-width: 120px;
 
 	display: block;
 	max-width: 930px;
-	min-width: 730px;
+	min-width: 800px;
 
 	> li {
 		display: block;
@@ -6251,6 +6718,7 @@ ul.checkbox-list {
 	input[type=text],
 	select {
 		width: 100%;
+		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
 	input[type=text],
@@ -6654,7 +7122,8 @@ ul.checkbox-list {
 .icon-problem-recovery,
 .icon-actions-number-gray,
 .icon-actions-number-yellow,
-.icon-actions-number-red {
+.icon-actions-number-red,
+.icon-description {
 	display: inline-block;
 	position: relative;
 	height: 18px;
@@ -6677,7 +7146,8 @@ ul.checkbox-list {
 	}
 }
 
-[data-count][class*='icon-']::after {
+[data-count][class*='icon-']::after,
+.icon-description::after {
 	position: absolute;
 	content: attr(data-count);
 	text-align: center;
@@ -6750,6 +7220,17 @@ ul.checkbox-list {
 	}
 	&::before {
 		background-position: -524px -245px;
+	}
+}
+.icon-description {
+	margin: 0 0 0 5px;
+
+	&::after {
+		content: '?';
+		color: $ui-bg-color;
+	}
+	&::before {
+		background-position: -474px -245px;
 	}
 }
 
@@ -6934,46 +7415,58 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET "HOST AVAILABILITY"
+.totals-list {
 
-.host-avail-widget {
-	width: 100%;
-	height: 100%;
-	table-layout: fixed;
+	&:not(.list-table) {
+		display: flex;
+		height: 100%;
+	}
 
-	td {
+	> div {
+		flex: 1;
+		align-items: center;
+		display: flex;
 		line-height: 18px;
 		overflow: hidden;
 		padding: 0 10px;
-		vertical-align: middle;
+		position: relative;
 	}
 
-	.host-avail-count {
+	.count {
 		font-size: 16px;
 	}
 
-	&.host-avail-layout-horizontal {
-		min-width: 305px;
+	&.totals-list-horizontal {
 
-		td {
-			height: 100%;
-			text-align: center;
-		}
-
-		.host-avail-count {
-			display: block;
+		> div {
+			flex-direction: column;
+			justify-content: center;
+			min-width: 55px;
+			text-align: center
 		}
 	}
 
-	&.host-avail-layout-vertical {
+	&.totals-list-vertical {
+		flex-direction: column;
 
-		td {
+		> div {
+			min-height: 21px;
 			padding-top: 3px;
 		}
 
-		.host-avail-count {
+		.count {
 			margin-right: 5px;
 		}
+	}
+}
+
+// WIDGET "HOST AVAILABILITY"
+
+.host-avail-widget {
+
+	td:not(:first-child) {
+		border-left: 1px dotted $table-border-color;
+
 	}
 
 	.host-avail-true {
@@ -6993,49 +7486,6 @@ table.preprocessing-test-results {
 	}
 }
 
-// WIDGET "PROBLEMS BY SEVERITY"
-
-.by-severity-widget {
-	height: 100%;
-	display: flex;
-
-	> div {
-		flex: 1;
-		align-items: center;
-		display: flex;
-		line-height: 18px;
-		overflow: hidden;
-		padding: 0 10px;
-		position: relative;
-	}
-
-	.by-severity-count {
-		font-size: 16px;
-	}
-
-	&.by-severity-layout-horizontal {
-
-		> div {
-			flex-direction: column;
-			justify-content: center;
-			min-width: 55px;
-			text-align: center
-		}
-	}
-
-	&.by-severity-layout-vertical {
-		flex-direction: column;
-
-		> div {
-			min-height: 26px;
-			padding-top: 3px;
-		}
-
-		.by-severity-count {
-			margin-right: 5px;
-		}
-	}
-}
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
@@ -7047,6 +7497,7 @@ table.preprocessing-test-results {
 		}
 	}
 }
+
 
 @if $theme_name == 'dev' {
 
@@ -7667,7 +8118,7 @@ Error notification appears after an action has been completed with errors or an 
 Global notification.
 
 ```html_example
-<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+<div class="msg-global-footer msg-warning">Zabbix server is not running: the information displayed may not be current.</div>
 ```
 */
 

@@ -77,7 +77,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 			$status = 'Executed';
 		}
 
-		$sql = 'SELECT mt.description FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alertid='.zbx_dbstr($auditactions['alertid']);
+		$sql = 'SELECT mt.name FROM media_type mt, alerts a WHERE a.mediatypeid = mt.mediatypeid AND a.alertid='.zbx_dbstr($auditactions['alertid']);
 		$type = DBfetch(DBselect($sql));
 
 		if ($auditactions['status'] == 1) {
@@ -94,7 +94,7 @@ class testPageReportsActionLog extends CLegacyWebTest {
 		$this->zbxTestTextPresent(
 				[
 					$today,
-					$type['description'],
+					$type['name'],
 					$status,
 					$retries,
 					$auditactions['sendto'],

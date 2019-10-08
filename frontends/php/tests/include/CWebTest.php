@@ -23,6 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/CTest.php';
 require_once dirname(__FILE__).'/web/CPage.php';
 require_once dirname(__FILE__).'/helpers/CXPathHelper.php';
+require_once dirname(__FILE__).'/helpers/CImageHelper.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -49,6 +50,9 @@ class CWebTest extends CTest {
 
 	// Instance of web page.
 	protected $page = null;
+
+	// Shared screenshot data.
+	protected static $screenshot_data = [];
 
 	/**
 	 * @inheritdoc
@@ -229,5 +233,210 @@ class CWebTest extends CTest {
 		}
 
 		$this->assertEquals($title, $this->page->getTitle());
+	}
+
+	/**
+	 * Get instance of web page used in this test.
+	 *
+	 * @return CPage
+	 */
+	public function getPage() {
+		return $this->page;
+	}
+
+	/**
+	 * Normalize regions defined in various formats.
+	 *
+	 * @param CElement|null $element    element to get screenshot of (set to null to get screenshot of a page)
+	 * @param array         $regions    regions to be normalized
+	 *
+	 * @return array
+	 */
+	protected function getNormalizedRegions($element, $regions) {
+		if (!is_array($regions) || CTestArrayHelper::isAssociative($regions)) {
+			$regions = [$regions];
+		}
+
+		$append = [];
+		$offset = ($element instanceof CElement) ? $element->getRect() : ['x' => 0, 'y' => 0];
+		foreach ($regions as $i => &$region) {
+			if (is_array($region)) {
+				$color = array_key_exists('color', $region) ? $region['color'] : null;
+
+				if (array_key_exists('element', $region)) {
+					if ($region['element'] instanceof CElement) {
+						$region = $region['element']->getRect();
+						$region['x'] -= $offset['x'];
+						$region['y'] -= $offset['y'];
+
+						if ($color !== null) {
+							$region['color'] = $color;
+						}
+					}
+					else {
+						$this->fail('Except element is not an instance of CElement.');
+					}
+				}
+				elseif (array_key_exists('query', $region)) {
+					if ($region['query'] instanceof CElementQuery) {
+						$query = $region['query'];
+					}
+					else {
+						$source = ($element instanceof CElement) ? $element : $this->page;
+						$query = $source->query($region['query']);
+					}
+
+					foreach ($query->all() as $item) {
+						$append[] = array_merge($item->getRect(), ($color !== null) ? ['color' => $color] : []);
+					}
+
+					unset($regions[$i]);
+				}
+				elseif (is_array($region) && (!array_key_exists('x', $region) || !array_key_exists('y', $region)
+						|| !array_key_exists('width', $region) || !array_key_exists('height', $region))) {
+					$this->fail('Screenshot except configuration is invalid.');
+				}
+			}
+			elseif ($region instanceof CElement) {
+				$region = $region->getRect();
+				$region['x'] -= $offset['x'];
+				$region['y'] -= $offset['y'];
+			}
+			else {
+				$this->fail('Screenshot except configuration is invalid.');
+			}
+		}
+		unset($region);
+
+		foreach ($append as &$region) {
+			$region['x'] -= $offset['x'];
+			$region['y'] -= $offset['y'];
+		}
+		unset($region);
+
+		return array_merge(array_values($regions), $append);
+	}
+
+	/**
+	 * Perform screenshot comparison.
+	 *
+	 * @param CElement|null $element    element to get screenshot of (set to null to get screenshot of a page)
+	 * @param string|null   $id         unique id of the screenshot
+	 * @param string|null   $message    error message if assertion fails
+	 */
+	public function assertScreenshot($element = null, $id = null, $message = null) {
+		$this->assertScreenshotExcept($element, [], $id, $message);
+	}
+
+	/**
+	 * Perform screenshot comparison with specified regions covered.
+	 *
+	 * @param CElement|null $element    element to get screenshot of (set to null to get screenshot of a page)
+	 * @param array         $regions    regions to be covered on a screenshot
+	 * @param string|null   $id         unique id of the screenshot
+	 * @param string|null   $message    error message if assertion fails
+	 */
+	public function assertScreenshotExcept($element = null, $regions = [], $id = null, $message = null) {
+		if ($message === null) {
+			$message = 'Screenshots don\'t match.';
+		}
+
+		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
+				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}";'.
+				'(document.head||document.documentElement).appendChild(tag);';
+
+		try {
+			$this->page->getDriver()->executeScript($script);
+		} catch (Exception $exception) {
+			// Code is not missing here.
+		}
+
+		$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+		if (($class = CTestArrayHelper::get($backtrace, '1.class')) === CWebTest::class) {
+			$class = CTestArrayHelper::get($backtrace, '2.class');
+			$function = CTestArrayHelper::get($backtrace, '2.function');
+		}
+		else {
+			$function = CTestArrayHelper::get($backtrace, '1.function');
+		}
+
+		if ($function === null && $id === null) {
+			$this->fail('Cannot get unique name of the screenshot.');
+		}
+
+		$name = md5($function.$id).'.png';
+		$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
+				$this->getNormalizedRegions($element, $regions)
+		);
+
+		if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
+			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) !== false) {
+				static::$screenshot_data[] = [
+					'class'		=> $class,
+					'function'	=> $function,
+					'id'		=> $id,
+					'delta'		=> null,
+					'error'		=> 'Reference screenshot is not set.'
+				];
+
+				$this->fail("Reference screenshot is not set.\nCurrent screenshot saved: ".
+						PHPUNIT_SCREENSHOT_URL.'ref_'.$name
+				);
+			}
+
+			$this->fail('Reference screenshot is not set and cannot be created.');
+		}
+
+		$compare = CImageHelper::compareImages($reference, $screenshot);
+
+		if ($compare['match'] === false) {
+			static::$screenshot_data[] = [
+				'class'		=> $class,
+				'function'	=> $function,
+				'id'		=> $id,
+				'delta'		=> $compare['delta'],
+				'error'		=> $compare['error']
+			];
+
+			if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) === false) {
+				$this->fail($message."\n".'Cannot save current screenshot.');
+			}
+
+			if ($compare['diff'] !== null) {
+				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'diff_'.$name, $compare['diff']) === false) {
+					$this->fail($message."\n".'Cannot save screenshot diff.');
+				}
+
+				$this->fail($message."\n".'Diff: '.PHPUNIT_SCREENSHOT_URL.'diff_'.$name);
+			}
+			else {
+				$this->fail($message.' ('.$compare['error'].")\nReference saved: ".PHPUNIT_SCREENSHOT_URL.'ref_'.$name);
+			}
+		}
+
+		try {
+			$this->page->getDriver()->executeScript('document.getElementById("selenium-injected-style").remove();');
+		} catch (Exception $exception) {
+			// Code is not missing here.
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function onAfterAllTests() {
+		if (self::$screenshot_data) {
+			$data = [
+				'url'		=> PHPUNIT_SCREENSHOT_URL,
+				'report'	=> self::$screenshot_data
+			];
+
+			if (@file_put_contents(PHPUNIT_SCREENSHOT_DIR.'report.json', json_encode($data))) {
+				echo 'Screenshot data report is saved as: '.PHPUNIT_SCREENSHOT_URL.'report.json'."\n";
+			}
+			else {
+				echo 'Failed to save screenshot data report.'."\n";
+			}
+		}
 	}
 }

@@ -132,8 +132,10 @@ class CXmlExportWriter extends CExportWriter {
 			'posts' => 'post_field',
 			'shapes' => 'shape',
 			'lines' => 'line',
-			'headers' => 'header',
-			'lld_macro_paths' => 'lld_macro_path'
+			'lld_macro_paths' => 'lld_macro_path',
+			'tls_accept' => 'option',
+			'media_types' => 'media_type',
+			'parameters' => 'parameter'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

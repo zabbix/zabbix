@@ -308,8 +308,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems')))
 			->setAction(
 				'var on = jQuery(this).is(":checked");'.
-				'jQuery("#graph_item_problems, #problemhosts, #problem_name, #problemhosts_select")'.
+				'jQuery("#graph_item_problems, #problem_name, #problemhosts_select")'.
 					'.prop("disabled", !on);'.
+				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
 				'jQuery("[name=\"severities[]\"]").prop("disabled", !on);'.
 				'jQuery("[name=\"evaltype\"]").prop("disabled", !on);'.
 				'jQuery("input, button", jQuery("#tags_table_tags")).prop("disabled", !on);'
@@ -335,7 +336,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_problems->getName()] = $field_problems;
 
 		// Problem hosts.
-		$field_problemhosts = (new CWidgetFieldTextArea('problemhosts', _('Problem hosts')))
+		$field_problemhosts = (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
 			->setPlaceholder(_('host pattern'));
 
 		if ($field_show_problems->getValue() != SVG_GRAPH_PROBLEMS_SHOW) {

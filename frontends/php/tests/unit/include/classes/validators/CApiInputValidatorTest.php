@@ -2714,6 +2714,79 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'Invalid parameter "/output/3": value (name) already exists.'
 			],
 			[
+				['type' => API_PSK],
+				'0123456789abcdef0123456789abcdef',
+				'/psk',
+				'0123456789abcdef0123456789abcdef'
+			],
+			[
+				['type' => API_PSK],
+				'0123456789abcdef0123456789abcde',
+				'/psk',
+				'Invalid parameter "/psk": minimum length is 32 characters.'
+			],
+			[
+				['type' => API_PSK],
+				'xyz',
+				'/psk',
+				'Invalid parameter "/psk": minimum length is 32 characters.'
+			],
+			[
+				['type' => API_PSK],
+				'0123456789abcdef0123456789abcd',
+				'/psk',
+				'Invalid parameter "/psk": minimum length is 32 characters.'
+			],
+			[
+				['type' => API_PSK],
+				'',
+				'/psk',
+				''
+			],
+			[
+				['type' => API_PSK, 'flags' => API_NOT_EMPTY],
+				'',
+				'/psk',
+				'Invalid parameter "/psk": cannot be empty.'
+			],
+			[
+				['type' => API_PSK],
+				[],
+				'/psk',
+				'Invalid parameter "/psk": a character string is expected.'
+			],
+			[
+				['type' => API_PSK],
+				true,
+				'/psk',
+				'Invalid parameter "/psk": a character string is expected.'
+			],
+			[
+				['type' => API_PSK],
+				123,
+				'/psk',
+				'Invalid parameter "/psk": a character string is expected.'
+			],
+			[
+				['type' => API_PSK],
+				123.5,
+				'/psk',
+				'Invalid parameter "/psk": a character string is expected.'
+			],
+			[
+				['type' => API_PSK],
+				null,
+				'/psk',
+				'Invalid parameter "/psk": a character string is expected.'
+			],
+			[
+				['type' => API_PSK],
+				// broken UTF-8 byte sequence
+				'abc'."\xd1".'e',
+				'/psk',
+				'Invalid parameter "/psk": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_URL],
 				'',
 				'/1/url',
@@ -2839,7 +2912,19 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'javascript:{$URL}',
 				'/1/url',
 				'javascript:{$URL}'
-			]
+			],
+			[
+				['type' => API_URL, 'flags' => API_ALLOW_EVENT_TAGS_MACRO],
+				'text{EVENT.TAGS."JIRAID"}text',
+				'/1/url',
+				'text{EVENT.TAGS."JIRAID"}text'
+			],
+			[
+				['type' => API_URL],
+				'text{EVENT.TAGS."JIRAID"}text',
+				'/1/url',
+				'Invalid parameter "/1/url": unacceptable URL.'
+			],
 		];
 	}
 

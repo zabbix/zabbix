@@ -157,7 +157,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
-		$this->zbxTestInputType('filter_application', 'Processes');
+		$this->zbxTestInputType('filter_application', 'General');
 
 		// Select trigger
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');
