@@ -11,7 +11,7 @@ usage()
 case $# in
 	0)
 		# disable tests
-		rm -f m4/conf_tests.m4 || exit $?
+		rm -f m4/conf_tests.m4
 		;;
 	1)
 		[ $1 = "tests" ] || usage
@@ -29,5 +29,3 @@ autoconf
 autoheader
 automake -a
 automake
-
-rm -f m4/conf_tests.m4
