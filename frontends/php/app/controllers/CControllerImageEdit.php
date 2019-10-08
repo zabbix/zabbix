@@ -27,7 +27,8 @@ class CControllerImageEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'imageid'   => 'db images.imageid',
+			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +45,17 @@ class CControllerImageEdit extends CController {
 	}
 
 	protected function doAction() {
+		/* if (!$this->getInput('imageid') && !$this->getInput('imagetype')) { */
+		/* 	$this->setResponse(new CControllerResponseFatal()); */
+		/* } */
+
+
 		$data = [
 			'demo' => __FILE__
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerImageEdit'));
+		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}
 }

@@ -78,14 +78,14 @@ else {
 			)
 			: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 
+		$edit_url = (new Curl('zabbix.php'))
+			->setArgument('action', 'image.edit')
+			->setArgument('imageid', $image['imageid']);
+
 		$image_row->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_CELL)
-				->addItem([
-					$img,
-					BR(),
-					new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid'])
-				])
+				->addItem([$img, BR(), new CLink($image['name'], $edit_url->getUrl())])
 		);
 
 		if ((++$count % 5) == 0) {

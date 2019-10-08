@@ -37,10 +37,8 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
 	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'housekeeping.edit')
+		->setArgument('action', 'housekeeping.update')
 		->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
@@ -170,5 +168,5 @@ $house_keeper_view = (new CTabView())
 	));
 
 $widget
-	->addItem($house_keeper_view)
+	->addItem($form->addItem($house_keeper_view))
 	->show();

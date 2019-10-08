@@ -27,13 +27,42 @@ class CControllerHousekeepingUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'hk_trends'           => 'db config.hk_trends',
+			'hk_trends_global'    => 'db config.hk_trends_global | in 1',
+			'hk_trends_mode'      => 'db config.hk_trends_mode',
+			'hk_history'          => 'db config.hk_history',
+			'hk_history_global'   => 'db config.hk_history_global | in 1',
+			'hk_history_mode'     => 'db config.hk_history_mode',
+			'hk_sessions'         => 'db config.hk_sessions',
+			'hk_sessions_mode'    => 'db config.hk_sessions_mode | in 1',
+			'hk_audit'            => 'db config.hk_audit',
+			'hk_audit_mode'       => 'db config.hk_audit_mode | in 1',
+			'hk_services'         => 'db config.hk_services',
+			'hk_services_mode'    => 'db config.hk_services_mode | in 1',
+			'hk_events_autoreg'   => 'db config.hk_events_autoreg',
+			'hk_events_discovery' => 'db config.hk_events_discovery',
+			'hk_events_internal'  => 'db config.hk_events_internal',
+			'hk_events_trigger'   => 'db config.hk_events_trigger',
+			'hk_events_mode'      => 'db config.hk_events_mode | in 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->GetValidationError()) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'housekeeping.edit')
+						->getUrl()
+					);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+					$this->setResponse($response);
+					break;
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
@@ -44,12 +73,61 @@ class CControllerHousekeepingUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
+		$config = [
+			'hk_events_mode'    => $this->getInput('hk_events_mode',    0),
+			'hk_services_mode'  => $this->getInput('hk_services_mode',  0),
+			'hk_audit_mode'     => $this->getInput('hk_audit_mode',     0),
+			'hk_sessions_mode'  => $this->getInput('hk_sessions_mode',  0),
+			'hk_history_mode'   => $this->getInput('hk_history_mode',   0),
+			'hk_history_global' => $this->getInput('hk_history_global', 0),
+			'hk_trends_mode'    => $this->getInput('hk_trends_mode',    0),
+			'hk_trends_global'  => $this->getInput('hk_trends_global',  0)
 		];
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of housekeeping'));
+		if ($config['hk_events_mode'] == 1) {
+			$config['hk_events_trigger']   = $this->getInput('hk_events_trigger');
+			$config['hk_events_internal']  = $this->getInput('hk_events_internal');
+			$config['hk_events_discovery'] = $this->getInput('hk_events_discovery');
+			$config['hk_events_autoreg']   = $this->getInput('hk_events_autoreg');
+		}
+
+		if ($config['hk_services_mode'] == 1) {
+			$config['hk_services'] = $this->getInput('hk_services');
+		}
+
+		if ($config['hk_audit_mode'] == 1) {
+			$config['hk_audit'] = $this->getInput('hk_audit');
+		}
+
+		if ($config['hk_sessions_mode'] == 1) {
+			$config['hk_sessions'] = $this->getInput('hk_sessions');
+		}
+
+		if ($config['hk_history_global'] == 1) {
+			$config['hk_history'] = $this->getInput('hk_history');
+		}
+
+		if ($config['hk_trends_global'] == 1) {
+			$config['hk_trends'] = $this->getInput('hk_trends');
+		}
+
+		DBstart();
+		$result = update_config($config);
+		$result = DBend($result);
+
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'housekeeping.edit')
+			->getUrl()
+		);
+
+		if ($result) {
+			$response->setMessageOk(_('Configuration updated'));
+		}
+		else {
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
+		}
+
 		$this->setResponse($response);
 	}
 }

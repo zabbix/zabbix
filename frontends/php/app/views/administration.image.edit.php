@@ -19,8 +19,6 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.image.edit.js.php');
-
 $widget = (new CWidget())
 	->setTitle(_('image.edit :data-demo: '.$data['demo']))
 	->setControls((new CTag('nav', true,
@@ -36,15 +34,66 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'image.edit')
-		->getUrl()
-	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+$form = (new CForm('post', null, 'multipart/form-data'))
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->addVar('form', $data['form']);
+if (isset($data['imageid'])) {
+	$smage_form->addVar('imageid', $data['imageid']);
+}
+$form->addVar('imagetype', $data['imagetype']);
 
-$widget
-	->addItem($form)
-	->show();
+// append form list
+$form_list = (new CFormList('image-form-list'))
+	->addRow(
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['imagename'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+			->setAriaRequired()
+	)
+	->addRow(
+		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(),
+		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+	);
+
+if (isset($data['imageid'])) {
+	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
+		$form_list->addRow(_('Image'), new CLink(
+			(new CImg('imgstore.php?iconid='.$data['imageid'], 'no image'))->addStyle('max-width:100%;'),
+			'image.php?imageid='.$data['imageid']
+		));
+	}
+	else {
+		$form_list->addRow(_('Image'),
+			(new CImg('imgstore.php?iconid='.$data['imageid'], 'no image', null))->addStyle('max-width:100%;')
+		);
+	}
+}
+
+// append tab
+$imageTab = (new CTabView())
+	->addTab('imageTab', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $form_list);
+
+// append buttons
+if (isset($data['imageid'])) {
+	$imageTab->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[
+			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid').
+				url_param($data['imagetype'], false, 'imagetype')
+			),
+			new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))
+		]
+	));
+}
+else {
+	$imageTab->setFooter(makeFormFooter(
+		new CSubmit('add', _('Add')),
+		[new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))]
+	));
+}
+
+$form->addItem($imageTab);
+
+$widget->addItem($form)->show();

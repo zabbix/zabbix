@@ -58,7 +58,6 @@ class CRouter {
 		'gui.edit'            => ['CControllerGuiEdit',            'layout.htmlpage', 'administration.gui.edit'],
 		'gui.update'          => ['CControllerGuiUpdate',          null, null],
 		'housekeeping.edit'   => ['CControllerHousekeepingEdit',   'layout.htmlpage', 'administration.housekeeping.edit'],
-		'housekeeping.reset'  => ['CControllerHousekeepingReset', null, null],
 		'housekeeping.update' => ['CControllerHousekeepingUpdate', null, null],
 		'image.list'          => ['CControllerImageList',          'layout.htmlpage', 'administration.image.list'],
 		'image.edit'          => ['CControllerImageEdit',          'layout.htmlpage', 'administration.image.edit'],
