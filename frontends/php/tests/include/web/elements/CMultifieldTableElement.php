@@ -360,5 +360,63 @@ class CMultifieldTableElement extends CTableElement {
 					throw new Exception('Cannot perform action "'.$action.'".');
 			}
 		}
+
+		return $this;
+	}
+
+	/*
+	 * @inheritdoc
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		$rows = $this->getRows();
+
+		if ($rows->count() !== count($expected)) {
+			if ($raise_exception) {
+				throw new Exception('Row count "'.$rows->count().'" doesn\'t match expected row count "'.
+						count($expected).'" of multifield element.'
+				);
+			}
+
+			return false;
+		}
+
+		$headers = $this->getHeadersText();
+		foreach ($rows as $id => $row) {
+			if (!array_key_exists($id, $expected)) {
+				if ($raise_exception) {
+					throw new Exception('Row with index "'.$id.'" is not expected in multifield element.');
+				}
+
+				return false;
+			}
+
+			$controls = $this->getRowControls($row, $headers);
+			foreach ($expected[$id] as $field => $value) {
+				if (!array_key_exists($field, $controls)) {
+					if ($raise_exception) {
+						throw new Exception('Expected field "'.$field.'" is not present in multifield element row.');
+					}
+
+					return false;
+				}
+
+				try {
+					if (!$controls[$field]->checkValue($value, $raise_exception)) {
+						return false;
+					}
+				}
+				catch (Exception $exception) {
+					if ($raise_exception) {
+						CExceptionHelper::setMessage($exception, 'Multifield element value for field "'.$field.
+								'['.$id.']" is invalid: '.$exception->getMessage()
+						);
+					}
+
+					throw $exception;
+				}
+			}
+		}
+
+		return true;
 	}
 }
