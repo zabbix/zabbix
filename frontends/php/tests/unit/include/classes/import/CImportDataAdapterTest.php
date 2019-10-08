@@ -2474,7 +2474,6 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$converterChain->addConverter('3.2', $importConverterFactory->getObject('3.2'));
 		$converterChain->addConverter('3.4', $importConverterFactory->getObject('3.4'));
 		$converterChain->addConverter('4.0', $importConverterFactory->getObject('4.0'));
-		$converterChain->addConverter('4.2', $importConverterFactory->getObject('4.2'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($source);
