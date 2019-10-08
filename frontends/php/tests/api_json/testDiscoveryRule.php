@@ -415,7 +415,7 @@ class testDiscoveryRule extends CAPITest {
 				'discoveryrule' => $default_options + [
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '2',
+							'lld_macro_pathid' => '992',
 						],
 						[
 							'lld_macro' => '{#B}',
@@ -1674,13 +1674,13 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110007',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '6'
+							'lld_macro_pathid' => '996'
 						],
 						[
-							'lld_macro_pathid' => '7'
+							'lld_macro_pathid' => '997'
 						],
 						[
-							'lld_macro_pathid' => '8'
+							'lld_macro_pathid' => '998'
 						]
 					]
 				],
@@ -1691,15 +1691,15 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110007',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '6',
+							'lld_macro_pathid' => '996',
 							'lld_macro' => '{#A}'
 						],
 						[
-							'lld_macro_pathid' => '7',
+							'lld_macro_pathid' => '997',
 							'lld_macro' => '{#B}'
 						],
 						[
-							'lld_macro_pathid' => '8',
+							'lld_macro_pathid' => '998',
 							'lld_macro' => '{#C}'
 						]
 					]
@@ -1711,15 +1711,15 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110007',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '6',
+							'lld_macro_pathid' => '996',
 							'path' => '$.list[:6].type'
 						],
 						[
-							'lld_macro_pathid' => '7',
+							'lld_macro_pathid' => '997',
 							'path' => '$.list[:7].type'
 						],
 						[
-							'lld_macro_pathid' => '8',
+							'lld_macro_pathid' => '998',
 							'path' => '$.list[:8].type'
 						]
 					]
@@ -1731,17 +1731,17 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110007',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '6',
+							'lld_macro_pathid' => '996',
 							'lld_macro' => '{#X}',
 							'path' => '$.list[:9].type'
 						],
 						[
-							'lld_macro_pathid' => '7',
+							'lld_macro_pathid' => '997',
 							'lld_macro' => '{#Y}',
 							'path' => '$.list[:10].type'
 						],
 						[
-							'lld_macro_pathid' => '8',
+							'lld_macro_pathid' => '998',
 							'lld_macro' => '{#Z}',
 							'path' => '$.list[:11].type'
 						]
@@ -1754,13 +1754,13 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110007',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '6'
+							'lld_macro_pathid' => '996'
 						],
 						[
-							'lld_macro_pathid' => '7'
+							'lld_macro_pathid' => '997'
 						],
 						[
-							'lld_macro_pathid' => '8'
+							'lld_macro_pathid' => '998'
 						],
 						[
 							'lld_macro' => '{#Q}',
@@ -1775,16 +1775,16 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110006',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '1',
+							'lld_macro_pathid' => '991',
 							'lld_macro' => '{#V}',
 						],
 						[
-							'lld_macro_pathid' => '2',
+							'lld_macro_pathid' => '992',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:6].type'
 						],
 						[
-							'lld_macro_pathid' => '3',
+							'lld_macro_pathid' => '993',
 							'lld_macro' => '{#G}',
 							'path' => '$.list[:7].type'
 						],
@@ -1805,16 +1805,16 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => '110006',
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '1',
+							'lld_macro_pathid' => '991',
 							'lld_macro' => '{#V}',
 						],
 						[
-							'lld_macro_pathid' => '2',
+							'lld_macro_pathid' => '992',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:6].type'
 						],
 						[
-							'lld_macro_pathid' => '3',
+							'lld_macro_pathid' => '993',
 							'lld_macro' => '{#G}',
 							'path' => '$.list[:7].type'
 						],
@@ -2259,27 +2259,27 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '18',
+							'lld_macro_pathid' => '1008',
 							'lld_macro' => '{#A}',
 							'path' => '$.list[:1].type'
 						],
 						[
-							'lld_macro_pathid' => '19',
+							'lld_macro_pathid' => '1009',
 							'lld_macro' => '{#B}',
 							'path' => '$.list[:2].type'
 						],
 						[
-							'lld_macro_pathid' => '20',
+							'lld_macro_pathid' => '1010',
 							'lld_macro' => '{#C}',
 							'path' => '$.list[:3].type'
 						],
 						[
-							'lld_macro_pathid' => '21',
+							'lld_macro_pathid' => '1011',
 							'lld_macro' => '{#D}',
 							'path' => '$.list[:4].type'
 						],
 						[
-							'lld_macro_pathid' => '22',
+							'lld_macro_pathid' => '1012',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:5].type'
 						]
@@ -2297,27 +2297,27 @@ class testDiscoveryRule extends CAPITest {
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
-							'lld_macro_pathid' => '18',
+							'lld_macro_pathid' => '1008',
 							'lld_macro' => '{#A}',
 							'path' => '$.list[:1].type'
 						],
 						[
-							'lld_macro_pathid' => '19',
+							'lld_macro_pathid' => '1009',
 							'lld_macro' => '{#B}',
 							'path' => '$.list[:2].type'
 						],
 						[
-							'lld_macro_pathid' => '20',
+							'lld_macro_pathid' => '1010',
 							'lld_macro' => '{#C}',
 							'path' => '$.list[:3].type'
 						],
 						[
-							'lld_macro_pathid' => '21',
+							'lld_macro_pathid' => '1011',
 							'lld_macro' => '{#D}',
 							'path' => '$.list[:4].type'
 						],
 						[
-							'lld_macro_pathid' => '22',
+							'lld_macro_pathid' => '1012',
 							'lld_macro' => '{#E}',
 							'path' => '$.list[:5].type'
 						]

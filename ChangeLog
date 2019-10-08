@@ -1,3 +1,8 @@
+Changes for 4.4.0
+
+4.4.0rc1 was released as 4.4.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.4.0rc1
 
 New features:
@@ -158,8 +163,10 @@ Bug fixes:
 Changes for 4.2.8rc1
 
 New features:
+.......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
+........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
 .........T [ZBX-15897] fixed overall health check in Template HP iLO SNMPv2 (vitaly)
 
 --------------------------------------------------------------------------------
@@ -732,8 +739,10 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.14rc1
 
 New features:
+.......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
+........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
 .........T [ZBX-15897] fixed overall health check in Template HP iLO SNMPv2 (vitaly)
 
 --------------------------------------------------------------------------------

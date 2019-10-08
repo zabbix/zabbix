@@ -149,66 +149,6 @@
 		</sequential>
 	</macrodef>
 
-	<target name="create-db-mysql" if="${with.mysql}">
-		<sequential>
-			<exec executable="mysql" failonerror="on">
-				<arg line="-u${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="-e &quot;DROP DATABASE IF EXISTS ${DBNAME}&quot;"/>
-			</exec>
-			<exec executable="mysql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="-e &quot;CREATE DATABASE IF NOT EXISTS ${DBNAME}&quot;"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-		</sequential>
-	</target>
-
-	<target name="create-db-postgresql" if="${with.postgresql}">
-		<sequential>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-c &quot;DROP DATABASE IF EXISTS ${DBNAME};&quot;"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-c &quot;CREATE DATABASE ${DBNAME};&quot;"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/schema.sql"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/images.sql"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/data.sql"/>
-			</exec>
-		</sequential>
-	</target>
-
-	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
-
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
@@ -370,7 +310,7 @@
 		</for>
 	</target>
 
-	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
+	<target name="build-dist" depends="make-gcc,make-db"/>
 
 	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->

@@ -371,7 +371,7 @@ class testFormTrigger extends CLegacyWebTest {
 			'select description'.
 			' from triggers t'.
 			' left join functions f on f.triggerid=t.triggerid'.
-			' where f.itemid=30004 and t.description LIKE \'testFormTrigger%\''
+			' where f.itemid=99102 and t.description LIKE \'testFormTrigger%\''
 		);
 	}
 
