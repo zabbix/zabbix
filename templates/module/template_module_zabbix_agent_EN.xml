@@ -49,7 +49,6 @@ Template tooling version used: 0.32</description>
             </item>
             <item>
                <name>Zabbix agent ping</name>
-               <type>ZABBIX_ACTIVE</type>
                <key>agent.ping</key>
                <history>7d</history>
                <description>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</description>
