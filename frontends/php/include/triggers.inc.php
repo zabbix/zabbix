@@ -736,6 +736,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
+	CArrayHelper::sort($triggers, ['description']);
 
 	$problem_triggerids = [];
 

@@ -102,17 +102,43 @@ class CDBHelper {
 	 * Get random database data set (limited set of random records).
 	 *
 	 * @param string  $sql       query to be executed
-	 * @param integer $count     data set size
+	 * @param integer $count     data set size (or null for all data set)
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	public static function getRandom($sql, $count) {
+	public static function getRandom($sql, $count = null) {
 		$data = self::getAll($sql);
 		shuffle($data);
 
-		return array_slice($data, 0, $count);
+		if ($count !== null) {
+			$data = array_slice($data, 0, $count);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get random database data suitable for PHPUnit data provider functions (limited set of random records).
+	 *
+	 * @param string  $sql       query to be executed
+	 * @param integer $count     data set size (or null for all data set)
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	public static function getRandomizedDataProvider($sql, $count = null) {
+		DBconnect($error);
+
+		$data = [];
+		foreach (CDBHelper::getRandom($sql, $count) as $row) {
+			$data[] = [$row];
+		}
+
+		DBclose();
+		return $data;
 	}
 
 	/**

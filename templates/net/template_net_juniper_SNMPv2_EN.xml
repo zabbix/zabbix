@@ -11,11 +11,14 @@
       <template>
          <template>Template Net Juniper SNMPv2</template>
          <name>Template Net Juniper SNMPv2</name>
-         <description>Template Net Juniper version: 0.20&#13;
+         <description>Template Net Juniper&#13;
+&#13;
 MIBs used:&#13;
 JUNIPER-ALARM-MIB&#13;
 JUNIPER-MIB&#13;
-SNMPv2-MIB</description>
+SNMPv2-MIB&#13;
+&#13;
+Template tooling version used: 0.23</description>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -371,7 +374,7 @@ http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=sear
                      <privatekey/>
                      <port/>
                      <description>MIB: JUNIPER-MIB&#13;
-The CPU Load Average over the last 5 minutes Here it will be shown as percentage valueZero if unavailable or inapplicable.&#13;
+The CPU utilization in percentage of this subject. Zero if unavailable or inapplicable.&#13;
 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</description>
                      <inventory_link>0</inventory_link>
                      <applications>
