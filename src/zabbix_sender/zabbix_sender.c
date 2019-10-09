@@ -255,7 +255,7 @@ static void	send_signal_handler(int sig)
 		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
 		break
 
-	switch(sig)
+	switch (sig)
 	{
 		CASE_LOG_WARNING(SIGALRM);
 		CASE_LOG_WARNING(SIGINT);
