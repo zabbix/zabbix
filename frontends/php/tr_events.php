@@ -87,6 +87,19 @@ if (!$events) {
 }
 $event = reset($events);
 
+$event['comments'] = ($trigger['comments'] !== '')
+	? CMacrosResolverHelper::resolveTriggerDescription(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'comments' => $trigger['comments'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		['events' => true]
+	)
+	: '';
+
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],

@@ -580,6 +580,7 @@ fail:
 	if (SUCCEED != ret)
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 
+	zbx_free(params);
 	zbx_free(message);
 	zbx_free(subject);
 	zbx_free(sendto);

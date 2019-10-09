@@ -159,7 +159,7 @@ function getSystemStatusData(array $filter) {
 			'preservekeys' => true
 		];
 
-		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1) {
+		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			$options['output'] = array_merge(
 				$options['output'],
 				['url', 'expression', 'recovery_mode', 'recovery_expression', 'opdata']
@@ -267,7 +267,7 @@ function getSystemStatusData(array $filter) {
 			])
 		];
 
-		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] == 1) {
+		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			$maked_data = CScreenProblem::makeData(
 				['problems' => $problems_data, 'triggers' => $data['triggers']],
 				['show' => 0, 'details' => 0, 'show_opdata' => $filter['show_opdata']]
@@ -714,7 +714,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 	$header_time = new CColHeader([_('Time'), (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN)]);
 
 	$show_timeline = (array_key_exists('show_timeline', $filter) && $filter['show_timeline']);
-	$show_opdata = (array_key_exists('show_opdata', $filter) && $filter['show_opdata']);
+	$show_opdata = (array_key_exists('show_opdata', $filter)) ? $filter['show_opdata'] : OPERATIONAL_DATA_SHOW_NONE;
 
 	if ($show_timeline) {
 		$header = [
@@ -732,7 +732,7 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 			_('Info'),
 			_('Host'),
 			_('Problem'),
-			$show_opdata ? _('Operational data') : null,
+			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
 			_('Ack'),
 			_('Actions'),
@@ -803,9 +803,15 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 
 		// operational data
 		$opdata = null;
-		if ($show_opdata) {
-			$opdata = ($trigger['opdata'] !== '')
-				? (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+		if ($show_opdata != OPERATIONAL_DATA_SHOW_NONE) {
+
+			if ($trigger['opdata'] === '') {
+				if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+					$opdata = (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+				}
+			}
+			else {
+				$opdata = CMacrosResolverHelper::resolveTriggerOpdata(
 					[
 						'triggerid' => $trigger['triggerid'],
 						'expression' => $trigger['expression'],
@@ -817,10 +823,14 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 						'events' => true,
 						'html' => true
 					]
-				)))
-					->addClass('opdata')
-					->addClass(ZBX_STYLE_WORDWRAP)
-				: (new CCol(CScreenProblem::getLatestValues($trigger['items'])))->addClass('latest-values');
+				);
+
+				if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
+					$opdata = (new CCol($opdata))
+						->addClass('opdata')
+						->addClass(ZBX_STYLE_WORDWRAP);
+				}
+			}
 		}
 
 		// ack
@@ -837,8 +847,13 @@ function makeProblemsPopup(array $problems, array $triggers, $backurl, array $ac
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
-			getSeverityCell($problem['severity'], null, $problem['name']),
-			$opdata,
+			getSeverityCell($problem['severity'], null,
+				(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
+					? [$problem['name'], ' (', $opdata, ')']
+					: $problem['name']
+				)
+			),
+			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 			zbx_date2age($problem['clock']),
 			$ack,
 			makeEventActionsIcons($problem['eventid'], $actions['all_actions'], $actions['mediatypes'],

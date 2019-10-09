@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
+    <version>4.2</version>
     <date>2019-10-01T13:43:45Z</date>
     <groups>
         <group>
@@ -226,25 +226,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix alerter processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of alert manager internal processes, in %</name>
@@ -313,25 +294,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix alert manager processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of alert syncer internal processes, in %</name>
@@ -400,25 +362,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix alert syncer processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of configuration syncer internal processes, in %</name>
@@ -487,25 +430,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix configuration syncer processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Zabbix configuration syncer processes more than 75% busy</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of discoverer data collector processes, in %</name>
@@ -574,25 +498,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix discoverer processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of escalator internal processes, in %</name>
@@ -661,25 +566,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix escalator processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of history syncer internal processes, in %</name>
@@ -748,25 +634,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix history syncer processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of housekeeper internal processes, in %</name>
@@ -835,25 +702,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(30m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(30m)}&lt;65</recovery_expression>
-                            <name>Zabbix housekeeper processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of http poller data collector processes, in %</name>
@@ -922,25 +770,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix http poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of icmp pinger data collector processes, in %</name>
@@ -1009,25 +838,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix icmp pinger processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of ipmi manager internal processes, in %</name>
@@ -1096,25 +906,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix ipmi manager processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of ipmi poller data collector processes, in %</name>
@@ -1183,25 +974,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix ipmi poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of java poller data collector processes, in %</name>
@@ -1270,25 +1042,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix java poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of LLD manager internal processes, in %</name>
@@ -1357,25 +1110,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix LLD manager processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of LLD worker internal processes, in %</name>
@@ -1444,25 +1178,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix LLD worker processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of poller data collector processes, in %</name>
@@ -1531,25 +1246,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of preprocessing manager internal processes, in %</name>
@@ -1618,25 +1314,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix preprocessing manager processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of preprocessing worker internal processes, in %</name>
@@ -1705,25 +1382,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix preprocessing worker processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of proxy poller data collector processes, in %</name>
@@ -1792,25 +1450,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix proxy poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of self-monitoring internal processes, in %</name>
@@ -1879,25 +1518,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix self-monitoring processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of snmp trapper data collector processes, in %</name>
@@ -1966,25 +1586,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix snmp trapper processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of task manager internal processes, in %</name>
@@ -2053,25 +1654,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix task manager processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of timer internal processes, in %</name>
@@ -2140,25 +1722,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix timer processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of trapper data collector processes, in %</name>
@@ -2227,25 +1790,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix trapper processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of unreachable poller data collector processes, in %</name>
@@ -2314,25 +1858,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix unreachable poller processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Utilization of vmware data collector processes, in %</name>
@@ -2401,25 +1926,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{avg(10m)}&gt;75</expression>
-                            <recovery_mode>1</recovery_mode>
-                            <recovery_expression>{avg(10m)}&lt;65</recovery_expression>
-                            <name>Zabbix vmware collector processes more than 75% busy</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Configuration cache, % used</name>
@@ -2488,25 +1994,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;75</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 75% used in the configuration cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing CacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Value cache, % used</name>
@@ -2575,25 +2062,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;95</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 95% used in the value cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Value cache hits</name>
@@ -2812,25 +2280,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{last()}=1</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>Zabbix value cache working in low memory mode</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>4</priority>
-                            <description/>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>VMware cache, % used</name>
@@ -2899,25 +2348,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;75</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 75% used in the vmware cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>History write cache, % used</name>
@@ -2986,25 +2416,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;75</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 75% used in the history cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>History index cache, % used</name>
@@ -3073,25 +2484,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;75</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 75% used in the history index cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Trend write cache, % used</name>
@@ -3160,25 +2552,6 @@
                     <master_item>
                         <key>zabbix[stats,{$ADDRESS},{$PORT}]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{max(10m)}&gt;75</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 75% used in the trends cache</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Number of processed values per second</name>
@@ -3763,25 +3136,6 @@
                     <verify_peer>0</verify_peer>
                     <verify_host>0</verify_host>
                     <master_item/>
-                    <triggers>
-                        <trigger>
-                            <expression>{min(10m)}&gt;100</expression>
-                            <recovery_mode>0</recovery_mode>
-                            <recovery_expression/>
-                            <name>More than 100 items having missing data for more than 10 minutes</name>
-                            <opdata/>
-                            <correlation_mode>0</correlation_mode>
-                            <correlation_tag/>
-                            <url/>
-                            <status>0</status>
-                            <priority>2</priority>
-                            <description>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</description>
-                            <type>0</type>
-                            <manual_close>0</manual_close>
-                            <dependencies/>
-                            <tags/>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>Zabbix stats queue</name>
@@ -4066,6 +3420,552 @@
             <tags/>
         </template>
     </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:rcache.buffer.pused.max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the configuration cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing CacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:wcache.history.pused.max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the history cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:wcache.index.pused.max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the history index cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:wcache.trend.pused.max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the trends cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing TrendCacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:vmware.buffer.pused.max(10m)}&gt;75</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 75% used in the vmware cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:vcache.buffer.pused.max(10m)}&gt;95</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 95% used in the value cache</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Consider increasing ValueCacheSize in the zabbix_server.conf configuration file</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:zabbix[stats,{$ADDRESS},{$PORT},queue,10m].min(10m)}&gt;100</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>More than 100 items having missing data for more than 10 minutes</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>2</priority>
+            <description>zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.alert_syncer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.alert_syncer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix alert syncer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.alerter.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.alerter.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix alerter processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.alert_manager.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.alert_manager.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix alert manager processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.configuration_syncer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.configuration_syncer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix configuration syncer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description>Zabbix configuration syncer processes more than 75% busy</description>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.discoverer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.discoverer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix discoverer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.escalator.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.escalator.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix escalator processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.history_syncer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.history_syncer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix history syncer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(30m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.housekeeper.avg.busy.avg(30m)}&lt;65</recovery_expression>
+            <name>Zabbix housekeeper processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.http_poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.http_poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix http poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.icmp_pinger.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.icmp_pinger.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix icmp pinger processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.ipmi_manager.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.ipmi_manager.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix ipmi manager processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.ipmi_poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.ipmi_poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix ipmi poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.java_poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.java_poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix java poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.lld_manager.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.lld_manager.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix LLD manager processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.lld_worker.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.lld_worker.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix LLD worker processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.preprocessing_manager.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.preprocessing_manager.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix preprocessing manager processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.preprocessing_worker.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.preprocessing_worker.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix preprocessing worker processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.proxy_poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.proxy_poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix proxy poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.self-monitoring.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.self-monitoring.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix self-monitoring processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.snmp_trapper.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.snmp_trapper.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix snmp trapper processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.task_manager.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.task_manager.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix task manager processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.timer.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.timer.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix timer processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.trapper.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.trapper.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix trapper processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.unreachable_poller.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.unreachable_poller.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix unreachable poller processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:vcache.cache.mode.last()}=1</expression>
+            <recovery_mode>0</recovery_mode>
+            <recovery_expression/>
+            <name>Zabbix value cache working in low memory mode</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>4</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+        <trigger>
+            <expression>{Template App Remote Zabbix server:process.vmware_collector.avg.busy.avg(10m)}&gt;75</expression>
+            <recovery_mode>1</recovery_mode>
+            <recovery_expression>{Template App Remote Zabbix server:process.vmware_collector.avg.busy.avg(10m)}&lt;65</recovery_expression>
+            <name>Zabbix vmware collector processes more than 75% busy</name>
+            <correlation_mode>0</correlation_mode>
+            <correlation_tag/>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <manual_close>0</manual_close>
+            <dependencies/>
+            <tags/>
+        </trigger>
+    </triggers>
     <graphs>
         <graph>
             <name>Value cache effectiveness</name>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.2</version>
+   <version>4.4</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -13,7 +13,7 @@
          <name>Template Module Zabbix agent</name>
          <description>Use this template for agents reachable from Zabbix server/proxy (passive mode).&#13;
 &#13;
-Template tooling version used: 0.30</description>
+Template tooling version used: 0.32</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -29,233 +29,29 @@ Template tooling version used: 0.30</description>
          </applications>
          <items>
             <item>
-               <name>Version of Zabbix agent running</name>
-               <type>0</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>agent.version</key>
-               <delay>1h</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Monitoring agent</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
                <name>Host name of Zabbix agent running</name>
-               <type>0</type>
-               <snmp_community/>
-               <snmp_oid/>
                <key>agent.hostname</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
+               <value_type>CHAR</value_type>
                <applications>
                   <application>
                      <name>Monitoring agent</name>
                   </application>
                </applications>
-               <valuemap/>
-               <logtimefmt/>
                <preprocessing>
                   <step>
-                     <type>20</type>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Version of Zabbix agent running</name>
-               <type>0</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>agent.version</key>
-               <delay>1h</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Monitoring agent</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
             </item>
             <item>
                <name>Zabbix agent ping</name>
-               <type>7</type>
-               <snmp_community/>
-               <snmp_oid/>
                <key>agent.ping</key>
-               <delay>1m</delay>
                <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <description>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</description>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Monitoring agent</name>
@@ -264,59 +60,51 @@ Template tooling version used: 0.30</description>
                <valuemap>
                   <name>Zabbix agent ping status</name>
                </valuemap>
-               <logtimefmt/>
-               <preprocessing/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
             </item>
             <item>
                <name>Zabbix agent availability</name>
-               <type>5</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>INTERNAL</type>
                <key>zabbix[host,agent,available]</key>
-               <delay>1m</delay>
                <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <description>Monitoring agent availability status</description>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Status</name>
@@ -325,48 +113,31 @@ Template tooling version used: 0.30</description>
                <valuemap>
                   <name>zabbix.host.available</name>
                </valuemap>
-               <logtimefmt/>
-               <preprocessing/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+               <triggers>
+                  <trigger>
+                     <expression>{max({$AGENT.TIMEOUT})}=0</expression>
+                     <name>Zabbix agent is not available (for {$AGENT.TIMEOUT})</name>
+                     <priority>AVERAGE</priority>
+                     <description>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
-         <discovery_rules/>
-         <httptests/>
          <macros>
             <macro>
                <macro>{$AGENT.TIMEOUT}</macro>
                <value>3m</value>
+               <description>Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).</description>
             </macro>
          </macros>
-         <templates/>
-         <screens/>
-         <tags/>
       </template>
       <template>
          <template>Template Module Zabbix agent active</template>
          <name>Template Module Zabbix agent active</name>
          <description>Use this template instead of 'Template Module Zabbix agent' for agents running in active mode only.&#13;
 &#13;
-Template tooling version used: 0.30</description>
+Template tooling version used: 0.32</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -382,233 +153,31 @@ Template tooling version used: 0.30</description>
          </applications>
          <items>
             <item>
-               <name>Version of Zabbix agent running</name>
-               <type>7</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>agent.version</key>
-               <delay>1h</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Monitoring agent</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
                <name>Host name of Zabbix agent running</name>
-               <type>7</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>ZABBIX_ACTIVE</type>
                <key>agent.hostname</key>
                <delay>1h</delay>
                <history>7d</history>
                <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
+               <value_type>CHAR</value_type>
                <applications>
                   <application>
                      <name>Monitoring agent</name>
                   </application>
                </applications>
-               <valuemap/>
-               <logtimefmt/>
                <preprocessing>
                   <step>
-                     <type>20</type>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Version of Zabbix agent running</name>
-               <type>7</type>
-               <snmp_community/>
-               <snmp_oid/>
-               <key>agent.version</key>
-               <delay>1h</delay>
-               <history>7d</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description/>
-               <inventory_link>0</inventory_link>
-               <applications>
-                  <application>
-                     <name>Monitoring agent</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
             </item>
             <item>
                <name>Zabbix agent ping</name>
-               <type>7</type>
-               <snmp_community/>
-               <snmp_oid/>
+               <type>ZABBIX_ACTIVE</type>
                <key>agent.ping</key>
-               <delay>1m</delay>
                <history>7d</history>
-               <trends>365d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <description>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</description>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Status</name>
@@ -617,80 +186,66 @@ Template tooling version used: 0.30</description>
                <valuemap>
                   <name>Zabbix agent ping status</name>
                </valuemap>
-               <logtimefmt/>
-               <preprocessing/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+               <triggers>
+                  <trigger>
+                     <expression>{nodata({$AGENT.NODATA_TIMEOUT})}=1</expression>
+                     <name>Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})</name>
+                     <priority>AVERAGE</priority>
+                     <description>For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Version of Zabbix agent running</name>
+               <type>ZABBIX_ACTIVE</type>
+               <key>agent.version</key>
+               <delay>1h</delay>
+               <history>7d</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <applications>
+                  <application>
+                     <name>Monitoring agent</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
             </item>
          </items>
-         <discovery_rules/>
-         <httptests/>
          <macros>
             <macro>
                <macro>{$AGENT.NODATA_TIMEOUT}</macro>
                <value>30m</value>
+               <description>No data timeout for active agents. Consider to keep it relatively high.</description>
             </macro>
          </macros>
-         <templates/>
-         <screens/>
-         <tags/>
       </template>
    </templates>
-   <graphs/>
-   <triggers>
-      <trigger>
-         <expression>{Template Module Zabbix agent:zabbix[host,agent,available].max({$AGENT.TIMEOUT})}=0</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Zabbix agent is not available (for {$AGENT.TIMEOUT})</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template Module Zabbix agent active:agent.ping.nodata({$AGENT.NODATA_TIMEOUT})}=1</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>3</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-   </triggers>
    <value_maps>
       <value_map>
          <name>Zabbix agent ping status</name>

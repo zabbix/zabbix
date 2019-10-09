@@ -76,6 +76,7 @@ class CRouter {
 		'discovery.view'				=> ['CControllerDiscoveryView',						'layout.htmlpage',		'monitoring.discovery.view'],
 		'export.valuemaps.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.hosts.xml'				=> ['CControllerExportXml',							'layout.xml',			null],
+		'export.mediatypes.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.screens.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.sysmaps.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
 		'export.templates.xml'			=> ['CControllerExportXml',							'layout.xml',			null],
@@ -154,10 +155,8 @@ class CRouter {
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
-		'popup.trigdesc.view'			=> ['CControllerPopupTrigDescView',					'layout.json',			'popup.trigdesc.view'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
-		'trigdesc.update'				=> ['CControllerTrigDescUpdate',					'layout.json',			null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search']
 	];
 

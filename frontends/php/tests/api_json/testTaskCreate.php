@@ -125,7 +125,7 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['23287', '90002']
+					'itemids' => ['29179', '90002']
 				],
 				'expected_error' => 'Cannot send request: host is not monitored.'
 			],
@@ -140,7 +140,7 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['23287', '90000']
+					'itemids' => ['29179', '90000']
 				],
 				'expected_error' => 'Cannot send request: item is disabled.'
 			],
@@ -155,14 +155,14 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['23287', '90001']
+					'itemids' => ['29179', '90001']
 				],
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
 			],
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['23279', '90001']
+					'itemids' => ['29207', '90001']
 				],
 				'expected_error' => 'Cannot send request: discovery rule is disabled.'
 			],
@@ -177,7 +177,7 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['90004', '23287']
+					'itemids' => ['90004', '29179']
 				],
 				'expected_error' => null
 			],
@@ -185,7 +185,7 @@ class testTaskCreate extends CAPITest {
 			[
 				'task' => [
 					'type' => '6',
-					'itemids' => ['23279']
+					'itemids' => ['29207']
 				],
 				'expected_error' => null
 			],

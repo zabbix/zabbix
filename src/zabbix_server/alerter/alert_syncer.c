@@ -210,7 +210,14 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		if (16 < sql_offset)
 			ret = (ZBX_DB_OK <= DBexecute("%s", sql) ? SUCCEED : FAIL);
 	}
-	DBcommit();
+	if (SUCCEED == ret)
+	{
+		if (ZBX_DB_OK != DBcommit())
+			ret = FAIL;
+	}
+	else
+		DBrollback();
+
 	zbx_vector_uint64_destroy(&alertids);
 	zbx_free(sql);
 
@@ -393,8 +400,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 	zbx_vector_uint64_create(&mediatypeids);
 	zbx_vector_ptr_create(&mediatypes);
 
-	am_db_get_alerts(&alerts);
-	if (0 == alerts.values_num)
+	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
 		goto out;
 
 	for (i = 0; i < alerts.values_num; i++)
@@ -628,6 +634,9 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
 				zbx_free(error_esc);
 			}
+			else
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",error=''");
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
 					result->alertid);
 
@@ -728,7 +737,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	int			medias_num;
+	int			medias_num = 0;
 	zbx_am_media_t		*media;
 	zbx_vector_uint64_t	mediatypeids;
 	zbx_vector_ptr_t	medias, mediatypes;
@@ -821,7 +830,6 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	sec1 = zbx_time();
 	sleeptime = ZBX_POLL_INTERVAL;
 
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
@@ -855,7 +863,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 
 		sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_POLL_INTERVAL + ZBX_POLL_INTERVAL;
+		nextcheck = sec1 + ZBX_POLL_INTERVAL;
 
 		if (0 > (sleeptime = nextcheck - (int)sec2))
 			sleeptime = 0;

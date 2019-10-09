@@ -265,7 +265,6 @@ $tranStrings = [
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
-		'Description' => _('Description'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Edit trigger' => _('Edit trigger'),
 		'Insert expression' => _('Insert expression'),
@@ -327,8 +326,11 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
+	require_once dirname(__FILE__).'/include/classes/core/CSession.php';
+
 	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
+		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']).';path='.
+			CSession::getDefaultCookiePath());
 	}
 
 	$files = [

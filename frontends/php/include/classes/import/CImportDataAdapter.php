@@ -427,6 +427,32 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Get media types from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getMediaTypes() {
+		$media_types = [];
+
+		if (array_key_exists('media_types', $this->data)) {
+			$keys = [
+				'password' => 'passwd',
+				'script_name' => 'exec_path',
+				'max_sessions' => 'maxsessions',
+				'attempts' => 'maxattempts'
+			];
+
+			foreach ($this->data['media_types'] as $media_type) {
+				$media_types[] = CArrayHelper::renameKeys($media_type,
+					$keys + (($media_type['type'] == MEDIA_TYPE_EXEC) ? ['parameters' => 'exec_params'] : [])
+				);
+			}
+		}
+
+		return $media_types;
+	}
+
+	/**
 	 * Enriches trigger expression and trigger recovery expression with host:item pair.
 	 *
 	 * @param string $host

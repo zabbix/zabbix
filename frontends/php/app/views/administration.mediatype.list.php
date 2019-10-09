@@ -28,6 +28,7 @@ $widget = (new CWidget())
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
+			->addItem(new CRedirectButton(_('Import'), 'conf.import.php?rules_preset=mediatype'))
 		))
 			->setAttribute('aria-label', _('Content controls'))
 	)
@@ -151,6 +152,14 @@ $mediaTypeForm->addItem([
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?')],
 		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?')],
+		'mediatype.export' => ['name' => _('Export'), 'redirect' =>
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'export.mediatypes.xml')
+				->setArgument('backurl', (new CUrl('zabbix.php'))
+					->setArgument('action', 'mediatype.list')
+					->getUrl())
+				->getUrl()
+		],
 		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?')]
 	], 'mediatype')
 ]);

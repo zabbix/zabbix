@@ -489,7 +489,7 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @param array  $data
 	 * @param string $data['triggerid']
-	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge and Description menus.
+	 * @param string $data['eventid']                 (optional) Mandatory for Acknowledge menu.
 	 * @param array  $data['acknowledge']             (optional) Acknowledge link parameters.
 	 * @param string $data['acknowledge']['backurl']
 	 * @param int    $data['severity_min']            (optional)
@@ -497,7 +497,6 @@ class CControllerMenuPopup extends CController {
 	 * @param array  $data['urls']                    (optional)
 	 * @param string $data['urls']['name']
 	 * @param string $data['urls']['url']
-	 * @param bool   $data['show_description']        (optional) default: true
 	 *
 	 * @return mixed
 	 */
@@ -556,21 +555,6 @@ class CControllerMenuPopup extends CController {
 				];
 			}
 
-			$options = [
-				'show_description' => !array_key_exists('show_description', $data) || $data['show_description']
-			];
-
-			if ($options['show_description']) {
-				$rw_triggers = API::Trigger()->get([
-					'output' => ['flags'],
-					'triggerids' => $data['triggerid'],
-					'editable' => true
-				]);
-
-				$options['description_enabled'] = ($db_trigger['comments'] !== ''
-					|| ($rw_triggers && $rw_triggers[0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL));
-			}
-
 			$menu_data = [
 				'type' => 'trigger',
 				'triggerid' => $data['triggerid'],
@@ -578,13 +562,6 @@ class CControllerMenuPopup extends CController {
 				'showEvents' => $show_events,
 				'configuration' => in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 			];
-
-			if (!$options['show_description']) {
-				$menu_data['show_description'] = false;
-			}
-			else if (!$options['description_enabled']) {
-				$menu_data['description_enabled'] = false;
-			}
 
 			if ($db_trigger['url'] !== '') {
 				$menu_data['urls'][] = [

@@ -686,7 +686,7 @@ static int	DBpatch_4030044(void)
 
 static int	DBpatch_4030045(void)
 {
-	const ZBX_FIELD	field = {"show_event_menu", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"show_event_menu", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }

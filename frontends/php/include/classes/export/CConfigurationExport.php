@@ -58,6 +58,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
+			'mediaTypes' => [],
 			'valueMaps' => []
 		];
 
@@ -74,6 +75,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
+			'mediaTypes' => [],
 			'valueMaps' => []
 		];
 
@@ -181,6 +183,10 @@ class CConfigurationExport {
 				$this->builder->buildMaps($this->data['maps']);
 			}
 
+			if ($this->data['mediaTypes']) {
+				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
+			}
+
 			if ($this->data['valueMaps']) {
 				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
 			}
@@ -226,6 +232,10 @@ class CConfigurationExport {
 
 		if ($options['maps']) {
 			$this->gatherMaps($options['maps']);
+		}
+
+		if ($options['mediaTypes']) {
+			$this->gatherMediaTypes($options['mediaTypes']);
 		}
 	}
 
@@ -313,10 +323,10 @@ class CConfigurationExport {
 			'output' => [
 				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
+				'tls_psk', 'inventory_mode'
 			],
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
-			'selectInventory' => true,
+			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
@@ -1089,6 +1099,26 @@ class CConfigurationExport {
 		unset($image);
 
 		$this->data['images'] = $images;
+	}
+
+	/**
+	 * Get media types for export builder from database.
+	 *
+	 * @param array $mediatypeids
+	 *
+	 * return array
+	 */
+	protected function gatherMediaTypes(array $mediatypeids) {
+		$this->data['mediaTypes'] = API::MediaType()->get([
+			'output' => ['name', 'type', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
+				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type',
+				'exec_path', 'exec_params', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
+				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
+				'description', 'parameters'
+			],
+			'mediatypeids' => $mediatypeids,
+			'preservekeys' => true
+		]);
 	}
 
 	/**
