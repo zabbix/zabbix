@@ -1166,7 +1166,7 @@ static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *reques
 
 	if (MIN_VALUE_LINES > (rate = atoi(p)) ||
 			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
-			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
+			(0 != is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
 	{
 		*error = zbx_strdup(*error, "Invalid fourth parameter.");
 		return FAIL;
@@ -1322,7 +1322,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	}
 
 	/* parameter 'output' (not used for log.count[], logrt.count[]) */
-	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+	if (0 != is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
 		output_template = "";
 
 	/* parameter 'maxdelay' */
@@ -1389,7 +1389,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		metric->error_count = 0;
 
-		if (1 == is_count_item)
+		if (0 != is_count_item)
 		{
 			/* send log.count[] or logrt.count[] item value to server */
 
@@ -1434,7 +1434,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		metric->error_count++;
 
-		if (1 == is_count_item)
+		if (0 != is_count_item)
 		{
 			/* restore original state to try again during the next check */
 
