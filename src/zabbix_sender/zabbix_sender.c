@@ -261,11 +261,28 @@ static int			destinations_count = 0;
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
 {
-	if (SIGALRM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
+
+#define CASE_LOG_WARNING(signal) \
+	case signal:							\
+		zabbix_log(LOG_LEVEL_WARNING, "interrupted by signal " #signal " while executing operation"); \
+		break
+
+	switch (sig)
+	{
+		CASE_LOG_WARNING(SIGALRM);
+		CASE_LOG_WARNING(SIGINT);
+		CASE_LOG_WARNING(SIGQUIT);
+		CASE_LOG_WARNING(SIGTERM);
+		CASE_LOG_WARNING(SIGHUP);
+		CASE_LOG_WARNING(SIGPIPE);
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "signal %d while executing operation", sig);
+	}
+#undef CASE_LOG_WARNING
 
 	/* Calling _exit() to terminate the process immediately is important. See ZBX-5732 for details. */
-	_exit(EXIT_FAILURE);
+	/* Return FAIL instead of EXIT_FAILURE to keep return signals consistent for send_value() */
+	_exit(FAIL);
 }
 #endif
 
@@ -513,6 +530,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGTERM, send_signal_handler);
 	signal(SIGHUP, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
+	signal(SIGPIPE, send_signal_handler);
 #endif
 	switch (configured_tls_connect_mode)
 	{
