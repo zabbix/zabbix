@@ -2113,7 +2113,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Query details about resolvable hosts.
 		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST]) {
 			$hosts = API::Host()->get([
-				'output' => ['host', 'name', 'description'],
+				'output' => $query_inventories
+					? ['host', 'name', 'description', 'inventory_mode']
+					: ['host', 'name', 'description'],
 				'hostids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
 				'selectInterfaces' => $query_interfaces ? ['main', 'type', 'useip', 'ip', 'dns'] : null,
 				'selectInventory' => $query_inventories ? API_OUTPUT_EXTEND : null,
@@ -2367,7 +2369,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					default:
 						// Inventories:
 						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros) && $host
-								&& $host['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+								&& $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 							$matched_macro['value']
 								= $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']];
 						}

@@ -1256,6 +1256,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 									'name' => '{#VMNAME}'
 								]
 							],
+							'inventory_mode' => '0',
 							'templates' => []
 						]
 					],
