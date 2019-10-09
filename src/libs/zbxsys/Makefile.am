@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libzbxsys.a
 
-libzbxsys_a_SOURCES = threads.c mutexs.c
+libzbxsys_a_SOURCES = \
+	mutexs.c \
+	threads.c
 
-EXTRA_DIST = symbols.c
+EXTRA_DIST = \
+	symbols.c
