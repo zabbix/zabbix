@@ -2375,6 +2375,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   left: 0;
   right: 0;
   bottom: 0;
+  height: inherit;
   padding: .25rem;
   box-sizing: border-box;
   display: flex;
@@ -2421,9 +2422,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   transition: opacity 0.2s ease-out; }
 
 .dashbrd-grid-widget-content {
-  position: relative;
   flex-grow: 1;
   margin-top: 2rem;
+  box-sizing: border-box;
+  height: calc(100% - 2rem);
   padding-bottom: 8px;
   overflow: auto;
   border: 1px solid #9f9f9f;
@@ -2456,6 +2458,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   transition: height .3s, margin-top .3s, box-shadow .3s; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
+  height: 100%;
   padding-top: 8px; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head {
   height: 2rem;
@@ -5245,9 +5248,6 @@ table.preprocessing-test-results .rel-container {
   margin-top: -2px; }
 
 .totals-list:not(.list-table) {
-  position: absolute;
-  left: 0;
-  right: 0;
   display: flex;
   height: 100%; }
 .totals-list > div {
@@ -5283,11 +5283,6 @@ table.preprocessing-test-results .rel-container {
   background: #97aab3; }
 .host-avail-widget .host-avail-total {
   background: transparent; }
-
-#iframe {
-  position: absolute;
-  left: 0;
-  right: 0; }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
   /* for IE11 only. Fixed cell height if table has 100% height */

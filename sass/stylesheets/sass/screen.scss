@@ -3486,6 +3486,7 @@ $form-icon-btn: (
 	left: 0;
 	right: 0;
 	bottom: 0;
+	height: inherit;
 	padding: .25rem;
 	box-sizing: border-box;
 	display: flex;
@@ -3542,9 +3543,10 @@ $form-icon-btn: (
 }
 
 .dashbrd-grid-widget-content {
-	position: relative;
 	flex-grow: 1;
 	margin-top: 2rem;
+	box-sizing: border-box;
+	height: calc(100% - 2rem);	
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
@@ -3605,6 +3607,7 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-content {
 			margin-top: 0;
+			height: 100%;
 			padding-top: 8px;
 		}
 
@@ -7419,9 +7422,6 @@ table.preprocessing-test-results {
 .totals-list {
 
 	&:not(.list-table) {
-		position: absolute;
-		left: 0;
-		right: 0;
 		display: flex;
 		height: 100%;
 	}
@@ -7488,12 +7488,6 @@ table.preprocessing-test-results {
 	.host-avail-total {
 		background: $host-avail-total-bg-color;
 	}
-}
-
-#iframe {
-	position: absolute;
-	left: 0;
-	right: 0;
 }
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
