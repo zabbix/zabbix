@@ -1992,7 +1992,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 							}
 							else
 							{
-								/* Did not manage to send the buffer.
+								/* Did not manage to send the buffer. */
 								/* Let's try to resend it in the next active process */
 								/* check instead of attempting to do that immediately */
 								/* until we reach limit of max lines per second. */
