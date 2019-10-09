@@ -309,7 +309,7 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
-				'inventory_mode' => $this->formatHostInventoryMode($host['inventory']),
+				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags'])
 			];
@@ -703,17 +703,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format host inventory mode.
-	 *
-	 * @param array $inventory
-	 *
-	 * @return string
-	 */
-	protected function formatHostInventoryMode(array $data) {
-		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
-	}
-
-	/**
 	 * Format host inventory.
 	 *
 	 * @param array $inventory
@@ -721,7 +710,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostInventory(array $inventory) {
-		unset($inventory['hostid'], $inventory['inventory_mode']);
+		unset($inventory['hostid']);
 
 		return $inventory;
 	}
@@ -782,7 +771,8 @@ class CConfigurationExportBuilder {
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
+				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
+				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
 		}
 
