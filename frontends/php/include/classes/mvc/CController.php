@@ -42,14 +42,14 @@ abstract class CController {
 	/**
 	 * Result of input validation, one of VALIDATION_OK, VALIDATION_ERROR, VALIDATION_FATAL_ERROR.
 	 *
-	 * @var string
+	 * @var int
 	 */
 	private $validationResult;
 
 	/**
 	 * Input parameters retrieved from global $_REQUEST after validation.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $input = [];
 
@@ -218,7 +218,7 @@ abstract class CController {
 	/**
 	 * Return validation result.
 	 *
-	 * @return var
+	 * @return int
 	 */
 	public function getValidationError() {
 		return $this->validationResult;
@@ -227,7 +227,7 @@ abstract class CController {
 	/**
 	 * Check if input parameter exists.
 	 *
-	 * @return var
+	 * @return bool
 	 */
 	public function hasInput($var) {
 		return array_key_exists($var, $this->input);
@@ -263,7 +263,7 @@ abstract class CController {
 	/**
 	 * Return all input parameters.
 	 *
-	 * @return var
+	 * @return array
 	 */
 	public function getInputAll() {
 		return $this->input;

@@ -28,7 +28,8 @@ class CControllerImageEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'imageid'   => 'db images.imageid',
-			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND
+			'imagetype' => 'db images.imagetype | in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND,
+			'name'      => 'db images.name'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -36,25 +37,41 @@ class CControllerImageEdit extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
+		else if (!$this->hasInput('imageid') && !$this->hasInput('imagetype')) {
+			$this->setResponse(new CControllerResponseFatal());
+			$ret = false;
+		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		if (!$this->hasInput('imageid')) {
+			$this->image = [
+				'imageid'   => 0,
+				'imagetype' => $this->getInput('imagetype'),
+				'name'      => $this->getInput('name', '')
+			];
+
+			return true;
+		}
+
+		$images = API::Image()->get(['imageids' => (array) $this->getInput('imageid')]);
+		if (!$images) {
+			return false;
+		}
+
+		$this->image = reset($images);
+
+		return true;
 	}
 
 	protected function doAction() {
-		/* if (!$this->getInput('imageid') && !$this->getInput('imagetype')) { */
-		/* 	$this->setResponse(new CControllerResponseFatal()); */
-		/* } */
-
-
-		$data = [
-			'demo' => __FILE__
-		];
-
-		$response = new CControllerResponseData($data);
+		$response = new CControllerResponseData($this->getInputAll() + $this->image);
 		$response->setTitle(_('Configuration of images'));
 		$this->setResponse($response);
 	}

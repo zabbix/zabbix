@@ -21,35 +21,155 @@
 
 class CControllerImageUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'name'      => 'required | not_empty | db images.name',
+			'imageid'   => 'db images.imageid',
+			'imagetype' => 'required | db images.imagetype'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->getValidationError()) {
+				case self::VALIDATION_ERROR:
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'image.edit')
+						->setArgument('imagetype', $this->getInput('imagetype'));
+
+					if ($this->hasInput('imageid')) {
+						$url->setArgument('imageid', $this->getInput('imageid'));
+					}
+
+					$response = new CControllerResponseRedirect($url);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError($this->hasInput('imageid') ? 'Cannot add image' : 'Cannot create image');
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		if (!$this->hasInput('imageid') || $this->getInput('imageid') == 0) {
+			$this->image = [
+				'imageid'   => 0,
+				'imagetype' => $this->getInput('imagetype'),
+				'name'      => $this->getInput('name', '')
+			];
+
+			return true;
+		}
+
+		$images = API::Image()->get(['imageids' => (array) $this->getInput('imageid')]);
+		if (!$images) {
+			return false;
+		}
+
+		$this->image = reset($images);
+
+		return true;
+	}
+
+	/**
+	 * @param $error string
+	 *
+	 * @return string|null
+	 */
+	protected function uploadImage(&$error) {
+		try {
+			if (array_key_exists('image', $_FILES)) {
+				$file = new CUploadFile($_FILES['image']);
+
+				if ($file->wasUploaded()) {
+					$file->validateImageSize();
+					return base64_encode($file->getContent());
+				}
+
+				return null;
+			}
+			else {
+				return null;
+			}
+		}
+		catch (Exception $e) {
+			$error = $e->getMessage();
+		}
+
+		return null;
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$image = $this->uploadImage($error);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerImageUpdate'));
+		if ($error) {
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.edit')
+				->setArgument('imagetype', $this->getInput('imagetype'));
+
+			if ($this->hasInput('imageid')) {
+				$url->setArgument('imageid', $this->getInput('imageid'));
+			}
+
+			$response = new CControllerResponseRedirect($url);
+			error($error);
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError($this->hasInput('imageid') ? 'Cannot update image' : 'Cannot create image');
+
+			return $this->setResponse($response);
+		}
+
+		if ($this->hasInput('imageid')) {
+			$result = API::Image()->update([
+				'imageid' => $this->getInput('imageid'),
+				'name'    => $this->getInput('name'),
+				'image'   => $image
+			]);
+		}
+		else {
+			$result = API::Image()->create([
+				'imagetype' => $this->getInput('imagetype'),
+				'name'      => $this->getInput('name'),
+				'image'     => $image
+			]);
+		}
+
+		if ($result) {
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, sprintf('Image [%s] %s', $this->hasInput('imageid')
+				? 'added'
+				: 'updated'
+			));
+
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $this->getInput('imagetype'))
+			);
+			$response->setMessageOk($this->getInput('imageid') ? 'Image added' : 'Image created');
+		}
+		else {
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.edit')
+				->setArgument('imagetype', $this->getInput('imagetype'));
+
+			if ($this->hasInput('imageid')) {
+				$url->setArgument('imageid', $this->getInput('imageid'));
+			}
+
+			$response = new CControllerResponseRedirect($url);
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError($this->hasInput('imageid') ? 'Cannot update image' : 'Cannot create image');
+		}
+
 		$this->setResponse($response);
 	}
 }

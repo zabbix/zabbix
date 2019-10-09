@@ -27,6 +27,10 @@ class CControllerResponseRedirect extends CControllerResponse {
 	private $formData = null;
 
 	public function __construct($location) {
+		if ($location instanceof CUrl) {
+			$location = $location->getUrl();
+		}
+
 		$this->location = $location;
 	}
 

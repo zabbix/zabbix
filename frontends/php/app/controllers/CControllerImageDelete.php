@@ -27,7 +27,8 @@ class CControllerImageDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'imageid'   => 'required | db images.imageid',
+			'imagetype' => 'required | db images.imagetype'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +41,41 @@ class CControllerImageDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		$images = API::Image()->get(['imageids' => (array) $this->getInput('imageid')]);
+		if (!$images) {
+			return false;
+		}
+
+		$this->image = reset($images);
+
+		return true;
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$result = API::Image()->delete((array) $this->image['imageid']);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerImageDelete'));
+		if ($result) {
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$this->image['name'].'] deleted');
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $this->getInput('imagetype'))
+				->getUrl()
+			);
+			$response->setMessageOk('Image deleted');
+		}
+		else {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'image.edit')
+				->setArgument('imageid', $this->getInput('imageid'))
+				->getUrl()
+			);
+			$response->setMessageError('Cannot delete image');
+		}
+
 		$this->setResponse($response);
 	}
 }

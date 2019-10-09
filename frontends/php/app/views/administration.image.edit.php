@@ -20,44 +20,43 @@
 
 
 $widget = (new CWidget())
-	->setTitle(_('image.edit :data-demo: '.$data['demo']))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
-					->setArgument('action', 'image.edit')
-					->getUrl()
-				))
-			)
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->setAttribute('aria-label', _('Main filter'))
+		->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
+			->setArgument('action', 'image.list')
+			->getUrl()
 		))
-			->setAttribute('aria-label', _('Content controls'))
 	);
 
-$form = (new CForm('post', null, 'multipart/form-data'))
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->addVar('form', $data['form']);
-if (isset($data['imageid'])) {
-	$smage_form->addVar('imageid', $data['imageid']);
-}
-$form->addVar('imagetype', $data['imagetype']);
+$form = (new CForm('post', (new CUrl('zabbix.php'))
+		->setArgument('action', 'image.update')
+		->getUrl(), 'multipart/form-data')
+	)
+		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+		->addVar('imagetype', $data['imagetype']);
 
-// append form list
-$form_list = (new CFormList('image-form-list'))
+if ($data['imageid'] != 0) {
+	$form->addVar('imageid', $data['imageid']);
+}
+
+$form_list = (new CFormList('imageFormList'))
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['imagename'], false, 64))
+		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
 	)
 	->addRow(
 		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(),
-		(new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CFile('image'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	);
 
-if (isset($data['imageid'])) {
+if ($data['imageid'] != 0) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
 		$form_list->addRow(_('Image'), new CLink(
 			(new CImg('imgstore.php?iconid='.$data['imageid'], 'no image'))->addStyle('max-width:100%;'),
@@ -71,29 +70,36 @@ if (isset($data['imageid'])) {
 	}
 }
 
-// append tab
-$imageTab = (new CTabView())
+$tab_view = (new CTabView())
 	->addTab('imageTab', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $form_list);
 
-// append buttons
-if (isset($data['imageid'])) {
-	$imageTab->setFooter(makeFormFooter(
+if ($data['imageid'] != 0) {
+	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid').
-				url_param($data['imagetype'], false, 'imagetype')
-			),
-			new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))
+			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'image.delete')
+					->setArgument('imageid', $data['imageid'])
+					->setArgument('imagetype', $data['imagetype']),
+				_('Delete selected image?')
+			))->setId('delete'),
+			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $data['imagetype'])
+			))->setId('cancel')
 		]
 	));
 }
 else {
-	$imageTab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))]
+	$tab_view->setFooter(makeFormFooter(
+		new CSubmit(null, _('Add')),
+		[
+			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $data['imagetype'])
+			))->setId('cancel')
+		]
 	));
 }
 
-$form->addItem($imageTab);
-
-$widget->addItem($form)->show();
+$widget->addItem($form->addItem($tab_view))->show();
