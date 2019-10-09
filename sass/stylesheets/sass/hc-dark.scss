@@ -139,32 +139,13 @@ $multiselect-selected-bg-color: #222;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-// DASHBOARD
-.dashbrd-grid-iterator {
-	&.dashbrd-grid-iterator-focus, &:hover {
-		.dashbrd-grid-iterator-head {
-			box-shadow: 0 -6px 8px -2px #000;
-		}
-	}
-}
-
-.dashbrd-grid-widget {
-	&.dashbrd-grid-widget-hidden-header {
-		&.dashbrd-grid-widget-focus, &:hover {
-			.dashbrd-grid-widget-head {
-				box-shadow: 0 -6px 8px -2px #000;
-			}
-		}
-	}
-}
-
-.dashbrd-grid-container.dashbrd-mode-edit {
-	.dashbrd-grid-iterator {
-		.dashbrd-grid-iterator-head {
-			box-shadow: 0 6px 8px -2px #000;
-		}
-	}
-}
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
 
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
@@ -196,11 +177,69 @@ $multiselect-selected-bg-color: #222;
 	}
 }
 
+.dashbrd-grid-widget {
+	&.dashbrd-grid-widget-hidden-header {
+		&.dashbrd-grid-widget-focus {
+			.dashbrd-grid-widget-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus {
+		.dashbrd-grid-iterator-head {
+			box-shadow: 0 -6px 8px -2px #000;
+		}
+	}
+}
+
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-widget {
+		&.ui-draggable-dragging {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					box-shadow: 0 -6px 8px -2px #000;
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px #000;
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		&.ui-draggable-dragging {
+			.dashbrd-grid-iterator-head {
+				box-shadow: 0 -6px 8px -2px #000;
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px #000;
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: none;
+			}
+		}
+	}
+
+	.dashbrd-grid-widget-placeholder > div {
+		background-color: lighten($ui-bg-color, 12%) !important;
+	}
+}
+
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -357px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -361px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -361px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -361px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -361px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -357px -693px
 );
 
@@ -1128,7 +1167,8 @@ td.inactive-bg {
 	background-position: -424px -325px;
 }
 
-.icon-action-msgs {
+.icon-action-msgs,
+.icon-description {
 	&::before {
 		background-position: -474px -325px;
 	}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>4.2</version>
+   <version>4.4</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -18,7 +18,18 @@ JUNIPER-ALARM-MIB&#13;
 JUNIPER-MIB&#13;
 SNMPv2-MIB&#13;
 &#13;
-Template tooling version used: 0.23</description>
+Template tooling version used: 0.32</description>
+         <templates>
+            <template>
+               <name>Template Module EtherLike-MIB SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Generic SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module Interfaces SNMPv2</name>
+            </template>
+         </templates>
          <groups>
             <group>
                <name>Templates/Network devices</name>
@@ -49,33 +60,74 @@ Template tooling version used: 0.23</description>
          </applications>
          <items>
             <item>
+               <name>Hardware model name</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.2636.3.1.2.0</snmp_oid>
+               <key>system.hw.model</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: JUNIPER-MIB&#13;
+The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.</description>
+               <inventory_link>MODEL</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+            </item>
+            <item>
+               <name>Hardware serial number</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>1.3.6.1.4.1.2636.3.1.3.0</snmp_oid>
+               <key>system.hw.serialnumber</key>
+               <delay>1h</delay>
+               <history>2w</history>
+               <trends>0</trends>
+               <value_type>CHAR</value_type>
+               <description>MIB: JUNIPER-MIB&#13;
+The serial number of this subject, blank if unknown or unavailable.</description>
+               <inventory_link>SERIALNO_A</inventory_link>
+               <applications>
+                  <application>
+                     <name>Inventory</name>
+                  </application>
+               </applications>
+               <preprocessing>
+                  <step>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                     <params>1d</params>
+                  </step>
+               </preprocessing>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <recovery_mode>NONE</recovery_mode>
+                     <name>Device has been replaced (new serial number received)</name>
+                     <priority>INFO</priority>
+                     <description>Device serial number has changed. Ack to close</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
+            </item>
+            <item>
                <name>Overall system health status</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.4.1.2636.3.4.2.3.1.0</snmp_oid>
                <key>system.status[jnxRedAlarmState.0]</key>
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
-               <status>0</status>
-               <value_type>3</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <description>MIB: JUNIPER-ALARM-MIB&#13;
 The red alarm indication on the craft interface panel.&#13;
 The red alarm is on when there is some system&#13;
@@ -86,7 +138,6 @@ threshold is being exceeded.&#13;
 This red alarm state could be turned off by the&#13;
 ACO/LT (Alarm Cut Off / Lamp Test) button on the&#13;
 front panel module.</description>
-               <inventory_link>0</inventory_link>
                <applications>
                   <application>
                      <name>Status</name>
@@ -95,463 +146,138 @@ front panel module.</description>
                <valuemap>
                   <name>JUNIPER-ALARM-MIB::jnxRedAlarmState</name>
                </valuemap>
-               <logtimefmt/>
-               <preprocessing/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Hardware serial number</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.2636.3.1.3.0</snmp_oid>
-               <key>system.hw.serialnumber</key>
-               <delay>1h</delay>
-               <history>2w</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>MIB: JUNIPER-MIB&#13;
-The serial number of this subject, blank if unknown or unavailable.</description>
-               <inventory_link>8</inventory_link>
-               <applications>
-                  <application>
-                     <name>Inventory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
-            </item>
-            <item>
-               <name>Hardware model name</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.2636.3.1.2.0</snmp_oid>
-               <key>system.hw.model</key>
-               <delay>1h</delay>
-               <history>2w</history>
-               <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <description>MIB: JUNIPER-MIB&#13;
-The name, model, or detailed description of the box,indicating which product the box is about, for example 'M40'.</description>
-               <inventory_link>29</inventory_link>
-               <applications>
-                  <application>
-                     <name>Inventory</name>
-                  </application>
-               </applications>
-               <valuemap/>
-               <logtimefmt/>
-               <preprocessing>
-                  <step>
-                     <type>20</type>
-                     <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
-                  </step>
-               </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+               <triggers>
+                  <trigger>
+                     <expression>{count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+                     <name>System status is in critical state</name>
+                     <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                     <priority>HIGH</priority>
+                     <description>Please check the device for errors</description>
+                  </trigger>
+               </triggers>
             </item>
             <item>
                <name>Operating system</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>1.3.6.1.2.1.1.1.0</snmp_oid>
-               <key>system.sw.os</key>
+               <key>system.sw.os[sysDescr.0]</key>
                <delay>1h</delay>
                <history>2w</history>
                <trends>0</trends>
-               <status>0</status>
-               <value_type>1</value_type>
-               <allowed_hosts/>
-               <units/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
+               <value_type>CHAR</value_type>
                <description>MIB: SNMPv2-MIB</description>
-               <inventory_link>5</inventory_link>
+               <inventory_link>OS</inventory_link>
                <applications>
                   <application>
                      <name>Inventory</name>
                   </application>
                </applications>
-               <valuemap/>
-               <logtimefmt/>
                <preprocessing>
                   <step>
-                     <type>5</type>
+                     <type>REGEX</type>
                      <params>kernel (JUNOS [0-9a-zA-Z\.\-]+)
 \1</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                   <step>
-                     <type>20</type>
+                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                      <params>1d</params>
-                     <error_handler>0</error_handler>
-                     <error_handler_params/>
                   </step>
                </preprocessing>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <output_format>0</output_format>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <master_item/>
+               <triggers>
+                  <trigger>
+                     <expression>{diff()}=1 and {strlen()}&gt;0</expression>
+                     <recovery_mode>NONE</recovery_mode>
+                     <name>Operating system description has changed</name>
+                     <priority>INFO</priority>
+                     <description>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</description>
+                     <manual_close>YES</manual_close>
+                  </trigger>
+               </triggers>
             </item>
          </items>
          <discovery_rules>
             <discovery_rule>
                <name>CPU and Memory Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5]</snmp_oid>
                <key>jnxOperatingTable.discovery</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
+                  <evaltype>AND_OR</evaltype>
                   <conditions>
                      <condition>
                         <macro>{#SNMPVALUE}</macro>
                         <value>Routing Engine.*</value>
-                        <operator>8</operator>
                         <formulaid>A</formulaid>
                      </condition>
                   </conditions>
                </filter>
-               <lifetime>30d</lifetime>
                <description>Scanning JUNIPER-MIB::jnxOperatingTable for CPU and Memory&#13;
 http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: JUNIPER-MIB&#13;
 The CPU utilization in percentage of this subject. Zero if unavailable or inapplicable.&#13;
 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>CPU</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+                           <name>{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
+                           <opdata>Current utilization: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Memory utilization</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.11.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.pused[jnxOperatingBuffer.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
+                     <key>vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]</key>
+                     <history>7d</history>
+                     <value_type>FLOAT</value_type>
                      <units>%</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: JUNIPER-MIB&#13;
 The buffer pool utilization in percentage of this subject.  Zero if unavailable or inapplicable.&#13;
 Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX%20SNMP%20Monitoring%20Guide_v1.1.pdf</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Memory</name>
                         </application>
                      </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
+                           <name>{#SNMPVALUE}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: High CPU utilization</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:vm.memory.pused[jnxOperatingBuffer.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: High memory utilization</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
                <graph_prototypes>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: CPU utilization</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <ymax_type_1>FIXED</ymax_type_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Net Juniper SNMPv2</host>
                               <key>system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}]</key>
@@ -561,306 +287,40 @@ Reference: http://kb.juniper.net/library/CUSTOMERSERVICE/GLOBAL_JTAC/BK26199/SRX
                   </graph_prototype>
                   <graph_prototype>
                      <name>{#SNMPVALUE}: Memory utilization</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
+                     <ymin_type_1>FIXED</ymin_type_1>
+                     <ymax_type_1>FIXED</ymax_type_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Net Juniper SNMPv2</host>
-                              <key>vm.memory.pused[jnxOperatingBuffer.{#SNMPINDEX}]</key>
+                              <key>vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <host_prototypes/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <lld_macro_paths/>
-               <preprocessing/>
-               <master_item/>
-            </discovery_rule>
-            <discovery_rule>
-               <name>Temperature discovery</name>
-               <type>4</type>
-               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.7,{#SENSOR_INFO},1.3.6.1.4.1.2636.3.1.13.1.5]</snmp_oid>
-               <key>jnxOperatingTable.discovery.temp</key>
-               <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions>
-                     <condition>
-                        <macro>{#SNMPVALUE}</macro>
-                        <value>[^0]+</value>
-                        <operator>8</operator>
-                        <formulaid>A</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature&#13;
-http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>{#SENSOR_INFO}: Temperature</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.7.{#SNMPINDEX}</snmp_oid>
-                     <key>sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
-                     <units>°C</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: JUNIPER-MIB&#13;
-The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Temperature</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item/>
-                  </item_prototype>
-               </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_WARN:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
-                     <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                           <expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                           <recovery_expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
-                     <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>4</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-This trigger uses temperature sensor values as well as temperature sensor status if available</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
-                     <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <lld_macro_paths/>
-               <preprocessing/>
-               <master_item/>
             </discovery_rule>
             <discovery_rule>
                <name>FAN Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5.4]</snmp_oid>
                <key>jnxOperatingTable.discovery.fans</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
                <description>Scanning JUNIPER-MIB::jnxOperatingTable for Fans</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Fan status</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.6.4.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: JUNIPER-MIB</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Fans</name>
@@ -869,138 +329,39 @@ This trigger uses temperature sensor values as well as temperature sensor status
                      <valuemap>
                         <name>JUNIPER-ALARM-MIB::jnxOperatingState</name>
                      </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
+                           <name>{#SNMPVALUE}: Fan is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the fan unit</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}].count(#1,{$FAN_CRIT_STATUS},eq)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: Fan is in critical state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the fan unit</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <lld_macro_paths/>
-               <preprocessing/>
-               <master_item/>
             </discovery_rule>
             <discovery_rule>
                <name>PSU Discovery</name>
-               <type>4</type>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.5.2]</snmp_oid>
                <key>jnxOperatingTable.discovery.psu</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
-               <filter>
-                  <evaltype>0</evaltype>
-                  <formula/>
-                  <conditions/>
-               </filter>
-               <lifetime>30d</lifetime>
                <description>Scanning JUNIPER-MIB::jnxOperatingTable for Power Supplies</description>
                <item_prototypes>
                   <item_prototype>
                      <name>{#SNMPVALUE}: Power supply status</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.6.2.{#SNMPINDEX}</snmp_oid>
                      <key>sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}]</key>
                      <delay>3m</delay>
                      <history>2w</history>
                      <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: JUNIPER-MIB&#13;
 If they are using DC power supplies there is a known issue on PR 1064039 where the fans do not detect the temperature correctly and fail to cool the power supply causing the shutdown to occur.&#13;
 This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK-MX104/m-p/289644#M14122</description>
-                     <inventory_link>0</inventory_link>
                      <applications>
                         <application>
                            <name>Power supply</name>
@@ -1009,79 +370,96 @@ This is fixed in Junos 13.3R7 https://forums.juniper.net/t5/Routing/PEM-0-not-OK
                      <valuemap>
                         <name>JUNIPER-ALARM-MIB::jnxOperatingState</name>
                      </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <timeout>3s</timeout>
-                     <url/>
-                     <query_fields/>
-                     <posts/>
-                     <status_codes>200</status_codes>
-                     <follow_redirects>1</follow_redirects>
-                     <post_type>0</post_type>
-                     <http_proxy/>
-                     <headers/>
-                     <retrieve_mode>0</retrieve_mode>
-                     <request_method>0</request_method>
-                     <output_format>0</output_format>
-                     <allow_traps>0</allow_traps>
-                     <ssl_cert_file/>
-                     <ssl_key_file/>
-                     <ssl_key_password/>
-                     <verify_peer>0</verify_peer>
-                     <verify_host>0</verify_host>
-                     <master_item/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
+                           <name>{#SNMPVALUE}: Power supply is in critical state</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>Please check the power supply unit for errors</description>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Net Juniper SNMPv2:sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}].count(#1,{$PSU_CRIT_STATUS},eq)}=1</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: Power supply is in critical state</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the power supply unit for errors</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
-               <jmx_endpoint/>
-               <timeout>3s</timeout>
-               <url/>
-               <query_fields/>
-               <posts/>
-               <status_codes>200</status_codes>
-               <follow_redirects>1</follow_redirects>
-               <post_type>0</post_type>
-               <http_proxy/>
-               <headers/>
-               <retrieve_mode>0</retrieve_mode>
-               <request_method>0</request_method>
-               <allow_traps>0</allow_traps>
-               <ssl_cert_file/>
-               <ssl_key_file/>
-               <ssl_key_password/>
-               <verify_peer>0</verify_peer>
-               <verify_host>0</verify_host>
-               <lld_macro_paths/>
-               <preprocessing/>
-               <master_item/>
+            </discovery_rule>
+            <discovery_rule>
+               <name>Temperature discovery</name>
+               <type>SNMPV2</type>
+               <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.4.1.2636.3.1.13.1.7,{#SENSOR_INFO},1.3.6.1.4.1.2636.3.1.13.1.5]</snmp_oid>
+               <key>jnxOperatingTable.discovery.temp</key>
+               <delay>1h</delay>
+               <filter>
+                  <evaltype>AND_OR</evaltype>
+                  <conditions>
+                     <condition>
+                        <macro>{#SNMPVALUE}</macro>
+                        <value>[^0]+</value>
+                        <formulaid>A</formulaid>
+                     </condition>
+                  </conditions>
+               </filter>
+               <description>Scanning JUNIPER-MIB::jnxOperatingTable for Temperature&#13;
+http://kb.juniper.net/InfoCenter/index?page=content&amp;id=KB17526&amp;actp=search. Filter limits results to Routing Engines</description>
+               <item_prototypes>
+                  <item_prototype>
+                     <name>{#SENSOR_INFO}: Temperature</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.4.1.2636.3.1.13.1.7.{#SNMPINDEX}</snmp_oid>
+                     <key>sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <value_type>FLOAT</value_type>
+                     <units>°C</units>
+                     <description>MIB: JUNIPER-MIB&#13;
+The temperature in Celsius (degrees C) of {#SENSOR_INFO}</description>
+                     <applications>
+                        <application>
+                           <name>Temperature</name>
+                        </application>
+                     </applications>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_WARN:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_WARN:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above warning threshold: &gt;{$TEMP_WARN:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>WARNING</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                           <dependencies>
+                              <dependency>
+                                 <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                                 <expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                                 <recovery_expression>{Template Net Juniper SNMPv2:sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}].max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                              </dependency>
+                           </dependencies>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&gt;{$TEMP_CRIT:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{max(5m)}&lt;{$TEMP_CRIT:""}-3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is above critical threshold: &gt;{$TEMP_CRIT:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>HIGH</priority>
+                           <description>This trigger uses temperature sensor values as well as temperature sensor status if available</description>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                           <expression>{avg(5m)}&lt;{$TEMP_CRIT_LOW:""}</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{min(5m)}&gt;{$TEMP_CRIT_LOW:""}+3</recovery_expression>
+                           <name>{#SENSOR_INFO}: Temperature is too low: &lt;{$TEMP_CRIT_LOW:""}</name>
+                           <opdata>Current value: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                     </trigger_prototypes>
+                  </item_prototype>
+               </item_prototypes>
             </discovery_rule>
          </discovery_rules>
-         <httptests/>
          <macros>
             <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
+               <macro>{$CPU.UTIL.CRIT}</macro>
                <value>90</value>
             </macro>
             <macro>
@@ -1093,7 +471,7 @@ Please check the power supply unit for errors</description>
                <value>3</value>
             </macro>
             <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
+               <macro>{$MEMORY.UTIL.MAX}</macro>
                <value>90</value>
             </macro>
             <macro>
@@ -1101,12 +479,12 @@ Please check the power supply unit for errors</description>
                <value>6</value>
             </macro>
             <macro>
-               <macro>{$TEMP_CRIT:"Routing Engine"}</macro>
-               <value>80</value>
-            </macro>
-            <macro>
                <macro>{$TEMP_CRIT_LOW}</macro>
                <value>5</value>
+            </macro>
+            <macro>
+               <macro>{$TEMP_CRIT:"Routing Engine"}</macro>
+               <value>80</value>
             </macro>
             <macro>
                <macro>{$TEMP_CRIT}</macro>
@@ -1121,58 +499,8 @@ Please check the power supply unit for errors</description>
                <value>50</value>
             </macro>
          </macros>
-         <templates>
-            <template>
-               <name>Template Module EtherLike-MIB SNMPv2</name>
-            </template>
-            <template>
-               <name>Template Module Generic SNMPv2</name>
-            </template>
-            <template>
-               <name>Template Module Interfaces SNMPv2</name>
-            </template>
-         </templates>
-         <screens/>
-         <tags/>
       </template>
    </templates>
-   <graphs/>
-   <triggers>
-      <trigger>
-         <expression>{Template Net Juniper SNMPv2:system.status[jnxRedAlarmState.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
-         <recovery_mode>0</recovery_mode>
-         <recovery_expression/>
-         <name>System status is in critical state</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>4</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Please check the device for errors</description>
-         <type>0</type>
-         <manual_close>0</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-      <trigger>
-         <expression>{Template Net Juniper SNMPv2:system.hw.serialnumber.diff()}=1 and {Template Net Juniper SNMPv2:system.hw.serialnumber.strlen()}&gt;0</expression>
-         <recovery_mode>2</recovery_mode>
-         <recovery_expression/>
-         <name>Device has been replaced (new serial number received)</name>
-         <correlation_mode>0</correlation_mode>
-         <correlation_tag/>
-         <url/>
-         <status>0</status>
-         <priority>1</priority>
-         <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Device serial number has changed. Ack to close</description>
-         <type>0</type>
-         <manual_close>1</manual_close>
-         <dependencies/>
-         <tags/>
-      </trigger>
-   </triggers>
    <value_maps>
       <value_map>
          <name>JUNIPER-ALARM-MIB::jnxRedAlarmState</name>

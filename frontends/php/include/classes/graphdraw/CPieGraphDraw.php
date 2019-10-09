@@ -231,7 +231,7 @@ class CPieGraphDraw extends CGraphDraw {
 			$items[] = $item;
 		}
 
-		$results = Manager::History()->getGraphAggregation($items, $from_time, $to_time);
+		$results = Manager::History()->getGraphAggregationByWidth($items, $from_time, $to_time);
 		$i = 0;
 
 		foreach ($items as $item) {

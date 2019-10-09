@@ -264,7 +264,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$items[] = $item;
 		}
 
-		$results = Manager::History()->getGraphAggregation($items, $this->from_time, $this->to_time, $x);
+		$results = Manager::History()->getGraphAggregationByWidth($items, $this->from_time, $this->to_time, $x);
 
 		foreach ($items as $item) {
 			if (!array_key_exists($item['itemid'], $this->data)) {

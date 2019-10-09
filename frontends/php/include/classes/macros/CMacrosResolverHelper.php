@@ -295,16 +295,19 @@ class CMacrosResolverHelper {
 	 *
 	 * @static
 	 *
-	 * @param array $triggers
-	 * @param string $triggers[triggerid]['expression']
-	 * @param string $triggers[triggerid]['url']
+	 * @param array  $trigger
+	 * @param string $trigger['triggerid']
+	 * @param string $trigger['expression']
+	 * @param string $trigger['url']
+	 * @param string $trigger['eventid']
+	 * @param string $url
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	public static function resolveTriggerUrls(array $triggers) {
+	public static function resolveTriggerUrl(array $trigger, &$url) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerUrls($triggers);
+		return self::$macrosResolver->resolveTriggerUrl($trigger, $url);
 	}
 
 	/**
@@ -630,5 +633,24 @@ class CMacrosResolverHelper {
 		self::init();
 
 		return self::$macrosResolver->extractMacrosFromPreprocessingSteps($data, $support_lldmacros);
+	}
+
+	/**
+	 * Return associative array of urls with resolved {EVENT.TAGS.*} macro in form
+	 * [<eventid> => ['urls' => [['url' => .. 'name' => ..], ..]]].
+	 *
+	 * @param array  $events                                Array of event tags.
+	 * @param string $events[<eventid>]['tags'][]['tag']    Event tag tag field value.
+	 * @param string $events[<eventid>]['tags'][]['value']  Event tag value field value.
+	 * @param array  $urls                                  Array of mediatype urls.
+	 * @param string $urls[]['event_menu_url']              Media type url field value.
+	 * @param string $urls[]['event_menu_name']             Media type url_name field value.
+	 *
+	 * @return array
+	 */
+	public static function resolveMediaTypeUrls(array $events, array $urls) {
+		self::init();
+
+		return self::$macrosResolver->resolveMediaTypeUrls($events, $urls);
 	}
 }

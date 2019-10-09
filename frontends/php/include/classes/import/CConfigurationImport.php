@@ -80,6 +80,7 @@ class CConfigurationImport {
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
@@ -153,6 +154,7 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+		$this->processMediaTypes();
 
 		return true;
 	}
@@ -752,6 +754,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item[$xml_itemkey])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_itemid = $this->referencer->resolveItem($hostId, $item[$xml_itemkey]['key']);
 
 					if ($master_itemid !== false) {
@@ -957,6 +965,12 @@ class CConfigurationImport {
 				}
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $item['master_item'])) {
+						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$item['master_itemid'] = $this->referencer->resolveItem($hostId,  $item['master_item']['key']);
 				}
 
@@ -1069,6 +1083,12 @@ class CConfigurationImport {
 					}
 
 					if ($prototype['type'] == ITEM_TYPE_DEPENDENT) {
+						if (!array_key_exists('key', $prototype[$xml_item_key])) {
+							throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+								_('cannot be empty')
+							));
+						}
+
 						$master_itemprototypeid = $this->referencer->resolveItem($hostId,
 							$prototype[$xml_item_key]['key']
 						);
@@ -1523,33 +1543,31 @@ class CConfigurationImport {
 				$graph['ymax_itemid'] = $itemId;
 			}
 
-			if (isset($graph['gitems']) && $graph['gitems']) {
-				foreach ($graph['gitems'] as &$gitem) {
-					$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-					$gitem['itemid'] = $gitemHostId
-						? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
-						: false;
+			foreach ($graph['gitems'] as &$gitem) {
+				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				$gitem['itemid'] = $gitemHostId
+					? $this->referencer->resolveItem($gitemHostId, $gitem['item']['key'])
+					: false;
 
-					if (!$gitem['itemid']) {
-						throw new Exception(_s(
-							'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
-							$gitem['item']['key'],
-							$gitem['item']['host'],
-							$graph['name']
-						));
-					}
+				if (!$gitem['itemid']) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used in graph "%3$s".',
+						$gitem['item']['key'],
+						$gitem['item']['host'],
+						$graph['name']
+					));
 				}
-				unset($gitem);
+			}
+			unset($gitem);
 
-				$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
+			$graphId = $this->referencer->resolveGraph($gitemHostId, $graph['name']);
 
-				if ($graphId) {
-					$graph['graphid'] = $graphId;
-					$graphsToUpdate[] = $graph;
-				}
-				else {
-					$graphsToCreate[] = $graph;
-				}
+			if ($graphId) {
+				$graph['graphid'] = $graphId;
+				$graphsToUpdate[] = $graph;
+			}
+			else {
+				$graphsToCreate[] = $graph;
 			}
 		}
 
@@ -1763,6 +1781,50 @@ class CConfigurationImport {
 			);
 			$screenImporter->delete($screens);
 			$screenImporter->import($screens);
+		}
+	}
+
+	/**
+	 * Import media types.
+	 */
+	protected function processMediaTypes() {
+		if (!$this->options['mediaTypes']['updateExisting'] && !$this->options['mediaTypes']['createMissing']) {
+			return;
+		}
+
+		$all_media_types = $this->getFormattedMediaTypes();
+
+		if (!$all_media_types) {
+			return;
+		}
+
+		$all_media_types = zbx_toHash($all_media_types, 'name');
+
+		$db_media_types = API::MediaType()->get([
+			'output' => ['mediatypeid', 'name'],
+			'filter' => ['name' => array_keys($all_media_types)]
+		]);
+		$db_media_types = zbx_toHash($db_media_types, 'name');
+
+		$upd_media_types = [];
+		$new_media_types = [];
+
+		foreach ($all_media_types as $name => $media_type) {
+			if (array_key_exists($name , $db_media_types)) {
+				$media_type['mediatypeid'] = $db_media_types[$name]['mediatypeid'];
+				$upd_media_types[] = $media_type;
+			}
+			else {
+				$new_media_types[] = $media_type;
+			}
+		}
+
+		if ($this->options['mediaTypes']['createMissing'] && $new_media_types) {
+			API::MediaType()->create($new_media_types);
+		}
+
+		if ($this->options['mediaTypes']['updateExisting'] && $upd_media_types) {
+			API::MediaType()->update($upd_media_types);
 		}
 	}
 
@@ -2448,6 +2510,19 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Get formatted media types.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedMediaTypes() {
+		if (!isset($this->formattedData['mediaTypes'])) {
+			$this->formattedData['mediaTypes'] = $this->adapter->getMediaTypes();
+		}
+
+		return $this->formattedData['mediaTypes'];
+	}
+
+	/**
 	 * Get items keys order tree, to ensure that master item will be inserted or updated before any of it dependent
 	 * item. Returns associative array where key is item index and value is item dependency level.
 	 *
@@ -2654,6 +2729,12 @@ class CConfigurationImport {
 				$traversal_path = [$entity['key_']];
 
 				while ($entity && $entity['type'] == ITEM_TYPE_DEPENDENT) {
+					if (!array_key_exists('key', $entity[$master_key_identifier])) {
+						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
+							_('cannot be empty')
+						));
+					}
+
 					$master_key = $entity[$master_key_identifier]['key'];
 
 					if (array_key_exists($host_key, $resolved_masters_cache)

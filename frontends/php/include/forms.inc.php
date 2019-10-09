@@ -1367,6 +1367,28 @@ function getItemPreprocessing(CForm $form, array $preprocessing, $readonly, arra
 					_('<metric name>{<label name>="<label value>", ...} == <value>')
 				);
 				break;
+
+			// ZBX-16642
+			case ZBX_PREPROC_CSV_TO_JSON:
+				$step_param_2_value = (array_key_exists('params', $step) && array_key_exists(2, $step['params']))
+					? $step['params'][2]
+					: ZBX_PREPROC_CSV_NO_HEADER;
+
+				$params = [
+					$step_param_0
+						->setAttribute('placeholder', ',')
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						->setAttribute('maxlength', 1),
+					$step_param_1
+						->setAttribute('placeholder', '"')
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+						->setAttribute('maxlength', 1),
+					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
+						->setLabel(_('With header row'))
+						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
+						->setReadonly($readonly)
+				];
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.

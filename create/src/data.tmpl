@@ -47,9 +47,9 @@ FIELDS|dcheckid|druleid|type|key_        |snmp_community|ports|snmpv3_securityna
 ROW   |2       |2      |9   |system.uname|              |10050|                   |0                   |                     |                     |0   |0                  |0                  |                  |1          |0          |
 
 TABLE |media_type
-FIELDS|mediatypeid|type|name |smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username|passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|content_type|
-ROW   |1          |0   |Email|mail.example.com|example.com|zabbix@example.com|         |          |        |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0           |
-ROW   |3          |2   |SMS  |                |           |                  |         |/dev/ttyS0|        |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0           |
+FIELDS|mediatypeid|type|name |smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username|passwd|status|smtp_port|smtp_security|smtp_verify_peer|smtp_verify_host|smtp_authentication|exec_params|maxsessions|maxattempts|attempt_interval|content_type|script|timeout|process_tags|show_event_menu|event_menu_url|event_menu_name|description|
+ROW   |1          |0   |Email|mail.example.com|example.com|zabbix@example.com|         |          |        |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |0           |      |30s    |0           |1              |              |               |           |
+ROW   |3          |2   |SMS  |                |           |                  |         |/dev/ttyS0|        |      |0     |25       |0            |0               |0               |0                  |           |1          |3          |10s             |1           |      |30s    |0           |1              |              |               |           |
 
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|
@@ -134,8 +134,8 @@ ROW   |3           |hc-light  |FFFFFF         |FFFFFF    |555555   |000000      
 ROW   |4           |hc-dark   |000000         |000000    |666666   |888888       |4F4F4F         |FFFFFF   |FFFFFF        |FFFFFF             |FFFFFF              |333333          |199C0D,F63100,2774A4,F7941D,FC6EA3,6C59DC,C7A72D,BA2A5D,F230E0,5CCD18,BB2A02,AC41A5,89ABF8,7EC25C,3165D5,79A277,AA73DE,FD5434,F21C3E,87AC4D,E89DF4|
 
 TABLE |globalmacro
-FIELDS|globalmacroid|macro            |value |
-ROW   |2            |{$SNMP_COMMUNITY}|public|
+FIELDS|globalmacroid|macro            |value |description|
+ROW   |2            |{$SNMP_COMMUNITY}|public|           |
 
 TABLE |regexps
 FIELDS|regexpid|name                                        |test_string|

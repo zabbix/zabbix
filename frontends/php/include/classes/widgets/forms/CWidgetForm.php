@@ -115,11 +115,11 @@ class CWidgetForm {
 	 */
 	protected static function convertDottedKeys(array $data) {
 		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
+			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', $key, $matches) === 1) {
 				$data[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
 				unset($data[$key]);
 			}
-			elseif (preg_match('/^([a-z]+)\.([a-z]+)\.(\d+)$/', $key, $matches) === 1) {
+			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', $key, $matches) === 1) {
 				$data[$matches[1]][$matches[3]][$matches[2]] = $value;
 				unset($data[$key]);
 			}

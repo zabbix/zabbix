@@ -147,6 +147,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param string $event['name']           Event name.
  * @param string $event['acknowledged']   State of acknowledgement.
  * @param CCOl   $event['opdata']         Operational data with expanded macros.
+ * @param string $event['comments']       Trigger description with expanded macros.
  * @param string $backurl                 A link back after acknowledgement has been clicked.
  *
  * @return CTableInfo
@@ -238,7 +239,9 @@ function make_event_details($event, $backurl) {
 
 	$tags = makeTags([$event]);
 
-	$table->addRow([_('Tags'), $tags[$event['eventid']]]);
+	$table
+		->addRow([_('Tags'), $tags[$event['eventid']]])
+		->addRow([_('Description'), zbx_str2links($event['comments'])]);
 
 	return $table;
 }
@@ -394,7 +397,7 @@ function make_small_eventlist($startEvent, $backurl) {
  *
  * @param array  $trigger                    An array of trigger data.
  * @param string $trigger['triggerid']       Trigger ID to select events.
- * @param string $trigger['description']     Trigger description.
+ * @param string $trigger['comments']        Trigger description.
  * @param string $trigger['url']             Trigger URL.
  * @param string $eventid_till
  * @param string $backurl                    URL to return to.

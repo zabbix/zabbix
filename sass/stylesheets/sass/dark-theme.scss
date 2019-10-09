@@ -198,30 +198,97 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
-// DASHBOARD
-.dashbrd-grid-iterator {
-	&.dashbrd-grid-iterator-focus, &:hover {
-		.dashbrd-grid-iterator-head {
-			box-shadow: inset 0 -12px 8px -8px rgba(0,0,0,.5), 0 -6px 8px -2px rgba(0,0,0,.5);
-		}
-	}
-}
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
 
 .dashbrd-grid-widget {
 	&.dashbrd-grid-widget-hidden-header {
-		&.dashbrd-grid-widget-focus, &:hover {
+		&.dashbrd-grid-widget-focus {
 			.dashbrd-grid-widget-head {
-				box-shadow: 0 -6px 8px -2px rgba(0,0,0,.5);
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 			}
 		}
 	}
 }
 
-.dashbrd-grid-container.dashbrd-mode-edit {
-	.dashbrd-grid-iterator {
+.dashbrd-grid-iterator {
+	&.dashbrd-grid-iterator-focus {
 		.dashbrd-grid-iterator-head {
-			box-shadow: 0 6px 8px -2px rgba(0,0,0,.5);
+			box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
 		}
+	}
+}
+
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-widget {
+		&.ui-draggable-dragging {
+			&.dashbrd-grid-widget-hidden-header {
+				.dashbrd-grid-widget-head {
+					box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+				}
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashbrd-grid-widget-head {
+				border-color: $ui-border-color;
+			}
+
+			.dashbrd-grid-widget-content {
+				border-color: $ui-border-color;
+			}
+		}
+	}
+
+	.dashbrd-grid-iterator {
+		&.ui-draggable-dragging {
+			.dashbrd-grid-iterator-head {
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+			}
+		}
+
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashbrd-grid-iterator-head {
+				border-color: $ui-border-color;
+			}
+
+			.dashbrd-grid-iterator-content {
+				.dashbrd-grid-widget {
+					.dashbrd-grid-widget-head {
+						border-color: $ui-border-color;
+					}
+
+					.dashbrd-grid-widget-content {
+						border-color: $ui-border-color;
+					}
+				}
+
+				.dashbrd-grid-iterator-placeholder > div {
+					border-color: $ui-border-color;
+				}
+			}
+
+			.dashbrd-grid-iterator-mask {
+				border: none;
+			}
+		}
+	}
+
+	.dashbrd-grid-widget-placeholder > div {
+		background-color: darken($ui-bg-color, 3%) !important;
 	}
 }
 
@@ -279,6 +346,10 @@ $multiselect-selected-bg-color: #696969;
 	&[data-count]::after {
 		color: $font-selected-color;
 	}
+}
+
+.icon-description::after {
+	color: $font-selected-color;
 }
 
 .totals-list {

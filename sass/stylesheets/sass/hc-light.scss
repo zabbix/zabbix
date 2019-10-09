@@ -137,7 +137,14 @@ $multiselect-selected-bg-color: #777;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
-// DASHBOARD
+/*
+ * Dashboard, widgets and iterators.
+ *
+ * To maintain code clarity:
+ *   - Do not mix rules for dashboard view mode and dashboard edit mode.
+ *   - Do not mix rules for widgets and iterators.
+ */
+
 .dashbrd-grid-new-widget-placeholder {
 	.dashbrd-grid-widget-new-box,
 	.dashbrd-grid-widget-set-position,
@@ -167,11 +174,21 @@ $multiselect-selected-bg-color: #777;
 	}
 }
 
+.dashbrd-grid-container.dashbrd-mode-edit {
+	.dashbrd-grid-iterator {
+		&.ui-resizable-resizing, &.ui-draggable-dragging {
+			.dashbrd-grid-iterator-mask {
+				border: none;
+			}
+		}
+	}
+}
+
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
 );
 
@@ -1042,7 +1059,8 @@ td.inactive-bg {
 	background-position: -424px -285px;
 }
 
-.icon-action-msgs {
+.icon-action-msgs,
+.icon-description {
 	&::before {
 		background-position: -474px -285px;
 	}

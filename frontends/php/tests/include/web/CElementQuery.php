@@ -433,7 +433,12 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			return $target->one()->isVisible();
+			$element = $target->one(false);
+			if ($element === null) {
+				return false;
+			}
+
+			return $element->isVisible();
 		};
 	}
 

@@ -34,7 +34,7 @@ class C20TriggerConverter extends CConverter {
 	/**
 	 * A parser for LLD macros.
 	 *
-	 * @var CMacroParser
+	 * @var CLLDMacroParser
 	 */
 	protected $lld_macro_parser;
 

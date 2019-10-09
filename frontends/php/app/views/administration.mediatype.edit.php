@@ -20,6 +20,7 @@
 
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
+$this->addJsFile('multilineinput.js');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 
@@ -137,6 +138,57 @@ else {
 	$passwd_field = (new CPassBox('passwd', $data['passwd']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
+// MEDIA_TYPE_WEBHOOK
+$parameters_table = (new CTable())
+	->setId('parameters_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+foreach ($data['parameters'] as $parameter) {
+	$parameters_table->addRow([
+		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', $parameter['value'], false,
+			DB::getFieldLength('media_type_param', 'value')
+		))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]);
+}
+
+$row_template = (new CTag('script', true))
+	->setId('parameters_row')
+	->setAttribute('type', 'text/x-jquery-tmpl')
+	->addItem(new CRow([
+		(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]));
+
+$widget->addItem($row_template);
+
+$parameters_table->addRow([(new CButton('parameter_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
 // append password field to form list
 $mediatype_formlist
 	->addRow(new CLabel(_('Password'), 'passwd'), $passwd_field)
@@ -145,6 +197,62 @@ $mediatype_formlist
 			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
+	)
+	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'row_webhook_parameters'
+	)
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['script'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => DB::getFieldLength('media_type', 'script')
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'row_webhook_script'
+	)
+	->addRow(new CLabel(_('Timeout'), 'timeout'),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'row_webhook_timeout'
+	)
+	->addRow(new CLabel(_('Process tags'), 'process_tags'),
+		(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
+			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+			->setUncheckedValue(ZBX_MEDIA_TYPE_TAGS_DISABLED),
+		'row_webhook_tags'
+	)
+	->addRow(new CLabel(_('Include event menu entry'), 'show_event_menu'),
+		(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
+			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setUncheckedValue(ZBX_EVENT_MENU_HIDE),
+		'row_webhook_show_event_menu'
+	)
+	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))->setAsteriskMark(),
+		(new CTextBox('event_menu_name', $data['event_menu_name'], false,
+			DB::getFieldLength('media_type', 'event_menu_name')
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setAriaRequired(),
+		'row_webhook_url_name'
+	)
+	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))->setAsteriskMark(),
+		(new CTextBox('event_menu_url', $data['event_menu_url'], false,
+			DB::getFieldLength('media_type', 'event_menu_url')
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setAriaRequired(),
+		'row_webhook_event_menu_url'
+	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)

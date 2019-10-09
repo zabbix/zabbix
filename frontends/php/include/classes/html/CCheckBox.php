@@ -39,6 +39,34 @@ class CCheckBox extends CInput {
 	private $label = '';
 
 	/**
+	 * Checkbox name.
+	 *
+	 * @var string
+	 */
+	private $name = '';
+
+	/**
+	 * Checkbox value.
+	 *
+	 * @var string
+	 */
+	private $value = '';
+
+	/**
+	 * Readonly state of checkbox which means it is disabled, but can have a hidden field.
+	 *
+	 * @var bool
+	 */
+	private $readonly = false;
+
+	/**
+	 * Checked or unchecked state of checkbox.
+	 *
+	 * @var bool
+	 */
+	private $checked = false;
+
+	/**
 	 * Checkbox label position (LABEL_POSITION_LEFT or LABEL_POSITION_RIGHT).
 	 *
 	 * @var int
@@ -46,7 +74,11 @@ class CCheckBox extends CInput {
 	private $label_position = self::LABEL_POSITION_RIGHT;
 
 	public function __construct($name = 'checkbox', $value = '1') {
-		parent::__construct('checkbox', $name, $value);
+		$this->name = $name;
+		$this->value = $value;
+
+		parent::__construct('checkbox', $this->name, $this->value);
+
 		$this->setChecked(false);
 		$this->addClass(ZBX_STYLE_CHECKBOX_RADIO);
 	}
@@ -59,7 +91,9 @@ class CCheckBox extends CInput {
 	 * @return CCheckBox
 	 */
 	public function setChecked($checked) {
-		if ($checked) {
+		$this->checked = $checked;
+
+		if ($this->checked) {
 			$this->attributes['checked'] = 'checked';
 		}
 		else {
@@ -123,6 +157,19 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
+	/**
+	 * Set checkbox as read only.
+	 *
+	 * @param bool $readonly  If true, set checkbox as read only, add hidden field depending in "checked" state.
+	 *
+	 * @return CCheckBox
+	 */
+	public function setReadonly($readonly) {
+		$this->readonly = $readonly;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
 		$elements = ($this->label_position === self::LABEL_POSITION_LEFT)
 			? [$this->label, new CSpan()]
@@ -131,6 +178,20 @@ class CCheckBox extends CInput {
 		$label = (new CLabel($elements, $this->getId()))
 			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
 
-		return parent::toString($destroy).($label->toString(true));
+		/*
+		 * Create only hidden fields for enabled readonly and checked elements. Once set unchecked value is properly
+		 * implemented, this code will change.
+		 */
+		$hidden = '';
+		if ($this->readonly && $this->enabled && $this->checked) {
+			$hidden = (new CVar($this->getName(), $this->value, $this->getId()))
+				->setEnabled(true)
+				->toString();
+			$this->removeId();
+		}
+
+		$this->setEnabled($this->enabled && !$this->readonly);
+
+		return $hidden.parent::toString($destroy).$label->toString();
 	}
 }

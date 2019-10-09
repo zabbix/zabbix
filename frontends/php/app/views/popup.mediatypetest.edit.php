@@ -19,28 +19,49 @@
 **/
 
 
-$form_list = (new CFormList())
-	->addRow(
-		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
-		(new CTextBox('sendto', $data['sendto'], false, 1024))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired()
-			->setEnabled($data['enabled'])
-	)
-	->addRow(
-		new CLabel(_('Subject'), 'subject'),
-		(new CTextBox('subject', $data['subject'], false, 1024))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setEnabled($data['enabled'])
-	)
-	->addRow(
-		(new CLabel(_('Message'), 'message'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
-		(new CTextArea('message', $data['message'], ['rows' => 10]))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
-			->setEnabled($data['enabled'])
-	);
+$form_list = (new CFormList());
+
+if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
+	$i = 0;
+
+	foreach ($data['parameters'] as $parameter) {
+		$fieldid = 'parameters['.$i.']';
+		$form_list
+			->addRow(new CLabel($parameter['name'], $fieldid.'[value]'), [
+				new CVar($fieldid.'[name]', $parameter['name']),
+				(new CTextBox($fieldid.'[value]', $parameter['value']))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			]);
+		$i++;
+	}
+
+	if (!$i) {
+		$form_list->addRow(_('Webhook does not have parameters.'));
+	}
+}
+else {
+	$form_list
+		->addRow(
+			(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
+			(new CTextBox('sendto', $data['sendto'], false, 1024))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+				->setAriaRequired()
+				->setEnabled($data['enabled'])
+		)
+		->addRow(
+			new CLabel(_('Subject'), 'subject'),
+			(new CTextBox('subject', $data['subject'], false, 1024))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setEnabled($data['enabled'])
+		)
+		->addRow(
+			(new CLabel(_('Message'), 'message'))->setAsteriskMark($data['type'] != MEDIA_TYPE_EXEC),
+			(new CTextArea('message', $data['message'], ['rows' => 10]))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAriaRequired($data['type'] != MEDIA_TYPE_EXEC)
+				->setEnabled($data['enabled'])
+		);
+}
 
 $form = (new CForm())
 	->cleanItems()
