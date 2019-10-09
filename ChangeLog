@@ -1,10 +1,27 @@
+Changes for 4.0.14rc1
+
+New features:
+.......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
+
+Bug fixes:
+........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
+.........T [ZBX-15897] fixed overall health check in Template HP iLO SNMPv2 (vitaly)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.13
+
+4.0.13rc1 was released as 4.0.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.13rc1
 
 New features:
+...G...... [ZBXNEXT-1287] added support for English performance counters on Windows (kalimulin)
 A......... [ZBX-3783] added strict validation of input parameters in valuemap.get() method (Sasha)
 .......PS. [ZBXNEXT-4920] increased received packet size to 1GB (akozlovs)
 
 Bug fixes:
+.......PS. [ZBX-13266] fixed performance of sql query with lots of items (MVekslers)
 .......... [ZBX-16089] fixed Windows socket initialization in Windows sender sample application (atumilovics)
 ..F....... [ZBX-16228] increased max length to 2000 characters for values of the headers of the http agents (averza)
 ..F....... [ZBX-16480] fixed error in graphs after page refresh if period was set to future (averza)

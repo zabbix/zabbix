@@ -66,7 +66,7 @@ class CAPIHelper {
 
 		$params = [
 			'http' => [
-				'method' => 'post',
+				'method' => 'POST',
 				'content' => $data,
 				'header' => [
 					'Content-type: application/json-rpc',
