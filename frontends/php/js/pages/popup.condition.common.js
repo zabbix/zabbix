@@ -34,10 +34,11 @@ function submitConditionPopup(response) {
 			if (Array.isArray(inputs[i])) {
 				for (var j in inputs[i]) {
 					if (inputs[i].hasOwnProperty(j)) {
-						create_var(form_name, input_name +  '[' + i + ']' +  '[' + j + ']', inputs[i][j], false);
+						create_var(form_name, input_name + '[' + i + ']' + '[' + j + ']', inputs[i][j], false);
 					}
 				}
-			} else {
+			}
+			else {
 				create_var(form_name, input_name + '[' + i + ']', inputs[i], false);
 			}
 		}
