@@ -8,3 +8,4 @@ libzbxsys_a_SOURCES = \
 
 EXTRA_DIST = \
 	symbols.c
+
