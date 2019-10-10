@@ -887,7 +887,13 @@ jQuery(function($) {
 			));
 
 		if (objectLength(ms.values.available) > 0) {
-			available_width = Math.max(available_width, 300);
+			available_width_min = Math.max(available_width, 300);
+
+			// Prevent less than 15% width difference for the available list and the input field.
+			if ((available_width_min - available_width) / available_width > .15) {
+				available_width = available_width_min;
+			}
+
 			available_left = Math.min(available_left, $(window).width() + $(window).scrollLeft() - available_width);
 			if (available_left < 0) {
 				available_width += available_left;
