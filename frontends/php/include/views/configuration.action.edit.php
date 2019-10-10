@@ -125,7 +125,7 @@ $action_tab->addRow(_('Type of calculation'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.action.condition",'.CJs::encodeJson([
+		->onClick('return PopUp("popup.action.condition.edit",'.CJs::encodeJson([
 			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' => $data['eventsource']
 		]).', null, this);')
@@ -897,7 +897,7 @@ if (!empty($data['new_operation'])) {
 
 		$operationConditionsTable->addRow([
 			(new CSimpleButton(_('Add')))
-				->onClick('return PopUp("popup.operation.condition",'.CJs::encodeJson([
+				->onClick('return PopUp("popup.operation.condition.edit",'.CJs::encodeJson([
 					'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 					'source' => $data['eventsource']
 				]).', null, this);')

@@ -45,7 +45,7 @@ switch ($data['type']) {
 		$condition_type_combobox = new CComboBox(
 			'condition_type',
 			$condition_type,
-			"reloadPopup(this.form, 'popup.event.condition');",
+			"reloadPopup(this.form, 'popup.event.condition.edit');",
 			corrConditionTypes()
 		);
 
@@ -154,7 +154,7 @@ switch ($data['type']) {
 		$action_condition_type_combobox = new CComboBox(
 			'condition_type',
 			$condition_type,
-			"reloadPopup(this.form, 'popup.action.condition');",
+			"reloadPopup(this.form, 'popup.action.condition.edit');",
 			$action_condition_options
 		);
 
@@ -630,7 +630,7 @@ switch ($data['type']) {
 		$opcondition_type_combobox = new CComboBox(
 			'condition_type',
 			$condition_type,
-			"reloadPopup(this.form, 'popup.operation.condition');",
+			"reloadPopup(this.form, 'popup.operation.condition.edit');",
 			$combobox_options
 		);
 
