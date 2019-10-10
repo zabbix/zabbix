@@ -615,7 +615,7 @@ class CItem extends CItemGeneral {
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
-				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE) {
+				if (item['authtype'] == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
