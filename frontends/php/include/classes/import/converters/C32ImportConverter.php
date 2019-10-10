@@ -92,24 +92,24 @@ class C32ImportConverter extends CConverter {
 						break;
 				}
 
-				$item['preprocessing'][] = ['type' => $type, 'params' => ''];
+				$item['preprocessing'][] = ['type' => (string) $type, 'params' => ''];
 			}
 
 			if ($item['delta'] == 1) {
-				$item['preprocessing'][] = ['type' => ZBX_PREPROC_DELTA_SPEED, 'params' => ''];
+				$item['preprocessing'][] = ['type' => (string) ZBX_PREPROC_DELTA_SPEED, 'params' => ''];
 			}
 			elseif ($item['delta'] == 2) {
-				$item['preprocessing'][] = ['type' => ZBX_PREPROC_DELTA_VALUE, 'params' => ''];
+				$item['preprocessing'][] = ['type' => (string) ZBX_PREPROC_DELTA_VALUE, 'params' => ''];
 			}
 
 			if ($item['multiplier'] == 1) {
-				$item['preprocessing'][] = ['type' => ZBX_PREPROC_MULTIPLIER, 'params' => $item['formula']];
+				$item['preprocessing'][] = ['type' => (string) ZBX_PREPROC_MULTIPLIER, 'params' => $item['formula']];
 			}
 
 			unset($item['data_type'], $item['delta'], $item['multiplier'], $item['formula']);
 
 			if (!$item['preprocessing']) {
-				unset($item['preprocessing']);
+				$item['preprocessing'] = '';
 			}
 
 			// Merge delay_flex into delay separated by a semicolon.
@@ -180,10 +180,10 @@ class C32ImportConverter extends CConverter {
 	 */
 	protected function convertMaps(array $maps) {
 		$default_shape = [
-			'type' => SYSMAP_SHAPE_TYPE_RECTANGLE,
+			'type' => (string) SYSMAP_SHAPE_TYPE_RECTANGLE,
 			'x' => DB::getDefault('sysmap_shape', 'x'),
 			'y' => DB::getDefault('sysmap_shape', 'y'),
-			'height' => 15,
+			'height' => '15',
 			'text' => '{MAP.NAME}',
 			'font' => DB::getDefault('sysmap_shape', 'font'),
 			'font_size' => DB::getDefault('sysmap_shape', 'font_size'),

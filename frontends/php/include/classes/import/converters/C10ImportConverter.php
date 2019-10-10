@@ -140,7 +140,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($content['hosts'] as &$host) {
-			$host = CArrayHelper::renameKeys($host, ['name' => 'host']);
+			$host['host'] = $host['name'];
 			$host = $this->convertHostInterfaces($host);
 			$host = $this->convertHostProfiles($host);
 			$host = $this->convertHostApplications($host);
@@ -148,10 +148,12 @@ class C10ImportConverter extends CConverter {
 			$host = $this->convertHostTriggers($host, $host['host']);
 			$host = $this->convertHostGraphs($host, $host['host']);
 			$host = $this->convertHostMacros($host);
+			$host = $this->convertProxy($host);
 
 			$host = $this->wrapChildren($host, 'templates', 'name');
 			$host = $this->wrapChildren($host, 'groups', 'name');
 
+			unset($host['useipmi']);
 			unset($host['useip']);
 			unset($host['ip']);
 			unset($host['dns']);
@@ -188,7 +190,8 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($content['templates'] as &$template) {
-			$template = CArrayHelper::renameKeys($template, ['name' => 'template']);
+			$template['template'] = $template['name'];
+			$template = $this->convertTemplateItem($template);
 			$template = $this->convertHostApplications($template);
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
@@ -226,12 +229,12 @@ class C10ImportConverter extends CConverter {
 		// create an agent interface from the host properties
 		if (isset($host['useip']) && isset($host['ip']) && isset($host['dns']) && isset($host['port'])) {
 			$agentInterface = [
-				'type' => INTERFACE_TYPE_AGENT,
+				'type' => (string) INTERFACE_TYPE_AGENT,
 				'useip' => $host['useip'],
 				'ip' => $host['ip'],
 				'dns' => $host['dns'],
 				'port' => $host['port'],
-				'default' => INTERFACE_PRIMARY,
+				'default' => (string) INTERFACE_PRIMARY,
 				'interface_ref' => 'if'.$i
 			];
 			$interfaces[] = $agentInterface;
@@ -259,14 +262,14 @@ class C10ImportConverter extends CConverter {
 			// if a least one IPMI item exists on a host, create an IPMI interface
 			if ($hasIpmiItem) {
 				$ipmiInterface = [
-					'type' => INTERFACE_TYPE_IPMI,
-					'useip' => INTERFACE_USE_IP,
+					'type' => (string) INTERFACE_TYPE_IPMI,
+					'useip' => (string) INTERFACE_USE_IP,
 					'ip' => (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '')
 						? $host['ipmi_ip'] : $host['ip'],
 					'dns' => '',
 					'port' => (array_key_exists('ipmi_port', $host) && $host['ipmi_port'] !== '')
 						? $host['ipmi_port'] : '623',
-					'default' => INTERFACE_PRIMARY,
+					'default' => (string) INTERFACE_PRIMARY,
 					'interface_ref' => 'if'.$i
 				];
 				$interfaces[] = $ipmiInterface;
@@ -282,12 +285,12 @@ class C10ImportConverter extends CConverter {
 					}
 
 					$snmpInterface = [
-						'type' => INTERFACE_TYPE_SNMP,
+						'type' => (string) INTERFACE_TYPE_SNMP,
 						'useip' => $host['useip'],
 						'ip' => $host['ip'],
 						'dns' => $host['dns'],
 						'port' => $item['snmp_port'],
-						'default' => (count($snmpInterfaces)) ? INTERFACE_SECONDARY : INTERFACE_PRIMARY,
+						'default' => (count($snmpInterfaces)) ? (string) INTERFACE_SECONDARY : (string) INTERFACE_PRIMARY,
 						'interface_ref' => 'if'.$i
 					];
 					$snmpInterfaces[$item['snmp_port']] = $snmpInterface;
@@ -326,6 +329,8 @@ class C10ImportConverter extends CConverter {
 
 						break;
 				}
+
+				unset($item['snmp_port']);
 			}
 			unset($item);
 		}
@@ -341,14 +346,14 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostProfiles(array $host) {
-		$host['inventory'] = ['inventory_mode' => HOST_INVENTORY_DISABLED];
+		$host['inventory'] = ['inventory_mode' => (string) HOST_INVENTORY_DISABLED];
 
 		// rename and merge profile fields
 		if (array_key_exists('host_profile', $host)) {
 			foreach ($host['host_profile'] as $key => $value) {
 				$host['inventory'][$this->getNewProfileName($key)] = $value;
 			}
-			$host['inventory']['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			$host['inventory']['inventory_mode'] = (string) HOST_INVENTORY_MANUAL;
 		}
 
 		if (array_key_exists('host_profiles_ext', $host)) {
@@ -364,7 +369,7 @@ class C10ImportConverter extends CConverter {
 					$host['inventory'][$key] = $value;
 				}
 			}
-			$host['inventory']['inventory_mode'] = HOST_INVENTORY_MANUAL;
+			$host['inventory']['inventory_mode'] = (string) HOST_INVENTORY_MANUAL;
 		}
 
 		return $host;
@@ -652,12 +657,21 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['items'] as &$item) {
-			$item = CArrayHelper::renameKeys($item, ['description' => 'name']);
+			$item = CArrayHelper::renameKeys($item, ['trapper_hosts' => 'allowed_hosts']);
+			$item['name'] = $item['description'];
 
 			// convert simple check keys
 			$item['key'] = $this->itemKeyConverter->convert($item['key']);
 
 			$item = $this->wrapChildren($item, 'applications', 'name');
+
+			$item = $this->convertItemValueMap($item);
+
+			// Add tag inventory_link.
+			$item['inventory_link'] = '';
+			$item['snmpv3_contextname'] = '';
+			$item['snmpv3_authprotocol'] = '';
+			$item['snmpv3_privprotocol'] = '';
 
 			unset($item['lastlogsize']);
 		}
@@ -691,16 +705,14 @@ class C10ImportConverter extends CConverter {
 			$graph = $this->convertGraphItemReference($graph, 'ymin_item_1');
 			$graph = $this->convertGraphItemReference($graph, 'ymax_item_1');
 
-			if ($graph['type'] == GRAPH_TYPE_NORMAL || $graph['type'] == GRAPH_TYPE_STACKED) {
-				unset($graph['show_legend']);
-			}
-
 			foreach ($graph['graph_items'] as &$graphItem) {
 				$graphItem = $this->convertGraphItemReference($graphItem, 'item', $hostName);
 
 				unset($graphItem['periods_cnt']);
 			}
 			unset($graphItem);
+
+			$graph['graph_items'] = array_values($graph['graph_items']);
 		}
 		unset($graph);
 
@@ -721,8 +733,6 @@ class C10ImportConverter extends CConverter {
 			$array[$key] = [];
 		}
 		else {
-			$colon_pos = strpos($array[$key], ':');
-
 			list ($host, $item_key) = explode(':', $array[$key], 2);
 
 			// replace host macros with the host name
@@ -850,6 +860,10 @@ class C10ImportConverter extends CConverter {
 				unset($link);
 			}
 
+			if (!array_key_exists('backgroundid', $map)) {
+				$map['backgroundid'] = '';
+			}
+
 			$map = CArrayHelper::renameKeys($map, ['backgroundid' => 'background']);
 		}
 		unset($map);
@@ -879,8 +893,12 @@ class C10ImportConverter extends CConverter {
 					if (isset($screenItem['resource']) && $screenItem['resource'] !== '0') {
 						$screenItem['resource'] = CArrayHelper::renameKeys($screenItem['resource'], ['key_' => 'key']);
 					}
+
+					$screenItem['sort_triggers'] = '';
 				}
 				unset($screenItem);
+
+				$screen['screen_items'] = array_values($screen['screen_items']);
 			}
 		}
 		unset($screen);
@@ -936,5 +954,58 @@ class C10ImportConverter extends CConverter {
 		}
 
 		return $array;
+	}
+
+	/**
+	 * Convert old proxy format to new proxy format.
+	 *
+	 * @param array $host  Import data.
+	 *
+	 * @return array
+	 */
+	protected function convertProxy(array $host) {
+		if (!array_key_exists('proxy_hostid', $host)) {
+			$host['proxy_hostid'] = '';
+		}
+
+		$host['proxy']['name'] = $host['proxy_hostid'];
+		unset($host['proxy_hostid']);
+
+		return $host;
+	}
+
+	/**
+	 * Convert valuemap for items.
+	 *
+	 * @param array $item  Import data.
+	 *
+	 * @return array
+	 */
+	protected function convertItemValueMap(array $item) {
+		$item['valuemap'] = [];
+		if (array_key_exists('valuemapid', $item)) {
+			$item['valuemap']['name'] = $item['valuemapid'];
+			unset($item['valuemapid']);
+		}
+
+		return $item;
+	}
+
+	/**
+	 * Add new tag port to template items.
+	 *
+	 * @param array $template  Import data.
+	 *
+	 * @return array
+	 */
+	protected function convertTemplateItem(array $template) {
+		if (array_key_exists('items', $template)) {
+			foreach ($template['items'] as &$item) {
+				$item['port'] = '';
+				unset($item['snmp_port']);
+			}
+		}
+
+		return $template;
 	}
 }

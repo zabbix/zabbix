@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 The template to monitor Apache HTTPD by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 `Template App Apache by HTTP` - (Zabbix version >= 4.2) - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
@@ -81,10 +81,10 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|10|
-|{$APACHE.STATUS.PATH}|<p>The URL path</p>|server-status?auto|
-|{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|80|
-|{$APACHE.STATUS.SCHEME}|<p>Request scheme which may be http or https</p>|http|
+|{$APACHE.RESPONSE_TIME.MAX.WARN}|<p>Maximum Apache response time in seconds for trigger expression</p>|`10`|
+|{$APACHE.STATUS.PATH}|<p>The URL path</p>|`server-status?auto`|
+|{$APACHE.STATUS.PORT}|<p>The port of Apache status page</p>|`80`|
+|{$APACHE.STATUS.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 
 ## Template links
 
@@ -103,7 +103,7 @@ There are no template links in this template.
 |Apache|Apache: Service ping|<p>-</p>|SIMPLE|net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p>|
 |Apache|Apache: Service response time|<p>-</p>|SIMPLE|net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]|
 |Apache|Apache: Total bytes|<p>Total bytes served</p>|DEPENDENT|apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p>|
-|Apache|Apache: Bytes per second||DEPENDENT|apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND|
+|Apache|Apache: Bytes per second|<p>Calculated as change rate for 'Total bytes' stat.</p><p>BytesPerSec is not used, as it counts average since last Apache server start.</p>|DEPENDENT|apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND|
 |Apache|Apache: Requests per second|<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p>|DEPENDENT|apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND|
 |Apache|Apache: Total requests|<p>A total number of accesses</p>|DEPENDENT|apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p>|
 |Apache|Apache: Uptime|<p>Service uptime in seconds</p>|DEPENDENT|apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p>|
@@ -127,17 +127,17 @@ There are no template links in this template.
 |Apache|Apache: Connections total|<p>Number of total connections</p>|DEPENDENT|apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p>|
 |Apache|Apache: Bytes per request|<p>Average number of client requests per second</p>|DEPENDENT|apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p>|
 |Apache|Apache: Number of async processes|<p>Number of async processes</p>|DEPENDENT|apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p>|
-|Zabbix_raw_items|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page</p>|HTTP_AGENT|apache.get_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } } // For versions without "ServerUptimeSeconds" metric output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime   // Parse "Scoreboard" to get worker count. if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string return JSON.stringify(output);`</p>|
+|Zabbix_raw_items|Apache: Get status|<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p>|HTTP_AGENT|apache.get_status<p>**Preprocessing**:</p><p>- JAVASCRIPT: `// Convert Apache status to JSON var lines = value.split("\n"); var fields = {},     output = {},     workers = {         "_": 0, "S": 0, "R": 0,         "W": 0, "K": 0, "D": 0,         "C": 0, "L": 0, "G": 0,         "I": 0, ".": 0     }; // Get all "Key: Value" pairs as an object for (var i = 0; i < lines.length; i++) {     var line = lines[i].match(/([A-z0-9 ]+): (.*)/);     if (line !== null) {         output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);     } } // For versions without "ServerUptimeSeconds" metric output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime   // Parse "Scoreboard" to get worker count. if (typeof output.Scoreboard === 'string') {     for (var i = 0; i < output.Scoreboard.length; i++) {         var char = output.Scoreboard[i];         workers[char]++;     } }   // Add worker data to the output output.Workers = {     waiting: workers["_"], starting: workers["S"], reading: workers["R"],     sending: workers["W"], keepalive: workers["K"], dnslookup: workers["D"],     closing: workers["C"], logging: workers["L"], finishing: workers["G"],     cleanup: workers["I"], slot: workers["."] };   // Return JSON string return JSON.stringify(output);`</p>|
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Apache: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
-|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
-|Apache: has been restarted (uptime < 10m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The Apache uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:apache.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
-|Apache: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Apache version has changed. Ack to close.</p>|`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
-|Apache: Failed to fetch status page (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
+|Apache: Service is down|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p>|
+|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"].min(5m)}>{$APACHE.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
+|Apache: has been restarted (uptime < 10m)|<p>Uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:apache.uptime.last()}<10m`|INFO|<p>Manual close: YES</p>|
+|Apache: Version has changed (new version: {ITEM.VALUE})|<p>Apache version has changed. Ack to close.</p>|`{TEMPLATE_NAME:apache.version.diff()}=1 and {TEMPLATE_NAME:apache.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|Apache: Failed to fetch status page (or no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:apache.get_status.nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p>|
 
 ## Feedback
 

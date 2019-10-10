@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 4.2  
+For Zabbix version: 4.4  
 The template to monitor Nginx by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -51,11 +51,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for trigger expression.</p>|1|
-|{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The Nginx maximum response time in seconds for trigger expression.</p>|10|
-|{$NGINX.STUB_STATUS.HOST}|<p>Hostname or IP of Nginx stub_status host or container.</p>|localhost|
-|{$NGINX.STUB_STATUS.PATH}|<p>The path of Nginx stub_status page.</p>|basic_status|
-|{$NGINX.STUB_STATUS.PORT}|<p>The port of Nginx stub_status host or container.</p>|80|
+|{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for trigger expression.</p>|`1`|
+|{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The Nginx maximum response time in seconds for trigger expression.</p>|`10`|
+|{$NGINX.STUB_STATUS.HOST}|<p>Hostname or IP of Nginx stub_status host or container.</p>|`localhost`|
+|{$NGINX.STUB_STATUS.PATH}|<p>The path of Nginx stub_status page.</p>|`basic_status`|
+|{$NGINX.STUB_STATUS.PORT}|<p>The port of Nginx stub_status host or container.</p>|`80`|
 
 ## Template links
 
@@ -84,18 +84,18 @@ There are no template links in this template.
 |Nginx|Nginx: Memory usage (rss)|<p>Resident set size memory used by process in bytes.</p>|ZABBIX_PASSIVE|proc.mem[nginx,,,,rss]|
 |Nginx|Nginx: CPU utilization|<p>Process CPU utilization percentage.</p>|ZABBIX_PASSIVE|proc.cpu.util[nginx]|
 |Nginx|Nginx: Version|<p>-</p>|DEPENDENT|nginx.version<p>**Preprocessing**:</p><p>- REGEX: `Server: nginx/(.+) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p>|
-|Zabbix_raw_items|Nginx: Get stub status page|<p>The following status information is provided:</p><p>Active connections - the current number of active client connections including Waiting connections.</p><p>Accepts - the total number of accepted client connections.</p><p>Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p><p>Requests - the total number of client requests.</p><p>Reading - the current number of connections where nginx is reading the request header.</p><p>Writing - the current number of connections where nginx is writing the response back to the client.</p><p>Waiting - the current number of idle client connections waiting for a request.</p>|ZABBIX_PASSIVE|web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]|
+|Zabbix_raw_items|Nginx: Get stub status page|<p>The following status information is provided:</p><p>Active connections - the current number of active client connections including Waiting connections.</p><p>Accepts - the total number of accepted client connections.</p><p>Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p><p>Requests - the total number of client requests.</p><p>Reading - the current number of connections where nginx is reading the request header.</p><p>Writing - the current number of connections where nginx is writing the response back to the client.</p><p>Waiting - the current number of idle client connections waiting for a request.</p><p>https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</p>|ZABBIX_PASSIVE|web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]|
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Nginx: Service is down|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p>|
-|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
-|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|<p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
-|Nginx: Process is not running|<p>Last value: {ITEM.LASTVALUE1}.</p>|`{TEMPLATE_NAME:proc.num[nginx].last()}=0`|HIGH||
-|Nginx: Version has changed (new version: {ITEM.VALUE})|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Nginx version has changed. Ack to close.</p>|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
-|Nginx: Failed to fetch stub status page (or no data for 30m)|<p>Last value: {ITEM.LASTVALUE1}.</p><p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"].str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
+|Nginx: Service is down|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].last()}=0`|AVERAGE|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p>|
+|Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)|<p>-</p>|`{TEMPLATE_NAME:net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"].min(5m)}>{$NGINX.RESPONSE_TIME.MAX.WARN}`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
+|Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)|<p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`{TEMPLATE_NAME:nginx.connections.dropped.rate.min(5m)} > {$NGINX.DROP_RATE.MAX.WARN}`|WARNING|<p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
+|Nginx: Process is not running|<p>-</p>|`{TEMPLATE_NAME:proc.num[nginx].last()}=0`|HIGH||
+|Nginx: Version has changed (new version: {ITEM.VALUE})|<p>Nginx version has changed. Ack to close.</p>|`{TEMPLATE_NAME:nginx.version.diff()}=1 and {TEMPLATE_NAME:nginx.version.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|Nginx: Failed to fetch stub status page (or no data for 30m)|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`{TEMPLATE_NAME:web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"].str("HTTP/1.1 200")}=0 or  {TEMPLATE_NAME:web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"].nodata(30m)}=1`|WARNING|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Process is not running</p><p>- Nginx: Service is down</p>|
 
 ## Feedback
 

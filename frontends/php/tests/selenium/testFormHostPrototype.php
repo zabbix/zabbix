@@ -440,11 +440,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestClickButtonMultiselect('add_templates_');
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
-			$this->zbxTestClickXpath('//button[contains(@onclick, "add_template")]');
 		}
 
 		if (array_key_exists('inventory', $data)) {
@@ -507,7 +506,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 					'checkbox' => true,
 					'hostgroup' => 'Virtual machines',
 					'group_prototype' => 'New test {#MACRO}',
-					'template' => 'Template OS Windows',
+					'template' => 'Template OS Windows by Zabbix agent',
 					'inventory' => 'Automatic'
 				]
 			],
@@ -555,11 +554,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
-			$this->zbxTestClickButtonMultiselect('add_templates_');
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 			$this->zbxTestClickLinkText($data['template']);
-			$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 		}
 
 		// Change inventory mode.
@@ -826,11 +824,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestClickButtonMultiselect('add_templates_');
+			$this->zbxTestClickXpathWait('//div[@id="templateTab"]//button[text()="Add"]');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
-			$this->zbxTestClickXpath('//div[@id="templateTab"]//button[text()="Add"]');
 		}
 
 		// Change inventory mode.

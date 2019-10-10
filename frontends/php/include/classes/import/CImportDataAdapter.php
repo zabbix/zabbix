@@ -30,13 +30,6 @@ class CImportDataAdapter {
 	protected $data;
 
 	/**
-	 * Object used for converting older import versions.
-	 *
-	 * @var CConverterChain
-	 */
-	protected $converterChain;
-
-	/**
 	 * Current import version.
 	 *
 	 * @var string
@@ -44,26 +37,11 @@ class CImportDataAdapter {
 	protected $currentVersion;
 
 	/**
-	 * @param string            $currentVersion     current import version
-	 * @param CConverterChain   $converterChain     object used for converting older import versions
-	 */
-	public function __construct($currentVersion, CConverterChain $converterChain) {
-		$this->currentVersion = $currentVersion;
-		$this->converterChain = $converterChain;
-	}
-
-	/**
 	 * Set the data and initialize the adapter.
 	 *
 	 * @param array $data   import data
 	 */
 	public function load(array $data) {
-		$version = $data['zabbix_export']['version'];
-
-		if ($this->currentVersion != $version) {
-			$data = $this->converterChain->convert($data, $version);
-		}
-
 		$this->data = $data['zabbix_export'];
 	}
 
@@ -116,16 +94,6 @@ class CImportDataAdapter {
 						}
 
 						$host['interfaces'][$inum] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
-					}
-				}
-
-				if (array_key_exists('inventory', $host)) {
-					if (array_key_exists('inventory_mode', $host['inventory'])) {
-						$host['inventory_mode'] = $host['inventory']['inventory_mode'];
-						unset($host['inventory']['inventory_mode']);
-					}
-					else {
-						$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
 					}
 				}
 
@@ -456,6 +424,32 @@ class CImportDataAdapter {
 		}
 
 		return $screens;
+	}
+
+	/**
+	 * Get media types from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getMediaTypes() {
+		$media_types = [];
+
+		if (array_key_exists('media_types', $this->data)) {
+			$keys = [
+				'password' => 'passwd',
+				'script_name' => 'exec_path',
+				'max_sessions' => 'maxsessions',
+				'attempts' => 'maxattempts'
+			];
+
+			foreach ($this->data['media_types'] as $media_type) {
+				$media_types[] = CArrayHelper::renameKeys($media_type,
+					$keys + (($media_type['type'] == MEDIA_TYPE_EXEC) ? ['parameters' => 'exec_params'] : [])
+				);
+			}
+		}
+
+		return $media_types;
 	}
 
 	/**

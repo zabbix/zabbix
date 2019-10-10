@@ -837,12 +837,13 @@ function getConditionFormula(conditions, evalType) {
 	 * Creates a table with dynamic add/remove row buttons.
 	 *
 	 * Supported options:
-	 * - template		- row template selector
-	 * - row			- element row selector
-	 * - add			- add row button selector
-	 * - remove			- remove row button selector
-	 * - counter 		- number to start row enumeration from
-	 * - dataCallback	- function to generate the data passed to the template
+	 * - template				- row template selector
+	 * - row					- element row selector
+	 * - add					- add row button selector
+	 * - remove					- remove row button selector
+	 * - counter 				- number to start row enumeration from
+	 * - dataCallback			- function to generate the data passed to the template
+	 * - remove_next_sibling	- remove also next element
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -858,6 +859,7 @@ function getConditionFormula(conditions, evalType) {
 			row: '.form_row',
 			add: '.element-table-add',
 			remove: '.element-table-remove',
+			remove_next_sibling: false,
 			disable: '.element-table-disable',
 			counter: null,
 			beforeRow: null,
@@ -928,6 +930,9 @@ function getConditionFormula(conditions, evalType) {
 	 * @param {object} options
 	 */
 	function removeRow(table, row, options) {
+		if (options.remove_next_sibling) {
+			row.next().remove();
+		}
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);

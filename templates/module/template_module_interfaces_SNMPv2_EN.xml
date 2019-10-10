@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>3.4</version>
+   <version>4.4</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -11,9 +11,12 @@
       <template>
          <template>Template Module Interfaces SNMPv2</template>
          <name>Template Module Interfaces SNMPv2</name>
-         <description>Template Interfaces version: 0.15&#13;
+         <description>Template Module Interfaces&#13;
+&#13;
 MIBs used:&#13;
-IF-MIB</description>
+IF-MIB&#13;
+&#13;
+Template tooling version used: 0.32</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -24,90 +27,273 @@ IF-MIB</description>
                <name>Network interfaces</name>
             </application>
          </applications>
-         <items/>
          <discovery_rules>
             <discovery_rule>
-               <name>Network Interfaces Discovery</name>
-               <type>4</type>
+               <name>Network interfaces discovery</name>
+               <type>SNMPV2</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                <snmp_oid>discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]</snmp_oid>
                <key>net.if.discovery</key>
                <delay>1h</delay>
-               <status>0</status>
-               <allowed_hosts/>
-               <snmpv3_contextname/>
-               <snmpv3_securityname/>
-               <snmpv3_securitylevel>0</snmpv3_securitylevel>
-               <snmpv3_authprotocol>0</snmpv3_authprotocol>
-               <snmpv3_authpassphrase/>
-               <snmpv3_privprotocol>0</snmpv3_privprotocol>
-               <snmpv3_privpassphrase/>
-               <params/>
-               <ipmi_sensor/>
-               <authtype>0</authtype>
-               <username/>
-               <password/>
-               <publickey/>
-               <privatekey/>
-               <port/>
                <filter>
-                  <evaltype>1</evaltype>
-                  <formula/>
+                  <evaltype>AND</evaltype>
                   <conditions>
                      <condition>
                         <macro>{#IFADMINSTATUS}</macro>
-                        <value>(1|3)</value>
-                        <operator>8</operator>
+                        <value>{$NET.IF.IFADMINSTATUS.MATCHES}</value>
                         <formulaid>A</formulaid>
                      </condition>
                      <condition>
-                        <macro>{#IFOPERSTATUS}</macro>
-                        <value>(1|2|3|4|5|7)</value>
-                        <operator>8</operator>
+                        <macro>{#IFADMINSTATUS}</macro>
+                        <value>{$NET.IF.IFADMINSTATUS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
-                        <macro>{#IFNAME}</macro>
-                        <value>@Network interfaces for discovery</value>
-                        <operator>8</operator>
+                        <macro>{#IFOPERSTATUS}</macro>
+                        <value>{$NET.IF.IFOPERSTATUS.MATCHES}</value>
                         <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFOPERSTATUS}</macro>
+                        <value>{$NET.IF.IFOPERSTATUS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$NET.IF.IFNAME.MATCHES}</value>
+                        <formulaid>E</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFNAME}</macro>
+                        <value>{$NET.IF.IFNAME.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>F</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFDESCR}</macro>
+                        <value>{$NET.IF.IFDESCR.MATCHES}</value>
+                        <formulaid>G</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFDESCR}</macro>
+                        <value>{$NET.IF.IFDESCR.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>H</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFALIAS}</macro>
+                        <value>{$NET.IF.IFALIAS.MATCHES}</value>
+                        <formulaid>I</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFALIAS}</macro>
+                        <value>{$NET.IF.IFALIAS.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>J</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFTYPE}</macro>
+                        <value>{$NET.IF.IFTYPE.MATCHES}</value>
+                        <formulaid>K</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#IFTYPE}</macro>
+                        <value>{$NET.IF.IFTYPE.NOT_MATCHES}</value>
+                        <operator>NOT_MATCHES_REGEX</operator>
+                        <formulaid>L</formulaid>
                      </condition>
                   </conditions>
                </filter>
-               <lifetime>30d</lifetime>
-               <description>Discovering interfaces from IF-MIB. Interfaces are not discovered:&#13;
-- with down(2) Administrative status&#13;
-- with notPresent(6) Operational status&#13;
-- loopbacks</description>
+               <description>Discovering interfaces from IF-MIB.</description>
                <item_prototypes>
                   <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of inbound packets which were chosen to be discarded&#13;
+even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
+One possible reason for discarding such a packet could be to free up buffer space.&#13;
+Discontinuities in the value of this counter can occur at re-initialization of the management system,&#13;
+and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Bits received</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+The number of outbound packets which were chosen to be discarded&#13;
+even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
+One possible reason for discarding such a packet could be to free up buffer space.&#13;
+Discontinuities in the value of this counter can occur at re-initialization of the management system,&#13;
+and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <description>MIB: IF-MIB&#13;
+For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Bits sent</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
+                     <delay>3m</delay>
+                     <history>7d</history>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>CHANGE_PER_SECOND</type>
+                           <params/>
+                        </step>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>8</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>Interface {#IFNAME}({#IFALIAS}): Speed</name>
+                     <type>SNMPV2</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}</snmp_oid>
+                     <key>net.if.speed[ifHighSpeed.{#SNMPINDEX}]</key>
+                     <delay>5m</delay>
+                     <history>7d</history>
+                     <trends>0d</trends>
+                     <units>bps</units>
+                     <description>MIB: IF-MIB&#13;
+An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.</description>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <preprocessing>
+                        <step>
+                           <type>MULTIPLIER</type>
+                           <params>1000000</params>
+                        </step>
+                        <step>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1h</params>
+                        </step>
+                     </preprocessing>
+                  </item_prototype>
+                  <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Operational status</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.status[ifOperStatus.{#SNMPINDEX}]</key>
-                     <delay>1m</delay>
-                     <history>2w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
+                     <history>7d</history>
+                     <trends>0</trends>
                      <description>MIB: IF-MIB&#13;
 The current operational state of the interface.&#13;
 - The testing(3) state indicates that no operational packet scan be passed&#13;
@@ -116,489 +302,62 @@ The current operational state of the interface.&#13;
 - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)&#13;
 - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state&#13;
 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <valuemap>
                         <name>IF-MIB::ifOperStatus</name>
                      </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Bits received</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>bps</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-The total number of octets received on the interface,including framing characters.  This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                        <step>
-                           <type>1</type>
-                           <params>8</params>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Bits sent</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>bps</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-The total number of octets transmitted out of the interface, including framing characters.  This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                        <step>
-                           <type>1</type>
-                           <params>8</params>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>1w</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>1w</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-The number of outbound packets which were chosen to be discarded&#13;
-even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
-One possible reason for discarding such a packet could be to free up buffer space.&#13;
-Discontinuities in the value of this counter can occur at re-initialization of the management system,&#13;
-and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-The number of inbound packets which were chosen to be discarded&#13;
-even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.&#13;
-One possible reason for discarding such a packet could be to free up buffer space.&#13;
-Discontinuities in the value of this counter can occur at re-initialization of the management system,&#13;
-and at other times as indicated by the value of ifCounterDiscontinuityTime.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing>
-                        <step>
-                           <type>10</type>
-                           <params/>
-                        </step>
-                     </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <trigger_prototypes>
+                        <trigger_prototype>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({last()}=2 and {diff()}=1)</expression>
+                           <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                           <recovery_expression>{last()}&lt;&gt;2</recovery_expression>
+                           <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
+                           <opdata>Current state: {ITEM.LASTVALUE1}</opdata>
+                           <priority>AVERAGE</priority>
+                           <description>This trigger expression works as follows:&#13;
+1. Can be triggered if operations status is down.&#13;
+2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.&#13;
+3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)&#13;
+&#13;
+WARNING: if closed manually - won't fire again on next poll, because of .diff.</description>
+                           <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                     </trigger_prototypes>
                   </item_prototype>
                   <item_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Interface type</name>
-                     <type>4</type>
+                     <type>SNMPV2</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.type[ifType.{#SNMPINDEX}]</key>
                      <delay>1h</delay>
-                     <history>1w</history>
+                     <history>7d</history>
                      <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
                      <description>MIB: IF-MIB&#13;
 The type of interface.&#13;
 Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),&#13;
 through updating the syntax of the IANAifType textual convention.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Interface {#IFNAME}({#IFALIAS})</name>
+                        </application_prototype>
+                     </application_prototypes>
                      <valuemap>
                         <name>IF-MIB::ifType</name>
                      </valuemap>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Speed</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}</snmp_oid>
-                     <key>net.if.speed[ifHighSpeed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>bps</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: IF-MIB&#13;
-An estimate of the interface's current bandwidth in units of 1,000,000 bits per second.  If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.  For a sub-layer which has no concept of bandwidth, this object should be zero.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Network interfaces</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
                      <preprocessing>
                         <step>
-                           <type>1</type>
-                           <params>1000000</params>
+                           <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                           <params>1d</params>
                         </step>
                      </preprocessing>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Interface is down</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>({Template Module Interfaces SNMPv2:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF_UTIL_MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} or&#13;
-{Template Module Interfaces SNMPv2:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF_UTIL_MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}) and&#13;
-{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces SNMPv2:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF_UTIL_MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
-{Template Module Interfaces SNMPv2:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF_UTIL_MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage &gt;{$IF_UTIL_MAX:"{#IFNAME}"}%</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>1</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Module Interfaces SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].avg(5m)}&gt;{$IF_ERRORS_WARN:"{#IFNAME}"}&#13;
-or {Template Module Interfaces SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].avg(5m)}&gt;{$IF_ERRORS_WARN:"{#IFNAME}"}</expression>
-                     <recovery_mode>1</recovery_mode>
-                     <recovery_expression>{Template Module Interfaces SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}*0.8&#13;
-and {Template Module Interfaces SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].avg(5m)}&lt;{$IF_ERRORS_WARN:"{#IFNAME}"}*0.8</recovery_expression>
-                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-Recovers when below 80% of {$IF_ERRORS_WARN:"{#IFNAME}"} threshold</description>
-                     <type>0</type>
-                     <manual_close>1</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
-                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
-                           <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
                   <trigger_prototype>
                      <expression>{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&lt;0 and {Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0&#13;
 and (&#13;
@@ -611,19 +370,14 @@ and (&#13;
 )&#13;
 and&#13;
 ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2)</expression>
-                     <recovery_mode>1</recovery_mode>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                      <recovery_expression>({Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].change()}&gt;0 and {Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].prev()}&gt;0) or&#13;
 ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2)</recovery_expression>
                      <name>Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>1</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.&#13;
-This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
-                     <type>0</type>
-                     <manual_close>1</manual_close>
+                     <opdata>Current reported speed: {ITEM.LASTVALUE1}</opdata>
+                     <priority>INFO</priority>
+                     <description>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</description>
+                     <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
                            <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
@@ -631,35 +385,53 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                            <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
                         </dependency>
                      </dependencies>
-                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>({Template Module Interfaces SNMPv2:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} or&#13;
+{Template Module Interfaces SNMPv2:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&gt;({$IF.UTIL.MAX:"{#IFNAME}"}/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}) and&#13;
+{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}&gt;0</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template Module Interfaces SNMPv2:net.if.in[ifHCInOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()} and&#13;
+{Template Module Interfaces SNMPv2:net.if.out[ifHCOutOctets.{#SNMPINDEX}].avg(15m)}&lt;(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*{Template Module Interfaces SNMPv2:net.if.speed[ifHighSpeed.{#SNMPINDEX}].last()}</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
+                     <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
+                     <priority>WARNING</priority>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
+                        </dependency>
+                     </dependencies>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module Interfaces SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}&#13;
+or {Template Module Interfaces SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].min(5m)}&gt;{$IF.ERRORS.WARN:"{#IFNAME}"}</expression>
+                     <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                     <recovery_expression>{Template Module Interfaces SNMPv2:net.if.in.errors[ifInErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8&#13;
+and {Template Module Interfaces SNMPv2:net.if.out.errors[ifOutErrors.{#SNMPINDEX}].max(5m)}&lt;{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8</recovery_expression>
+                     <name>Interface {#IFNAME}({#IFALIAS}): High error rate ( &gt; {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)</name>
+                     <opdata>errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}</opdata>
+                     <priority>WARNING</priority>
+                     <description>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</description>
+                     <manual_close>YES</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>Interface {#IFNAME}({#IFALIAS}): Link down</name>
+                           <expression>{$IFCONTROL:"{#IFNAME}"}=1 and ({Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}=2 and {Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].diff()}=1)</expression>
+                           <recovery_expression>{Template Module Interfaces SNMPv2:net.if.status[ifOperStatus.{#SNMPINDEX}].last()}&lt;&gt;2</recovery_expression>
+                        </dependency>
+                     </dependencies>
                   </trigger_prototype>
                </trigger_prototypes>
                <graph_prototypes>
                   <graph_prototype>
                      <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
-                     <width>900</width>
-                     <height>200</height>
-                     <yaxismin>0</yaxismin>
-                     <yaxismax>100</yaxismax>
-                     <show_work_period>1</show_work_period>
-                     <show_triggers>1</show_triggers>
-                     <type>0</type>
-                     <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
-                     <percent_left>0.0000</percent_left>
-                     <percent_right>0.0000</percent_right>
-                     <ymin_type_1>0</ymin_type_1>
-                     <ymax_type_1>0</ymax_type_1>
-                     <ymin_item_1>0</ymin_item_1>
-                     <ymax_item_1>0</ymax_item_1>
                      <graph_items>
                         <graph_item>
-                           <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
+                           <drawtype>GRADIENT_LINE</drawtype>
                            <color>1A7C11</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.in[ifHCInOctets.{#SNMPINDEX}]</key>
@@ -667,11 +439,8 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         </graph_item>
                         <graph_item>
                            <sortorder>1</sortorder>
-                           <drawtype>2</drawtype>
+                           <drawtype>BOLD_LINE</drawtype>
                            <color>2774A4</color>
-                           <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.out[ifHCOutOctets.{#SNMPINDEX}]</key>
@@ -679,11 +448,8 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         </graph_item>
                         <graph_item>
                            <sortorder>2</sortorder>
-                           <drawtype>0</drawtype>
                            <color>F63100</color>
-                           <yaxisside>1</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
+                           <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
@@ -691,11 +457,8 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         </graph_item>
                         <graph_item>
                            <sortorder>3</sortorder>
-                           <drawtype>0</drawtype>
                            <color>A54F10</color>
-                           <yaxisside>1</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
+                           <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
@@ -703,11 +466,8 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         </graph_item>
                         <graph_item>
                            <sortorder>4</sortorder>
-                           <drawtype>0</drawtype>
                            <color>FC6EA3</color>
-                           <yaxisside>1</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
+                           <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]</key>
@@ -715,11 +475,8 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                         </graph_item>
                         <graph_item>
                            <sortorder>5</sortorder>
-                           <drawtype>0</drawtype>
                            <color>6C59DC</color>
-                           <yaxisside>1</yaxisside>
-                           <calc_fnc>2</calc_fnc>
-                           <type>0</type>
+                           <yaxisside>RIGHT</yaxisside>
                            <item>
                               <host>Template Module Interfaces SNMPv2</host>
                               <key>net.if.in.discards[ifInDiscards.{#SNMPINDEX}]</key>
@@ -728,31 +485,107 @@ This Ethernet connection has transitioned down from its known maximum speed. Thi
                      </graph_items>
                   </graph_prototype>
                </graph_prototypes>
-               <host_prototypes/>
-               <jmx_endpoint/>
             </discovery_rule>
          </discovery_rules>
-         <httptests/>
          <macros>
+            <macro>
+               <macro>{$IF.ERRORS.WARN}</macro>
+               <value>2</value>
+            </macro>
+            <macro>
+               <macro>{$IF.UTIL.MAX}</macro>
+               <value>90</value>
+            </macro>
             <macro>
                <macro>{$IFCONTROL}</macro>
                <value>1</value>
             </macro>
             <macro>
-               <macro>{$IF_ERRORS_WARN}</macro>
-               <value>2</value>
+               <macro>{$NET.IF.IFADMINSTATUS.MATCHES}</macro>
+               <value>^.*</value>
+               <description>Ignore notPresent(6)</description>
             </macro>
             <macro>
-               <macro>{$IF_UTIL_MAX}</macro>
-               <value>90</value>
+               <macro>{$NET.IF.IFADMINSTATUS.NOT_MATCHES}</macro>
+               <value>^2$</value>
+               <description>Ignore down(2) administrative status</description>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFALIAS.MATCHES}</macro>
+               <value>.*</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFALIAS.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFDESCR.MATCHES}</macro>
+               <value>.*</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFDESCR.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFNAME.MATCHES}</macro>
+               <value>^.*$</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFNAME.NOT_MATCHES}</macro>
+               <value>(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})</value>
+               <description>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</description>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFOPERSTATUS.MATCHES}</macro>
+               <value>^.*$</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFOPERSTATUS.NOT_MATCHES}</macro>
+               <value>^6$</value>
+               <description>Ignore notPresent(6)</description>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFTYPE.MATCHES}</macro>
+               <value>.*</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFTYPE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
             </macro>
          </macros>
-         <templates/>
-         <screens/>
+         <screens>
+            <screen>
+               <name>Network interfaces</name>
+               <hsize>1</hsize>
+               <vsize>1</vsize>
+               <screen_items>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
+                     <style>0</style>
+                     <resource>
+                        <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
+                        <host>Template Module Interfaces SNMPv2</host>
+                     </resource>
+                     <width>500</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <url/>
+                     <application/>
+                     <max_columns>3</max_columns>
+                  </screen_item>
+               </screen_items>
+            </screen>
+         </screens>
       </template>
    </templates>
-   <graphs/>
-   <triggers/>
    <value_maps>
       <value_map>
          <name>IF-MIB::ifOperStatus</name>

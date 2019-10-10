@@ -616,23 +616,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	/**
 	 * Resolve macros in trigger URL.
 	 *
-	 * @param string $triggers[$triggerid]['expression']
-	 * @param string $triggers[$triggerid]['url']
+	 * @param array  $trigger
+	 * @param string $trigger['triggerid']
+	 * @param string $trigger['expression']
+	 * @param string $trigger['url']
+	 * @param string $trigger['eventid']     (optional)
+	 * @param string $url
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	public function resolveTriggerUrls(array $triggers) {
+	public function resolveTriggerUrl(array $trigger, &$url) {
 		$macros = [
 			'host' => [],
 			'interface' => [],
-			'item' => []
+			'item' => [],
+			'event' => []
 		];
 		$usermacros = [];
 		$macro_values = [];
 
 		$types = [
 			'macros' => [
-				'trigger' => ['{TRIGGER.ID}']
+				'trigger' => ['{TRIGGER.ID}'],
+				'event' => ['{EVENT.ID}']
 			],
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
@@ -645,55 +651,61 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
+		$triggerid = $trigger['triggerid'];
+
 		// Find macros.
-		foreach ($triggers as $triggerid => $trigger) {
-			$functionids = $this->findFunctions($trigger['expression']);
+		$functionids = $this->findFunctions($trigger['expression']);
+		$matched_macros = $this->extractMacros([$trigger['url']], $types);
 
-			$matched_macros = $this->extractMacros([$trigger['url']], $types);
+		foreach ($matched_macros['macros']['trigger'] as $macro) {
+			$macro_values[$triggerid][$macro] = $triggerid;
+		}
 
-			foreach ($matched_macros['macros']['trigger'] as $macro) {
-				$macro_values[$triggerid][$macro] = $triggerid;
+		foreach ($matched_macros['macros']['event'] as $macro) {
+			if (!array_key_exists('eventid', $trigger) && $macro === '{EVENT.ID}') {
+				return false;
 			}
+			$macro_values[$triggerid][$macro] = $trigger['eventid'];
+		}
 
-			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macros_n']['host'] as $token => $data) {
+			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
+			if (array_key_exists($data['f_num'], $functionids)) {
+				$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 			}
+		}
 
-			foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
+			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
+			if (array_key_exists($data['f_num'], $functionids)) {
+				$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 			}
+		}
 
-			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
+			if (array_key_exists($data['f_num'], $functionids)) {
+				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 			}
+		}
 
-			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-						'token' => $token,
-						'function' => $data['function'],
-						'parameters' => $data['parameters']
-					];
-				}
+			if (array_key_exists($data['f_num'], $functionids)) {
+				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+					'token' => $token,
+					'function' => $data['function'],
+					'parameters' => $data['parameters']
+				];
 			}
+		}
 
-			if ($matched_macros['usermacros']) {
-				$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
-			}
+		if ($matched_macros['usermacros']) {
+			$usermacros[$triggerid] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 		}
 
 		// Get macro value.
@@ -727,18 +739,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$types = $this->transformToPositionTypes($types);
 
-		// Replace macros to value.
-		foreach ($triggers as $triggerid => &$trigger) {
-			$matched_macros = $this->getMacroPositions($trigger['url'], $types);
+		$matched_macros = $this->getMacroPositions($trigger['url'], $types);
 
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$trigger['url'] =
-					substr_replace($trigger['url'], $macro_values[$triggerid][$macro], $pos, strlen($macro));
-			}
+		$url = $trigger['url'];
+		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+			$url = substr_replace($url, $macro_values[$triggerid][$macro], $pos, strlen($macro));
 		}
-		unset($trigger);
 
-		return $triggers;
+		return true;
 	}
 
 	/**
@@ -2105,7 +2113,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Query details about resolvable hosts.
 		if ($selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST]) {
 			$hosts = API::Host()->get([
-				'output' => ['host', 'name', 'description'],
+				'output' => $query_inventories
+					? ['host', 'name', 'description', 'inventory_mode']
+					: ['host', 'name', 'description'],
 				'hostids' => $selements_to_resolve[SYSMAP_ELEMENT_TYPE_HOST],
 				'selectInterfaces' => $query_interfaces ? ['main', 'type', 'useip', 'ip', 'dns'] : null,
 				'selectInventory' => $query_inventories ? API_OUTPUT_EXTEND : null,
@@ -2359,7 +2369,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					default:
 						// Inventories:
 						if (array_key_exists('{'.$matched_macro['macro'].'}', $supported_inventory_macros) && $host
-								&& $host['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+								&& $host['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 							$matched_macro['value']
 								= $host['inventory'][$supported_inventory_macros['{'.$matched_macro['macro'].'}']];
 						}
@@ -2672,5 +2682,90 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'delay' => $data['delay'],
 			'macros' => $macros
 		];
+	}
+
+	/**
+	 * Return associative array of urls with resolved {EVENT.TAGS.*} macro in form
+	 * [<eventid> => ['urls' => [['url' => .. 'name' => ..], ..]]].
+	 *
+	 * @param array  $events                                Array of event tags.
+	 * @param string $events[<eventid>]['tags'][]['tag']    Event tag tag field value.
+	 * @param string $events[<eventid>]['tags'][]['value']  Event tag value field value.
+	 * @param array  $urls                                  Array of mediatype urls.
+	 * @param string $urls[]['event_menu_url']              Media type url field value.
+	 * @param string $urls[]['event_menu_name']             Media type url_name field value.
+	 *
+	 * @return array
+	 */
+	public function resolveMediaTypeUrls(array $events, array $urls) {
+		$macros = [
+			'event' => []
+		];
+		$types = [
+			'macros_an' => [
+				'event' => ['{EVENT.TAGS}']
+			]
+		];
+
+		$urls = CArrayHelper::renameObjectsKeys($urls, ['event_menu_url' => 'url', 'event_menu_name' => 'name']);
+		$url_macros = [];
+
+		foreach ($urls as $index => $url) {
+			$matched_macros = $this->extractMacros([$url['url'], $url['name']], $types);
+			$url_macros[$index] = [];
+
+			foreach ($matched_macros['macros_an']['event'] as $token => $data) {
+				$url_macros[$index][$token] = true;
+
+				foreach ($events as $eventid => $event) {
+					$macro_values[$eventid][$token] = null;
+
+					$macros['event'][$eventid][$data['f_num']][$token] = true;
+				}
+			}
+		}
+
+		foreach ($events as $eventid => $event) {
+			if (!array_key_exists($eventid, $macros['event'])) {
+				continue;
+			}
+
+			CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+			$tag_value = [];
+			foreach ($event['tags'] as $tag) {
+				$tag_value += [$tag['tag'] => $tag['value']];
+			}
+
+			foreach ($macros['event'][$eventid] as $f_num => $tokens) {
+				if (array_key_exists($f_num, $tag_value)) {
+					foreach ($tokens as $token => $foo) {
+						$macro_values[$eventid][$token] = $tag_value[$f_num];
+					}
+				}
+			}
+		}
+
+		foreach ($events as $eventid => $event) {
+			$events[$eventid]['urls'] = [];
+
+			foreach ($urls as $index => $url) {
+				if ($url_macros[$index]) {
+					foreach ($url_macros[$index] as $macro => $foo) {
+						if ($macro_values[$eventid][$macro] === null) {
+							continue 2;
+						}
+					}
+
+					foreach (['url', 'name'] as $field) {
+						$url[$field] = strtr($url[$field], $macro_values[$eventid]);
+					}
+				}
+
+				$events[$eventid]['urls'][] = $url;
+			}
+		}
+
+		return $events;
 	}
 }

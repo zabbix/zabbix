@@ -662,7 +662,6 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $groupids
  * @param string $application
- * @param int    $style                               Table display style: either hosts on top or on the left.
  * @param array  $host_options
  * @param array  $trigger_options
  * @param array  $problem_options
@@ -672,8 +671,8 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []) {
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
@@ -759,13 +758,14 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
-			'time_from' => $problem_options['time_from']
+			'time_from' => $problem_options['time_from'],
+			'sortfield' => 'eventid'
 		]);
 
 		$objectids = [];
 
 		foreach ($problems as $problem) {
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
+			if ($triggers[$problem['objectid']]['priority'] <= $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
 				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
 				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
@@ -1178,10 +1178,11 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
  * Make trigger info block.
  *
  * @param array $trigger  Trigger described in info block.
+ * @param array $eventid  Associated eventid.
  *
  * @return object
  */
-function make_trigger_details($trigger) {
+function make_trigger_details($trigger, $eventid) {
 	$hostNames = [];
 
 	$config = select_config();
@@ -1211,7 +1212,7 @@ function make_trigger_details($trigger) {
 		->addRow([
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid']))
+				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid))
 			)
 		])
 		->addRow([
@@ -2336,7 +2337,7 @@ function makeTriggersHostsList(array $triggers_hosts) {
 			}
 
 			if ($trigger_hosts) {
-				$trigger_hosts[] = ', ';
+				$trigger_hosts[] = (new CSpan(','))->addClass('separator');
 			}
 			$trigger_hosts[] = $host_name;
 		}

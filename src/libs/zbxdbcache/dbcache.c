@@ -1121,7 +1121,12 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
@@ -1160,6 +1165,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, trend->value_type);
 		zbx_trends_export_write(json.buffer, json.buffer_size);
 	}
 
@@ -1213,7 +1219,12 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 		}
 
 		zbx_json_clean(&json);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.name, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
 		for (j = 0; j < host_info->groups.values_num; j++)
@@ -1262,6 +1273,7 @@ static void	DCexport_history(const ZBX_DC_HISTORY *history, int history_num, zbx
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_TYPE, h->value_type);
 		zbx_history_export_write(json.buffer, json.buffer_size);
 	}
 
@@ -4354,12 +4366,13 @@ void	DCupdate_hosts_availability(void)
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
 				(zbx_host_availability_t *)hosts.values[i]))
 		{
-			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
+			continue;
 		}
 
+		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
 

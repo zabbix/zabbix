@@ -72,7 +72,7 @@ class CWidgetConfig {
 			WIDGET_FAV_SCREENS			=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
-			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 2],
+			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
 			WIDGET_MAP					=> ['width' => 18,	'height' => 5],
 			WIDGET_NAV_TREE				=> ['width' => 6,	'height' => 5],
 			WIDGET_PLAIN_TEXT			=> ['width' => 6,	'height' => 3],
@@ -212,8 +212,7 @@ class CWidgetConfig {
 	 *
 	 * @return bool
 	 */
-	private static function hasPadding($type, $fields, $view_mode)
-	{
+	private static function hasPadding($type, $fields, $view_mode) {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
 				case WIDGET_CLOCK:
@@ -229,12 +228,14 @@ class CWidgetConfig {
 		else {
 			switch ($type) {
 				case WIDGET_HOST_AVAIL:
-				case WIDGET_GRAPH_PROTOTYPE:
-					return false;
+					return (count($fields['interface_type']) != 1);
 
 				case WIDGET_PROBLEMS_BY_SV:
-					return (!array_key_exists('show_type', $fields)
-						|| $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS);
+					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
+
+				case WIDGET_GRAPH_PROTOTYPE:
+				case WIDGET_URL:
+					return false;
 
 				default:
 					return true;
@@ -251,8 +252,7 @@ class CWidgetConfig {
 	 *
 	 * @return array
 	 */
-	public static function getConfiguration($type, $fields, $view_mode)
-	{
+	public static function getConfiguration($type, $fields, $view_mode) {
 		return [
 			'padding' => self::hasPadding($type, $fields, $view_mode)
 		];

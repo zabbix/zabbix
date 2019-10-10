@@ -137,7 +137,6 @@ class C42ImportConverterTest extends CImportConverterTest {
 							'name' => 'Parent screen 2',
 							'hsize' => 1,
 							'vsize' => 4,
-							'screen_items' => []
 						],
 						[
 							'name' => 'Child screen',
@@ -160,6 +159,47 @@ class C42ImportConverterTest extends CImportConverterTest {
 									'max_columns' => 3
 								]
 							]
+						]
+					]
+				],
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'inventory_mode' => 1,
+								'type' => ''
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'inventory_mode' => 'AUTOMATIC'
+						]
+					]
+				]
+			],
+			[
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'inventory_mode' => 1,
+								'type' => 'x'
+							]
+						]
+					]
+				],
+				[
+					'hosts' => [
+						[
+							'inventory' => [
+								'type' => 'x'
+							],
+							'inventory_mode' => 'AUTOMATIC'
 						]
 					]
 				]

@@ -44,6 +44,8 @@ class CControllerDashboardWidgetConfigure extends CController {
 	protected function doAction() {
 		$type = $this->getInput('type');
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Transforms corrupted data to default values.
+		$form->validate();
 
 		$this->setResponse(new CControllerResponseData(['main_block' => CJs::encodeJson([
 			'configuration' => CWidgetConfig::getConfiguration(

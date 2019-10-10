@@ -20,6 +20,7 @@
 
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
+$this->addJsFile('multilineinput.js');
 
 $widget = (new CWidget())->setTitle(_('Media types'));
 
@@ -40,26 +41,13 @@ $mediaTypeForm = (new CForm())
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
-	->addRow((new CLabel(_('Name'), 'description'))->setAsteriskMark(),
-		(new CTextBox('description', $data['description'], false, 100))
+	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		(new CTextBox('name', $data['name'], false, 100))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow((new CLabel(_('Type'), 'type')), (new CHorList())
-		->addItem((new CComboBox('type', $data['type'], null, [
-				MEDIA_TYPE_EMAIL => _('Email'),
-				MEDIA_TYPE_EXEC => _('Script'),
-				MEDIA_TYPE_SMS => _('SMS'),
-				MEDIA_TYPE_JABBER => _('Jabber')
-			]))
-			->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')])
-		)
-		->addItem((new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
-			->setId('eztext_link')
-			->setTarget('_blank')
-		)
-	)
+	->addRow(new CLabel(_('Type'), 'type'), new CComboBox('type', $data['type'], null, media_type2str()))
 	->addRow((new CLabel(_('SMTP server'), 'smtp_server'))->setAsteriskMark(),
 		(new CTextBox('smtp_server', $data['smtp_server']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -78,7 +66,7 @@ $mediatype_formlist = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
-	->addRow((new CLabel(_('Connection security'), 'smtp_security')),
+	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
 		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
 			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
 			->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
@@ -87,7 +75,7 @@ $mediatype_formlist = (new CFormList())
 	)
 	->addRow(_('SSL verify peer'), (new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']))
 	->addRow(_('SSL verify host'), (new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']))
-	->addRow((new CLabel(_('Authentication'), 'smtp_authentication')),
+	->addRow(new CLabel(_('Authentication'), 'smtp_authentication'),
 		(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
 			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
 			->addValue(_('Username and password'), SMTP_AUTHENTICATION_NORMAL)
@@ -150,31 +138,121 @@ else {
 	$passwd_field = (new CPassBox('passwd', $data['passwd']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
+// MEDIA_TYPE_WEBHOOK
+$parameters_table = (new CTable())
+	->setId('parameters_table')
+	->setHeader([
+		(new CColHeader(_('Name')))->setWidth('50%'),
+		(new CColHeader(_('Value')))->setWidth('50%'),
+		_('Action')
+	])
+	->setAttribute('style', 'width: 100%;');
+
+foreach ($data['parameters'] as $parameter) {
+	$parameters_table->addRow([
+		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('media_type_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', $parameter['value'], false,
+			DB::getFieldLength('media_type_param', 'value')
+		))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]);
+}
+
+$row_template = (new CTag('script', true))
+	->setId('parameters_row')
+	->setAttribute('type', 'text/x-jquery-tmpl')
+	->addItem(new CRow([
+		(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
+			->setAttribute('style', 'width: 100%;')
+			->removeId(),
+		(new CButton('', _('Remove')))
+			->removeId()
+			->onClick('jQuery(this).closest("tr").remove()')
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]));
+
+$widget->addItem($row_template);
+
+$parameters_table->addRow([(new CButton('parameter_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
 // append password field to form list
 $mediatype_formlist
-	->addRow((new CLabel(_('Jabber identifier'), 'jabber_username'))->setAsteriskMark(),
-		(new CTextBox('jabber_username', $data['jabber_username']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Username'), 'eztext_username'))->setAsteriskMark(),
-		(new CTextBox('eztext_username', $data['eztext_username']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Password'), 'passwd'))
-		->setAsteriskMark($data['type'] == MEDIA_TYPE_JABBER || $data['type'] == MEDIA_TYPE_EZ_TEXTING),
-		$passwd_field
-	)
-	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
-		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
-	]))
-	->addRow((new CLabel(_('Message format'), 'content_type')),
+	->addRow(new CLabel(_('Password'), 'passwd'), $passwd_field)
+	->addRow(new CLabel(_('Message format'), 'content_type'),
 		(new CRadioButtonList('content_type', (int) $data['content_type']))
 			->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
 			->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
 			->setModern(true)
+	)
+	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
+		(new CDiv($parameters_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+		'row_webhook_parameters'
+	)
+	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
+		(new CMultilineInput('script', $data['script'], [
+			'title' => _('JavaScript'),
+			'placeholder' => _('script'),
+			'placeholder_textarea' => 'return value',
+			'grow' => 'auto',
+			'rows' => 0,
+			'maxlength' => DB::getFieldLength('media_type', 'script')
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired(),
+		'row_webhook_script'
+	)
+	->addRow(new CLabel(_('Timeout'), 'timeout'),
+		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'row_webhook_timeout'
+	)
+	->addRow(new CLabel(_('Process tags'), 'process_tags'),
+		(new CCheckBox('process_tags', ZBX_MEDIA_TYPE_TAGS_ENABLED))
+			->setChecked($data['process_tags'] == ZBX_MEDIA_TYPE_TAGS_ENABLED)
+			->setUncheckedValue(ZBX_MEDIA_TYPE_TAGS_DISABLED),
+		'row_webhook_tags'
+	)
+	->addRow(new CLabel(_('Include event menu entry'), 'show_event_menu'),
+		(new CCheckBox('show_event_menu', ZBX_EVENT_MENU_SHOW))
+			->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setUncheckedValue(ZBX_EVENT_MENU_HIDE),
+		'row_webhook_show_event_menu'
+	)
+	->addRow((new CLabel(_('Menu entry name'), 'event_menu_name'))->setAsteriskMark(),
+		(new CTextBox('event_menu_name', $data['event_menu_name'], false,
+			DB::getFieldLength('media_type', 'event_menu_name')
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setAriaRequired(),
+		'row_webhook_url_name'
+	)
+	->addRow((new CLabel(_('Menu entry URL'), 'event_menu_url'))->setAsteriskMark(),
+		(new CTextBox('event_menu_url', $data['event_menu_url'], false,
+			DB::getFieldLength('media_type', 'event_menu_url')
+		))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+			->setAriaRequired(),
+		'row_webhook_event_menu_url'
+	)
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
@@ -199,7 +277,7 @@ switch ($data['maxsessions']) {
 }
 
 $mediaOptionsForm = (new CFormList('options'))
-	->addRow((new CLabel(_('Concurrent sessions'), 'maxsessions_type')),
+	->addRow(new CLabel(_('Concurrent sessions'), 'maxsessions_type'),
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addItem([
