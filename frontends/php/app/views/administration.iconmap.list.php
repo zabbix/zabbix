@@ -29,6 +29,9 @@ $widget = (new CWidget())
 					->setArgument('action', 'iconmap.list')
 					->getUrl()
 				))
+				->addItem(new CRedirectButton(_('Create icon map'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'iconmap.edit')
+				))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -45,10 +48,10 @@ foreach ($data['iconmaps'] as $icon_map) {
 		$row[] = BR();
 	}
 
-	$table->addRow([
-		new CLink($icon_map['name'], 'adm.iconmapping.php?form=update&iconmapid='.$icon_map['iconmapid']),
-		$row
-	]);
+	$table->addRow([new CLink($icon_map['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'iconmap.edit')
+		->setArgument('iconmapid', $icon_map['iconmapid'])
+	), $row]);
 }
 
 $widget->addItem($table)->show();

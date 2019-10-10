@@ -21,13 +21,10 @@
 
 class CControllerIconMapClone extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'iconmapid' => 'required | db icon_map.iconmapid',
+			'iconmap'   => 'required | array',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +37,25 @@ class CControllerIconMapClone extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		return (bool) API::IconMap()->get([
+			'output' => ['iconmapid'],
+			'iconmapids' => (array) $this->getInput('iconmapid'),
+			'editable' => true
+		]);
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'iconmap.edit'));
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerIconMapClone'));
+		$form_data = $this->getInputAll();
+
+		unset($form_data['iconmapid']);
+
+		$response->setFormData($form_data);
 		$this->setResponse($response);
 	}
 }

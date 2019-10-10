@@ -66,6 +66,7 @@ class CRouter {
 		'iconmap.list'        => ['CControllerIconMapList',        'layout.htmlpage', 'administration.iconmap.list'],
 		'iconmap.edit'        => ['CControllerIconMapEdit',        'layout.htmlpage', 'administration.iconmap.edit'],
 		'iconmap.clone'       => ['CControllerIconMapClone', null, null],
+		'iconmap.update'      => ['CControllerIconMapUpdate', null, null],
 		'iconmap.delete'      => ['CControllerIconMapDelete', null, null],
 		'regex.list'          => ['CControllerRegExList',          'layout.htmlpage', 'administration.regex.list'],
 		'regex.edit'          => ['CControllerRegExEdit',          'layout.htmlpage', 'administration.regex.edit'],

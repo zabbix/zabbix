@@ -27,7 +27,8 @@ class CControllerIconMapEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'iconmapid'      => 'db icon_map.iconmapid',
+			'iconmap'        => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +41,68 @@ class CControllerIconMapEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		$this->inventory_list = [];
+		$inventory_list = getHostInventories();
+		foreach ($inventory_list as $field) {
+			$this->inventory_list[$field['nr']] = $field['title'];
+		}
+
+		$this->images = [];
+		$images = API::Image()->get([
+			'output' => ['imageid', 'name'],
+			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
+			'sortfield' => 'name',
+			'preservekeys' => true
+		]);
+		foreach ($images as $icon) {
+			$this->images[$icon['imageid']] = $icon['name'];
+		}
+
+		reset($this->images);
+		$this->default_imageid = key($this->images);
+
+		if ($this->hasInput('iconmapid')) {
+			$iconmaps = API::IconMap()->get([
+				'output' => ['iconmapid', 'name', 'default_iconid'],
+				'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
+				'iconmapids' => (array) $this->getInput('iconmapid'),
+				'editable' => true
+			]);
+
+			if (!$iconmaps) {
+				return false;
+			}
+
+			$this->iconmap = $this->getInput('iconmap', []) + reset($iconmaps);
+		}
+		else {
+			$this->iconmap = $this->getInput('iconmap', []) + [
+				'name' => '',
+				'default_iconid' => $this->default_imageid,
+				'mappings' => []
+			];
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
 		$data = [
-			'demo' => __FILE__
+			'iconmapid' => $this->getInput('iconmapid', 0),
+			'icon_list' => $this->images,
+			'iconmap' => $this->iconmap,
+			'inventory_list' => $this->inventory_list
 		];
 
+		$data['default_imageid'] = $this->default_imageid;
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerIconMapEdit'));
+		$response->setTitle(_('Configuration of icon mapping'));
+
 		$this->setResponse($response);
 	}
 }

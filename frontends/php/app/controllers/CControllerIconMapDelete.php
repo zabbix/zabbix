@@ -27,7 +27,7 @@ class CControllerIconMapDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'iconmapid' => 'required | db icon_map.iconmapid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +40,33 @@ class CControllerIconMapDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		return (bool) API::IconMap()->get([
+			'output' => ['iconmapid'],
+			'iconmapids' => (array) $this->getInput('iconmapid'),
+			'editable' => true
+		]);
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$result = (bool) API::IconMap()->delete((array) $this->getInput('iconmapid'));
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerIconMapDelete'));
+		$url = (new CUrl('zabbix.php'));
+		if ($result) {
+			$url->setArgument('action', 'iconmap.list');
+			$response = new CControllerResponseRedirect($url);
+			$response->setMessageOk(_('Icon map deleted'));
+		}
+		else {
+			$url->setArgument('action', 'iconmap.edit');
+			$url->setArgument('iconmapid', $this->getInput('iconmapid'));
+			$response = new CControllerResponseRedirect($url);
+			$response->setMessageError(_('Cannot delete icon map'));
+		}
+
 		$this->setResponse($response);
 	}
 }
