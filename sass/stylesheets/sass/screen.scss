@@ -3632,7 +3632,7 @@ $form-icon-btn: (
 	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 
 	// Not to loose hovered header while widget underneath is updating.
-	z-index: 3;
+	z-index: 80;
 
 	h4 {
 		flex-grow: 1;
