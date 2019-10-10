@@ -1782,9 +1782,13 @@ static int	process_host_availability_contents(struct zbx_json_parse *jp_data, ch
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, (zbx_host_availability_t *)hosts.values[i]))
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			if (SUCCEED != zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset,
+					(zbx_host_availability_t *)hosts.values[i]))
+			{
+				continue;
+			}
 
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
@@ -2185,7 +2189,7 @@ try_again:
 		if (0 != hd->logeventid)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 
-		if (0 != hd->state)
+		if (ITEM_STATE_NORMAL != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
 		if (0 == (PROXY_HISTORY_FLAG_NOVALUE & hd->flags))

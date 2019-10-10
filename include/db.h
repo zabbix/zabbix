@@ -236,8 +236,11 @@ struct	_DC_TRIGGER;
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 
 #	define	ZBX_SQL_EXEC_FROM	0
-
-#	define	ZBX_SQL_STRCMP		"%s'%s'"
+#	ifdef HAVE_MYSQL
+#		define	ZBX_SQL_STRCMP		"%s binary '%s'"
+#	else
+#		define	ZBX_SQL_STRCMP		"%s'%s'"
+#	endif
 #	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif

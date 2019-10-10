@@ -102,8 +102,8 @@ failed(4)  The temperature sensor detects a condition that could  permanently da
                <name>Overall system health status</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>1.3.6.1.4.1.232.2.1.3.0</snmp_oid>
-               <key>system.status[cpqSiMibCondition.0]</key>
+               <snmp_oid>1.3.6.1.4.1.232.6.1.3.0</snmp_oid>
+               <key>system.status[cpqHeMibCondition.0]</key>
                <delay>30s</delay>
                <history>2w</history>
                <trends>0d</trends>
@@ -2740,7 +2740,7 @@ Please check virtual disk for warnings or errors</description>
    <graphs/>
    <triggers>
       <trigger>
-         <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+         <expression>{Template Server HP iLO SNMPv2:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>System status is in critical state</name>
@@ -2757,7 +2757,7 @@ Please check the device for errors</description>
          <tags/>
       </trigger>
       <trigger>
-         <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_WARN_STATUS},eq)}=1</expression>
+         <expression>{Template Server HP iLO SNMPv2:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_WARN_STATUS},eq)}=1</expression>
          <recovery_mode>0</recovery_mode>
          <recovery_expression/>
          <name>System status is in warning state</name>
@@ -2773,7 +2773,7 @@ Please check the device for warnings</description>
          <dependencies>
             <dependency>
                <name>System status is in critical state</name>
-               <expression>{Template Server HP iLO SNMPv2:system.status[cpqSiMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
+               <expression>{Template Server HP iLO SNMPv2:system.status[cpqHeMibCondition.0].count(#1,{$HEALTH_CRIT_STATUS},eq)}=1</expression>
                <recovery_expression/>
             </dependency>
          </dependencies>
