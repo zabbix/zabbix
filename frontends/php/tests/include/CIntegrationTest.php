@@ -48,6 +48,7 @@ class CIntegrationTest extends CAPITest {
 	const AGENT_PORT_SUFFIX = '50';
 	const SERVER_PORT_SUFFIX = '51';
 	const PROXY_PORT_SUFFIX = '52';
+	const AGENT2_PORT_SUFFIX = '53';
 
 	/**
 	 * Components required by test suite.
@@ -454,7 +455,7 @@ class CIntegrationTest extends CAPITest {
 			self::COMPONENT_AGENT2 => [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
 			]
 		];
 
