@@ -755,7 +755,6 @@ static int	send_buffer(const char *host, unsigned short port)
 	const char			*err_send_step = "";
 	zbx_socket_t			s;
 	struct zbx_json 		json;
-	ZBX_THREAD_LOCAL static int	last_reported_error = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
@@ -911,19 +910,7 @@ out:
 					host, port, err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
-
-		if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-		{
-			/* report network errors not more often than once in 10 seconds */
-			if (10 <= (now - last_reported_error))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "send value error: %s%s",
-						err_send_step, zbx_socket_strerror());
-				last_reported_error = now;
-			}
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
