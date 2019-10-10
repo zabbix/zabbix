@@ -737,18 +737,18 @@ jQuery(function($) {
 
 		var addNew = false;
 
-		if (ms.options.addNew && search.length) {
+		if (ms.options.addNew && ms.values.search.length) {
 			if (data.length || objectLength(ms.values.selected) > 0) {
 				var names = {};
 
 				// Check if value exists among available values.
 				$.each(data, function(i, item) {
-					if (item.name === search) {
+					if (item.name === ms.values.search) {
 						names[item.name.toUpperCase()] = true;
 					}
 				});
 
-				if (typeof names[search.toUpperCase()] === 'undefined') {
+				if (typeof names[ms.values.search.toUpperCase()] === 'undefined') {
 					addNew = true;
 				}
 
@@ -763,7 +763,7 @@ jQuery(function($) {
 						}
 					});
 
-					if (typeof names[search.toUpperCase()] === 'undefined') {
+					if (typeof names[ms.values.search.toUpperCase()] === 'undefined') {
 						addNew = true;
 					}
 				}
@@ -789,10 +789,10 @@ jQuery(function($) {
 		});
 
 		if (addNew) {
-			ms.values.available[search] = {
-				id: search,
+			ms.values.available[ms.values.search] = {
+				id: ms.values.search,
 				prefix: '',
-				name: search + ' (' + ms.options.labels['new'] + ')',
+				name: ms.values.search + ' (' + ms.options.labels['new'] + ')',
 				isNew: true
 			};
 		}
@@ -829,8 +829,8 @@ jQuery(function($) {
 		if (found > 0) {
 			$('[aria-live]', $obj).text(
 				(available_more
-					? sprintf(t('More than %1$d matches for %2$s found'), found, search)
-					: sprintf(t('%1$d matches for %2$s found'), found, search)) +
+					? sprintf(t('More than %1$d matches for %2$s found'), found, ms.values.search)
+					: sprintf(t('%1$d matches for %2$s found'), found, ms.values.search)) +
 				', ' + sprintf(t('%1$s preselected, use down,up arrow keys and enter to select'), preselected)
 			);
 		}
