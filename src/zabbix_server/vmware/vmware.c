@@ -1923,6 +1923,8 @@ out:
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
+ *             counters     - [IN/OUT] the vector the created performance     *
+ *                                     counter object should be added to      *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -2141,6 +2143,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	{
 		zbx_vmware_dev_t	*dev;
 		char			*unitNumber = NULL, *controllerKey = NULL, *busNumber = NULL,
+					*controllerLabel = NULL, *controllerType = NULL,
 					*scsiCtlrUnitNumber = NULL;
 		xmlXPathObject		*xpathObjController = NULL;
 
@@ -2182,14 +2185,30 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 			dev = (zbx_vmware_dev_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 			dev->type =  ZBX_VMWARE_DEV_TYPE_DISK;
 
-			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber> */
-			/* where controller type is either ide or scsi depending on the controller type   */
-			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", (NULL == scsiCtlrUnitNumber ? "ide" : "scsi"),
-					busNumber, unitNumber);
+			/* the virtual disk instance has format <controller type><busNumber>:<unitNumber>     */
+			/* where controller type is either ide, sata or scsi depending on the controller type */
 
 			dev->label = zbx_xml_read_node_value(details, nodeset->nodeTab[i],
 					"*[local-name()='deviceInfo']/*[local-name()='label']");
 
+			controllerLabel = zbx_xml_read_node_value(details, xpathObjController->nodesetval->nodeTab[0],
+				"*[local-name()='deviceInfo']/*[local-name()='label']");
+
+			if (NULL != scsiCtlrUnitNumber ||
+				(NULL != controllerLabel && NULL != strstr(controllerLabel, "SCSI")))
+			{
+				controllerType = "scsi";
+			}
+			else if (NULL != controllerLabel && NULL != strstr(controllerLabel, "SATA"))
+			{
+				controllerType = "sata";
+			}
+			else
+			{
+				controllerType = "ide";
+			}
+
+			dev->instance = zbx_dsprintf(NULL, "%s%s:%s", controllerType, busNumber, unitNumber);
 			zbx_vector_ptr_append(&vm->devs, dev);
 
 			disks++;
@@ -2200,6 +2219,7 @@ static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 		if (NULL != xpathObjController)
 			xmlXPathFreeObject(xpathObjController);
 
+		zbx_free(controllerLabel);
 		zbx_free(scsiCtlrUnitNumber);
 		zbx_free(busNumber);
 		zbx_free(unitNumber);
@@ -4548,8 +4568,6 @@ clean:
  *                             (Datastore, VirtualMachine...)                 *
  *             id       - [IN] the performance entity id                      *
  *             error    - [IN] the error to add                               *
- *             instance - [IN] the performance counter instance name          *
- *             now      - [IN] the current timestamp                          *
  *                                                                            *
  * Comments: The performance counters are specified by their path:            *
  *             <group>/<key>[<rollup type>]                                   *
@@ -4572,12 +4590,12 @@ static void	vmware_perf_data_add_error(zbx_vector_ptr_t *perfdata, const char *t
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_parse_perf_data                                   *
+ * Function: vmware_service_copy_perf_data                                    *
  *                                                                            *
- * Purpose: updates vmware performance statistics data                        *
+ * Purpose: copies vmware performance statistics of specified service         *
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
- *             perfdata - [IN] the performance data                           *
+ *             perfdata - [IN/OUT] the performance data                       *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vector_ptr_t *perfdata)
@@ -4959,7 +4977,7 @@ static void	vmware_service_remove(zbx_vmware_service_t *service)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_get_service                                               *
+ * Function: zbx_vmware_get_service                                           *
  *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *

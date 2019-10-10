@@ -1021,4 +1021,18 @@ out:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
       data: "@.id"
       detached: 1
+---
+test case: Compile success $['cn=snmp,cn=monitor']['connections']
+in:
+  path: "$['cn=snmp,cn=monitor']['connections']"
+out:
+  result: SUCCEED
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'cn=snmp,cn=monitor'"
+      detached: 0
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'connections'"
+      detached: 0
 ...

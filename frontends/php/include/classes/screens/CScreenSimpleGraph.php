@@ -49,9 +49,14 @@ class CScreenSimpleGraph extends CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
-			$this->action = 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$resourceid.
-				'&from='.$this->timeline['from'].'&to='.$this->timeline['to'].
-				$this->getProfileUrlParams();
+			$this->action = (new CUrl('history.php'))
+				->setArgument('action', HISTORY_GRAPH)
+				->setArgument('itemids', [$resourceid])
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to'])
+				->setArgument('profileIdx', $this->profileIdx)
+				->setArgument('profileIdx2', $this->profileIdx2)
+				->getUrl();
 		}
 
 		if ($resourceid && $this->mode != SCREEN_MODE_EDIT) {
@@ -60,15 +65,32 @@ class CScreenSimpleGraph extends CScreenBase {
 			}
 		}
 
-		$timeControlData['src'] = $resourceid
-			? 'chart.php?itemids[]='.$resourceid.'&'.$this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-			: 'chart3.php?';
+		if ($resourceid) {
+			$src = (new CUrl('chart.php'))
+				->setArgument('itemids', [$resourceid])
+				->setArgument('width', $this->screenitem['width'])
+				->setArgument('height', $this->screenitem['height']);
+		}
+		else {
+			$src = new CUrl('chart3.php');
+		}
 
-		$timeControlData['src'] .= ($this->mode == SCREEN_MODE_EDIT)
-			? '&from='.ZBX_PERIOD_DEFAULT_FROM.'&to='.ZBX_PERIOD_DEFAULT_TO
-			: '&from='.$this->timeline['from'].'&to='.$this->timeline['to'];
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$src
+				->setArgument('from', ZBX_PERIOD_DEFAULT_FROM)
+				->setArgument('to', ZBX_PERIOD_DEFAULT_TO);
+		}
+		else {
+			$src
+				->setArgument('from', $this->timeline['from'])
+				->setArgument('to', $this->timeline['to']);
+		}
 
-		$timeControlData['src'] .= $this->getProfileUrlParams();
+		$src
+			->setArgument('profileIdx', $this->profileIdx)
+			->setArgument('profileIdx2', $this->profileIdx2);
+
+		$timeControlData['src'] = $src->getUrl();
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
@@ -86,8 +108,12 @@ class CScreenSimpleGraph extends CScreenBase {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-				$item = new CLink(null, 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$resourceid.
-					'&from='.$this->timeline['from'].'&to='.$this->timeline['to']
+				$item = new CLink(null, (new CUrl('history.php'))
+					->setArgument('action', HISTORY_GRAPH)
+					->setArgument('itemids', [$resourceid])
+					->setArgument('from', $this->timeline['from'])
+					->setArgument('to', $this->timeline['to'])
+					->getUrl()
 				);
 			}
 			$item->setId($containerid);
