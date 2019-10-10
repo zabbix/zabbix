@@ -21,6 +21,7 @@
 require_once dirname(__FILE__).'/testDataCollection.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testAgent2BackwardCompatibility.php';
+require_once dirname(__FILE__).'/testGoAgentDynamic.php'; // Should be merged with testAgent2BackwardCompatibility
 
 class IntegrationTests {
 	public static function suite() {
@@ -28,6 +29,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testAgent2BackwardCompatibility');
+		$suite->addTestSuite('testGoAgentDynamic');
 
 		return $suite;
 	}
