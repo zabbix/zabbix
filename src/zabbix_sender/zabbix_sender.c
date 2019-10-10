@@ -302,7 +302,7 @@ ZBX_THREAD_SENDVAL_ARGS;
 static int	update_exit_status(int old_status, int new_status)
 {
 	/* FAIL(-1) signal gets converted to unsigned char when leaving the thread */
-	if (FAIL == old_status || WEXITSTATUS(FAIL) == new_status)
+	if (FAIL == old_status || (unsigned char)FAIL == new_status)
 		return FAIL;
 
 	if (SUCCEED == old_status)
