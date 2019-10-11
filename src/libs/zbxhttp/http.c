@@ -152,15 +152,11 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				break;
 			case HTTPTEST_AUTH_NEGOTIATE:
 #if defined(CURLAUTH_NEGOTIATE)
-#	define ZBX_CURLAUTH_NEGOTIATE CURLAUTH_NEGOTIATE
-#elif defined(CURLAUTH_GSSNEGOTIATE)
-#	define ZBX_CURLAUTH_NEGOTIATE CURLAUTH_GSSNEGOTIATE
-#endif
-
-#ifdef ZBX_CURLAUTH_NEGOTIATE
-				curlauth = ZBX_CURLAUTH_NEGOTIATE;
+				curlauth = CURLAUTH_NEGOTIATE;
 				break;
-#	undef ZBX_CURLAUTH_NEGOTIATE
+#elif defined(CURLAUTH_GSSNEGOTIATE)
+				curlauth = CURLAUTH_GSSNEGOTIATE;
+				break;
 #else
 				*error = zbx_strdup(*error, "Cannot set HTTP server authentication method to"
 						" negotiate: cURL library support >= 7.10.6 is required");
