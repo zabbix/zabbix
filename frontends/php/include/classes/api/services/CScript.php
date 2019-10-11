@@ -664,11 +664,15 @@ class CScript extends CApiService {
 
 		$scripts = $this->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
 			'hostids' => $hostids,
 			'sortfield' => 'name',
 			'preservekeys' => true
 		]);
+
+		$scripts = $this->addRelatetGroupsAndHosts([
+			'selectGroups' => null,
+			'selectHosts' => ['hostid']
+		], $scripts, $hostids);
 
 		if ($scripts) {
 			// resolve macros
@@ -734,6 +738,21 @@ class CScript extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		return $this->addRelatetGroupsAndHosts($options, $result);
+	}
+
+	/**
+	 * Applies relational subselect onto already fetched result.
+	 *
+	 * @param  array $options
+	 * @param  mixed $options['selectGroups']
+	 * @param  mixed $options['selectHosts']
+	 * @param  array $result
+	 * @param  array $hostids                  An additional filter by hostids, which will be added to "hosts" key.
+	 *
+	 * @return array $result
+	 */
+	private function addRelatetGroupsAndHosts(array $options, array $result, array $hostids = null) {
 		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
 		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
 
@@ -803,6 +822,10 @@ class CScript extends CApiService {
 		if ($is_hosts_select) {
 			$sql = 'SELECT hostid,groupid FROM hosts_groups'.
 				' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
+			if ($hostids !== null) {
+				$sql .= ' AND '.dbConditionInt('hostid', $hostids);
+			}
+
 			$db_group_hosts = DBSelect($sql);
 
 			$all_hostids = [];
