@@ -809,13 +809,21 @@ class CScript extends CApiService {
 			$host_groups_with_write_access = $host_groups;
 		}
 
+		$nested = [];
+		foreach ($host_groups as $groupid => $group) {
+			$name = $group['name'];
+
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$nested[$name][$groupid] = true;
+			}
+		}
+
 		$hstgrp_branch = [];
 		foreach ($host_groups as $groupid => $group) {
 			$hstgrp_branch[$groupid] = [$groupid => true];
-			foreach ($host_groups as $n_groupid => $n_group) {
-				if (strpos($n_group['name'], $group['name'].'/') === 0) {
-					$hstgrp_branch[$groupid][$n_groupid] = true;
-				}
+			if (array_key_exists($group['name'], $nested)) {
+				$hstgrp_branch[$groupid] += $nested[$group['name']];
 			}
 		}
 
