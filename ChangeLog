@@ -170,9 +170,25 @@ Bug fixes:
 Changes for 4.2.8rc1
 
 New features:
+........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 .......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
+A......... [ZBX-16702] fixed error in the elastic search clearing history (vasilijs)
+..F....... [ZBX-10805] fixed log items graphs drawing with numeric values like trapper items (vasilijs)
+A......... [ZBX-16604] fixed occurrence of an undefined index in discovered graph configuration (vasilijs)
+..F....... [ZBX-16611] fixed memory and performance leaks in gtlc.js library (averza)
+..F....... [ZBX-15135] fixed incorrect triggers being displayed in Availability report when filtering by template (averza, Ivo)
+..F....... [ZBX-16681] fixed displaying of "Acknowledge" menu option for "Not classified" problems in the Trigger overview page (Sasha)
+...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)
+...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
+...G...... [ZBX-16680] fixed freeing locked resources when Zabbix agent cannot be started and has to exit with failure (viktors)
+..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
+...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
+........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)
+........S. [ZBX-16383] addjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
+.......PS. [ZBX-16575] getting disk controller type from linked controller label value (atumilovics)
+.......PS. [ZBX-16561] fixed JsonPath parsing for comma characters inside quoted string (atumilovics)
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
 .........T [ZBX-15897] fixed overall health check in Template HP iLO SNMPv2 (vitaly)
 
