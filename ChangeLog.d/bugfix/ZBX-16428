@@ -1,1 +1,0 @@
-...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)
