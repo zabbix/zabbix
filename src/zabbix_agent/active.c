@@ -1153,7 +1153,7 @@ static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *reques
 
 	if (MIN_VALUE_LINES > (rate = atoi(p)) ||
 			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
-			(1 == is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
+			(0 != is_count_item && MAX_VALUE_LINES_MULTIPLIER * MAX_VALUE_LINES < rate))
 	{
 		*error = zbx_strdup(*error, "Invalid fourth parameter.");
 		return FAIL;
@@ -1309,7 +1309,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	}
 
 	/* parameter 'output' (not used for log.count[], logrt.count[]) */
-	if (1 == is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
+	if (0 != is_count_item || (NULL == (output_template = get_rparam(&request, 5))))
 		output_template = "";
 
 	/* parameter 'maxdelay' */
@@ -1376,7 +1376,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		metric->error_count = 0;
 
-		if (1 == is_count_item)
+		if (0 != is_count_item)
 		{
 			/* send log.count[] or logrt.count[] item value to server */
 
@@ -1421,7 +1421,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		metric->error_count++;
 
-		if (1 == is_count_item)
+		if (0 != is_count_item)
 		{
 			/* restore original state to try again during the next check */
 
@@ -1755,7 +1755,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	time_t	nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
-	double	time_now;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1781,11 +1780,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
-		zbx_update_env(time_now);
-		now = (int)time_now;
+		zbx_update_env(zbx_time());
 
-		if (now >= nextsend)
+		if ((now = time(NULL)) >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);
 			nextsend = time(NULL) + 1;
