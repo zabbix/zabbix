@@ -53,6 +53,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		$type = $this->getInput('type', array_keys($known_widget_types)[0]);
 		$form = CWidgetConfig::getForm($type, $this->getInput('fields', '{}'));
+		// Transforms corrupted data to default values.
+		$form->validate();
 
 		$config = select_config();
 

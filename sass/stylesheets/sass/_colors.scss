@@ -44,7 +44,6 @@ $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
 $overlay-bg-color: #fff !default;
 
-
 // UI
 $ui-bg-color: #fff !default;
 $ui-bg-selected-color: #768d99 !default;
@@ -64,7 +63,6 @@ $table-border-color: #ebeef0 !default;
 
 $ui-tab-bg-selected-color: #0275b8 !default;
 
-
 // FORMS
 $form-font-color: #1f2c33 !default;
 $form-bg-color: #fff !default;
@@ -82,6 +80,13 @@ $scrollbar-thumb-color-darken: 5% !default;
 
 $input-placeholder-color: #9d9d9d !default;
 
+// ERROR MESSAGES
+$msg-bad-color: darken(desaturate($red, 10%), 20%) !default;
+$msg-bad-border-color: $light-red !default;
+$msg-good-color: darken(desaturate($green, 10%), 20%) !default;
+$msg-good-border-color: $light-green !default;
+$msg-warning-color: #9a7938 !default;
+$msg-warning-border-color: #ffd788 !default;
 
 // BUTTONS
 $btn-font-color: #fff !default;
@@ -136,6 +141,8 @@ $ok-unack-fg-color: #009900 !default;
 $ok-ack-fg-color: #009900 !default;
 
 // MULTISELECT
+$multiselect-selected-bg-color: #93a5af !default;
+
 $multiselect-disabled-bg-color: $disabled-bg-color;
 $multiselect-item-disabled-color: $disabled-item-color;
 $multiselect-item-disabled-bg-color: $disabled-item-bg-color;

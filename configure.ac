@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.0.12rc1])
+AC_INIT([Zabbix],[4.0.14rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 
@@ -1288,7 +1288,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([ZBXCMOCKA], [(test -d tests/) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"

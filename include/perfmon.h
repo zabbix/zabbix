@@ -41,6 +41,13 @@ typedef enum
 }
 zbx_perf_counter_status_t;
 
+typedef enum
+{
+	PERF_COUNTER_LANG_DEFAULT = 0,
+	PERF_COUNTER_LANG_EN
+}
+zbx_perf_counter_lang_t;
+
 typedef struct perf_counter_id
 {
 	struct perf_counter_id	*next;
@@ -55,6 +62,7 @@ typedef struct perf_counter_data
 	char				*name;
 	char				*counterpath;
 	int				interval;
+	zbx_perf_counter_lang_t		lang;
 	zbx_perf_counter_status_t	status;
 	HCOUNTER			handle;
 	PDH_RAW_COUNTER			rawValues[2];	/* rate counters need two raw values */
@@ -69,12 +77,12 @@ zbx_perf_counter_data_t;
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
 PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *counter, PDH_HQUERY query,
-		const char *counterpath, PDH_HCOUNTER *handle);
+		const char *counterpath, zbx_perf_counter_lang_t lang, PDH_HCOUNTER *handle);
 PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
 
-PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, double *value);
+PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, zbx_perf_counter_lang_t lang, double *value);
 wchar_t		*get_counter_name(DWORD pdhIndex);
-int		check_counter_path(char *counterPath);
+int		check_counter_path(char *counterPath, int convert_from_numeric);
 
 #endif /* ZABBIX_PERFMON_H */

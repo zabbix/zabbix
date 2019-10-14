@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-11 01:43+0300\n"
+"POT-Creation-Date: 2019-10-13 01:42+0300\n"
 "PO-Revision-Date: 2019-03-23 23:45+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -53,7 +53,7 @@ msgid_plural "%1$d days"
 msgstr[0] "%1$d gün"
 msgstr[1] "%1$d gün"
 
-#: jsLoader.php:237
+#: jsLoader.php:242
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
@@ -120,8 +120,8 @@ msgstr[1] ""
 #: include/classes/widgets/CWidgetConfig.php:155
 #: include/classes/widgets/CWidgetConfig.php:156
 #: include/classes/widgets/CWidgetConfig.php:157
-#: include/classes/widgets/CWidgetConfig.php:158 jsLoader.php:278
-#: jsLoader.php:279 jsLoader.php:280 jsLoader.php:281
+#: include/classes/widgets/CWidgetConfig.php:158 jsLoader.php:283
+#: jsLoader.php:284 jsLoader.php:285 jsLoader.php:286
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -135,7 +135,7 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:238
+#: jsLoader.php:243
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
@@ -165,8 +165,8 @@ msgstr[0] "Kalan deneme sayısı %1$s"
 msgstr[1] "Kalan deneme sayısı %1$s"
 
 #: include/classes/widgets/CWidgetConfig.php:153
-#: include/classes/widgets/CWidgetConfig.php:154 jsLoader.php:276
-#: jsLoader.php:277
+#: include/classes/widgets/CWidgetConfig.php:154 jsLoader.php:281
+#: jsLoader.php:282
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
@@ -186,13 +186,13 @@ msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
 msgstr ""
 
-#: jsLoader.php:232
+#: jsLoader.php:237
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
 msgstr ""
 
-#: jsLoader.php:282
+#: jsLoader.php:287
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
@@ -242,7 +242,7 @@ msgstr "(vekil sunucu yok)"
 msgid "0 - use default port"
 msgstr "0 - öntanımlı bağlantı noktasını kullan"
 
-#: include/triggers.inc.php:1846
+#: include/triggers.inc.php:1847
 msgid "0 or 1"
 msgstr "0 veya 1"
 
@@ -337,7 +337,7 @@ msgstr[1] "Hesap %1$s saniyeliğine bloke edildi."
 msgid "Ack"
 msgstr "Onay"
 
-#: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:242
+#: app/views/monitoring.acknowledge.edit.php:72 jsLoader.php:247
 msgid "Acknowledge"
 msgstr "Onay"
 
@@ -428,21 +428,21 @@ msgstr ""
 msgid "Action"
 msgstr "Eylem"
 
-#: include/classes/api/services/CAction.php:2819
-#: include/classes/api/services/CAction.php:2837
-#: include/classes/api/services/CAction.php:3014
-#: include/classes/api/services/CAction.php:3047
+#: include/classes/api/services/CAction.php:2825
+#: include/classes/api/services/CAction.php:2843
+#: include/classes/api/services/CAction.php:3020
+#: include/classes/api/services/CAction.php:3053
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "\"%1$s\" eylemi halihazırda var."
 
-#: include/classes/api/services/CAction.php:2890
-#: include/classes/api/services/CAction.php:3091
+#: include/classes/api/services/CAction.php:2896
+#: include/classes/api/services/CAction.php:3097
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr "Eylem \"%1$s\" hiçbir işlem tanımlanmadı."
 
-#: actionconf.php:233
+#: actionconf.php:232
 msgid "Action added"
 msgstr "Eylem eklendi"
 
@@ -450,17 +450,17 @@ msgstr "Eylem eklendi"
 msgid "Action condition value must be empty."
 msgstr ""
 
-#: actionconf.php:257
+#: actionconf.php:254
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:503
+#: actionconf.php:500
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Eylem devre dışı"
 msgstr[1] "Eylemler devre dışı"
 
-#: actionconf.php:502
+#: actionconf.php:499
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Eylem etkin"
@@ -488,7 +488,7 @@ msgstr "Eylem güncellendi"
 #: include/views/configuration.action.list.php:23
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:66
-#: include/views/monitoring.sysmap.list.php:61 jsLoader.php:241
+#: include/views/monitoring.sysmap.list.php:61 jsLoader.php:246
 #: tr_events.php:146
 msgid "Actions"
 msgstr "Eylemler"
@@ -658,7 +658,7 @@ msgstr "Şu zamana kadar aktif"
 #: include/views/monitoring.sysmap.edit.php:294
 #: include/views/monitoring.sysmap.edit.php:330
 #: include/views/monitoring.sysmap.edit.php:398 jsLoader.php:115
-#: jsLoader.php:294
+#: jsLoader.php:299
 msgid "Add"
 msgstr "Ekle"
 
@@ -670,7 +670,7 @@ msgstr "Yeni bir parçacık ekle"
 msgid "Add child"
 msgstr "Alt ekle"
 
-#: jsLoader.php:296
+#: jsLoader.php:301
 msgid "Add child element"
 msgstr "Alt öğe ekle"
 
@@ -678,7 +678,7 @@ msgstr "Alt öğe ekle"
 msgid "Add host"
 msgstr "Ana makine ekle"
 
-#: jsLoader.php:297
+#: jsLoader.php:302
 msgid "Add multiple maps"
 msgstr "Birden çok harita ekle"
 
@@ -728,7 +728,7 @@ msgstr "Parçacık ekle"
 msgid "Added"
 msgstr "Eklendi"
 
-#: jsLoader.php:230
+#: jsLoader.php:235
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
@@ -845,7 +845,7 @@ msgstr "Tüm gruplar"
 msgid "All hosts"
 msgstr "Tüm ana makineler"
 
-#: jsLoader.php:193
+#: jsLoader.php:198
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Tüm bağlantılarda \"Name\" ve \"URL\" tanımlanmış olmalıdır"
 
@@ -879,7 +879,7 @@ msgstr ""
 msgid "All templates"
 msgstr "Tüm şablonlar"
 
-#: include/triggers.inc.php:1241
+#: include/triggers.inc.php:1242
 #: include/views/configuration.trigger.prototype.edit.php:520
 #: include/views/configuration.trigger.prototype.massupdate.php:173
 #: include/views/configuration.triggers.edit.php:554
@@ -898,7 +898,7 @@ msgstr "İzin verilen ana makineler"
 msgid "Alternatively, you can install it manually:"
 msgstr "Alternatif olarak elle yükleyebilirsiniz:"
 
-#: include/triggers.inc.php:1309
+#: include/triggers.inc.php:1310
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1146
 #: include/views/configuration.correlation.edit.php:94
@@ -1021,7 +1021,7 @@ msgstr "Uygulamalar"
 #: include/views/js/monitoring.sysmaps.js.php:535
 #: include/views/js/monitoring.sysmaps.js.php:630
 #: include/views/js/monitoring.sysmaps.js.php:730 jsLoader.php:114
-#: jsLoader.php:293
+#: jsLoader.php:298
 msgid "Apply"
 msgstr "Uygula"
 
@@ -1040,7 +1040,7 @@ msgid "Apr"
 msgstr "Nis"
 
 #: include/forms.inc.php:1972 include/func.inc.php:119
-#: include/func.inc.php:256 jsLoader.php:145
+#: include/func.inc.php:256 jsLoader.php:150
 msgid "April"
 msgstr "Nisan"
 
@@ -1190,7 +1190,7 @@ msgid "Aug"
 msgstr "Ağu"
 
 #: include/forms.inc.php:1959 include/func.inc.php:123
-#: include/func.inc.php:260 jsLoader.php:149
+#: include/func.inc.php:260 jsLoader.php:154
 msgid "August"
 msgstr "Ağustos"
 
@@ -1422,11 +1422,11 @@ msgstr "Sınır genişliği"
 msgid "Bottom"
 msgstr "Alt"
 
-#: jsLoader.php:185
+#: jsLoader.php:190
 msgid "Bring forward"
 msgstr "Öne getir"
 
-#: jsLoader.php:184
+#: jsLoader.php:189
 msgid "Bring to front"
 msgstr "Öne getir"
 
@@ -1484,7 +1484,7 @@ msgstr "SLA Hesapla, kabul edilebilir SLA (% olarak)"
 msgid "Calculated"
 msgstr "Hesaplanmış"
 
-#: jsLoader.php:141
+#: jsLoader.php:146
 msgid "Calendar"
 msgstr ""
 
@@ -1492,7 +1492,7 @@ msgstr ""
 msgid "Callback"
 msgstr "Geri çağırma"
 
-#: jsLoader.php:233
+#: jsLoader.php:238
 msgctxt "screen reader"
 msgid "Can not be removed"
 msgstr ""
@@ -1525,7 +1525,7 @@ msgstr "Kanada (136 karakter)"
 #: include/views/js/configuration.discovery.edit.js.php:667
 #: include/views/js/conf.import.js.php:16
 #: include/views/monitoring.slideconf.edit.php:277 jsLoader.php:117
-#: jsLoader.php:129 jsLoader.php:295 jsLoader.php:307
+#: jsLoader.php:131 jsLoader.php:300 jsLoader.php:312
 msgid "Cancel"
 msgstr "İptal"
 
@@ -1534,9 +1534,9 @@ msgstr "İptal"
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
 msgstr "Bir web senaryosuna keşfedilen bir uygulama \"%1$s\" eklenemez."
 
-#: include/classes/api/services/CGraph.php:694
-#: include/classes/api/services/CGraph.php:708
-#: include/classes/api/services/CGraph.php:722
+#: include/classes/api/services/CGraph.php:696
+#: include/classes/api/services/CGraph.php:710
+#: include/classes/api/services/CGraph.php:724
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
 msgstr "\"%2$s\" grafiğine sayısal olmayan \"%1$s\" öğesi eklenemez."
@@ -1547,11 +1547,11 @@ msgstr "\"%2$s\" grafiğine sayısal olmayan \"%1$s\" öğesi eklenemez."
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
 msgstr "\"%2$s\" grafik prototipine sayısal olmayan \"%1$s\" öğesi eklenemez."
 
-#: actionconf.php:234
+#: actionconf.php:233
 msgid "Cannot add action"
 msgstr "Eylem eklenemiyor"
 
-#: actionconf.php:320
+#: actionconf.php:317
 msgid "Cannot add action condition"
 msgstr "Eylem koşulu eklenemiyor"
 
@@ -1719,6 +1719,10 @@ msgstr "Değer haritası eklenemiyor"
 msgid "Cannot add web scenario"
 msgstr "Web senaryosu eklenemiyor"
 
+#: jsLoader.php:128
+msgid "Cannot add widget: not enough free space on the dashboard."
+msgstr ""
+
 #: jsLoader.php:121
 msgid "Cannot add widgets in kiosk mode"
 msgstr ""
@@ -1850,7 +1854,7 @@ msgstr "Parçacık oluşturulamıyor: %1$s."
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "\"%1$s\" Zabbix dahili kullanıcısı silinemiyor, bu kullanıcıyı devredışı bırakmayı deneyin."
 
-#: actionconf.php:257
+#: actionconf.php:254
 msgid "Cannot delete action"
 msgstr "Eylem silinemiyor"
 
@@ -1914,7 +1918,7 @@ msgstr[1] "Gruplar silinemiyor"
 msgid "Cannot delete host"
 msgstr "Ana makine silinemiyor"
 
-#: include/classes/api/services/CHost.php:1189
+#: include/classes/api/services/CHost.php:1193
 #, c-format
 msgid "Cannot delete host because maintenance \"%1$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete selected hosts because maintenance \"%1$s\" must contain at least one host or host group."
@@ -1944,7 +1948,7 @@ msgstr "Simge eşlemesi silinemiyor"
 msgid "Cannot delete image"
 msgstr "Resim silinemiyor"
 
-#: include/classes/api/services/CHost.php:994
+#: include/classes/api/services/CHost.php:998
 msgid "Cannot delete inventory."
 msgstr "Envanter silinemiyor."
 
@@ -2005,7 +2009,7 @@ msgstr[1] "Betikler silinemiyor"
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr "Betikler silinemiyor. \"%1$s\" betiği \"%2$s\" eylem işleminde kullanılıyor."
 
-#: actionconf.php:525
+#: actionconf.php:519
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemiyor"
 
@@ -2098,7 +2102,7 @@ msgstr[1] "Değer haritaları silinemiyor"
 msgid "Cannot delete web scenario"
 msgstr "Web senaryosu silinemiyor"
 
-#: actionconf.php:514
+#: actionconf.php:508
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Eylem devre dışı bırakılamıyor"
@@ -2161,7 +2165,7 @@ msgstr "Öğe kuyruğu görüntülenemiyor."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "\"Graph sum\" türünde birden çok öğe görüntülenemez."
 
-#: actionconf.php:513
+#: actionconf.php:507
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Eylem etkinleştirilemiyor"
@@ -2220,7 +2224,7 @@ msgstr[1] "Web senaryoları etkinleştirilemiyor"
 msgid "Cannot execute script"
 msgstr "Betik çalıştırılamıyor"
 
-#: jsLoader.php:196
+#: jsLoader.php:201
 msgid "Cannot expand macros."
 msgstr "Makrolar genişletilemiyor."
 
@@ -2254,7 +2258,7 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ana makinesi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1086
+#: include/classes/import/CConfigurationImport.php:1122
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının ana makine prototipi \"%2$s\" için ana makine grubu \"%1$s\" bulunamadı."
@@ -2277,32 +2281,32 @@ msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" simgesi bulunamadı."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan simge haritası \"%1$s\" bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1470
+#: include/classes/import/CConfigurationImport.php:1506
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1239
+#: include/classes/import/CConfigurationImport.php:1275
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MAKS değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1454
+#: include/classes/import/CConfigurationImport.php:1490
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "\"%3$s\" grafiği için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1219
+#: include/classes/import/CConfigurationImport.php:1255
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının grafik prototipi \"%3$s\" için Y ekseni MİN değeri olarak kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1489
+#: include/classes/import/CConfigurationImport.php:1525
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "\"%3$s\" grafiğinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1259
+#: include/classes/import/CConfigurationImport.php:1295
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\" üzerindeki \"%4$s\" keşif kuralının \"%3$s\" grafik prototipinde kullanılan \"%2$s\" üzerindeki \"%1$s\" öğesi bulunamadı."
@@ -2327,7 +2331,7 @@ msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" haritası bulunamıyor."
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ekranı bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:1109
+#: include/classes/import/CConfigurationImport.php:1145
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine prototipi için \"%1$s\" şablonu bulunamıyor."
@@ -2338,12 +2342,12 @@ msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının \"%2$s\" ana makine pro
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "\"%2$s\" haritasında kullanılan \"%1$s\" tetikleyicisi bulunamıyor."
 
-#: include/classes/import/CConfigurationImport.php:716
+#: include/classes/import/CConfigurationImport.php:748
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\" üzerindeki \"%2$s\" öğesi için değer haritası \"%1$s\" bulunamadı."
 
-#: include/classes/import/CConfigurationImport.php:1014
+#: include/classes/import/CConfigurationImport.php:1050
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\" üzerindeki \"%3$s\" keşif kuralının öğe prototipi \"%2$s\" için kullanılan \"%1$s\" değer haritası bulunamıyor."
@@ -2356,7 +2360,7 @@ msgstr "Ağaç biçimlendirilemiyor. Servis bağlantılarındaki mantık yapıs�
 msgid "Cannot format tree."
 msgstr "Ağaç biçimlendirilemiyor."
 
-#: include/classes/api/services/CTemplate.php:803
+#: include/classes/api/services/CTemplate.php:804
 msgid "Cannot have empty visible template name."
 msgstr "Görünür şablon adı boş olamaz."
 
@@ -2367,7 +2371,7 @@ msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
 msgstr[0] "\"%1$s\" ekranı içeri aktarılamıyor: \"%2$s\" alt ekranı mevcut değil."
 msgstr[1] "\"%1$s\" ekranı içeri aktarılamıyor: \"%2$s\" alt ekranları mevcut değil."
 
-#: include/classes/import/importers/CTemplateImporter.php:121
+#: include/classes/import/importers/CTemplateImporter.php:123
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
@@ -2388,12 +2392,12 @@ msgstr "Görünüm dosyası \"%s\" içerilemiyor."
 msgid "Cannot insert trigger expression"
 msgstr "Tetikleyici ifadesi eklenemiyor"
 
-#: include/classes/api/services/CHost.php:972
+#: include/classes/api/services/CHost.php:976
 msgid "Cannot link template"
 msgstr "Şablon bağlantısı yapılamıyor"
 
-#: include/classes/api/services/CTemplate.php:890
-#: include/classes/api/services/CTemplate.php:904
+#: include/classes/api/services/CTemplate.php:891
+#: include/classes/api/services/CTemplate.php:905
 msgid "Cannot link template."
 msgstr "Şablon bağlantısı yapılamıyor."
 
@@ -2401,11 +2405,11 @@ msgstr "Şablon bağlantısı yapılamıyor."
 msgid "Cannot logout."
 msgstr "Oturum kapatılamıyor."
 
-#: include/classes/api/services/CHost.php:830
+#: include/classes/api/services/CHost.php:834
 msgid "Cannot mass update host name."
 msgstr "Ana makine adına toplu güncelleme yapılamıyor."
 
-#: include/classes/api/services/CTemplate.php:1028
+#: include/classes/api/services/CTemplate.php:1029
 msgid "Cannot mass update template name."
 msgstr "Şablon adına toplu güncelleme yapılamıyor."
 
@@ -2413,7 +2417,7 @@ msgstr "Şablon adına toplu güncelleme yapılamıyor."
 msgid "Cannot mass update visible host name."
 msgstr "Görünür ana makine adına toplu güncelleme yapılamıyor."
 
-#: include/classes/api/services/CTemplate.php:993
+#: include/classes/api/services/CTemplate.php:994
 msgid "Cannot mass update visible template name."
 msgstr "Görünür şablon adına toplu güncelleme yapılamıyor."
 
@@ -2489,7 +2493,7 @@ msgstr ""
 msgid "Cannot send request: %1$s."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2853
+#: include/classes/api/services/CAction.php:2859
 #, c-format
 msgid "Cannot set \"%1$s\" for action \"%2$s\"."
 msgstr "\"%2$s\" eylemi için \"%1$s\" ayarlanamıyor."
@@ -2535,9 +2539,9 @@ msgstr "\"%1$s\" öğe prototipinde uygulama prototipi için \"templateid\" alan
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranında \"templateid\" ayarlanamıyor."
 
-#: include/classes/api/services/CHost.php:881
-#: include/classes/api/services/CHost.php:1745
-#: include/classes/api/services/CHost.php:1889
+#: include/classes/api/services/CHost.php:885
+#: include/classes/api/services/CHost.php:1751
+#: include/classes/api/services/CHost.php:1897
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Devre dışı envanter için envanter alanları tanımlanamaz."
 
@@ -2566,12 +2570,12 @@ msgstr "Uygulamaların bağlantısı kaldırılıp temizlenemiyor."
 msgid "Cannot unlink and clear discovery rules"
 msgstr "Keşif kurallarının bağlantısı kaldırılıp temizlenemiyor"
 
-#: include/classes/api/services/CHost.php:947
+#: include/classes/api/services/CHost.php:951
 msgid "Cannot unlink template"
 msgstr "Şablonun bağlantısı kaldırılamadı"
 
-#: include/classes/api/services/CTemplate.php:855
-#: include/classes/api/services/CTemplate.php:878
+#: include/classes/api/services/CTemplate.php:856
+#: include/classes/api/services/CTemplate.php:879
 msgid "Cannot unlink template."
 msgstr "Şablonun bağlantısı kaldırılamıyor."
 
@@ -2580,8 +2584,8 @@ msgstr "Şablonun bağlantısı kaldırılamıyor."
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "\"%s\" tetikleyicisinin bağlantısı kaldırılamıyor, ana makineyle bağlantılı bırakılmış şablondan öğeler var."
 
-#: include/classes/api/services/CAction.php:2993
-#: include/classes/api/services/CAction.php:2998
+#: include/classes/api/services/CAction.php:2999
+#: include/classes/api/services/CAction.php:3004
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "\"%2$s\" eylemi için \"%1$s\" güncellenemiyor."
@@ -2621,7 +2625,7 @@ msgstr "\"%2$s\" tetikleyicisi için \"%1$s\" ayarlanamıyor."
 msgid "Cannot update \"%1$s\" for trigger prototype \"%2$s\"."
 msgstr "\"%2$s\" tetikleyici prototipi için \"%1$s\" ayarlanamıyor."
 
-#: include/classes/api/services/CHost.php:1868
+#: include/classes/api/services/CHost.php:1874
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "\"%1$s\" keşfedilmiş ana makinesi için \"%2$s\" ayarlanamıyor."
@@ -2802,8 +2806,8 @@ msgstr "Ağ haritası güncellenemiyor"
 msgid "Cannot update proxy"
 msgstr "Vekil sunucu güncellenemiyor"
 
-#: include/classes/api/services/CProxy.php:702
-#: include/classes/api/services/CProxy.php:820
+#: include/classes/api/services/CProxy.php:703
+#: include/classes/api/services/CProxy.php:822
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Keşfedilen ana makine \"%1$s\" için vekil sunucu güncellenemiyor."
@@ -2843,8 +2847,8 @@ msgstr "Şablon güncellenemiyor"
 msgid "Cannot update templated applications."
 msgstr "Şablonlanmış uygulamalar güncellenemiyor."
 
-#: include/classes/api/services/CTemplate.php:754
-#: include/classes/api/services/CTemplate.php:1088
+#: include/classes/api/services/CTemplate.php:755
+#: include/classes/api/services/CTemplate.php:1090
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
 msgstr "Keşfedilmiş ana makine \"%1$s\" üzerindeki şablonlar güncellenemiyor."
@@ -2936,7 +2940,7 @@ msgctxt "noun"
 msgid "Change"
 msgstr "Değişiklik"
 
-#: include/classes/screens/CScreenBase.php:406
+#: include/classes/screens/CScreenBase.php:397
 #: include/classes/screens/CScreenBuilder.php:502
 #: include/classes/screens/CScreenMap.php:45
 #: include/views/configuration.services.edit.php:62
@@ -3089,7 +3093,7 @@ msgstr "Çince (zh_TW)"
 msgid "Circular reference in screens: %1$s."
 msgstr "Ekranlarda çevrimsel referans: %1$s."
 
-#: include/classes/import/importers/CTemplateImporter.php:153
+#: include/classes/import/importers/CTemplateImporter.php:155
 #, c-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Şablonlarda çevrimsel referans: %1$s."
@@ -3099,7 +3103,7 @@ msgstr "Şablonlarda çevrimsel referans: %1$s."
 msgid "Circular template linkage is not allowed."
 msgstr "Çevrimsel şablon bağlantısına izin verilmiyor."
 
-#: jsLoader.php:205
+#: jsLoader.php:210
 msgid "Clear"
 msgstr "Temizle"
 
@@ -3149,7 +3153,7 @@ msgstr "Saat"
 #: include/views/configuration.triggers.edit.php:644
 #: include/views/monitoring.screen.edit.php:222
 #: include/views/monitoring.slideconf.edit.php:275
-#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:244
+#: include/views/monitoring.sysmap.edit.php:389 jsLoader.php:249
 msgid "Clone"
 msgstr "Klonla"
 
@@ -3157,8 +3161,8 @@ msgstr "Klonla"
 #: include/views/js/monitoring.sysmaps.js.php:422
 #: include/views/js/monitoring.sysmaps.js.php:542
 #: include/views/js/monitoring.sysmaps.js.php:637
-#: include/views/js/monitoring.sysmaps.js.php:734 jsLoader.php:130
-#: jsLoader.php:222 jsLoader.php:300
+#: include/views/js/monitoring.sysmaps.js.php:734 jsLoader.php:132
+#: jsLoader.php:227 jsLoader.php:305
 msgid "Close"
 msgstr "Kapat"
 
@@ -3182,8 +3186,8 @@ msgid "Close problem"
 msgstr "Problemi kapat"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:216
-#: jsLoader.php:221
+#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:221
+#: jsLoader.php:226
 msgid "Collapse"
 msgstr "Daralt"
 
@@ -3196,7 +3200,7 @@ msgid "Colour"
 msgstr "Renk"
 
 #: include/classes/validators/CColorValidator.php:32
-#: include/validate.inc.php:208 jsLoader.php:198
+#: include/validate.inc.php:208 jsLoader.php:203
 #, c-format
 msgid "Colour \"%1$s\" is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "\"%1$s\" rengi doğru değil: onaltılık renk kodu bekleniyor (6 hane)."
@@ -3250,7 +3254,7 @@ msgstr "Ticari"
 msgid "Compact view"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2711
+#: include/classes/api/services/CAction.php:2717
 msgid "Comparing several triggers with \"and\" is not allowed."
 msgstr "Birkaç tetikleyicinin \"ve\" ile karşılaştırılmasına izin verilmez."
 
@@ -3266,7 +3270,7 @@ msgstr "Eşzamanlı oturumlar"
 msgid "Condition"
 msgstr "Koşul"
 
-#: include/classes/api/services/CAction.php:2710
+#: include/classes/api/services/CAction.php:2716
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için \"%3$s\" formülünde \"%2$s\" koşulu kullanılmıyor."
@@ -3281,7 +3285,7 @@ msgstr "\"%1$s\" korelasyonu için \"%3$s\" formülünde \"%2$s\" durumu kullan�
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralı için \"%3$s\" formülünde \"%2$s\" durumu kullanılmıyor."
 
-#: include/classes/api/services/CAction.php:2709
+#: include/classes/api/services/CAction.php:2715
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
 msgstr "\"%1$s\" eylemi için \"%3$s\" formülünde kullanılan \"%2$s\" durumu tanımlanmadı."
@@ -3310,7 +3314,7 @@ msgid "Conditions duplicates for correlation \"%1$s\"."
 msgstr "Korelasyon \"%1$s\" için durum yinelemeleri."
 
 #: include/menu.inc.php:175 include/views/inventory.host.view.php:172
-#: jsLoader.php:243
+#: jsLoader.php:248
 msgid "Configuration"
 msgstr "Yapılandırma"
 
@@ -3687,7 +3691,7 @@ msgstr "Koordinatlar"
 #: include/views/configuration.copy.elements.php:73
 #: include/views/configuration.graph.list.php:150
 #: include/views/configuration.item.list.php:250
-#: include/views/configuration.triggers.list.php:301 jsLoader.php:190
+#: include/views/configuration.triggers.list.php:301 jsLoader.php:195
 msgid "Copy"
 msgstr "Kopyala"
 
@@ -3790,7 +3794,7 @@ msgstr "Korelasyon oluştur"
 msgid "Create dashboard"
 msgstr "Pano oluştur"
 
-#: jsLoader.php:247
+#: jsLoader.php:252
 msgid "Create dependent item"
 msgstr "Bağımlı öğe oluştur"
 
@@ -3890,7 +3894,7 @@ msgstr "Harita oluştur"
 msgid "Create media type"
 msgstr "Medya türü oluştur"
 
-#: include/views/conf.import.php:25 jsLoader.php:245
+#: include/views/conf.import.php:25 jsLoader.php:250
 msgid "Create new"
 msgstr "Yeni oluştur"
 
@@ -3915,7 +3919,7 @@ msgid "Create template"
 msgstr "Şablon oluştur"
 
 #: include/views/configuration.triggers.list.php:28
-#: include/views/configuration.triggers.list.php:135 jsLoader.php:246
+#: include/views/configuration.triggers.list.php:135 jsLoader.php:251
 msgid "Create trigger"
 msgstr "Tetikleyici oluştur"
 
@@ -4064,7 +4068,7 @@ msgid "DNS name"
 msgstr "DNS adı"
 
 #: app/views/report.services.php:34 include/forms.inc.php:1867
-#: include/maintenances.inc.php:33 report4.php:107
+#: include/maintenances.inc.php:33 report4.php:111
 msgid "Daily"
 msgstr "Günlük"
 
@@ -4134,7 +4138,7 @@ msgstr "Veri"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Veri önbellek istatistikleri. Önbellek - değerlerden biri (kipler: all, float, uint, str, log, text), geçmiş (kipler: pfree, total, used, free), eğilim (kipler: pfree, total, used, free), metin (kipler: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2684
+#: include/classes/graphdraw/CLineGraphDraw.php:2686
 #: include/classes/graphdraw/CPieGraphDraw.php:808
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4222,7 +4226,7 @@ msgstr "Donanımın bakım zamanının bittiği tarih"
 msgid "Date HW purchased"
 msgstr "Donanımın alındığı tarih"
 
-#: app/views/report.services.php:69 report4.php:179
+#: app/views/report.services.php:69 report4.php:183
 msgid "Day"
 msgstr "Gün"
 
@@ -4262,7 +4266,7 @@ msgid "Dec"
 msgstr "Ara"
 
 #: include/forms.inc.php:1991 include/func.inc.php:127
-#: include/func.inc.php:264 jsLoader.php:153
+#: include/func.inc.php:264 jsLoader.php:158
 msgid "December"
 msgstr "Aralık"
 
@@ -4275,7 +4279,7 @@ msgstr "Aralık"
 #: include/views/inventory.host.view.php:75
 #: include/views/js/monitoring.sysmaps.js.php:118
 #: include/views/js/monitoring.sysmaps.js.php:220
-#: include/views/js/monitoring.sysmaps.js.php:589 jsLoader.php:179
+#: include/views/js/monitoring.sysmaps.js.php:589 jsLoader.php:184
 msgid "Default"
 msgstr "Öntanımlı"
 
@@ -4372,7 +4376,7 @@ msgstr "Gecikmenin yapıldığı"
 #: include/views/monitoring.screen.list.php:126
 #: include/views/monitoring.slideconf.list.php:97
 #: include/views/monitoring.sysmap.list.php:99 jsLoader.php:118
-#: jsLoader.php:248
+#: jsLoader.php:253
 msgid "Delete"
 msgstr "Sil"
 
@@ -4405,7 +4409,7 @@ msgstr "Şu anki eylem silinsin mi?"
 msgid "Delete current correlation?"
 msgstr "Mevcut korelasyon silinsin mi?"
 
-#: jsLoader.php:249
+#: jsLoader.php:254
 msgid "Delete dashboard?"
 msgstr "Pano silinsin mi?"
 
@@ -4449,7 +4453,7 @@ msgstr "Öğe prototipi silinsin mi?"
 msgid "Delete item?"
 msgstr "Öğe silinsin mi?"
 
-#: jsLoader.php:195
+#: jsLoader.php:200
 msgid "Delete links between selected elements?"
 msgstr "Seçili elemanlar arasındaki bağlar silinsin mi?"
 
@@ -4502,7 +4506,7 @@ msgstr "Seçilen panolar silinsin mi?"
 msgid "Delete selected discovery rules?"
 msgstr "Seçilen keşif kuralları silinsin mi?"
 
-#: jsLoader.php:182
+#: jsLoader.php:187
 msgid "Delete selected elements?"
 msgstr "Seçilen elemanlar silinsin mi?"
 
@@ -4587,7 +4591,7 @@ msgstr "Seçilen ekranlar silinsin mi?"
 msgid "Delete selected scripts?"
 msgstr "Seçilen betikler silinsin mi?"
 
-#: jsLoader.php:183
+#: jsLoader.php:188
 msgid "Delete selected shapes?"
 msgstr "Seçilen şekiller silinsin mi?"
 
@@ -4663,7 +4667,7 @@ msgstr "Web senaryosu silinsin mi?"
 msgid "Deleted"
 msgstr "Silindi"
 
-#: include/classes/api/services/CHost.php:1341
+#: include/classes/api/services/CHost.php:1345
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Silindi: \"%1$s\" ana makinesi."
@@ -4673,7 +4677,7 @@ msgstr "Silindi: \"%1$s\" ana makinesi."
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" ana makine prototipi."
 
-#: include/classes/api/services/CTemplate.php:684
+#: include/classes/api/services/CTemplate.php:685
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
 msgstr "Silindi: \"%1$s\" şablonu."
@@ -4696,7 +4700,7 @@ msgstr "Reddet"
 msgid "Dependencies"
 msgstr "Bağımlılıklar"
 
-#: include/triggers.inc.php:2724
+#: include/triggers.inc.php:2725
 msgid "Dependent"
 msgstr "Bağımlı"
 
@@ -4704,7 +4708,7 @@ msgstr "Bağımlı"
 msgid "Dependent item"
 msgstr "Bağımlı öğe"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2724
+#: app/views/popup.generic.php:288 include/triggers.inc.php:2725
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4733,7 +4737,7 @@ msgstr "Dağıtım durumu"
 #: include/views/configuration.template.edit.php:108
 #: include/views/configuration.trigger.prototype.edit.php:536
 #: include/views/configuration.triggers.edit.php:570
-#: include/views/inventory.host.view.php:116 jsLoader.php:250
+#: include/views/inventory.host.view.php:116 jsLoader.php:255
 msgid "Description"
 msgstr "Açıklama"
 
@@ -4869,7 +4873,7 @@ msgstr "Seçilen web senaryoları devre dışı bırakılsın mı?"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
-#: include/items.inc.php:189 include/triggers.inc.php:2174
+#: include/items.inc.php:189 include/triggers.inc.php:2175
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5063,7 +5067,7 @@ msgid "Display stacked graph"
 msgstr "Yığılmış grafik göster"
 
 #: include/actions.inc.php:1792 include/actions.inc.php:1864
-#: include/actions.inc.php:1955 include/func.inc.php:1703 jsLoader.php:303
+#: include/actions.inc.php:1955 include/func.inc.php:1703 jsLoader.php:308
 #: queue.php:298 search.php:256 search.php:356 search.php:498
 #, c-format
 msgid "Displaying %1$s of %2$s found"
@@ -5094,7 +5098,7 @@ msgstr ""
 msgid "Do not keep trends"
 msgstr ""
 
-#: jsLoader.php:138 jsLoader.php:251
+#: jsLoader.php:140 jsLoader.php:256
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Koşulsal ifadeyi değiştirmek ister misiniz?"
 
@@ -5196,14 +5200,14 @@ msgstr "\"%1$s\" tetikleyicisinde bağımlılıklar mükerrer."
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "\"%1$s\" tetikleyici prototipinde bağımlılıklar mükerrer."
 
-#: include/classes/api/services/CHost.php:1681
-#: include/classes/api/services/CHost.php:1919
+#: include/classes/api/services/CHost.php:1687
+#: include/classes/api/services/CHost.php:1927
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı ana makine adına (\"%s\") sahip ana makine halihazırda verilerde bulunuyor."
 
-#: include/classes/api/services/CHost.php:1688
-#: include/classes/api/services/CHost.php:1939
+#: include/classes/api/services/CHost.php:1694
+#: include/classes/api/services/CHost.php:1947
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Mükerrer ana makine. Aynı görünür ana makine adlı (\"%s\") ana makine halihazırda verilerde bulunuyor."
@@ -5269,7 +5273,7 @@ msgstr "Dinamik öğe"
 msgid "Dynamic items"
 msgstr ""
 
-#: jsLoader.php:194
+#: jsLoader.php:199
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir isme sahip olduğundan emin olun"
 
@@ -5287,7 +5291,7 @@ msgstr "Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir i
 #: include/views/js/configuration.discovery.edit.js.php:7
 #: include/views/js/monitoring.sysmaps.js.php:751
 #: include/views/js/monitoring.sysmaps.js.php:766 jsLoader.php:116
-#: jsLoader.php:289
+#: jsLoader.php:294
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -5307,11 +5311,11 @@ msgstr "Ekranı düzenle"
 msgid "Edit slide show"
 msgstr "Slayt gösterisini düzenle"
 
-#: jsLoader.php:292
+#: jsLoader.php:297
 msgid "Edit tree element"
 msgstr "Ağaç öğesini düzenle"
 
-#: jsLoader.php:252
+#: jsLoader.php:257
 msgid "Edit trigger"
 msgstr "Tetikleyiciyi düzenle"
 
@@ -5399,7 +5403,7 @@ msgstr ""
 msgid "Empty correlation ID."
 msgstr "Boş korelasyon ID'si."
 
-#: include/classes/api/services/CAction.php:2741
+#: include/classes/api/services/CAction.php:2747
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için boş filtre koşulu formül ID'si."
@@ -5414,12 +5418,12 @@ msgstr "\"%1$s\" keşif kuralı için boş filtre koşulu formül ID'si."
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralı için boş filtre koşul makrosu."
 
-#: include/classes/api/services/CAction.php:2746
+#: include/classes/api/services/CAction.php:2752
 #, c-format
 msgid "Empty filter condition operator for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2730
+#: include/classes/api/services/CAction.php:2736
 #, c-format
 msgid "Empty filter condition type for action \"%1$s\"."
 msgstr ""
@@ -5430,7 +5434,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:187
 #: include/classes/api/services/CDRule.php:313
 #: include/classes/api/services/CHostInterface.php:383
-#: include/classes/api/services/CHost.php:1153
+#: include/classes/api/services/CHost.php:1157
 #: include/classes/api/services/CHostPrototype.php:875
 #: include/classes/api/services/CImage.php:437
 #: include/classes/api/services/CMaintenance.php:512
@@ -5446,7 +5450,7 @@ msgstr ""
 #: include/classes/api/services/CService.php:366
 #: include/classes/api/services/CService.php:430
 #: include/classes/api/services/CService.php:498
-#: include/classes/api/services/CTemplate.php:549
+#: include/classes/api/services/CTemplate.php:550
 #: include/classes/api/services/CTrigger.php:659
 #: include/classes/api/services/CTrigger.php:783
 #: include/classes/api/services/CUserMacro.php:600
@@ -5604,7 +5608,7 @@ msgstr ""
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
-#: include/triggers.inc.php:1246 include/triggers.inc.php:2171
+#: include/triggers.inc.php:1247 include/triggers.inc.php:2172
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5661,7 +5665,7 @@ msgstr "Amerikan İngilizcesi (en_US)"
 msgid "Equals"
 msgstr ""
 
-#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:595
+#: include/items.inc.php:35 include/views/js/common.item.edit.js.php:573
 #: include/views/js/configuration.httpconf.edit.js.php:77
 msgid "Error"
 msgstr "Hata"
@@ -5671,7 +5675,7 @@ msgstr "Hata"
 msgid "Error in search request for table \"%1$s\"."
 msgstr "\"%1$s\" tablosu için arama isteği hatası."
 
-#: include/func.inc.php:1938
+#: include/func.inc.php:1938 jsLoader.php:142
 msgid "Error message"
 msgstr ""
 
@@ -5706,7 +5710,7 @@ msgstr "Olay korelasyon kuralları"
 msgid "Event details"
 msgstr "Olay detayları"
 
-#: include/triggers.inc.php:1236
+#: include/triggers.inc.php:1237
 msgid "Event generation"
 msgstr "Olay oluşturma"
 
@@ -5759,7 +5763,7 @@ msgstr "Dahil etme"
 msgid "Exclude host groups"
 msgstr "Ana makine gruplarını hariç tut"
 
-#: jsLoader.php:131
+#: jsLoader.php:133
 msgid "Execute"
 msgstr "Çalıştır"
 
@@ -5794,13 +5798,13 @@ msgstr "Çalıştırılmış"
 msgid "Executed script"
 msgstr "Çalıştırılmış betik"
 
-#: jsLoader.php:132
+#: jsLoader.php:134
 msgid "Execution confirmation"
 msgstr "Çalıştırma onayı"
 
 #: include/classes/html/CCollapsibleUiWidget.php:59
-#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:217
-#: jsLoader.php:220
+#: include/classes/widgets/CWidgetHelper.php:893 jsLoader.php:222
+#: jsLoader.php:225
 msgid "Expand"
 msgstr "Genişlet"
 
@@ -5901,7 +5905,7 @@ msgstr "Harici kontrol"
 msgid "Ez Texting"
 msgstr "Ez Mesajlaşma"
 
-#: jsLoader.php:165
+#: jsLoader.php:170
 msgctxt "Friday short"
 msgid "F"
 msgstr "Cum"
@@ -5929,7 +5933,7 @@ msgstr "Başarısız"
 msgid "Failed to create dashboard"
 msgstr "Pano oluşturma başarısız"
 
-#: include/views/js/common.item.edit.js.php:597
+#: include/views/js/common.item.edit.js.php:575
 #: include/views/js/configuration.httpconf.edit.js.php:75
 msgid "Failed to parse URL."
 msgstr "URL ayrıştırılamadı."
@@ -5938,7 +5942,7 @@ msgstr "URL ayrıştırılamadı."
 msgid "Failed to update dashboard"
 msgstr "Pano güncelleme başarısız"
 
-#: include/classes/api/services/CTemplate.php:507
+#: include/classes/api/services/CTemplate.php:508
 msgid "Failed to update template."
 msgstr "Şablon güncellenemedi."
 
@@ -5967,7 +5971,7 @@ msgid "Feb"
 msgstr "Şub"
 
 #: include/forms.inc.php:1956 include/func.inc.php:117
-#: include/func.inc.php:254 jsLoader.php:143
+#: include/func.inc.php:254 jsLoader.php:148
 msgid "February"
 msgstr "Şubat"
 
@@ -5981,14 +5985,14 @@ msgid "Field \"%1$s\" cannot be set to NULL."
 msgstr "\"%1$s\" alanı NULL olarak ayarlanamıyor."
 
 #: app/controllers/CControllerPopupTriggerWizard.php:226
-#: include/classes/api/services/CAction.php:1705
+#: include/classes/api/services/CAction.php:1711
 #: include/classes/api/services/CDRule.php:196
 #: include/classes/api/services/CDRule.php:318
 #: include/classes/api/services/CDRule.php:493
 #: include/classes/api/services/CDRule.php:503
 #: include/classes/api/services/CHostGroup.php:911
 #: include/classes/api/services/CHost.php:743
-#: include/classes/api/services/CTemplate.php:782
+#: include/classes/api/services/CTemplate.php:783
 #: include/classes/api/services/CTriggerGeneral.php:237
 #: include/classes/validators/CNewValidator.php:255
 #: include/validate.inc.php:300
@@ -6040,7 +6044,7 @@ msgstr "\"%2$s\" medya türü için \"%1$s\" alanı gerekiyor."
 msgid "Field \"%1$s\" must be missing."
 msgstr "\"%1$s\" alanı eksik olmalıdır."
 
-#: include/classes/api/services/CTemplate.php:401
+#: include/classes/api/services/CTemplate.php:403
 msgid "Field \"host\" is mandatory."
 msgstr "\"Ana makine\" alanı zorunludur."
 
@@ -6100,7 +6104,6 @@ msgstr "Dolu bölge"
 #: app/views/monitoring.problem.view.php:339
 #: include/classes/html/CFilter.php:402
 #: include/classes/widgets/forms/CWidgetFormMap.php:56
-#: include/classes/widgets/forms/CWidgetFormMap.php:101
 #: include/forms.inc.php:886
 #: include/views/administration.auditacts.list.php:47
 #: include/views/administration.auditlogs.list.php:61
@@ -6122,7 +6125,7 @@ msgstr "Dolu bölge"
 #: include/views/monitoring.screen.list.php:58
 #: include/views/monitoring.slideconf.list.php:45
 #: include/views/monitoring.sysmap.list.php:40
-#: include/views/reports.toptriggers.php:76 latest.php:320 report2.php:424
+#: include/views/reports.toptriggers.php:76 latest.php:320 report2.php:449
 msgid "Filter"
 msgstr "Filtre"
 
@@ -6226,7 +6229,7 @@ msgid "Fri"
 msgstr "Cum"
 
 #: include/forms.inc.php:1924 include/forms.inc.php:2039
-#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:158
+#: include/func.inc.php:139 include/func.inc.php:229 jsLoader.php:163
 msgid "Friday"
 msgstr "Cuma"
 
@@ -6234,7 +6237,7 @@ msgstr "Cuma"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:86
 #: include/views/configuration.services.edit.php:245
 #: include/views/configuration.services.edit.php:291
-#: include/views/js/monitoring.sysmaps.js.php:669 report4.php:195
+#: include/views/js/monitoring.sysmaps.js.php:669 report4.php:199
 #: services.php:47 services.php:182
 msgid "From"
 msgstr "Kimden"
@@ -6321,7 +6324,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr "Web sayfasının içeriğini al. Web sayfası kaynağını metin olarak döndürür"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1392
+#: include/triggers.inc.php:1393
 msgid "Given expression is not a macro"
 msgstr "Verilen ifade bir makro değil"
 
@@ -6349,7 +6352,7 @@ msgstr "Genel değer"
 msgid "Go back to %1$s"
 msgstr "Dönüş yap: %1$s"
 
-#: jsLoader.php:257
+#: jsLoader.php:262
 msgid "Go to"
 msgstr "Buraya git"
 
@@ -6374,7 +6377,7 @@ msgstr "Gradyan çizgi"
 #: include/views/monitoring.charts.php:38
 #: include/views/monitoring.history.php:66
 #: include/views/monitoring.screen.constructor.edit.php:156 latest.php:539
-#: latest.php:691 report2.php:430
+#: latest.php:691 report2.php:455
 msgid "Graph"
 msgstr "Grafik"
 
@@ -6551,7 +6554,7 @@ msgstr "Aynı ada sahip ancak başka türdeki grafik mevcut."
 #: include/views/conf.import.php:37 include/views/inventory.host.view.php:141
 #: include/views/inventory.host.view.php:156
 #: include/views/inventory.host.view.php:167
-#: include/views/monitoring.charts.php:63 jsLoader.php:258 search.php:130
+#: include/views/monitoring.charts.php:63 jsLoader.php:263 search.php:130
 #: search.php:136 search.php:172 search.php:201 search.php:239 search.php:291
 #: search.php:345 search.php:411 search.php:445 search.php:468
 msgid "Graphs"
@@ -6610,12 +6613,12 @@ msgstr "\"%1$s\" grubu, bir ana makine prototipi tarafından kullanıldığı i�
 msgid "Group \"%1$s\" cannot be deleted, because it is used in a correlation condition."
 msgstr "\"%1$s\" grubu, bir korelasyon koşulunda kullanıldığından silinemiyor."
 
-#: include/classes/import/importers/CTemplateImporter.php:249
+#: include/classes/import/importers/CTemplateImporter.php:251
 #, c-format
 msgid "Group \"%1$s\" does not exist."
 msgstr "\"%1$s\" grubu mevcut değil."
 
-#: include/classes/import/importers/CHostImporter.php:156
+#: include/classes/import/importers/CHostImporter.php:161
 #, c-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "\"%2$s\" ana makinesi için \"%1$s\" grubu mevcut değil."
@@ -6770,7 +6773,7 @@ msgstr "Yardım"
 msgid "Hexadecimal to decimal"
 msgstr "Onaltılıktan ondalığa"
 
-#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:172
+#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:177
 msgid "Hidden"
 msgstr "Gizli"
 
@@ -6820,7 +6823,7 @@ msgstr ""
 #: include/views/administration.general.housekeeper.edit.php:117
 #: include/views/configuration.item.list.php:67
 #: include/views/configuration.item.prototype.list.php:55 items.php:238
-#: jsLoader.php:259 latest.php:407 latest.php:544 latest.php:696
+#: jsLoader.php:264 latest.php:407 latest.php:544 latest.php:696
 msgid "History"
 msgstr "Geçmiş"
 
@@ -6887,7 +6890,7 @@ msgstr "Yatay hizalama"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/forms.inc.php:375 include/hostgroups.inc.php:251
-#: include/maps.inc.php:24 include/triggers.inc.php:1204
+#: include/maps.inc.php:24 include/triggers.inc.php:1205
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.graph.list.php:51
@@ -6911,24 +6914,24 @@ msgstr "Yatay hizalama"
 #: include/views/monitoring.screen.php:78
 #: include/views/monitoring.slides.php:75
 #: include/views/reports.toptriggers.php:79 items.php:917 items.php:1297
-#: jsLoader.php:174 latest.php:404 latest.php:421 queue.php:263
-#: report2.php:408 report2.php:430 search.php:125
+#: jsLoader.php:179 latest.php:404 latest.php:421 queue.php:263
+#: report2.php:432 report2.php:455 search.php:125
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Ana makine"
 msgstr[1] "Ana makineler"
 
-#: include/classes/api/services/CHost.php:843
-#: include/classes/api/services/CTemplate.php:434
-#: include/classes/import/importers/CHostImporter.php:60
+#: include/classes/api/services/CHost.php:847
+#: include/classes/api/services/CTemplate.php:435
+#: include/classes/import/importers/CHostImporter.php:62
 #, c-format
 msgid "Host \"%1$s\" already exists."
 msgstr "\"%1$s\" ana makinesi zaten var."
 
 #: include/classes/api/services/CHostGroup.php:1457
 #: include/classes/api/services/CHost.php:806
-#: include/classes/api/services/CHost.php:1669
-#: include/classes/api/services/CHost.php:1845
+#: include/classes/api/services/CHost.php:1675
+#: include/classes/api/services/CHost.php:1851
 #, c-format
 msgid "Host \"%1$s\" cannot be without host group."
 msgstr "\"%1$s\" ana makinesi, ana makine grubu olmadan bulunamaz."
@@ -6994,8 +6997,8 @@ msgstr[1] "Ana makineler etkin"
 #: include/views/js/configuration.action.edit.js.php:200
 #: include/views/js/monitoring.sysmaps.js.php:71
 #: include/views/js/monitoring.sysmaps.js.php:77
-#: include/views/js/monitoring.sysmaps.js.php:125 jsLoader.php:177
-#: report2.php:356 report2.php:378 search.php:288
+#: include/views/js/monitoring.sysmaps.js.php:125 jsLoader.php:182
+#: report2.php:393 report2.php:431 search.php:288
 msgid "Host group"
 msgstr "Ana makine grubu"
 
@@ -7070,7 +7073,7 @@ msgstr "Ana makine arayüzü"
 #: include/views/configuration.host.edit.php:753
 #: include/views/configuration.host.prototype.edit.php:373
 #: include/views/inventory.host.list.php:23
-#: include/views/inventory.host.view.php:214 jsLoader.php:260
+#: include/views/inventory.host.view.php:214 jsLoader.php:265
 msgid "Host inventory"
 msgstr "Ana makine envanteri"
 
@@ -7161,7 +7164,7 @@ msgstr "Ana makine prototipleri silindi"
 msgid "Host router"
 msgstr "Ana makine yönlendiricisi"
 
-#: host_screen.php:27 jsLoader.php:261
+#: host_screen.php:27 jsLoader.php:266
 msgid "Host screens"
 msgstr "Ana makine ekranları"
 
@@ -7187,25 +7190,25 @@ msgstr "Ana makine güncellendi"
 msgid "Host with ID \"%1$s\" is not available."
 msgstr "\"%1$s\" ID'li ana makine mevcut değil."
 
-#: include/classes/api/services/CTemplate.php:1054
+#: include/classes/api/services/CTemplate.php:1055
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" adında bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1776
-#: include/classes/api/services/CHost.php:1995
+#: include/classes/api/services/CHost.php:1782
+#: include/classes/api/services/CHost.php:2003
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "\"%s\" adlı ana makine zaten var."
 
-#: include/classes/api/services/CTemplate.php:460
-#: include/classes/api/services/CTemplate.php:1019
+#: include/classes/api/services/CTemplate.php:461
+#: include/classes/api/services/CTemplate.php:1020
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" görünür adlı bir ana makine halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1782
-#: include/classes/api/services/CHost.php:2002
+#: include/classes/api/services/CHost.php:1788
+#: include/classes/api/services/CHost.php:2010
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "\"%s\" görünen adlı ana makine zaten var."
@@ -7220,7 +7223,7 @@ msgstr "\"%s\" görünen adlı ana makine zaten var."
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:827 include/items.inc.php:1181
 #: include/menu.inc.php:132 include/menu.inc.php:196
-#: include/triggers.inc.php:901
+#: include/triggers.inc.php:902
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:86
 #: include/views/configuration.host.discovery.list.php:55
@@ -7443,7 +7446,7 @@ msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinler
 #: include/maps.inc.php:623
 #: include/views/administration.general.image.edit.php:56
 #: include/views/administration.general.image.edit.php:59
-#: include/views/js/monitoring.sysmaps.js.php:72 jsLoader.php:178
+#: include/views/js/monitoring.sysmaps.js.php:72 jsLoader.php:183
 msgid "Image"
 msgstr "Resim"
 
@@ -7533,48 +7536,49 @@ msgstr "Bakımda"
 msgid "In progress"
 msgstr "İşlemde"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:107
+#: app/controllers/CControllerDashboardWidgetEdit.php:109
 msgid "Inaccessible graph"
 msgstr "Erişilemeyen grafik"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:239
+#: app/controllers/CControllerDashboardWidgetEdit.php:241
 #: host_prototypes.php:354
 msgid "Inaccessible group"
 msgstr "Erişilemeyen grup"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:240
+#: app/controllers/CControllerDashboardWidgetEdit.php:242
 msgid "Inaccessible host"
 msgstr "Erişilemeyen ana makine"
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:241
+#: app/controllers/CControllerDashboardWidgetEdit.php:243
 msgid "Inaccessible item"
 msgstr "Erişilemeyen öğe"
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:291 include/triggers.inc.php:2326
+#: include/hostgroups.inc.php:291 include/triggers.inc.php:2327
 #: include/views/configuration.host.list.php:190
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
 msgstr ""
 
-#: app/controllers/CControllerDashboardWidgetEdit.php:103
+#: app/controllers/CControllerDashboardWidgetEdit.php:105
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:85
 msgid "Inaccessible map"
 msgstr "Erişilemeyen harita"
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:898 include/triggers.inc.php:2465
+#: include/items.inc.php:898 include/triggers.inc.php:2466
 msgid "Inaccessible template"
 msgstr ""
 
-#: include/triggers.inc.php:2694 include/triggers.inc.php:2702
+#: include/triggers.inc.php:2695 include/triggers.inc.php:2703
 msgid "Inaccessible trigger"
 msgstr ""
 
 #: app/controllers/CControllerDashboardView.php:400
 #: include/actions.inc.php:2071 include/actions.inc.php:2094
-#: include/actions.inc.php:2099 include/views/monitoring.screen.edit.php:88
+#: include/actions.inc.php:2099 include/events.inc.php:224
+#: include/views/monitoring.screen.edit.php:88
 #: include/views/monitoring.slideconf.edit.php:78
 #: include/views/monitoring.sysmap.edit.php:76
 msgid "Inaccessible user"
@@ -7679,7 +7683,7 @@ msgstr "Yanlış SNMP topluluğu."
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Servis için yanlış kabul edilebilir SLA \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:3160
+#: include/classes/api/services/CAction.php:3166
 msgid "Incorrect acknowledgement action operationid."
 msgstr "Hatalı onaylama eylemi operationid'si."
 
@@ -7687,7 +7691,7 @@ msgstr "Hatalı onaylama eylemi operationid'si."
 msgid "Incorrect action condition discovery check."
 msgstr "Yanlış eylem koşul keşif kontrolü."
 
-#: include/classes/api/services/CAction.php:3236
+#: include/classes/api/services/CAction.php:3242
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Yanlış eylem koşulu keşif kontrolü. Keşif kontrolü mevcut değil ya da ona erişiminiz yok."
 
@@ -7695,7 +7699,7 @@ msgstr "Yanlış eylem koşulu keşif kontrolü. Keşif kontrolü mevcut değil 
 msgid "Incorrect action condition discovery object."
 msgstr "Yanlış eylem koşulu keşif nesnesi."
 
-#: include/classes/api/services/CAction.php:3233
+#: include/classes/api/services/CAction.php:3239
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Yanlış eylem koşulu keşif kuralı. Keşif kuralı mevcut değil ya da ona erişiminiz yok."
 
@@ -7707,11 +7711,11 @@ msgstr "Yanlış eylem koşul keşif durumu."
 msgid "Incorrect action condition event type."
 msgstr "Yanlış eylem koşulu olay türü."
 
-#: include/classes/api/services/CAction.php:3221
+#: include/classes/api/services/CAction.php:3227
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Yanlış eylem koşulu ana makine grubu. Ana makine grubu mevcut değil ya da ona erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:3224
+#: include/classes/api/services/CAction.php:3230
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Yanlış eylem koşulu ana makinesi. Ana makine mevcut değil ya da ona erişiminiz yok."
 
@@ -7720,11 +7724,11 @@ msgstr "Yanlış eylem koşulu ana makinesi. Ana makine mevcut değil ya da ona 
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Yanlış eylem koşulu bağlantı noktası \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:3239
+#: include/classes/api/services/CAction.php:3245
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Yanlış eylem durumunda vekil sunucu. Vekil sunucu yok veya ona erişemiyorsunuz."
 
-#: include/classes/api/services/CAction.php:3227
+#: include/classes/api/services/CAction.php:3233
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Yanlış eylem durumunda şablon. Şablon yok veya ona erişemiyorsunuz."
 
@@ -7732,7 +7736,7 @@ msgstr "Yanlış eylem durumunda şablon. Şablon yok veya ona erişemiyorsunuz.
 msgid "Incorrect action condition trigger severity."
 msgstr "Yanlış eylem durumunda tetikleyici önem derecesi."
 
-#: include/classes/api/services/CAction.php:3230
+#: include/classes/api/services/CAction.php:3236
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Yanlış eylem durumunda tetikleyici. Tetikleyici yok veya ona erişemiyorsunuz."
 
@@ -7740,56 +7744,56 @@ msgstr "Yanlış eylem durumunda tetikleyici. Tetikleyici yok veya ona erişemiy
 msgid "Incorrect action condition type."
 msgstr "Yanlış eylem durumunda tür."
 
-#: include/classes/api/services/CAction.php:1878
+#: include/classes/api/services/CAction.php:1884
 msgid "Incorrect action operation command type."
 msgstr "Yanlış eylem işlem komut türü."
 
-#: include/classes/api/services/CAction.php:2027
+#: include/classes/api/services/CAction.php:2033
 msgid "Incorrect action operation condition acknowledge type."
 msgstr "Yanlış işlem koşul onay türü."
 
-#: include/classes/api/services/CAction.php:2032
+#: include/classes/api/services/CAction.php:2038
 msgid "Incorrect action operation condition type."
 msgstr "Yanlış eylem işlem koşul türü."
 
-#: include/classes/api/services/CAction.php:1722
 #: include/classes/api/services/CAction.php:1728
+#: include/classes/api/services/CAction.php:1734
 msgid "Incorrect action operation escalation step values."
 msgstr "Yanlış eylem işlem eskalasyon adım değerleri."
 
-#: include/classes/api/services/CAction.php:1991
+#: include/classes/api/services/CAction.php:1997
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
 msgstr "Yanlış eylem işlemi ana makine grubu. Ana makine grubu mevcut değil veya bu ana makine grubuna erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:1994
+#: include/classes/api/services/CAction.php:2000
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
 msgstr "Yanlış eylem işlem ana makinesi. Ana makine mevcut değil veya sizin bu ana makineye erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:1885
-#: include/classes/api/services/CAction.php:1894
+#: include/classes/api/services/CAction.php:1891
+#: include/classes/api/services/CAction.php:1900
 #, c-format
 msgid "Incorrect action operation port \"%s\"."
 msgstr "Yanlış eylem işlem portu \"%s\"."
 
-#: include/classes/api/services/CAction.php:1997
+#: include/classes/api/services/CAction.php:2003
 msgid "Incorrect action operation template. Template does not exist or you have no access to this template."
 msgstr "Yanlış eylem işlemi şablonu. Şablon yok veya bu şablona erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:1745
+#: include/classes/api/services/CAction.php:1751
 #, c-format
 msgid "Incorrect action operation type \"%1$s\" for event source \"%2$s\"."
 msgstr "Olay kaynağı \"%2$s\" için yanlış eylem işlem türü \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:2003
+#: include/classes/api/services/CAction.php:2009
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
 msgstr "Yanlış eylem işlem kullanıcı grubu. Kullanıcı grubu mevcut değil veya sizin bu kullanıcı grubuna erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:2000
+#: include/classes/api/services/CAction.php:2006
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "Yanlış eylem işlem kullanıcısı. Kullanıcı mevcut değil veta sizin bu kullanıcıya erişiminiz yok."
 
-#: include/classes/api/services/CAction.php:3104
-#: include/classes/api/services/CAction.php:3122
+#: include/classes/api/services/CAction.php:3110
+#: include/classes/api/services/CAction.php:3128
 msgid "Incorrect action operationid."
 msgstr "Yanlış eylem operationid'si."
 
@@ -7881,26 +7885,26 @@ msgstr "Arayüz için yanlış toplu değer."
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için yanlış SLA hesaplaması."
 
-#: include/classes/api/services/CHost.php:826
-#: include/classes/api/services/CHost.php:1657
-#: include/classes/api/services/CHost.php:1913
+#: include/classes/api/services/CHost.php:829
+#: include/classes/api/services/CHost.php:1663
+#: include/classes/api/services/CHost.php:1921
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "\"%s\" ana makine adı için yanlış karakterler kullanıldı."
 
-#: include/classes/api/services/CProxy.php:623
-#: include/classes/api/services/CProxy.php:736
+#: include/classes/api/services/CProxy.php:624
+#: include/classes/api/services/CProxy.php:738
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "\"%1$s\" proxy adı için yanlış karakterler kullanıldı."
 
-#: include/classes/api/services/CTemplate.php:411
-#: include/classes/api/services/CTemplate.php:1062
+#: include/classes/api/services/CTemplate.php:413
+#: include/classes/api/services/CTemplate.php:1065
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
 msgstr "\"%1$s\" şablon adı için yanlış karakterler kullanıldı."
 
-#: include/classes/api/services/CAction.php:2703
+#: include/classes/api/services/CAction.php:2709
 #, c-format
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış koşullar."
@@ -7914,7 +7918,7 @@ msgstr "Keşif kuralı \"%1$s\" için yanlış koşullar."
 msgid "Incorrect correlation ID."
 msgstr "Yanlış korelasyon ID'si."
 
-#: include/classes/api/services/CAction.php:2708
+#: include/classes/api/services/CAction.php:2714
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
 msgstr "\"%1$s\" eylemi için yanlış özel ifade \"%2$s\": %3$s."
@@ -7964,7 +7968,7 @@ msgstr "sysmap için yanlış alanlar."
 msgid "Incorrect file upload."
 msgstr "Yanlış dosya yüklemesi."
 
-#: include/classes/api/services/CAction.php:2742
+#: include/classes/api/services/CAction.php:2748
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış süzgeç koşul formülü ID'si."
@@ -7984,8 +7988,8 @@ msgstr "\"%1$s\" korelasyonu için yanlış süzgeç koşul formülü ID'si veri
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralı için yanlış süzgeç koşul makrosu."
 
-#: include/classes/api/services/CAction.php:1645
-#: include/classes/api/services/CAction.php:2747
+#: include/classes/api/services/CAction.php:1651
+#: include/classes/api/services/CAction.php:2753
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış süzgeç koşul operatörü."
@@ -7995,15 +7999,15 @@ msgstr "\"%1$s\" eylemi için yanlış süzgeç koşul operatörü."
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralı için yanlış süzgeç koşul operatörü."
 
-#: include/classes/api/services/CAction.php:1638
-#: include/classes/api/services/CAction.php:2731
+#: include/classes/api/services/CAction.php:1644
+#: include/classes/api/services/CAction.php:2737
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış süzgeç koşul türü."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1393
+#: include/triggers.inc.php:1394
 msgid "Incorrect function is used"
 msgstr "Yanlış fonksiyon kullanıldı"
 
@@ -8035,21 +8039,21 @@ msgstr "Yanlış ana makine grubu."
 msgid "Incorrect image index."
 msgstr "Yanlış resim indeksi."
 
-#: include/classes/api/services/CAction.php:2896
-#: include/classes/api/services/CAction.php:2908
-#: include/classes/api/services/CAction.php:2920
+#: include/classes/api/services/CAction.php:2902
+#: include/classes/api/services/CAction.php:2914
+#: include/classes/api/services/CAction.php:2926
 #: include/classes/api/services/CHost.php:812
-#: include/classes/api/services/CHost.php:1651
-#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:1657
+#: include/classes/api/services/CHost.php:1838
 #: include/classes/api/services/CImage.php:449
 #: include/classes/api/services/CImage.php:490
-#: include/classes/api/services/CProxy.php:618
-#: include/classes/api/services/CProxy.php:682
-#: include/classes/api/services/CProxy.php:725
-#: include/classes/api/services/CProxy.php:747
+#: include/classes/api/services/CProxy.php:619
+#: include/classes/api/services/CProxy.php:683
+#: include/classes/api/services/CProxy.php:727
+#: include/classes/api/services/CProxy.php:749
 #: include/classes/api/services/CScreen.php:454
-#: include/classes/api/services/CTemplate.php:406
-#: include/classes/api/services/CTemplate.php:534
+#: include/classes/api/services/CTemplate.php:408
+#: include/classes/api/services/CTemplate.php:535
 #: include/classes/api/services/CTemplateScreen.php:596
 msgid "Incorrect input parameters."
 msgstr "Yanlış giriş parametreleri."
@@ -8064,13 +8068,13 @@ msgstr "Yanlış arayüz DNS parametresi \"%s\" sağlandı."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Yanlış arayüz bağlantı noktası \"%s\" sağlandı."
 
-#: include/classes/api/services/CHost.php:1751
-#: include/classes/api/services/CHost.php:1895
+#: include/classes/api/services/CHost.php:1757
+#: include/classes/api/services/CHost.php:1903
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Yanlış envanter alanı \"%s\"."
 
-#: include/classes/api/services/CAction.php:1981
+#: include/classes/api/services/CAction.php:1987
 msgid "Incorrect inventory mode in action operation."
 msgstr "Eylem işleminde yanlış envanter kipi."
 
@@ -8094,7 +8098,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "Ekran öğesi için yanlış öğe prototip ID'si \"%1$s\" sağlandı."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1394
+#: include/triggers.inc.php:1395
 msgid "Incorrect item value type"
 msgstr "Yanlış öğe değeri türü"
 
@@ -8167,21 +8171,21 @@ msgstr "Yanlış yöntem \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Yanlış nesne değeri."
 
-#: include/classes/api/services/CAction.php:2814
+#: include/classes/api/services/CAction.php:2820
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış parametre."
 
-#: include/classes/api/services/CAction.php:1056
+#: include/classes/api/services/CAction.php:1062
 msgid "Incorrect parameter for operations."
 msgstr "İşlemler için yanlış parametre."
 
-#: include/classes/api/services/CAction.php:2983
+#: include/classes/api/services/CAction.php:2989
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
 msgstr "Eylem güncelleme yöntemi \"%1$s\" için yanlış parametreler."
 
-#: include/classes/api/services/CAction.php:1018
+#: include/classes/api/services/CAction.php:1024
 msgid "Incorrect parameters for condition."
 msgstr "Koşul için yanlış parametreler."
 
@@ -8260,8 +8264,8 @@ msgstr "\"%1$s\" servisi için yanlış sıralama düzeni."
 msgid "Incorrect source value."
 msgstr "Yanlış kaynak değeri."
 
-#: include/classes/api/services/CHost.php:1723
-#: include/classes/api/services/CHost.php:1863
+#: include/classes/api/services/CHost.php:1729
+#: include/classes/api/services/CHost.php:1869
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış durum."
@@ -8324,7 +8328,7 @@ msgstr "Yanlış tetikleyici prototipi ifadesi. \"%1$s\" ana makinesi mevcut de�
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "Yanlış tetikleyici prototipi ifadesi. Tetikleyici prototipi ifade elemanları aynı anda bir şablona ve bir ana makineye ait olmamalıdır."
 
-#: include/classes/api/services/CAction.php:2696
+#: include/classes/api/services/CAction.php:2702
 #, c-format
 msgid "Incorrect type of calculation for action \"%1$s\"."
 msgstr "\"%1$s\" eylemi için yanlış hesaplama türü."
@@ -8368,12 +8372,12 @@ msgid "Incorrect user group."
 msgstr "Yanlış kullanıcı grubu."
 
 #: app/controllers/CControllerPopupGeneric.php:390
-#: include/classes/api/services/CAction.php:818
-#: include/classes/api/services/CAction.php:861
-#: include/classes/api/services/CAction.php:935
-#: include/classes/api/services/CAction.php:1843
-#: include/classes/api/services/CAction.php:2860
-#: include/classes/api/services/CAction.php:3005
+#: include/classes/api/services/CAction.php:823
+#: include/classes/api/services/CAction.php:866
+#: include/classes/api/services/CAction.php:940
+#: include/classes/api/services/CAction.php:1849
+#: include/classes/api/services/CAction.php:2866
+#: include/classes/api/services/CAction.php:3011
 #: include/classes/api/services/CDiscoveryRule.php:1014
 #: include/classes/api/services/CDRule.php:237
 #: include/classes/api/services/CDRule.php:244
@@ -8401,7 +8405,7 @@ msgid "Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "\"%2$s\" alanı için yanlış değer \"%1$s\"."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:134
-#: include/classes/api/services/CAction.php:1776
+#: include/classes/api/services/CAction.php:1782
 #: include/classes/api/services/CScreenItem.php:576
 #: include/validate.inc.php:351
 #, c-format
@@ -8472,10 +8476,10 @@ msgstr ""
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
 #: correlation.php:267 correlation.php:280
-#: include/classes/api/services/CAction.php:1737
-#: include/classes/api/services/CAction.php:1911
-#: include/classes/api/services/CAction.php:1987
-#: include/classes/api/services/CAction.php:2949
+#: include/classes/api/services/CAction.php:1743
+#: include/classes/api/services/CAction.php:1917
+#: include/classes/api/services/CAction.php:1993
+#: include/classes/api/services/CAction.php:2955
 #: include/classes/api/services/CCorrelation.php:1045
 #: include/classes/api/services/CCorrelation.php:1080
 #: include/classes/api/services/CCorrelation.php:1101
@@ -8503,18 +8507,18 @@ msgstr ""
 #: include/classes/api/services/CEvent.php:847
 #: include/classes/api/services/CEvent.php:904
 #: include/classes/api/services/CHost.php:770
-#: include/classes/api/services/CHost.php:1555
-#: include/classes/api/services/CHost.php:1561
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1593
-#: include/classes/api/services/CHost.php:1601
-#: include/classes/api/services/CHost.php:1607
-#: include/classes/api/services/CHost.php:1616
-#: include/classes/api/services/CHost.php:1622
-#: include/classes/api/services/CHost.php:1717
-#: include/classes/api/services/CHost.php:1857
+#: include/classes/api/services/CHost.php:1559
+#: include/classes/api/services/CHost.php:1565
+#: include/classes/api/services/CHost.php:1580
+#: include/classes/api/services/CHost.php:1586
+#: include/classes/api/services/CHost.php:1591
+#: include/classes/api/services/CHost.php:1597
+#: include/classes/api/services/CHost.php:1605
+#: include/classes/api/services/CHost.php:1611
+#: include/classes/api/services/CHost.php:1620
+#: include/classes/api/services/CHost.php:1626
+#: include/classes/api/services/CHost.php:1723
+#: include/classes/api/services/CHost.php:1863
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:216
@@ -8579,10 +8583,10 @@ msgstr ""
 #: include/classes/api/services/CProxy.php:565
 #: include/classes/api/services/CProxy.php:578
 #: include/classes/api/services/CProxy.php:584
-#: include/classes/api/services/CProxy.php:660
-#: include/classes/api/services/CProxy.php:668
-#: include/classes/api/services/CProxy.php:783
-#: include/classes/api/services/CProxy.php:791
+#: include/classes/api/services/CProxy.php:661
+#: include/classes/api/services/CProxy.php:669
+#: include/classes/api/services/CProxy.php:785
+#: include/classes/api/services/CProxy.php:793
 #: include/classes/api/services/CScreen.php:422
 #: include/classes/api/services/CScreen.php:428
 #: include/classes/api/services/CTriggerGeneral.php:242
@@ -8611,14 +8615,14 @@ msgstr ""
 #: include/classes/graphdraw/CPieGraphDraw.php:213
 #: include/classes/helpers/CSvgGraphHelper.php:235
 #: include/classes/helpers/CSvgGraphHelper.php:247
-#: include/classes/import/CConfigurationImport.php:807
-#: include/classes/import/CConfigurationImport.php:845
-#: include/classes/import/CConfigurationImport.php:2460
-#: include/classes/import/CConfigurationImport.php:2564
-#: include/classes/import/CConfigurationImport.php:2574
+#: include/classes/import/CConfigurationImport.php:839
+#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:2506
 #: include/classes/import/CConfigurationImport.php:2610
-#: include/classes/import/CConfigurationImport.php:2619
-#: include/classes/import/CConfigurationImport.php:2625
+#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:2656
+#: include/classes/import/CConfigurationImport.php:2665
+#: include/classes/import/CConfigurationImport.php:2671
 #: include/classes/validators/CNewValidator.php:91
 #: include/classes/validators/CNewValidator.php:101
 #: include/classes/validators/CNewValidator.php:266
@@ -8643,8 +8647,8 @@ msgstr "\"%1$s\" alanı için yanlış değer: boş bırakılamaz."
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr "PSK alanı için yanlış değer kullanıldı. Çift sayıda onaltılık karakterden oluşmalıdır."
 
-#: include/classes/api/services/CProxy.php:645
-#: include/classes/api/services/CProxy.php:775
+#: include/classes/api/services/CProxy.php:646
+#: include/classes/api/services/CProxy.php:777
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Vekil sunucu durumu için yanlış değer kullanıldı \"%1$s\"."
@@ -8699,7 +8703,7 @@ msgid "Insert"
 msgstr "Ekle"
 
 #: include/views/configuration.trigger.prototype.edit.php:111
-#: include/views/configuration.triggers.edit.php:136 jsLoader.php:253
+#: include/views/configuration.triggers.edit.php:136 jsLoader.php:258
 msgid "Insert expression"
 msgstr "İfade ekle"
 
@@ -9028,7 +9032,6 @@ msgstr "Geçersiz parametre sayısı."
 #: include/classes/validators/CApiInputValidator.php:1572
 #: include/classes/validators/CApiInputValidator.php:1577
 #: include/classes/widgets/fields/CWidgetFieldGraphOverride.php:133
-#: include/classes/widgets/forms/CWidgetFormMap.php:101
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:480
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:484
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:490
@@ -9116,7 +9119,7 @@ msgstr "Geçersiz görünüm adı \"%s\" verildi. İzin verilen karakterler: \"a
 msgid "Inventory"
 msgstr "Envanter"
 
-#: include/classes/api/services/CHost.php:1013
+#: include/classes/api/services/CHost.php:1017
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için envanter devre dışı."
@@ -9203,7 +9206,7 @@ msgstr "\"%1$s\" öğesi mevcut değil veya bu öğeye erişiminiz yok"
 msgid "Item \"%1$s\" has master item and cannot be copied."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:699
+#: include/classes/import/CConfigurationImport.php:731
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" öğesi: uygulama \"%3$s\" mevcut değil."
@@ -9487,7 +9490,7 @@ msgid "Jan"
 msgstr "Oca"
 
 #: include/forms.inc.php:1948 include/func.inc.php:116
-#: include/func.inc.php:253 jsLoader.php:142
+#: include/func.inc.php:253 jsLoader.php:147
 msgid "January"
 msgstr "Ocak"
 
@@ -9500,7 +9503,7 @@ msgid "Jul"
 msgstr "Tem"
 
 #: include/forms.inc.php:1951 include/func.inc.php:122
-#: include/func.inc.php:259 jsLoader.php:148
+#: include/func.inc.php:259 jsLoader.php:153
 msgid "July"
 msgstr "Temmuz"
 
@@ -9509,7 +9512,7 @@ msgid "Jun"
 msgstr "Haz"
 
 #: include/forms.inc.php:1988 include/func.inc.php:121
-#: include/func.inc.php:258 jsLoader.php:147
+#: include/func.inc.php:258 jsLoader.php:152
 msgid "June"
 msgstr "Haziran"
 
@@ -9539,7 +9542,7 @@ msgstr "Anahtar \"%1$s\" eşleşmiyor <grpmax|grpmin|grpsum|grpavg>[\"Ana makine
 #: include/views/configuration.action.edit.php:983
 #: include/views/configuration.action.edit.php:1770
 #: include/views/configuration.action.edit.php:2225
-#: include/views/js/common.item.edit.js.php:383
+#: include/views/js/common.item.edit.js.php:361
 msgid "Key passphrase"
 msgstr "Anahtar parola deyimi"
 
@@ -9681,11 +9684,11 @@ msgstr "Son değişiklik (azalan sıralı)"
 msgid "Last check"
 msgstr "Son kontrol"
 
-#: jsLoader.php:264
+#: jsLoader.php:269
 msgid "Last hour graph"
 msgstr "Son saat grafiği"
 
-#: jsLoader.php:265
+#: jsLoader.php:270
 msgid "Last month graph"
 msgstr "Son ayın grafiği"
 
@@ -9708,18 +9711,18 @@ msgstr "En son görüldüğü (dönem)"
 msgid "Last value"
 msgstr "Son değer"
 
-#: jsLoader.php:266
+#: jsLoader.php:271
 msgid "Last week graph"
 msgstr "Son haftanın grafiği"
 
 #: include/menu.inc.php:68 include/views/inventory.host.view.php:127
-#: jsLoader.php:262 latest.php:26 latest.php:306 search.php:128 search.php:232
+#: jsLoader.php:267 latest.php:26 latest.php:306 search.php:128 search.php:232
 #: search.php:289 search.php:338
 msgid "Latest data"
 msgstr "En Son Veriler"
 
 #: app/views/monitoring.widget.problems.view.php:60 include/blocks.inc.php:549
-#: include/classes/screens/CScreenProblem.php:914 jsLoader.php:263
+#: include/classes/screens/CScreenProblem.php:914 jsLoader.php:268
 msgid "Latest values"
 msgstr "En son değerler"
 
@@ -9976,7 +9979,7 @@ msgstr "\"Desteklenmiyor\" durumundaki düşük seviye keşif kuralı"
 msgid "M"
 msgstr "M"
 
-#: jsLoader.php:161
+#: jsLoader.php:166
 msgctxt "Monday short"
 msgid "M"
 msgstr "Pzt"
@@ -10069,7 +10072,7 @@ msgstr "Makrolar güncellendi"
 #: include/views/monitoring.hostscreen.php:57
 #: include/views/monitoring.overview.items.php:45
 #: include/views/monitoring.overview.triggers.php:82
-#: include/views/monitoring.slides.php:83 report2.php:185 report4.php:128
+#: include/views/monitoring.slides.php:83 report2.php:185 report4.php:132
 #: srv_status.php:167
 msgid "Main filter"
 msgstr ""
@@ -10163,7 +10166,7 @@ msgstr ""
 #: include/screens.inc.php:34 include/views/js/monitoring.sysmaps.js.php:69
 #: include/views/js/monitoring.sysmaps.js.php:182
 #: include/views/monitoring.screen.constructor.edit.php:385
-#: include/views/monitoring.sysmap.edit.php:287 jsLoader.php:175 map.php:25
+#: include/views/monitoring.sysmap.edit.php:287 jsLoader.php:180 map.php:25
 msgid "Map"
 msgstr "Harita"
 
@@ -10258,7 +10261,7 @@ msgid "Mar"
 msgstr "Mar"
 
 #: include/forms.inc.php:1964 include/func.inc.php:118
-#: include/func.inc.php:255 jsLoader.php:144
+#: include/func.inc.php:255 jsLoader.php:149
 msgid "March"
 msgstr "Mart"
 
@@ -10352,7 +10355,7 @@ msgid "Maximum total length of email address exceeded for media type with ID \"%
 msgstr ""
 
 #: include/forms.inc.php:1980 include/func.inc.php:120
-#: include/func.inc.php:257 jsLoader.php:146
+#: include/func.inc.php:257 jsLoader.php:151
 msgid "May"
 msgstr "Mayıs"
 
@@ -10368,7 +10371,7 @@ msgid "Media"
 msgstr "Medya"
 
 #: app/views/administration.mediatype.edit.php:174 include/audit.inc.php:26
-#: report4.php:99
+#: report4.php:103
 msgid "Media type"
 msgstr "Medya türü"
 
@@ -10605,7 +10608,7 @@ msgid "Mon"
 msgstr "Pzt"
 
 #: include/forms.inc.php:1904 include/forms.inc.php:2019
-#: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:154
+#: include/func.inc.php:135 include/func.inc.php:225 jsLoader.php:159
 msgid "Monday"
 msgstr "Pazartesi"
 
@@ -10631,20 +10634,20 @@ msgstr "Gözlemleme"
 msgid "Monospace"
 msgstr "Eş aralıklı"
 
-#: app/views/report.services.php:67 include/forms.inc.php:1944 report4.php:166
+#: app/views/report.services.php:67 include/forms.inc.php:1944 report4.php:170
 msgid "Month"
 msgstr "Ay"
 
 #: app/views/report.services.php:36 include/forms.inc.php:1869
-#: include/maintenances.inc.php:37 report4.php:109
+#: include/maintenances.inc.php:37 report4.php:113
 msgid "Monthly"
 msgstr "Aylık"
 
-#: include/classes/html/CMultiSelect.php:71 jsLoader.php:226
+#: include/classes/html/CMultiSelect.php:71 jsLoader.php:231
 msgid "More matches found..."
 msgstr "Daha çok eşleşen bulundu..."
 
-#: jsLoader.php:236
+#: jsLoader.php:241
 #, c-format
 msgctxt "screen reader"
 msgid "More than %1$d matches for %2$s found"
@@ -10668,11 +10671,11 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr "Çoklu"
 
-#: include/triggers.inc.php:1237
+#: include/triggers.inc.php:1238
 msgid "Multiple PROBLEM events"
 msgstr "Birden çok PROBLEM olayı"
 
-#: jsLoader.php:203
+#: jsLoader.php:208
 msgid "Mute"
 msgstr "Sesi Kapat"
 
@@ -10688,7 +10691,7 @@ msgstr "NNTP"
 msgid "NTLM"
 msgstr "NTLM"
 
-#: actionconf.php:36 actionconf.php:239 adm.regexps.php:36 adm.regexps.php:158
+#: actionconf.php:36 adm.regexps.php:36 adm.regexps.php:158
 #: adm.regexps.php:189 app/controllers/CControllerPopupGeneric.php:71
 #: app/controllers/CControllerPopupGeneric.php:83
 #: app/controllers/CControllerPopupGeneric.php:95
@@ -10819,7 +10822,7 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:41
 #: include/views/monitoring.sysmap.list.php:58 items.php:45 latest.php:371
 #: latest.php:405 latest.php:422 maintenance.php:41 queue.php:264
-#: report2.php:430 screenconf.php:42 services.php:36 slideconf.php:36
+#: report2.php:455 screenconf.php:42 services.php:36 slideconf.php:36
 #: sysmaps.php:40 trigger_prototypes.php:37 triggers.php:46
 msgid "Name"
 msgstr "Ad"
@@ -10906,7 +10909,7 @@ msgstr "Yeni koşul"
 msgid "New dashboard"
 msgstr "Yeni pano"
 
-#: jsLoader.php:189
+#: jsLoader.php:194
 msgid "New element"
 msgstr "Yeni eleman"
 
@@ -10956,7 +10959,7 @@ msgstr "Sonraki adım"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
+#: include/triggers.inc.php:1244 include/triggers.inc.php:1249
 #: include/views/administration.users.list.php:111
 #: include/views/administration.users.list.php:115
 #: include/views/configuration.host.prototype.list.php:126
@@ -11023,9 +11026,9 @@ msgstr "Ekran için hiç \"%1$s\" verilmemiş."
 msgid "No \"%1$s\" given for template screen."
 msgstr "Şablon ekran için hiç \"%1$s\" verilmemiş."
 
-#: include/classes/api/services/CAction.php:2754
-#: include/classes/api/services/CAction.php:2874
-#: include/classes/api/services/CAction.php:3067
+#: include/classes/api/services/CAction.php:2760
+#: include/classes/api/services/CAction.php:2880
+#: include/classes/api/services/CAction.php:3073
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "\"%1$s\" eyleminin bir filtre koşulu için hiçbir \"%2$s\" verilmedi."
@@ -11035,7 +11038,7 @@ msgstr "\"%1$s\" eyleminin bir filtre koşulu için hiçbir \"%2$s\" verilmedi."
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralının bir filtre koşulu için hiçbir \"%2$s\" verilmedi."
 
-#: include/classes/api/services/CAction.php:2715
+#: include/classes/api/services/CAction.php:2721
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "\"%1$s\" eylem süzgeci için hiç \"%2$s\" verilmedi."
@@ -11081,13 +11084,13 @@ msgstr "Hiçbir aracı arabirimi bulunmuyor."
 msgid "No applications found."
 msgstr "Hiçbir uygulama bulunmadı."
 
-#: include/classes/api/services/CAction.php:1808
+#: include/classes/api/services/CAction.php:1814
 #, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama tipi belirtilmemiş."
 
-#: include/classes/api/services/CAction.php:1818
-#: include/classes/api/services/CAction.php:1853
+#: include/classes/api/services/CAction.php:1824
+#: include/classes/api/services/CAction.php:1859
 #, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı ismi belirtilmemiş."
@@ -11096,11 +11099,11 @@ msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı i
 msgid "No authentication user name specified."
 msgstr "Hiçbir kimlik doğrulama kullanıcı adı belirtilmedi."
 
-#: include/classes/api/services/CAction.php:1789
+#: include/classes/api/services/CAction.php:1795
 msgid "No command specified for action operation."
 msgstr "Eylem işlemi için hiçbir komut belirtilmemiş."
 
-#: include/classes/api/services/CAction.php:1783
+#: include/classes/api/services/CAction.php:1789
 msgid "No command type specified for action operation."
 msgstr "Eylem işlemi için hiçbir komut tipi belirtilmemiş."
 
@@ -11158,7 +11161,7 @@ msgstr "Hiçbir keşif kuralı ID'si verilmedi."
 msgid "No encryption"
 msgstr "Şifreleme yok"
 
-#: include/classes/api/services/CAction.php:1798
+#: include/classes/api/services/CAction.php:1804
 #, c-format
 msgid "No execution target specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir yürütme hedefi sağlanmadı."
@@ -11224,7 +11227,7 @@ msgstr "Resim yok"
 #: include/views/configuration.host.discovery.edit.php:380
 #: include/views/configuration.item.edit.php:473
 #: include/views/configuration.item.massupdate.php:78
-#: include/views/configuration.item.prototype.edit.php:459 jsLoader.php:286
+#: include/views/configuration.item.prototype.edit.php:459 jsLoader.php:291
 msgid "No interface found"
 msgstr "Hiçbir arabirim bulunamadı"
 
@@ -11232,19 +11235,19 @@ msgstr "Hiçbir arabirim bulunamadı"
 msgid "No interface found."
 msgstr "Hiçbir arabirim bulunamadı."
 
-#: include/classes/api/services/CProxy.php:653
-#: include/classes/api/services/CProxy.php:830
+#: include/classes/api/services/CProxy.php:654
+#: include/classes/api/services/CProxy.php:832
 #, c-format
 msgid "No interface provided for proxy \"%s\"."
 msgstr "\"%s\" vekil sunucusu için hiçbir arayüz sağlanmadı."
 
-#: include/classes/api/services/CHost.php:1730
-#: include/classes/api/services/CHost.php:1906
+#: include/classes/api/services/CHost.php:1736
+#: include/classes/api/services/CHost.php:1914
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "\"%s\" ana makinesi için arayüz yok."
 
-#: include/classes/api/services/CAction.php:1976
+#: include/classes/api/services/CAction.php:1982
 msgid "No inventory mode specified for action operation."
 msgstr "Eylem işlemi için hiçbir envanter kipi belirtilmedi."
 
@@ -11278,7 +11281,7 @@ msgstr "Ekran elemanı için hiçbir harita ID'si sağlanmamış."
 msgid "No maps added."
 msgstr "Hiçbir harita eklenmemiş."
 
-#: include/classes/html/CMultiSelect.php:70 jsLoader.php:225
+#: include/classes/html/CMultiSelect.php:70 jsLoader.php:230
 msgid "No matches found"
 msgstr "Hiçbir eşleşen bulunmadı"
 
@@ -11313,9 +11316,9 @@ msgstr "Sistem erişimi için izin yok."
 #: app/controllers/CControllerWidgetMapView.php:68
 #: app/controllers/CControllerWidgetPlainTextView.php:78
 #: app/views/monitoring.widget.graph.view.php:23 disc_prototypes.php:727
-#: include/classes/api/services/CAction.php:1611
-#: include/classes/api/services/CAction.php:1988
-#: include/classes/api/services/CAction.php:2965
+#: include/classes/api/services/CAction.php:1617
+#: include/classes/api/services/CAction.php:1994
+#: include/classes/api/services/CAction.php:2971
 #: include/classes/api/services/CApplication.php:304
 #: include/classes/api/services/CApplication.php:340
 #: include/classes/api/services/CApplication.php:454
@@ -11342,7 +11345,7 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CGraphGeneral.php:64
 #: include/classes/api/services/CGraphGeneral.php:86
 #: include/classes/api/services/CGraph.php:554
-#: include/classes/api/services/CGraph.php:680
+#: include/classes/api/services/CGraph.php:682
 #: include/classes/api/services/CGraphPrototype.php:570
 #: include/classes/api/services/CGraphPrototype.php:655
 #: include/classes/api/services/CGraphPrototype.php:717
@@ -11359,10 +11362,10 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:394
 #: include/classes/api/services/CHostInterface.php:653
-#: include/classes/api/services/CHost.php:1122
-#: include/classes/api/services/CHost.php:1157
-#: include/classes/api/services/CHost.php:1706
-#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:1126
+#: include/classes/api/services/CHost.php:1161
+#: include/classes/api/services/CHost.php:1712
+#: include/classes/api/services/CHost.php:1844
 #: include/classes/api/services/CHostPrototype.php:353
 #: include/classes/api/services/CHostPrototype.php:399
 #: include/classes/api/services/CHostPrototype.php:420
@@ -11403,9 +11406,9 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CProxy.php:163
 #: include/classes/api/services/CProxy.php:253
 #: include/classes/api/services/CProxy.php:415
-#: include/classes/api/services/CProxy.php:696
-#: include/classes/api/services/CProxy.php:729
-#: include/classes/api/services/CProxy.php:814
+#: include/classes/api/services/CProxy.php:697
+#: include/classes/api/services/CProxy.php:731
+#: include/classes/api/services/CProxy.php:816
 #: include/classes/api/services/CScreenItem.php:396
 #: include/classes/api/services/CScreenItem.php:443
 #: include/classes/api/services/CScreen.php:770
@@ -11417,8 +11420,8 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CService.php:989
 #: include/classes/api/services/CService.php:1013
 #: include/classes/api/services/CTask.php:136
-#: include/classes/api/services/CTemplate.php:722
-#: include/classes/api/services/CTemplate.php:744
+#: include/classes/api/services/CTemplate.php:723
+#: include/classes/api/services/CTemplate.php:745
 #: include/classes/api/services/CTemplateScreen.php:631
 #: include/classes/api/services/CTemplateScreen.php:682
 #: include/classes/api/services/CTemplateScreen.php:745
@@ -11438,8 +11441,8 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CUserMacro.php:766
 #: include/classes/api/services/CUser.php:422
 #: include/classes/api/services/CUser.php:986
-#: include/classes/api/services/CValueMap.php:236
-#: include/classes/api/services/CValueMap.php:336
+#: include/classes/api/services/CValueMap.php:240
+#: include/classes/api/services/CValueMap.php:340
 #: include/classes/helpers/CMapHelper.php:81
 #: include/classes/screens/CScreenHistory.php:139
 #: include/classes/screens/CScreenHttpTestDetails.php:46
@@ -11447,7 +11450,7 @@ msgstr "Sistem erişimi için izin yok."
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Başvurulan nesne için izin yok veya nesne mevcut değil!"
 
-#: include/classes/api/services/CAction.php:1836
+#: include/classes/api/services/CAction.php:1842
 #, c-format
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir özel anahtar dosyası belirtilmemiş."
@@ -11460,7 +11463,7 @@ msgstr "Hiçbir özel anahtar dosyası belirtilmedi."
 msgid "No proxy"
 msgstr "Vekil sunucu yok"
 
-#: include/classes/api/services/CAction.php:1828
+#: include/classes/api/services/CAction.php:1834
 #, c-format
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir açık anahtar dosyası belirtilmemiş."
@@ -11469,11 +11472,11 @@ msgstr "Eylem işlem komutu \"%s\" için hiçbir açık anahtar dosyası belirti
 msgid "No public key file specified."
 msgstr "Hiçbir açık anahtar dosyası belirtilmemiş."
 
-#: include/classes/api/services/CAction.php:1760
+#: include/classes/api/services/CAction.php:1766
 msgid "No recipients for action operation message."
 msgstr "Eylem işlem mesajı için hiçbir alıcı yok."
 
-#: include/classes/widgets/CWidgetConfig.php:152 jsLoader.php:275
+#: include/classes/widgets/CWidgetConfig.php:152 jsLoader.php:280
 msgid "No refresh"
 msgstr "Tazeleme yok"
 
@@ -11485,7 +11488,7 @@ msgstr "Ekran elemanları için hiçbir ekran ID'si sağlanmamış."
 msgid "No screens added."
 msgstr "Hiçbir ekran eklenmemiş."
 
-#: include/classes/api/services/CAction.php:1863
+#: include/classes/api/services/CAction.php:1869
 msgid "No script specified for action operation command."
 msgstr "Eylem işlem komutu için hiçbir betik belirtilmemiş."
 
@@ -11545,7 +11548,7 @@ msgid "None"
 msgstr "Hiçbiri"
 
 #: app/views/popup.generic.php:533 include/graphs.inc.php:24
-#: include/items.inc.php:160 include/triggers.inc.php:1236
+#: include/items.inc.php:160 include/triggers.inc.php:1237
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -11618,7 +11621,7 @@ msgstr "Yapacak hiçbir şey yok."
 msgid "Notification report"
 msgstr "Bildirim raporu"
 
-#: include/menu.inc.php:169 report4.php:65
+#: include/menu.inc.php:169 report4.php:69
 msgid "Notifications"
 msgstr "Bildirimler"
 
@@ -11632,7 +11635,7 @@ msgid "Nov"
 msgstr "Kas"
 
 #: include/forms.inc.php:1983 include/func.inc.php:126
-#: include/func.inc.php:263 jsLoader.php:152
+#: include/func.inc.php:263 jsLoader.php:157
 msgid "November"
 msgstr "Kasım"
 
@@ -11784,13 +11787,13 @@ msgid "Numeral systems"
 msgstr "Sayısal sistemler"
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1844 include/views/configuration.item.edit.php:676
+#: include/triggers.inc.php:1845 include/views/configuration.item.edit.php:676
 #: include/views/configuration.item.massupdate.php:278
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Numeric (float)"
 msgstr "Sayısal (kayan noktalı)"
 
-#: include/triggers.inc.php:1845
+#: include/triggers.inc.php:1846
 msgid "Numeric (integer)"
 msgstr "Sayısal (tam sayısal)"
 
@@ -11863,13 +11866,13 @@ msgid "Octal to decimal"
 msgstr "Sekizlikten ondalığa"
 
 #: include/forms.inc.php:1975 include/func.inc.php:125
-#: include/func.inc.php:262 jsLoader.php:151
+#: include/func.inc.php:262 jsLoader.php:156
 msgid "October"
 msgstr "Ekim"
 
 #: app/views/administration.proxy.list.php:145
 #: include/views/monitoring.sysmap.constructor.php:48
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:171
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:176
 msgid "Off"
 msgstr "Kapalı"
 
@@ -11879,9 +11882,9 @@ msgstr "Kapalı"
 #: include/classes/html/CTriggersInfo.php:76
 #: include/views/administration.users.list.php:124
 #: include/views/configuration.triggers.list.php:58
-#: include/views/js/common.item.edit.js.php:601
+#: include/views/js/common.item.edit.js.php:579
 #: include/views/js/configuration.httpconf.edit.js.php:76
-#: include/views/js/conf.import.js.php:24 report2.php:430
+#: include/views/js/conf.import.js.php:24 report2.php:455
 msgid "Ok"
 msgstr "Tamam"
 
@@ -11896,7 +11899,7 @@ msgstr "Eski olay etiketi değeri"
 
 #: app/views/administration.proxy.list.php:144
 #: include/views/monitoring.sysmap.constructor.php:48
-#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:170
+#: include/views/monitoring.sysmap.constructor.php:58 jsLoader.php:175
 msgid "On"
 msgstr "Açık"
 
@@ -11994,11 +11997,11 @@ msgstr[1] "Yalnızca seçili problemler"
 msgid "Only super admins can create correlations."
 msgstr "Yalnızca süper yöneticiler korelasyon oluşturabilir."
 
-#: include/classes/api/services/CValueMap.php:283
+#: include/classes/api/services/CValueMap.php:287
 msgid "Only super admins can create value maps."
 msgstr "Yalnızca süper yöneticiler değer haritaları oluşturabilir."
 
-#: include/classes/api/services/CValueMap.php:219
+#: include/classes/api/services/CValueMap.php:223
 msgid "Only super admins can delete value maps."
 msgstr "Yalnızca süper yöneticiler değer haritalarını silebilir."
 
@@ -12010,7 +12013,7 @@ msgstr ""
 msgid "Only super admins can update correlations."
 msgstr "Yalnızca süper yöneticiler korelasyonları güncelleyebilir."
 
-#: include/classes/api/services/CValueMap.php:308
+#: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
 msgstr "Yalnızca süper yöneticiler değer haritalarını güncelleyebilir."
 
@@ -12032,7 +12035,7 @@ msgstr "Opera"
 msgid "Operating system information. Returns string"
 msgstr "İşletim sistemi bilgileri. String döndürür"
 
-#: actionconf.php:405 correlation.php:317
+#: actionconf.php:402 correlation.php:317
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -12051,11 +12054,11 @@ msgstr "İşlem koşulu"
 msgid "Operation details"
 msgstr "İşlem detayları"
 
-#: include/classes/api/services/CAction.php:1949
+#: include/classes/api/services/CAction.php:1955
 msgid "Operation has no group to operate."
 msgstr "İşlem, işlem yapılacak hiçbir gruba sahip değil."
 
-#: include/classes/api/services/CAction.php:1961
+#: include/classes/api/services/CAction.php:1967
 msgid "Operation has no template to operate."
 msgstr "İşlem, işlem yapacak şablona sahip değil."
 
@@ -12090,7 +12093,7 @@ msgstr "Seçenekler"
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
-#: include/triggers.inc.php:1309
+#: include/triggers.inc.php:1310
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1147
 #: include/views/configuration.correlation.edit.php:95
@@ -12524,7 +12527,7 @@ msgstr "Pasif"
 #: include/views/configuration.item.prototype.edit.php:538
 #: include/views/configuration.item.prototype.edit.php:566
 #: include/views/general.login.php:64
-#: include/views/js/common.item.edit.js.php:386 items.php:194
+#: include/views/js/common.item.edit.js.php:364 items.php:194
 msgid "Password"
 msgstr "Parola"
 
@@ -12540,11 +12543,11 @@ msgstr ""
 msgid "Password should not be empty"
 msgstr "Parola boş olmamalı"
 
-#: jsLoader.php:191
+#: jsLoader.php:196
 msgid "Paste"
 msgstr "Yapıştır"
 
-#: jsLoader.php:192
+#: jsLoader.php:197
 msgid "Paste without external links"
 msgstr "Harici bağlantılar olmadan yapıştır"
 
@@ -12579,7 +12582,7 @@ msgstr "Bir DNS sorgusu gerçekleştirir. Gerekli bilgi türünü içeren karakt
 #: include/views/configuration.item.edit.php:699
 #: include/views/configuration.item.massupdate.php:457
 #: include/views/configuration.item.prototype.edit.php:627
-#: include/views/configuration.maintenance.edit.php:77 report4.php:104
+#: include/views/configuration.maintenance.edit.php:77 report4.php:108
 #: srv_status.php:170
 msgid "Period"
 msgstr "Dönem"
@@ -12656,7 +12659,7 @@ msgstr "Lütfen veritabanını elle oluşturun ve bu veritabanına bağlantı i�
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
 msgstr "Lütfen, (isteğe bağlı) kurulum adının yanı sıra Zabbix sunucusunun ana makine adını veya ana makine IP adresini ve bağlantı noktası numarasını girin."
 
-#: jsLoader.php:180
+#: jsLoader.php:185
 msgid "Please select two elements"
 msgstr "Lütfen iki eleman seçiniz"
 
@@ -12864,7 +12867,7 @@ msgstr ""
 msgid "Problem display"
 msgstr "Problem gösterimi"
 
-#: include/triggers.inc.php:1229
+#: include/triggers.inc.php:1230
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
 msgstr "Problem ifadesi"
@@ -12882,7 +12885,7 @@ msgstr ""
 msgid "Problem is suppressed"
 msgstr ""
 
-#: jsLoader.php:201
+#: jsLoader.php:206
 msgid "Problem on"
 msgstr "Üzerinde problem"
 
@@ -12915,7 +12918,7 @@ msgstr "Problem, eğer en az alttakilerden birinde sorun varsa"
 #: include/maps.inc.php:390 include/maps.inc.php:471 include/maps.inc.php:483
 #: include/maps.inc.php:559 include/maps.inc.php:571 include/menu.inc.php:52
 #: include/views/common.filter.trigger.php:42
-#: include/views/inventory.host.view.php:135 jsLoader.php:267 report2.php:430
+#: include/views/inventory.host.view.php:135 jsLoader.php:272 report2.php:455
 #: search.php:129 search.php:233 search.php:290 search.php:339
 msgid "Problems"
 msgstr "Problemler"
@@ -12957,7 +12960,7 @@ msgstr "Vekil sunucular"
 msgid "Proxy"
 msgstr "Vekil sunucu"
 
-#: include/classes/import/importers/CHostImporter.php:168
+#: include/classes/import/importers/CHostImporter.php:173
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "\"%2$s\" ana bilgisayarı için \"%1$s\" vekil sunucusu mevcut değil."
@@ -12972,8 +12975,8 @@ msgstr ""
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Vekil sunucu \"%1$s\", bulma kuralı \"%2$s\" tarafından kullanılıyor."
 
-#: include/classes/api/services/CProxy.php:637
-#: include/classes/api/services/CProxy.php:762
+#: include/classes/api/services/CProxy.php:638
+#: include/classes/api/services/CProxy.php:764
 #, c-format
 msgid "Proxy \"%s\" already exists."
 msgstr "Vekil sunucu \"%s\" halihazırda mevcut."
@@ -13155,7 +13158,7 @@ msgstr "Alıcı (azalan)"
 msgid "Recovery"
 msgstr "Kurtarma"
 
-#: include/triggers.inc.php:1233
+#: include/triggers.inc.php:1234
 #: include/views/configuration.trigger.prototype.edit.php:273
 #: include/views/configuration.trigger.prototype.edit.php:355
 #: include/views/configuration.triggers.edit.php:297
@@ -13192,11 +13195,11 @@ msgid "Refresh"
 msgstr "Tazele"
 
 #: include/classes/widgets/forms/CWidgetForm.php:53 include/html.inc.php:192
-#: jsLoader.php:268
+#: jsLoader.php:273
 msgid "Refresh interval"
 msgstr ""
 
-#: jsLoader.php:269
+#: jsLoader.php:274
 msgid "Refresh interval multiplier"
 msgstr ""
 
@@ -13375,8 +13378,8 @@ msgstr "Uzak komut"
 #: include/views/monitoring.sysmap.constructor.php:37
 #: include/views/monitoring.sysmap.constructor.php:43
 #: include/views/monitoring.sysmap.edit.php:242
-#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:188
-#: jsLoader.php:290
+#: include/views/monitoring.sysmap.edit.php:260 jsLoader.php:193
+#: jsLoader.php:295
 msgid "Remove"
 msgstr "Kaldır"
 
@@ -13412,7 +13415,7 @@ msgctxt "screen reader"
 msgid "Remove, %1$s"
 msgstr ""
 
-#: jsLoader.php:231
+#: jsLoader.php:236
 #, c-format
 msgctxt "screen reader"
 msgid "Removed, %1$s"
@@ -13529,7 +13532,7 @@ msgstr "Sıfırlama onayı"
 msgid "Reset defaults"
 msgstr "Öntanımlılara sıfırla"
 
-#: jsLoader.php:202
+#: jsLoader.php:207
 msgid "Resolved"
 msgstr "Çözüldü"
 
@@ -13552,18 +13555,18 @@ msgstr "\"%1$s\" korelasyon kuralıyla çözümlenmiş."
 msgid "Resolved by correlation rule."
 msgstr "Korelasyon kuralıyla çözümlenmiş."
 
+#: app/views/monitoring.widget.problems.view.php:143
+#: include/classes/screens/CScreenHostTriggers.php:249
+#: include/classes/screens/CScreenProblem.php:1018
+msgid "Resolved by inaccessible user."
+msgstr ""
+
 #: app/views/monitoring.widget.problems.view.php:142
 #: include/classes/screens/CScreenHostTriggers.php:248
 #: include/classes/screens/CScreenProblem.php:1017
 #, c-format
 msgid "Resolved by user \"%1$s\"."
 msgstr "\"%1$s\" kullanıcısı tarafından çözümlenmiş."
-
-#: app/views/monitoring.widget.problems.view.php:143
-#: include/classes/screens/CScreenHostTriggers.php:249
-#: include/classes/screens/CScreenProblem.php:1018
-msgid "Resolved by user."
-msgstr "Kullanıcı tarafından çözümlenmiş."
 
 #: include/views/administration.auditlogs.list.php:52
 #: include/views/administration.auditlogs.list.php:73
@@ -13755,12 +13758,12 @@ msgstr "Ana makinede belirtilen komutu çalıştırır. Komutun metin sonucunu d
 msgid "Russian (ru_RU)"
 msgstr "Rusça (ru_RU)"
 
-#: jsLoader.php:166
+#: jsLoader.php:171
 msgctxt "Saturday short"
 msgid "S"
 msgstr "Cmt"
 
-#: jsLoader.php:167
+#: jsLoader.php:172
 msgctxt "Sunday short"
 msgid "S"
 msgstr "Pzr"
@@ -13952,7 +13955,7 @@ msgid "Sat"
 msgstr "Cts"
 
 #: include/forms.inc.php:1929 include/forms.inc.php:2044
-#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:159
+#: include/func.inc.php:140 include/func.inc.php:230 jsLoader.php:164
 msgid "Saturday"
 msgstr "Cumartesi"
 
@@ -14145,7 +14148,7 @@ msgstr "Betik güncellendi"
 #: app/controllers/CControllerPopupScriptExec.php:58
 #: app/views/administration.script.edit.php:25
 #: app/views/administration.script.list.php:27 include/menu.inc.php:283
-#: jsLoader.php:270
+#: jsLoader.php:275
 msgid "Scripts"
 msgstr "Betikler"
 
@@ -14246,7 +14249,7 @@ msgstr "Güvenlik adı"
 #: include/views/monitoring.screen.constructor.edit.php:332
 #: include/views/monitoring.screen.constructor.edit.php:390
 #: include/views/monitoring.screen.constructor.edit.php:651
-#: include/views/monitoring.screen.constructor.edit.php:699 jsLoader.php:229
+#: include/views/monitoring.screen.constructor.edit.php:699 jsLoader.php:234
 #: latest.php:357
 msgid "Select"
 msgstr "Seç"
@@ -14258,7 +14261,7 @@ msgstr "Seç"
 msgid "Select prototype"
 msgstr "Prototip seç"
 
-#: include/classes/widgets/fields/CWidgetFieldWidgetListComboBox.php:53
+#: include/classes/widgets/fields/CWidgetFieldWidgetListComboBox.php:75
 msgid "Select widget"
 msgstr "Parçacığı seç"
 
@@ -14267,7 +14270,7 @@ msgstr "Parçacığı seç"
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:525
+#: actionconf.php:519
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
@@ -14287,19 +14290,19 @@ msgstr "Seçilen öğeler"
 msgid "Selected items only"
 msgstr ""
 
-#: jsLoader.php:234
+#: jsLoader.php:239
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:235
+#: jsLoader.php:240
 #, c-format
 msgctxt "screen reader"
 msgid "Selected, %1$s, read only, in position %2$d of %3$d"
 msgstr ""
 
-#: jsLoader.php:186
+#: jsLoader.php:191
 msgid "Send backward"
 msgstr "Geriye gönder"
 
@@ -14338,7 +14341,7 @@ msgstr "Kullanıcı gruplarına Gönder"
 msgid "Send to Users"
 msgstr "Kullanıcılara Gönder"
 
-#: jsLoader.php:187
+#: jsLoader.php:192
 msgid "Send to back"
 msgstr "Geriye gönder"
 
@@ -14358,7 +14361,7 @@ msgid "Separated"
 msgstr "Ayrılmış"
 
 #: include/forms.inc.php:1967 include/func.inc.php:124
-#: include/func.inc.php:261 jsLoader.php:150
+#: include/func.inc.php:261 jsLoader.php:155
 msgid "September"
 msgstr "Eylül"
 
@@ -14526,7 +14529,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:167 include/triggers.inc.php:1214
+#: include/events.inc.php:167 include/triggers.inc.php:1215
 #: include/views/configuration.item.list.php:145
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -14572,7 +14575,7 @@ msgstr "Şekil"
 
 #: include/views/monitoring.screen.edit.php:215
 #: include/views/monitoring.slideconf.edit.php:268
-#: include/views/monitoring.sysmap.edit.php:382 jsLoader.php:254
+#: include/views/monitoring.sysmap.edit.php:382 jsLoader.php:259
 msgid "Sharing"
 msgstr "Paylaşım"
 
@@ -14602,7 +14605,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:261
 #: include/classes/widgets/forms/CWidgetFormTrigOver.php:31
 #: include/views/common.filter.trigger.php:39
-#: include/views/js/monitoring.sysmaps.js.php:75 report2.php:462
+#: include/views/js/monitoring.sysmaps.js.php:75 report2.php:480
 msgid "Show"
 msgstr "Göster"
 
@@ -14705,7 +14708,7 @@ msgstr "Eğer Zabbix sunucusu erişilemezse uyarı göster"
 msgid "Show working time"
 msgstr "Çalışma zamanlarını göster"
 
-#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:173
+#: include/views/monitoring.sysmap.constructor.php:54 jsLoader.php:178
 msgid "Shown"
 msgstr "Gösterilen"
 
@@ -14860,7 +14863,7 @@ msgstr "Slaytlar"
 msgid "Slovak (sk_SK)"
 msgstr "Slovakça (sk_SK)"
 
-#: jsLoader.php:206
+#: jsLoader.php:211
 msgid "Snooze"
 msgstr "Ertele"
 
@@ -14933,7 +14936,7 @@ msgstr "Kaynak türü"
 msgid "Spanish (es_ES)"
 msgstr "İspanyolca (es_ES)"
 
-#: include/classes/api/services/CAction.php:1873
+#: include/classes/api/services/CAction.php:1879
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "Belirtilen betik mevcut değil veya eylem işlem komutu için üzerinde hakkınız yok."
 
@@ -15158,7 +15161,7 @@ msgctxt "encryption certificate"
 msgid "Subject"
 msgstr "Konu"
 
-#: jsLoader.php:271
+#: jsLoader.php:276
 msgid "Submap"
 msgstr "Altharita"
 
@@ -15166,7 +15169,7 @@ msgstr "Altharita"
 msgid "Success Audit"
 msgstr "Başarı denetimi"
 
-#: include/func.inc.php:1938
+#: include/func.inc.php:1938 jsLoader.php:141
 msgid "Success message"
 msgstr ""
 
@@ -15180,7 +15183,7 @@ msgid "Sun"
 msgstr "Paz"
 
 #: include/forms.inc.php:1934 include/forms.inc.php:2049
-#: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:160
+#: include/func.inc.php:142 include/func.inc.php:224 jsLoader.php:165
 msgid "Sunday"
 msgstr "Pazar"
 
@@ -15268,12 +15271,12 @@ msgstr "Sistem zamanı. utc türünde integer; lokal türünde string döndürü
 msgid "System uptime in seconds. Returns integer"
 msgstr "Saniye olarak sistem çalışma süresi. Tam sayı döndürür"
 
-#: jsLoader.php:164
+#: jsLoader.php:169
 msgctxt "Thursday short"
 msgid "T"
 msgstr "Per"
 
-#: jsLoader.php:162
+#: jsLoader.php:167
 msgctxt "Tuesday short"
 msgid "T"
 msgstr "Sal"
@@ -15393,13 +15396,13 @@ msgstr "Telnet"
 #: include/actions.inc.php:47 include/audit.inc.php:53
 #: include/forms.inc.php:460 include/forms.inc.php:857
 #: include/views/configuration.template.edit.php:40
-#: include/views/configuration.template.edit.php:334 report2.php:284
+#: include/views/configuration.template.edit.php:334 report2.php:391
 #: search.php:407
 msgid "Template"
 msgstr "Şablon"
 
-#: include/classes/api/services/CHost.php:854
-#: include/classes/api/services/CTemplate.php:424
+#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CTemplate.php:425
 #: include/classes/import/importers/CTemplateImporter.php:72
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -15407,12 +15410,12 @@ msgstr "\"%1$s\" şablonu zaten var."
 
 #: include/classes/api/services/CHostGroup.php:1462
 #: include/classes/api/services/CTemplate.php:368
-#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:987
 #, c-format
 msgid "Template \"%1$s\" cannot be without host group."
 msgstr "\"%1$s\" şablonu, ana makine grubu olmadan bulunamaz."
 
-#: include/classes/import/importers/CHostImporter.php:46
+#: include/classes/import/importers/CHostImporter.php:47
 #, c-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "\"%2$s\" ana makinesi için \"%1$s\" şablonu mevcut değil."
@@ -15429,7 +15432,7 @@ msgstr "Şablon, başka şablonlarla, diğer şablonlar üzerinden bile olsa bir
 msgid "Template deleted"
 msgstr "Şablon silindi"
 
-#: report2.php:252
+#: report2.php:390
 msgid "Template group"
 msgstr "Şablon grubu"
 
@@ -15455,7 +15458,7 @@ msgstr "\"%1$s\" şablon ekranı zaten var."
 msgid "Template screens"
 msgstr "Şablon ekranları"
 
-#: report2.php:317
+#: report2.php:392
 msgid "Template trigger"
 msgstr "Şablon tetikleyici"
 
@@ -15467,25 +15470,25 @@ msgstr "Şablon güncellendi"
 msgid "Template value"
 msgstr "Şablon değeri"
 
-#: include/classes/api/services/CTemplate.php:1041
+#: include/classes/api/services/CTemplate.php:1042
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "\"%1$s\" aynı adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1797
-#: include/classes/api/services/CHost.php:2020
+#: include/classes/api/services/CHost.php:1803
+#: include/classes/api/services/CHost.php:2028
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "\"%s\" ile aynı adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CTemplate.php:447
-#: include/classes/api/services/CTemplate.php:1006
+#: include/classes/api/services/CTemplate.php:448
+#: include/classes/api/services/CTemplate.php:1007
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "\"%1$s\" ile aynı görünür adlı şablon halihazırda mevcut."
 
-#: include/classes/api/services/CHost.php:1803
-#: include/classes/api/services/CHost.php:2028
+#: include/classes/api/services/CHost.php:1809
+#: include/classes/api/services/CHost.php:2036
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "\"%s\" ile aynı görünen isimli şablon zaten var."
@@ -15706,13 +15709,13 @@ msgid "Thu"
 msgstr "Per"
 
 #: include/forms.inc.php:1919 include/forms.inc.php:2034
-#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:157
+#: include/func.inc.php:138 include/func.inc.php:228 jsLoader.php:162
 msgid "Thursday"
 msgstr "Perşembe"
 
 #: app/views/report.services.php:68
 #: include/views/configuration.services.edit.php:252
-#: include/views/configuration.services.edit.php:305 report4.php:195
+#: include/views/configuration.services.edit.php:305 report4.php:199
 #: services.php:48 services.php:191
 msgid "Till"
 msgstr "Kadar"
@@ -15809,7 +15812,7 @@ msgstr "Zaman damgası"
 msgid "To"
 msgstr "Kime"
 
-#: jsLoader.php:285
+#: jsLoader.php:290
 msgid "To set a host interface select a single item type for all items"
 msgstr "Ana makine arayüzü ayarlamak için tüm öğeler için tek bir öğe türü seçin"
 
@@ -15920,14 +15923,14 @@ msgstr "Yönelimler"
 #: app/views/popup.services.php:44 include/actions.inc.php:44
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
-#: include/triggers.inc.php:1208
+#: include/triggers.inc.php:1209
 #: include/views/configuration.services.edit.php:87
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.parent.list.php:35
 #: include/views/configuration.triggers.edit.php:582
 #: include/views/js/monitoring.sysmaps.js.php:70
 #: include/views/js/monitoring.sysmaps.js.php:707
-#: include/views/reports.toptriggers.php:79 jsLoader.php:176 jsLoader.php:272
+#: include/views/reports.toptriggers.php:79 jsLoader.php:181 jsLoader.php:277
 #: services.php:357
 msgid "Trigger"
 msgstr "Tetikleyici"
@@ -15942,7 +15945,7 @@ msgstr "\"%2$s\" üzerinde \"%1$s\" tetiği zaten var."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "\"%1$s\" tetikleyicisi farklı bağlantılara sahip şablonlara ait."
 
-#: include/classes/import/CConfigurationImport.php:1610
+#: include/classes/import/CConfigurationImport.php:1646
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "\"%1$s\" tetikleyicisi, varolmayan \"%2$s\" tetikleyicisine bağımlı."
@@ -16060,7 +16063,7 @@ msgstr "Tetikleyici prototipi \"%1$s\", farklı bağlantılara sahip şablonlara
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "Tetikleyici prototipi \"%1$s\", çoklu keşif kurallarından öğe prototipleri içeriyor."
 
-#: include/classes/import/CConfigurationImport.php:1332
+#: include/classes/import/CConfigurationImport.php:1368
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Tetikleyici prototipi \"%1$s\", var olmayan \"%2$s\" tetikleyicisine bağlı."
@@ -16120,11 +16123,11 @@ msgstr "Tetikleyici önem dereceleri"
 msgid "Trigger severity"
 msgstr "Tetikleyici önem derecesi"
 
-#: jsLoader.php:255
+#: jsLoader.php:260
 msgid "Trigger status \"OK\""
 msgstr "Tetikleyici durumu \"TAMAM\""
 
-#: jsLoader.php:256
+#: jsLoader.php:261
 msgid "Trigger status \"Problem\""
 msgstr "Tetikleyici durumu \"Problem\""
 
@@ -16134,7 +16137,7 @@ msgstr "Tetikleyici güncellendi"
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
-#: include/html.inc.php:388 include/triggers.inc.php:875
+#: include/html.inc.php:388 include/triggers.inc.php:876
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
@@ -16180,7 +16183,7 @@ msgid "Tue"
 msgstr "Sal"
 
 #: include/forms.inc.php:1909 include/forms.inc.php:2024
-#: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:155
+#: include/func.inc.php:136 include/func.inc.php:226 jsLoader.php:160
 msgid "Tuesday"
 msgstr "Salı"
 
@@ -16193,7 +16196,7 @@ msgstr "Türkçe (tr_TR)"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "İki öğe (\"%1$s\" ve \"%2$s\"), bir ana makine envanter alanını (\"%3$s\") oluşturamaz, bu durum çakışmaya neden olur."
 
-#: jsLoader.php:181
+#: jsLoader.php:186
 msgid "Two map elements should be selected"
 msgstr ""
 
@@ -16308,7 +16311,7 @@ msgstr "BİLİNMEYEN"
 #: include/views/configuration.triggers.edit.php:569
 #: include/views/js/monitoring.sysmaps.js.php:254
 #: include/views/monitoring.screen.constructor.edit.php:843
-#: include/views/monitoring.sysmap.edit.php:230 items.php:139 jsLoader.php:273
+#: include/views/monitoring.sysmap.edit.php:230 items.php:139 jsLoader.php:278
 msgid "URL"
 msgstr "URL"
 
@@ -16328,7 +16331,7 @@ msgstr "URL B"
 msgid "URL C"
 msgstr "URL C"
 
-#: include/views/js/common.item.edit.js.php:597
+#: include/views/js/common.item.edit.js.php:575
 #: include/views/js/configuration.httpconf.edit.js.php:78
 msgid "URL is not properly encoded."
 msgstr "URL düzgün şekilde kodlanmamış."
@@ -16354,7 +16357,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL, \"%1$s\" haritası için hem \"name\" hem de \"url\" alanlarına sahip olmalıdır."
 
 #: include/views/js/monitoring.sysmaps.js.php:251
-#: include/views/monitoring.sysmap.edit.php:281 jsLoader.php:274
+#: include/views/monitoring.sysmap.edit.php:281 jsLoader.php:279
 msgid "URLs"
 msgstr "URL'ler"
 
@@ -16432,7 +16435,7 @@ msgstr "Birim"
 #: include/items.inc.php:171 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2171
+#: include/triggers.inc.php:242 include/triggers.inc.php:2172
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
@@ -16458,12 +16461,12 @@ msgstr "Bilinmeyen fonksiyon."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:535
-#: include/triggers.inc.php:1391
+#: include/triggers.inc.php:1392
 msgid "Unknown host item, no such item in selected host"
 msgstr "Bilinmeyen ana makine öğesi, seçilen ana makinede böyle bir öğe yok"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1390
+#: include/triggers.inc.php:1391
 msgid "Unknown host, no such host present in system"
 msgstr "Bilinmeyen ana makine, sistemde böyle bir ana makine bulunmuyor"
 
@@ -16539,7 +16542,7 @@ msgstr "Bağlantı kaldırıldı: \"%2$s\" üzerindeki \"%1$s\" öğe prototipi.
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
 msgstr "Bağlantı kaldırıldı: \"%2$s\" üzerindeki \"%1$s\" web senaryosu."
 
-#: jsLoader.php:204
+#: jsLoader.php:209
 msgid "Unmute"
 msgstr "Sesi Aç"
 
@@ -16553,7 +16556,7 @@ msgstr "Desteklenmeyen içe aktarma dosya uzantısı \"%1$s\"."
 msgid "Unsupported import format \"%1$s\"."
 msgstr "Desteklenmeyen içe aktarma biçimi \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:2755
+#: include/classes/api/services/CAction.php:2761
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "\"%1$s\" eyleminin bir filtre koşulu için desteklenmeyen parametre \"%2$s\"."
@@ -16563,7 +16566,7 @@ msgstr "\"%1$s\" eyleminin bir filtre koşulu için desteklenmeyen parametre \"%
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralının bir filtre koşulu için desteklenmeyen parametre \"%2$s\"."
 
-#: include/classes/api/services/CAction.php:2716
+#: include/classes/api/services/CAction.php:2722
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "\"%1$s\" eyleminin filtresi için desteklenmeyen parametre \"%2$s\"."
@@ -16734,8 +16737,8 @@ msgstr "Öğelerde kullanılır"
 
 #: httpconf.php:59 include/actions.inc.php:1769 include/actions.inc.php:1823
 #: include/actions.inc.php:2038 include/audit.inc.php:24
-#: include/classes/setup/CSetupWizard.php:245 include/events.inc.php:224
-#: include/hosts.inc.php:61 include/views/administration.auditlogs.list.php:26
+#: include/classes/setup/CSetupWizard.php:245 include/hosts.inc.php:61
+#: include/views/administration.auditlogs.list.php:26
 #: include/views/administration.auditlogs.list.php:71
 #: include/views/administration.users.edit.php:453
 #: include/views/configuration.action.edit.php:698
@@ -17257,15 +17260,10 @@ msgstr "\"%1$s\" değeri \"grid_show\" parametresi için geçersiz. Seçenekler 
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "\"%1$s\" değeri \"grid_show\" parametresi için geçersiz. Seçenekler şunlardır: \"%2$s\"."
 
-#: include/classes/db/DB.php:359
+#: include/classes/db/DB.php:359 include/classes/db/DB.php:388
 #, c-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk %4$d karakter."
-
-#: include/classes/db/DB.php:388
-#, c-format
-msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
-msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk 2048 karakter."
 
 #: include/validate.inc.php:149 include/validate.inc.php:173
 #: include/validate.inc.php:188
@@ -17301,7 +17299,7 @@ msgstr "Değer önbellek istatistikleri. Geçerli kipler şunlardır: total, fre
 msgid "Value map"
 msgstr "Değer eşlemesi"
 
-#: include/classes/api/services/CValueMap.php:271
+#: include/classes/api/services/CValueMap.php:275
 #, c-format
 msgid "Value map \"%1$s\" already exists."
 msgstr "\"%1$s\" değer eşlemesi zaten var."
@@ -17410,11 +17408,11 @@ msgstr "Bayt cinsinden veya toplam yüzdesi olarak sanal alan boyutu. Bayt için
 msgid "Visible name"
 msgstr "Görünen isim"
 
-#: include/classes/api/services/CHost.php:1931
+#: include/classes/api/services/CHost.php:1939
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Ana makine adı eksikse görünür adı boş olamaz."
 
-#: jsLoader.php:163
+#: jsLoader.php:168
 msgctxt "Wednesday short"
 msgid "W"
 msgstr "Çar"
@@ -17431,7 +17429,11 @@ msgctxt "setup"
 msgid "Warning"
 msgstr "Uyarı"
 
-#: jsLoader.php:209
+#: jsLoader.php:143
+msgid "Warning message"
+msgstr ""
+
+#: jsLoader.php:214
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Özür dileriz, hatırlamak için olası maksimum eleman sayısına ulaşıldı."
 
@@ -17470,7 +17472,7 @@ msgstr "\"%1$s\" web senaryosu, \"%2$s\" sunucusunda halihazırda mevcut."
 msgid "Web scenario \"%1$s\" already exists."
 msgstr "\"%1$s\" web senaryosu zaten var."
 
-#: include/classes/import/CConfigurationImport.php:1382
+#: include/classes/import/CConfigurationImport.php:1418
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" üzerindeki \"%1$s\" web senaryosu: \"%3$s\" uygulaması mevcut değil."
@@ -17510,12 +17512,12 @@ msgid "Wed"
 msgstr "Pts"
 
 #: include/forms.inc.php:1914 include/forms.inc.php:2029
-#: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:156
+#: include/func.inc.php:137 include/func.inc.php:227 jsLoader.php:161
 msgid "Wednesday"
 msgstr "Çarşamba"
 
 #: app/views/report.services.php:35 include/forms.inc.php:1868
-#: include/maintenances.inc.php:35 report4.php:108
+#: include/maintenances.inc.php:35 report4.php:112
 msgid "Weekly"
 msgstr "Haftalık"
 
@@ -17606,8 +17608,8 @@ msgstr "Yaz"
 msgid "Wrong fields for dependency for service \"%1$s\"."
 msgstr "\"%1$s\" servisi için olan bağımlılıklar için yanlış alanlar."
 
-#: include/classes/api/services/CHost.php:1645
-#: include/classes/api/services/CHost.php:1826
+#: include/classes/api/services/CHost.php:1651
+#: include/classes/api/services/CHost.php:1832
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "\"%1$s\" ana makinesi için yanlış alanlar."
@@ -17760,11 +17762,11 @@ msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/views/report.services.php:47 app/views/report.services.php:66
-#: report4.php:120 report4.php:154
+#: report4.php:124 report4.php:158
 msgid "Year"
 msgstr "Yıl"
 
-#: app/views/report.services.php:37 report4.php:110
+#: app/views/report.services.php:37 report4.php:114
 msgid "Yearly"
 msgstr "Yıllık"
 
@@ -17775,7 +17777,7 @@ msgstr "Yıllık"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1242 include/triggers.inc.php:1247
+#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/administration.users.list.php:109
 #: include/views/configuration.host.prototype.list.php:126
@@ -17816,12 +17818,12 @@ msgstr "İşlem için ana makine belirtmemişsiniz."
 msgid "You did not specify host group for operation."
 msgstr "İşlem için ana makine grubu belirtmemişsiniz."
 
-#: include/classes/api/services/CAction.php:1933
+#: include/classes/api/services/CAction.php:1939
 #, c-format
 msgid "You did not specify targets for action operation command \"%s\"."
 msgstr "\"%s\" eylem işlem komutu için hedef belirtmemişsiniz."
 
-#: include/classes/api/services/CAction.php:1927
+#: include/classes/api/services/CAction.php:1933
 #, c-format
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
@@ -17839,10 +17841,10 @@ msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
 #: include/classes/api/services/CScript.php:555
 #: include/classes/api/services/CTask.php:104
 #: include/classes/api/services/CTemplate.php:388
-#: include/classes/api/services/CTemplate.php:529
-#: include/classes/api/services/CTemplate.php:561
-#: include/classes/api/services/CTemplate.php:978
-#: include/classes/api/services/CTemplate.php:1083
+#: include/classes/api/services/CTemplate.php:530
+#: include/classes/api/services/CTemplate.php:562
+#: include/classes/api/services/CTemplate.php:979
+#: include/classes/api/services/CTemplate.php:1085
 #: include/classes/api/services/CUserMacro.php:266
 #: include/classes/api/services/CUserMacro.php:350
 #: include/classes/api/services/CUserMacro.php:443
@@ -18097,9 +18099,9 @@ msgstr "aracı"
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.list.php:48
 #: include/views/configuration.triggers.list.php:57
-#: include/views/js/configuration.graph.edit.js.php:55 report2.php:237
-#: report2.php:256 report2.php:288 report2.php:321 report2.php:363
-#: report2.php:382 report4.php:87 report4.php:289
+#: include/views/js/configuration.graph.edit.js.php:55 report2.php:239
+#: report2.php:275 report2.php:310 report2.php:337 report2.php:424
+#: report4.php:91 report4.php:293
 msgid "all"
 msgstr "hepsi"
 
@@ -18131,7 +18133,7 @@ msgstr "bir dizi veya bir string bekleniyor"
 msgid "an empty string is expected"
 msgstr "boş bir string bekleniyor"
 
-#: include/classes/api/services/CHost.php:1588
+#: include/classes/api/services/CHost.php:1592
 msgid "an even number of hexadecimal characters is expected"
 msgstr "çift sayıda onaltılık karakter bekleniyor"
 
@@ -18224,7 +18226,7 @@ msgstr "değiştirilemez"
 #: app/controllers/CControllerPopupMedia.php:105 correlation.php:227
 #: correlation.php:237 correlation.php:243 correlation.php:263
 #: correlation.php:267 correlation.php:280
-#: include/classes/api/services/CAction.php:1911
+#: include/classes/api/services/CAction.php:1917
 #: include/classes/api/services/CCorrelation.php:1045
 #: include/classes/api/services/CCorrelation.php:1080
 #: include/classes/api/services/CCorrelation.php:1101
@@ -18237,8 +18239,8 @@ msgstr "değiştirilemez"
 #: include/classes/api/services/CDRule.php:357
 #: include/classes/api/services/CDRule.php:512
 #: include/classes/api/services/CEvent.php:847
-#: include/classes/api/services/CHost.php:1576
-#: include/classes/api/services/CHost.php:1582
+#: include/classes/api/services/CHost.php:1580
+#: include/classes/api/services/CHost.php:1586
 #: include/classes/api/services/CItemGeneral.php:484
 #: include/classes/api/services/CItemGeneral.php:511
 #: include/classes/api/services/CItemGeneral.php:517
@@ -18275,8 +18277,7 @@ msgstr "değiştirilemez"
 #: include/classes/validators/CApiInputValidator.php:739
 #: include/classes/validators/CApiInputValidator.php:941
 #: include/classes/validators/CApiInputValidator.php:983
-#: include/classes/validators/CNewValidator.php:91
-#: include/classes/widgets/forms/CWidgetFormMap.php:101 usergrps.php:318
+#: include/classes/validators/CNewValidator.php:91 usergrps.php:318
 #: usergrps.php:358 usergrps.php:361
 msgid "cannot be empty"
 msgstr "boş olamaz"
@@ -18299,11 +18300,11 @@ msgid "check expression starting from \"%1$s\""
 msgstr "\"%1$s\" sonrasından itibaren ifadeyi kontrol et"
 
 #: include/classes/api/services/CItemGeneral.php:1649
-#: include/classes/import/CConfigurationImport.php:2611
+#: include/classes/import/CConfigurationImport.php:2657
 msgid "circular item dependency is not allowed"
 msgstr "çevrimsel öğe bağımlılığına izin verilmiyor"
 
-#: jsLoader.php:212
+#: jsLoader.php:217
 msgid "colour"
 msgstr ""
 
@@ -18325,7 +18326,7 @@ msgstr ""
 msgid "count() - Number of successfully retrieved values V (which fulfill operator O) for period T"
 msgstr ""
 
-#: include/func.inc.php:622 jsLoader.php:135
+#: include/func.inc.php:622 jsLoader.php:137
 msgctxt "day short"
 msgid "d"
 msgstr "g"
@@ -18416,7 +18417,7 @@ msgstr ""
 msgid "equals"
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1716
+#: include/classes/api/services/CAction.php:1722
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr "esc_step_from ve esc_step_to ikisi beraber tanımlanmak zorunda."
 
@@ -18456,7 +18457,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "genel temizlik hizmeti ayarları"
 
-#: include/func.inc.php:623 jsLoader.php:136
+#: include/func.inc.php:623 jsLoader.php:138
 msgctxt "hour short"
 msgid "h"
 msgstr "sa"
@@ -18639,12 +18640,12 @@ msgstr ""
 msgid "low-level discovery rule"
 msgstr "düşük seviye keşif kuralı"
 
-#: include/func.inc.php:624 jsLoader.php:109 jsLoader.php:137 jsLoader.php:304
+#: include/func.inc.php:624 jsLoader.php:109 jsLoader.php:139 jsLoader.php:309
 msgctxt "minute short"
 msgid "m"
 msgstr "dk"
 
-#: include/func.inc.php:621 jsLoader.php:134
+#: include/func.inc.php:621 jsLoader.php:136
 msgctxt "month short"
 msgid "m"
 msgstr "ay"
@@ -18694,8 +18695,8 @@ msgid "maximum dependent items count reached"
 msgstr "maksimum bağımlı öğe sayısına ulaşıldı"
 
 #: include/classes/api/services/CItemGeneral.php:1729
-#: include/classes/import/CConfigurationImport.php:2565
-#: include/classes/import/CConfigurationImport.php:2626
+#: include/classes/import/CConfigurationImport.php:2611
+#: include/classes/import/CConfigurationImport.php:2672
 msgid "maximum number of dependency levels reached"
 msgstr "maksimum bağımlılık düzeyi sayısına ulaşıldı"
 
@@ -18711,7 +18712,7 @@ msgstr "min"
 msgid "min() - Minimum value for period T"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1594
+#: include/classes/api/services/CHost.php:1598
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "minimum uzunluk %1$s karakter"
@@ -18759,7 +18760,7 @@ msgstr ""
 msgid "name"
 msgstr "ad"
 
-#: include/classes/html/CMultiSelect.php:73 jsLoader.php:228
+#: include/classes/html/CMultiSelect.php:73 jsLoader.php:233
 msgid "new"
 msgstr "yeni"
 
@@ -18939,7 +18940,7 @@ msgstr "sağ"
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:45
 #: include/views/configuration.services.parent.list.php:47
-#: include/views/configuration.services.parent.list.php:48 jsLoader.php:291
+#: include/views/configuration.services.parent.list.php:48 jsLoader.php:296
 msgid "root"
 msgstr "kök"
 
@@ -18969,10 +18970,10 @@ msgstr "seçilen"
 msgid "short description"
 msgstr "kısa tanımlama"
 
-#: include/classes/api/services/CHost.php:1601
-#: include/classes/api/services/CHost.php:1607
-#: include/classes/api/services/CHost.php:1616
-#: include/classes/api/services/CHost.php:1622
+#: include/classes/api/services/CHost.php:1605
+#: include/classes/api/services/CHost.php:1611
+#: include/classes/api/services/CHost.php:1620
+#: include/classes/api/services/CHost.php:1626
 #: include/classes/api/services/CHttpTest.php:959
 #: include/classes/api/services/CHttpTest.php:1057
 #: include/classes/api/services/CItemGeneral.php:498
@@ -18982,8 +18983,8 @@ msgstr "kısa tanımlama"
 #: include/classes/api/services/CItemGeneral.php:1903
 #: include/classes/api/services/CMaintenance.php:472
 #: include/classes/api/services/CMaintenance.php:675
-#: include/classes/api/services/CProxy.php:661
-#: include/classes/api/services/CProxy.php:784
+#: include/classes/api/services/CProxy.php:662
+#: include/classes/api/services/CProxy.php:786
 #: include/classes/api/services/CTriggerGeneral.php:548
 #: include/classes/api/services/CTriggerGeneral.php:574
 #: include/classes/api/services/CTriggerGeneral.php:793
@@ -19071,7 +19072,7 @@ msgstr "\"%1$s\" etiketi eksik"
 msgid "third"
 msgstr ""
 
-#: jsLoader.php:213
+#: jsLoader.php:218
 msgid "time shift"
 msgstr ""
 
@@ -19109,7 +19110,7 @@ msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "bağlantılara sahip tetikleyici başka bir şablona veya ana makineye taşınamaz"
 
 #: app/views/layout.htmlpage.menu.php:31
-#: include/classes/html/CMultiSelect.php:72 jsLoader.php:227
+#: include/classes/html/CMultiSelect.php:72 jsLoader.php:232
 msgid "type here to search"
 msgstr "aramak için buraya yazın"
 
@@ -19147,8 +19148,8 @@ msgstr "beklenmedik metin \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:805
 #: include/classes/api/services/CEvent.php:905
-#: include/classes/api/services/CHost.php:1556
-#: include/classes/api/services/CHost.php:1562
+#: include/classes/api/services/CHost.php:1560
+#: include/classes/api/services/CHost.php:1566
 #: include/classes/api/services/CItemGeneral.php:1278
 #: include/classes/api/services/CProxy.php:559
 #: include/classes/api/services/CProxy.php:566
@@ -19205,11 +19206,11 @@ msgstr "desteklenmeyen sürüm numarası"
 msgid "value"
 msgstr "değer"
 
-#: include/classes/import/CConfigurationImport.php:808
-#: include/classes/import/CConfigurationImport.php:846
-#: include/classes/import/CConfigurationImport.php:2461
-#: include/classes/import/CConfigurationImport.php:2575
-#: include/classes/import/CConfigurationImport.php:2620
+#: include/classes/import/CConfigurationImport.php:840
+#: include/classes/import/CConfigurationImport.php:878
+#: include/classes/import/CConfigurationImport.php:2507
+#: include/classes/import/CConfigurationImport.php:2621
+#: include/classes/import/CConfigurationImport.php:2666
 #, c-format
 msgid "value \"%1$s\" not found"
 msgstr "\"%1$s\" değeri bulunamadı"
@@ -19235,8 +19236,8 @@ msgid "value is too long"
 msgstr "değer çok uzun"
 
 #: include/classes/api/services/CHost.php:771
-#: include/classes/api/services/CHost.php:1718
-#: include/classes/api/services/CHost.php:1858
+#: include/classes/api/services/CHost.php:1724
+#: include/classes/api/services/CHost.php:1864
 #: include/classes/api/services/CMapElement.php:102
 #: include/classes/api/services/CMap.php:675
 #: include/classes/api/services/CMap.php:681
@@ -19262,7 +19263,7 @@ msgstr ""
 msgid "wrong item type"
 msgstr ""
 
-#: include/func.inc.php:620 jsLoader.php:133
+#: include/func.inc.php:620 jsLoader.php:135
 msgctxt "year short"
 msgid "y"
 msgstr "y"

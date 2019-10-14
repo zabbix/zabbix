@@ -659,7 +659,6 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $groupids
  * @param string $application
- * @param int    $style                               Table display style: either hosts on top or on the left.
  * @param array  $host_options
  * @param array  $trigger_options
  * @param array  $problem_options
@@ -669,8 +668,8 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []) {
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
@@ -729,11 +728,14 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => null,
+		'show_recent' => null,
 		'time_from' => null,
 		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
+	CArrayHelper::sort($triggers, ['description']);
 
 	$problem_triggerids = [];
 
@@ -751,17 +753,16 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
 			'objectids' => $problem_triggerids,
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
-			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
-				? false
-				: null,
-			'time_from' => $problem_options['time_from']
+			'recent' => $problem_options['show_recent'],
+			'acknowledged' => $problem_options['acknowledged'],
+			'time_from' => $problem_options['time_from'],
+			'sortfield' => 'eventid'
 		]);
 
 		$objectids = [];
 
 		foreach ($problems as $problem) {
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
+			if ($triggers[$problem['objectid']]['priority'] <= $problem['severity']) {
 				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
 				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
 				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];

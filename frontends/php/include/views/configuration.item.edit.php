@@ -252,7 +252,7 @@ $itemFormList->addRow(
 					->setAttribute('placeholder', _('name'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 1000))
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
