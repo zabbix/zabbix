@@ -87,19 +87,6 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Resize multiselect selected text
-		 *
-		 * @return jQuery
-		 */
-		resize: function() {
-			return this.each(function() {
-				var $obj = $(this);
-
-				resizeAllSelectedTexts($obj);
-			});
-		},
-
-		/**
 		 * Insert outside data
 		 *
 		 * @param object    multiselect value object
@@ -122,23 +109,41 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Clean multi select object values.
+		 * Resize multiselect selected text
 		 *
 		 * @return jQuery
 		 */
-		clean: function() {
+		resize: function() {
+			return this.each(function() {
+				var $obj = $(this);
+
+				resizeAllSelectedTexts($obj);
+			});
+		},
+
+		/**
+		 * Enable multi select UI control.
+		 *
+		 * @return jQuery
+		 */
+		enable: function() {
 			return this.each(function() {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				for (var id in ms.values.selected) {
-					removeSelected($obj, id);
-				}
+				if (ms.options.disabled === true) {
+					$obj.removeAttr('aria-disabled');
+					$('.multiselect-list', $obj).removeClass('disabled');
+					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
+					$obj.append(makeMultiSelectInput($obj));
 
-				cleanAvailable($obj);
-				cleanSearchInput($obj);
-				cleanSearchHistory($obj);
-				updateSearchFieldVisibility($obj);
+					ms.options.disabled = false;
+
+					cleanAvailable($obj);
+					cleanSearchInput($obj);
+					cleanSearchHistory($obj);
+					updateSearchFieldVisibility($obj);
+				}
 			});
 		},
 
@@ -169,28 +174,23 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Enable multi select UI control.
+		 * Clean multi select object values.
 		 *
 		 * @return jQuery
 		 */
-		enable: function() {
+		clean: function() {
 			return this.each(function() {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				if (ms.options.disabled === true) {
-					$obj.removeAttr('aria-disabled');
-					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
-					$obj.append(makeMultiSelectInput($obj));
-
-					ms.options.disabled = false;
-
-					cleanAvailable($obj);
-					cleanSearchInput($obj);
-					cleanSearchHistory($obj);
-					updateSearchFieldVisibility($obj);
+				for (var id in ms.values.selected) {
+					removeSelected($obj, id);
 				}
+
+				cleanAvailable($obj);
+				cleanSearchInput($obj);
+				cleanSearchHistory($obj);
+				updateSearchFieldVisibility($obj);
 			});
 		}
 	};
