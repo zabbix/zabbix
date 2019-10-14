@@ -878,6 +878,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		do
 		{
 			memset(&page, 0, sizeof(page));
+			errbuf[0] = '\0';
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
