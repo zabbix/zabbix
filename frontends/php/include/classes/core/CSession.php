@@ -39,12 +39,8 @@ class CSession {
 	 */
 	public static function start() {
 		if (!self::$session_created) {
-			$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-			// remove file name from path
-			$path = substr($path, 0, strrpos($path, '/') + 1);
-
 			ob_start();
-			session_set_cookie_params(0, $path, null, HTTPS, true);
+			session_set_cookie_params(0, self::getDefaultCookiePath(), null, HTTPS, true);
 
 			if (!session_start()) {
 				throw new Exception('Cannot start session.');
@@ -75,6 +71,17 @@ class CSession {
 		self::open();
 		$_SESSION[$key] = $value;
 		self::close();
+	}
+
+	/**
+	 * Determines default cookie path.
+	 *
+	 * @return string
+	 */
+	public static function getDefaultCookiePath() {
+		$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+		return rtrim(substr($path, 0, strrpos($path, '/')), '/');
 	}
 
 	/**
