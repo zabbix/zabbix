@@ -139,7 +139,7 @@ jQuery(function($) {
 
 					ms.options.disabled = false;
 
-					resetInput($obj);
+					cleanSearch($obj);
 				}
 			});
 		},
