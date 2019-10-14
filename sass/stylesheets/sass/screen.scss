@@ -1693,9 +1693,7 @@ output {
 .multiselect-available {
 	position: absolute;
 	z-index: 1000;
-	margin-top: 1px;
-	border: 1px solid $form-border-focus-color;
-	max-height: 400px;
+	border: 1px solid $action-border-color;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
