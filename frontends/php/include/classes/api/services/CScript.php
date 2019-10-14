@@ -669,7 +669,7 @@ class CScript extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$scripts = $this->addRelatetGroupsAndHosts([
+		$scripts = $this->addRelatedGroupsAndHosts([
 			'selectGroups' => null,
 			'selectHosts' => ['hostid']
 		], $scripts, $hostids);
@@ -738,7 +738,7 @@ class CScript extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		return $this->addRelatetGroupsAndHosts($options, $result);
+		return $this->addRelatedGroupsAndHosts($options, $result);
 	}
 
 	/**
@@ -752,7 +752,7 @@ class CScript extends CApiService {
 	 *
 	 * @return array $result
 	 */
-	private function addRelatetGroupsAndHosts(array $options, array $result, array $hostids = null) {
+	private function addRelatedGroupsAndHosts(array $options, array $result, array $hostids = null) {
 		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
 		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
 
