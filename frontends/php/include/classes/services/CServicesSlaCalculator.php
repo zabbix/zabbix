@@ -179,6 +179,7 @@ class CServicesSlaCalculator {
 		];
 		$prevTime = $period_start;
 
+		// Count active uptimes/downtimes at the beginning of calculated period.
 		foreach ($data as $val) {
 			if ($period_start != $val['clock']) {
 				continue;
@@ -246,8 +247,8 @@ class CServicesSlaCalculator {
 			$prevTime = $val['clock'];
 		}
 
-		$slaTime['problemTime'] = &$slaTime['ut']['problemTime'];
-		$slaTime['okTime'] = &$slaTime['ut']['okTime'];
+		$slaTime['problemTime'] = $slaTime['ut']['problemTime'] + $slaTime['dt']['problemTime'];
+		$slaTime['okTime'] = $slaTime['ut']['okTime'] + $slaTime['dt']['okTime'];
 		$slaTime['downtimeTime'] = $slaTime['dt']['okTime'] + $slaTime['dt']['problemTime'];
 
 		$fullTime = $slaTime['problemTime'] + $slaTime['okTime'];
