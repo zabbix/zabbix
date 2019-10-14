@@ -249,8 +249,8 @@ class CServicesSlaCalculator {
 			$prevTime = $val['clock'];
 		}
 
-		$slaTime['problemTime'] = $slaTime['ut']['problemTime'] + $slaTime['dt']['problemTime'];
-		$slaTime['okTime'] = $slaTime['ut']['okTime'] + $slaTime['dt']['okTime'];
+		$slaTime['problemTime'] = &$slaTime['ut']['problemTime'];
+		$slaTime['okTime'] = &$slaTime['ut']['okTime'];
 		$slaTime['downtimeTime'] = $slaTime['dt']['okTime'] + $slaTime['dt']['problemTime'];
 
 		$fullTime = $slaTime['problemTime'] + $slaTime['okTime'];
