@@ -269,9 +269,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (0 != (fping_existence & FPING_EXISTS) && 0 != hosts_count)
 	{
-		if ((FPING_UNINITIALIZED_INTERVAL == packet_interval) &&
-				(SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
-				error, max_error_len)))
+		if (FPING_UNINITIALIZED_INTERVAL == packet_interval &&
+				SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+				error, max_error_len))
 		{
 			return ret;
 		}
@@ -281,9 +281,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (0 != (fping_existence & FPING6_EXISTS) && 0 != hosts_count)
 	{
-		if ((FPING_UNINITIALIZED_INTERVAL == packet_interval6) &&
-				(SUCCEED != get_interval_option(CONFIG_FPING6_LOCATION, hosts[0].addr, &packet_interval6,
-				error, max_error_len)))
+		if (FPING_UNINITIALIZED_INTERVAL == packet_interval6 &&
+				SUCCEED != get_interval_option(CONFIG_FPING6_LOCATION, hosts[0].addr, &packet_interval6,
+				error, max_error_len))
 		{
 			return ret;
 		}
@@ -293,9 +293,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #else
 	if (0 != hosts_count)
 	{
-		if ((FPING_UNINITIALIZED_INTERVAL == packet_interval) &&
-				(SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
-				error, max_error_len)))
+		if (FPING_UNINITIALIZED_INTERVAL == packet_interval &&
+				SUCCEED != get_interval_option(CONFIG_FPING_LOCATION, hosts[0].addr, &packet_interval,
+				error, max_error_len))
 		{
 			return ret;
 		}
