@@ -124,20 +124,22 @@ class CServicesSlaCalculator {
 			ksort($service_time_data);
 
 			/*
-			 * If 'downtime' service time is active at moment of $period_start, move $start_value to moment when service
-			 * time ends.
+			 * If 'downtime' service time is active at moment of $period_start and service is in problem state, move
+			 * $start_value to moment when service time ends.
 			 */
-			$first_service_time_start_time = key($service_time_data);
-			$first_service_time = $service_time_data[$first_service_time_start_time];
-			if ($period_start == $first_service_time_start_time && array_key_exists('dt_s', $first_service_time)) {
-				foreach (array_keys($service_time_data) as $service_time_ts) {
-					if (array_key_exists('dt_e', $service_time_data[$service_time_ts])) {
-						$data[] = [
-							'alarm' => $start_value,
-							'clock' => $service_time_ts
-						];
-						$start_value = 0;
-						break;
+			if ($start_value > 1) {
+				$first_service_time_start_time = key($service_time_data);
+				$first_service_time = $service_time_data[$first_service_time_start_time];
+				if ($period_start == $first_service_time_start_time && array_key_exists('dt_s', $first_service_time)) {
+					foreach (array_keys($service_time_data) as $service_time_ts) {
+						if (array_key_exists('dt_e', $service_time_data[$service_time_ts])) {
+							$data[] = [
+								'alarm' => $start_value,
+								'clock' => $service_time_ts
+							];
+							$start_value = 0;
+							break;
+						}
 					}
 				}
 			}
