@@ -151,7 +151,7 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				curlauth = CURLAUTH_NTLM;
 				break;
 			case HTTPTEST_AUTH_NEGOTIATE:
-#ifdef CURLAUTH_NEGOTIATE
+#if LIBCURL_VERSION_NUM >= 0x072600
 				curlauth = CURLAUTH_NEGOTIATE;
 #else
 				curlauth = CURLAUTH_GSSNEGOTIATE;
