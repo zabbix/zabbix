@@ -48,8 +48,7 @@ class CControllerWidgetTrigOverView extends CControllerWidget {
 		];
 
 		list($data['hosts'], $data['triggers']) = getTriggersOverviewData(getSubGroups($fields['groupids']),
-			$fields['application'], $fields['style'], [], $trigger_options,
-			['show_suppressed' => $fields['show_suppressed']]
+			$fields['application'], [], $trigger_options, ['show_suppressed' => $fields['show_suppressed']]
 		);
 
 		$this->setResponse(new CControllerResponseData($data));

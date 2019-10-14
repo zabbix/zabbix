@@ -51,6 +51,13 @@ class CCheckboxElement extends CElement {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->isChecked();
+	}
+
+	/**
 	 * Set checkbox state to checked.
 	 *
 	 * @return $this
