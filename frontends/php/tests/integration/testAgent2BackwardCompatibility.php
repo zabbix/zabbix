@@ -26,13 +26,12 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup history
  */
 class testAgent2BackwardCompatibility extends CIntegrationTest {
-
 	private static $metrics = [
 			'agent.ping',
 			'kernel.maxfiles',
 			'kernel.maxproc',
-			'net.dns[,www.zabbix.com]',
-			'net.dns.record[,www.zabbix.com]',
+			'net.dns[,zabbix.com]',
+			'net.dns.record[,zabbix.com]',
 			'net.if.discovery',
 			'net.tcp.listen[80]',
 			'net.tcp.port[,80]',
@@ -42,9 +41,7 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 			'proc.num[zabbix_server]',
 			'system.cpu.discovery',
 			'system.cpu.num',
-			'system.hostname',
 			'system.hw.cpu',
-			'system.hw.chassis',
 			'system.hw.devices',
 			'system.hw.macaddr',
 			'system.sw.arch',
@@ -54,13 +51,18 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 			'system.users.num',
 			'vfs.dir.count[/mnt]',
 			'vfs.dir.size[/mnt]',
-			'vfs.file.contents[/etc/hostname]',
-			'vfs.file.exists[/etc/hostname]',
-			'vfs.file.md5sum[/etc/hostname]',
-			'vfs.file.size[/etc/hostname]',
-			'vfs.file.time[/etc/hostname]',
+			'vfs.file.contents[/etc/hosts]',
+			'vfs.file.exists[/etc/hosts]',
+			'vfs.file.md5sum[/etc/hosts]',
+			'vfs.file.size[/etc/hosts]',
+			'vfs.file.time[/etc/hosts]',
+			'vfs.file.regexp[/etc/hosts,localhost]',
+			'vfs.file.cksum[/etc/hosts]',
 			'vfs.fs.discovery',
-			'web.page.regexp[localhost/invalid_link_returns_404,,,404,2]'
+			'web.page.regexp[localhost/invalid_link_returns_404,,,404,2]',
+			'system.run[uname]',
+			'log[' . PHPUNIT_COMPONENT_DIR . 'zabbix_server.log]',
+			'log.count[' . PHPUNIT_COMPONENT_DIR . 'zabbix_server.log, server ]'
 	];
 
 	private static $hostids = [];
@@ -139,7 +141,7 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 					'hostid' => self::$hostids['agent'],
 					'name' => $metric,
 					'key_' => $metric,
-					'type' => ITEM_TYPE_ZABBIX,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'value_type' => ITEM_VALUE_TYPE_TEXT,
 					'delay' => '1s',
 					'interfaceid' => $interfaceids['agent']
@@ -153,7 +155,7 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 					'hostid' => self::$hostids['go_agent'],
 					'name' => $metric,
 					'key_' => $metric,
-					'type' => ITEM_TYPE_ZABBIX,
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'value_type' => ITEM_VALUE_TYPE_TEXT,
 					'delay' => '1s',
 					'interfaceid' => $interfaceids['go_agent']
@@ -175,17 +177,20 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 	public function agentConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'UnreachablePeriod'	=> 5,
-				'UnavailableDelay'	=> 5,
-				'UnreachableDelay'	=> 1
+				'UnreachablePeriod'		=> 5,
+				'UnavailableDelay'		=> 5,
+				'UnreachableDelay'		=> 1
 			],
 			self::COMPONENT_AGENT => [
-				'Hostname'		=> 'agent',
-				'ServerActive'	=> '127.0.0.1'
+				'Hostname'			=> 'agent',
+				'ServerActive'			=> '127.0.0.1',
+				'EnableRemoteCommands'		=> '1'
 			],
 			self::COMPONENT_AGENT2 => [
-				'Hostname'		=> 'go_agent',
-				'ServerActive'	=> '127.0.0.1'
+				'Hostname'			=> 'go_agent',
+				'ServerActive'			=> '127.0.0.1',
+				'EnableRemoteCommands'		=> '1',
+				'Plugins.Uptime.Capacity'	=> '10'
 			]
 		];
 	}
@@ -198,35 +203,18 @@ class testAgent2BackwardCompatibility extends CIntegrationTest {
 	 * @hosts go_agent, agent
 	 */
 	public function testAgent2BackwardCompatibility_checkAgentData() {
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-				'enabling Zabbix agent checks on host "agent": host became available',
-				'resuming Zabbix agent checks on host "agent": connection restored'
-		]);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-				'enabling Zabbix agent checks on host "go_agent": host became available',
-				'resuming Zabbix agent checks on host "go_agent": connection restored'
-		]);
-
 		foreach (self::$metrics as $metric) {
-			$passive_data = $this->call('history.get', [
+			$data = $this->callUntilDataIsPresent('history.get', [
 					'itemids'	=> self::$itemids[$metric],
 					'history'	=> ITEM_VALUE_TYPE_TEXT
 				]);
 
-			$passive_data_go = $this->call('history.get', [
+			$data_go = $this->callUntilDataIsPresent('history.get', [
 					'itemids'	=> self::$itemids_go[$metric],
 					'history'	=> ITEM_VALUE_TYPE_TEXT
 			]);
 
-			// Both values empty - passed
-			if (count($passive_data['result']) == 0 && count($passive_data_go['result']) == 0) {
-				continue;
-			}
-
-			$this->assertTrue(count($passive_data['result']) > 0);
-			$this->assertTrue(count($passive_data_go['result']) > 0);
-			$this->assertEquals($passive_data['result'][0]['value'], $passive_data_go['result'][0]['value']);
+			$this->assertEquals($data['result'][0]['value'], $data_go['result'][0]['value']);
 		}
 	}
 }
