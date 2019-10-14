@@ -1464,7 +1464,7 @@ output {
 %timeline-dot {
 	content: '';
 	position: absolute;
-	z-index: 70;
+	z-index: 1;
 	display: block;
 	width: 4px;
 	height: 4px;
@@ -3512,7 +3512,7 @@ $form-icon-btn: (
 	 * For floating headers to appear over other widgets.
 	 * Cannot rely on DOM order here, since widgets of iterators can be shuffled on refresh.
 	 */
-	z-index: 80;
+	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
@@ -3670,7 +3670,7 @@ $form-icon-btn: (
 	transition: margin-top .3s, height .3s, opacity .15s .15s, box-shadow .3s;
 
 	// Not to loose hovered header while widget underneath is updating.
-	z-index: 80;
+	z-index: 3;
 
 	h4 {
 		flex-grow: 1;
