@@ -706,7 +706,7 @@ class CScript extends CApiService {
 
 						// set confirmation text with resolved macros
 						if (isset($macros_data[$hostid][$scriptid]) && $script['confirmation']) {
-							$scripts_by_host[$hostid][$size]['confirmation'] = $macros_data[$hostId][$scriptid];
+							$scripts_by_host[$hostid][$size]['confirmation'] = $macros_data[$hostid][$scriptid];
 						}
 					}
 				}
