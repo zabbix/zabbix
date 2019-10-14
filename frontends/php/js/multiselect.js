@@ -139,10 +139,7 @@ jQuery(function($) {
 
 					ms.options.disabled = false;
 
-					cleanAvailable($obj);
-					cleanSearchInput($obj);
-					cleanSearchHistory($obj);
-					updateSearchFieldVisibility($obj);
+					resetInput($obj);
 				}
 			});
 		},
@@ -165,10 +162,7 @@ jQuery(function($) {
 
 					ms.options.disabled = true;
 
-					cleanAvailable($obj);
-					cleanSearchInput($obj);
-					cleanSearchHistory($obj);
-					updateSearchFieldVisibility($obj);
+					cleanSearch($obj);
 				}
 			});
 		},
@@ -187,10 +181,7 @@ jQuery(function($) {
 					removeSelected($obj, id);
 				}
 
-				cleanAvailable($obj);
-				cleanSearchInput($obj);
-				cleanSearchHistory($obj);
-				updateSearchFieldVisibility($obj);
+				cleanSearch($obj);
 			});
 		}
 	};
@@ -648,11 +639,7 @@ jQuery(function($) {
 		$('.selected ul', $obj).append($li);
 
 		resizeSelectedText($obj, $li);
-
-		cleanAvailable($obj);
-		cleanSearchInput($obj);
-		cleanSearchHistory($obj);
-		updateSearchFieldVisibility($obj);
+		cleanSearch($obj);
 	}
 
 	function removeSelected($obj, id) {
@@ -667,10 +654,7 @@ jQuery(function($) {
 			addDefaultValue($obj);
 		}
 
-		cleanAvailable($obj);
-		cleanSearchInput($obj);
-		cleanSearchHistory($obj);
-		updateSearchFieldVisibility($obj);
+		cleanSearch($obj);
 	}
 
 	function addAvailable($obj, item) {
@@ -1009,6 +993,13 @@ jQuery(function($) {
 			clearTimeout(ms.values.searchTimeout);
 			delete ms.values.searchTimeout;
 		}
+	}
+
+	function cleanSearch($obj) {
+		cleanAvailable($obj);
+		cleanSearchInput($obj);
+		cleanSearchHistory($obj);
+		updateSearchFieldVisibility($obj);
 	}
 
 	function resizeSelectedText($obj, $li) {
