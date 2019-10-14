@@ -164,7 +164,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 				goto clean;
 
 			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
-					&error)))
+					PERF_COUNTER_LANG_DEFAULT, &error)))
 			{
 				goto clean;
 			}
