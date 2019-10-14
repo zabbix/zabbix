@@ -370,7 +370,7 @@ jQuery(function($) {
 						/*
 						 * Strategy:
 						 * 1. Load the cached result set if such exists for the given term and show the list.
-						 * 2. Skip anything if already expecting the result set to arrive for the given.
+						 * 2. Skip anything if already expecting the result set to arrive for the given term.
 						 * 3. Schedule result set retrieval for the given term otherwise.
 						 */
 
