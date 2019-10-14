@@ -20,6 +20,8 @@
 #ifndef ZABBIX_LOG_H
 #define ZABBIX_LOG_H
 
+#include "common.h"
+
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
 #define LOG_LEVEL_ERR		2
