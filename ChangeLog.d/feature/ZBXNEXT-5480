@@ -1,1 +1,0 @@
-A........T [ZBXNEXT-5480] removed linux, windows, zabbix-agent and mysql 'classic' templates from XML and tmpl files, updated conf/zabbix_agentd/userparameter_mysql.conf to match new mysql template (vitaly)

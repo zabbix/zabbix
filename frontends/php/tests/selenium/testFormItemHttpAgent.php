@@ -1047,7 +1047,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'SSL verify peer' => false,
 				'SSL verify host' => false,
 				'Type of information' => 'Numeric (unsigned)',
-				'Update interval' => '30s',
+				'Update interval' => '1m',
 				'Show value' => 'As is',
 				'Enable trapping' => false,
 				'Populates host inventory field' => '-None-',

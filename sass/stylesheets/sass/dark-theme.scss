@@ -348,6 +348,10 @@ $multiselect-selected-bg-color: #696969;
 	}
 }
 
+.icon-description::after {
+	color: $font-selected-color;
+}
+
 .totals-list {
 	color: darken($font-color, 85%);
 }

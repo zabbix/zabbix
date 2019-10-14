@@ -1961,6 +1961,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+			zbx_free(hv_list);
 			goto unlock;
 		}
 

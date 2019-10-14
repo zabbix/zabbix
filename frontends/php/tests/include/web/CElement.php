@@ -626,7 +626,7 @@ class CElement extends CBaseElement implements IWaitable {
 	public function click($force = false) {
 		try {
 			return parent::click();
-		} catch (UnrecognizedExceptionException $exception) {
+		} catch (Exception $exception) {
 			if (!$force) {
 				throw $exception;
 			}

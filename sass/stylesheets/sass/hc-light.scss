@@ -187,8 +187,8 @@ $multiselect-selected-bg-color: #777;
 // ICONS
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -203px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -730px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -766px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -208px -729px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -208px -765px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -203px -693px
 );
 
@@ -1059,7 +1059,8 @@ td.inactive-bg {
 	background-position: -424px -285px;
 }
 
-.icon-action-msgs {
+.icon-action-msgs,
+.icon-description {
 	&::before {
 		background-position: -474px -285px;
 	}

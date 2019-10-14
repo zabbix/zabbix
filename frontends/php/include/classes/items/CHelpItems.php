@@ -342,7 +342,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'wmi.getall[<namespace>,<query>]',
-					'description' => _('Execute WMI query and return the json document with all selected objects')
+					'description' => _('Execute WMI query and return the JSON document with all selected objects')
 				],
 				[
 					'key' => 'zabbix.stats[<ip>,<port>]',

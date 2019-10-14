@@ -109,6 +109,21 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 
 		$this->fields[$field_layout->getName()] = $field_layout;
 
+		// Show operational data.
+		$field_show_opdata = (new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [
+			OPERATIONAL_DATA_SHOW_NONE => _('None'),
+			OPERATIONAL_DATA_SHOW_SEPARATELY => _('Separately'),
+			OPERATIONAL_DATA_SHOW_WITH_PROBLEM => _('With problem name')
+		]))
+			->setDefault(OPERATIONAL_DATA_SHOW_NONE)
+			->setModern(true);
+
+		if (array_key_exists('show_opdata', $this->data)) {
+			$field_show_opdata->setValue($this->data['show_opdata']);
+		}
+
+		$this->fields[$field_show_opdata->getName()] = $field_show_opdata;
+
 		// Show suppressed problems.
 		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
 			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
@@ -131,16 +146,6 @@ class CWidgetFormProblemsBySv extends CWidgetForm {
 		}
 
 		$this->fields[$field_hide_empty_groups->getName()] = $field_hide_empty_groups;
-
-		// Show operational data.
-		$field_show_opdata = (new CWidgetFieldCheckBox('show_opdata', _('Show operational data')))
-			->setFlags(CWidgetField::FLAG_ACKNOWLEDGES);
-
-		if (array_key_exists('show_opdata', $this->data)) {
-			$field_show_opdata->setValue($this->data['show_opdata']);
-		}
-
-		$this->fields[$field_show_opdata->getName()] = $field_show_opdata;
 
 		// Problem display.
 		$field_ext_ack = (new CWidgetFieldRadioButtonList('ext_ack', _('Problem display'), [

@@ -80,6 +80,7 @@ class CConfigurationImport {
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
+			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
 			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
@@ -153,6 +154,7 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+		$this->processMediaTypes();
 
 		return true;
 	}
@@ -1783,6 +1785,50 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Import media types.
+	 */
+	protected function processMediaTypes() {
+		if (!$this->options['mediaTypes']['updateExisting'] && !$this->options['mediaTypes']['createMissing']) {
+			return;
+		}
+
+		$all_media_types = $this->getFormattedMediaTypes();
+
+		if (!$all_media_types) {
+			return;
+		}
+
+		$all_media_types = zbx_toHash($all_media_types, 'name');
+
+		$db_media_types = API::MediaType()->get([
+			'output' => ['mediatypeid', 'name'],
+			'filter' => ['name' => array_keys($all_media_types)]
+		]);
+		$db_media_types = zbx_toHash($db_media_types, 'name');
+
+		$upd_media_types = [];
+		$new_media_types = [];
+
+		foreach ($all_media_types as $name => $media_type) {
+			if (array_key_exists($name , $db_media_types)) {
+				$media_type['mediatypeid'] = $db_media_types[$name]['mediatypeid'];
+				$upd_media_types[] = $media_type;
+			}
+			else {
+				$new_media_types[] = $media_type;
+			}
+		}
+
+		if ($this->options['mediaTypes']['createMissing'] && $new_media_types) {
+			API::MediaType()->create($new_media_types);
+		}
+
+		if ($this->options['mediaTypes']['updateExisting'] && $upd_media_types) {
+			API::MediaType()->update($upd_media_types);
+		}
+	}
+
+	/**
 	 * Deletes items from DB that are missing in XML.
 	 *
 	 * @return null
@@ -2461,6 +2507,19 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['templateScreens'];
+	}
+
+	/**
+	 * Get formatted media types.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedMediaTypes() {
+		if (!isset($this->formattedData['mediaTypes'])) {
+			$this->formattedData['mediaTypes'] = $this->adapter->getMediaTypes();
+		}
+
+		return $this->formattedData['mediaTypes'];
 	}
 
 	/**
