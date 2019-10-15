@@ -30,7 +30,7 @@ extern char	*CONFIG_FILE;
  * Purpose: creates dynamic shared memory segment                             *
  *                                                                            *
  * Parameters: shm       - [OUT] the dynamic shared memory data               *
- *             shm_size  - [IN] the inital size (can be 0)                    *
+ *             shm_size  - [IN] the initial size (can be 0)                   *
  *             mutex     - [IN] the name of mutex used to synchronize memory  *
  *                              access                                        *
  *             copy_func - [IN] the function used to copy shared memory       *
@@ -147,7 +147,7 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm)
  *                                                                            *
  * Return value: SUCCEED - the local reference to dynamic shared memory       *
  *                         segment was validated successfully and contains    *
- *                         corret dynamic shared memory segment address       *
+ *                         correct dynamic shared memory segment address      *
  *               FAIL    - otherwise. The errmsg contains error message and   *
  *                         must be freed by the caller.                       *
  *                                                                            *

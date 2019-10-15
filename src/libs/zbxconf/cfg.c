@@ -586,7 +586,7 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
  * Function: zbx_set_data_destination_hosts                                   *
  *                                                                            *
  * Purpose: parse "ServerActive' parameter value and set destination servers  *
- *          using a calback function                                          *
+ *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb)

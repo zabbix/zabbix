@@ -188,7 +188,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  *                                                                            *
  * Function: zbx_getip_by_host                                                *
  *                                                                            *
- * Purpose: retrieve IP addres by host name                                   *
+ * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
