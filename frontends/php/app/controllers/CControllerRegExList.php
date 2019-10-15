@@ -19,8 +19,8 @@
 **/
 
 
-
 require_once dirname(__FILE__).'/../../include/regexp.inc.php';
+
 class CControllerRegExList extends CController {
 
 	protected function init() {
@@ -29,16 +29,10 @@ class CControllerRegExList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'uncheck' => 'int32',
 		];
 
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return $this->validateInput($fields);
 	}
 
 	protected function checkPermissions() {
@@ -46,28 +40,41 @@ class CControllerRegExList extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'regexps' => [],
-			'regexpids' => []
-		];
-
-		$dbRegExp = DBselect('SELECT re.* FROM regexps re');
-
-		while ($regExp = DBfetch($dbRegExp)) {
-			$regExp['expressions'] = [];
-
-			$data['regexps'][$regExp['regexpid']] = $regExp;
-			$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
+		if ($this->getInput('uncheck', false)) {
+			uncheckTableRows();
 		}
 
-		order_result($data['regexps'], 'name');
+		$data = [
+			'regexes' => [],
+			'db_exps' => [],
+			'regexids' => []
+		];
 
-		$data['db_exps'] = DBfetchArray(DBselect(
+		$dbregex = DBselect('SELECT re.* FROM regexps re');
+
+		while ($regex = DBfetch($dbregex)) {
+			$regex['expressions'] = [];
+
+			$data['regexes'][$regex['regexpid']] = $regex;
+			$data['regexids'][$regex['regexpid']] = $regex['regexpid'];
+		}
+
+		order_result($data['regexes'], 'name');
+
+		$dbexpressions = DBselect(
 			'SELECT e.*'.
 			' FROM expressions e'.
-			' WHERE '.dbConditionInt('e.regexpid', $data['regexpids']).
+			' WHERE '.dbConditionInt('e.regexpid', $data['regexids']).
 			' ORDER BY e.expression_type'
-		));
+		);
+
+		while ($expr = DBfetch($dbexpressions)) {
+			$data['db_exps'][] = [
+				'regexid' => $expr['regexpid'],
+				'expression' => $expr['expression'],
+				'expression_type' => $expr['expression_type'],
+			];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

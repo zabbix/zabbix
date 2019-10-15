@@ -27,7 +27,7 @@ class CControllerRegExDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'regexids' => 'required | array_db regexps.regexpid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +40,54 @@ class CControllerRegExDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		/** @var array $regexids */
+		$regexids = $this->getinput('regexids');
+		$this->db_regexes = DBfetchArray(DBselect('SELECT regexpid, name FROM regexps'.
+			' WHERE '.dbConditionInt('regexpid', $regexids)
+		));
+
+		if (count($this->db_regexes) != count($regexids)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$audit = [];
+		$regexids = [];
+		foreach ($this->db_regexes as $db_regex) {
+			$regexids[] = $db_regex['regexpid'];
+			$audit[] = 'Id ['.$db_regex['regexpid'].'] '._('Name').' ['.$db_regex['name'].']';
+		}
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerRegExDelete'));
+		DBstart();
+		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexids));
+		if ($result) {
+			$result = DBend($result);
+		}
+
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
+		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_n('Regular expression deleted', 'Regular expressions deleted',
+				count($this->db_regexes)
+			));
+
+			foreach ($audit as $msg) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, $msg);
+			}
+		}
+		else {
+			$response->setMessageError(_n('Cannot delete regular expression', 'Cannot delete regular expressions',
+				count($this->db_regexes)
+			));
+		}
+
 		$this->setResponse($response);
 	}
 }

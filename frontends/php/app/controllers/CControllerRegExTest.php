@@ -21,13 +21,9 @@
 
 class CControllerRegExTest extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'ajaxdata' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +40,36 @@ class CControllerRegExTest extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
+		$response = new CAjaxResponse();
+		$data = $this->getInput('ajaxdata', []);
+
+		$result = [
+			'expressions' => $this->getInput('expressions', []),
+			'errors' => [],
+			'final' => true
 		];
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerRegExTest'));
-		$this->setResponse($response);
+		$validator = new CRegexValidator([
+			'messageInvalid' => _('Regular expression must be a string'),
+			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
+		]);
+
+		foreach ($data['expressions'] as $id => $expression) {
+			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE]) ||
+				$validator->validate($expression['expression'])
+			) {
+				$match = CGlobalRegexp::matchExpression($expression, $data['testString']);
+
+				$result['expressions'][$id] = $match;
+			} else {
+				$match = false;
+				$result['errors'][$id] = $validator->getError();
+			}
+
+			$result['final'] = $result['final'] && $match;
+		}
+
+		$response->success($result);
+		$response->send();
 	}
 }

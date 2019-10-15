@@ -29,7 +29,9 @@ $widget = (new CWidget())
 					->setArgument('action', 'regex.list')
 					->getUrl()
 				))
-				->addItem(new CSubmit('form', _('New regular expression')))
+				->addItem(new CRedirectButton(_('New regular expression'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'regex.edit')
+				))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -40,7 +42,7 @@ $form = (new CForm())->setName('regularExpressionsForm');
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_regexps'))->onClick("checkAll('".$form->getName()."', 'all_regexps', 'regexpids');")
+			(new CCheckBox('all-regexes'))->onClick("checkAll('".$form->getName()."', 'all-regexes', 'regexids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Name'),
 		_('Expressions')
@@ -48,37 +50,42 @@ $table = (new CTableInfo())
 
 $expressions = [];
 $values = [];
+
 foreach($data['db_exps'] as $exp) {
-	if (!isset($expressions[$exp['regexpid']])) {
-		$values[$exp['regexpid']] = 1;
+	if (!isset($expressions[$exp['regexid']])) {
+		$values[$exp['regexid']] = 1;
 	}
 	else {
-		$values[$exp['regexpid']]++;
+		$values[$exp['regexid']] ++;
 	}
 
-	if (!isset($expressions[$exp['regexpid']])) {
-		$expressions[$exp['regexpid']] = new CTable();
+	if (!isset($expressions[$exp['regexid']])) {
+		$expressions[$exp['regexid']] = new CTable();
 	}
 
-	$expressions[$exp['regexpid']]->addRow([
-		new CCol($values[$exp['regexpid']]),
+	$expressions[$exp['regexid']]->addRow([
+		new CCol($values[$exp['regexid']]),
 		new CCol(' &raquo; '),
 		new CCol($exp['expression']),
 		new CCol(' ['.expression_type2str($exp['expression_type']).']')
 	]);
 }
-foreach($data['regexps'] as $regexpid => $regexp) {
+
+foreach($data['regexes'] as $regexid => $regex) {
 	$table->addRow([
-		new CCheckBox('regexpids['.$regexp['regexpid'].']', $regexp['regexpid']),
-		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
-		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
+		new CCheckBox('regexids['.$regexid.']', $regexid),
+		new CLink($regex['name'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'regex.edit')
+			->setArgument('regexid', $regexid)
+		),
+		array_key_exists($regexid, $expressions) ? $expressions[$regexid] : ''
 	]);
 }
 
 $form->addItem([
 	$table,
-	new CActionButtonList('action', 'regexpids', [
-		'regexp.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
+	new CActionButtonList('action', 'regexids', [
+		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
 	])
 ]);
 

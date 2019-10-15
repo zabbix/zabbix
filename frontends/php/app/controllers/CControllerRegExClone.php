@@ -21,13 +21,12 @@
 
 class CControllerRegExClone extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'name'         => 'string | db regexps.name',
+			'test_string'  => 'string | db regexps.test_string',
+			'regexid'      => 'required | db regexps.regexpid',
+			'expressions'  => 'array',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +39,29 @@ class CControllerRegExClone extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		$db_regex = DBfetch(DBSelect('SELECT * FROM regexps'.
+			' WHERE '.dbConditionInt('regexpid', (array) $this->getInput('regexid'))
+		));
+
+		if (!$db_regex) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.edit'));
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerRegExClone'));
+		$form_data = $this->getInputAll();
+		unset($form_data['regexid']);
+		$form_data['form_refresh'] = 1;
+
+		$response->setFormData($form_data);
 		$this->setResponse($response);
 	}
 }

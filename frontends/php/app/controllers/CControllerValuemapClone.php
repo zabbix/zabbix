@@ -27,7 +27,6 @@ class CControllerValuemapClone extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +43,5 @@ class CControllerValuemapClone extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerValuemapClone'));
-		$this->setResponse($response);
 	}
 }
