@@ -204,7 +204,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 	if (0 != getaddrinfo(host, NULL, &hints, &ai))
 	{
 		ip[0] = '\0';
-		return;
+		goto out;
 	}
 
 	switch(ai->ai_addr->sa_family) {
@@ -216,8 +216,11 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 			break;
 		default:
 			ip[0] = '\0';
-			return;
+			goto out;
 	}
+out:
+	if (NULL != ai)
+		freeaddrinfo(ai);
 }
 #else
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)

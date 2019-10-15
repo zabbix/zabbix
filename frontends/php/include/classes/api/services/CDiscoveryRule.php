@@ -1968,10 +1968,9 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status'],
+			'output' => ['host', 'name', 'status', 'inventory_mode'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectInventory' => ['inventory_mode'],
 			'selectTemplates' => ['templateid'],
 			'preservekeys' => true
 		]);
