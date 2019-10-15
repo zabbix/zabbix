@@ -1155,7 +1155,7 @@ output {
 
 .multiselect-available {
   position: absolute;
-  z-index: 1000;
+  z-index: 20000;
   border: 1px solid #383838;
   overflow-y: auto;
   -webkit-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);

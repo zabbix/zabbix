@@ -1692,7 +1692,7 @@ output {
 
 .multiselect-available {
 	position: absolute;
-	z-index: 1000;
+	z-index: 20000;
 	border: 1px solid $action-border-color;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
