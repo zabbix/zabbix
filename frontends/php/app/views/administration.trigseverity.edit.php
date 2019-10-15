@@ -92,6 +92,10 @@ $severity_tab = (new CFormList())
 
 $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'trigseverity.update')
+		->getUrl()
+	)
 	->addItem(
 		(new CTabView())
 			->addTab('severities', _('Trigger severities'), $severity_tab)
