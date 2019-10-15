@@ -27,7 +27,7 @@ class CControllerMacrosUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'macros' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -44,12 +44,72 @@ class CControllerMacrosUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$db_macros = API::UserMacro()->get([
+			'output' => ['globalmacroid', 'macro', 'value', 'description'],
+			'globalmacro' => true,
+			'preservekeys' => true
+		]);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerMacrosUpdate'));
+		/** @var array $macros */
+		$macros = $this->getInput('macros', []);
+
+		foreach ($macros as $idx => $macro) {
+			if (!array_key_exists('globalmacroid', $macro) && $macro['macro'] === '' && $macro['value'] === ''
+					&& $macro['description'] === '') {
+				unset($macros[$idx]);
+			}
+		}
+
+		$macros_to_update = [];
+		foreach ($macros as $idx => $macro) {
+			if (array_key_exists('globalmacroid', $macro) && array_key_exists($macro['globalmacroid'], $db_macros)) {
+				$dbMacro = $db_macros[$macro['globalmacroid']];
+
+				// remove item from new macros array
+				unset($macros[$idx], $db_macros[$macro['globalmacroid']]);
+
+				// if the macro is unchanged - skip it
+				if ($dbMacro['macro'] === $macro['macro'] && $dbMacro['value'] === $macro['value']
+						&& $dbMacro['description'] === $macro['description']) {
+					continue;
+				}
+
+				$macros_to_update[] = $macro;
+			}
+		}
+
+		$result = true;
+
+		if ($macros_to_update || $db_macros || $macros) {
+			DBstart();
+
+			// update
+			if ($macros_to_update) {
+				$result = (bool) API::UserMacro()->updateGlobal($macros_to_update);
+			}
+
+			// deletehe
+			if ($db_macros) {
+				$result = $result && (bool) API::UserMacro()->deleteGlobal(array_keys($db_macros));
+			}
+
+			// create
+			if ($macros) {
+				$result = $result && (bool) API::UserMacro()->createGlobal(array_values($macros));
+			}
+
+			$result = DBend($result);
+		}
+
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'macros.edit'));
+		if ($result) {
+			$response->setMessageOk(_('Macros updated'));
+		}
+		else {
+			$response->setMessageError(_('Cannot update macros'));
+			$response->setFormData($this->getInputAll());
+		}
+
 		$this->setResponse($response);
 	}
 }

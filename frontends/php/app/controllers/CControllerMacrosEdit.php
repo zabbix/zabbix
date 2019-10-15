@@ -27,7 +27,7 @@ class CControllerMacrosEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'macros' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,10 +46,15 @@ class CControllerMacrosEdit extends CController {
 	protected function doAction() {
 		$data = [];
 
-		$data['macros'] = API::UserMacro()->get([
-			'output' => ['globalmacroid', 'macro', 'value', 'description'],
-			'globalmacro' => true
-		]);
+		if ($this->hasInput('macros')) {
+			$data['macros'] = $this->getInput('macros');
+		}
+		else {
+			$data['macros'] = API::UserMacro()->get([
+				'output' => ['globalmacroid', 'macro', 'value', 'description'],
+				'globalmacro' => true
+			]);
+		}
 
 		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
