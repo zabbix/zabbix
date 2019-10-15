@@ -82,7 +82,7 @@ extern "C" void	zbx_co_uninitialize()
  *             vtProp        [OUT] - pointer to memory for the queried value  *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
- *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
+ *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  * Comments: *vtProp must be initialized with VariantInit(),                  *
  *           wmi_* must not be NULL. The callers must convert value to the    *

@@ -177,8 +177,8 @@ ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
  */
 #define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
-/* cURL specific atribute to prevent the use of "Expect" derective */
-/* acording RFC 7231/5.1.1 if xml request with a size is large than 1k */
+/* cURL specific attribute to prevent the use of "Expect" directive */
+/* according to RFC 7231/5.1.1 if xml request is larger than 1k */
 #define ZBX_XML_HEADER3		"Expect:"
 
 #define ZBX_POST_VSPHERE_HEADER									\
@@ -1010,7 +1010,7 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Function: vmware_shared_perf_entity_clean                                  *
  *                                                                            *
- * Purpose: cleans resources allocated by vmware peformance entity in vmware  *
+ * Purpose: cleans resources allocated by vmware performance entity in vmware *
  *          cache                                                             *
  *                                                                            *
  * Parameters: entity - [IN] the entity to free                               *
@@ -1813,7 +1813,7 @@ static void	zbx_property_collection_free(zbx_property_collection_iter *iter)
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the contents were retrieved successfully           *
- *               FAIL    - the content retrieval faield                       *
+ *               FAIL    - the content retrieval failed                       *
  *                                                                            *
  ******************************************************************************/
 static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **fullname, char **error)
