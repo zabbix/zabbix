@@ -24,13 +24,20 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#define PCI_SYSTEM			2
-#define PCI_PROCESSOR			238
-#define PCI_PROCESSOR_TIME		6
-#define PCI_PROCESSOR_QUEUE_LENGTH	44
-#define PCI_SYSTEM_UP_TIME		674
-#define PCI_TERMINAL_SERVICES		2176
-#define PCI_TOTAL_SESSIONS		2178
+/* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
+typedef enum
+{
+	PCI_SYSTEM = 0,
+	PCI_PROCESSOR,
+	PCI_PROCESSOR_INFORMATION,
+	PCI_PROCESSOR_TIME,
+	PCI_PROCESSOR_QUEUE_LENGTH,
+	PCI_SYSTEM_UP_TIME,
+	PCI_TERMINAL_SERVICES,
+	PCI_TOTAL_SESSIONS,
+	PCI_MAX_INDEX = PCI_TOTAL_SESSIONS
+}
+zbx_builtin_counter_ref_t;
 
 typedef enum
 {
@@ -84,5 +91,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, zbx_perf_counter_lang_t lang, double *value);
 wchar_t		*get_counter_name(DWORD pdhIndex);
 int		check_counter_path(char *counterPath, int convert_from_numeric);
+int		init_builtin_counter_indexes(void);
+DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t ref);
 
 #endif /* ZABBIX_PERFMON_H */

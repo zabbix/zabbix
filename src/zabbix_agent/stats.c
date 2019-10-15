@@ -31,6 +31,8 @@
 #ifdef _WINDOWS
 #	include "service.h"
 #	include "perfstat.h"
+/* defined in sysinfo lib */
+extern int get_cpu_num_win32(void);
 #else
 #	include "daemon.h"
 #	include "ipc.h"
@@ -63,31 +65,7 @@ zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 static int	zbx_get_cpu_num(void)
 {
 #if defined(_WINDOWS)
-	/* Define a function pointer type for the GetActiveProcessorCount API */
-	typedef DWORD (WINAPI *GETACTIVEPC) (WORD);
-
-	GETACTIVEPC	get_act;
-	SYSTEM_INFO	sysInfo;
-
-	/* The rationale for checking dynamically if the GetActiveProcessorCount is implemented */
-	/* in kernel32.lib, is because the function is implemented only on 64 bit versions of Windows */
-	/* from Windows 7 onward. Windows Vista 64 bit doesn't have it and also Windows XP does */
-	/* not. We can't resolve this using conditional compilation unless we release multiple agents */
-	/* targeting different sets of Windows APIs. */
-	get_act = (GETACTIVEPC)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetActiveProcessorCount");
-
-	if (NULL != get_act)
-	{
-		return (int)get_act(ALL_PROCESSOR_GROUPS);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find address of GetActiveProcessorCount function");
-
-		GetNativeSystemInfo(&sysInfo);
-
-		return (int)sysInfo.dwNumberOfProcessors;
-	}
+	return get_cpu_num_win32();
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct pst_dynamic	psd;
 
@@ -168,11 +146,9 @@ int	init_collector_data(char **error)
 	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
 
 #ifdef _WINDOWS
-
 	ZBX_UNUSED(error);
 
 	sz_cpu = sizeof(zbx_perf_counter_data_t *) * (cpu_count + 1);
-
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
