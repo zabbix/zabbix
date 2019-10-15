@@ -1,0 +1,1 @@
+.......PS. [ZBX-16746] fixed support of libcurl version less than 7.38 for Kerberos authentification (akozlovs)
