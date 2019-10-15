@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
 
 $widget = (new CWidget())
 	->setTitle(_('Value mapping'))
@@ -29,10 +32,12 @@ $widget = (new CWidget())
 					->setArgument('action', 'valuemap.list')
 					->getUrl()
 				))
-				->addItem(new CSubmit('form', _('Create value map')))
-				->addItem((new CButton('form', _('Import')))
-					->onClick('redirect("conf.import.php?rules_preset=valuemap")')
-				)
+				->addItem(new CRedirectButton(_('Create value map'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'valuemap.edit')
+				))
+				->addItem(new CRedirectButton(_('Import'), (new CUrl('conf.import.php'))
+					->setArgument('rules_preset', 'valuemap')
+				))
 			)
 		))
 			->setAttribute('aria-label', _('Content controls'))
@@ -63,7 +68,10 @@ foreach ($data['valuemaps'] as $valuemap) {
 
 	$table->addRow([
 		new CCheckBox('valuemapids['.$valuemap['valuemapid'].']', $valuemap['valuemapid']),
-		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
+		new CLink($valuemap['name'], (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.edit')
+			->setArgument('valuemapid', $valuemap['valuemapid'])
+		),
 		$mappings,
 		$valuemap['used_in_items'] ? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
@@ -76,7 +84,8 @@ $form->addItem([
 		'valuemap.export' => ['name' => _('Export'), 'redirect' =>
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'export.valuemaps.xml')
-				->setArgument('backurl', (new CUrl('adm.valuemapping.php'))
+				->setArgument('backurl', (new CUrl('zabbix.php'))
+					->setArgument('action', 'valuemap.list')
 					->setArgument('page', getPageNumber())
 					->getUrl())
 				->getUrl()

@@ -27,7 +27,11 @@ class CControllerValuemapEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'valuemapid'   => 'db valuemaps.valuemapid',
+			'name'         => 'string | db valuemaps.name',
+			'mappings'     => 'array',
+			'form_refresh' => '',
+			'page'         => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +44,71 @@ class CControllerValuemapEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		if ($this->hasInput('valuemapid')) {
+			$valuemaps = API::ValueMap()->get([
+				'output'         => ['valuemapid', 'name'],
+				'valuemapids'    => (array) $this->getInput('valuemapid'),
+				'selectMappings' => ['value', 'newvalue']
+			]);
+
+			if (!$valuemaps) {
+				return false;
+			}
+
+			if ($this->getInput('form_refresh', 0) != 0) {
+				$this->valuemap = [
+					'mappings'       => $this->getInput('mappings', []),
+					'name'           => $this->getInput('name', ''),
+					'valuemapid'     => $this->getInput('valuemapid'),
+					'valuemap_count' => 0
+				];
+			}
+			else {
+				$this->valuemap = reset($valuemaps);
+			}
+		}
+		else {
+			$this->valuemap = [
+				'name'       => '',
+				'mappings'   => [],
+				'valuemapid' => 0
+			];
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
 		$data = [
-			'demo' => __FILE__
+			'mappings'       => $this->getInput('mappings', $this->valuemap['mappings']),
+			'name'           => $this->getInput('name', $this->valuemap['name']),
+			'valuemapid'     => $this->getInput('valuemapid', $this->valuemap['valuemapid']),
+			'valuemap_count' => 0
 		];
 
+		if ($data['valuemapid'] != 0) {
+			$data['valuemap_count'] += API::Item()->get([
+				'countOutput' => true,
+				'webitems'    => true,
+				'filter'      => ['valuemapid' => $data['valuemapid']]
+			]);
+
+			$data['valuemap_count'] += API::ItemPrototype()->get([
+				'countOutput' => true,
+				'filter'      => ['valuemapid' => $data['valuemapid']]
+			]);
+		}
+
+		if (!$data['mappings']) {
+			$data['mappings'][] = ['value' => '', 'newvalue' => ''];
+		}
+
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerValuemapEdit'));
+		$response->setTitle(_('Configuration of value mapping'));
 		$this->setResponse($response);
 	}
 }

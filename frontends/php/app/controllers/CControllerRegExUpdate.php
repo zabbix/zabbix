@@ -87,7 +87,6 @@ class CControllerRegExUpdate extends CController {
 		], $expressions);
 
 		if ($result) {
-			uncheckTableRows();
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.list');
 
 			$response = new CControllerResponseRedirect($url);

@@ -27,29 +27,117 @@ class CControllerValuemapUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'valuemapid'   => 'db valuemaps.valuemapid',
+			'name'         => 'required | string | not_empty | db valuemaps.name',
+			'mappings'     => 'required | array',
+			'form_refresh' => '',
+			'page'         => 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->getValidationError()) {
+				case self::VALIDATION_ERROR:
+					$url = (new CUrl('zabbix.php'))->setArgument('action', 'valuemap.edit');
+
+					if ($this->hasInput('valuemapid')) {
+						$url->setArgument('valuemapid', $this->getInput('valuemapid'));
+					}
+
+					$response = new CControllerResponseRedirect($url);
+					$response->setFormData($this->getInputAll());
+
+					$response->setMessageError($this->hasInput('valuemapid')
+						? _('Cannot update value map')
+						: _('Cannot add value map')
+					);
+
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		if ($this->hasInput('valuemapid')) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => [],
+				'valuemapids' => (array) $this->getInput('valuemapid')
+			]);
+
+			if (!$valuemaps) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	protected function doUpdateAction() {
+		$result = (bool) API::ValueMap()->update([
+			'name'       => $this->getInput('name'),
+			'mappings'   => $this->getInput('mappings', []),
+			'valuemapid' => $this->getInput('valuemapid')
+		]);
+
+		if ($result) {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+			);
+			$response->setMessageOk(_('Value map updated'));
+		}
+		else {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.edit')
+				->setArgument('valuemapid', $this->getInput('valuemapid'))
+			);
+			$response->setMessageError(_('Cannot update value map'));
+			$response->setFormData($this->getInputAll());
+		}
+
+		$this->setResponse($response);
+	}
+
+	protected function doCreateAction() {
+		$result = (bool) API::ValueMap()->create([
+			'name'     => $this->getInput('name'),
+			'mappings' => $this->getInput('mappings')
+		]);
+
+		if ($result) {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.list')
+			);
+			$response->setMessageOk(_('Value map added'));
+		}
+		else {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'valuemap.edit')
+			);
+			$response->setMessageError(_('Cannot add value map'));
+			$response->setFormData($this->getInputAll());
+		}
+
+		$this->setResponse($response);
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerValuemapUpdate'));
-		$this->setResponse($response);
+		if ($this->hasInput('valuemapid')) {
+			$this->doUpdateAction();
+		}
+		else {
+			$this->doCreateAction();
+		}
 	}
 }

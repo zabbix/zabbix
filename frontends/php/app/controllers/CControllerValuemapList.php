@@ -27,7 +27,7 @@ class CControllerValuemapList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'uncheck' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,7 +54,8 @@ class CControllerValuemapList extends CController {
 
 		$data = [
 			'sort' => $sortfield,
-			'sortorder' => $sortorder
+			'sortorder' => $sortorder,
+			'uncheck' => $this->getInput('uncheck', false)
 		];
 
 		$data['valuemaps'] = API::ValueMap()->get([
@@ -65,7 +66,9 @@ class CControllerValuemapList extends CController {
 		]);
 
 		order_result($data['valuemaps'], $sortfield, $sortorder);
-		$data['paging'] = getPagingLine($data['valuemaps'], $sortorder, new CUrl('adm.valuemapping.php'));
+		$data['paging'] = getPagingLine($data['valuemaps'], $sortorder, (new CUrl('zabbix.php'))
+			->setArgument('action', 'valuemap.list')
+		);
 
 		foreach ($data['valuemaps'] as &$valuemap) {
 			order_result($valuemap['mappings'], 'value');
@@ -87,6 +90,7 @@ class CControllerValuemapList extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of value mapping'));
+
 		$this->setResponse($response);
 	}
 }

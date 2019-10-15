@@ -40,14 +40,11 @@ class CControllerRegExList extends CController {
 	}
 
 	protected function doAction() {
-		if ($this->getInput('uncheck', false)) {
-			uncheckTableRows();
-		}
-
 		$data = [
-			'regexes' => [],
-			'db_exps' => [],
-			'regexids' => []
+			'regexes'  => [],
+			'db_exps'  => [],
+			'regexids' => [],
+			'uncheck'  => $this->getInput('uncheck', false)
 		];
 
 		$dbregex = DBselect('SELECT re.* FROM regexps re');

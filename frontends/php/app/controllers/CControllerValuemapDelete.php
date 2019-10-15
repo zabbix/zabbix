@@ -27,7 +27,7 @@ class CControllerValuemapDelete extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'valuemapids' => 'required | array_db valuemaps.valuemapid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -40,16 +40,32 @@ class CControllerValuemapDelete extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
+		$valuemaps = API::ValueMap()->get([
+			'output' => [],
+			'valuemapids' => $this->getInput('valuemapids')
+		]);
+
+		return (count($this->getInput('valuemapids')) == count($valuemaps));
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		/** @var array $valuemapids */
+		$valuemapids = $this->getInput('valuemapids');
+		$result = (bool) API::ValueMap()->delete($valuemapids);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerValuemapDelete'));
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'valuemap.list'));
+		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk(_n('Value map deleted', 'Value maps deleted', count($valuemapids)));
+		}
+		else {
+			$response->setMessageError(_n('Cannot delete value map', 'Cannot delete value maps', count($valuemapids)));
+		}
+
 		$this->setResponse($response);
 	}
 }

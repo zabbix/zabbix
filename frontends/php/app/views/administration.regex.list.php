@@ -19,6 +19,10 @@
 **/
 
 
+if ($data['uncheck']) {
+	uncheckTableRows();
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setControls((new CTag('nav', true,

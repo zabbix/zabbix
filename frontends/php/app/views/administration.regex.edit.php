@@ -163,7 +163,11 @@ if ($data['regexid'] != 0) {
 else {
 	$reg_exp_view->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[
+			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'regex.list')
+			))->setId('cancel')
+		]
 	));
 }
 
