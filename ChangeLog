@@ -24,7 +24,7 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 .......PS. [ZBX-16575] getting disk controller type from linked controller label value (atumilovics)
 .......PS. [ZBX-16561] fixed JsonPath parsing for comma characters inside quoted string (atumilovics)
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
-........S. [ZBX-16383] addjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
+........S. [ZBX-16383] adjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
 
 --------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
 ...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
 ........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)
-........S. [ZBX-16383] addjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
+........S. [ZBX-16383] adjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
 .......PS. [ZBX-16575] getting disk controller type from linked controller label value (atumilovics)
 .......PS. [ZBX-16561] fixed JsonPath parsing for comma characters inside quoted string (atumilovics)
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
@@ -802,7 +802,7 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
 ...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
 ........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)
-........S. [ZBX-16383] addjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
+........S. [ZBX-16383] adjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
 .......PS. [ZBX-16575] getting disk controller type from linked controller label value (atumilovics)
 .......PS. [ZBX-16561] fixed JsonPath parsing for comma characters inside quoted string (atumilovics)
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
