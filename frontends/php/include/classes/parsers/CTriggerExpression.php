@@ -574,7 +574,7 @@ class CTriggerExpression {
 
 		$expression = substr($this->expression, $this->pos, $pos + 1 - $this->pos);
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+		$this->result->addToken(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO,
 			$expression, $this->pos, $this->function_parser->getLength() + 2,
 			[
 				'host' => '',
