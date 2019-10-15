@@ -2,6 +2,7 @@ Changes for 4.0.14rc1
 
 New features:
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
+.........T [ZBXNEXT-4746] added "Template Server Cisco UCS SNMPv2" template (vitaly)
 .......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
