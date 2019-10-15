@@ -91,9 +91,9 @@ static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
 
 	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE) && 0 == maintenance_off)
 	{
-		const char	*desription[] = {"with data collection", "without data collection"};
+		const char	*description[] = {"with data collection", "without data collection"};
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", desription[diff->maintenance_type]);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", description[diff->maintenance_type]);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);

@@ -2329,7 +2329,7 @@ out:
     misses: 0
 ---
 # TC40
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get interval of values when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2381,7 +2381,7 @@ out:
     misses: 3
 ---
 # TC41
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2425,7 +2425,7 @@ out:
     misses: 2
 ---
 # TC42
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values during interval when using nanoseconds in end time
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2469,7 +2469,7 @@ out:
     misses: 2
 ---
 # TC43
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values during interval when using nanoseconds in end time and not enough data
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2521,7 +2521,7 @@ out:
     misses: 3
 ---
 # TC44
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get 1 value during interval when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2563,7 +2563,7 @@ out:
     misses: 1
 ---
 # TC45
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned
 test case: Get 1 value during interval when using nanoseconds in end time (2) 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2611,7 +2611,7 @@ out:
     misses: 1
 ---
 # TC46
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned
 test case: Get 10 values during interval when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2670,7 +2670,7 @@ out:
     misses: 0
 ---
 # TC47
-# Test empty requests in low memory mode */ 
+# Test empty requests in low memory mode
 test case: Get number of uncached item values from interval when cache working in low memory mode
 in:
   history:

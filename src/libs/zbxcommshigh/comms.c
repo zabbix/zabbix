@@ -35,7 +35,7 @@
  *             protocol - [IN] the transport protocol                         *
  *             timeout - [IN] timeout for this operation                      *
  *                                                                            *
- * Return value: SUCCEED - data successfully transmited                       *
+ * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
  *                                                                            *
  * Author: Alexander Vladishev, Alexei Vladishev                              *
