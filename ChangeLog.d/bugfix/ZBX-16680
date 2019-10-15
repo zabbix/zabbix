@@ -1,1 +1,0 @@
-...G...... [ZBX-16680] fixed freeing locked resources when Zabbix agent cannot be started and has to exit with failure (viktors)

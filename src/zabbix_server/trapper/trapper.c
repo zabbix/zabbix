@@ -506,17 +506,17 @@ static void	recv_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	}
 
 	string_alloc = 0;
-	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc);
-	string_alloc = 0;
-	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc);
-	string_alloc = 0;
-	zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc);
+	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc))
+		string_alloc = 0;
+	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc))
+		string_alloc = 0;
+	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc))
+		string_alloc = 0;
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_params))
 	{
 		size_t	string_offset = 0;
 
-		string_alloc = 0;
 		zbx_strncpy_alloc(&params, &string_alloc, &string_offset, jp_params.start,
 				jp_params.end - jp_params.start + 1);
 	}
