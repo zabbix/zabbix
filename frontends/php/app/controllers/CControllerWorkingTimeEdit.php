@@ -27,7 +27,7 @@ class CControllerWorkingTimeEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'work_period' => 'db config.work_period'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -45,7 +45,7 @@ class CControllerWorkingTimeEdit extends CController {
 
 	protected function doAction() {
 		$config = select_config();
-		$data = ['work_period' => $config['work_period']];
+		$data = ['work_period' => $this->getInput('work_period', $config['work_period'])];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of working time'));

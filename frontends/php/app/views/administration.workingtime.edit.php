@@ -48,6 +48,7 @@ $table = (new CTabView())
 
 $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'workingtime.update')->getUrl())
 	->addItem($table);
 
 $widget->addItem($form)->show();

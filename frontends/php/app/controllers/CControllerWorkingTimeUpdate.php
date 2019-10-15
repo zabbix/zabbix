@@ -27,13 +27,26 @@ class CControllerWorkingTimeUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'work_period' => 'required | string | not_empty | db config.work_period'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->GetValidationError()) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'workingtime.edit')
+						->getUrl()
+					);
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+					$this->setResponse($response);
+					break;
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
@@ -44,12 +57,34 @@ class CControllerWorkingTimeUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'workingtime.edit')
+			->getUrl()
+		);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerWorkingTimeUpdate'));
+		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
+		if ($time_period_parser->parse($this->getInput('work_period')) != CParser::PARSE_SUCCESS) {
+			error(_s('Field "%1$s" is not correct: %2$s', _('Working time'), _('a time period is expected')));
+
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
+			$this->setResponse($response);
+
+			return;
+		}
+
+		DBstart();
+		$result = update_config(['work_period' => $this->getInput('work_period')]);
+		$result = DBend($result);
+
+		if ($result) {
+			$response->setMessageOk(_('Configuration updated'));
+		}
+		else {
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
+		}
+
 		$this->setResponse($response);
 	}
 }
