@@ -65,11 +65,17 @@ $from_list
 	)
 	->addRow(_('User group for database down message'), $alert_user_group)
 	->addRow(_('Log unmatched SNMP traps'),
-		(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
+		(new CCheckBox('snmptrap_logging'))
+			->setUncheckedValue('0')
+			->setChecked($data['snmptrap_logging'] == 1)
 	);
 
 $form = (new CForm())
 	->setName('otherForm')
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', 'miscconfig.update')
+		->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())

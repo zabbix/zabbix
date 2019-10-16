@@ -27,13 +27,32 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'refresh_unsupported'    => 'string',
+			'discovery_groupid'      => 'db hstgrp.groupid',
+			'default_inventory_mode' => 'in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
+			'alert_usrgrpid'         => 'db usrgrp.usrgrpid',
+			'snmptrap_logging'       => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->getValidationError()) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'miscconfig.edit')
+					);
+
+					$response->setFormData($this->getInputAll());
+					$response->setMessageError(_('Cannot update configuration'));
+
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
 		}
 
 		return $ret;
@@ -44,12 +63,28 @@ class CControllerMiscConfigUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'demo' => __FILE__
-		];
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'miscconfig.edit')
+		);
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('CControllerMiscConfigUpdate'));
+		DBstart();
+		$result = update_config([
+			'refresh_unsupported'    => $this->getInput('refresh_unsupported'),
+			'alert_usrgrpid'         => $this->getInput('alert_usrgrpid'),
+			'discovery_groupid'      => $this->getInput('discovery_groupid'),
+			'default_inventory_mode' => $this->getInput('default_inventory_mode'),
+			'snmptrap_logging'       => $this->getInput('snmptrap_logging')
+		]);
+		$result = DBend($result);
+
+		if ($result) {
+			$response->setMessageOk(_('Configuration updated'));
+		}
+		else {
+			$response->setMessageError(_('Cannot update configuration'));
+			$response->setFormData($this->getInputAll());
+		}
+
 		$this->setResponse($response);
 	}
 }

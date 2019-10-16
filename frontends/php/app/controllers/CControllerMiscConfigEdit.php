@@ -27,7 +27,11 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'demo' => ''
+			'refresh_unsupported'    => 'string',
+			'discovery_groupid'      => 'db hstgrp.groupid',
+			'default_inventory_mode' => 'in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
+			'alert_usrgrpid'         => 'db usrgrp.usrgrpid',
+			'snmptrap_logging'       => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,11 +51,11 @@ class CControllerMiscConfigEdit extends CController {
 		$config = select_config();
 
 		$data = [
-			'refresh_unsupported' => $config['refresh_unsupported'],
-			'discovery_groupid' => $config['discovery_groupid'],
-			'default_inventory_mode' => $config['default_inventory_mode'],
-			'alert_usrgrpid' => $config['alert_usrgrpid'],
-			'snmptrap_logging' => $config['snmptrap_logging']
+			'refresh_unsupported'    => $this->getInput('refresh_unsupported', $config['refresh_unsupported']),
+			'discovery_groupid'      => $this->getInput('discovery_groupid', $config['discovery_groupid']),
+			'default_inventory_mode' => $this->getInput('default_inventory_mode', $config['default_inventory_mode']),
+			'alert_usrgrpid'         => $this->getInput('alert_usrgrpid', $config['alert_usrgrpid']),
+			'snmptrap_logging'       => $this->getInput('snmptrap_logging', $config['snmptrap_logging'])
 		];
 
 		$data['discovery_groups'] = API::HostGroup()->get([
