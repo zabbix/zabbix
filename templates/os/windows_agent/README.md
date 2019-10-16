@@ -255,7 +255,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)|<p>-</p>|`{TEMPLATE_NAME:system.localtime.fuzzytime({$SYSTEM.FUZZYTIME.MAX})}=0`|WARNING|<p>Manual close: YES</p>|
-|Systen name has changed (new name: {ITEM.VALUE})|<p>System name has changed. Ack to close.</p>|`{TEMPLATE_NAME:system.hostname.diff()}=1 and {TEMPLATE_NAME:system.hostname.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|System name has changed (new name: {ITEM.VALUE})|<p>System name has changed. Ack to close.</p>|`{TEMPLATE_NAME:system.hostname.diff()}=1 and {TEMPLATE_NAME:system.hostname.strlen()}>0`|INFO|<p>Manual close: YES</p>|
 |Host has been restarted (uptime < 10m)|<p>The device uptime is less than 10 minutes.</p>|`{TEMPLATE_NAME:system.uptime.last()}<10m`|WARNING|<p>Manual close: YES</p>|
 
 ## Feedback
