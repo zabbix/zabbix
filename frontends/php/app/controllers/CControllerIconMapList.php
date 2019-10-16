@@ -26,17 +26,7 @@ class CControllerIconMapList extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'demo' => ''
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions() {

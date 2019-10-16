@@ -24,7 +24,7 @@ class CControllerIconMapClone extends CController {
 	protected function checkInput() {
 		$fields = [
 			'iconmapid' => 'required | db icon_map.iconmapid',
-			'iconmap'   => 'required | array',
+			'iconmap'   => 'required | array'
 		];
 
 		$ret = $this->validateInput($fields);

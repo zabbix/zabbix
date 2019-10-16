@@ -38,7 +38,7 @@ class CControllerTrigSeverityEdit extends CController {
 			'severity_name_4'  => 'string',
 			'severity_color_4' => 'string',
 			'severity_name_5'  => 'string',
-			'severity_color_5' => 'string',
+			'severity_color_5' => 'string'
 		];
 
 		$ret = $this->validateInput($fields);

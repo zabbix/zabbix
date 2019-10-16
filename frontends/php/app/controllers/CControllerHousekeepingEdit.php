@@ -43,7 +43,7 @@ class CControllerHousekeepingEdit extends CController {
 			'hk_history'          => 'db config.hk_history',
 			'hk_trends_mode'      => 'db config.hk_trends_mode',
 			'hk_trends_global'    => 'db config.hk_trends_global',
-			'hk_trends'           => 'db config.hk_trends',
+			'hk_trends'           => 'db config.hk_trends'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -29,7 +29,7 @@ class CControllerRegExList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'uncheck' => 'int32',
+			'uncheck' => 'int32'
 		];
 
 		return $this->validateInput($fields);
@@ -69,7 +69,7 @@ class CControllerRegExList extends CController {
 			$data['db_exps'][] = [
 				'regexid' => $expr['regexpid'],
 				'expression' => $expr['expression'],
-				'expression_type' => $expr['expression_type'],
+				'expression_type' => $expr['expression_type']
 			];
 		}
 

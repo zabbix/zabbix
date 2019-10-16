@@ -26,7 +26,7 @@ class CControllerRegExClone extends CController {
 			'name'         => 'string | db regexps.name',
 			'test_string'  => 'string | db regexps.test_string',
 			'regexid'      => 'required | db regexps.regexpid',
-			'expressions'  => 'array',
+			'expressions'  => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
