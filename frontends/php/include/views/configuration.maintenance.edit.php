@@ -119,31 +119,6 @@ $maintenancePeriodFormList->addRow(
 	(new CLabel(_('Periods'), $periodsDiv->getId()))->setAsteriskMark(), $periodsDiv
 );
 
-if ($data['new_timeperiod']) {
-	if (is_array($data['new_timeperiod']) && array_key_exists('id', $data['new_timeperiod'])) {
-		$save_label = _('Update');
-	}
-	else {
-		$save_label = _('Add');
-	}
-
-	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		(new CDiv([
-			getTimeperiodForm($data),
-			new CHorList([
-				(new CSimpleButton($save_label))
-					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "add_timeperiod", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK),
-				(new CSimpleButton(_('Cancel')))
-					->onClick('javascript: submitFormWithParam("'.$maintenanceForm->getName().'", "cancel_new_timeperiod", "1");')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			])
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-}
-
 /*
  * Hosts and groups tab.
  */
