@@ -90,6 +90,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 
 				if ($data['month_date_type'] == 1) {
 					$data['dayofweek'] = array_sum($this->getInput('days', []));
+					$data['day'] = 0;
 				}
 			}
 
@@ -101,7 +102,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		else {
 			// Initialize form fields from database field values.
 			$data += [
-				'day' =>				0,
+				'day' =>				1,
 				'period_days' =>		floor($data['period'] / SEC_PER_DAY),
 				'period_hours' =>		floor(($data['period'] % SEC_PER_DAY) / SEC_PER_HOUR),
 				'period_minutes' => 	floor((($data['period'] % SEC_PER_DAY) % SEC_PER_DAY) / SEC_PER_MIN),
