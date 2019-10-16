@@ -2915,9 +2915,9 @@ out:
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 2
-# time
+# Seconds
 ---
-test case: Value target time is with future timestamp and there are more values with future timestamp
+test case: Value target time is with future timestamp and there are more values with future timestamp for seconds
 in:
   history:
   - itemid: 1
@@ -2953,4 +2953,42 @@ out:
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 1
+---
+test case: Value target time is with future timestamp but seconds also requires value from past
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:58:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 181
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row2
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 122
+      values_total: 2
+      db_cached_from: 2017-01-10 09:56:59 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
 ...
