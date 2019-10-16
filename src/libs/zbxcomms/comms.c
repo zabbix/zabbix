@@ -1568,7 +1568,9 @@ const char	*zbx_tcp_recv_line(zbx_socket_t *s)
 		}
 		else
 		{
-			if (0 != (left = MIN(ZBX_TCP_LINE_LEN - s->read_bytes, (size_t)(ptr - buffer))))
+			left = ZBX_TCP_LINE_LEN - s->read_bytes;
+
+			if (0 != (left = NULL == ptr ? left : MIN(left, (size_t)(ptr - buffer))))
 			{
 				/* fill the string to the defined limit */
 				zbx_strncpy_alloc(&s->buffer, &alloc, &offset, buffer, left);
