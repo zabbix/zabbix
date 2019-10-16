@@ -691,8 +691,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Name": cannot be empty.',
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.',
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			],
@@ -702,7 +702,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'name' => 'discoveryRuleError',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Key": cannot be empty.'
+						'Incorrect value for field "Key": cannot be empty.'
 					]
 				]
 			],
@@ -712,7 +712,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'discovery-rule-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-							'Incorrect value for field "Name": cannot be empty.'
+						'Incorrect value for field "Name": cannot be empty.'
 					]
 				]
 			],
@@ -800,7 +800,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 1,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -813,7 +813,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 3599,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -826,7 +826,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '59m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -839,7 +839,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '1304w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -852,7 +852,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '9126d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -865,7 +865,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '219001h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -878,7 +878,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '13140001m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -891,7 +891,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 788400001,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": must be between "3600" and "788400000".'
+						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -2058,180 +2058,5 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
-	}
-
-	public function getLLDMacrosTabData() {
-		return [
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Macro with empty path',
-					'key' => 'macro-with-empty-path',
-					'macros' => [
-						['macro' => '{#MACRO}', 'path'=>''],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Macro without #',
-					'key' => 'macro-without-hash',
-					'macros' => [
-						['macro' => '{MACRO}', 'path'=>'$.path'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Macro with cyrillic symbols',
-					'key' => 'macro-with-cyrillic-symbols',
-					'macros' => [
-						['macro' => '{#МАКРО}', 'path'=>'$.path'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Macro with special symbols',
-					'key' => 'macro-with-with-special-symbols',
-					'macros' => [
-						['macro' => '{#MACRO!@$%^&*()_+|?}', 'path'=>'$.path'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'LLD with empty macro',
-					'key' => 'lld-with-empty-macro',
-					'macros' => [
-						['macro' => '', 'path'=>'$.path'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'LLD with context macro',
-					'key' => 'lld-with-context-macro',
-					'macros' => [
-						['macro' => '{$MACRO:A}', 'path'=>'$.path'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'LLD with two equal macros',
-					'key' => 'lld-with-two-equal-macros',
-					'macros' => [
-						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
-						['macro' => '{#MACRO}', 'path'=>'$.path.b'],
-					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'LLD with valid macro and path',
-					'key' => 'lld-with-valid-macro-and-path',
-					'macros' => [
-						['macro' => '{#MACRO1}', 'path'=>'$.path'],
-						['macro' => '{#MACRO2}', 'path'=>"$['а']['!@#$%^&*()_+']"]
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test creation of a discovery rule with data filling in Macros tab.
-	 *
-	 * @dataProvider getLLDMacrosTabData
-	 */
-	public function testFormLowLevelDiscovery_LLDMacrosTab($data) {
-		$sql_items = "SELECT * FROM items ORDER BY itemid";
-		$old_hash = CDBHelper::getHash($sql_items);
-
-		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
-		$this->query('button:Create discovery rule')->one()->click();
-
-		$form = $this->query('name:itemForm')->asForm()->one();
-		$form->getField('Name')->fill($data['name']);
-		$form->getField('Key')->fill($data['key']);
-		$form->selectTab('LLD macros');
-
-		$macros_table = $form->getField('LLD macros');
-		$button = $macros_table->query('button:Add')->one();
-		$last = count($data['macros']) - 1;
-
-		foreach ($data['macros'] as $i => $lld_macro) {
-			$row = $macros_table->getRows()->get($i);
-			$row->getColumn('LLD macro')->query('tag:input')->one()->fill($lld_macro['macro']);
-			$row->getColumn('JSON Path')->query('tag:input')->one()->fill($lld_macro['path']);
-
-			if ($i !== $last) {
-				$button->click();
-			}
-		}
-
-		$form->submit();
-		$this->page->waitUntilReady();
-
-		// Get global message.
-		$message = CMessageElement::find()->one();
-
-		$expected = $data['expected'];
-		switch ($expected) {
-			case TEST_GOOD:
-				// Check if message is positive.
-				$this->assertTrue($message->isGood());
-				// Check message title.
-				$this->assertEquals('Discovery rule created', $message->getTitle());
-
-				// Check the results in DB.
-				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE key_='.zbx_dbstr($data['key'])));
-
-				// Check the results in form.
-				$this->checkLLDMacrosFormFields($data);
-				break;
-			case TEST_BAD:
-				// Check if message is negative.
-				$this->assertTrue($message->isBad());
-				// Check message title.
-				$this->assertEquals('Cannot add discovery rule', $message->getTitle());
-				$this->assertTrue($message->hasLine($data['error_details']));
-
-				// Check that DB hash is not changed.
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_items));
-				break;
-		}
-	}
-
-	private function checkLLDMacrosFormFields($data) {
-		$id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($data['key']));
-		$this->page->open('host_discovery.php?form=update&itemid='.$id);
-		$form = $this->query('name:itemForm')->asForm()->one();
-		$form->selectTab('LLD macros');
-		$table = $form->getField('LLD macros');
-
-		foreach ($data['macros'] as $i => $lld_macro) {
-			$row = $table->getRows()->get($i);
-			$macro = $row->getColumn('LLD macro')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($lld_macro['macro'], $macro);
-
-			$path = $row->getColumn('JSON Path')->query('tag:input')->one()->getAttribute('value');
-			$this->assertEquals($lld_macro['path'], $path);
-		}
 	}
 }

@@ -20,6 +20,10 @@
 
 
 class CRadioButtonList extends CList {
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'radio-list-control';
 
 	const ORIENTATION_HORIZONTAL = 'horizontal';
 	const ORIENTATION_VERTICAL = 'vertical';
@@ -29,9 +33,19 @@ class CRadioButtonList extends CList {
 	private $orientation;
 	private $enabled;
 	private $readonly;
-	private $values;
 	private $modern;
 	private $autofocused;
+
+	/**
+	 * Array of value elements.
+	 *
+	 * string $values[]['name']       Input form element label.
+	 * string $values[]['value']      Input form element value.
+	 * string $values[]['id']         Input form element id attribute.
+	 * string $values[]['on_change']  Javascript handler for onchange event.
+	 * @property array
+	 */
+	protected $values = [];
 
 	public function __construct($name, $value) {
 		parent::__construct();
@@ -46,6 +60,16 @@ class CRadioButtonList extends CList {
 		$this->setId(zbx_formatDomId($name));
 	}
 
+	/**
+	 * Add value.
+	 *
+	 * @param string $name       Input element label.
+	 * @param string $value      Input element value.
+	 * @param string $id         Input element id.
+	 * @param string $on_change  Javascript handler for onchange event.
+	 *
+	 * @return CRadioButtonList
+	 */
 	public function addValue($name, $value, $id = null, $on_change = null) {
 		$this->values[] = [
 			'name' => $name,
@@ -83,17 +107,15 @@ class CRadioButtonList extends CList {
 
 	public function toString($destroy = true) {
 		if ($this->modern) {
-			$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
+			$this->addClass(static::ZBX_STYLE_CLASS);
 		}
 		else {
-			$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
-				? ZBX_STYLE_LIST_HOR_CHECK_RADIO
-				: ZBX_STYLE_LIST_CHECK_RADIO
-			);
+			$this->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
+			$this->addClass($this->orientation === self::ORIENTATION_HORIZONTAL ? ZBX_STYLE_HOR_LIST : null);
 		}
 
 		if ($this->readonly) {
-			parent::addItem(new CVar($this->name, $this->value, zbx_formatDomId($this->name)));
+			$this->addItem(new CVar($this->name, $this->value, zbx_formatDomId($this->name)));
 		}
 
 		foreach ($this->values as $key => $value) {
@@ -116,11 +138,15 @@ class CRadioButtonList extends CList {
 			}
 
 			if ($this->modern) {
-				parent::addItem([$radio, new CLabel($value['name'], $value['id'])]);
+				$this->addItem((new CListItem([$radio, new CLabel($value['name'], $value['id'])]))->addClass(
+					array_key_exists('class', $value) ? $value['class'] : null
+				));
 			}
 			else {
 				$radio->addClass(ZBX_STYLE_CHECKBOX_RADIO);
-				parent::addItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]);
+				$this->addItem((new CListItem([$radio, new CLabel([new CSpan(), $value['name']], $value['id'])]))
+					->addClass(array_key_exists('class', $value) ? $value['class'] : null)
+				);
 			}
 		}
 

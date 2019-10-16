@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../CElement.php';
  * Checkbox list element.
  */
 class CCheckboxListElement extends CElement {
+
 	/**
 	 * Get collection of checkboxes.
 	 *
@@ -69,9 +70,7 @@ class CCheckboxListElement extends CElement {
 				throw new Exception('Failed to find checkbox element by label name: "'.$labels.'".');
 			}
 
-			if ($checked !== $element->isSelected()) {
-				$label->click();
-			}
+			$element->set($checked);
 		}
 
 		return $this;
@@ -136,5 +135,20 @@ class CCheckboxListElement extends CElement {
 		$this->set(array_diff($this->getLabels()->asText(), $labels), false);
 
 		return $this->set($labels, true);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		$value = [];
+
+		foreach ($this->query('xpath://input[@type="checkbox"]')->asCheckbox()->all() as $checkbox) {
+			if ($checkbox->isChecked() && ($label = $checkbox->getLabel()) !== null) {
+				$value[] = $label->getText();
+			}
+		}
+
+		return $value;
 	}
 }

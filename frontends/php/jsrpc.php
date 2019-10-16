@@ -53,135 +53,16 @@ if (!is_array($data) || !isset($data['method'])
 }
 
 $result = [];
+
 switch ($data['method']) {
-	case 'host.get':
+	case 'search':
 		$result = API::Host()->get([
-			'startSearch' => true,
-			'search' => $data['params']['search'],
-			'output' => ['hostid', 'host', 'name'],
+			'output' => ['hostid', 'name'],
+			'search' => ['name' => $data['params']['search'], 'host' => $data['params']['search']],
+			'searchByAny' => true,
 			'sortfield' => 'name',
 			'limit' => 15
 		]);
-		break;
-
-	case 'message.mute':
-		$msgsettings = getMessageSettings();
-		$msgsettings['sounds.mute'] = 1;
-		updateMessageSettings($msgsettings);
-		break;
-
-	case 'message.unmute':
-		$msgsettings = getMessageSettings();
-		$msgsettings['sounds.mute'] = 0;
-		updateMessageSettings($msgsettings);
-		break;
-
-	case 'message.settings':
-		$msgsettings = getMessageSettings();
-		$msgsettings['timeout'] = timeUnitToSeconds($msgsettings['timeout']);
-		$result = $msgsettings;
-		break;
-
-	case 'message.get':
-		$msgsettings = getMessageSettings();
-
-		// if no severity is selected, show nothing
-		if (empty($msgsettings['triggers.severities'])) {
-			break;
-		}
-
-		// timeout
-		$timeout = time() - timeUnitToSeconds($msgsettings['timeout']);
-		$lastMsgTime = 0;
-		if (isset($data['params']['messageLast']['events'])) {
-			$lastMsgTime = $data['params']['messageLast']['events']['time'];
-		}
-
-		$options = [
-			'monitored' => true,
-			'lastChangeSince' => max([$lastMsgTime, $msgsettings['last.clock'], $timeout]),
-			'value' => [TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE],
-			'priority' => array_keys($msgsettings['triggers.severities']),
-			'triggerLimit' => 15
-		];
-		if (!$msgsettings['triggers.recovery']) {
-			$options['value'] = [TRIGGER_VALUE_TRUE];
-		}
-		if (!$msgsettings['show_suppressed']) {
-			$options['suppressed'] = $msgsettings['show_suppressed'];
-		}
-		$events = getLastEvents($options);
-
-		$sortClock = [];
-		$sortEvent = [];
-
-		$usedTriggers = [];
-		foreach ($events as $number => $event) {
-			if (count($usedTriggers) < 15) {
-				if (!isset($usedTriggers[$event['objectid']])) {
-					$trigger = $event['trigger'];
-					$host = $event['host'];
-
-					if ($event['value'] == TRIGGER_VALUE_FALSE) {
-						$priority = 0;
-						$title = _('Resolved');
-						$sound = $msgsettings['sounds.recovery'];
-					}
-					else {
-						$priority = $trigger['priority'];
-						$title = _('Problem on');
-						$sound = $msgsettings['sounds.'.$trigger['priority']];
-					}
-
-					$url_problems = (new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_hostids[]', $host['hostid'])
-						->setArgument('filter_set', '1')
-						->getUrl();
-					$url_events = (new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_triggerids[]', $event['objectid'])
-						->setArgument('filter_set', '1')
-						->getUrl();
-					$url_tr_events = 'tr_events.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'];
-
-					$result[$number] = [
-						'type' => 3,
-						'caption' => 'events',
-						'sourceid' => $event['eventid'],
-						'time' => $event['clock'],
-						'priority' => $priority,
-						'sound' => $sound,
-						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_problems.']'.CHtml::encode($host['name']).'[/url]',
-						'body' => [
-							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
-							'[url='.$url_tr_events.']'.
-								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url]',
-						],
-						'timeout' => $msgsettings['timeout']
-					];
-
-					$sortClock[$number] = $event['clock'];
-					$sortEvent[$number] = $event['eventid'];
-					$usedTriggers[$event['objectid']] = true;
-				}
-			}
-			else {
-				break;
-			}
-		}
-		array_multisort($sortClock, SORT_ASC, $sortEvent, SORT_ASC, $result);
-		break;
-
-	case 'message.closeAll':
-		$msgsettings = getMessageSettings();
-		switch (strtolower($data['params']['caption'])) {
-			case 'events':
-				$msgsettings['last.clock'] = (int) $data['params']['time'] + 1;
-				updateMessageSettings($msgsettings);
-				break;
-		}
 		break;
 
 	case 'zabbix.status':
@@ -265,7 +146,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = CPageFilter::enrichParentGroups($hostGroups, [
+						$hostGroups = enrichParentGroups($hostGroups, [
 							'real_hosts' => null
 						] + $options);
 					}
@@ -500,6 +381,27 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($groups, ['usrgrpid' => 'id']);
+				}
+				break;
+
+			case 'drules':
+				$drules = API::DRule()->get([
+					'output' => ['druleid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'limit' => $config['search_limit']
+				]);
+
+				if ($drules) {
+					CArrayHelper::sort($drules, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$applications = array_slice($drules, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($drules, ['druleid' => 'id']);
 				}
 				break;
 

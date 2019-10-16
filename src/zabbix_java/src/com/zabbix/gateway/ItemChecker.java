@@ -77,6 +77,11 @@ abstract class ItemChecker
 		return values;
 	}
 
+	String getFirstKey()
+	{
+		return 0 == keys.size() ? null : keys.get(0);
+	}
+
 	protected final JSONObject getJSONValue(String key)
 	{
 		JSONObject value = new JSONObject();

@@ -74,10 +74,10 @@ class CControllerFavouriteDelete extends CController {
 					'switchElementClass(\'addrm_fav\', \'btn-remove-fav\', \'btn-add-fav\');'."\n".
 				'}'."\n".
 				'else {'."\n".
-					'var $widgets = jQuery(".dashbrd-grid-widget-container").dashboardGrid('."\n".
+					'var $widgets = jQuery(".dashbrd-grid-container").dashboardGrid('."\n".
 						'"getWidgetsBy", "type", "'.$widgetids[$object].'");'."\n".
 					'jQuery.each($widgets, function(index, widget) {'."\n".
-						'jQuery(".dashbrd-grid-widget-container").dashboardGrid('."\n".
+						'jQuery(".dashbrd-grid-container").dashboardGrid('."\n".
 							'"refreshWidget", widget["widgetid"]);'."\n".
 					'});'."\n".
 				'}';

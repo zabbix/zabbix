@@ -940,7 +940,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'graphName' => 'graphSimple',
-					'error-msg' => 'Cannot add graph',
+					'error-msg' => 'Cannot add graph prototype',
 					'errors' => [
 						'Graph with name "graphSimple" already exists in graphs or graph prototypes'
 					]
@@ -960,7 +960,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'graphName' => 'graphSaveCheck',
 					'noItem' => true,
-					'error-msg' => 'Cannot add graph',
+					'error-msg' => 'Cannot add graph prototype',
 					'errors' => [
 						'Missing items for graph prototype "graphSaveCheck".'
 					]
@@ -992,9 +992,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'noAxisItem' => true,
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
-					'error-msg' => 'Cannot add graph',
+					'error-msg' => 'Cannot add graph prototype',
 					'errors' => [
-						'No permissions to referred object or it does not exist!'
+						'Invalid parameter "ymin_itemid": cannot be empty.'
 					]
 				]
 			],
@@ -1006,9 +1006,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'noAxisItem' => true,
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'error-msg' => 'Cannot add graph',
+					'error-msg' => 'Cannot add graph prototype',
 					'errors' => [
-						'No permissions to referred object or it does not exist!'
+						'Invalid parameter "ymax_itemid": cannot be empty.'
 					]
 				]
 			],
@@ -1023,7 +1023,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'yaxismin' => 'name',
 					'ymax_type' => 'Fixed',
 					'yaxismax' => 'name',
-					'error-msg' => 'age received incorrect data',
+					'error-msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value "0" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "0" for "Height" field: must be between 20 and 65535.',
@@ -1041,7 +1041,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Fixed',
-					'error-msg' => 'age received incorrect data',
+					'error-msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "preproc.h"
+#include "daemon.h"
 
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -502,6 +503,38 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_http_headers                                                 *
+ *                                                                            *
+ * Purpose: adds HTTP headers to curl_slist and prepares cookie header string *
+ *                                                                            *
+ * Parameters: headers         - [IN] HTTP headers as string                  *
+ *             headers_slist   - [IN/OUT] curl_slist                          *
+ *             header_cookie   - [IN/OUT] cookie header as string             *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_http_headers(char *headers, struct curl_slist **headers_slist, char **header_cookie)
+{
+#define COOKIE_HEADER_STR	"Cookie:"
+#define COOKIE_HEADER_STR_LEN	ZBX_CONST_STRLEN(COOKIE_HEADER_STR)
+
+	char	*line;
+
+	while (NULL != (line = zbx_http_get_header(&headers)))
+	{
+		if (0 == strncmp(COOKIE_HEADER_STR, line, COOKIE_HEADER_STR_LEN))
+			*header_cookie = zbx_strdup(*header_cookie, line + COOKIE_HEADER_STR_LEN);
+		else
+			*headers_slist = curl_slist_append(*headers_slist, line);
+
+		zbx_free(line);
+	}
+
+#undef COOKIE_HEADER_STR
+#undef COOKIE_HEADER_STR_LEN
+}
 #endif
 
 /******************************************************************************
@@ -644,16 +677,17 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &buffer,
 			MACRO_TYPE_COMMON, NULL, 0);
 
+	/* Avoid the potential usage of uninitialized values when: */
+	/* 1) compile without libCURL support */
+	/* 2) update interval is invalid */
+	db_httpstep.name = NULL;
+
 	if (SUCCEED != is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
 	{
 		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
 		goto httptest_error;
 	}
-
-	/* Explicitly initialize the name. If we compile without libCURL support, */
-	/* we avoid the potential usage of unititialized values. */
-	db_httpstep.name = NULL;
 
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -683,9 +717,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	httpstep.httptest = httptest;
 	httpstep.httpstep = &db_httpstep;
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		struct curl_slist	*headers_slist = NULL;
+		char			*header_cookie = NULL;
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -699,6 +734,14 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 				&db_httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 		http_substitute_variables(httptest, &db_httpstep.url);
+
+		db_httpstep.required = zbx_strdup(NULL, row[6]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
+				&db_httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
+				&db_httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		db_httpstep.post_type = atoi(row[8]);
 
@@ -732,14 +775,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			err_str = zbx_dsprintf(err_str, "timeout \"%s\" exceeds 1 hour limit", buffer);
 			goto httpstep_error;
 		}
-
-		db_httpstep.required = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
-				&db_httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
-
-		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
-				&db_httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		db_httpstep.follow_redirects = atoi(row[9]);
 		db_httpstep.retrieve_mode = atoi(row[10]);
@@ -780,9 +815,18 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		/* headers defined in a step overwrite headers defined in scenario */
 		if (NULL != httpstep.headers && '\0' != *httpstep.headers)
-			zbx_http_add_headers(httpstep.headers, &headers_slist);
+			add_http_headers(httpstep.headers, &headers_slist, &header_cookie);
 		else if (NULL != httptest->headers && '\0' != *httptest->headers)
-			zbx_http_add_headers(httptest->headers, &headers_slist);
+			add_http_headers(httptest->headers, &headers_slist, &header_cookie);
+
+		err = curl_easy_setopt(easyhandle, CURLOPT_COOKIE, header_cookie);
+		zbx_free(header_cookie);
+
+		if (CURLE_OK != err)
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			goto httpstep_error;
+		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
 		{
@@ -817,6 +861,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		do
 		{
 			memset(&page, 0, sizeof(page));
+			errbuf[0] = '\0';
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
@@ -1047,7 +1092,7 @@ int	process_httptests(int httppoller_num, int now)
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		ZBX_STR2UINT64(host.hostid, row[0]);
 		strscpy(host.host, row[1]);

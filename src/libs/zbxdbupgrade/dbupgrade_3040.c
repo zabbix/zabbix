@@ -27,6 +27,9 @@
 
 #ifndef HAVE_SQLITE3
 
+int	DBpatch_3040006(void);
+int	DBpatch_3040007(void);
+
 static int	DBpatch_3040000(void)
 {
 	return SUCCEED;

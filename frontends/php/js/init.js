@@ -18,7 +18,50 @@
  **/
 
 
+/**
+ * An object that is used to namespace objects, allows to retrieve and write objects via arbitrary path.
+ */
+window.ZABBIX = Object.create({
+
+	/**
+	 * @param {string} path  Dot separated path. Each segment is used as object key.
+	 * @param {mixed} value  Optional value to be written into path only if path held undefined before.
+	 *
+	 * @return {mixed}  Value underlaying the path is returned.
+	 */
+	namespace: function(path, value) {
+		return path.split('.').reduce(function(obj, pt, idx, src) {
+			var last = (idx + 1 == src.length);
+
+			if (typeof obj[pt] === 'undefined') {
+				obj[pt] = last ? value : {};
+			}
+
+			return obj[pt];
+		}, this);
+	},
+
+	/**
+	 * Logs user out, also, handles side effects before that.
+	 */
+	logout: function() {
+		var ls = this.namespace('instances.localStorage');
+		ls && ls.destruct();
+
+		redirect('index.php?reconnect=1', 'post', 'sid', true);
+	}
+});
+
 jQuery(function($) {
+
+	$.propHooks.disabled = {
+		set: function (el, val) {
+			if (el.disabled !== val) {
+				el.disabled = val;
+				$(el).trigger(val ? 'disable' : 'enable');
+			}
+		}
+	};
 
 	var $search = $('#search');
 
@@ -28,7 +71,7 @@ jQuery(function($) {
 		$search.keyup(function() {
 			$search
 				.siblings('button')
-				.attr('disabled', ($.trim($search.val()) === '') ? true : null);
+				.prop('disabled', ($.trim($search.val()) === ''));
 		}).closest('form').submit(function() {
 			if ($.trim($search.val()) === '') {
 				return false;
@@ -61,66 +104,169 @@ jQuery(function($) {
 		changeClass(comboBox);
 	});
 
-	/**
-	 * Build menu popup for given elements.
-	 */
-	$(document).on('keydown click', '[data-menu-popup]', function(event) {
-		var obj = $(this),
-			data = obj.data('menu-popup');
+	function uncheckedHandler($checkbox) {
+		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
 
-		if (event.type === 'keydown') {
-			if (event.which != 13) {
-				return;
-			}
-
-			event.preventDefault();
-			event.target = this;
+		if ($checkbox.is(':checked') || $checkbox.prop('disabled')) {
+			$hidden.remove();
 		}
+		else if (!$hidden.length) {
+			$('<input>', {'type': 'hidden', 'name': $checkbox.prop('name')})
+				.val($checkbox.attr('unchecked-value'))
+				.insertBefore($checkbox);
+		}
+	}
 
+	$('input[unchecked-value]').each(function() {
+		var $this = $(this);
+
+		uncheckedHandler($this);
+		$this.on('change enable disable', function() {
+			uncheckedHandler($(this));
+		});
+	});
+
+	function showMenuPopup($obj, data, event) {
 		switch (data.type) {
 			case 'history':
 				data = getMenuPopupHistory(data);
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data, obj);
+				data = getMenuPopupHost(data, $obj);
 				break;
 
-			case 'map':
-				data = getMenuPopupMap(data, obj);
+			case 'map_element_submap':
+				data = getMenuPopupMapElementSubmap(data);
+				break;
+
+			case 'map_element_group':
+				data = getMenuPopupMapElementGroup(data);
+				break;
+
+			case 'map_element_trigger':
+				data = getMenuPopupMapElementTrigger(data);
+				break;
+
+			case 'map_element_image':
+				data = getMenuPopupMapElementImage(data);
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data, obj);
+				data = getMenuPopupRefresh(data, $obj);
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data, obj);
+				data = getMenuPopupTrigger(data, $obj);
 				break;
 
-			case 'triggerLog':
-				data = getMenuPopupTriggerLog(data, obj);
-				break;
-
-			case 'triggerMacro':
+			case 'trigger_macro':
 				data = getMenuPopupTriggerMacro(data);
 				break;
 
-			case 'dependent_items':
-				data = getMenuPopupDependentItems(data);
+			case 'dashboard':
+				data = getMenuPopupDashboard(data, $obj);
 				break;
 
-			case 'dashboard':
-				data = getMenuPopupDashboard(data, obj);
+			case 'item':
+				data = getMenuPopupItem(data, $obj);
+				break;
+
+			case 'item_prototype':
+				data = getMenuPopupItemPrototype(data);
 				break;
 		}
 
-		obj.menuPopup(data, event);
+		$obj.menuPopup(data, event);
+	}
+
+	/**
+	 * Create preloader elements for the menu popup.
+	 */
+	function createMenuPopupPreloader() {
+		return $('<div>', {
+			'id': 'menu-popup-preloader',
+			'class': 'preloader-container menu-popup-preloader'
+		})
+			.append($('<div>').addClass('preloader'))
+			.appendTo($('body'))
+			.on('click', function(e) {
+				e.stopPropagation();
+			})
+			.hide();
+	}
+
+	/**
+	 * Event handler for the preloader elements destroy.
+	 */
+	function menuPopupPreloaderCloseHandler(event) {
+		overlayPreloaderDestroy(event.data.id, event.data.xhr);
+	}
+
+	/**
+	 * Build menu popup for given elements.
+	 */
+	$(document).on('keydown click', '[data-menu-popup]', function(event) {
+		var $obj = $(this),
+			data = $obj.data('menu-popup'),
+			position_target = event.target;
+
+		if (event.type === 'keydown' && event.which != 13) {
+			return;
+		}
+		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
+			|| event.originalEvent.detail !== 0) {
+			position_target = event;
+		}
+
+		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
+		if ($('#menu-popup-preloader').length) {
+			$(document).trigger('click');
+		}
+
+		var	$preloader = createMenuPopupPreloader(),
+			url = new Curl('zabbix.php');
+
+		url.setArgument('action', 'menu.popup');
+		url.setArgument('type', data.type);
+
+		var xhr = $.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			data: {
+				data: data.data
+			},
+			dataType: 'json',
+			beforeSend: function() {
+				$('.menu-popup-top').menuPopup('close');
+				setTimeout(function(){
+					$preloader
+						.fadeIn(200)
+						.position({
+							of: position_target,
+							my: 'left top',
+							at: 'left bottom'
+						});
+				}, 500);
+			},
+			success: function(resp) {
+				overlayPreloaderDestroy($preloader.prop('id'));
+				showMenuPopup($obj, resp.data, event);
+			},
+			error: function() {
+			}
+		});
+
+		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+
+		$(document)
+			.off('click', menuPopupPreloaderCloseHandler)
+			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 
 		return false;
 	});
 
-	/*
+	/**
 	 * add.popup event
 	 *
 	 * Call multiselect method 'addData' if parent was multiselect, execute addPopupValues function
@@ -149,29 +295,32 @@ jQuery(function($) {
 				}
 			}
 		}
-		else if ($('[name="'+data.parentId+'"]').hasClass('patternselect')) {
+		else if ($('[name="' + data.parentId + '"]').hasClass('patternselect')) {
 			/**
-			 * Pattern select allows enter multiple comma or newline separated values in same editable field. Values
-			 * passed to add.popup should be appended at the and of existing value string. Duplicates are skipped.
+			 * Pattern select allows to enter multiple comma or newline separated values in same editable field. Values
+			 * passed to add.popup should be appended at the end of existing value string.
+			 *
+			 * values_arr is used to catch duplicates.
+			 * values_str is used to store user's original syntax.
 			 */
-			var values = $('[name="'+data.parentId+'"]').val();
+			var values_str = $('[name="' + data.parentId + '"]').val(),
+				values_arr = values_str.split(/[,|\n]+/).map(function(str) {return str.trim()});
 
 			data.values.forEach(function(val) {
-				var escaped = val[data.object].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-				if (!values.match(new RegExp('(' + escaped + '([,|\n]|$))', 'gm'))) {
-					if (values !== '') {
-						values += ', ';
+				if (values_arr.indexOf(val[data.object]) == -1) {
+					if (values_str !== '') {
+						values_str += ', ';
 					}
-					values += val[data.object];
+					values_str += val[data.object];
 				}
 			});
 
-			$('[name="'+data.parentId+'"]')
-				.val(values)
+			$('[name="' + data.parentId + '"]')
+				.val(values_str)
 				.trigger('change');
 		}
-		else if (typeof addPopupValues !== 'undefined') {
+		else if (!$('[name="' + data.parentId + '"]').hasClass('simple-textbox')
+				&& typeof addPopupValues !== 'undefined') {
 			// execute function if they exist
 			addPopupValues(data);
 		}

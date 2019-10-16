@@ -19,6 +19,7 @@
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
+#include "zbxmockdb.h"
 
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
@@ -65,6 +66,10 @@ struct zbx_db_result
 	int			row_to_fetch;	/* for error messages */
 	int			columns;	/* to make sure that rows have identical number of columns */
 };
+
+DB_RESULT	__fwd_zbx_db_select(const char *fmt, ...);
+DB_RESULT	__wrap_zbx_db_select_n(const char *query, int n);
+int	__wrap___zbx_DBexecute(const char *fmt, ...);
 
 /* zbx_mockdb_t:queries hashset support */
 static zbx_hash_t	mockdb_query_hash(const void *data)
@@ -287,13 +292,13 @@ int	__wrap_DBcommit(void)
 	return ZBX_DB_OK;
 }
 
-void	zbx_mockdb_init()
+void	zbx_mockdb_init(void)
 {
 	zbx_hashset_create_ext(&mockdb.queries, 0, mockdb_query_hash, mockdb_query_compare, mockdb_query_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 }
 
-void	zbx_mockdb_destroy()
+void	zbx_mockdb_destroy(void)
 {
 	zbx_hashset_destroy(&mockdb.queries);
 }

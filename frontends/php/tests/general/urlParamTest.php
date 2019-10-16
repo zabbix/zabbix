@@ -55,12 +55,6 @@ class urlParamTest extends CTest {
 				'requestData' => []
 			],
 			[
-				'inputData' => [['a' => 1, 'b' => 2, 'c' => 3], true],
-				'expectedResult' => '',
-				'expectError' => true,
-				'requestData' => []
-			],
-			[
 				'inputData' => ['abc', false, 'name'],
 				'expectedResult' => '&name=abc',
 				'expectError' => false,

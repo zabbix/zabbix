@@ -41,6 +41,8 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 void	zbx_delete_inactive_ipmi_hosts(time_t last_check);
 
+void	zbx_perform_all_openipmi_ops(int timeout);
+
 #endif	/* HAVE_OPENIPMI */
 
 #endif	/* ZABBIX_CHECKS_IPMI_H */

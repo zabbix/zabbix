@@ -312,7 +312,8 @@
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
 			axis: 'y',
-			cursor: 'move',
+			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -353,42 +354,45 @@
 
 	jQuery(function($) {
 		$('#tabs').on('tabsactivate', function(event, ui) {
-			if (ui.newPanel.selector === '#previewTab') {
+			if (ui.newPanel.attr('id') === 'previewTab') {
 				var preview_chart = $('#previewChart'),
-					name = 'chart3.php',
-					src = '&name=' + encodeURIComponent($('#name').val()) +
-						'&width=' + $('#width').val() +
-						'&height=' + $('#height').val() +
-						'&graphtype=' + $('#graphtype').val() +
-						'&legend=' + ($('#show_legend').is(':checked') ? 1 : 0);
+					src = new Curl('chart3.php');
 
-				if (preview_chart.hasClass('preloader')) {
+				if (preview_chart.find('.preloader').length) {
 					return false;
 				}
 
+				src.setArgument('period', '3600');
+				src.setArgument('name', $('#name').val());
+				src.setArgument('width', $('#width').val());
+				src.setArgument('height', $('#height').val());
+				src.setArgument('graphtype', $('#graphtype').val());
+				src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
+
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-				name = 'chart7.php';
-				src += '&graph3d=' + ($('#show_3d').is(':checked') ? 1 : 0);
+				src.setPath('chart7.php');
+				src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
 
 				<?php else: ?>
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-				src += '&percent_left=' + $('#percent_left').val()
-					+ '&percent_right=' + $('#percent_right').val();
+				src.setArgument('percent_left', $('#percent_left').val());
+				src.setArgument('percent_right', $('#percent_right').val());
 				<?php endif ?>
 
-				src += '&ymin_type=' + $('#ymin_type').val() +
-					'&ymax_type=' + $('#ymax_type').val() +
-					'&yaxismin=' + $('#yaxismin').val() +
-					'&yaxismax=' + $('#yaxismax').val() +
-					'&ymin_itemid=' + $('#ymin_itemid').val() +
-					'&ymax_itemid=' + $('#ymax_itemid').val() +
-					'&showworkperiod=' + ($('#show_work_period').is(':checked') ? 1 : 0) +
-					'&showtriggers=' + ($('#show_triggers').is(':checked') ? 1 : 0);
+				src.setArgument('ymin_type', $('#ymin_type').val());
+				src.setArgument('ymax_type', $('#ymax_type').val());
+				src.setArgument('yaxismin', $('#yaxismin').val());
+				src.setArgument('yaxismax', $('#yaxismax').val());
+				src.setArgument('ymin_itemid', $('#ymin_itemid').val());
+				src.setArgument('ymax_itemid', $('#ymax_itemid').val());
+				src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
+				src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
+
 				<?php endif ?>
 
 				$('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
 					if (!$.isEmptyObject(value) && value.name != null) {
-						src += '&' + value.name + '=' + value.value;
+						src.setArgument(value.name, value.value);
 					}
 				});
 
@@ -398,13 +402,13 @@
 					image.remove();
 				}
 
-				preview_chart.attr('class', 'preloader');
+				preview_chart.append($('<div>').addClass('preloader'));
 
-				$('<img />').attr('src', name + '?period=3600' + src).load(function() {
-					preview_chart
-						.removeAttr('class')
-						.append($(this));
-				});
+				$('<img />')
+					.attr('src', src.getUrl())
+					.on('load', function() {
+						preview_chart.html($(this));
+					});
 			}
 		});
 

@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="custom_intervals_row">
 	<tr class="form_row">
 		<td>
-			<ul class="<?= ZBX_STYLE_RADIO_SEGMENTED ?>" id="delay_flex_#{rowNum}_type">
+			<ul class="<?= CRadioButtonList::ZBX_STYLE_CLASS ?>" id="delay_flex_#{rowNum}_type">
 				<li>
 					<input type="radio" id="delay_flex_#{rowNum}_type_0" name="delay_flex[#{rowNum}][type]" value="0" checked="checked">
 					<label for="delay_flex_#{rowNum}_type_0"><?= _('Flexible') ?></label>
@@ -73,6 +73,28 @@
 			})
 			.trigger('change');
 
+		$('#history_mode')
+			.change(function() {
+				if ($('[name="history_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+					$('#history').prop('disabled', true).hide();
+				}
+				else {
+					$('#history').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
+
+		$('#trends_mode')
+			.change(function() {
+				if ($('[name="trends_mode"][value=' + <?= ITEM_STORAGE_OFF ?> + ']').is(':checked')) {
+					$('#trends').prop('disabled', true).hide();
+				}
+				else {
+					$('#trends').prop('disabled', false).show();
+				}
+			})
+			.trigger('change');
+
 		$('#custom_intervals').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
@@ -99,8 +121,8 @@
 			disabled: (preprocessing.find('tr.sortable') < 2),
 			items: 'tr.sortable',
 			axis: 'y',
-			cursor: 'move',
 			containment: 'parent',
+			cursor: IE ? 'move' : 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -200,7 +222,7 @@
 						items: 'tbody tr.sortable',
 						axis: 'y',
 						containment: 'parent',
-						cursor: 'move',
+						cursor: IE ? 'move' : 'grabbing',
 						handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 						tolerance: 'pointer',
 						opacity: 0.6,

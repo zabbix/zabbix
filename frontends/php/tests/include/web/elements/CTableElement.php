@@ -46,7 +46,7 @@ class CTableElement extends CElement {
 	 */
 	protected function normalize() {
 		if ($this->getTagName() !== 'table') {
-			$this->setElement($this->query('xpath:.//table')->one());
+			$this->setElement($this->query('xpath:.//table')->waitUntilPresent()->one());
 		}
 	}
 
@@ -118,8 +118,8 @@ class CTableElement extends CElement {
 		foreach ($this->getRows() as $row) {
 			$data = [];
 
-			foreach ($row->query('xpath:./*')->all() as $i => $column) {
-				$data[$headers[$i]] = $column;
+			foreach ($row->query('xpath:./td|./th')->all() as $i => $column) {
+				$data[CTestArrayHelper::get($headers, $i, $i)] = $column;
 			}
 
 			$table[] = new CElementCollection($data);
@@ -150,6 +150,41 @@ class CTableElement extends CElement {
 
 		$selector = 'xpath:.//tbody/tr/td['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
 		return $this->query($selector)->asTableRow(['parent' => $this])->one(false);
+	}
+
+	/**
+	 * Find row by column value.
+	 *
+	 * @param array $content    column data
+	 *
+	 * @return CTableRow|null
+	 */
+	public function findRows($content) {
+		$rows = [];
+
+		if (CTestArrayHelper::isAssociative($content)) {
+			$content = [$content];
+		}
+
+		foreach ($this->getRows() as $row) {
+			foreach ($content as $columns) {
+				$found = true;
+
+				foreach ($columns as $name => $value) {
+					if (CTestArrayHelper::get($value, 'text', $value) !== $row->getColumnData($name, $value)) {
+						$found = false;
+						break;
+					}
+				}
+
+				if ($found) {
+					$rows[] = $row;
+					break;
+				}
+			}
+		}
+
+		return new CElementCollection($rows, CTableRowElement::class);
 	}
 
 	/**

@@ -20,6 +20,10 @@ $blue: white;
 
 $white: #000 !important;
 
+$disabled-bg-color: #000;
+$disabled-item-color: #b5b5b5;
+$disabled-item-bg-color: #383838;
+
 // MAIN
 $main-nav-bg-color: #000;
 $main-subnav-bg-color: #e0e0e0;
@@ -30,7 +34,6 @@ $font-selected-color: #fff;
 $font-alt-color: #cacaca;
 $body-bg-color: #111;
 $overlay-bg-color: #222;
-
 
 // UI
 $ui-bg-color: #000;
@@ -50,7 +53,6 @@ $table-border-color: #333;
 
 $ui-tab-bg-selected-color: #fff;
 
-
 // FORMS
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
@@ -66,6 +68,12 @@ $scrollbar-thumb-color: #999;
 $scrollbar-thumb-color-darken: 30%;
 
 $input-placeholder-color: #bbb;
+
+// ERROR MESSAGES
+$msg-bad-color: $light-red;
+$msg-good-color: $light-green;
+$msg-warning-color: #ffb319;
+$msg-warning-border-color: #ffb319;
 
 // BUTTONS
 $btn-font-color: #333;
@@ -119,6 +127,9 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+// MULTISELECT
+$multiselect-selected-bg-color: #222;
+
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
@@ -127,6 +138,37 @@ $ok-ack-fg-color: #00ff00;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+
+// DASHBOARD
+.dashbrd-grid-new-widget-placeholder {
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		box-shadow: none;
+		border-color: $font-color;
+		background-color: transparent;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -269px -888px;
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -457px -888px;
+		}
+	}
+}
 
 // ICONS
 $var-icons: (
@@ -260,15 +302,15 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu {
+.menu-popup {
 	background-color: $form-bg-color;
 	border: 1px solid $form-border-color;
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		color: $form-disabled-font-color;
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		&:hover,
 		&:focus,
 		&:active,
@@ -302,9 +344,19 @@ ul.top-nav-icons {
 }
 
 .filter-breadcrumb {
-	a {
-		&:focus {
-			margin-bottom: -1px;
+
+	li,
+	> li:first-child {
+
+		> span a:focus {
+			margin-bottom: -2px;
+		}
+	}
+
+	> li {
+
+		> span a:focus {
+			line-height: 12px;
 		}
 	}
 }
@@ -337,7 +389,7 @@ button {
 	}
 }
 
-.radio-segmented {
+.radio-list-control {
 
 	.average-bg,
 	.disaster-bg,
@@ -519,19 +571,10 @@ ul.top-nav-icons {
 	}
 }
 
-.subfilter-enabled {
-	background-color: #000;
-}
-
-
+.subfilter-enabled,
 .subfilter-disable-btn {
-	background-color: $ui-bg-color !important;
-
-	&:active {
-		background-color: $ui-bg-color !important;
-	}
+	background-color: $ui-bg-color;
 }
-
 
 .tag {
 	color: $ui-bg-color;
@@ -542,23 +585,15 @@ ul.top-nav-icons {
 }
 
 .multiselect {
+
 	.multiselect-list {
-		padding-left: 2px;
-		padding-bottom: 2px;
 
-		li {
+		li.selected {
 
-			&.selected {
-
-				.subfilter-enabled {
-					background-color: $ui-hover-color !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
-
-				.subfilter-disable-btn {
-					background-color: $ui-hover-color !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
+			.subfilter-enabled,
+			.subfilter-disable-btn,
+			.subfilter-disable-btn:active {
+				@include box-shadow(0 0 0 1px rgba($blue, 1));
 			}
 		}
 	}
@@ -1041,39 +1076,12 @@ td.inactive-bg {
 }
 
 // ERROR MESSAGES
-.msg-bad {
-	.link-action {
-		color: $light-red;
+.msg-bad,
+.msg-good,
+.msg-warning {
 
-		.arrow-up {
-			border-bottom-color: $light-red;
-		}
-		.arrow-down {
-			border-top-color: $light-red;
-		}
-		&:hover {
+	.link-action:hover {
 		color: $link-hover-color;
-		}
-	}
-
-	button {
-		color: $btn-alt-font-color;
-	}
-}
-
-.msg-good {
-	.link-action {
-		color: $light-green;
-
-		.arrow-up {
-			border-bottom-color: $light-green;
-		}
-		.arrow-down {
-			border-top-color: $light-green;
-		}
-		&:hover {
-		color: $link-hover-color;
-		}
 	}
 
 	button {
@@ -1244,7 +1252,7 @@ td.inactive-bg {
 	background-position: -323px -325px;
 }
 .icon-invisible::before {
-	background-position: -401px -803px,
+	background-position: -401px -803px;
 }
 .icon-problem-generated::before {
 	background-position: -449px -325px;

@@ -1,0 +1,486 @@
+# Both expected and peer is IPv4
+---
+test case: IPv4 match
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Second IPv4 from list matches
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '127.0.0.2'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Peer IP is different
+in:
+  allowed_peers: '127.0.0.1,127.0.0.2'
+  peer: '126.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+# Both expected and peer is IPv6
+---
+test case: IPv6 match
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 from list matches
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8330,127.0.0.1,2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Peer IPv6 is different
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8330'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Peer IPv6 is different at start
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '3001:0db8:0000:0000:0000:ff00:0042:8330'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Peer IP is not in list
+in:
+  allowed_peers: '3001:0db8:0000:0000:0000:ff00:0042:8329,2101:0db8:0000:0000:0000:ff00:0042:8329,2001:0db9:0000:0000:0000:ff00:0042:8329,2001:0db8:0100:0000:0000:ff00:0042:8329,2001:0db8:0000:0001:0000:ff00:0042:8329,2001:0db8:0000:0000:0000:ff10:0042:8329,2001:0db8:0000:0000:0000:ff00:0043:8329'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+# Expected is IPv4 but connected is IPv6
+---
+test case: IPv6 compatible peer is connected
+in:
+  allowed_peers: '127.2.0.1'
+  peer: '::127.2.0.1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 compatible expanded peer is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 mapped peer is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::ffff:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 mapped peer expanded is connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 compatible peer mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '::127.2.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:0:7F02:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped peer mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '::ffff:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped peer expanded mismatch IP
+in:
+  allowed_peers: '127.1.0.1'
+  peer: '0:0:0:0:0:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 peer partially compatible
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::fffe:127.0.0.1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 peer does not match IPv4
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded peer is connected, not in list
+in:
+  allowed_peers: '127.0.0.1'
+  peer: 'F000:0:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 compatible expanded peer is connected mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0000:0001:0:0:0:0:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 mapped expanded is connected mismatch
+in:
+  allowed_peers: '127.0.0.1'
+  peer: 'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:7F00:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 local ip mismatch IPv4 local IP
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv4 local IP expected, but IPv6 local IP expanded connected
+in:
+  allowed_peers: '127.0.0.1'
+  peer: '0:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+# Expected is IPv6 but connected is IPv4 (mirror of the previous test "Expected is IPv4 but connected is IPv6")
+test case: IPv4 compatible peer is connected
+in:
+  allowed_peers: '::127.2.0.1'
+  peer: '127.2.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 compatible expanded peer is connected
+in:
+  allowed_peers: '0:0:0:0:0:0:7F00:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 mapped peer is connected
+in:
+  allowed_peers: '::ffff:127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 mapped peer expanded is connected
+in:
+  allowed_peers: '0:0:0:0:0:FFFF:7F00:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 compatible peer mismatch IP
+in:
+  allowed_peers: '::127.2.0.1'
+  peer: '127.1.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 compatible expanded mismatch
+in:
+  allowed_peers: '0:0:0:0:0:0:7F02:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 mapped peer mismatch IP
+in:
+  allowed_peers: '::ffff:127.0.0.1'
+  peer: '127.1.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 mapped peer expanded mismatch IP
+in:
+  allowed_peers: '0:0:0:0:0:FFFF:7F00:0001'
+  peer: '127.1.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 peer partially compatible
+in:
+  allowed_peers: '::fffe:127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 peer does not match IPv6
+in:
+  allowed_peers: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 compatible expanded peer is connected, not in list
+in:
+  allowed_peers: 'F000:0:0:0:0:0:7F00:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 compatible expanded peer is connected mismatch
+in:
+  allowed_peers: '0000:0001:0:0:0:0:7F00:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 mapped expanded is connected mismatch
+in:
+  allowed_peers: 'FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:7F00:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 local IP mismatch IPv6 local IP
+in:
+  allowed_peers: '::1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv6 local expanded IP expected, but IPv4 local IP connected
+in:
+  allowed_peers: '0:0:0:0:0:0:0:0001'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+# Additional tests
+test case: Compare only first 3 octets
+in:
+  allowed_peers: '127.0.0.0/24'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Compare all 4 octets sanity check
+in:
+  allowed_peers: '127.0.0.0/32'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: IPv4 does not match address that is not compatible or mapped
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv4 does not match address that is not compatible or mapped 2
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '0:0:0:0:0:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv4 match address that is compatible or mapped
+in:
+  allowed_peers: '127.0.0.0/0'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Compare only first 96 bits
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
+  peer: '0:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Compare 128 bits
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/128'
+  peer: '0:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Compare only the first 3 octets where the first one does not match
+in:
+  allowed_peers: '127.0.0.1/24'
+  peer: '128.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Compare only the first 96 bits where the first one does not match
+in:
+  allowed_peers: '0:0:0:0:0:0:ffff:ffff/96'
+  peer: '1:0:0:0:0:0:0:0001'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv4 in list
+in:
+  allowed_peers: '128.0.0.0/24,127.0.0.1'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv6 in list
+in:
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/96,::1'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Any IPv4
+in:
+  allowed_peers: '128.0.0.0/0'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Any IPv6
+in:
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/0'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: Any IPv6 allows also any IPv4
+in:
+  allowed_peers: '1000:0000:0000:0000:0000:0000:FFFF:FFFF/0'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: IPv4 first CIDR value is not saved on next value in list
+in:
+  allowed_peers: '127.0.0.0/24,128.0.0.2'
+  peer: '128.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Long list of allowed peers and no match
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24,0000:0000:0000:0000:0000:0000:127.0.0.1,::FFFF:127.0.0.1,0000:0000:0000:0000:0000:0000:0000:0003,::127.0.0.1,::127.0.0.1/128,::1'
+  peer: '127.2.1.5'
+  family: 'AF_INET'
+out:
+  return: FAIL
+---
+test case: Long list of allowed peers and no match IPv6
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24,0000:0000:0000:0000:0000:0000:127.0.0.1,::FFFF:127.0.0.1,0000:0000:0000:0000:0000:0000:0000:0003,::127.0.0.1,::127.0.0.1/128,::1'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: Long list of allowed peers but there is match
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24,0000:0000:0000:0000:0000:0000:127.0.0.1,::FFFF:127.0.0.1,0000:0000:0000:0000:0000:0000:0000:0003,::127.0.0.1,::127.0.0.1/128,::1,::1/96,::,::/0,0.0.0.0/0,0000:0000:0000:0000:0000:0000:0000:0000/0'
+  peer: '127.2.1.5'
+  family: 'AF_INET'
+out:
+  return: SUCCEED
+---
+test case: Long list of allowed peers but there is match IPv6
+in:
+  allowed_peers: 'localhost,127.0.0.2,127.0.0.0/24,0000:0000:0000:0000:0000:0000:127.0.0.1,::FFFF:127.0.0.1,0000:0000:0000:0000:0000:0000:0000:0003,::127.0.0.1,::127.0.0.1/128,::1,::1/96,::,::/0,0.0.0.0/0,0000:0000:0000:0000:0000:0000:0000:0000/0'
+  peer: '2001:0db8:0000:0000:0000:ff00:0042:8329'
+  family: 'AF_INET6'
+out:
+  return: SUCCEED
+---
+test case: IPv6 unspecified address in list, connection from IPv6
+in:
+  allowed_peers: '::'
+  peer: '::1'
+  family: 'AF_INET6'
+out:
+  return: FAIL
+---
+test case: IPv6 unspecified address in list, connection from IPv4
+in:
+  allowed_peers: '::'
+  peer: '127.0.0.1'
+  family: 'AF_INET'
+out:
+  return: FAIL
+...

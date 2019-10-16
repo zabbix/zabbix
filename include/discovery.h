@@ -21,7 +21,6 @@
 #ifndef ZABBIX_DISCOVERY_H
 #define ZABBIX_DISCOVERY_H
 
-#include "zbxjson.h"
 #include "comms.h"
 
 void	discovery_update_host(DB_DHOST *dhost, int status, int now);

@@ -56,10 +56,14 @@ $currentYear = date('Y');
 
 // fetch media types
 $media_types = [];
-$db_media_types = DBselect('SELECT mt.* FROM media_type mt ORDER BY mt.description');
+$db_media_types = API::MediaType()->get([
+	'output' => ['description'],
+	'preservekeys' => true
+]);
 
-while ($media_type_data = DBfetch($db_media_types)) {
-	$media_types[$media_type_data['mediatypeid']] = $media_type_data['description'];
+CArrayHelper::sort($db_media_types, ['description']);
+foreach ($db_media_types as $mediatypeid => $db_media_type) {
+	$media_types[$mediatypeid] = $db_media_type['description'];
 }
 
 $widget = (new CWidget())->setTitle(_('Notifications'));
@@ -279,7 +283,9 @@ else {
 
 		$links = [];
 		foreach ($media_types as $id => $description) {
-			$links[] = new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
+			$links[] = (CWebUser::getType() < USER_TYPE_SUPER_ADMIN)
+				? $description
+				: new CLink($description, 'zabbix.php?action=mediatype.edit&mediatypeid='.$id);
 			$links[] = SPACE.'/'.SPACE;
 		}
 		array_pop($links);

@@ -557,7 +557,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -572,7 +572,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -586,7 +586,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: XML is empty.'
+						'Invalid parameter "posts": XML is expected.'
 					]
 				]
 			],
@@ -601,7 +601,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
 					]
 				]
 			],
@@ -616,7 +616,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'XML data',
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Cannot read XML: (73) expected \'>\''
+						'Invalid parameter "posts": (73) expected \'>\''
 					]
 				]
 			],
@@ -646,54 +646,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'error' => 'Cannot add item',
 					'error_details' => [
 						'Incorrect value "test" for "status_codes" field.'
-					]
-				]
-			],
-			// Check HTTP authentication required fields
-			[
-				[
-					'fields' => [
-						'Name' => 'Basic authentication',
-						'Key' => 'item-basic-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'Basic'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'NTLM authentication',
-						'Key' => 'item-ntlm-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'NTLM'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'NTLM authentication with space in input',
-						'Key' => 'item-space-authentication',
-						'URL' => 'zabbix.com',
-						'HTTP authentication' => 'NTLM',
-						'User name' => ' ',
-						'Password' => ' '
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
 					]
 				]
 			]
@@ -797,7 +749,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'JSON data',
 					'error_details' => [
-						'Cannot read JSON.'
+						'Invalid parameter "posts": JSON is expected.'
 					]
 				]
 			],
@@ -805,7 +757,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Cannot read XML: XML is empty.'
+						'Invalid parameter "posts": XML is expected.'
 					]
 				]
 			],
@@ -816,7 +768,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Cannot read XML: (4) Start tag expected, \'<\' not found'
+						'Invalid parameter "posts": (4) Start tag expected, \'<\' not found'
 					]
 				]
 			],
@@ -838,31 +790,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error_details' => [
 						'Incorrect value "test" for "status_codes" field.'
-					]
-				]
-			],
-			// Check HTTP authentication required fields.
-			[
-				[
-					'fields' => [
-						'HTTP authentication' => 'Basic'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'HTTP authentication' => 'NTLM'
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "Username": cannot be empty.',
-						'Incorrect value for field "Password": cannot be empty.'
 					]
 				]
 			]
@@ -971,7 +898,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						// inputs
 						'Timeout' => '1m',
 						'Required status codes' => '0, 100-500',
-						'HTTP proxy' => 'http://[user[:password]@]proxy.example.com[:port]',
+						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
 						'SSL certificate file' => 'ssl_file',
@@ -997,6 +924,30 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'Content-Type', 'value' => 'application/xml']
 					],
 					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
+			// Empty Basic authentication user/password
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty Basic User/Password',
+						'Key' => 'basic.empty.user.pass',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'Basic',
+					],
+					'check_form' => true
+				]
+			],
+			// Empty NTLM authentication user/password
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty NTLM User/Password',
+						'Key' => 'ntlm.empty.user.pass',
+						'URL' => 'zabbix.com',
+						'HTTP authentication' => 'NTLM',
+					],
 					'check_form' => true
 				]
 			]
@@ -1064,14 +1015,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				'Request type' => 'GET',
 				'Timeout' => '3s',
 				'Required status codes' => '200',
-				'Follow redirects' => false,
+				'Follow redirects' => true,
 				'Convert to JSON' => false,
 				'HTTP authentication' => 'None',
 				'SSL verify peer' => false,
 				'SSL verify host' => false,
 				'Type of information' => 'Numeric (unsigned)',
 				'Update interval' => '30s',
-				'History storage period' => '90d',
 				'Show value' => 'As is',
 				'Enable trapping' => false,
 				'Populates host inventory field' => '-None-',
@@ -1128,6 +1078,24 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
+			// Empty Basic authentication user/password
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'Basic',
+					],
+					'check_form' => true
+				]
+			],
+			// Empty NTLM authentication user/password
+			[
+				[
+					'fields' => [
+						'HTTP authentication' => 'NTLM',
+					],
+					'check_form' => true
+				]
+			],
 			// All posible fields.
 			[
 				[
@@ -1143,7 +1111,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Show value' => 'APC Battery Status',
 						// inputs
 						'Timeout' => '1m',
-						'HTTP proxy' => 'http://[user[:password]@]proxy.example.com[:port]',
+						'HTTP proxy' => '[protocol://][user[:password]@]proxy.example.com[:port]',
 						'User name' => 'admin',
 						'Password' => 'zabbix',
 						'SSL certificate file' => 'ssl_file_update',

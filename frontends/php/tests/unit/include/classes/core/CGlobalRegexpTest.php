@@ -69,14 +69,14 @@ class CGlobalRegexpTest extends PHPUnit_Framework_TestCase
 			// regular expressions, TRUE, case-sensitive
 			[
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^Log entry [0-9]+', 1),
-				'success' => ['Log entry 29', 'Log entry 0'],
-				'fail' => [' Log entry 171', 'Log entry']
+				'success' => ['Log entry 29', 'Log entry 0', "line\nLog entry 5"],
+				'fail' => [' Log entry 171', 'Log entry', 'lineLog entry 5']
 			],
 			// regular expressions, TRUE, case-insensitive
 			[
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^Log entry [0-9]+', 0),
-				'success' => ['LOG ENTRY 71', 'log entry 161: something bad happened'],
-				'fail' => [' Log entry 171', 'log entry']
+				'success' => ['LOG ENTRY 71', 'log entry 161: something bad happened', "line\nLog entry 5"],
+				'fail' => [' Log entry 171', 'log entry', 'lineLog entry 5']
 			],
 			// regular expressions, FALSE, case-sensitive
 			[

@@ -177,7 +177,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 	protected function selectData() {
 		$this->data = [];
-		$now = time(null);
+		$now = time();
 
 		if (!isset($this->stime)) {
 			$this->stime = $now - $this->period;
@@ -1315,6 +1315,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
+			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY * 3],			// 1 week and 3 days
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK],			// 1 month and 1 week
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_WEEK * 2],		// 1 month and 2 weeks
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
@@ -1568,9 +1569,9 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$newPow = false;
 			if ($byteStep) {
-				$maxYPow = convertToBase1024($maxY, 1024);
-				$minYPow = convertToBase1024($minY, 1024);
-				$powStep = 1024;
+				$maxYPow = convertToBase1024($maxY, ZBX_KIBIBYTE);
+				$minYPow = convertToBase1024($minY, ZBX_KIBIBYTE);
+				$powStep = ZBX_KIBIBYTE;
 			} else {
 				$maxYPow = convertToBase1024($maxY);
 				$minYPow = convertToBase1024($minY);
@@ -2382,7 +2383,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$y_offsets = $this->shiftY + self::legendOffsetY;
 
 		if (!$this->with_vertical_padding) {
-			$y_offsets -= $this->m_showTriggers
+			$y_offsets -= ($this->m_showTriggers && count($this->triggers) > 0)
 				? static::DEFAULT_TOP_BOTTOM_PADDING / 2
 				: static::DEFAULT_TOP_BOTTOM_PADDING;
 		}
@@ -2517,6 +2518,7 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawDimensions() {
 		set_image_header();
 
+		$this->calculateTopPadding();
 		$this->selectTriggers();
 		$this->calcDimentions();
 
@@ -2621,6 +2623,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| ($this->items[$item]['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+							&& preg_match('/^(event)?log(rt)?\[/', $this->items[$item]['key_']))
 						|| ($this->items[$item]['has_scheduling_intervals'] && $delay == 0)) {
 					$draw = true;
 				}

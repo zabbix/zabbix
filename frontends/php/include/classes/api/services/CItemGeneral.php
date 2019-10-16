@@ -91,7 +91,6 @@ abstract class CItemGeneral extends CApiService {
 			'lifetime'				=> [],
 			'preprocessing'			=> ['template' => 1],
 			'jmx_endpoint'			=> [],
-			'master_itemid'			=> ['template' => 1],
 			'url'					=> ['template' => 1],
 			'timeout'				=> ['template' => 1],
 			'query_fields'			=> ['template' => 1],
@@ -1398,10 +1397,11 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function createItemPreprocessing(array $items) {
 		$item_preproc = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
+				$step = 1;
+
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
 						'itemid' => $item['itemid'],
@@ -1414,7 +1414,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1427,11 +1427,11 @@ abstract class CItemGeneral extends CApiService {
 	protected function updateItemPreprocessing(array $items) {
 		$item_preproc = [];
 		$item_preprocids = [];
-		$step = 1;
 
 		foreach ($items as $item) {
 			if (array_key_exists('preprocessing', $item)) {
 				$item_preprocids[] = $item['itemid'];
+				$step = 1;
 
 				foreach ($item['preprocessing'] as $preprocessing) {
 					$item_preproc[] = [
@@ -1449,7 +1449,7 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($item_preproc) {
-			DB::insert('item_preproc', $item_preproc);
+			DB::insertBatch('item_preproc', $item_preproc);
 		}
 	}
 
@@ -1584,7 +1584,7 @@ abstract class CItemGeneral extends CApiService {
 					'SELECT i.itemid,i.hostid,i.master_itemid'.
 					' FROM items i'.
 					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED])
+						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
 				);
 			}
 			else {
@@ -1872,14 +1872,8 @@ abstract class CItemGeneral extends CApiService {
 		if (array_key_exists('authtype', $data)
 				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM)) {
 			$rules += [
-				'username' => [
-					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('items', 'username')
-				],
-				'password' => [
-					'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-					'length' => DB::getFieldLength('items', 'password')
-				]
+				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
+				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]
 			];
 		}
 
@@ -1983,11 +1977,13 @@ abstract class CItemGeneral extends CApiService {
 				libxml_clear_errors();
 
 				if (!$errors) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.', _('XML is empty')));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('XML is expected'))
+					);
 				}
 				else {
 					$error = reset($errors);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot read XML: %1$s.',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
 						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
 						$error->line, $error->column
 					)));
@@ -1996,7 +1992,9 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
 				if (trim($posts, " \r\n") === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 
 				$types = [
@@ -2023,7 +2021,9 @@ abstract class CItemGeneral extends CApiService {
 				$json->decode($posts);
 
 				if ($json->hasError()) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot read JSON.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
+					);
 				}
 			}
 		}

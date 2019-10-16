@@ -322,13 +322,7 @@ void	zbx_binary_heap_remove_direct(zbx_binary_heap_t *heap, zbx_uint64_t key)
 
 void	zbx_binary_heap_clear(zbx_binary_heap_t *heap)
 {
-	if (NULL != heap->elems)
-	{
-		heap->mem_free_func(heap->elems);
-		heap->elems = NULL;
-		heap->elems_num = 0;
-		heap->elems_alloc = 0;
-	}
+	heap->elems_num = 0;
 
 	if (HAS_DIRECT_OPTION(heap))
 		zbx_hashmap_clear(heap->key_index);

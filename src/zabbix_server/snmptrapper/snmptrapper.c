@@ -610,7 +610,7 @@ static int	get_latest_data(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: main_snmptrapper_loop                                            *
+ * Function: snmptrapper_thread                                               *
  *                                                                            *
  * Purpose: SNMP trap reader's entry point                                    *
  *                                                                            *
@@ -619,7 +619,7 @@ static int	get_latest_data(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 {
-	const char	*__function_name = "main_snmptrapper_loop";
+	const char	*__function_name = "snmptrapper_thread";
 	double		sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -640,14 +640,14 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	buffer = (char *)zbx_malloc(buffer, MAX_BUFFER_LEN);
 	*buffer = '\0';
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_latest_data())
+		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data())
 			read_traps();
 		sec = zbx_time() - sec;
 
@@ -661,4 +661,9 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	if (-1 != trap_fd)
 		close(trap_fd);
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

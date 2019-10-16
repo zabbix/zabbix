@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('Configuration of host groups');
 $page['file'] = 'hostgroups.php';
@@ -207,6 +206,15 @@ elseif (hasRequest('action')) {
 
 			show_messages($result, $messageSuccess, $messageFailed);
 		}
+	}
+
+	if (hasRequest('groups') && !$result) {
+		$groups = API::HostGroup()->get([
+			'groupids' => getRequest('groups'),
+			'output' => []
+		]);
+
+		uncheckTableRows(null, zbx_objectValues($groups, 'groupid'));
 	}
 }
 

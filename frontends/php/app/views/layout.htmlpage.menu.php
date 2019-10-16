@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $user_navigation = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
 			->cleanItems()
 			->addItem([
-				(new CTextBox('search', '', false, 255))
+				(new CTextBox('search', getRequest('search', ''), false, 255))
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH)
 					->setAttribute('aria-label', _('type here to search')),
@@ -71,15 +72,10 @@ if (!$data['user']['is_guest']) {
 }
 
 $user_menu->addItem(
-	(new CLink(SPACE,
-		(new CUrl('index.php'))
-			->setArgument('reconnect', 1)
-			->setArgument('form', 'default')
-			->toString()
-	))
+	(new CLink(SPACE, 'javascript:;'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setTitle(_('Sign out'))
-		->addSID()
+		->onClick('ZABBIX.logout()')
 );
 
 $user_navigation->addItem($user_menu);

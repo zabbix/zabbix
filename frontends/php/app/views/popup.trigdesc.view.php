@@ -34,6 +34,10 @@ $form = (new CForm())
 				->setAttribute('autofocus', 'autofocus')
 		));
 
+if (array_key_exists('eventid', $data)) {
+	$form->addVar('eventid', $data['eventid']);
+}
+
 $script_inline = '';
 
 if ($data['isTriggerEditable']) {
@@ -57,12 +61,19 @@ if ($data['isTriggerEditable']) {
 					'url: "zabbix.php?action=trigdesc.update",'.
 					'data: {'.
 						'"triggerid": '.$data['trigger']['triggerid'].','.
+						(array_key_exists('eventid', $data) ? '"eventid": '.$data['eventid'].',' : '').
 						'"comments": jQuery("[name=comments]", forms).val(),'.
 						'"sid": jQuery("[name=sid]", forms).val()'.
 					'},'.
 					'success: function(r) {'.
 						'if (typeof r.errors === "undefined") {'.
+							/**
+							 * Before reloadPopup call:
+							 * - add input[name=success][value=1] to tell "popup.trigdesc.view" display success message;
+							 * - remove [name=comments] and [name=comments_unresolved] to avoid unneeded data transfer.
+							 */
 							'jQuery(forms).append(jQuery("<input>", {type: "hidden", "name": "success"}).val(1));'.
+							'jQuery("[name=comments], [name=comments_unresolved]", jQuery(forms)).remove();'.
 							'reloadPopup(forms[0], "popup.trigdesc.view");'.
 						'}'.
 						'else {'.
@@ -86,9 +97,9 @@ if ($data['isCommentExist'] && $data['isTriggerEditable']) {
 			'var forms = jQuery("form[name='.$form->getName().']");'.
 			'jQuery("[name=comments]", forms)'.
 				'.text(jQuery("[name=comments_unresolved]", forms).val())'.
-				'.removeProp("readonly")'.
+				'.prop("readonly", false)'.
 				'.focus();'.
-			'jQuery(".trigger-descr-update-btn").removeProp("disabled");'.
+			'jQuery(".trigger-descr-update-btn").prop("disabled", false);'.
 			'jQuery(".trigger-descr-edit-btn").attr("disabled", "disabled");'.
 		'}';
 }

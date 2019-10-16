@@ -30,6 +30,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			->setAttribute('role', 'navigation')
 			->setAttribute('aria-label', _x('Hierarchy', 'screen reader'))
 			->addClass(ZBX_STYLE_OBJECT_GROUP)
+			->addClass(ZBX_STYLE_FILTER_BREADCRUMB)
 			->addItem([
 				(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
 				'/',
@@ -60,8 +61,8 @@ $favourite_icon = get_icon('favourite', [
 
 $refresh_icon = get_icon('screenconf');
 
-$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'], true,
-	['elementid' => $this->data['elementId']]
+$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(WIDGET_SLIDESHOW, 'x'.$this->data['refreshMultiplier'],
+	true, ['elementid' => $this->data['elementId']]
 ));
 
 if (isset($this->data['isDynamicItems'])) {

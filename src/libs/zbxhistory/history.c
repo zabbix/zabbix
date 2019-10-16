@@ -159,7 +159,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 	pos = values->values_num;
 	ret = writer->get_values(writer, itemid, start, count, end, values);
 
-	if (SUCCEED == ret && SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ret && SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		int	i;
 		char	buffer[MAX_STRING_LEN];

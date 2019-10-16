@@ -610,7 +610,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_setproctitle(const char *fmt, ...)
+void	zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	const char	*__function_name = "__zbx_zbx_setproctitle";
@@ -1056,7 +1056,7 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function recursively calls itself for each filter fragment. *
@@ -1180,7 +1180,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if a filter already exists. This         *
@@ -2212,7 +2212,58 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 	return nextcheck;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_item_nextcheck_unreachable                             *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for item on unreachable host        *
+ *                                                                            *
+ * Parameters: simple_interval  - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] preprocessed custom intervals          *
+ *             disable_until    - [IN] timestamp for next check               *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until)
+{
+	int	nextcheck = 0;
+	time_t	next_interval, tmax, scheduled_check = 0;
 
+	/* first try to parse out and calculate scheduled intervals */
+	if (NULL != custom_intervals)
+		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
+
+	/* Try to find the nearest 'nextcheck' value with condition */
+	/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
+	/* possible to check the item within a year, fail. */
+
+	nextcheck = disable_until;
+	tmax = disable_until + SEC_PER_YEAR;
+
+	if (NULL != custom_intervals)
+	{
+		while (nextcheck < tmax)
+		{
+			if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
+				break;
+
+			/* find the flexible interval change */
+			if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+			{
+				nextcheck = ZBX_JAN_2038;
+				break;
+			}
+			nextcheck = next_interval;
+		}
+	}
+
+	if (0 != scheduled_check && scheduled_check < nextcheck)
+		nextcheck = (int)scheduled_check;
+
+	return nextcheck;
+}
 /******************************************************************************
  *                                                                            *
  * Function: calculate_proxy_nextcheck                                        *
@@ -2634,9 +2685,6 @@ int	is_double(const char *str)
 {
 	int	len;
 
-	while (' ' == *str)			/* trim left spaces */
-		str++;
-
 	if ('-' == *str || '+' == *str)		/* check leading sign */
 		str++;
 
@@ -2658,9 +2706,6 @@ int	is_double(const char *str)
 		while (0 != isdigit(*str))
 			str++;
 	}
-
-	while (' ' == *str)			/* trim right spaces */
-		str++;
 
 	return '\0' == *str ? SUCCEED : FAIL;
 }
@@ -2743,29 +2788,6 @@ int	is_time_suffix(const char *str, int *value, int length)
 		*value = value_tmp * factor;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_time2bool                                                    *
- *                                                                            *
- * Purpose: check if the string is a zero with or without time suffix         *
- *                                                                            *
- * Parameters: value_raw - [IN] string to check                               *
- *                                                                            *
- * Return value: 0 - the string is equivalent to zero                         *
- *               1 - the string is not equivalent to zero or not a number     *
- *                     with time unit suffix at all                           *
- *                                                                            *
- ******************************************************************************/
-unsigned char	zbx_time2bool(const char *value_raw)
-{
-	int	value;
-
-	if (SUCCEED != is_time_suffix(value_raw, &value, ZBX_LENGTH_UNLIMITED))
-		return 1;
-
-	return 0 != value;
 }
 
 #ifdef _WINDOWS

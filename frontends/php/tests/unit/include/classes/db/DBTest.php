@@ -33,7 +33,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 					'sortfield' => ['host', 'name'],
 					'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
 				],
-				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid BETWEEN 9998 AND 10003 AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
+				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid IN (9998,9999,10000,10001,10002,10003) AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
 			],
 			[
 				'hosts', null,

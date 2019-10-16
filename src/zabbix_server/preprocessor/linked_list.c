@@ -124,7 +124,7 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
  ******************************************************************************/
 void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 {
-	return zbx_list_insert_after(list, NULL, value, inserted);
+	zbx_list_insert_after(list, NULL, value, inserted);
 }
 
 /******************************************************************************
@@ -301,7 +301,7 @@ void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator)
  *             iterator2 - [IN] second list iterator                          *
  *                                                                            *
  * Return value: SUCCEED is returned if both iterator point at the same item, *
- *               FAIL otheriwse.                                              *
+ *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2)

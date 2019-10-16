@@ -212,6 +212,16 @@ pre {
 	}
 }
 
+.disabled {
+	@include opacity(0.35);
+	cursor: default !important;
+
+	.disabled,
+	[disabled] {
+		opacity: 1 !important;
+	}
+}
+
 %space-pre-wrap {
 	white-space: pre-wrap;
 	word-wrap: break-word;
@@ -511,7 +521,7 @@ ul.top-nav-icons {
 
 .header-title {
 	border-bottom: 1px solid $ui-border-color;
-	margin-top: -10px;
+	margin: -10px 0 10px;
 	padding: 10px 0 6px;
 	width: 100%;
 
@@ -658,11 +668,15 @@ article {
 // Breadcrumbs inline with filter block
 .filter-breadcrumb {
 	display: inline-block;
+	padding-top: 0;
 	z-index: 3;
+	max-width: calc(100vw - 200px);
 
 	li {
 		line-height: 14px;
 		vertical-align: top;
+		float: none;
+		display: inline-block;
 
 		.status-container {
 			padding-top: 3px;
@@ -672,23 +686,42 @@ article {
 			display: inline-block;
 			height: 18px;
 			padding: 4px 7px 0;
+			line-height: 14px;
 
 			a {
+				display: inline-block;
 				max-width: 200px;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
+				margin-bottom: -1px;
+
+				&:focus {
+					margin-bottom: -2px;
+				}
 			}
 		}
 	}
 
 	> li {
 		padding: 1px 0;
+
+		> span {
+
+			a {
+				margin-top: 1px;
+				line-height: 13px;
+			}
+		}
 	}
 
-	> li:first-child {
-		float: left;
+	> li {
+		line-height: 22px;
 		white-space: nowrap;
+
+		.status-container {
+			line-height: 14px;
+		}
 	}
 
 	+ .filter-space {
@@ -1312,6 +1345,10 @@ output {
 	white-space: nowrap;
 }
 
+.wordwrap {
+	word-break: break-all;
+}
+
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
@@ -1465,6 +1502,26 @@ output {
 	}
 }
 
+.disabled {
+	background-color: transparent;
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			color: darken($ui-bg-selected-color, 25%);
+		}
+	}
+}
+
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1506,7 +1563,7 @@ output {
 	}
 }
 
-.multiselect-wrapper {
+.multiselect-control {
 	position: relative;
 	vertical-align: top;
 	display: inline-block;
@@ -1565,20 +1622,23 @@ output {
 
 			&.selected {
 
-				.subfilter-enabled {
-					background-color: lighten($ui-bg-selected-color, 10%);
-				}
-
-				.subfilter-disable-btn {
-					background-color: lighten($ui-bg-selected-color, 10%);
-					@include opacity(1);
-
-					&:active {
-						background-color: lighten($ui-bg-selected-color, 10%);
-						@include opacity(1);
-					}
+				.subfilter-enabled,
+				.subfilter-disable-btn,
+				.subfilter-disable-btn:active {
+					background-color: $multiselect-selected-bg-color;
 				}
 			}
+		}
+	}
+
+	.disabled {
+		@include opacity(1);
+		background-color: $multiselect-disabled-bg-color;
+
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			background-color: $multiselect-item-disabled-bg-color;
+			color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -1764,6 +1824,10 @@ output {
 				}
 			}
 		}
+
+		.wrap-multiple-controls {
+			display: flex;
+		}
 	}
 
 	.table-forms-td-right {
@@ -1813,6 +1877,15 @@ output {
 		padding: .3em 0;
 	}
 
+	&.hor-list li {
+		margin-right: 15px;
+		padding: .3em 0 0 0;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
 	label {
 		padding: 0 0 0 18px;
 		display: inline-block;
@@ -1831,21 +1904,7 @@ output {
 	}
 }
 
-.list-hor-check-radio {
-	@extend .list-check-radio;
-
-	li {
-		display: inline-block;
-		margin-right: 15px;
-		padding: .3em 0 0 0;
-
-		&:last-child {
-			margin-right: 0;
-		}
-	}
-}
-
-.radio-segmented {
+.radio-list-control {
 	white-space: nowrap;
 
 	li {
@@ -2016,7 +2075,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color!important;
+		color: $font-color !important;
 		@extend %form-disabled;
 	}
 }
@@ -2820,34 +2879,6 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
-.disabled {
-	cursor: default !important;
-	background-color: transparent !important;
-	@include opacity(0.35);
-
-	.subfilter-enabled {
-		color: darken($ui-bg-selected-color, 35%);
-	}
-
-	.subfilter-disable-btn {
-		cursor: default;
-		color: darken($ui-bg-selected-color, 25%);
-		background-color: $ui-bg-selected-color;
-
-		&:hover {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:focus {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-
-		&:active {
-			color: darken($ui-bg-selected-color, 35%);
-		}
-	}
-}
-
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -2961,6 +2992,32 @@ $var-icons: (
 	}
 }
 
+.icon-none {
+	margin-left: 18px;
+}
+
+$trigger-expression-tree-icons: (
+	top-bottom: url(../img/icon-sprite.svg) no-repeat -84px -300px,
+	top-bottom-right: url(../img/icon-sprite.svg) no-repeat -84px -334px,
+	top-right: url(../img/icon-sprite.svg) no-repeat -84px -372px,
+	empty: url(../img/icon-sprite.svg) no-repeat -84px -350px
+);
+
+@each $var-icon, $bgimage in $trigger-expression-tree-icons {
+	.icon-tree-#{$var-icon} {
+		margin: 0 12px 0 0;
+
+		&::before {
+			background: $bgimage;
+			display: inline-block;
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			content: '';
+		}
+	}
+}
+
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
@@ -3015,6 +3072,21 @@ $form-icon-btn: (
 	height: 24px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
+}
+
+.drag-icon,
+.ui-draggable .dashbrd-widget-head,
+.ui-draggable .dashbrd-grid-widget-head {
+	@extend %cursor-drag;
+}
+
+.ui-draggable-dragging {
+
+	.drag-icon,
+	.dashbrd-widget-head,
+	.dashbrd-grid-widget-head {
+		@extend %cursor-dragging;
+	}
 }
 
 .icon-info {
@@ -3213,7 +3285,7 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.dashbrd-grid-widget-container {
+.dashbrd-grid-container {
 	position: relative;
 	margin: -4px;
 }
@@ -3225,22 +3297,73 @@ $form-icon-btn: (
 	z-index: 999;
 }
 
-.dashbrd-grid-empty-placeholder {
+.dashbrd-grid-new-widget-placeholder {
+	box-sizing: border-box;
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: calc(100% / 6 - .65rem);
 	height: 200px;
-	margin: .25rem;
+	padding: .25rem;
+	width: calc(100% / 6 - .65rem);
+	z-index: 999;
+	color: $font-alt-color;
+	cursor:pointer;
 
-	h1 {
-		padding: 10px;
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(2px 2px 6px $action-shadow-color);
+		border: 1px dashed $form-border-color;
+		background-color: rgba($ui-bg-color, .7);
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		@include box-shadow(inset 2px 2px 6px $action-shadow-color);
+		background: darken($body-bg-color, 6%);
+	}
+
+	.dashbrd-grid-new-widget-label {
+		$icon-height: 28px;
+
+		position: absolute;
+		left: 0;
+		top: calc(50% - #{$icon-height / 2});
+		right: 0;
+		bottom: 0;
+		padding: ($icon-height + 10px) 5px 5px;
 		text-align: center;
+
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -157px -888px;
+			content: ' ';
+			height: $icon-height;
+			width: 36px;
+			position: absolute;
+			top: 0;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+	}
+
+	&.disabled {
+		@include opacity(1);
+
+		.dashbrd-grid-widget-new-box {
+			background-color: rgba($ui-bg-color, .7);
+
+			.dashbrd-grid-new-widget-label::before {
+				background: url(../img/icon-sprite.svg) no-repeat -122px -284px;
+			}
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -345px -888px;
+		}
 	}
 }
 
@@ -3262,7 +3385,7 @@ $form-icon-btn: (
 
 .dashbrd-grid-widget-content {
 	flex: 1;
-	overflow-y: auto;
+	overflow: auto;
 	@extend %webkit-scrollbar;
 
 	.list-table {
@@ -3294,7 +3417,9 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
 	}
 }
@@ -3304,7 +3429,7 @@ $form-icon-btn: (
 	position: absolute;
 }
 
-.dashbrd-grid-widget-padding {
+.dashbrd-grid-widget-container {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
@@ -3594,8 +3719,14 @@ $form-icon-btn: (
 		border-color: $table-border-color;
 	}
 
-	.msg-good, .msg-bad {
+	.msg-bad,
+	.msg-good,
+	.msg-warning {
 		margin: 0 10px;
+	}
+
+	&.dashbrd-widget-fluid {
+		margin-right: 0;
 	}
 }
 
@@ -3663,23 +3794,10 @@ $form-icon-btn: (
 	&:link {
 		border: none;
 	}
-
-	&:focus {
-
-		&:after {
-			content: "";
-			background: rgba($blue, .35);
-			height: 2px;
-			position: absolute;
-			left: 0;
-			right: 0;
-			bottom: -2px;
-		}
-	}
 }
 
 // Action Menus, Pop-up Menus
-.action-menu {
+.menu-popup {
 	position: absolute;
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
@@ -3703,7 +3821,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -3750,7 +3868,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		display: block;
 		height: 24px;
 		line-height: 24px;
@@ -3813,8 +3931,21 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 190px);
 			max-width: inherit;
-			margin: 0 0 10px 0;
+			margin: 0 -10px 10px -10px;
+			padding: 0 10px;
 			@extend %webkit-scrollbar;
+
+			.table-forms .table-forms-td-right {
+				padding-right: 8px;
+			}
+
+			.columns-wrapper {
+				flex-wrap: nowrap;
+
+				.column-50:last-of-type {
+					margin-left: 10px;
+				}
+			}
 		}
 		.overlay-dialogue-controls {
 			text-align: right;
@@ -3843,7 +3974,9 @@ $form-icon-btn: (
 	}
 
 	.msg-bad,
-	.msg-good {
+	.msg-good,
+	.msg-warning {
+		position: -webkit-sticky;
 		position: sticky;
 		top: 0;
 		z-index: 1000;
@@ -4137,6 +4270,15 @@ $form-icon-btn: (
 	float: left;
 	margin: 2px 0 0 -19px;
 	@include border-radius(2px);
+
+	.notif-indic-snooze {
+		width: 14px;
+		height: 14px;
+		float: left;
+		margin-top: 20px;
+		background: url(../img/icon-sprite.svg) no-repeat -11px -587px;
+	}
+
 }
 
 .notif-indic-container {
@@ -4281,6 +4423,10 @@ $form-icon-btn: (
 	}
 }
 
+.svg-graph {
+	display: block;
+}
+
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
 .svg-graph-legend {
@@ -4291,13 +4437,14 @@ $form-icon-btn: (
 	overflow-y: hidden;
 	white-space: normal;
 	margin: 0 10px;
+	line-height: $svg-legend-line-height;
 
 	div {
 		display: inline-block;
 		margin: 0 4px;
 		font-size: 12px;
-		line-height: $svg-legend-line-height;
-		vertical-align: middle;
+		line-height: 1.1;
+		vertical-align: bottom;
 		min-width: 120px;
 		overflow: hidden;
 		white-space: nowrap;
@@ -4357,6 +4504,10 @@ $form-icon-btn: (
 			float: left;
 			display: block;
 		}
+	}
+
+	.header {
+		margin: 0 0 10px 3px;
 	}
 }
 
@@ -4904,122 +5055,161 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-.msg-good {
-	color: $font-color;
-	border: 2px solid $light-green;
+.msg-bad,
+.msg-good,
+.msg-warning {
 	background-color: $ui-bg-color;
+	color: $font-color;
+	border: 2px solid;
+	font-size: $font-top-nav-size;
+	margin-bottom: 10px;
+	padding: 6px 10px 6px 75px;
 	text-align: left;
+	vertical-align: middle;
+	position: relative;
+	@include border-radius(2px);
 
-	@extend %msg;
+	.overlay-close-btn {
+		color: $font-alt-color;
+		font-size: $font-top-nav-size;
+	}
 
 	.link-action {
-		color: darken(desaturate($green, 10%), 20%);
 		margin-right: 10px;
 		font-size: $font-msg-reset-size;
 
 		.arrow-up {
 			border-bottom-color: darken(desaturate($green, 10%), 20%);
 		}
+
 		.arrow-down {
 			border-top-color: darken(desaturate($green, 10%), 20%);
 		}
 	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
-	}
-
-	ul {
-		border-top-color: $light-green;
-	}
-
 	button {
 		background-color: $white;
-		color: darken(desaturate($green, 10%), 20%);
-		border-color: $light-green;
 	}
-}
 
-.msg-good:before {
-	content: "";
-	background-color: $light-green;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
+	&:before {
+		content: "";
+		width: 61px;
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+	}
 
-.msg-good:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -244px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+	&:after {
+		content: "";
+		background: url(../img/icon-sprite.svg) no-repeat;
+		margin-top: 2px;
+		margin-left: 16px;
+		width: 27px;
+		height: 25px;
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
 }
 
 .msg-bad {
-	color: $font-color;
-	border: 2px solid $light-red;
-	background-color: $ui-bg-color;
-	text-align: left;
-
-	@extend %msg;
+	border-color: $msg-bad-border-color;
 
 	.link-action {
-		color: darken(desaturate($red, 10%), 20%);
-		margin-right: 10px;
-		font-size: $font-msg-reset-size;
+		color: $msg-bad-color;
 
 		.arrow-up {
-			border-bottom-color: darken(desaturate($red, 10%), 20%);
+			border-bottom-color: $msg-bad-color;
 		}
-		.arrow-down {
-			border-top-color: darken(desaturate($red, 10%), 20%);
-		}
-	}
 
-	.overlay-close-btn {
-		color: $font-alt-color;
+		.arrow-down {
+			border-top-color: $msg-bad-color;
+		}
 	}
 
 	ul {
-		border-top-color: $light-red;
+		border-top-color: $msg-bad-border-color;
 	}
 
 	button {
-		background-color: $white;
-		color: darken(desaturate($red, 10%), 20%);
-		border-color: $light-red;
+		color: $msg-bad-color;
+		border-color: $msg-bad-border-color;
+	}
+
+	&:before {
+		background-color: $msg-bad-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
 	}
 }
 
-.msg-bad:before {
-	content: "";
-	background-color: $light-red;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
+.msg-good {
+	border-color: $msg-good-border-color;
+
+	.link-action {
+		color: $msg-good-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-good-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-good-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-good-border-color;
+	}
+
+	button {
+		color: $msg-good-color;
+		border-color: $msg-good-border-color;
+	}
+
+	&:before {
+		background-color: $msg-good-border-color;
+	}
+
+	&:after {
+		background-position: -122px -244px;
+	}
 }
 
-.msg-bad:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
+.msg-warning {
+	border-color: $msg-warning-border-color;
+
+	.link-action {
+		color: $msg-warning-color;
+
+		.arrow-up {
+			border-bottom-color: $msg-warning-color;
+		}
+
+		.arrow-down {
+			border-top-color: $msg-warning-color;
+		}
+	}
+
+	ul {
+		border-top-color: $msg-warning-border-color;
+	}
+
+	button {
+		color: $msg-warning-color;
+		border-color: $msg-warning-border-color;
+	}
+
+	&:before {
+		background-color: $msg-warning-border-color;
+	}
+
+	&:after {
+		background-position: -122px -325px;
+	}
 }
 
 .msg-details {
@@ -5073,58 +5263,14 @@ td.inactive-bg {
 	}
 }
 
-%msg {
-	font-size: $font-top-nav-size;
-	padding: 6px 10px 6px 75px;
-	text-align: left;
-	vertical-align: middle;
-	position: relative;
-	margin-bottom: 10px;
-	@include border-radius(2px);
-
-	.overlay-close-btn {
-		font-size: $font-top-nav-size;
-	}
-}
-
-.msg-bad-global {
+.msg-global-footer {
 	display: none;
 	position: fixed;
 	z-index: 10000;
-	text-align: left;
 	right: 0;
 	left: 0;
 	bottom: 0;
-	vertical-align: middle;
-	font-size: $font-top-nav-size;
-	color: $font-color;
-	border: 2px solid $alt-yellow;
-	background-color: $ui-bg-color;
 	margin: 0 10px 0 10px;
-	padding: 6px 10px 6px 75px;
-}
-
-.msg-bad-global:before {
-	content: "";
-	background-color: $alt-yellow;
-	float: left;
-	width: 61px;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	position: absolute;
-}
-
-.msg-bad-global:after {
-	content: "";
-	background: url(../img/icon-sprite.svg) no-repeat -122px -325px;
-	width: 27px;
-	height: 25px;
-	top: 0;
-	left: 0;
-	position: absolute;
-	margin-left: 16px;
-	margin-top: 2px;
 }
 
 .msg-global {
@@ -5379,10 +5525,29 @@ a.overlay-close-btn {
 	background-color: rgba($ui-bg-color, .8);
 	@include border-radius(50%);
 	@include transform(translateY(-50%));
+
+	&.menu-popup-preloader {
+		@include border-radius(0);
+		@include box-shadow(0 4px 20px 0 $action-shadow-color);
+		@include transform(none);
+		background: $action-preloader-bg-color;
+		border: 1px solid $action-border-color;
+		height: 120px;
+		width: 120px;
+		position: fixed;
+		right: auto;
+		bottom: auto;
+		display: flex;
+		align-items: center;
+		margin: 0;
+		z-index: 1010;
+	}
 }
 
 .preloader {
 	@include border-radius(50%);
+	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+	background-color: rgba($ui-bg-color, .8);
 	width: 20px;
 	height: 20px;
 	margin: 0 auto;
@@ -5472,6 +5637,20 @@ $browser-logos: (
 	@extend %webkit-scrollbar;
 }
 
+%cursor-drag {
+	cursor: move; /* fallback if grab cursor is unsupported */
+	cursor: grab;
+}
+
+%cursor-dragging {
+	cursor: move; /* fallback if grabbing cursor is unsupported */
+	cursor: grabbing;
+}
+
+.cursor-dragging {
+	@extend %cursor-dragging;
+}
+
 .cursor-move {
 	cursor: move;
 }
@@ -5546,6 +5725,7 @@ tr.cursor-move {
 
 .flickerfreescreen {
 	position: relative;
+	overflow: hidden;
 }
 
 .graph-wrapper {
@@ -5616,6 +5796,11 @@ svg {
 	.map-container {
 		display: table;
 	}
+
+	.flickerfreescreen {
+		display: inline-block;
+	}
+
 	.table-forms-container {
 		display: table;
 		margin: 0;
@@ -5978,7 +6163,6 @@ svg {
 
 					> .drag-icon {
 						min-width: 24px;
-						cursor: move;
 					}
 
 					> .item-name {
@@ -6203,6 +6387,10 @@ svg {
 	}
 }
 
+#expressions_list .ui-sortable-helper {
+	display: table;
+}
+
 // RANGE CONTROL
 $range-track-color: silver;
 $range-progress-color: $link-color;
@@ -6284,15 +6472,16 @@ $range-input-width: 31px;
 		margin-left: -$range-thumb-size/2;
 		width: $range-thumb-size;
 		height: $range-thumb-size;
-		border-radius: $range-thumb-size/2;
-		box-shadow: 0 0 1px white;
+		border-radius: 50%;
 		background: $range-thumb-color;
 	}
 
 	&.range-control-focus {
 		.range-control-thumb {
+			margin-top: -$range-thumb-size/1.5;
+			margin-left: -$range-thumb-size/1.5;
 			background: $range-thumb-color-focus;
-			box-shadow: 0 0 0 2px lighten($btn-bg-color, 10%);
+			border: 2px solid lighten($btn-bg-color, 10%);
 		}
 
 		.range-control-progress {
@@ -6349,917 +6538,4 @@ $range-input-width: 31px;
 // Screen reader
 .inline-sr-only {
 	font-size: 0;
-}
-
-@if $theme_name == 'dev' {
-
-/*doc
----
-//title: About
-name: about
-category: About
----
-
-##About the Zabbix Styleguide
-
-The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
-
-* A common design language inside the company and community
-* More modular approach to design, reusable components
-* A single source of information for front-end developers
-
-May the force be with you!
-*/
-
-/*doc
----
-//title: Components
-name: components
-category: Components
----
-*/
-
-/*doc
----
-parent: components
-title: Typography
-name: typography
----
-
-The default font face is Arial. Relative units (em) should be used to set the type size and line height.
-
-##Headings
-
-```html_example
-<h1>Main Heading</h1><br>
-<h2>Section Header</h2><br>
-<h3>Contextual Menu Heading</h3><br>
-<h4>Widget and Dialog Heading</h4>
-```
-
-##Paragraphs
-
-Paragraphs are used to visually separate blocks of multiple sentences.
-
-```html_example
-<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-```
-*/
-
-/*doc
----
-parent: components
-title: Tables
-name: table
----
-
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Table with Pagination
-
-Pagination is used to separate large amounts of tabular data into descrete peices.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="table-paging">
-   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
-</div>
-```
-
-##Table with No Results
-
-In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="nothing-to-show">
-            <td colspan="11">We couldn't find any results</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Tables with Elements and Highlights
-
-Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
-
-```html_example
-<div class="overflow-table">
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Alert labels</td>
-            <td>asdasasdasd</td>
-            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
-         </tr>
-         <tr>
-            <td>Icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Links with icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Labels</td>
-            <td>asdasasdasd</td>
-            <td>
-               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
-               <div class="status-container"><span class="status-red">label</span></div>
-            </td>
-         </tr>
-         <tr>
-            <td>Tree</td>
-            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
-            <td>
-               <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a>
-               <div class="treeview"><span class="arrow-down"></span></div>
-               <a href="#">Expanded</a>
-            </td>
-         </tr>
-          <tr>
-            <td>Severity</td>
-            <td>asdasd</td>
-            <td class="normal-bg">
-               <span class="link-action">25</span>
-            </td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Forms
-name: forms
----
-
-Forms contain UI elements that are used to submit information.
-
-##Primary Button
-
-```html_example
-<button type="button">Primary Button</button>
-<button type="button" disabled>Primary Button</button>
-```
-
-##Secondary Button
-
-```html_example
-<button type="button" class="btn-alt">Secondary Button</button>
-<button type="button" class="btn-alt" disabled>Secondary Button</button>
-```
-
-##Form Button
-
-```html_example
-<button type="button" class="btn-grey">Form Button</button>
-<button type="button" class="btn-grey" disabled>Form Button</button>
-```
-
-##Link Button
-
-```html_example
-<button type="button" class="btn-link">Link Button</button>
-<button type="button" class="btn-link" disabled>Link Button</button>
-```
-
-##Icon Button
-
-```html_example
-<button type="button" class="btn-max" title="Maximize"></button>
-<button type="button" class="btn-max" title="Maximize" disabled></button>
-```
-
-##Inputs
-
-Text on html5 input types
-
-```html_example
-<ul class="table-forms">
-   <li>
-      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="DefaultInput">
-         <div class="red">You can't leave this empty.</div>
-      </div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
-   </li>
-   <li>
-      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
-      </div>
-   </li>
-</ul>
-```
-
-##Selects
-
-```html_example
-<select>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-<select disabled>
-   <option>Select options</option>
-   <option>Option 1</option>
-   <option>Option 2</option>
-   <option>Option 3</option>
-</select>
-```
-
-## Radios
-
-```html_example
-<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
-<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
-```
-
-## Segmented Radio Controls
-
-```html_example
-<p>
-<ul class="radio-segmented">
-   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
-</ul>
-</p>
-```
-
-## Checkboxes
-
-```html_example
-<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
-<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
-```
-
-## Radio and Checkbox Lists
-
-```html_example
-<ul class="list-check-radio">
-   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-</ul>
-```
-*/
-
-/*doc
----
-parent: components
-title: Dialogs
-name: dialog
----
-
-Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
-
-##Alert Dialogs
-
-Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
-
-```html_example
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body">Some explanatory information</div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-
-<div class="overlay-dialogue">
-   <!--<span class="overlay-close-btn"></span>-->
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
-   </div>
-   <div class="overlay-dialogue-body"></div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
-</div>
-```
-
-##Dialogs with Scrollable Content
-
-In exceptional cases dialogs may contain additional information inside a scrollable area.
-
-```html_example
-<div class="overlay-dialogue" style="max-width: 500px">
-   <span class="overlay-close-btn"></span>
-   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
-   </div>
-   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
-   <table class="list-table">
-      <thead>
-         <tr>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Duration</th>
-            <th>Age</th>
-            <th>Ack</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>2015-09-08 13:47:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>15d 23h 45m</td>
-            <td>15d 23h 45m</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 06:14:58</td>
-            <td><span class="green">OK</span></td>
-            <td>1m 4d 7h</td>
-            <td>1m 20d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 05:32:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>42m</td>
-            <td>1m 20d 8h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 06:11:58</td>
-            <td><span class="green">OK</span></td>
-            <td>23h 21m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 05:38:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>33m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-```
-
-##Contextual Dialogs
-
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
-
-```html_example
-<ul class="action-menu">
-   <li>
-      <h3>Favourite screens</h3>
-   </li>
-   <li><span class="action-menu-item">Add</span></li>
-   <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
-      </ul>
-   </li>
-   <li><span class="action-menu-item">Remove all</span></li>
-   <li>
-      <div></div>
-   </li>
-   <li>
-      <h3>Favourite slide shows</h3>
-   </li>
-   <li><span class="action-menu-item selected">Add</span></li>
-   <li><span class="action-menu-item-disabled">Remove</span></li>
-   <li><span class="action-menu-item-disabled">Remove all</span></li>
-</ul>
-```
-*/
-
-/*doc
----
-parent: components
-title: Notifications
-name: notifications
----
-
-Notificatiions are used to provide feedback after certain actions or give information.
-
-##Success Notification
-
-Success notification appears after an action has been completed without errors. Has green background.
-
-```html_example
-<div class="msg-good">
-   Well done! You successfully added new parameters.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Error Notification
-
-Error notification appears after an action has been completed with errors or an error in general. Has red background.
-
-```html_example
-<div class="msg-bad">
-   Oh snap! Check form fields and try submitting again.
-   <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
-   </div>
-   <span class="overlay-close-btn" title="Close"></span>
-</div>
-```
-
-##Global Notification
-
-Global notification.
-
-```html_example
-<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Icons
-name: icons
----
-
-Icons:
-
-```html_example
-<div class="icon-help"></div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Datepickers
-name: date
----
-
-Datepickers are used to select a single date or a date range.
-
-```html_example
-<div class="overlay-dialogue calendar">
-   <div class="calendar-header">
-      <div class="calendar-year">
-         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
-      </div>
-      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
-   </div>
-   <table>
-      <thead>
-         <tr>
-            <th>M</th>
-            <th>T</th>
-            <th>W</th>
-            <th>T</th>
-            <th>F</th>
-            <th>S</th>
-            <th>S</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td class="grey">29</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-         </tr>
-         <tr>
-            <td>7</td>
-            <td>8</td>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-         </tr>
-         <tr>
-            <td>14</td>
-            <td>15</td>
-            <td class="selected">16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-         </tr>
-         <tr>
-            <td>21</td>
-            <td>22</td>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td>26</td>
-            <td>27</td>
-         </tr>
-         <tr>
-            <td>28</td>
-            <td>29</td>
-            <td>30</td>
-            <td>31</td>
-            <td class="grey">1</td>
-            <td class="grey">2</td>
-            <td class="grey">3</td>
-         </tr>
-         <tr>
-            <td class="grey">4</td>
-            <td class="grey">5</td>
-            <td class="grey">6</td>
-            <td class="grey">7</td>
-            <td class="grey">8</td>
-            <td class="grey">9</td>
-            <td class="grey">10</td>
-         </tr>
-      </tbody>
-   </table>
-   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
-   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
-</div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Navigation
-name: navigation
----
-
-##Main Navigation
-
-Main navigation is used to jump between high level sections of the application.
-
-```html_example
-<nav role="navigation">
-   <div class="top-nav-container">
-      <ul class="top-nav">
-         <li class="selected"><a href="#">Monitoring</a></li>
-         <li><a href="#">Inventory</a></li>
-         <li><a href="#">Reports</a></li>
-         <li><a href="#">Configuration</a></li>
-         <li><a href="#">Administration</a></li>
-      </ul>
-      <!--<ul class="top-nav-icons">
-         <li>
-            <form><input type="text"><button type="button" class="btn-search"></button></form>
-         </li>
-         <li><a href="#" class="top-nav-help" title="Help"></a></li>
-         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
-         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
-	display: inline-block;
-	color: $font-selected-color;
-	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
-	padding: 2px 3px;
-	text-align: center;
-	line-height: 1em;
-	max-width: 133px;
-	vertical-align: middle;
-	@extend %overflow-ellipsis;
-	@include border-radius(2px);
-
-	&:last-child {
-		margin: 0;
-	}
-}
-
-         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
-      </ul>-->
-   </div>
-   <div class="top-subnav-container">
-      <ul class="top-subnav">
-         <li><a href="#" class="selected">Dashboard</a></li>
-         <li><a href="#">Overview</a></li>
-         <li><a href="#">Web</a></li>
-         <li><a href="#">Latest data</a></li>
-         <li><a href="#">Triggers</a></li>
-         <li><a href="#">Events</a></li>
-         <li><a href="#">Graphs</a></li>
-         <li><a href="#">Screens</a></li>
-         <li><a href="#">Maps</a></li>
-         <li><a href="#">Discovery</a></li>
-         <li><a href="#">Services</a></li>
-      </ul>
-      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
-   </div>
-</nav>
-```
-
-##Object Navigation
-
-```html_example
-<ul class="object-group">
-   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
-   <li class="green">Enabled</li>
-   <li>
-      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
-   </li>
-   <li><span class="selected"><a href="#">Discovery</a></span></li>
-   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
-   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
-   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
-   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
-   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
-   <li><span><a href="#">Web scenarios</a></span></li>
-</ul>
-```
-
-##Tabs
-
-Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
-
-```html_example
-<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
-```
-*/
-
-/*doc
----
-parent: components
-title: Links
-name: links
----
-
-A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
-
-```html_example
-<p><a href="#">Default link</a></p>
-<p><a href="#" class="grey link-alt">Alternative link</a></p>
-<p><a href="#" class="green link-alt">Alternative link</a></p>
-<p><a href="#" class="red link-alt">Alternative link</a></p>
-<p><span class="link-action">Action link</span></p>
-<p><span class="green link-action">Action link</span></p>
-<p><span class="yellow link-action">Action link</span></p>
-<span class="red link-action">Action link</span>
-```
-*/
-
-/*doc
----
-parent: components
-title: Labels
-name: labels
----
-
-Labels add information. Different colors
-
-```html_example
-<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Progress Indicators
-name: progress
----
-
-Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
-
-```html_example
-<div class="preloader-container">
-   <div class="preloader"></div>
-</div>
-```
-*/
-
-/*doc
----
-parent: components
-title: Widgets
-name: widgets
----
-
-Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
-
-```html_example
-<div class="dashbrd-widget">
-   <div class="dashbrd-widget-head cursor-move">
-      <h4>Favorite screens</h4>
-      <ul>
-         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
-         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
-         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
-      </ul>
-   </div>
-   <table class="list-table">
-      <tbody>
-         <tr>
-            <td><a href="#">Zabbix server</a></td>
-         </tr>
-         <tr>
-            <td><a href="#">My 2nd megaserver</a></td>
-         </tr>
-      </tbody>
-   </table>
-   <ul class="dashbrd-widget-foot">
-      <li><a href="#">Screens</a></li>
-      <li><a href="#">Slide shows</a></li>
-   </ul>
-</div>
-```
-*/
 }

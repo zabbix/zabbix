@@ -36,7 +36,16 @@ class CWidgetElement extends CElement {
 		$action = $this->query('class:btn-widget-action')->one();
 		$settings = json_decode($action->getAttribute('data-menu-popup'));
 
-		return $settings->currentRate;
+		return $settings->data->currentRate;
+	}
+
+	/**
+	 * Get header of widget.
+	 *
+	 * @return string
+	 */
+	public function getHeaderText() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
 	}
 
 	/**
@@ -45,7 +54,7 @@ class CWidgetElement extends CElement {
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
@@ -77,4 +86,14 @@ class CWidgetElement extends CElement {
 			return ($target->query('xpath:.//div[@class="preloader-container"]')->one(false) === null);
 		};
 	}
+
+	/**
+	 * Delete a widget.
+	 *
+	 * @return boolean
+	 */
+	public function delete() {
+		$this->query("xpath:.//button[@title='Delete']")->one()->click()->waitUntilNotVisible();
+	}
 }
+

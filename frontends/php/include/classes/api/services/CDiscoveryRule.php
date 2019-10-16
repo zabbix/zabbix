@@ -908,8 +908,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
-	protected function updateReal($items) {
-		$items = zbx_toArray($items);
+	protected function updateReal(array $items) {
+		CArrayHelper::sort($items, ['itemid']);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
 
@@ -1157,7 +1157,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'itemids' => $discoveryid,
 			'output' => ['itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				'snmpv3_securitylevel',	'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'lastlogsize', 'logtimefmt',
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'mtime', 'flags', 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime',
 				'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname', 'jmx_endpoint', 'url',
@@ -1638,7 +1638,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$items = zbx_toHash($items, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['items'] = isset($items[$itemid]) ? $items[$itemid]['rowscount'] : 0;
+					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
 				}
 			}
 		}
@@ -1674,7 +1674,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['triggers'] = isset($triggers[$itemid]) ? $triggers[$itemid]['rowscount'] : 0;
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1710,7 +1712,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1737,7 +1741,9 @@ class CDiscoveryRule extends CItemGeneral {
 				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
 
 				foreach ($result as $itemid => $item) {
-					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
+					$result[$itemid]['hostPrototypes'] = array_key_exists($itemid, $hostPrototypes)
+						? $hostPrototypes[$itemid]['rowscount']
+						: '0';
 				}
 			}
 		}

@@ -170,7 +170,7 @@ static void	DCdump_proxies(void)
 		proxy = (ZBX_DC_PROXY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " location:%u", proxy->hostid, proxy->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
-		zabbix_log(LOG_LEVEL_TRACE, "  compres:%d", proxy->auto_compress);
+		zabbix_log(LOG_LEVEL_TRACE, "  compress:%d", proxy->auto_compress);
 
 	}
 
@@ -284,7 +284,7 @@ static void	DCdump_htmpls(void)
 
 static void	DCdump_gmacros(void)
 {
-	const char		*__function_name = "DCdump_gmacro";
+	const char		*__function_name = "DCdump_gmacros";
 
 	ZBX_DC_GMACRO		*gmacro;
 	zbx_hashset_iter_t	iter;
@@ -556,7 +556,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d lastclock:%d", item->delay, item->nextcheck,
 				item->lastclock);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", item->data_expected_from);
-		zabbix_log(LOG_LEVEL_TRACE, "  history:%d", item->history);
+		zabbix_log(LOG_LEVEL_TRACE, "  history:%d history_sec:%d", item->history, item->history_sec);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
@@ -1151,7 +1151,7 @@ static void	DCdump_maintenances(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
 
-void	DCdump_configuration()
+void	DCdump_configuration(void)
 {
 	DCdump_config();
 	DCdump_hosts();

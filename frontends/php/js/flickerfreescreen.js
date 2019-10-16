@@ -129,7 +129,7 @@
 					self.refreshImg(id, function() {
 						$('a', '#flickerfreescreen_' + id).each(function() {
 								var obj = $(this),
-								url = new Curl(obj.attr('href'));
+								url = new Curl(obj.attr('href'), false);
 
 								url.setArgument('from', screen.timeline.from);
 								url.setArgument('to', screen.timeline.to);
@@ -216,10 +216,6 @@
 					},
 					screen.interval
 				);
-
-				// refresh time control actual time
-				clearTimeout(timeControl.timeRefreshTimeoutHandler);
-				timeControl.refreshTime();
 			}
 		},
 
@@ -310,10 +306,10 @@
 				var url = new Curl(screen.data.options.refresh);
 				url.setArgument('curtime', new CDate().getTime());
 
-				jQuery.ajax( {
+				jQuery.ajax({
 					'url': url.getUrl()
 				})
-				.error(function() {
+				.fail(function() {
 					screen.error++;
 					window.flickerfreeScreen.calculateReRefresh(id);
 				})
@@ -345,7 +341,6 @@
 				$('img', '#flickerfreescreen_' + id).each(function() {
 					var domImg = $(this),
 						url = new Curl(domImg.attr('src'), false),
-						on_dashboard = timeControl.objectList[id].onDashboard,
 						zbx_sbox = domImg.data('zbx_sbox');
 
 					if (zbx_sbox && zbx_sbox.prevent_refresh) {
@@ -369,7 +364,7 @@
 							usemap: domImg.attr('usemap'),
 							alt: domImg.attr('alt')
 						})
-						.error(function() {
+						.on('error', function() {
 							screen.error++;
 							window.flickerfreeScreen.calculateReRefresh(id);
 						})
@@ -398,7 +393,7 @@
 							}
 						});
 
-					var async = flickerfreeScreen.getImageSboxHeight(url, function (height) {
+					var async = flickerfreeScreen.getImageSboxHeight(url, function(height) {
 							zbx_sbox.height = parseInt(height, 10);
 							// 'src' should be added only here to trigger load event after new height is received.
 							img.data('zbx_sbox', zbx_sbox)
@@ -438,7 +433,7 @@
 				url.setArgument('_', (new Date).getTime().toString(34));
 
 				return $.get(url.getUrl(), {'onlyHeight': 1}, 'json')
-					.success(function(response, status, xhr) {
+					.done(function(response, status, xhr) {
 						cb(xhr.getResponseHeader('X-ZBX-SBOX-HEIGHT'))
 					});
 			}

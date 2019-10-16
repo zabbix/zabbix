@@ -26,9 +26,9 @@
 class CFrontendSetup {
 
 	const MIN_PHP_VERSION = '5.4.0';
-	const MIN_PHP_MEMORY_LIMIT = 134217728; // 128*1024*1024
-	const MIN_PHP_POST_MAX_SIZE = 16777216; // 16*1024*1024
-	const MIN_PHP_UPLOAD_MAX_FILESIZE = 2097152; // 2*1024*1024
+	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
+	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
+	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
 	const MIN_PHP_MAX_EXECUTION_TIME = 300;
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
@@ -125,7 +125,8 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit").', mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit").',
+				mem2str(self::MIN_PHP_MEMORY_LIMIT))
 		];
 	}
 
@@ -142,7 +143,8 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size").', mem2str(self::MIN_PHP_POST_MAX_SIZE))
+			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size").',
+				mem2str(self::MIN_PHP_POST_MAX_SIZE))
 		];
 	}
 
@@ -159,7 +161,8 @@ class CFrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize").', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
+			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize").',
+				mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
 		];
 	}
 

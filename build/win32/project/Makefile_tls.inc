@@ -60,7 +60,7 @@ TLSLIB2 =			$(TLSLIBDIR)\libssl.lib
 !				ERROR TLSLIBDIR "$(TLSLIBDIR)" contains libraries from OpenSSL 1.0.x (libeay32.lib, ssleay32.lib) and 1.1.x (libcrypto.lib, libssl.lib). TLSLIBDIR cannot be used in this case. Use TLSLIB="$(TLSLIBDIR)\libeay32.lib" TLSLIB2="$(TLSLIBDIR)\ssleay32.lib" for OpenSSL 1.0.x or TLSLIB="$(TLSLIBDIR)\libcrypto.lib" TLSLIB2="$(TLSLIBDIR)\libssl.lib" for OpenSSL 1.1.x.
 !			ENDIF
 !		ENDIF
-CFLAGS =	$(CFLAGS) /DHAVE_OPENSSL
+CFLAGS =	$(CFLAGS) /DHAVE_OPENSSL /DHAVE_OPENSSL_WITH_PSK
 !	ENDIF
 
 !	IF !EXISTS("$(TLSLIB)")

@@ -474,10 +474,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$lefty_max = $this->fields['lefty_max']->getValue();
 			$lefty_min = ($lefty_min !== '') ? convertFunctionValue($lefty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
 			$lefty_max = ($lefty_max !== '') ? convertFunctionValue($lefty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$compare = true;
 
-			if ($lefty_min !== '' && $lefty_max !== '' && bccomp($lefty_min, $lefty_max) >= 0) {
+			if (strlen(substr(strrchr($lefty_min, '.'), 1)) > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$compare = false;
+			}
+			if (strlen(substr(strrchr($lefty_max, '.'), 1))  > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$compare = false;
+			}
+
+			if ($compare && $lefty_min !== '' && $lefty_max !== ''
+					&& bccomp($lefty_min, $lefty_max, 4) >= 0) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
-					_('Y axis MAX value must be greater than Y axis MIN value.')
+					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
 		}
@@ -487,10 +498,21 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			$righty_max = $this->fields['righty_max']->getValue();
 			$righty_min = ($righty_min != '') ? convertFunctionValue($righty_min, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
 			$righty_max = ($righty_max != '') ? convertFunctionValue($righty_max, ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) : '';
+			$compare = true;
 
-			if ($righty_min !== '' && $righty_max !== '' && bccomp($righty_min, $righty_max) >= 0) {
+			if (strlen(substr(strrchr($righty_min, '.'), 1)) > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Min'), _('too many decimal places'));
+				$compare = false;
+			}
+			if (strlen(substr(strrchr($righty_max, '.'), 1))  > 4) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _('too many decimal places'));
+				$compare = false;
+			}
+
+			if ($compare && $righty_min !== '' && $righty_max !== ''
+					&& bccomp($righty_min, $righty_max, 4) >= 0) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'),
-					_('Y axis MAX value must be greater than Y axis MIN value.')
+					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
 		}

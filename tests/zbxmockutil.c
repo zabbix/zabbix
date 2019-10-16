@@ -142,6 +142,78 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	return ITEM_VALUE_TYPE_MAX;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_item_type                                        *
+ *                                                                            *
+ * Purpose: converts item type from text format                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mock_str_to_item_type(const char *str)
+{
+	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX"))
+		return ITEM_TYPE_ZABBIX;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SNMPv1"))
+		return ITEM_TYPE_SNMPv1;
+
+	if (0 == strcmp(str, "ITEM_TYPE_TRAPPER"))
+		return ITEM_TYPE_TRAPPER;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SIMPLE"))
+		return ITEM_TYPE_SIMPLE;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SNMPv2c"))
+		return ITEM_TYPE_SNMPv2c;
+
+	if (0 == strcmp(str, "ITEM_TYPE_INTERNAL"))
+		return ITEM_TYPE_INTERNAL;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SNMPv3"))
+		return ITEM_TYPE_SNMPv3;
+
+	if (0 == strcmp(str, "ITEM_TYPE_ZABBIX_ACTIVE"))
+		return ITEM_TYPE_ZABBIX_ACTIVE;
+
+	if (0 == strcmp(str, "ITEM_TYPE_AGGREGATE"))
+		return ITEM_TYPE_AGGREGATE;
+
+	if (0 == strcmp(str, "ITEM_TYPE_HTTPTEST"))
+		return ITEM_TYPE_HTTPTEST;
+
+	if (0 == strcmp(str, "ITEM_TYPE_EXTERNAL"))
+		return ITEM_TYPE_EXTERNAL;
+
+	if (0 == strcmp(str, "ITEM_TYPE_DB_MONITOR"))
+		return ITEM_TYPE_DB_MONITOR;
+
+	if (0 == strcmp(str, "ITEM_TYPE_IPMI"))
+		return ITEM_TYPE_IPMI;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SSH"))
+		return ITEM_TYPE_SSH;
+
+	if (0 == strcmp(str, "ITEM_TYPE_TELNET"))
+		return ITEM_TYPE_TELNET;
+
+	if (0 == strcmp(str, "ITEM_TYPE_CALCULATED"))
+		return ITEM_TYPE_CALCULATED;
+
+	if (0 == strcmp(str, "ITEM_TYPE_JMX"))
+		return ITEM_TYPE_JMX;
+
+	if (0 == strcmp(str, "ITEM_TYPE_SNMPTRAP"))
+		return ITEM_TYPE_SNMPTRAP;
+
+	if (0 == strcmp(str, "ITEM_TYPE_DEPENDENT"))
+		return ITEM_TYPE_DEPENDENT;
+
+	if (0 == strcmp(str, "ITEM_TYPE_HTTPAGENT"))
+		return ITEM_TYPE_HTTPAGENT;
+
+	return FAIL;
+}
+
 zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 {
 	zbx_mock_error_t	err;
@@ -213,4 +285,23 @@ int	zbx_mock_str_to_return_code(const char *str)
 
 	fail_msg("Unknown return code  \"%s\"", str);
 	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mock_str_to_value_type                                       *
+ *                                                                            *
+ * Purpose: converts item value type from text format                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mock_str_to_family(const char *str)
+{
+	if (0 == strcmp(str, "AF_INET"))
+		return AF_INET;
+
+	if (0 == strcmp(str, "AF_INET6"))
+		return AF_INET6;
+
+	fail_msg("Unknown family \"%s\"", str);
+	return AF_UNSPEC;
 }

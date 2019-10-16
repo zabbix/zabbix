@@ -156,8 +156,6 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
-
 // append table to form
 $httpForm->addItem([
 	$httpTable,

@@ -21,6 +21,7 @@
 #include "log.h"
 #include "comms.h"
 #include "base64.h"
+#include "zbxalgo.h"
 
 #include "zbxmedia.h"
 
@@ -130,7 +131,7 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
  * Parameters: mailbox       - [IN] a null-terminated UTF-8 string              *
  *             error         - [IN] pointer to string for reporting errors      *
  *             max_error_len - [IN] size of 'error' string                      *
- *             mailaddrs     - [OUT] array of mail adresses                     *
+ *             mailaddrs     - [OUT] array of mail addresses                    *
  *                                                                              *
  * Comments:   The function is very much simplified in comparison with full     *
  *             RFC 5322-compliant parser. It does not recognize:                *
@@ -711,7 +712,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 			goto error;
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1L)))
 			goto error;

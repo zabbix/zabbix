@@ -18,6 +18,10 @@ $lighter-green: #00cc00;
 
 $blue: #111;
 
+$disabled-bg-color: #f0f0f0;
+$disabled-item-color: #fff;
+$disabled-item-bg-color: #9f9f9f;
+
 // MAIN
 $main-nav-bg-color: #fff;
 $main-subnav-bg-color: #000;
@@ -28,7 +32,6 @@ $font-selected-color: #fff;
 $font-alt-color: #333;
 $body-bg-color: #fff;
 $overlay-bg-color: #000;
-
 
 // UI
 $ui-bg-color: #fff;
@@ -48,7 +51,6 @@ $table-border-color: #888;
 
 $ui-tab-bg-selected-color: #888;
 
-
 // FORMS
 $form-font-color: #000;
 $form-bg-color: #fff;
@@ -64,6 +66,12 @@ $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
 $input-placeholder-color: #777;
+
+// ERROR MESSAGES
+$msg-bad-color: $red;
+$msg-good-color: $green;
+$msg-warning-color: #b37e12;
+$msg-warning-border-color: #ffb319;
 
 // BUTTONS
 $btn-font-color: #fff;
@@ -117,6 +125,9 @@ $problem-ack-fg-color: #cc0000;
 $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
 
+// MULTISELECT
+$multiselect-selected-bg-color: #777;
+
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
 	background-color: $ui-bg-selected-color !important;
@@ -126,6 +137,35 @@ $ok-ack-fg-color: #009900;
 // Important! @import string should come after variables
 @import 'screen.scss';
 
+// DASHBOARD
+.dashbrd-grid-new-widget-placeholder {
+	.dashbrd-grid-widget-new-box,
+	.dashbrd-grid-widget-set-position,
+	.dashbrd-grid-widget-set-size {
+		box-shadow: none;
+		border-color: $font-color;
+		background-color: transparent;
+	}
+
+	.dashbrd-grid-widget-set-size {
+		border: 2px dashed $font-color;
+		box-shadow: none;
+	}
+
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -213px -888px;
+		}
+	}
+}
+
+.dashbrd-grid-widget-set-size {
+	.dashbrd-grid-new-widget-label {
+		&::before {
+			background: url(../img/icon-sprite.svg) no-repeat -401px -888px;
+		}
+	}
+}
 
 // ICONS
 $var-icons: (
@@ -241,13 +281,13 @@ $icon-widget-btn: (
 	}
 }
 
-.action-menu {
+.menu-popup {
 
-	.action-menu-item-disabled {
+	.menu-popup-item-disabled {
 		color: $form-disabled-font-color;
 	}
 
-	.action-menu-item {
+	.menu-popup-item {
 		&:hover,
 		&:focus,
 		&:active,
@@ -315,7 +355,7 @@ button {
 	}
 }
 
-.radio-segmented {
+.radio-list-control {
 
 	.average-bg,
 	.disaster-bg,
@@ -456,9 +496,19 @@ ul.top-nav-icons {
 }
 
 .filter-breadcrumb {
-	a {
-		&:focus {
-			margin-bottom: -1px;
+
+	li,
+	> li:first-child {
+
+		> span a:focus {
+			margin-bottom: -2px;
+		}
+	}
+
+	> li {
+
+		> span a:focus {
+			line-height: 12px;
 		}
 	}
 }
@@ -514,23 +564,15 @@ ul.top-nav-icons {
 }
 
 .multiselect {
+
 	.multiselect-list {
-		padding-left: 2px;
-		padding-bottom: 2px;
 
-		li {
+		li.selected {
 
-			&.selected {
-
-				.subfilter-enabled {
-					background-color: #777 !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
-
-				.subfilter-disable-btn {
-					background-color: #777 !important;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
+			.subfilter-enabled,
+			.subfilter-disable-btn,
+			.subfilter-disable-btn:active {
+				@include box-shadow(0 0 0 1px rgba($blue, 1));
 			}
 		}
 	}
@@ -1011,35 +1053,12 @@ td.inactive-bg {
 }
 
 // ERROR MESSAGES
-.msg-bad {
-	.link-action {
-		color: $red;
+.msg-bad,
+.msg-good,
+.msg-warning {
 
-		.arrow-up {
-			border-bottom-color: $red;
-		}
-		.arrow-down {
-			border-top-color: $red;
-		}
-		&:hover {
+	.link-action:hover {
 		color: $link-hover-color;
-		}
-	}
-}
-
-.msg-good {
-	.link-action {
-		color: $green;
-
-		.arrow-up {
-			border-bottom-color: $green;
-		}
-		.arrow-down {
-			border-top-color: $green;
-		}
-		&:hover {
-		color: $link-hover-color;
-		}
 	}
 }
 
@@ -1174,7 +1193,7 @@ td.inactive-bg {
 	background-position: -323px -285px;
 }
 .icon-invisible::before {
-	background-position: -249px -803px,
+	background-position: -249px -803px;
 }
 .icon-problem-generated::before {
 	background-position: -449px -285px;

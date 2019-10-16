@@ -48,7 +48,7 @@
 			.change(function() {
 				if (this.checked) {
 					jQuery('#confirmation')
-						.removeAttr('disabled')
+						.prop('disabled', false)
 						.keyup();
 				}
 				else {

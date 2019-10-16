@@ -98,18 +98,6 @@ static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
-	zbx_uint64_t	history_counter;	/* the total number of processed values */
-	zbx_uint64_t	history_float_counter;	/* the number of processed float values */
-	zbx_uint64_t	history_uint_counter;	/* the number of processed uint values */
-	zbx_uint64_t	history_str_counter;	/* the number of processed str values */
-	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
-	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
-	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
-}
-ZBX_DC_STATS;
-
-typedef struct
-{
 	zbx_hashset_t		trends;
 	ZBX_DC_STATS		stats;
 
@@ -119,6 +107,8 @@ typedef struct
 	int			history_num;
 	int			trends_num;
 	int			trends_last_cleanup_hour;
+	int			history_num_total;
+	int			history_progress_ts;
 }
 ZBX_DC_CACHE;
 
@@ -175,6 +165,34 @@ static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_queue_get_size(void);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_stats_all                                                  *
+ *                                                                            *
+ * Purpose: retrieves all internal metrics of the database cache              *
+ *                                                                            *
+ * Parameters: stats - [OUT] write cache metrics                              *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_stats_all(zbx_wcache_info_t *wcache_info)
+{
+	LOCK_CACHE;
+
+	wcache_info->stats = cache->stats;
+	wcache_info->history_free = hc_mem->free_size;
+	wcache_info->history_total = hc_mem->total_size;
+	wcache_info->index_free = hc_index_mem->free_size;
+	wcache_info->index_total = hc_index_mem->total_size;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		wcache_info->trend_free = trend_mem->free_size;
+		wcache_info->trend_total = trend_mem->orig_size;
+	}
+
+	UNLOCK_CACHE;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -616,7 +634,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  ******************************************************************************/
 static void	DBflush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
 {
-	const char	*__function_name = "DCflush_trends";
+	const char	*__function_name = "DBflush_trends";
 	int		num, i, clock, inserts_num = 0, itemids_alloc, itemids_num = 0, trends_to = *trends_num;
 	unsigned char	value_type;
 	zbx_uint64_t	*itemids = NULL;
@@ -775,8 +793,11 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 
 	trend = DCget_trend(history->itemid);
 
-	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type))
+	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type) &&
+			SUCCEED == zbx_history_requires_trends(trend->value_type))
+	{
 		DCflush_trend(trend, trends, trends_alloc, trends_num);
+	}
 
 	trend->value_type = history->value_type;
 	trend->clock = hour;
@@ -3151,25 +3172,80 @@ static void	sync_history_cache_full(void)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
-
-	while (0 != hc_queue_get_size())
+	if (0 != hc_queue_get_size())
 	{
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-			sync_server_history(&values_num, &triggers_num, &more);
-		else
-			sync_proxy_history(&values_num, &more);
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
-		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-				(double)values_num / (cache->history_num + values_num) * 100);
+		do
+		{
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				sync_server_history(&values_num, &triggers_num, &more);
+			else
+				sync_proxy_history(&values_num, &more);
+
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
+					(double)values_num / (cache->history_num + values_num) * 100);
+		}
+		while (0 != hc_queue_get_size());
+
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}
 
 	zbx_binary_heap_destroy(&cache->history_queue);
 	cache->history_queue = tmp_history_queue;
 
-	zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_sync_history_cache_progress                              *
+ *                                                                            *
+ * Purpose: log progress of syncing history data                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_log_sync_history_cache_progress(void)
+{
+	double		pcnt = -1.0;
+	int		ts_last, ts_next, sec;
+
+	LOCK_CACHE;
+
+	if (INT_MAX == cache->history_progress_ts)
+	{
+		UNLOCK_CACHE;
+		return;
+	}
+
+	ts_last = cache->history_progress_ts;
+	sec = time(NULL);
+
+	if (0 == cache->history_progress_ts)
+	{
+		cache->history_num_total = cache->history_num;
+		cache->history_progress_ts = sec;
+	}
+
+	if (ZBX_HC_SYNC_TIME_MAX <= sec - cache->history_progress_ts || 0 == cache->history_num)
+	{
+		if (0 != cache->history_num_total)
+			pcnt = 100 * (double)(cache->history_num_total - cache->history_num) / cache->history_num_total;
+
+		cache->history_progress_ts = (0 == cache->history_num ? INT_MAX : sec);
+	}
+
+	ts_next = cache->history_progress_ts;
+
+	UNLOCK_CACHE;
+
+	if (0 == ts_last)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data in progress... ");
+
+	if (-1.0 != pcnt)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%", pcnt);
+
+	if (INT_MAX == ts_next)
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 }
 
 /******************************************************************************
@@ -3186,7 +3262,7 @@ static void	sync_history_cache_full(void)
  ******************************************************************************/
 void	zbx_sync_history_cache(int *values_num, int *triggers_num, int *more)
 {
-	const char		*__function_name = "zbx_sync_history_cache";
+	const char	*__function_name = "zbx_sync_history_cache";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -4212,6 +4288,9 @@ int	init_database_cache(char **error)
 			goto out;
 	}
 
+	cache->history_num_total = 0;
+	cache->history_progress_ts = 0;
+
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
@@ -4378,12 +4457,13 @@ void	DCupdate_hosts_availability(void)
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		if (SUCCEED == zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
+		if (SUCCEED != zbx_sql_add_host_availability(&sql_buf, &sql_buf_alloc, &sql_buf_offset,
 				(zbx_host_availability_t *)hosts.values[i]))
 		{
-			zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
+			continue;
 		}
 
+		zbx_strcpy_alloc(&sql_buf, &sql_buf_alloc, &sql_buf_offset, ";\n");
 		DBexecute_overflowed_sql(&sql_buf, &sql_buf_alloc, &sql_buf_offset);
 	}
 

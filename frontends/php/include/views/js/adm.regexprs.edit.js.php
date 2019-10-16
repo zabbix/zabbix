@@ -73,8 +73,7 @@
 			 * @param {String} string Test string to test expression against
 			 */
 			testExpressions: function(string) {
-				var url = new Curl(),
-					ajaxData = {
+				var ajaxData = {
 						testString: string,
 						expressions: {}
 					};
@@ -92,8 +91,12 @@
 					}
 				});
 
+				var url = new Curl('adm.regexps.php');
+				url.setArgument('output', 'ajax');
+				url.setArgument('ajaxaction', 'test');
+
 				$.post(
-					'adm.regexps.php?output=ajax&ajaxaction=test&sid=' + url.getArgument('sid'),
+					url.getUrl(),
 					{ajaxdata: ajaxData},
 					$.proxy(this.showTestResults, this),
 					'json'

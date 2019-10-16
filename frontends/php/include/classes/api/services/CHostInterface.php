@@ -720,32 +720,20 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfaces($interfaces);
 	}
 
+	/**
+	 * Prepares data to validate main interface for every interface type. Executes main interface validation.
+	 *
+	 * @param array $interfaces                     Array of interfaces to validate.
+	 * @param int   $interfaces[]['hostid']         Updated interface's hostid.
+	 * @param int   $interfaces[]['interfaceid']    Updated interface's interfaceid.
+	 *
+	 * @throws APIException
+	 */
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$interfaceidsWithoutHostIds = [];
-
-		// gather all hostids where interfaces should be checked
-		foreach ($interfaces as $interface) {
-			if (isset($interface ['type']) || isset($interface['main'])) {
-				if (isset($interface['hostid'])) {
-					$hostids[$interface['hostid']] = $interface['hostid'];
-				}
-				else {
-					$interfaceidsWithoutHostIds[] = $interface['interfaceid'];
-				}
-			}
-		}
-
-		// gather missing host ids
-		$hostIds = [];
-		if ($interfaceidsWithoutHostIds) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));
-			while ($hostData = DBfetch($dbResult)) {
-				$hostIds[$hostData['hostid']] = $hostData['hostid'];
-			}
-		}
+		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
 
 		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -756,7 +744,7 @@ class CHostInterface extends CApiService {
 			if (isset($dbInterfaces[$interface['interfaceid']])) {
 				$dbInterfaces[$interface['interfaceid']] = array_merge(
 					$dbInterfaces[$interface['interfaceid']],
-					$interfaces[$interface['interfaceid']]
+					$interface
 				);
 			}
 		}
@@ -902,8 +890,10 @@ class CHostInterface extends CApiService {
 					'groupCount' => true
 				]);
 				$items = zbx_toHash($items, 'interfaceid');
-				foreach ($result as $interfaceId => $interface) {
-					$result[$interfaceId]['items'] = isset($items[$interfaceId]) ? $items[$interfaceId]['rowscount'] : 0;
+				foreach ($result as $interfaceid => $interface) {
+					$result[$interfaceid]['items'] = array_key_exists($interfaceid, $items)
+						? $items[$interfaceid]['rowscount']
+						: '0';
 				}
 			}
 		}

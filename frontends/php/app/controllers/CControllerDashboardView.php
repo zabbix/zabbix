@@ -438,9 +438,9 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 					: CWidgetConfig::getDefaultRfRate($widget['type']);
 
 				$widget_form = CWidgetConfig::getForm($widget['type'], CJs::encodeJson($fields));
-				if ($widget_form->validate()) {
-					$fields = $widget_form->getFieldsData();
-				}
+				// Transforms corrupted data to default values.
+				$widget_form->validate();
+				$fields = $widget_form->getFieldsData();
 
 				$grid_widgets[] = [
 					'widgetid' => $widgetid,
@@ -453,6 +453,7 @@ class CControllerDashboardView extends CControllerDashboardAbstract {
 						'height' => (int) $widget['height']
 					],
 					'rf_rate' => (int) CProfile::get('web.dashbrd.widget.rf_rate', $rf_rate, $widgetid),
+					'scrollable' => CWidgetConfig::isScrollable($widget['type']),
 					'fields' => $fields
 				];
 			}

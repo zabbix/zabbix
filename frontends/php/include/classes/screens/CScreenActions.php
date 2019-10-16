@@ -42,12 +42,12 @@ class CScreenActions extends CScreenBase {
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				$sortfield = 'description';
+				$sortfield = 'mediatypeid';
 				$sortorder = ZBX_SORT_UP;
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				$sortfield = 'description';
+				$sortfield = 'mediatypeid';
 				$sortorder = ZBX_SORT_DOWN;
 				break;
 
@@ -72,50 +72,35 @@ class CScreenActions extends CScreenBase {
 				break;
 		}
 
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-					'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
-				' FROM events e,alerts a'.
-					' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-				' WHERE e.eventid=a.eventid'.
-					' AND alerttype='.ALERT_TYPE_MESSAGE;
-
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$userid = CWebUser::$data['userid'];
-			$userGroups = getUserGroupsByUserId($userid);
-			$sql .= ' AND EXISTS ('.
-					'SELECT NULL'.
-					' FROM functions f,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-					')';
-		}
-
-		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
-		$alerts = DBfetchArray(DBselect($sql, $this->screenitem['elements']));
-
-		order_result($alerts, $sortfield, $sortorder);
+		$alerts = API::Alert()->get([
+			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
+				'mediatypeid', 'alerttype'
+			],
+			'selectMediatypes' => ['description', 'maxattempts'],
+			'filter' => [
+				'alerttype' => ALERT_TYPE_MESSAGE
+			],
+			'time_from' => $this->timeline['from_ts'],
+			'time_till' => $this->timeline['to_ts'],
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => $this->screenitem['elements']
+		]);
 
 		$userids = [];
-
 		foreach ($alerts as $alert) {
 			if ($alert['userid'] != 0) {
 				$userids[$alert['userid']] = true;
 			}
 		}
 
-		if ($userids) {
-			$dbUsers = API::User()->get([
+		$db_users = $userids
+			? API::User()->get([
 				'output' => ['userid', 'alias', 'name', 'surname'],
 				'userids' => array_keys($userids),
 				'preservekeys' => true
-			]);
-		}
+			])
+			: [];
 
 		// indicator of sort field
 		$sort_div = (new CSpan())->addClass(($sortorder === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
@@ -125,7 +110,7 @@ class CScreenActions extends CScreenBase {
 			->setHeader([
 				($sortfield === 'clock') ? [('Time'), $sort_div] : _('Time'),
 				_('Action'),
-				($sortfield === 'description') ? [_('Type'), $sort_div] : _('Type'),
+				($sortfield === 'mediatypeid') ? [_('Type'), $sort_div] : _('Type'),
 				($sortfield === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
 				_('Message'),
 				($sortfield === 'status') ? [_('Status'), $sort_div] : _('Status'),
@@ -139,37 +124,39 @@ class CScreenActions extends CScreenBase {
 		]);
 
 		foreach ($alerts as $alert) {
-			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
+			if ($alert['alerttype'] == ALERT_TYPE_MESSAGE && array_key_exists(0, $alert['mediatypes'])
+					&& ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW)) {
+				$info_icons = makeWarningIcon(_n('%1$s retry left', '%1$s retries left',
+					$alert['mediatypes'][0]['maxattempts'] - $alert['retries'])
+				);
 			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-				$status = (new CSpan([
-					_('In progress').':',
-					BR(),
-					_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])])
-				)
-					->addClass(ZBX_STYLE_YELLOW);
+			elseif ($alert['error'] !== '') {
+				$info_icons = makeErrorIcon($alert['error']);
 			}
 			else {
-				$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
+				$info_icons = null;
 			}
 
-			$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $dbUsers))
-				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
-				: zbx_nl2br($alert['sendto']);
+			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
 
-			$info_icons = [];
-			if ($alert['error'] !== '') {
-				$info_icons[] = makeErrorIcon($alert['error']);
+			$action_type = '';
+			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
+				$action_type = $alert['mediatypes'][0]['description'];
+				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
+			}
+
+			$action_name = '';
+			if (array_key_exists($alert['actionid'], $actions)) {
+				$action_name = $actions[$alert['actionid']]['name'];
 			}
 
 			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-				array_key_exists($alert['actionid'], $actions) ? $actions[$alert['actionid']]['name'] : '',
-				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
-				$recipient,
+				$action_name,
+				$action_type,
+				makeEventDetailsTableUser($alert, $db_users),
 				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-				$status,
+				makeActionTableStatus($alert),
 				makeInformationList($info_icons)
 			]);
 		}

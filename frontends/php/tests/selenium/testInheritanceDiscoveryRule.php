@@ -77,17 +77,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 						'Discovery rule "discovery-rule-inheritance5" already exists on "Template inheritance test host", inherited from another template'
 					]
 				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'testInheritanceDiscoveryRuleWithLLDMacros',
-					'key' => 'discovery-rule-inheritance-with-macros',
-					'macros' => [
-						['macro' => '{#MACRO1}', 'path'=>'$.path.1'],
-						['macro' => '{#MACRO2}', 'path'=>'$.path.1']
-					]
-				]
 			]
 		];
 	}
@@ -100,19 +89,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 		$this->zbxTestInputType('name', $data['name']);
 		$this->zbxTestInputType('key', $data['key']);
-
-		if (array_key_exists('macros', $data)) {
-			$this->zbxTestTabSwitch('LLD macros');
-			$last = count($data['macros']) - 1;
-
-			foreach ($data['macros'] as $i => $lld_macro) {
-				$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
-				$this->zbxTestInputType('lld_macro_paths_'.$i.'_path', $lld_macro['path'] );
-				if ($i !== $last) {
-					$this->zbxTestClick('lld_macro_add');
-				}
-			}
-		}
 
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {
@@ -158,13 +134,6 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@value="'.$data['name'].'"][@readonly]');
 				$this->zbxTestAssertElementPresentXpath('//input[@id="key"][@value="'.$data['key'].'"][@readonly]');
-				if (array_key_exists('macros', $data)) {
-					$this->zbxTestTabSwitch('LLD macros');
-					foreach ($data['macros'] as $i => $lld_macro) {
-						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_lld_macro"][@value="'.$lld_macro['macro'].'"][@readonly]');
-						$this->zbxTestAssertElementPresentXpath('//input[@id="lld_macro_paths_'.$i.'_path"][@value="'.$lld_macro['path'].'"][@readonly]');
-					}
-				}
 				break;
 
 			case TEST_BAD:

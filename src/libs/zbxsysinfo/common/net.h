@@ -80,6 +80,9 @@
 #	ifndef T_TXT
 #		define T_TXT	16
 #	endif
+#	ifndef T_AAAA
+#		define T_AAAA	28
+#	endif
 #	ifndef T_SRV
 #		define T_SRV	33
 #	endif

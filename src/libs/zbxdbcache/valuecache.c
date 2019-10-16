@@ -2394,12 +2394,12 @@ void	zbx_vc_destroy(void)
  * Purpose: resets value cache                                                *
  *                                                                            *
  * Comments: All items and their historical data are removed,                 *
- *           cache working mode, statistics reseted.                          *
+ *           cache working mode, statistics reset.                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_reset(void)
 {
-	const char	*__function_name = "zbx_vc_clean";
+	const char	*__function_name = "zbx_vc_reset";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

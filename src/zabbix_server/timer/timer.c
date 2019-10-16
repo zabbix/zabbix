@@ -91,9 +91,9 @@ static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
 
 	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE) && 0 == maintenance_off)
 	{
-		const char	*desription[] = {"with data collection", "without data collection"};
+		const char	*description[] = {"with data collection", "without data collection"};
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", desription[diff->maintenance_type]);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", description[diff->maintenance_type]);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
@@ -164,7 +164,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			break;
 
-		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 			log_host_maintenance_update(diff);
 	}
 
@@ -192,12 +192,12 @@ static void	db_remove_expired_event_suppress_data(int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_event_suppress_data_free                                     *
+ * Function: event_suppress_data_free                                         *
  *                                                                            *
  * Purpose: free event suppress data structure                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_event_suppress_data_free(zbx_event_suppress_data_t *data)
+static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
 {
 	zbx_vector_uint64_pair_destroy(&data->maintenances);
 	zbx_free(data);
@@ -614,7 +614,7 @@ cleanup:
 		zbx_vector_uint64_destroy(&maintenanceids);
 	}
 
-	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)zbx_event_suppress_data_free);
+	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)event_suppress_data_free);
 	zbx_vector_ptr_destroy(&event_data);
 
 	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
@@ -693,7 +693,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -754,9 +754,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (maintenance_time != update_time)
 		{
-			maintenance_time = (int)sec;
+			update_time -= update_time % 60;
+			maintenance_time = update_time;
 
-			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - sec)))
+			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - maintenance_time)))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",
@@ -769,4 +770,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		idle = 1;
 	}
 
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

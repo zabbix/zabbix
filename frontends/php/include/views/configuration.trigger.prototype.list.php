@@ -147,8 +147,6 @@ foreach ($this->data['triggers'] as $trigger) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
-
 // append table to form
 $triggersForm->addItem([
 	$triggersTable,

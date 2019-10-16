@@ -154,18 +154,34 @@ Curl.prototype = {
 	formatArguments: function() {
 		this.args = {};
 		var args = this.query.split('&');
-		var keyval = '';
 
 		if (args.length < 1) {
 			return;
 		}
 
+		var keyval = '',
+			array_values = {};
+
 		for (var i = 0; i < args.length; i++) {
 			keyval = args[i].split('=');
+
 			if (keyval.length > 1) {
 				try {
 					var tmp = keyval[1].replace(/\+/g, '%20');
-					this.args[decodeURIComponent(keyval[0])] = decodeURIComponent(tmp);
+					keyval[0] = decodeURIComponent(keyval[0]);
+					var matches = keyval[0].match(/(.*)\[\]$/);
+
+					// Find all parameters with non-indexed arrays like "groupids[]" and store them for later use.
+					if (matches) {
+						if (!(matches[1] in array_values)) {
+							array_values[matches[1]] = [];
+						}
+
+						array_values[matches[1]].push(decodeURIComponent(tmp));
+					}
+					else {
+						this.args[keyval[0]] = decodeURIComponent(tmp);
+					}
 				}
 				catch(exc) {
 					this.args[keyval[0]] = keyval[1];
@@ -174,6 +190,11 @@ Curl.prototype = {
 			else {
 				this.args[keyval[0]] = '';
 			}
+		}
+
+		// Set non-indexed array parameters with values.
+		for (var key in array_values) {
+			this.setArgument(key, array_values[key]);
 		}
 	},
 

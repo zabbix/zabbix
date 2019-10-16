@@ -20,6 +20,7 @@
 
 
 class CControllerPopupServices extends CController {
+
 	protected function init() {
 		$this->disableSIDvalidation();
 	}
@@ -29,7 +30,7 @@ class CControllerPopupServices extends CController {
 			'serviceid' =>	'db services.serviceid',
 			'pservices' =>	'in 1',
 			'cservices' =>	'in 1',
-			'parentid' =>	'int32'
+			'parentid' =>	'db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);

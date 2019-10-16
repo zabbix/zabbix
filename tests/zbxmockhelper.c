@@ -21,6 +21,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
+#include "zbxmockhelper.h"
 
 char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
 {

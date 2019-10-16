@@ -47,7 +47,7 @@
 <script type="text/javascript">
 	// Change dashboard settings.
 	function dashbrd_config() {
-		var dashboard = jQuery('.dashbrd-grid-widget-container').data('dashboardGrid'),
+		var dashboard = jQuery('.dashbrd-grid-container').data('dashboardGrid'),
 			options = {
 				dashboardid: <?=$this->data['dashboard']['dashboardid'];?>,
 				userid: dashboard['dashboard']['userid'],
@@ -62,7 +62,7 @@
 	};
 
 	function dashbrdApplyProperties() {
-		var dashboard = jQuery('.dashbrd-grid-widget-container'),
+		var dashboard = jQuery('.dashbrd-grid-container'),
 			form = jQuery('[name=dashboard_properties_form]'),
 			url = new Curl('zabbix.php', false),
 			form_data = {};
@@ -150,7 +150,7 @@
 	// Save changes and cancel editing dashboard.
 	function dashbrd_save_changes() {
 		// Update buttons on existing widgets to view mode.
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('saveDashboardChanges');
+		jQuery('.dashbrd-grid-container').dashboardGrid('saveDashboardChanges');
 	};
 
 	// Cancel editing dashboard.
@@ -159,12 +159,12 @@
 		e.preventDefault();
 
 		// Update buttons on existing widgets to view mode.
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('cancelEditDashboard');
+		jQuery('.dashbrd-grid-container').dashboardGrid('cancelEditDashboard');
 	};
 
 	// Add new widget.
 	function dashbrd_add_widget() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('addNewWidget', this);
+		jQuery('.dashbrd-grid-container').dashboardGrid('addNewWidget', this);
 	};
 
 	var showEditMode = function showEditMode() {
@@ -177,11 +177,11 @@
 		jQuery('#dashbrd-cancel', ul).click(dashbrd_cancel),
 
 		// Update buttons on existing widgets to edit mode.
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('setModeEditDashboard');
+		jQuery('.dashbrd-grid-container').dashboardGrid('setModeEditDashboard');
 
 		// Hide filter with timeline.
 		jQuery('.filter-btn-container, .filter-space').hide();
-		timeControl.removeAllSBox();
+		timeControl.disableAllSBox();
 	};
 
 	// Method to fill data in dashboard sharing form.
@@ -200,6 +200,9 @@
 	};
 
 	jQuery(document).ready(function($) {
+		// Disable page refresh on time range change.
+		timeControl.refreshPage = false;
+
 		// Turn on edit dashboard.
 		$('#dashbrd-edit').click(showEditMode);
 
@@ -223,7 +226,7 @@
 
 	// Function is in global scope, because it should be accessible by html onchange() attribute.
 	function updateWidgetConfigDialogue() {
-		jQuery('.dashbrd-grid-widget-container').dashboardGrid('updateWidgetConfigDialogue');
+		jQuery('.dashbrd-grid-container').dashboardGrid('updateWidgetConfigDialogue');
 	}
 
 	/**

@@ -20,6 +20,10 @@
 
 
 class CMultiSelect extends CTag {
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'multiselect-control';
 
 	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
@@ -201,8 +205,8 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
-					$popup_parameters['only_hostid'] = $parameters['hostid'];
-					$autocomplete_parameters['hostid'] = $parameters['hostid'];
+					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
+					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
 				}
 
 				if (array_key_exists('numeric', $parameters) && $parameters['numeric']) {

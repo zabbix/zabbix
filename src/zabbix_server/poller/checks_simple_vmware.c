@@ -32,6 +32,11 @@
 #define ZBX_VMWARE_DATASTORE_SIZE_PFREE		2
 #define ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED	3
 
+#define ZBX_DATASTORE_TOTAL			""
+#define ZBX_DATASTORE_COUNTER_CAPACITY		0x01
+#define ZBX_DATASTORE_COUNTER_USED		0x02
+#define ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
+
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
@@ -53,37 +58,73 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: hv_get                                                           *
+ *                                                                            *
+ * Purpose: return pointer to Hypervisor data from hashset with uuid          *
+ *                                                                            *
+ * Parameters: hvs  - [IN] the hashset with all Hypervisors                   *
+ *             uuid - [IN] the uuid of Hypervisor                             *
+ *                                                                            *
+ * Return value: zbx_vmware_hv_t* - the operation has completed successfully  *
+ *               NULL             - the operation has failed                  *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 {
-	const char	*__function_name = "hv_get";
-
 	zbx_vmware_hv_t	*hv, hv_local = {.uuid = (char *)uuid};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, uuid);
 
 	hv = (zbx_vmware_hv_t *)zbx_hashset_search(hvs, &hv_local);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)hv);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)hv);
 
 	return hv;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: ds_get                                                           *
+ *                                                                            *
+ * Purpose: return pointer to Datastore data from vector with id              *
+ *                                                                            *
+ * Parameters: dss - [IN] the vector with all Datastores                      *
+ *             id  - [IN] the id of Datastore                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *        zbx_vmware_datastore_t* - the operation has completed successfully  *
+ *        NULL                    - the operation has failed                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, const char *name)
+{
+	int			i;
+	zbx_vmware_datastore_t	ds_cmp;
+
+	ds_cmp.name = (char *)name;
+
+	if (FAIL == (i = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_name_compare)))
+		return NULL;
+
+	return dss->values[i];
+}
+
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
 {
-	const char	*__function_name = "service_hv_get_by_vm_uuid";
-
 	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid};
 	zbx_vmware_vm_index_t	vmi_local = {&vm_local, NULL}, *vmi;
 	zbx_vmware_hv_t		*hv = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, uuid);
 
 	if (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_search(&service->data->vms_index, &vmi_local)))
 		hv = vmi->hv;
 	else
 		hv = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)hv);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)hv);
 
 	return hv;
 
@@ -91,31 +132,27 @@ static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service,
 
 static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char *uuid)
 {
-	const char	*__function_name = "service_vm_get";
-
 	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid}, *vm;
 	zbx_vmware_vm_index_t	vmi_local = {&vm_local, NULL}, *vmi;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, uuid);
 
 	if (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_search(&service->data->vms_index, &vmi_local)))
 		vm = vmi->vm;
 	else
 		vm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)vm);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)vm);
 
 	return vm;
 }
 
 static zbx_vmware_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *clusterid)
 {
-	const char		*__function_name = "cluster_get";
-
 	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, clusterid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, clusterid);
 
 	for (i = 0; i < clusters->values_num; i++)
 	{
@@ -127,19 +164,17 @@ static zbx_vmware_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char 
 
 	cluster = NULL;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)cluster);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)cluster);
 
 	return cluster;
 }
 
 static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, const char *name)
 {
-	const char		*__function_name = "cluster_get_by_name";
-
 	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:'%s'", __function_name, name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:'%s'", __func__, name);
 
 	for (i = 0; i < clusters->values_num; i++)
 	{
@@ -151,7 +186,7 @@ static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, con
 
 	cluster = NULL;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)cluster);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)cluster);
 
 	return cluster;
 }
@@ -187,15 +222,13 @@ out:
 static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid, const char *instance, int coeff, AGENT_RESULT *result)
 {
-	const char			*__function_name = "vmware_service_get_counter_value_by_id";
-
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
 	zbx_str_uint64_pair_t		*perfvalue;
 	int				i, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t			value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __func__,
 			type, id, counterid, instance);
 
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
@@ -257,7 +290,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	SET_UI64_RESULT(result, value);
 	ret = SYSINFO_RET_OK;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -308,12 +341,10 @@ static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *servic
 static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const char *uuid, const char *instance,
 		const char *path, int coeff, AGENT_RESULT *result)
 {
-	const char	*__function_name = "vmware_service_get_vm_counter";
-
 	zbx_vmware_vm_t	*vm;
 	int		ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:%s instance:%s path:%s", __function_name, uuid, instance, path);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:%s instance:%s path:%s", __func__, uuid, instance, path);
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
 	{
@@ -324,7 +355,7 @@ static int	vmware_service_get_vm_counter(zbx_vmware_service_t *service, const ch
 	ret = vmware_service_get_counter_value_by_path(service, "VirtualMachine", vm->id, path, instance, coeff,
 			result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -362,11 +393,9 @@ out:
 static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *username, const char *password,
 		AGENT_RESULT *result, int *ret)
 {
-	const char		*__function_name = "get_vmware_service";
-
 	zbx_vmware_service_t	*service;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __function_name, username, url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, username, url);
 
 	if (NULL == (service = zbx_vmware_get_service(url, username, password)))
 	{
@@ -386,7 +415,7 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 		service = NULL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, (void *)service);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)service);
 
 	return service;
 }
@@ -409,14 +438,12 @@ out:
 static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, const char *password,
 		int propid, AGENT_RESULT *result)
 {
-	const char		*__function_name = "get_vcenter_vmprop";
-
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	char			*url, *uuid, *value;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() propid:%d", __function_name, propid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() propid:%d", __func__, propid);
 
 	if (2 != request->nparam)
 	{
@@ -456,7 +483,7 @@ static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, cons
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -479,14 +506,12 @@ out:
 static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, const char *password, int propid,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "get_vcenter_hvprop";
-
 	zbx_vmware_service_t	*service;
 	const char		*uuid, *url, *value;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() propid:%d", __function_name, propid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() propid:%d", __func__, propid);
 
 	if (2 != request->nparam)
 	{
@@ -525,23 +550,20 @@ static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, cons
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
 
-
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_cluster_discovery";
-
 	struct zbx_json		json_data;
 	char			*url;
 	zbx_vmware_service_t	*service;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -579,7 +601,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -587,14 +609,12 @@ out:
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_cluster_status";
-
 	char			*url, *name;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -638,7 +658,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -646,11 +666,9 @@ out:
 static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
 		zbx_vector_ptr_t *add_results)
 {
-	const char	*__function_name = "vmware_get_events";
+	int	i;
 
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __function_name, eventlog_last_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
 	/* events were retrieved in reverse chronological order */
 	for (i = events->values_num - 1; i >= 0; i--)
@@ -678,21 +696,20 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __function_name, add_results->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results)
 {
-	const char		*__function_name = "check_vcenter_eventlog";
-
-	char			*url;
+	const char		*url, *skip;
+	unsigned char		skip_old;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (1 != request->nparam)
+	if (2 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -700,16 +717,31 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 
 	url = get_rparam(request, 0);
 
+	if (NULL == (skip = get_rparam(request, 1)) || '\0' == *skip || 0 == strcmp(skip, "all"))
+	{
+		skip_old = 0;
+	}
+	else if (0 == strcmp(skip, "skip"))
+	{
+		skip_old = 1;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog_last_key)
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key)
 	{
-		service->eventlog_last_key = request->lastlogsize;
+		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.skip_old = skip_old;
 	}
-	else if (request->lastlogsize < service->eventlog_last_key)
+	else if (request->lastlogsize < service->eventlog.last_key)
 	{
 		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
 		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
@@ -719,14 +751,14 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	else if (0 < service->data->events.values_num)
 	{
 		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
-		service->eventlog_last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 	}
 
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -734,13 +766,11 @@ out:
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_version";
-
 	char			*url;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -764,7 +794,7 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -772,13 +802,11 @@ out:
 int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_fullname";
-
 	char			*url;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -802,7 +830,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -810,15 +838,13 @@ out:
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_cluster_name";
-
 	char			*url, *uuid;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -855,7 +881,7 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -863,18 +889,16 @@ out:
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_cpu_usage";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -882,8 +906,6 @@ int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_discovery";
-
 	struct zbx_json		json_data;
 	char			*url, *name;
 	zbx_vmware_service_t	*service;
@@ -891,7 +913,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_vmware_hv_t		*hv;
 	zbx_hashset_iter_t	iter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -942,7 +964,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -950,15 +972,13 @@ out:
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_fullname";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_FULL_NAME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -966,15 +986,13 @@ int	check_vcenter_hv_fullname(AGENT_REQUEST *request, const char *username, cons
 int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_cpu_num";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -982,18 +1000,16 @@ int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, const char *username, co
 int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_cpu_freq";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_CPU_MHZ, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1001,15 +1017,13 @@ int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_cpu_model";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_CPU_MODEL, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1017,15 +1031,13 @@ int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_cpu_threads";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1033,15 +1045,13 @@ int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, const char *username
 int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_memory";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1049,15 +1059,13 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_model";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_MODEL, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1065,15 +1073,13 @@ int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, cons
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_uuid";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_UUID, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1081,15 +1087,13 @@ int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_hw_vendor";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_VENDOR, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1097,15 +1101,13 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_memory_size_ballooned";
-
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t	*service;
 	const char		*uuid, *url;
 	zbx_vmware_hv_t		*hv;
 	zbx_uint64_t		value = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -1155,7 +1157,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1163,18 +1165,16 @@ out:
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_memory_used";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_MEMORY_USED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1182,11 +1182,9 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_sensor_health_state";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HEALTH_STATE, result);
 
@@ -1206,7 +1204,7 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 		UNSET_STR_RESULT(result);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1214,11 +1212,9 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_status";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_STATUS, result);
 
@@ -1238,22 +1234,21 @@ int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const 
 		UNSET_STR_RESULT(result);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
+
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_uptime";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_UPTIME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1261,15 +1256,13 @@ int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_version";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_VERSION, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1277,14 +1270,12 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_hv_vm_num";
-
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t	*service;
 	const char		*uuid, *url;
 	zbx_vmware_hv_t		*hv;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -1317,7 +1308,7 @@ int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1325,14 +1316,12 @@ out:
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_network_in";
-
 	char			*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 > request->nparam || request->nparam > 3)
 	{
@@ -1366,7 +1355,7 @@ int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, co
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1374,14 +1363,12 @@ out:
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_network_out";
-
 	char			*url, *mode, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 > request->nparam || request->nparam > 3)
 	{
@@ -1415,7 +1402,7 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1423,14 +1410,12 @@ out:
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_datacenter_name";
-
 	char			*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -1458,7 +1443,7 @@ int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *usernam
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1466,15 +1451,13 @@ out:
 int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_datastore_discovery";
-
 	char			*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	struct zbx_json		json_data;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -1499,12 +1482,10 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < hv->datastores.values_num; i++)
+	for (i = 0; i < hv->ds_names.values_num; i++)
 	{
-		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
-
 		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE}", hv->ds_names.values[i], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 
@@ -1518,7 +1499,77 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *perfcounter, AGENT_RESULT *result)
+{
+	char			*url, *mode, *uuid, *name;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_datastore_t	*datastore;
+	int			ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	datastore = ds_get(&service->data->datastores, name);
+
+	if (NULL == datastore)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	if (FAIL == zbx_vector_str_bsearch(&hv->ds_names, datastore->name, ZBX_DEFAULT_STR_COMPARE_FUNC))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
+				datastore->name));
+		goto unlock;
+	}
+
+	if (NULL == datastore->uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, perfcounter, datastore->uuid, 1,
+			result);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1526,132 +1577,15 @@ out:
 int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_datastore_read";
-
-	char			*url, *mode, *uuid, *name;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			i, ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	for (i = 0; i < hv->datastores.values_num; i++)
-	{
-		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
-
-		if (0 == strcmp(name, datastore->name))
-		{
-			if (NULL == datastore->uuid)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-				goto unlock;
-			}
-
-			ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
-					"datastore/totalReadLatency[average]", datastore->uuid, 1, result);
-			goto unlock;
-		}
-	}
-
-	ret = SYSINFO_RET_OK;
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
+			result);
 }
 
 int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_datastore_write";
-
-	char			*url, *mode, *uuid, *name;
-	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			i, ret = SYSINFO_RET_FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
-	mode = get_rparam(request, 3);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto out;
-	}
-
-	zbx_vmware_lock();
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	for (i = 0; i < hv->datastores.values_num; i++)
-	{
-		zbx_vmware_datastore_t	*datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
-
-		if (0 == strcmp(name, datastore->name))
-		{
-			if (NULL == datastore->uuid)
-				break;
-
-			ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id,
-					"datastore/totalWriteLatency[average]", datastore->uuid, 1, result);
-			goto unlock;
-		}
-	}
-
-	ret = SYSINFO_RET_OK;
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
-
-	return ret;
+	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
+			result);
 }
 
 static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
@@ -1706,80 +1640,48 @@ static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_da
 	return SYSINFO_RET_OK;
 }
 
-int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+static int	check_vcenter_ds_param(const char *param, int *mode)
 {
-#define		ZBX_DATASTORE_TOTAL			""
-#define		ZBX_DATASTORE_COUNTER_CAPACITY		0x01
-#define		ZBX_DATASTORE_COUNTER_USED		0x02
-#define		ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
 
-	const char		*__function_name = "check_vcenter_hv_datastore_size";
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "total"))
+	{
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
+	}
+	else if (0 == strcmp(param, "free"))
+	{
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
+	}
+	else if (0 == strcmp(param, "pfree"))
+	{
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
+	}
+	else if (0 == strcmp(param, "uncommitted"))
+	{
+		*mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
+	}
+	else
+		return FAIL;
 
-	char			*url, *param, *uuid, *name;
+	return SUCCEED;
+}
+
+static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const char *name, const int mode,
+		const char *username, const char *password, AGENT_RESULT *result)
+{
 	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	int			i, ret = SYSINFO_RET_FAIL, mode;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_datastore_t	*datastore = NULL;
 	zbx_uint64_t		disk_used, disk_provisioned, disk_capacity;
 	unsigned int		flags;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (3 > request->nparam || request->nparam > 4)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
-	param = get_rparam(request, 3);
-
-	if (NULL == param || '\0' == *param || 0 == strcmp(param, "total"))
-	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_TOTAL;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY;
-	}
-	else if (0 == strcmp(param, "free"))
-	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_FREE;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
-	}
-	else if (0 == strcmp(param, "pfree"))
-	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_PFREE;
-		flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
-	}
-	else if (0 == strcmp(param, "uncommitted"))
-	{
-		mode = ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED;
-		flags = ZBX_DATASTORE_COUNTER_PROVISIONED | ZBX_DATASTORE_COUNTER_USED;
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
-		goto out;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
-	for (i = 0; i < hv->datastores.values_num; i++)
-	{
-		datastore = (zbx_vmware_datastore_t *)hv->datastores.values[i];
-		if (0 == strcmp(name, datastore->name))
-			break;
-	}
+	datastore = ds_get(&service->data->datastores, name);
 
 	if (NULL == datastore)
 	{
@@ -1787,10 +1689,33 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
+	if (NULL != hv_uuid &&
+			FAIL == zbx_vector_str_bsearch(&datastore->hv_uuids, hv_uuid, ZBX_DEFAULT_STR_COMPARE_FUNC))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Hypervisor '%s' not found on this datastore.", hv_uuid));
+		goto unlock;
+	}
+
 	if (ZBX_VMWARE_TYPE_VSPHERE == service->type)
 	{
 		ret = check_vcenter_hv_datastore_size_vsphere(mode, datastore, result);
 		goto unlock;
+	}
+
+	switch (mode)
+	{
+		case ZBX_VMWARE_DATASTORE_SIZE_TOTAL:
+			flags = ZBX_DATASTORE_COUNTER_CAPACITY;
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_FREE:
+			flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
+			flags = ZBX_DATASTORE_COUNTER_CAPACITY | ZBX_DATASTORE_COUNTER_USED;
+			break;
+		case ZBX_VMWARE_DATASTORE_SIZE_UNCOMMITTED:
+			flags = ZBX_DATASTORE_COUNTER_PROVISIONED | ZBX_DATASTORE_COUNTER_USED;
+			break;
 	}
 
 	if (0 != (flags & ZBX_DATASTORE_COUNTER_PROVISIONED))
@@ -1841,29 +1766,52 @@ int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username
 			SET_UI64_RESULT(result, disk_provisioned - disk_used);
 			break;
 		case ZBX_VMWARE_DATASTORE_SIZE_PFREE:
-			SET_DBL_RESULT(result, (double) (disk_capacity - disk_used) / disk_capacity * 100);
+			SET_DBL_RESULT(result, 0 != disk_capacity ?
+					(double) (disk_capacity - disk_used) / disk_capacity * 100 : 0);
 			break;
 	}
 
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
+}
 
-#undef	ZBX_DATASTORE_COUNTER_PROVISIONED
-#undef	ZBX_DATASTORE_COUNTER_USED
-#undef	ZBX_DATASTORE_COUNTER_CAPACITY
-#undef	ZBX_DATASTORE_TOTAL
+int	check_vcenter_hv_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char	*url, *uuid, *name, *param;
+	int	ret = SYSINFO_RET_FAIL, mode;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	name = get_rparam(request, 2);
+	param = get_rparam(request, 3);
+
+	if (SUCCEED == check_vcenter_ds_param(param, &mode))
+		ret = check_vcenter_ds_size(url, uuid, name, mode, username, password, result);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
 }
 
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_hv_perfcounter";
-
 	char			*url, *uuid, *path;
 	const char 		*instance;
 	zbx_vmware_service_t	*service;
@@ -1871,7 +1819,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	zbx_uint64_t		counterid;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -1916,24 +1864,330 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
 
+int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *hv_uuid, *ds_list = NULL;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	int			i, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam )
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	hv_uuid = get_rparam(request, 1);
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	for (i = 0; i < hv->ds_names.values_num; i++)
+	{
+		ds_list = zbx_strdcatf(ds_list, "%s\n", hv->ds_names.values[i]);
+	}
+
+	if (NULL != ds_list)
+		ds_list[strlen(ds_list)-1] = '\0';
+	else
+		ds_list = zbx_strdup(NULL, "");
+
+	SET_TEXT_RESULT(result, ds_list);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url, *ds_name, *hv_list = NULL, *hv_name;
+	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_vmware_datastore_t	*datastore = NULL;
+	zbx_vmware_hv_t		*hv;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam )
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	ds_name = get_rparam(request, 1);
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	for (i = 0; i < service->data->datastores.values_num; i++)
+	{
+		if (0 != strcmp(ds_name, service->data->datastores.values[i]->name))
+			continue;
+
+		datastore = service->data->datastores.values[i];
+		break;
+	}
+
+	if (NULL == datastore)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	for (i=0; i < datastore->hv_uuids.values_num; i++)
+	{
+		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+			zbx_free(hv_list);
+			goto unlock;
+		}
+
+		if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
+			hv_name = datastore->hv_uuids.values[i];
+
+		hv_list = zbx_strdcatf(hv_list, "%s\n", hv_name);
+	}
+
+	if (NULL != hv_list)
+		hv_list[strlen(hv_list)-1] = '\0';
+	else
+		hv_list = zbx_strdup(NULL, "");
+
+	SET_TEXT_RESULT(result, hv_list);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char	*url, *name, *param;
+	int	ret = SYSINFO_RET_FAIL, mode;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 > request->nparam || request->nparam > 3)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	name = get_rparam(request, 1);
+	param = get_rparam(request, 2);
+
+	if (SUCCEED == check_vcenter_ds_param(param, &mode))
+		ret = check_vcenter_ds_size(url, NULL, name, mode, username, password, result);
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	char			*url;
+	zbx_vmware_service_t	*service;
+	struct zbx_json		json_data;
+	int			i, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (1 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < service->data->datastores.values_num; i++)
+	{
+		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
+		const char *perfcounter, AGENT_RESULT *result)
+{
+	char			*url, *mode, *name;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_datastore_t	*datastore;
+	int			i, ret = SYSINFO_RET_FAIL, count = 0;
+	zbx_uint64_t		latency = 0, counterid;
+	unsigned char		is_maxlatency = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
+
+	if (2 > request->nparam || request->nparam > 3)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	name = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency") && 0 != strcmp(mode, "maxlatency"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	if (NULL != mode && 0 == strcmp(mode, "maxlatency"))
+		is_maxlatency = 1;
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	datastore = ds_get(&service->data->datastores, name);
+
+	if (NULL == datastore)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	if (NULL == datastore->uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		goto unlock;
+	}
+
+	for (i = 0; i < datastore->hv_uuids.values_num; i++)
+	{
+		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids.values[i])))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+			goto unlock;
+		}
+
+		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, result)))
+		{
+			goto unlock;
+		}
+
+		if (0 == ISSET_VALUE(result))
+			continue;
+
+		if (0 == is_maxlatency)
+		{
+			latency += *GET_UI64_RESULT(result);
+			count++;
+		}
+		else if (latency < *GET_UI64_RESULT(result))
+			latency = *GET_UI64_RESULT(result);
+
+		UNSET_UI64_RESULT(result);
+	}
+
+	if (0 == is_maxlatency && 0 != count)
+		latency = latency / count;
+
+	SET_UI64_RESULT(result, latency);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
+			result);
+}
+
+int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
+			result);
+}
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_cpu_num";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_CPU_NUM, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1941,15 +2195,13 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_cluster_name";
-
 	char			*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_hv_t		*hv;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -1985,7 +2237,7 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -1993,13 +2245,11 @@ out:
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_cpu_ready";
-
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 	const char		*url, *uuid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2025,7 +2275,7 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2033,18 +2283,16 @@ out:
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_cpu_usage";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_CPU_USAGE, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2052,14 +2300,12 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_hv_name";
-
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	char			*url, *uuid;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2092,7 +2338,7 @@ int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *usernam
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2100,8 +2346,6 @@ out:
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_discovery";
-
 	struct zbx_json		json_data;
 	char			*url, *vm_name, *hv_name;
 	zbx_vmware_service_t	*service;
@@ -2110,7 +2354,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_hashset_iter_t	iter;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (1 != request->nparam)
 	{
@@ -2168,7 +2412,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2176,14 +2420,12 @@ out:
 int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_hv_name";
-
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	char			*url, *uuid, *name;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2223,7 +2465,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2231,18 +2473,16 @@ out:
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2250,18 +2490,16 @@ int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_ballooned";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2269,18 +2507,16 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_compressed";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2288,18 +2524,16 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_swapped";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2307,18 +2541,16 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_usage_guest";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2326,18 +2558,16 @@ int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, const char 
 int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_usage_host";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2345,18 +2575,16 @@ int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, const char *
 int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_private";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2364,18 +2592,16 @@ int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_memory_size_shared";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2383,18 +2609,16 @@ int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, const char *user
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_powerstate";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_POWER_STATE, result);
 
 	if (SYSINFO_RET_OK == ret)
 		ret = vmware_set_powerstate_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2402,8 +2626,6 @@ int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, co
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_net_if_discovery";
-
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
@@ -2411,7 +2633,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 	char			*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2467,7 +2689,7 @@ int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *userna
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2475,14 +2697,12 @@ out:
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_net_if_in";
-
 	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
 	const char		*path;
 	int 			coeff, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -2532,7 +2752,7 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2540,14 +2760,12 @@ out:
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_net_if_out";
-
 	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
 	const char		*path;
 	int 			coeff, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -2597,7 +2815,7 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2605,15 +2823,13 @@ out:
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_storage_committed";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_COMMITED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2621,15 +2837,13 @@ int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *usern
 int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_storage_unshared";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_UNSHARED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2637,15 +2851,13 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_storage_committed";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2653,15 +2865,13 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_uptime";
+	int	ret;
 
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_UPTIME, result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2669,8 +2879,6 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_vfs_dev_discovery";
-
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
@@ -2678,7 +2886,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 	char			*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2733,7 +2941,7 @@ int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *usern
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2741,14 +2949,12 @@ out:
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_vfs_dev_read";
-
 	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
 	const char		*path;
 	int			coeff, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -2798,7 +3004,7 @@ int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, 
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2806,14 +3012,12 @@ out:
 int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_vfs_dev_write";
-
 	char			*url, *uuid, *instance, *mode;
 	zbx_vmware_service_t	*service;
 	const char		*path;
 	int			coeff, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -2863,7 +3067,7 @@ int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, const char *username,
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2871,15 +3075,13 @@ out:
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_vfs_fs_discovery";
-
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	char			*url, *uuid;
 	int			i, ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (2 != request->nparam)
 	{
@@ -2929,7 +3131,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -2937,15 +3139,13 @@ out:
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_vfs_fs_size";
-
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	char			*url, *uuid, *fsname, *mode;
 	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_fs_t		*fs = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -3009,7 +3209,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }
@@ -3017,8 +3217,6 @@ out:
 int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vcenter_vm_perfcounter";
-
 	char			*url, *uuid, *path;
 	const char 		*instance;
 	zbx_vmware_service_t	*service;
@@ -3026,7 +3224,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	zbx_uint64_t		counterid;
 	int			ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -3071,7 +3269,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
 	return ret;
 }

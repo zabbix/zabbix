@@ -169,12 +169,14 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['show_latest_values']    (optional)
 	 * @param array  $config
 	 * @param int    $config['search_limit']
+	 * @param bool   $resolve_comments
+	 * @param bool   $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $config) {
+	public static function getData(array $filter, array $config, $resolve_comments = false, $resolve_urls = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids'] ? $filter['groupids'] : null;
 		$filter_hostids = array_key_exists('hostids', $filter) && $filter['hostids'] ? $filter['hostids'] : null;
 		$filter_applicationids = null;
@@ -325,18 +327,37 @@ class CScreenProblem extends CScreenBase {
 					$seen_triggerids += $triggerids;
 
 					$options = [
-						'output' => ['priority', 'url', 'flags', 'expression', 'comments'],
-						'selectHosts' => ['hostid', 'name', 'status'],
-						'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+						'output' => ['priority'],
+						'selectHosts' => ['hostid'],
 						'triggerids' => array_keys($triggerids),
 						'monitored' => true,
 						'skipDependent' => ($filter['show'] == TRIGGERS_OPTION_ALL) ? null : true,
 						'preservekeys' => true
 					];
 
-					if ((array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1)
-							|| (array_key_exists('details', $filter) && $filter['details'] == 1)) {
+					$show_latest_values =
+						(array_key_exists('show_latest_values', $filter) && $filter['show_latest_values'] == 1);
+					$details = (array_key_exists('details', $filter) && $filter['details'] == 1);
+
+					if ($show_latest_values) {
+						$options['selectItems'] =
+							['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'];
+					}
+
+					if ($resolve_comments || $resolve_urls || $show_latest_values || $details) {
+						$options['output'][] = 'expression';
+					}
+
+					if ($show_latest_values || $details) {
 						$options['output'] = array_merge($options['output'], ['recovery_mode', 'recovery_expression']);
+					}
+
+					if ($resolve_comments) {
+						$options['output'][] = 'comments';
+					}
+
+					if ($resolve_urls) {
+						$options['output'][] = 'url';
 					}
 
 					$data['triggers'] += API::Trigger()->get($options);
@@ -550,12 +571,13 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_latest_values']
 	 * @param bool  $resolve_comments
+	 * @param bool  $resolve_urls
 	 *
 	 * @static
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, $resolve_comments = false) {
+	public static function makeData(array $data, array $filter, $resolve_comments = false, $resolve_urls = false) {
 		// unset unused triggers
 		$triggerids = [];
 
@@ -590,28 +612,39 @@ class CScreenProblem extends CScreenBase {
 
 			// Sort items.
 			if ($filter['show_latest_values'] == 1) {
+				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
+
 				foreach ($data['triggers'] as &$trigger) {
-					if (count($trigger['items']) > 1) {
-						$order = [];
-						$pos = 0;
-						foreach ($trigger['expression_html'] as $expression_parts) {
-							if (is_array($expression_parts) && $expression_parts[1] instanceof CLink) {
-								$order[$expression_parts[1]->getAttribute('data-itemid')] = $pos++;
-							}
-						}
-						usort($trigger['items'], function ($a, $b) use ($order) {
-							return ($order[$a['itemid']] > $order[$b['itemid']]) ? 1 : -1;
-						});
-					}
 					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
 				}
 				unset($trigger);
 			}
 		}
 
-		$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 		if ($resolve_comments) {
-			$data['triggers'] = CMacrosResolverHelper::resolveTriggerDescriptions($data['triggers']);
+			foreach ($data['problems'] as &$problem) {
+				$trigger = $data['triggers'][$problem['objectid']];
+				$problem['comments'] = CMacrosResolverHelper::resolveTriggerDescription(
+					[
+						'triggerid' => $problem['objectid'],
+						'expression' => $trigger['expression'],
+						'comments' => $trigger['comments'],
+						'clock' => $problem['clock'],
+						'ns' => $problem['ns']
+					],
+					['events' => true]
+				);
+			}
+			unset($problem);
+
+			foreach ($data['triggers'] as &$trigger) {
+				unset($trigger['comments']);
+			}
+			unset($trigger);
+		}
+
+		if ($resolve_urls) {
+			$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 		}
 
 		// get additional data
@@ -766,18 +799,6 @@ class CScreenProblem extends CScreenBase {
 					: [];
 			}
 			unset($trigger);
-
-			$rw_triggers = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => $triggerids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($data['triggers'] as $triggerid => &$trigger) {
-				$trigger['editable'] = array_key_exists($triggerid, $rw_triggers);
-			}
-			unset($trigger);
 		}
 
 		if ($data['problems']) {
@@ -787,7 +808,7 @@ class CScreenProblem extends CScreenBase {
 		if ($this->data['action'] === 'problem.view') {
 			$url_form = clone $url;
 
-			$form = (new CForm('get', 'zabbix.php'))
+			$form = (new CForm('post', 'zabbix.php'))
 				->setName('problem')
 				->cleanItems()
 				->addVar('backurl',
@@ -994,7 +1015,7 @@ class CScreenProblem extends CScreenBase {
 						$info_icons[] = makeInformationIcon(
 							array_key_exists($problem['userid'], $data['users'])
 								? _s('Resolved by user "%1$s".', getUserFullname($data['users'][$problem['userid']]))
-								: _('Resolved by user.')
+								: _('Resolved by inaccessible user.')
 						);
 					}
 				}
@@ -1013,16 +1034,11 @@ class CScreenProblem extends CScreenBase {
 							))->addClass(ZBX_STYLE_REL_CONTAINER)
 					: makeInformationList($info_icons);
 
-				$options = [
-					'description_enabled' => ($trigger['comments'] !== ''
-						|| ($trigger['editable'] && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL))
-				];
-
 				$description = array_key_exists($trigger['triggerid'], $dependencies)
 					? makeTriggerDependencies($dependencies[$trigger['triggerid']])
 					: [];
 				$description[] = (new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger, null, $options));
+					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid']));
 
 				if ($this->data['filter']['details'] == 1) {
 					$description[] = BR();

@@ -166,7 +166,7 @@ $itemFormList->addRow(
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}'))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
+				(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->setAttribute('data-row-action', 'remove_row')
@@ -514,16 +514,38 @@ $itemFormList->addRow(
 
 $itemFormList
 	->addRow(
-		(new CVisibilityBox('visible[history]', 'history', _('Original')))
+		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
 			->setLabel(_('History storage period'))
 			->setChecked(isset($data['visible']['history'])),
-		(new CTextBox('history', $data['history']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CDiv([
+			(new CRadioButtonList('history_mode', (int) $data['history_mode']))
+				->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('history', $data['history']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->addClass('wrap-multiple-controls')
+			->setId('history_div')
 	)
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
+		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))
 			->setLabel(_('Trend storage period'))
 			->setChecked(isset($data['visible']['trends'])),
-		(new CTextBox('trends', $data['trends']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CDiv([
+			(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
+				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
+				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+				->setModern(true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('trends', $data['trends']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->addClass('wrap-multiple-controls')
+			->setId('trends_div')
 	);
 
 // append status to form list

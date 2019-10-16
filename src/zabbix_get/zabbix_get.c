@@ -293,6 +293,9 @@ int	main(int argc, char **argv)
 	int		i, ret = SUCCEED;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
+#if defined(_WINDOWS)
+	char		*error = NULL;
+#endif
 
 #if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -383,6 +386,15 @@ int	main(int argc, char **argv)
 		}
 	}
 
+#if defined(_WINDOWS)
+	if (SUCCEED != zbx_socket_start(&error))
+	{
+		zbx_error(error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	if (NULL == host || NULL == key)
 	{
 		usage();
@@ -443,9 +455,10 @@ int	main(int argc, char **argv)
 #endif
 	}
 #if !defined(_WINDOWS)
-	signal(SIGINT,  get_signal_handler);
-	signal(SIGTERM, get_signal_handler);
+	signal(SIGINT, get_signal_handler);
 	signal(SIGQUIT, get_signal_handler);
+	signal(SIGTERM, get_signal_handler);
+	signal(SIGHUP, get_signal_handler);
 	signal(SIGALRM, get_signal_handler);
 	signal(SIGPIPE, get_signal_handler);
 #endif
@@ -463,5 +476,10 @@ out:
 #endif
 	}
 #endif
+#if defined(_WINDOWS)
+	while (0 == WSACleanup())
+		;
+#endif
+
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

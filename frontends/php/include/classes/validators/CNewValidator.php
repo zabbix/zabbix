@@ -303,7 +303,7 @@ class CNewValidator {
 		}
 
 		// between 0 and _I64_MAX
-		return (bccomp($value, '0') >= 0 && bccomp($value, '9223372036854775807') <= 0);
+		return (bccomp($value, '0') >= 0 && bccomp($value, ZBX_DB_MAX_ID) <= 0);
 	}
 
 	public static function is_int32($value) {

@@ -28,7 +28,7 @@ $table = (new CTableInfo())
 	->setHeader([
 		($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'),
 		_('Action'),
-		($data['sortfield'] === 'description') ? [_('Type'), $sort_div] : _('Type'),
+		($data['sortfield'] === 'mediatypeid') ? [_('Type'), $sort_div] : _('Type'),
 		($data['sortfield'] === 'sendto') ? [_('Recipient'), $sort_div] : _('Recipient'),
 		_('Message'),
 		($data['sortfield'] === 'status') ? [_('Status'), $sort_div] : _('Status'),
@@ -36,37 +36,26 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['alerts'] as $alert) {
-	if ($alert['status'] == ALERT_STATUS_SENT) {
-		$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
+	if ($alert['alerttype'] == ALERT_TYPE_MESSAGE && array_key_exists('maxattempts', $alert)
+			&& ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW)) {
+		$info_icons = makeWarningIcon(_n('%1$s retry left', '%1$s retries left',
+			$alert['maxattempts'] - $alert['retries'])
+		);
 	}
-	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-		$status = (new CSpan([
-			_('In progress').':',
-			BR(),
-			_n('%1$s retry left', '%1$s retries left', $alert['maxattempts'] - $alert['retries'])])
-		)
-			->addClass(ZBX_STYLE_YELLOW);
+	elseif ($alert['error'] !== '') {
+		$info_icons = makeErrorIcon($alert['error']);
 	}
 	else {
-		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-	}
-
-	$recipient = ($alert['userid'] != 0 && array_key_exists($alert['userid'], $data['db_users']))
-		? [bold(getUserFullname($data['db_users'][$alert['userid']])), BR(), zbx_nl2br($alert['sendto'])]
-		: zbx_nl2br($alert['sendto']);
-
-	$info_icons = [];
-	if ($alert['error'] !== '') {
-		$info_icons[] = makeErrorIcon($alert['error']);
+		$info_icons = null;
 	}
 
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		array_key_exists($alert['actionid'], $data['actions']) ? $data['actions'][$alert['actionid']]['name'] : '',
-		$alert['mediatypeid'] == 0 ? '' : $alert['description'],
-		$recipient,
+		$alert['description'],
+		makeEventDetailsTableUser($alert, $data['db_users']),
 		[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
-		$status,
+		makeActionTableStatus($alert),
 		makeInformationList($info_icons)
 	]);
 }

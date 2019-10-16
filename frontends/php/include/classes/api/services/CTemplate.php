@@ -391,6 +391,8 @@ class CTemplate extends CHostGeneral {
 
 		$templateDbFields = ['host' => null];
 
+		$host_name_parser = new CHostNameParser();
+
 		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if ((!isset($template['name']) || zbx_empty(trim($template['name']))) && isset($template['host'])) {
@@ -406,11 +408,10 @@ class CTemplate extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
-			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $template['host'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect characters used for template name "%1$s".',
-					$template['host']
-				));
+			if ($host_name_parser->parse($template['host']) != CParser::PARSE_SUCCESS) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect characters used for template name "%1$s".', $template['host'])
+				);
 			}
 
 			if (isset($template['host'])) {
@@ -1057,11 +1058,12 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		if (isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Incorrect characters used for template name "%1$s".',
-				$data['host']
-			));
+		$host_name_parser = new CHostNameParser();
+
+		if (array_key_exists('host', $data) && $host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect characters used for template name "%1$s".', $data['host'])
+			);
 		}
 	}
 
@@ -1147,10 +1149,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$templates = zbx_toHash($templates, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($templates[$templateid]))
-						$result[$templateid]['templates'] = $templates[$templateid]['rowscount'];
-					else
-						$result[$templateid]['templates'] = 0;
+					$result[$templateid]['templates'] = array_key_exists($templateid, $templates)
+						? $templates[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1177,10 +1178,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$hosts = zbx_toHash($hosts, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($hosts[$templateid]))
-						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
-					else
-						$result[$templateid]['hosts'] = 0;
+					$result[$templateid]['hosts'] = array_key_exists($templateid, $hosts)
+						? $hosts[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}
@@ -1215,10 +1215,9 @@ class CTemplate extends CHostGeneral {
 				]);
 				$screens = zbx_toHash($screens, 'templateid');
 				foreach ($result as $templateid => $template) {
-					if (isset($screens[$templateid]))
-						$result[$templateid]['screens'] = $screens[$templateid]['rowscount'];
-					else
-						$result[$templateid]['screens'] = 0;
+					$result[$templateid]['screens'] = array_key_exists($templateid, $screens)
+						? $screens[$templateid]['rowscount']
+						: '0';
 				}
 			}
 		}

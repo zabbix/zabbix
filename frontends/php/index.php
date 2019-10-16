@@ -43,6 +43,7 @@ check_fields($fields);
 
 if (hasRequest('reconnect') && CWebUser::isLoggedIn()) {
 	CWebUser::logout();
+	redirect('index.php');
 }
 
 $config = select_config();
@@ -93,4 +94,6 @@ $messages = clear_messages();
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',
 	'autologin' => $autologin == 1,
 	'error' => hasRequest('enter') && $messages ? array_pop($messages) : null
-]))->render();
+]))
+	->disableJsLoader()
+	->render();

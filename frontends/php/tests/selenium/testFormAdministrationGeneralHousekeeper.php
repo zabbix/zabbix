@@ -225,7 +225,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 0,
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -235,7 +235,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '1439m',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -245,7 +245,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '23h',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -255,7 +255,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '13140001m',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -265,7 +265,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '219001h',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -275,7 +275,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '9126d',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -285,7 +285,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_trigger' => '1304w',
 					'errors' => [
-						'Invalid trigger data storage period: must be between "86400" and "788400000"',
+						'Invalid trigger data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -295,7 +295,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_internal' => 0,
 					'errors' => [
-						'Invalid internal data storage period: must be between "86400" and "788400000"',
+						'Invalid internal data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -305,7 +305,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_discovery' => 0,
 					'errors' => [
-						'Invalid network discovery data storage period: must be between "86400" and "788400000"',
+						'Invalid network discovery data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -315,7 +315,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_events_mode' => true,
 					'hk_events_autoreg' => 0,
 					'errors' => [
-						'Invalid auto-registration data storage period: must be between "86400" and "788400000"',
+						'Invalid auto-registration data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -325,7 +325,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_services_mode' => true,
 					'hk_services' => 0,
 					'errors' => [
-						'Invalid data storage period for services: must be between "86400" and "788400000"',
+						'Invalid data storage period for services: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -335,7 +335,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_audit_mode' => true,
 					'hk_audit' => 0,
 					'errors' => [
-						'Invalid audit data storage period: must be between "86400" and "788400000"',
+						'Invalid audit data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],
@@ -345,7 +345,7 @@ class testFormAdministrationGeneralHousekeeper extends CLegacyWebTest {
 					'hk_sessions_mode' => true,
 					'hk_sessions' => 0,
 					'errors' => [
-						'Invalid user sessions data storage period: must be between "86400" and "788400000"',
+						'Invalid user sessions data storage period: value must be one of 86400-788400000',
 					]
 				]
 			],

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_LOG_H
 #define ZABBIX_LOG_H
 
+#include "common.h"
+
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
 #define LOG_LEVEL_ERR		2
@@ -40,6 +42,11 @@
 
 #define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
+extern int	zbx_log_level;
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_log_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+
 typedef enum
 {
 	ERR_Z3001 = 3001,
@@ -53,7 +60,15 @@ typedef enum
 zbx_err_codes_t;
 
 #ifdef HAVE___VA_ARGS__
-#	define zabbix_log(level, fmt, ...) __zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, ...)									\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			__zbx_zabbix_log(level, __VA_ARGS__);						\
+	}												\
+	while (0)
 #else
 #	define zabbix_log __zbx_zabbix_log
 #endif
@@ -67,7 +82,6 @@ int		zabbix_increase_log_level(void);
 int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
 #endif
-int		zabbix_check_log_level(int level);
 
 char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
@@ -76,7 +90,7 @@ char		*strerror_from_system(unsigned long error);
 char		*strerror_from_module(unsigned long error, const wchar_t *module);
 #endif
 
-void		zbx_redirect_stdio(const char *filename);
+int		zbx_redirect_stdio(const char *filename);
 
 void		zbx_handle_log(void);
 

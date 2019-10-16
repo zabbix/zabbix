@@ -59,10 +59,19 @@ class CSegmentedRadioElement extends CElement {
 	}
 
 	/**
+	 * Get label of selected element.
+	 *
+	 * @return string
+	 */
+	public function getSelected() {
+		return $this->query('css:input[type="radio"]:checked + label')->one()->getText();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return (($this->getLabels()->filter(CElementQuery::ATTRIBUTES_NOT_PRESENT, ['disabled'])->count() > 0) === $enabled);
+		return (($this->query('xpath:.//input[@type="radio"][not(@disabled)]')->count() > 0) === $enabled);
 	}
 
 	/**
@@ -75,5 +84,12 @@ class CSegmentedRadioElement extends CElement {
 	 */
 	public function fill($text) {
 		return $this->select($text);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->getSelected();
 	}
 }

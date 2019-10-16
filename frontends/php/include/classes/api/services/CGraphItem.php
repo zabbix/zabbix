@@ -132,6 +132,7 @@ class CGraphItem extends CApiService {
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -149,7 +150,7 @@ class CGraphItem extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// adding graphs
-		if ($options['selectGraphs'] !== null) {
+		if ($options['selectGraphs'] !== null && $options['selectGraphs'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
 			$graphs = API::Graph()->get([
 				'output' => $options['selectGraphs'],

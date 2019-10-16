@@ -252,7 +252,7 @@ $itemFormList->addRow(
 					->setAttribute('placeholder', _('name'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				'&rArr;',
-				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly))
+				(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_TAG_WIDTH),
 				(new CButton(null, _('Remove')))
@@ -312,7 +312,7 @@ $itemFormList->addRow(
 	new CLabel(_('HTTP proxy'), 'http_proxy'),
 	(new CTextBox('http_proxy', $data['http_proxy'], $readonly, DB::getFieldLength('items', 'http_proxy')))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]'),
+		->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]'),
 	'http_proxy_row'
 );
 
@@ -332,18 +332,16 @@ $itemFormList->addRow(
 
 // ITEM_TYPE_HTTPAGENT User name.
 $itemFormList->addRow(
-	(new CLabel(_('User name'), 'http_username'))->setAsteriskMark(),
+	new CLabel(_('User name'), 'http_username'),
 	(new CTextBox('http_username', $data['http_username'], $readonly, DB::getFieldLength('items', 'username')))
-		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_username_row'
 );
 
 // ITEM_TYPE_HTTPAGENT Password.
 $itemFormList->addRow(
-	(new CLabel(_('Password'), 'http_password'))->setAsteriskMark(),
+	new CLabel(_('Password'), 'http_password'),
 	(new CTextBox('http_password', $data['http_password'], $readonly, DB::getFieldLength('items', 'password')))
-		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	'http_password_row'
 );
@@ -416,7 +414,8 @@ $itemFormList->addRow(
 				'dstfld1' => 'master_itemid',
 				'hostid' => $data['hostid'],
 				'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-				'webitems' => true
+				'webitems' => true,
+				'normal_only' => true
 			]
 		]
 	]))
@@ -759,54 +758,70 @@ $itemFormList->addRow(_('Custom intervals'),
 );
 
 // Append history storage to form list.
-$keepHistory = [];
-$keepHistory[] = (new CTextBox('history', $data['history'], $discovered_item))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
-
+$keep_history_hint = null;
 if ($data['config']['hk_history_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
+	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+				->setAttribute('target', '_blank')
+		: _x('global housekeeping settings', 'item_form');
 
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
-			->setAttribute('target', '_blank');
-		$keepHistory[] = $link;
-	}
-	else {
-		$keepHistory[] = _x('global housekeeping settings', 'item_form');
-	}
-
-	$keepHistory[] = ' ('.$data['config']['hk_history'].')';
+	$keep_history_hint = (new CDiv(makeInformationIcon([
+		' '._x('Overridden by', 'item_form').' ',
+		$link,
+		' ('.$data['config']['hk_history'].')'
+	])))
+		->addStyle('margin: 5px 0 0 5px;')
+		->setId('history_mode_hint');
 }
 
 $itemFormList->addRow((new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
-	$keepHistory
+	(new CDiv([
+		(new CRadioButtonList('history_mode', (int) $data['history_mode']))
+			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
+			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->setReadonly($discovered_item)
+			->setModern(true),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('history', $data['history'], $discovered_item))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$keep_history_hint
+	]))->addClass('wrap-multiple-controls')
 );
 
 // Append trend storage to form list.
-$keepTrend = [];
-$keepTrend[] = (new CTextBox('trends', $data['trends'], $discovered_item))
-	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	->setAriaRequired();
-
+$keep_trend_hint = null;
 if ($data['config']['hk_trends_global']
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
-			->setAttribute('target', '_blank');
-		$keepTrend[] = $link;
-	}
-	else {
-		$keepTrend[] = _x('global housekeeping settings', 'item_form');
-	}
+	$link = (CWebUser::getType() == USER_TYPE_SUPER_ADMIN)
+		? (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+				->setAttribute('target', '_blank')
+		: _x('global housekeeping settings', 'item_form');
 
-	$keepTrend[] = ' ('.$data['config']['hk_trends'].')';
+	$keep_trend_hint = (new CDiv(makeInformationIcon([
+		' '._x('Overridden by', 'item_form').' ',
+		$link,
+		' ('.$data['config']['hk_trends'].')'
+	])))
+		->addStyle('margin: 5px 0 0 5px;')
+		->setId('trends_mode_hint');
 }
 
-$itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(), $keepTrend,
+$itemFormList->addRow((new CLabel(_('Trend storage period'), 'trends'))->setAsteriskMark(),
+	(new CDiv([
+		(new CRadioButtonList('trends_mode', (int) $data['trends_mode']))
+			->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
+			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
+			->setReadonly($discovered_item)
+			->setModern(true),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('trends', $data['trends'], $discovered_item))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$keep_trend_hint
+	]))->addClass('wrap-multiple-controls'),
 	'row_trends'
 );
 

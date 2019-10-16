@@ -18,35 +18,11 @@
 **/
 
 
-/**
- * jQuery based publish/subscribe handler.
- *
- * - $.subscribe(event_name, callback)
- * - $.unsubscribe(event_name, callback)
- * - $.publish(event_name, data_object)
- *
- */
-(function($) {
-	var pubsub = $({});
-
-	$.subscribe = function() {
-		pubsub.on.apply(pubsub, arguments);
-	};
-
-	$.unsubscribe = function() {
-		pubsub.off.apply(pubsub, arguments);
-	};
-
-	$.publish = function() {
-		pubsub.trigger.apply(pubsub, arguments);
-	};
-}(jQuery));
-
 // Time range selector.
 jQuery(function ($){
 	var container = $('.filter-space').first(),
 		xhr = null,
-		endpoint = new Curl('zabbix.php'),
+		endpoint = new Curl('zabbix.php', false),
 		element = {
 			from: container.find('[name=from]'),
 			to: container.find('[name=to]'),
@@ -147,20 +123,16 @@ jQuery(function ($){
 			element.label.text(data.label);
 		}
 
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', false);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', false);
 
 		$.each({
 			decrement: data.can_decrement,
 			increment: data.can_increment,
 			zoomout: data.can_zoomout
 		}, function (elm, state) {
-			if (state === true) {
-				element[elm].removeAttr('disabled');
+			if (typeof state !== 'undefined') {
+				element[elm].prop('disabled', !state);
 			}
-			else if (state === false) {
-				element[elm].attr('disabled', true);
-			}
-
 			element[elm].removeClass('disabled');
 		});
 
@@ -180,7 +152,7 @@ jQuery(function ($){
 		}
 
 		element.apply.closest('.ui-tabs-panel').addClass('in-progress');
-		$([element.from[0], element.to[0], element.apply[0]]).attr('disabled', true);
+		$([element.from[0], element.to[0], element.apply[0]]).prop('disabled', true);
 		$([element.decrement[0], element.zoomout[0], element.increment[0]]).addClass('disabled');
 
 		ui_disabled = true;
@@ -319,18 +291,22 @@ jQuery(function ($){
 		was_dragged = false,
 		prevent_click = false;
 
-	$(document).on('mousedown', 'img', selectionHandlerDragStart)
+	$(document)
+		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(e) {
-			$.publish('timeselector.zoomout', {
-				from: element.from.val(),
-				to: element.to.val()
-			});
+			if (typeof $(e.target).data('zbx_sbox') !== 'undefined') {
+				$.publish('timeselector.zoomout', {
+					from: element.from.val(),
+					to: element.to.val()
+				});
 
-			return cancelEvent(e);
+				return cancelEvent(e);
+			}
 		})
 		.on('click', 'a', function(e) {
 			// Prevent click on graph image parent <a/> element when clicked inside graph selectable area.
-			if ($(e.target).is('img') && prevent_click) {
+			if ($(e.target).is('img') && typeof $(e.target).data('zbx_sbox') !== 'undefined' && prevent_click
+					&& $(this).hasClass('dashbrd-widget-graph-link')) {
 				return cancelEvent(e);
 			}
 		});
@@ -487,8 +463,6 @@ var timeControl = {
 
 	// options
 	refreshPage: true,
-	timeRefreshInterval: 0,
-	timeRefreshTimeoutHandler: null,
 
 	addObject: function(id, time, objData) {
 		if (typeof this.objectList[id] === 'undefined'
@@ -539,9 +513,8 @@ var timeControl = {
 
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-					var graphUrl = new Curl(obj.src);
-					graphUrl.unsetArgument('sid');
-					graphUrl.setArgument('width', obj.objDims.width - 1);
+					var graphUrl = new Curl(obj.src, false);
+					graphUrl.setArgument('width', Math.floor(obj.objDims.width));
 
 					obj.src = graphUrl.getUrl();
 				}
@@ -620,7 +593,7 @@ var timeControl = {
 				id: img.attr('id'),
 				'class': img.attr('class')
 			})
-			.on('load', function() {
+			.one('load', function() {
 				img.replaceWith(clone);
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 			});
@@ -661,32 +634,15 @@ var timeControl = {
 		this.objectList[id].processed = 0;
 		this.objectList[id].refresh = true;
 		this.processObjects();
-
-		if (this.timeRefreshInterval > 0) {
-			this.refreshTime();
-		}
 	},
 
-	useTimeRefresh: function(timeRefreshInterval) {
-		if (!empty(timeRefreshInterval) && timeRefreshInterval > 0) {
-			this.timeRefreshInterval = timeRefreshInterval * 1000;
-		}
-	},
-
-	refreshTime: function() {
-		if (this.timeRefreshInterval > 0) {
-			// plan next time update
-			this.timeRefreshTimeoutHandler = window.setTimeout(function() { timeControl.refreshTime(); }, this.timeRefreshInterval);
-		}
-	},
-
-	removeAllSBox: function() {
+	disableAllSBox: function() {
 		jQuery.each(this.objectList, function(i, obj) {
 			if (obj.loadSBox == 1) {
-				obj.loadSBox = 0;
-				jQuery('#'+obj.id).removeData('zbx_sbox');
+				jQuery('#'+obj.containerid).removeClass('dashbrd-widget-graph-link');
 			}
 		});
+		jQuery(document).off('dblclick mousedown', 'img');
 	},
 
 	/**

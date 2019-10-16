@@ -18,7 +18,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
+				]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))
@@ -52,7 +52,7 @@
 						(new CTag('label', false, _('Read-write')))
 							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
 					])
-				]))->addClass(ZBX_STYLE_RADIO_SEGMENTED)
+				]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
 			),
 			(new CCol(
 				(new CButton('remove', _('Remove')))

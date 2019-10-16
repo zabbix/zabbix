@@ -71,7 +71,7 @@ var CViewSwitcher = Class.create({
 		// enable previously disabled dropdown items
 		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
 			for (var DDi in this.disableDDItems[this.lastValue]) {
-				jQuery('#' + DDi).find('option').attr('disabled', false);
+				jQuery('#' + DDi).find('option').prop('disabled', false);
 			}
 		}
 
@@ -80,11 +80,11 @@ var CViewSwitcher = Class.create({
 			for (var DDi in this.disableDDItems[myValue]) {
 				var DD = jQuery('#' + DDi);
 				for (var Oi in this.disableDDItems[myValue][DDi]) {
-					DD.find('[value='+this.disableDDItems[myValue][DDi][Oi]+']').attr('disabled', true);
+					DD.find('[value='+this.disableDDItems[myValue][DDi][Oi]+']').prop('disabled', true);
 				}
 				// if selected option unavailable set to first available
-				if (DD.find('option:selected').attr('disabled')) {
-					DD.find('option:not(:disabled):first').attr('selected', true);
+				if (DD.find('option:selected').prop('disabled')) {
+					DD.find('option:not(:disabled):first').prop('selected', true);
 					DD.trigger(this.objAction);
 				}
 			}

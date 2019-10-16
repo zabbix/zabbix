@@ -43,45 +43,48 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 	const char	*__function_name = "select_discovered_host";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	hostid = 0;
-	char		*sql = NULL;
+	zbx_uint64_t	hostid = 0, proxy_hostid;
+	char		*sql = NULL, *ip_esc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
 	switch (event->object)
 	{
 		case EVENT_OBJECT_DHOST:
-			sql = zbx_dsprintf(sql,
-				"select h.hostid,h.status"
-				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
-				" where h.hostid=i.hostid"
-					" and i.ip=ds.ip"
-					" and ds.dcheckid=dc.dcheckid"
-					" and dc.druleid=dr.druleid"
-					" and h.status in (%d,%d)"
-					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
-					" and i.useip=1"
-					" and ds.dhostid=" ZBX_FS_UI64
-				" order by i.hostid",
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-				event->objectid);
-			break;
 		case EVENT_OBJECT_DSERVICE:
+			result = DBselect(
+					"select dr.proxy_hostid,ds.ip"
+					" from drules dr,dchecks dc,dservices ds"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds.%s=" ZBX_FS_UI64,
+					EVENT_OBJECT_DSERVICE == event->object ? "dserviceid" : "dhostid",
+					event->objectid);
+
+			if (NULL == (row = DBfetch(result)))
+			{
+				DBfree_result(result);
+				goto exit;
+			}
+
+			ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+			ip_esc = DBdyn_escape_string(row[1]);
+			DBfree_result(result);
+
 			sql = zbx_dsprintf(sql,
-				"select h.hostid,h.status"
-				" from hosts h,interface i,dservices ds,dchecks dc,drules dr"
-				" where h.hostid=i.hostid"
-					" and i.ip=ds.ip"
-					" and ds.dcheckid=dc.dcheckid"
-					" and dc.druleid=dr.druleid"
-					" and h.status in (%d,%d)"
-					" and " ZBX_SQL_NULLCMP("dr.proxy_hostid", "h.proxy_hostid")
-					" and i.useip=1"
-					" and ds.dserviceid=" ZBX_FS_UI64
-				" order by i.hostid",
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-				event->objectid);
+					"select h.hostid"
+					" from hosts h,interface i"
+					" where h.hostid=i.hostid"
+						" and i.ip='%s'"
+						" and i.useip=1"
+						" and h.status in (%d,%d)"
+						" and h.proxy_hostid%s"
+					" order by i.hostid",
+					ip_esc,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+					DBsql_id_cmp(proxy_hostid));
+
+			zbx_free(ip_esc);
 			break;
 		case EVENT_OBJECT_ZABBIX_ACTIVE:
 			sql = zbx_dsprintf(sql,
@@ -90,7 +93,7 @@ static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 					" where h.host=a.host"
 						" and a.autoreg_hostid=" ZBX_FS_UI64
 						" and h.status in (%d,%d)",
-						event->objectid,
+					event->objectid,
 					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 			break;
 		default:

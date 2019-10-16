@@ -30,11 +30,19 @@ require_once dirname(__FILE__).'/../../../include/classes/debug/CProfiler.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/DbBackend.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/MysqlDbBackend.php';
 require_once dirname(__FILE__).'/../../../include/classes/db/PostgresqlDbBackend.php';
+require_once dirname(__FILE__).'/CTestArrayHelper.php';
 
 /**
  * Database helper.
  */
 class CDBHelper {
+
+	/**
+	 * Backup stack.
+	 *
+	 * @var array
+	 */
+	static $backups = [];
 
 	/**
 	 * Perform select query and check the result.
@@ -94,17 +102,43 @@ class CDBHelper {
 	 * Get random database data set (limited set of random records).
 	 *
 	 * @param string  $sql       query to be executed
-	 * @param integer $count     data set size
+	 * @param integer $count     data set size (or null for all data set)
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	public static function getRandom($sql, $count) {
+	public static function getRandom($sql, $count = null) {
 		$data = self::getAll($sql);
 		shuffle($data);
 
-		return array_slice($data, 0, $count);
+		if ($count !== null) {
+			$data = array_slice($data, 0, $count);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get random database data suitable for PHPUnit data provider functions (limited set of random records).
+	 *
+	 * @param string  $sql       query to be executed
+	 * @param integer $count     data set size (or null for all data set)
+	 *
+	 * @return array
+	 *
+	 * @throws Exception
+	 */
+	public static function getRandomizedDataProvider($sql, $count = null) {
+		DBconnect($error);
+
+		$data = [];
+		foreach (CDBHelper::getRandom($sql, $count) as $row) {
+			$data[] = [$row];
+		}
+
+		DBclose();
+		return $data;
 	}
 
 	/**
@@ -146,6 +180,14 @@ class CDBHelper {
 	 * Result: [users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,...]
 	 */
 	public static function getTables(&$tables, $top_table) {
+		if (is_array($top_table)) {
+			foreach ($top_table as $table) {
+				self::getTables($tables, $table);
+			}
+
+			return;
+		}
+
 		if (in_array($top_table, $tables)) {
 			return;
 		}
@@ -185,35 +227,42 @@ class CDBHelper {
 	 * Saves data of the specified table and all dependent tables in temporary storage.
 	 * For example: backupTables('users')
 	 */
-
 	public static function backupTables($top_table) {
 		global $DB;
 
 		$tables = [];
 		static::getTables($tables, $top_table);
+		self::$backups[] = $tables;
+
+		$suffix = '_tmp'.count(self::$backups);
 
 		foreach ($tables as $table) {
+			DBexecute('drop table if exists '.$table.$suffix);
+
 			switch ($DB['TYPE']) {
 				case ZBX_DB_MYSQL:
-					DBexecute("drop table if exists ${table}_tmp");
-					DBexecute("create table ${table}_tmp like $table");
-					DBexecute("insert into ${table}_tmp select * from $table");
+					DBexecute('create table '.$table.$suffix.' like '.$table);
+					DBexecute('insert into '.$table.$suffix.' select * from '.$table);
 					break;
 				default:
-					DBexecute("drop table if exists ${table}_tmp");
-					DBexecute("select * into table ${table}_tmp from $table");
+					DBexecute('select * into table '.$table.$suffix.' from '.$table);
 			}
 		}
 	}
 
 	/**
 	 * Restores data from temporary storage. backupTables() must be called first.
-	 * For example: restoreTables('users')
+	 * For example: restoreTables()
 	 */
-	public static function restoreTables($top_table) {
+	public static function restoreTables() {
 		global $DB;
 
-		$tables = [];
+		if (!self::$backups) {
+			return;
+		}
+
+		$suffix = '_tmp'.count(self::$backups);
+		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			$result = DBselect('select @@unique_checks,@@foreign_key_checks');
@@ -222,15 +271,13 @@ class CDBHelper {
 			DBexecute('set foreign_key_checks=0');
 		}
 
-		static::getTables($tables, $top_table);
-
 		foreach (array_reverse($tables) as $table) {
-			DBexecute("delete from $table");
+			DBexecute('delete from '.$table);
 		}
 
 		foreach ($tables as $table) {
-			DBexecute("insert into $table select * from ${table}_tmp");
-			DBexecute("drop table ${table}_tmp");
+			DBexecute('insert into '.$table.' select * from '.$table.$suffix);
+			DBexecute('drop table '.$table.$suffix);
 		}
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
@@ -299,6 +346,26 @@ class CDBHelper {
 	}
 
 	/**
+	 * Escapes value to be used in SQL query.
+	 *
+	 * @param mixed $value    value to be escaped
+	 *
+	 * @return string
+	 */
+	public static function escape($value) {
+		if (!is_array($value)) {
+			return zbx_dbstr($value);
+		}
+
+		$result = [];
+		foreach ($value as $part) {
+			$result[] = zbx_dbstr($part);
+		}
+
+		return implode(',', $result);
+	}
+
+	/**
 	 * Add host groups to user group with these rights.
 	 *
 	 * @param string $usergroup_name
@@ -362,11 +429,9 @@ class CDBHelper {
 				'value' => $value,
 				'name' => $trigger['description'],
 				'severity' => $trigger['priority'],
-				'clock' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
-				'ns' => array_key_exists('ns', $event_fields) ? $event_fields['ns'] : 0,
-				'acknowledged' => array_key_exists('acknowledged', $event_fields)
-					? $event_fields['acknowledged']
-					: EVENT_NOT_ACKNOWLEDGED
+				'clock' => CTestArrayHelper::get($event_fields, 'clock', time()),
+				'ns' => CTestArrayHelper::get($event_fields, 'ns', 0),
+				'acknowledged' => CTestArrayHelper::get($event_fields, 'acknowledged', EVENT_NOT_ACKNOWLEDGED)
 			];
 
 			$eventid = DB::insert('events', [$fields]);
@@ -379,7 +444,7 @@ class CDBHelper {
 					DB::update('triggers', [
 						'values' => [
 							'value' => TRIGGER_VALUE_TRUE,
-							'lastchange' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
+							'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time())
 						],
 						'where' => ['triggerid' => $trigger['triggerid']]
 					]);
@@ -396,7 +461,7 @@ class CDBHelper {
 						DB::update('triggers', [
 							'values' => [
 								'value' => TRIGGER_VALUE_FALSE,
-								'lastchange' => array_key_exists('clock', $event_fields) ? $event_fields['clock'] : time(),
+								'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time())
 							],
 							'where' => ['triggerid' => $trigger['triggerid']]
 						]);

@@ -19,44 +19,30 @@
 **/
 
 
-require_once dirname(__FILE__).'/function_DBcommit.php';
 require_once dirname(__FILE__).'/function_DBconnect.php';
 require_once dirname(__FILE__).'/function_DBclose.php';
-require_once dirname(__FILE__).'/function_DBend.php';
-require_once dirname(__FILE__).'/function_DBexecute.php';
-require_once dirname(__FILE__).'/function_DBfetch.php';
-require_once dirname(__FILE__).'/function_DBloadfile.php';
-require_once dirname(__FILE__).'/function_DBrollback.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
-require_once dirname(__FILE__).'/function_DBstart.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
 require_once dirname(__FILE__).'/dbConditionIdTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
 require_once dirname(__FILE__).'/testHistoryManager.php';
-// require_once dirname(__FILE__).'/urlParamTest.php';
+require_once dirname(__FILE__).'/urlParamTest.php';
 
 class GeneralTests {
 
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
-		$suite->addTestSuite('function_DBcommit');
 		$suite->addTestSuite('function_DBconnect');
 		$suite->addTestSuite('function_DBclose');
-		$suite->addTestSuite('function_DBend');
-		$suite->addTestSuite('function_DBexecute');
-		$suite->addTestSuite('function_DBfetch');
-		$suite->addTestSuite('function_DBloadfile');
-		$suite->addTestSuite('function_DBrollback');
 		$suite->addTestSuite('function_DBselect');
-		$suite->addTestSuite('function_DBstart');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('dbConditionIntTest');
 		$suite->addTestSuite('dbConditionIdTest');
 		$suite->addTestSuite('dbConditionStringTest');
 		$suite->addTestSuite('testHistoryManager');
-//		$suite->addTestSuite('urlParamTest');
+		$suite->addTestSuite('urlParamTest');
 
 		return $suite;
 	}

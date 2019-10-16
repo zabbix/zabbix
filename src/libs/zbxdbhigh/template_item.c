@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+#include "template.h"
 
 typedef struct
 {

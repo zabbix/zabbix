@@ -20,6 +20,30 @@
 
 jQuery.noConflict();
 
+/**
+ * jQuery based publish/subscribe handler.
+ *
+ * - $.subscribe(event_name, callback)
+ * - $.unsubscribe(event_name, callback)
+ * - $.publish(event_name, data_object)
+ *
+ */
+(function($) {
+	var pubsub = $({});
+
+	$.subscribe = function() {
+		pubsub.on.apply(pubsub, arguments);
+	};
+
+	$.unsubscribe = function() {
+		pubsub.off.apply(pubsub, arguments);
+	};
+
+	$.publish = function() {
+		pubsub.trigger.apply(pubsub, arguments);
+	};
+}(jQuery));
+
 var overlays_stack = [];
 
 function isset(key, obj) {
@@ -178,7 +202,7 @@ function checkAll(form_name, chkMain, shkName) {
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
-	chkbxRange.saveCookies(shkName);
+	chkbxRange.saveSessionStorage(shkName);
 
 	return true;
 }
@@ -423,14 +447,12 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 
 	var url = new Curl('zabbix.php');
 	url.setArgument('action', action);
-	jQuery.each(options, function(key, value) {
-		url.setArgument(key, value);
-	});
 
 	jQuery.ajax({
 		url: url.getUrl(),
-		type: 'get',
+		type: 'post',
 		dataType: 'json',
+		data: options,
 		beforeSend: function(jqXHR) {
 			overlayDialogue(ovelay_properties, trigger_elmnt, jqXHR);
 		},
@@ -471,11 +493,11 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 /**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
- * @param {string} dialogueid	Unique overlay element identifier.
- * @param {object} element		UI element which must be focused when overlay UI element will be closed.
- * @param {object} type			Type of overlay UI element.
- * @param {object} xhr			(optional) XHR request used to load content. Used to abort loading. Currently used with
- *								type 'popup' only.
+ * @param {string} id       Unique overlay element identifier.
+ * @param {object} element  UI element which must be focused when overlay UI element will be closed.
+ * @param {object} type     Type of overlay UI element.
+ * @param {object} xhr      (optional) XHR request used to load content. Used to abort loading. Currently used with
+ *                          type 'popup' only.
  */
 function addToOverlaysStack(id, element, type, xhr) {
 	var index = null,
@@ -527,9 +549,14 @@ function closeDialogHandler(event) {
 					hintBox.hideHint(dialog.element, true);
 					break;
 
-				// Close context menu overlays.
-				case 'contextmenu':
-					jQuery('.action-menu.action-menu-top:visible').menuPopup('close', dialog.element);
+				// Close popup menu overlays.
+				case 'menu-popup':
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					break;
+
+				// Close context menu preloader.
+				case 'preloader':
+					overlayPreloaderDestroy(dialog.dialogueid, dialog.xhr);
 					break;
 
 				// Close overlay time picker.
@@ -788,13 +815,12 @@ function validate_trigger_expression(formname, dialogueid) {
 }
 
 function redirect(uri, method, needle, invert_needle, add_sid) {
-	if (typeof add_sid === 'undefined') {
-		add_sid = true;
-	}
-	method = method || 'get';
+	method = (method || 'get').toLowerCase();
+	add_sid = (method !== 'get' && (typeof add_sid === 'undefined' || add_sid));
+
 	var url = new Curl(uri, add_sid);
 
-	if (method.toLowerCase() == 'get') {
+	if (method == 'get') {
 		window.location = url.getUrl();
 	}
 	else {
@@ -816,15 +842,32 @@ function redirect(uri, method, needle, invert_needle, add_sid) {
 			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
 
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
-				action += '&' + key + '=' + args[key];
+				if (Array.isArray(args[key])) {
+					for (var i = 0, l = args[key].length; i < l; i++) {
+						action += '&' + key + '[]=' + args[key][i];
+					}
+				}
+				else {
+					action += '&' + key + '=' + args[key];
+				}
+
 				continue;
 			}
 
 			var hInput = document.createElement('input');
 			hInput.setAttribute('type', 'hidden');
 			postForm.appendChild(hInput);
-			hInput.setAttribute('name', key);
-			hInput.setAttribute('value', args[key]);
+
+			if (Array.isArray(args[key])) {
+				hInput.setAttribute('name', key + '[]');
+				for (var i = 0, l = args[key].length; i < l; i++) {
+					hInput.setAttribute('value', args[key][i]);
+				}
+			}
+			else {
+				hInput.setAttribute('name', key);
+				hInput.setAttribute('value', args[key]);
+			}
 		}
 
 		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
@@ -933,6 +976,25 @@ function basename(path, suffix) {
  */
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
+}
+
+/**
+ * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
+ *
+ * @param {type} time   Unix timestamp to convert.
+ *
+ * @returns {string}
+ */
+function time2str(time) {
+	var dt = new Date(time * 1000),
+		Y = dt.getFullYear(),
+		m = appendZero(dt.getMonth()+1),
+		d = appendZero(dt.getDate()),
+		H = appendZero(dt.getHours()),
+		i = appendZero(dt.getMinutes()),
+		s = appendZero(dt.getSeconds());
+
+	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
 }
 
 /**

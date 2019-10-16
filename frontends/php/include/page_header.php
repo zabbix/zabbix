@@ -180,33 +180,42 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
-	$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
+	$pageHeader->addCssFile('assets/styles/'.CHtml::encode($theme).'.css');
 
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
 	}
+
 	$pageHeader
-		->addJsFile('js/browsers.js')
+		->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 		->addJsBeforeScripts(
 			'var PHP_TZ_OFFSET = '.date('Z').','.
 				'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
-	);
+		);
 
-	// show GUI messages in pages with menus and in fullscreen mode
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;showGuiMessaging='
-		.($is_standard_page ? '1' : '0');
-	$pageHeader->addJsFile($path);
+	// Show GUI messages in pages with menus and in fullscreen mode.
+	if (CView::$js_loader_disabled !== true) {
+		$pageHeader->addJsFile((new CUrl('jsLoader.php'))
+			->setArgument('ver', ZABBIX_VERSION)
+			->setArgument('lang', CWebUser::$data['lang'])
+			->setArgument('showGuiMessaging', ($is_standard_page && !CWebUser::isGuest()) ? 1 : null)
+			->getUrl()
+		);
 
-	if (!empty($page['scripts']) && is_array($page['scripts'])) {
-		foreach ($page['scripts'] as $script) {
-			$path .= '&amp;files[]='.$script;
+		if ($page['scripts']) {
+			$pageHeader->addJsFile((new CUrl('jsLoader.php'))
+				->setArgument('ver', ZABBIX_VERSION)
+				->setArgument('lang', CWebUser::$data['lang'])
+				->setArgument('files', $page['scripts'])
+				->getUrl()
+			);
 		}
-		$pageHeader->addJsFile($path);
 	}
+
 	$pageHeader->display();
 ?>
 <body lang="<?= CWebUser::getLang() ?>">
-<output class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></output>
+<output class="<?= ZBX_STYLE_MSG_GLOBAL_FOOTER.' '.ZBX_STYLE_MSG_WARNING ?>" id="msg-global-footer"></output>
 <?php
 }
 
@@ -266,10 +275,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 // unset multiple variables
 unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
-
-if ($page['type'] == PAGE_TYPE_HTML && $is_standard_page) {
-	zbx_add_post_js('initMessages();');
-}
 
 // if a user logs in after several unsuccessful attempts, display a warning
 if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {

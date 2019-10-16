@@ -1,0 +1,1 @@
+.......PS. [ZBX-16664] fixed IPMI poller skips processing if one of the elements is missing information (akozlovs)

@@ -24,7 +24,7 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*str, *no_custom = NULL;
-	int			value, expected_ret, ret, custom;
+	int			value, expected_ret, ret;
 	zbx_custom_interval_t	*custom_intervals;
 	zbx_mock_handle_t	handle;
 

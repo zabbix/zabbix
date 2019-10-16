@@ -187,10 +187,27 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
 					proxy->auto_compress = 1;
 
-				ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+				if (!ZBX_IS_RUNNING())
+				{
+					int	flags = ZBX_TCP_PROTOCOL;
 
-				if (SUCCEED == ret)
-					*data = zbx_strdup(*data, s.buffer);
+					if (0 != (s.protocol & ZBX_TCP_COMPRESS))
+						flags |= ZBX_TCP_COMPRESS;
+
+					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
+							flags, CONFIG_TIMEOUT);
+
+					zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from passive proxy at"
+							" \"%s\": Zabbix server shutdown in progress", s.peer);
+					ret = FAIL;
+				}
+				else
+				{
+					ret = zbx_send_proxy_data_response(proxy, &s, NULL);
+
+					if (SUCCEED == ret)
+						*data = zbx_strdup(*data, s.buffer);
+				}
 			}
 		}
 
@@ -356,6 +373,11 @@ static int	proxy_get_host_availability(DC_PROXY *proxy)
 
 	proxy->version = zbx_get_protocol_version(&jp);
 
+	if (SUCCEED != zbx_check_protocol_version(proxy))
+	{
+		goto out;
+	}
+
 	if (SUCCEED != proxy_check_error_response(&jp, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid host availability data:"
@@ -419,6 +441,11 @@ static int	proxy_get_history_data(DC_PROXY *proxy)
 		}
 
 		proxy->version = zbx_get_protocol_version(&jp);
+
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			break;
+		}
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -493,6 +520,11 @@ static int	proxy_get_discovery_data(DC_PROXY *proxy)
 
 		proxy->version = zbx_get_protocol_version(&jp);
 
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			break;
+		}
+
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid discovery data:"
@@ -565,6 +597,11 @@ static int	proxy_get_auto_registration(DC_PROXY *proxy)
 		}
 
 		proxy->version = zbx_get_protocol_version(&jp);
+
+		if (SUCCEED != zbx_check_protocol_version(proxy))
+		{
+			break;
+		}
 
 		if (SUCCEED != proxy_check_error_response(&jp, &error))
 		{
@@ -642,6 +679,11 @@ static int	proxy_process_proxy_data(DC_PROXY *proxy, const char *answer, zbx_tim
 	}
 
 	proxy->version = zbx_get_protocol_version(&jp);
+
+	if (SUCCEED != zbx_check_protocol_version(proxy))
+	{
+		goto out;
+	}
 
 	if (SUCCEED != (ret = process_proxy_data(proxy, &jp, ts, &error)))
 	{
@@ -914,7 +956,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -955,5 +997,10 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 }

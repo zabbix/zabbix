@@ -221,7 +221,7 @@ function make_event_details($event, $backurl) {
 					$table->addRow([_('Resolved by'), getUserFullname($user[0])]);
 				}
 				else {
-					$table->addRow([_('Resolved by'), _('User')]);
+					$table->addRow([_('Resolved by'), _('Inaccessible user')]);
 				}
 			}
 		}
@@ -807,75 +807,4 @@ function getTagString(array $tag, $tag_name_format = PROBLEMS_TAG_NAME_FULL) {
 		default:
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
 	}
-}
-
-function getLastEvents($options) {
-	if (!isset($options['limit'])) {
-		$options['limit'] = 15;
-	}
-
-	$triggerOptions = [
-		'output' => ['triggerid', 'priority'],
-		'filter' => [],
-		'skipDependent' => 1,
-		'selectHosts' => ['hostid', 'name'],
-		'sortfield' => 'lastchange',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['triggerLimit']
-	];
-
-	$eventOptions = [
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => ['clock', 'eventid'],
-		'sortorder' => ZBX_SORT_DOWN
-	];
-
-	if (isset($options['eventLimit'])) {
-		$eventOptions['limit'] = $options['eventLimit'];
-	}
-
-	if (isset($options['priority'])) {
-		$triggerOptions['filter']['priority'] = $options['priority'];
-	}
-	if (isset($options['monitored'])) {
-		$triggerOptions['monitored'] = $options['monitored'];
-	}
-	if (isset($options['lastChangeSince'])) {
-		$triggerOptions['lastChangeSince'] = $options['lastChangeSince'];
-		$eventOptions['time_from'] = $options['lastChangeSince'];
-	}
-	if (isset($options['value'])) {
-		$triggerOptions['filter']['value'] = $options['value'];
-		$eventOptions['value'] = $options['value'];
-	}
-	if (array_key_exists('suppressed', $options)) {
-		$eventOptions['suppressed'] = $options['suppressed'];
-	}
-
-	// triggers
-	$triggers = API::Trigger()->get($triggerOptions);
-	$triggers = zbx_toHash($triggers, 'triggerid');
-
-	// events
-	$eventOptions['objectids'] = zbx_objectValues($triggers, 'triggerid');
-	$events = API::Event()->get($eventOptions);
-
-	$sortClock = [];
-	$sortEvent = [];
-	foreach ($events as $enum => $event) {
-		if (!isset($triggers[$event['objectid']])) {
-			continue;
-		}
-
-		$events[$enum]['trigger'] = $triggers[$event['objectid']];
-		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
-		$sortClock[$enum] = $event['clock'];
-		$sortEvent[$enum] = $event['eventid'];
-		$events[$enum]['trigger']['description'] = $event['name'];
-	}
-	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
-
-	return $events;
 }

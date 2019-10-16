@@ -66,35 +66,31 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getAlerts($sortfield, $sortorder, $show_lines)
-	{
-		$sql = 'SELECT a.alertid,a.clock,a.sendto,a.subject,a.message,a.status,a.retries,a.error,'.
-			'a.userid,a.actionid,a.mediatypeid,mt.description,mt.maxattempts'.
-			' FROM events e,alerts a'.
-			' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE e.eventid=a.eventid'.
-			' AND alerttype='.ALERT_TYPE_MESSAGE;
+	private function getAlerts($sortfield, $sortorder, $show_lines)	{
+		$alerts = API::Alert()->get([
+			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
+				'mediatypeid', 'alerttype'
+			],
+			'selectMediatypes' => ['description', 'maxattempts'],
+			'filter' => [
+				'alerttype' => ALERT_TYPE_MESSAGE
+			],
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => $show_lines
+		]);
 
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$userid = CWebUser::$data['userid'];
-			$userGroups = getUserGroupsByUserId($userid);
-			$sql .= ' AND EXISTS ('.
-				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-				' JOIN rights r'.
-				' ON r.id=hgg.groupid'.
-				' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE e.objectid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.hostid=hgg.hostid'.
-				' GROUP BY f.triggerid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-				')';
+		foreach ($alerts as &$alert) {
+			$alert['description'] = '';
+			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
+				$alert['description'] = $alert['mediatypes'][0]['description'];
+				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];
+			}
+			unset($alert['mediatypes']);
+
+			$alert['action_type'] = ZBX_EVENT_HISTORY_ALERT;
 		}
-
-		$sql .= ' ORDER BY '.$sortfield.' '.$sortorder;
-		$alerts = DBfetchArray(DBselect($sql, $show_lines));
-		order_result($alerts, $sortfield, $sortorder);
+		unset($alert);
 
 		return $alerts;
 	}
@@ -106,8 +102,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getDbUsers(array $alerts)
-	{
+	private function getDbUsers(array $alerts) {
 		$userids = [];
 
 		foreach ($alerts as $alert) {
@@ -133,8 +128,7 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private static function getSorting($sort_triggers)
-	{
+	private static function getSorting($sort_triggers) {
 		switch ($sort_triggers) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
 				return ['clock', ZBX_SORT_UP];
@@ -144,10 +138,10 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 				return ['clock', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
-				return ['description', ZBX_SORT_UP];
+				return ['mediatypeid', ZBX_SORT_UP];
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
-				return ['description', ZBX_SORT_DOWN];
+				return ['mediatypeid', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
 				return ['status', ZBX_SORT_UP];

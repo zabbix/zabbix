@@ -61,7 +61,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -76,19 +77,22 @@ class CControllerPopupTriggerExpr extends CController {
 		$this->param1Str = [
 			'pattern' => [
 				'C' => 'T',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
 		$this->param2SecCount = [
 			'pattern' => [
 				'C' => 'V',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'last' => [
 				'C' => _('Last of').' (T)',
 				'T' => T_ZBX_INT,
-				'M' => $this->metrics
+				'M' => $this->metrics,
+				'A' => false
 			]
 		];
 
@@ -101,15 +105,18 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'v' => [
 				'C' => 'V',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'o' => [
 				'C' => 'O',
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -122,7 +129,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			'p' => [
 				'C' => _('Percentage').' (P)',
@@ -145,7 +153,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			]
 		];
 
@@ -158,7 +167,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			'time' => [
 				'C' => _('Time').' (t)',
@@ -167,11 +177,13 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'fit' => [
 				'C' => _('Fit'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			],
 			'mode' => [
 				'C' => _('Mode'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
@@ -184,7 +196,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'shift' => [
 				'C' => _('Time shift'),
-				'T' => T_ZBX_INT
+				'T' => T_ZBX_INT,
+				'A' => false
 			],
 			't' => [
 				'C' => _('Threshold'),
@@ -193,7 +206,8 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'fit' => [
 				'C' => _('Fit'),
-				'T' => T_ZBX_STR
+				'T' => T_ZBX_STR,
+				'A' => false
 			]
 		];
 
@@ -406,7 +420,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'dstfld1' =>			'string|not_empty',
 			'expression' =>			'string',
 			'itemid' =>				'db items.itemid',
-			'parent_discoveryid' =>	'int32',
+			'parent_discoveryid' =>	'db items.itemid',
 			'function' =>			'in '.implode(',', array_keys($this->functions)),
 			'operator' =>			'in '.implode(',', array_keys($this->operators)),
 			'params' =>				'',
@@ -460,9 +474,11 @@ class CControllerPopupTriggerExpr extends CController {
 			$result = $expression_data->parse($expression);
 
 			if ($result) {
-				// Only one item function macro is supported in an expression.
-				$function_macro_tokens = $result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO);
-				if (count($function_macro_tokens) == 1) {
+				$function_macro_tokens = $result->getTokensByType(
+					CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO
+				);
+
+				if ($function_macro_tokens) {
 					$function_macro_token = $function_macro_tokens[0];
 					$function = $function_macro_token['data']['functionName'];
 
@@ -480,18 +496,17 @@ class CControllerPopupTriggerExpr extends CController {
 					}
 
 					/*
-					 * Try to find an operator and a numeric value.
-					 * The value and operator can be extracted only if the immediately follow the item function macro.
+					 * Try to find an operator and a value.
+					 * The value and operator can be extracted only if they immediately follow the item function macro.
 					 */
 					$tokens = $result->getTokens();
 					foreach ($tokens as $key => $token) {
-						if ($token['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
+						if ($token['type'] == CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO) {
 							if (array_key_exists($key + 2, $tokens)
-									&& $tokens[$key + 1]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR
+									&& $tokens[$key + 1]['type'] == CTriggerExprParserResult::TOKEN_TYPE_OPERATOR
 									&& array_key_exists($function, $this->functions)
-									&& in_array($tokens[$key + 1]['value'], $this->functions[$function]['operators'])
-									&& $tokens[$key + 2]['type'] == CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER) {
-
+									&& in_array($tokens[$key + 1]['value'],
+										$this->functions[$function]['operators'])) {
 								$operator = $tokens[$key + 1]['value'];
 								$value = $tokens[$key + 2]['value'];
 							}
@@ -614,7 +629,9 @@ class CControllerPopupTriggerExpr extends CController {
 					if ($data['paramtype'] == PARAM_TYPE_COUNTS
 							&& array_key_exists('last', $data['params'])
 							&& $data['params']['last'] !== '') {
-						$data['params']['last'] = '#'.$data['params']['last'];
+						$data['params']['last'] = zbx_is_int($data['params']['last'])
+							? '#'.$data['params']['last']
+							: $data['params']['last'];
 					}
 					elseif ($data['paramtype'] == PARAM_TYPE_TIME && in_array($function, ['last', 'band', 'strlen'])) {
 						$data['params']['last'] = '';

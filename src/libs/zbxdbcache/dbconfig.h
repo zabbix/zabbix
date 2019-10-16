@@ -371,6 +371,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	auto_compress;
 	const char	*proxy_address;
+	int		last_version_error_time;
 }
 ZBX_DC_PROXY;
 

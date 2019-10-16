@@ -220,6 +220,15 @@ elseif ($config == QUEUE_DETAILS) {
 		'preservekeys' => true
 	]);
 
+	if (count($queueData) != count($items)) {
+		$items += API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'selectHosts' => ['name'],
+			'itemids' => array_diff(array_keys($queueData), array_keys($items)),
+			'preservekeys' => true
+		]);
+	}
+
 	$items = CMacrosResolverHelper::resolveItemNames($items);
 
 	// get hosts for queue items

@@ -121,15 +121,10 @@ class CDService extends CApiService {
 		if (!is_null($options['dcheckids'])) {
 			zbx_value2array($options['dcheckids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dchecks'] = 'dchecks dc';
-
-			$sqlParts['where'][] = dbConditionInt('dc.dcheckid', $options['dcheckids']);
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
-			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
+			$sqlParts['where'][] = dbConditionInt('ds.dcheckid', $options['dcheckids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['dcheckid'] = 'dc.dcheckid';
+				$sqlParts['group']['dcheckid'] = 'ds.dcheckid';
 			}
 		}
 
@@ -189,12 +184,12 @@ class CDService extends CApiService {
 			$result = $this->unsetExtraFields($result, ['dhostid'], $options['output']);
 		}
 
-// removing keys (hash -> array)
+		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
 		}
 
-	return $result;
+		return $result;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -294,6 +289,12 @@ class CDService extends CApiService {
 							|| count($result[$dserviceid]['hosts']) < $options['limitSelects']) {
 						$result[$dserviceid]['hosts'][] = $db_host;
 					}
+				}
+			}
+
+			if ($options['selectHosts'] == API_OUTPUT_COUNT) {
+				foreach ($result as $dserviceid => $dservice) {
+					$result[$dserviceid]['hosts'] = (string) $dservice['hosts'];
 				}
 			}
 		}

@@ -26,6 +26,7 @@
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 #include "zbxtasks.h"
 #include "mutexs.h"
+#include "daemon.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -108,6 +109,11 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 	zbx_update_proxy_data(&proxy, zbx_get_protocol_version(jp), time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0));
 
+	if (SUCCEED != zbx_check_protocol_version(&proxy))
+	{
+		goto out;
+	}
+
 	if (SUCCEED != (ret = process_proxy_data(&proxy, jp, ts, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
@@ -116,7 +122,17 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_time
 		goto out;
 	}
 
-	zbx_send_proxy_data_response(&proxy, sock, error);
+	if (!ZBX_IS_RUNNING())
+	{
+		error = zbx_strdup(error, "Zabbix server shutdown in progress");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from active proxy at \"%s\": %s",
+				sock->peer, error);
+		ret = status = FAIL;
+		goto out;
+	}
+	else
+		zbx_send_proxy_data_response(&proxy, sock, error);
+
 out:
 	if (FAIL == ret)
 	{

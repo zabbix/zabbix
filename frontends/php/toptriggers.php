@@ -21,7 +21,6 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 
 $page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
@@ -172,15 +171,12 @@ while ($row = DBfetch($result)) {
 }
 
 $data['triggers'] = API::Trigger()->get([
-	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'],
-	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+	'output' => ['triggerid', 'description', 'expression', 'priority', 'lastchange'],
 	'selectHosts' => ['hostid', 'status', 'name'],
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
 	'preservekeys' => true
 ]);
-
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 $trigger_hostids = [];
 
@@ -198,13 +194,9 @@ CArrayHelper::sort($data['triggers'], [
 
 $data['hosts'] = API::Host()->get([
 	'output' => ['hostid', 'status'],
-	'selectGraphs' => API_OUTPUT_COUNT,
-	'selectScreens' => API_OUTPUT_COUNT,
 	'hostids' => $trigger_hostids,
 	'preservekeys' => true
 ]);
-
-$data['scripts'] = API::Script()->getScriptsByHosts($trigger_hostids);
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

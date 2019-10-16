@@ -1,5 +1,7 @@
 if SERVER
-SERVER_tests = evaluate
+SERVER_tests = \
+	evaluate \
+	queue
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -85,5 +87,19 @@ evaluate_LDADD += @SERVER_LIBS@
 evaluate_LDFLAGS = @SERVER_LDFLAGS@
 
 evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+queue_SOURCES = \
+	queue.c \
+	$(COMMON_SRC_FILES)
+
+queue_LDADD = \
+	$(COMMON_LIB_FILES)
+
+queue_LDADD += @SERVER_LIBS@
+
+queue_LDFLAGS = @SERVER_LDFLAGS@
+
+queue_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

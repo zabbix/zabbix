@@ -21,7 +21,7 @@
 #define ZABBIX_MOCK_DB_H
 
 
-void	zbx_mockdb_init();
-void	zbx_mockdb_destroy();
+void	zbx_mockdb_init(void);
+void	zbx_mockdb_destroy(void);
 
 #endif /* BUILD_TESTS_ZBXMOCKDB_H_ */

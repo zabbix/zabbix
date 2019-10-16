@@ -113,7 +113,7 @@ zbx_oracle_db_handle_t;
 
 static zbx_oracle_db_handle_t	oracle;
 
-static ub4	OCI_DBserver_status();
+static ub4	OCI_DBserver_status(void);
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
@@ -286,14 +286,8 @@ static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
 }
 #endif /*HAVE_POSTGRESQL*/
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_execute		__zbx_zbx_db_execute
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static int	__zbx_zbx_db_execute(const char *fmt, ...)
+static int	zbx_db_execute(const char *fmt, ...)
 {
 	va_list	args;
 	int	ret;
@@ -305,14 +299,8 @@ static int	__zbx_zbx_db_execute(const char *fmt, ...)
 	return ret;
 }
 
-#ifdef HAVE___VA_ARGS__
-#	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zbx_db_select		__zbx_zbx_db_select
-#endif
-
 __zbx_attr_format_printf(1, 2)
-static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
+static DB_RESULT	zbx_db_select(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	result;
@@ -340,6 +328,7 @@ static int	is_recoverable_mysql_error(void)
 		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
 		case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
 		case ER_UNKNOWN_ERROR:
+		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
 #ifdef ER_CONNECTION_KILLED
@@ -351,9 +340,9 @@ static int	is_recoverable_mysql_error(void)
 	return FAIL;
 }
 #elif defined(HAVE_POSTGRESQL)
-static int	is_recoverable_postgresql_error(const PGconn *conn, const PGresult *pg_result)
+static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult *pg_result)
 {
-	if (CONNECTION_OK != PQstatus(conn))
+	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
@@ -2002,6 +1991,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	if (OCI_SUCCESS != rc)
 	{
+		ub4	rows_fetched;
+		ub4	sizep = sizeof(ub4);
+
 		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
 				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
 		{
@@ -2017,6 +2009,15 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			case 3114:	/* ORA-03114: not connected to ORACLE */
 				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
 				return NULL;
+			default:
+				rc = OCIAttrGet((void *)result->stmthp, (ub4)OCI_HTYPE_STMT, (void *)&rows_fetched,
+						(ub4 *)&sizep, (ub4)OCI_ATTR_ROWS_FETCHED, (OCIError *)oracle.errhp);
+
+				if (OCI_SUCCESS != rc || 1 != rows_fetched)
+				{
+					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
+					return NULL;
+				}
 		}
 	}
 
@@ -2288,7 +2289,7 @@ static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_co
 
 #ifdef HAVE_ORACLE
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-static ub4	OCI_DBserver_status()
+static ub4	OCI_DBserver_status(void)
 {
 	sword	err;
 	ub4	server_status = OCI_SERVER_NOT_CONNECTED;

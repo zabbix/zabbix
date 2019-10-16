@@ -242,7 +242,7 @@ The total number of octets transmitted out of the interface, including framing c
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.in.errors[ifInErrors.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>3m</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>
@@ -290,7 +290,7 @@ For packet-oriented interfaces, the number of inbound packets that contained err
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}</snmp_oid>
                      <key>net.if.out.errors[ifOutErrors.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
+                     <delay>3m</delay>
                      <history>1w</history>
                      <trends>365d</trends>
                      <status>0</status>

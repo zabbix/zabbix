@@ -46,8 +46,9 @@ class testPageScreens extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allScreens
-	*/
+	 * @dataProvider allScreens
+	 * @ignore-browser-errors
+	 */
 	public function testPageScreens_SimpleEdit($screen) {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
@@ -59,8 +60,9 @@ class testPageScreens extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allScreens
-	*/
+	 * @dataProvider allScreens
+	 * @ignore-browser-errors
+	 */
 	public function testPageScreens_SimpleUpdate($screen) {
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
 		$oldHashScreen = CDBHelper::getHash($sqlScreen);

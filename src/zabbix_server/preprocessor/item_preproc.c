@@ -104,7 +104,7 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	{
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
-			zbx_variant_set_variant(value_num, value);
+			zbx_variant_copy(value_num, value);
 			ret = SUCCEED;
 			break;
 		case ZBX_VARIANT_STR:
@@ -193,11 +193,16 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *value, const char *params,
 		char **errmsg)
 {
+	char	buffer[MAX_STRING_LEN];
 	char	*err = NULL;
 
-	if (FAIL == is_double(params))
+	zbx_strlcpy(buffer, params, sizeof(buffer));
+
+	zbx_trim_float(buffer);
+
+	if (FAIL == is_double(buffer))
 		err = zbx_dsprintf(NULL, "a numerical value is expected");
-	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, params, &err))
+	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
 
 	*errmsg = zbx_dsprintf(*errmsg, "cannot apply multiplier \"%s\" to value \"%s\" of type \"%s\": %s",
@@ -313,7 +318,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 		return FAIL;
 
 	zbx_variant_clear(value);
-	zbx_variant_set_variant(value, &value_num);
+	zbx_variant_copy(value, &value_num);
 
 	if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->value.type)
 	{
@@ -329,7 +334,7 @@ static int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, co
 	}
 
 	history_value->timestamp = *ts;
-	zbx_variant_set_variant(&history_value->value, &value_num);
+	zbx_variant_copy(&history_value->value, &value_num);
 	zbx_variant_clear(&value_num);
 
 	if (SUCCEED != ret)
@@ -754,7 +759,7 @@ static int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char
 		return FAIL;
 	}
 
-	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, &new_value))
+	if (FAIL == zbx_mregexp_sub_precompiled(value->data.str, regex, output, ZBX_MAX_RECV_DATA_SIZE, &new_value))
 	{
 		*errmsg = zbx_strdup(*errmsg, "pattern does not match");
 		zbx_regexp_free(regex);
@@ -814,20 +819,24 @@ static int	item_preproc_regsub(zbx_variant_t *value, const char *params, char **
  ******************************************************************************/
 static int	item_preproc_jsonpath_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	struct zbx_json_parse	jp, jp_out;
+	struct zbx_json_parse	jp;
 	char			*data = NULL;
-	size_t			data_alloc = 0;
 
 	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 		return FAIL;
 
-	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_json_path_open(&jp, params, &jp_out))
+	if (FAIL == zbx_json_open(value->data.str, &jp) || FAIL == zbx_jsonpath_query(&jp, params, &data))
 	{
 		*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
 		return FAIL;
 	}
 
-	zbx_json_value_dyn(&jp_out, &data, &data_alloc);
+	if (NULL == data)
+	{
+		*errmsg = zbx_strdup(*errmsg, "no data matches the specified path");
+		return FAIL;
+	}
+
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, data);
 
@@ -1054,3 +1063,6 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 
 	return FAIL;
 }
+#ifdef HAVE_TESTS
+#	include "../../../tests/zabbix_server/preprocessor/item_preproc_test.c"
+#endif

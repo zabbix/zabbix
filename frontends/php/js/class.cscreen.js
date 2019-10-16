@@ -62,7 +62,6 @@ Cscreen.prototype = {
 
 		jQuery('.screenitem').droppable({
 			accept: '.draggable',
-			hoverClass: 'ui-sortable-placeholder',
 			drop: this.on_drop,
 			tolerance: 'pointer'
 		});
@@ -77,7 +76,7 @@ Cscreen.prototype = {
 		var x2 = dropDiv.data('xcoord');
 		var y2 = dropDiv.data('ycoord');
 
-		var url = new Curl(location.href);
+		var url = new Curl();
 		var params = {
 			ajaxAction: 'sw_pos',
 			output: 'ajax',

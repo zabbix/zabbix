@@ -121,7 +121,7 @@ class CElement extends CBaseElement implements IWaitable {
 			$query->setContext($this->parent);
 		}
 
-		$this->setElement($query->one());
+		$this->setElement($query->waitUntilPresent()->one());
 		if (!$this->normalized) {
 			$this->normalize();
 		}
@@ -156,8 +156,30 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @return CElementQuery
 	 */
-	public function parents($type, $locator = null) {
-		return $this->query('xpath:./ancestor::'.CXPathHelper::fromSelector($type, $locator));
+	public function parents($type = null, $locator = null) {
+		$selector = 'xpath:./ancestor';
+		if ($type !== null) {
+			$selector .= '::'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
+	}
+
+	/**
+	 * Get children selection query.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return CElementQuery
+	 */
+	public function children($type = null, $locator = null) {
+		$selector = 'xpath:./*';
+		if ($type !== null) {
+			$selector = 'xpath:./'.CXPathHelper::fromSelector($type, $locator);
+		}
+
+		return $this->query($selector);
 	}
 
 	/**
@@ -226,12 +248,37 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Get element value.
+	 *
+	 * @return type
+	 */
+	public function getValue() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].value;', [$this]);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function sendKeys($value) {
+		if (is_string($value) && strpos($value, '"') === false) {
+			parent::sendKeys($value);
+		}
+		else {
+			CElementQuery::getDriver()->executeScript('arguments[0].value=arguments[1];arguments[0].focus();',
+					[$this, $value]
+			);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Highlight the value in the field.
 	 *
 	 * @return $this
 	 */
 	public function selectValue() {
-		$this->click()->sendKeys([WebDriverKeys::CONTROL, 'a', WebDriverKeys::CONTROL]);
+		CElementQuery::getDriver()->executeScript('arguments[0].focus();arguments[0].select();', [$this]);
 
 		return $this;
 	}
@@ -244,6 +291,10 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function overwrite($text) {
+		if ($text === '' || $text === null) {
+			$text = WebDriverKeys::DELETE;
+		}
+
 		return $this->selectValue()->type($text);
 	}
 
@@ -257,7 +308,6 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function fill($text) {
 		return $this->overwrite($text);
-//		return $this->clear()->type($text);
 	}
 
 	/**
@@ -281,13 +331,22 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if element is present.
+	 *
+	 * @return boolean
+	 */
+	public function isPresent() {
+		return !$this->isStalled();
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getPresentCondition() {
 		$target = $this;
 
 		return function () use ($target) {
-			return !$target->isStalled();
+			return $target->isPresent();
 		};
 	}
 
@@ -303,14 +362,49 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
+	 * Check if text is present.
+	 *
+	 * @param string $text    text to be present
+	 *
+	 * @return boolean
+	 */
+	public function isTextPresent($text) {
+		return (strpos($this->getText(), $text) !== false);
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function getTextPresentCondition($text) {
 		$target = $this;
 
 		return function () use ($target, $text) {
-			return (strpos($target->getText(), $text) !== false);
+			return $target->isTextPresent($text);
 		};
+	}
+
+	/**
+	 * Check presence of the attribute(s).
+	 *
+	 * @param string|array    $attributes attribute or attributes to be present.
+	 *
+	 * @return boolean
+	 */
+	public function isAttributePresent($attributes) {
+		if (!is_array($attributes)) {
+			$attributes = [$attributes];
+		}
+
+		foreach ($attributes as $key => $value) {
+			if (is_numeric($key) && $this->getAttribute($value) === null) {
+				return false;
+			}
+			elseif ($this->getAttribute($key) !== $value) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -320,17 +414,17 @@ class CElement extends CBaseElement implements IWaitable {
 		$target = $this;
 
 		return function () use ($target, $attributes) {
-			foreach ($attributes as $key => $value) {
-				if (is_numeric($key) && $target->getAttribute($value) === null) {
-					return false;
-				}
-				elseif ($target->getAttribute($key) !== $value) {
-					return false;
-				}
-			}
-
-			return true;
+			return $target->isAttributePresent($attributes);
 		};
+	}
+
+	/**
+	 * Check if element is ready.
+	 *
+	 * @return boolean
+	 */
+	public function isReady() {
+		return $this->isClickable();
 	}
 
 	/**
@@ -375,5 +469,136 @@ class CElement extends CBaseElement implements IWaitable {
 		CElementQuery::wait()->until(WebDriverExpectedCondition::elementToBeSelected($this));
 
 		return $this;
+	}
+
+	/**
+	 * Detect element by its tag or class.
+	 *
+	 * @param type $options
+	 */
+	public function detect($options = []) {
+
+		$tag = $this->getTagName();
+		if ($tag === 'textarea') {
+			return $this->asElement($options);
+		}
+
+		if ($tag === 'select') {
+			return $this->asDropdown($options);
+		}
+
+		if ($tag === 'table') {
+			return $this->asTable($options);
+		}
+
+		if ($tag === 'input') {
+			$type = $this->getAttribute('type');
+			if ($type === 'checkbox' || $type === 'radio') {
+				return $this->asCheckbox($options);
+			}
+			else {
+				return $this->asElement($options);
+			}
+		}
+
+		$class = explode(' ', $this->getAttribute('class'));
+		if (in_array('multiselect-control', $class)) {
+			return $this->asMultiselect($options);
+		}
+
+		if (in_array('radio-list-control', $class)) {
+			return $this->asSegmentedRadio($options);
+		}
+
+		if (in_array('checkbox-list', $class)) {
+			return $this->asCheckboxList($options);
+		}
+
+		if (in_array('range-control', $class)) {
+			return $this->asRangeControl($options);
+		}
+
+		if (in_array('multilineinput-control', $class)) {
+			return $this->asMultiline($options);
+		}
+
+		self::addWarning('No specific element was detected');
+
+		return $this;
+	}
+
+	/**
+	 * Throw error for not supported method invocation.
+	 *
+	 * @param string $method    method name
+	 *
+	 * @throws Exception
+	 */
+	public static function onNotSupportedMethod($method) {
+		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function isEnabled($enabled = true) {
+		$classes = explode(' ', parent::getAttribute('class'));
+
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
+
+		return $is_enabled === $enabled;
+	}
+
+	/**
+	 * Check element value.
+	 *
+	 * @param mixed $expected    expected value of the element
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		$value = $this->getValue();
+
+		if (is_array($value)) {
+			if (!is_array($expected)) {
+				$expected = [$expected];
+			}
+
+			foreach (['value', 'expected'] as $var) {
+				$values = [];
+				foreach ($$var as $item) {
+					$values[] = '"'.$item.'"';
+				}
+
+				sort($values);
+
+				$$var = implode(', ', $values);
+			}
+		}
+
+		if ($expected != $value && $raise_exception) {
+			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
+		}
+
+		return ($expected == $value);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function click($force = false) {
+		try {
+			return parent::click();
+		} catch (Exception $exception) {
+			if (!$force) {
+				throw $exception;
+			}
+
+			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
+		}
 	}
 }

@@ -29,6 +29,7 @@
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
+	zbx_uint64_t	hostid;
 	char		*host;
 	char		*ip;
 	char		*dns;
@@ -213,12 +214,14 @@ void	DBrollback(void)
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
-void	DBend(int ret)
+int	DBend(int ret)
 {
 	if (SUCCEED == ret)
-		DBcommit();
-	else
-		DBrollback();
+		return ZBX_DB_OK == DBcommit() ? SUCCEED : FAIL;
+
+	DBrollback();
+
+	return FAIL;
 }
 
 #ifdef HAVE_ORACLE
@@ -261,7 +264,7 @@ void	DBstatement_prepare(const char *sql)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_DBexecute(const char *fmt, ...)
+int	DBexecute(const char *fmt, ...)
 {
 	va_list	args;
 	int	rc;
@@ -297,7 +300,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
  * Comments: don't retry if DB is down                                        *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_DBexecute_once(const char *fmt, ...)
+int	DBexecute_once(const char *fmt, ...)
 {
 	va_list	args;
 	int	rc;
@@ -328,7 +331,7 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Purpose: execute a select statement                                        *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
+DB_RESULT	DBselect_once(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	rc;
@@ -351,7 +354,7 @@ DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	__zbx_DBselect(const char *fmt, ...)
+DB_RESULT	DBselect(const char *fmt, ...)
 {
 	va_list		args;
 	DB_RESULT	rc;
@@ -720,13 +723,99 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "task_remote_command") ||
-			0 == strcmp(tablename, "task_remote_command_result"))
+			0 == strcmp(tablename, "autoreg_host"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
 }
+
+#define MAX_EXPRESSIONS	950
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
+#ifdef HAVE_ORACLE
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_condition_alloc_btw                                        *
+ *                                                                            *
+ * Purpose: Takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condition is generated from the given  *
+ *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elements in 'values' array         *
+ *             seq_len    - [OUT] - array of sequential chains                *
+ *             seq_num    - [OUT] - length of seq_len                         *
+ *             in_num     - [OUT] - number of id for 'IN'                     *
+ *             between_num- [OUT] - number of sequential chains for 'BETWEEN' *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBadd_condition_alloc_btw(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num, int **seq_len, int *seq_num, int *in_num, int *between_num)
+{
+	int		i, len, first, start;
+	zbx_uint64_t	value;
+
+	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
+	/* An isolated value is represented as a sequence with length 1. */
+	*seq_len = (int *)zbx_malloc(*seq_len, num * sizeof(int));
+
+	for (i = 1, *seq_num = 0, value = values[0], len = 1; i < num; i++)
+	{
+		if (values[i] != ++value)
+		{
+			if (MIN_NUM_BETWEEN <= len)
+				(*between_num)++;
+			else
+				*in_num += len;
+
+			(*seq_len)[(*seq_num)++] = len;
+			len = 1;
+			value = values[i];
+		}
+		else
+			len++;
+	}
+
+	if (MIN_NUM_BETWEEN <= len)
+		(*between_num)++;
+	else
+		*in_num += len;
+
+	(*seq_len)[(*seq_num)++] = len;
+
+	if (MAX_EXPRESSIONS < *in_num || 1 < *between_num || (0 < *in_num && 0 < *between_num))
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+	/* compose "between"s */
+	for (i = 0, first = 1, start = 0; i < *seq_num; i++)
+	{
+		if (MIN_NUM_BETWEEN <= (*seq_len)[i])
+		{
+			if (1 != first)
+			{
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			}
+			else
+				first = 0;
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname, values[start], values[start + (*seq_len)[i] - 1]);
+		}
+
+		start += (*seq_len)[i];
+	}
+
+	if (0 < *in_num && 0 < *between_num)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -749,13 +838,11 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num)
 {
-#define MAX_EXPRESSIONS	950
-#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
-
-	int		i, start, len, seq_num, first;
-	int		between_num = 0, in_num = 0, in_cnt;
-	zbx_uint64_t	value;
+#ifdef HAVE_ORACLE
+	int		start, between_num = 0, in_num = 0, seq_num;
 	int		*seq_len = NULL;
+#endif
+	int		i, in_cnt;
 #if defined(HAVE_SQLITE3)
 	int		expr_num, expr_cnt = 0;
 #endif
@@ -763,83 +850,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
-
-	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
-	/* An isolated value is represented as a sequence with length 1. */
-	seq_len = (int *)zbx_malloc(seq_len, num * sizeof(int));
-
-	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
-	{
-		if (values[i] != ++value)
-		{
-			if (MIN_NUM_BETWEEN <= len)
-				between_num++;
-			else
-				in_num += len;
-
-			seq_len[seq_num++] = len;
-			len = 1;
-			value = values[i];
-		}
-		else
-			len++;
-	}
-
-	if (MIN_NUM_BETWEEN <= len)
-		between_num++;
-	else
-		in_num += len;
-
-	seq_len[seq_num++] = len;
-
-	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
-		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-
-#if defined(HAVE_SQLITE3)
-	expr_num = between_num + (in_num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
-
-	if (MAX_EXPRESSIONS < expr_num)
-		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-#endif
-	/* compose "between"s */
-	for (i = 0, first = 1, start = 0; i < seq_num; i++)
-	{
-		if (MIN_NUM_BETWEEN <= seq_len[i])
-		{
-			if (1 != first)
-			{
-#if defined(HAVE_SQLITE3)
-				if (MAX_EXPRESSIONS == ++expr_cnt)
-				{
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
-					expr_cnt = 0;
-				}
-				else
-#endif
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
-			}
-			else
-				first = 0;
-
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					fieldname, values[start], values[start + seq_len[i] - 1]);
-		}
-
-		start += seq_len[i];
-	}
-
-	if (0 < in_num && 0 < between_num)
-	{
-#if defined(HAVE_SQLITE3)
-		if (MAX_EXPRESSIONS == ++expr_cnt)
-		{
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
-			expr_cnt = 0;
-		}
-		else
-#endif
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
-	}
+#ifdef HAVE_ORACLE
+	DBadd_condition_alloc_btw(sql, sql_alloc, sql_offset, fieldname, values, num, &seq_len, &seq_num, &in_num,
+			&between_num);
 
 	if (1 < in_num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -850,15 +863,40 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		if (MIN_NUM_BETWEEN > seq_len[i])
 		{
 			if (1 == in_num)
+#else
+	if (MAX_EXPRESSIONS < num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+#if	defined(HAVE_SQLITE3)
+	expr_num = (num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
+
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+#endif
+
+	if (1 < num)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+
+	/* compose "in"s */
+	for (i = 0, in_cnt = 0; i < num; i++)
+	{
+			if (1 == num)
+#endif
 			{
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
+#ifdef HAVE_ORACLE
 						values[start]);
+#else
+						values[i]);
+#endif
 				break;
 			}
 			else
 			{
+#ifdef HAVE_ORACLE
 				do
 				{
+#endif
 					if (MAX_EXPRESSIONS == in_cnt)
 					{
 						in_cnt = 0;
@@ -880,8 +918,10 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 #endif
 					}
 
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
 					in_cnt++;
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",",
+#ifdef HAVE_ORACLE
+							values[start++]);
 				}
 				while (0 != --seq_len[i]);
 			}
@@ -890,19 +930,30 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 			start += seq_len[i];
 	}
 
+	zbx_free(seq_len);
+
 	if (1 < in_num)
+#else
+							values[i]);
+			}
+	}
+
+	if (1 < num)
+#endif
 	{
 		(*sql_offset)--;
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 	}
 
-	zbx_free(seq_len);
-
 #if defined(HAVE_SQLITE3)
 	if (MAX_EXPRESSIONS < expr_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 #endif
+#ifdef HAVE_ORACLE
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
+#else
+	if (MAX_EXPRESSIONS < num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
@@ -1281,7 +1332,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 	}
 
 	autoreg_host = (zbx_autoreg_host_t *)zbx_malloc(NULL, sizeof(zbx_autoreg_host_t));
-	autoreg_host->autoreg_hostid = 0;
+	autoreg_host->autoreg_hostid = autoreg_host->hostid = 0;
 	autoreg_host->host = zbx_strdup(NULL, host);
 	autoreg_host->ip = zbx_strdup(NULL, ip);
 	autoreg_host->dns = zbx_strdup(NULL, dns);
@@ -1309,6 +1360,7 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_str_t	hosts;
+	zbx_uint64_t		current_proxy_hostid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
@@ -1324,13 +1376,11 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,a.host_metadata"
+				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata"
 				" from hosts h"
 				" left join autoreg_host a"
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
-				" where h.proxy_hostid=" ZBX_FS_UI64
-					" and",
-				proxy_hostid);
+				" where");
 		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 				(const char **)hosts.values, hosts.values_num);
 
@@ -1345,8 +1395,14 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				if (0 != strcmp(autoreg_host->host, row[0]))
 					continue;
 
-				if (SUCCEED == DBis_null(row[1]) || 0 != strcmp(autoreg_host->host_metadata, row[1]))
+				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
+				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
+
+				if (current_proxy_hostid != proxy_hostid || SUCCEED == DBis_null(row[3]) ||
+						0 != strcmp(autoreg_host->host_metadata, row[3]))
+				{
 					break;
+				}
 
 				zbx_vector_ptr_remove(autoreg_hosts, i);
 				autoreg_host_free(autoreg_host);
@@ -1395,6 +1451,16 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 	zbx_vector_str_destroy(&hosts);
 	zbx_free(sql);
+}
+
+static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
+{
+	const zbx_autoreg_host_t	*p1 = *(const zbx_autoreg_host_t **)d1;
+	const zbx_autoreg_host_t	*p2 = *(const zbx_autoreg_host_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->hostid, p2->hostid);
+
+	return 0;
 }
 
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
@@ -1473,11 +1539,6 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 			zbx_free(dns_esc);
 			zbx_free(ip_esc);
 		}
-
-		ts.sec = autoreg_host->now;
-
-		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	if (0 != create)
@@ -1491,6 +1552,17 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
+	}
+
+	zbx_vector_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
+
+	for (i = 0; i < autoreg_hosts->values_num; i++)
+	{
+		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
+
+		ts.sec = autoreg_host->now;
+		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
 	}
 
 	zbx_process_events(NULL, NULL);
@@ -1550,7 +1622,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_MAX_SQL_SIZE < *sql_offset)
+	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1559,10 +1631,25 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+		/* make sure we are not called twice without */
+		/* putting a new sql into the buffer first */
+		if (*sql_offset <= ZBX_SQL_EXEC_FROM)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return ret;
+		}
 
-		if (ZBX_DB_OK > DBexecute("%s", *sql))
+		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
+		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
+#else
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+#endif
+		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
+		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
+		if (ZBX_DB_OK > DBexecute("%s", *sql + ZBX_SQL_EXEC_FROM))
 			ret = FAIL;
+
 		*sql_offset = 0;
 
 		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
@@ -2476,7 +2563,7 @@ retry_oracle:
 		}
 	}
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		for (i = 0; i < self->rows.values_num; i++)
 		{
@@ -2524,7 +2611,6 @@ retry_oracle:
 #	else
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_command);
 #	endif
-
 		for (j = 0; j < self->fields.values_num; j++)
 		{
 			const zbx_db_value_t	*value = &values[j];

@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -37,7 +36,10 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), 'isset({copy})'],
+	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,
+									IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+									'isset({copy})'
+								],
 	'copy_mode' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
@@ -51,7 +53,9 @@ $fields = [
 		_('Update interval')
 	],
 	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
-	'history' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})',
+	'history_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
+	'history' =>				[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({history_mode}) && {history_mode}=='.ITEM_STORAGE_CUSTOM,
 		_('History storage period')
 	],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE]), null],
@@ -65,9 +69,10 @@ $fields = [
 									]),
 									'isset({add}) || isset({update})'
 								],
+	'trends_mode' =>			[T_ZBX_INT, O_OPT, null,	IN([ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]), null],
 	'trends' =>					[T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({value_type}) && '.
-			IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
+		'(isset({add}) || isset({update})) && isset({trends_mode}) && {trends_mode}=='.ITEM_STORAGE_CUSTOM.
+			' && isset({value_type}) && '.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Trend storage period')
 	],
 	'value_type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({add}) || isset({update})'],
@@ -120,8 +125,7 @@ $fields = [
 		'(isset({add}) || isset({update})) && isset({value_type}) && {value_type} == 2'],
 	'preprocessing' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetid' =>		    [T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_groupid' =>		    [T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'copy_targetids' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_application' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'visible' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -177,13 +181,13 @@ $fields = [
 									IN([HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM]),
 									null
 								],
-	'http_username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_username' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
 									_('Username')
 								],
-	'http_password' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'http_password' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({http_authtype})'.
 										' && ({http_authtype} == '.HTTPTEST_AUTH_BASIC.
 											' || {http_authtype} == '.HTTPTEST_AUTH_NTLM.')',
@@ -571,6 +575,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($preprocessing as &$step) {
 			switch ($step['type']) {
 				case ZBX_PREPROC_MULTIPLIER:
+					$step['params'] = trim($step['params'][0]);
+					break;
+
 				case ZBX_PREPROC_RTRIM:
 				case ZBX_PREPROC_LTRIM:
 				case ZBX_PREPROC_TRIM:
@@ -616,8 +623,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
 				'units' => getRequest('units', ''),
 				'delay' => $delay,
-				'history' => getRequest('history', DB::getDefault('items', 'history')),
-				'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
+				'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: getRequest('history', DB::getDefault('items', 'history')),
+				'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: getRequest('trends', DB::getDefault('items', 'trends')),
 				'valuemapid' => getRequest('valuemapid', 0),
 				'logtimefmt' => getRequest('logtimefmt', ''),
 				'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -731,7 +742,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
 					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
 				}
-				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);;
+				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
 					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
 				}
@@ -777,11 +788,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
 				}
-				if ($db_item['history'] != getRequest('history', DB::getDefault('items', 'history'))) {
-					$item['history'] = getRequest('history', DB::getDefault('items', 'history'));
+				$def_item_history = (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: DB::getDefault('items', 'history');
+				if ((string) $db_item['history'] !== (string) getRequest('history', $def_item_history)) {
+					$item['history'] = getRequest('history', $def_item_history);
 				}
-				if ($db_item['trends'] != getRequest('trends', DB::getDefault('items', 'trends'))) {
-					$item['trends'] = getRequest('trends', DB::getDefault('items', 'trends'));
+				$def_item_trends = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+					? ITEM_NO_STORAGE_VALUE
+					: DB::getDefault('items', 'trends');
+				if ((string) $db_item['trends'] !== (string) getRequest('trends', $def_item_trends)) {
+					$item['trends'] = getRequest('trends', $def_item_trends);
 				}
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
@@ -1047,7 +1064,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'interfaceid' => getRequest('interfaceid'),
 					'description' => getRequest('description'),
 					'delay' => $delay,
-					'history' => getRequest('history'),
+					'history' => (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+						? ITEM_NO_STORAGE_VALUE
+						: getRequest('history'),
 					'type' => getRequest('type'),
 					'snmp_community' => getRequest('snmp_community'),
 					'snmp_oid' => getRequest('snmp_oid'),
@@ -1062,7 +1081,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
 					'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
 					'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-					'trends' => getRequest('trends'),
+					'trends' => (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
+						? ITEM_NO_STORAGE_VALUE
+						: getRequest('trends'),
 					'logtimefmt' => getRequest('logtimefmt'),
 					'valuemapid' => getRequest('valuemapid'),
 					'authtype' => getRequest('authtype'),
@@ -1105,6 +1126,9 @@ elseif ($valid_input && hasRequest('massupdate') && hasRequest('group_itemid')) 
 					foreach ($preprocessing as &$step) {
 						switch ($step['type']) {
 							case ZBX_PREPROC_MULTIPLIER:
+								$step['params'] = trim($step['params'][0]);
+								break;
+
 							case ZBX_PREPROC_RTRIM:
 							case ZBX_PREPROC_LTRIM:
 							case ZBX_PREPROC_TRIM:
@@ -1205,15 +1229,15 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
-	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetid');
+			$hosts_ids = getRequest('copy_targetids');
 		}
 		// host groups
 		else {
 			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetid');
+			$group_ids = getRequest('copy_targetids');
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
@@ -1308,6 +1332,15 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' &&
 	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
+if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
+	$itemids = API::Item()->get([
+		'output' => [],
+		'itemids' => getRequest('group_itemid'),
+		'editable' => true
+	]);
+	uncheckTableRows(getRequest('hostid'), zbx_objectValues($itemids, 'itemid'));
+}
+
 /*
  * Display
  */
@@ -1346,11 +1379,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 		}
 
 		if (getRequest('type', $item['type']) == ITEM_TYPE_DEPENDENT) {
-			$master_item_options = [
-				'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
-				'itemids' => getRequest('master_itemid', $item['master_itemid']),
-				'webitems' => true
-			];
+			// Unset master item if submitted form has no master_itemid set.
+			if (hasRequest('form_refresh') && !hasRequest('master_itemid')) {
+				$item['master_itemid'] = 0;
+			}
+			else {
+				$master_item_options = [
+					'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+					'itemids' => getRequest('master_itemid', $item['master_itemid']),
+					'webitems' => true
+				];
+			}
 		}
 	}
 	else {
@@ -1388,6 +1427,24 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 	$data['config'] = select_config();
 	$data['host'] = $host;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	$history_in_seconds = timeUnitToSeconds($data['history']);
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
+		$data['history'] = DB::getDefault('items', 'history');
+	}
+	else {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
+	}
+
+	$trends_in_seconds = timeUnitToSeconds($data['trends']);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
+		$data['trends'] = $data['trends_default'];
+	}
+	else {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
+	}
 
 	// Sort interfaces to be listed starting with one selected as 'main'.
 	CArrayHelper::sort($data['interfaces'], [
@@ -1582,18 +1639,37 @@ elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform'
 
 	$data['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 
+	$history_in_seconds = timeUnitToSeconds($data['history']);
+	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_OFF);
+		$data['history'] = DB::getDefault('items', 'history');
+	}
+	else {
+		$data['history_mode'] = getRequest('history_mode', ITEM_STORAGE_CUSTOM);
+	}
+
+	$trends_in_seconds = timeUnitToSeconds($data['trends']);
+	if (!getRequest('form_refresh') && $trends_in_seconds !== null && $trends_in_seconds == ITEM_NO_STORAGE_VALUE) {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_OFF);
+		$data['trends'] = DB::getDefault('items', 'trends');
+	}
+	else {
+		$data['trends_mode'] = getRequest('trends_mode', ITEM_STORAGE_CUSTOM);
+	}
+
 	// render view
 	$itemView = new CView('configuration.item.massupdate', $data);
 	$itemView->render();
 	$itemView->show();
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	// render view
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
-	$graphView = new CView('configuration.copy.elements', $data);
-	$graphView->render();
-	$graphView->show();
+
+	// render view
+	$itemView = new CView('configuration.copy.elements', $data);
+	$itemView->render();
+	$itemView->show();
 }
 // list of items
 else {
@@ -1625,7 +1701,7 @@ else {
 		],
 		'editable' => true,
 		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTriggers' => ['triggerid', 'description'],
+		'selectTriggers' => ['triggerid'],
 		'selectApplications' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => ['ts_delete'],
@@ -1669,7 +1745,13 @@ else {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
-		$options['application'] = $_REQUEST['filter_application'];
+		$options['applicationids'] = array_keys(API::Application()->get([
+			'output' => [],
+			'groupids' => array_key_exists('groupids', $options) ? $options['groupids'] : null,
+			'hostids' => array_key_exists('filter_hostid', $data) ? $data['filter_hostid'] : null,
+			'search' => ['name' => getRequest('filter_application')],
+			'preservekeys' => true
+		]));
 	}
 	if (isset($_REQUEST['filter_name']) && !zbx_empty($_REQUEST['filter_name'])) {
 		$options['search']['name'] = $_REQUEST['filter_name'];
@@ -1939,23 +2021,14 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get([
 		'triggerids' => $itemTriggerIds,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
+			'status', 'state', 'error', 'templateid', 'flags'
+		],
 		'selectHosts' => ['hostid', 'name', 'host'],
-		'selectFunctions' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	]);
 
 	$data['trigger_parent_templates'] = getTriggerParentTemplates($data['itemTriggers'], ZBX_FLAG_DISCOVERY_NORMAL);
-
-	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$host = reset($hosts);
-
-		$data['showInfoColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showInfoColumn'] = true;
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

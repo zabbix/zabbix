@@ -17,7 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinc.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <stdint.h>
+
 #include "module.h"
 
 /* the variable keeps timeout setting for item processing */

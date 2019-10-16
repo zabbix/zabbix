@@ -146,27 +146,38 @@ class CHistoryManager {
 
 		if ($limit == 1) {
 			foreach ($items as $item) {
-				$values = DBfetchArray(DBselect(
-					'SELECT *'.
+				// Executing two subsequent queries individually for the sake of performance.
+
+				$clock_max = DBfetch(DBselect(
+					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						' AND h.clock=('.
-							'SELECT MAX(h2.clock)'.
-							' FROM '.self::getTableName($item['value_type']).' h2'.
-							' WHERE h2.itemid='.zbx_dbstr($item['itemid']).
-								($period ? ' AND h2.clock>'.$period : '').
-						')'.
-					' ORDER BY h.ns DESC',
-					$limit
-				));
+						($period ? ' AND h.clock>'.$period : '')
+				), false);
 
-				if ($values) {
-					$results[$item['itemid']] = $values;
+				if ($clock_max) {
+					$clock_max = reset($clock_max);
+
+					if ($clock_max !== null) {
+						$values = DBfetchArray(DBselect(
+							'SELECT *'.
+							' FROM '.self::getTableName($item['value_type']).' h'.
+							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+								' AND h.clock='.zbx_dbstr($clock_max).
+							' ORDER BY h.ns DESC',
+							$limit
+						));
+
+						if ($values) {
+							$results[$item['itemid']] = $values;
+						}
+					}
 				}
 			}
 		}
 		else {
 			foreach ($items as $item) {
+				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
 					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
@@ -181,6 +192,11 @@ class CHistoryManager {
 					$clock = $values[$count - 1]['clock'];
 
 					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
+						/*
+						 * The last selected entries having the same clock means the selection (not just the order)
+						 * of the last entries is possibly wrong due to unordered by nanoseconds.
+						 */
+
 						do {
 							unset($values[--$count]);
 						} while ($values && $values[$count - 1]['clock'] == $clock);
@@ -217,6 +233,170 @@ class CHistoryManager {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Returns the history value of the item at the given time. If no value exists at the given time, the function
+	 * will return the previous value.
+	 *
+	 * The $item parameter must have the value_type and itemid properties set.
+	 *
+	 * @param array  $item
+	 * @param string $item['itemid']
+	 * @param int    $item['value_type']
+	 * @param int    $clock
+	 * @param int    $ns
+	 *
+	 * @return string|null  Value at specified time of first value before specified time. null if value is not found.
+	 */
+	public function getValueAt(array $item, $clock, $ns) {
+		switch (self::getDataSourceType($item['value_type'])) {
+			case ZBX_HISTORY_SOURCE_ELASTIC:
+				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
+
+			default:
+				return $this->getValueAtFromSql($item, $clock, $ns);
+		}
+	}
+
+	/**
+	 * Elasticsearch specific implementation of getValueAt.
+	 *
+	 * @see CHistoryManager::getValueAt
+	 */
+	private function getValueAtFromElasticsearch(array $item, $clock, $ns) {
+		$query = [
+			'sort' => [
+				'clock' => ZBX_SORT_DOWN,
+				'ns' => ZBX_SORT_DOWN
+			],
+			'size' => 1
+		];
+
+		$filters = [
+			[
+				[
+					'term' => [
+						'itemid' => $item['itemid']
+					]
+				],
+				[
+					'term' => [
+						'clock' => $clock
+					]
+				],
+				[
+					'range' => [
+						'ns' => [
+							'lte' => $ns
+						]
+					]
+				]
+			],
+			[
+				[
+					'term' => [
+						'itemid' => $item['itemid']
+					]
+				],
+				[
+					'range' => [
+						'clock' => [
+							'lt' => $clock
+						] + (ZBX_HISTORY_PERIOD ? ['gte' => $clock - ZBX_HISTORY_PERIOD] : [])
+					]
+				]
+			]
+		];
+
+		foreach ($filters as $filter) {
+			$query['query']['bool']['must'] = $filter;
+			$endpoints = self::getElasticsearchEndpoints($item['value_type']);
+
+			if (count($endpoints) !== 1) {
+				break;
+			}
+
+			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
+			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
+				return $result[0]['value'];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * SQL specific implementation of getValueAt.
+	 *
+	 * @see CHistoryManager::getValueAt
+	 */
+	private function getValueAtFromSql(array $item, $clock, $ns) {
+		$value = null;
+		$table = self::getTableName($item['value_type']);
+
+		$sql = 'SELECT value'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns='.zbx_dbstr($ns);
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			$value = $row['value'];
+		}
+
+		if ($value !== null) {
+			return $value;
+		}
+
+		$max_clock = 0;
+		$sql = 'SELECT DISTINCT clock'.
+				' FROM '.$table.
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+					' AND clock='.zbx_dbstr($clock).
+					' AND ns<'.zbx_dbstr($ns);
+
+		if (($row = DBfetch(DBselect($sql))) !== false) {
+			$max_clock = $row['clock'];
+		}
+
+		if ($max_clock == 0) {
+			$sql = 'SELECT MAX(clock) AS clock'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock<'.zbx_dbstr($clock).
+						(ZBX_HISTORY_PERIOD ? ' AND clock>='.zbx_dbstr($clock - ZBX_HISTORY_PERIOD) : '');
+
+			if (($row = DBfetch(DBselect($sql))) !== false) {
+				$max_clock = $row['clock'];
+			}
+		}
+
+		if ($max_clock == 0) {
+			return $value;
+		}
+
+		if ($clock == $max_clock) {
+			$sql = 'SELECT value'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($clock).
+						' AND ns<'.zbx_dbstr($ns);
+		}
+		else {
+			$sql = 'SELECT value'.
+					' FROM '.$table.
+					' WHERE itemid='.zbx_dbstr($item['itemid']).
+						' AND clock='.zbx_dbstr($max_clock).
+					' ORDER BY itemid,clock desc,ns desc';
+		}
+
+		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
+			$value = $row['value'];
+		}
+
+		return $value;
 	}
 
 	/**
@@ -582,7 +762,7 @@ class CHistoryManager {
 		global $HISTORY;
 
 		if (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])
-				&& count($HISTORY['types'] > 0)) {
+				&& count($HISTORY['types']) > 0) {
 
 			$query = [
 				'query' => [

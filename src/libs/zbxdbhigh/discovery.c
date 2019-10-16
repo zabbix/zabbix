@@ -44,7 +44,7 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 	return result;
 }
 
-static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
+static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char *ip, int port)
 {
 	DB_RESULT	result;
 	char		*ip_esc;
@@ -57,8 +57,9 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 			" where ds.dhostid=dh.dhostid"
 				" and dh.druleid=" ZBX_FS_UI64
 				" and ds.ip" ZBX_SQL_STRCMP
+				" and ds.port=%d"
 			" order by dh.dhostid",
-			druleid, ZBX_SQL_STRVAL_EQ(ip_esc));
+			druleid, ZBX_SQL_STRVAL_EQ(ip_esc), port);
 
 	zbx_free(ip_esc);
 
@@ -133,12 +134,13 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
-		const char *ip, int status, const char *value)
+		const char *ip, int port, int status, const char *value)
 {
 	const char	*__function_name = "discovery_register_host";
 
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		match_value = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' status:%d value:'%s'",
 			__function_name, ip, status, value);
@@ -151,13 +153,16 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 		{
 			DBfree_result(result);
 
-			result = discovery_get_dhost_by_ip(drule->druleid, ip);
+			result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 			row = DBfetch(result);
 		}
+		else
+			match_value = 1;
+
 	}
 	else
 	{
-		result = discovery_get_dhost_by_ip(drule->druleid, ip);
+		result = discovery_get_dhost_by_ip_port(drule->druleid, ip, port);
 		row = DBfetch(result);
 	}
 
@@ -186,7 +191,7 @@ static void	discovery_register_host(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_D
 		dhost->lastup = atoi(row[2]);
 		dhost->lastdown = atoi(row[3]);
 
-		if (0 == drule->unique_dcheckid)
+		if (0 == match_value)
 			discovery_separate_host(drule, dhost, ip);
 	}
 	DBfree_result(result);
@@ -497,7 +502,7 @@ void	discovery_update_service(DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *
 
 	/* register host if is not registered yet */
 	if (0 == dhost->dhostid)
-		discovery_register_host(drule, dcheckid, dhost, ip, status, value);
+		discovery_register_host(drule, dcheckid, dhost, ip, port, status, value);
 
 	/* register service if is not registered yet */
 	if (0 != dhost->dhostid)

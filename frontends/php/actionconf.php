@@ -223,7 +223,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Action updated');
 		$messageFailed = _('Cannot update action');
-		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$action['eventsource'] = $eventsource;
@@ -232,11 +231,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$messageSuccess = _('Action added');
 		$messageFailed = _('Cannot add action');
-		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	if ($result) {
-		add_audit($auditAction, AUDIT_RESOURCE_ACTION, _('Name').NAME_DELIMITER.$action['name']);
 		unset($_REQUEST['form']);
 	}
 
@@ -278,7 +275,8 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 					}
 				}
 				else {
-					if ($newCondition['value'] == $condition['value']) {
+					if ($newCondition['value'] == $condition['value'] && (!array_key_exists('value2', $newCondition)
+							|| $newCondition['value2'] === $condition['value2'])) {
 						$newCondition['value'] = null;
 					}
 				}
@@ -494,16 +492,13 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.mass
 		$actions[] = ['actionid' => $actionid, 'status' => $status];
 	}
 
-	$response = API::Action()->update($actions);
+	$result = API::Action()->update($actions);
 
-	if ($response && array_key_exists('actionids', $response)) {
+	if ($result && array_key_exists('actionids', $result)) {
 		$message = $status == ACTION_STATUS_ENABLED
 			? _n('Action enabled', 'Actions enabled', $actions_count)
 			: _n('Action disabled', 'Actions disabled', $actions_count);
 
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $response['actionids']).'] '.
-			($status == ACTION_STATUS_ENABLED ? 'enabled' : 'disabled')
-		);
 		show_messages(true, $message);
 		uncheckTableRows();
 	}
@@ -522,6 +517,15 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
 		uncheckTableRows();
 	}
 	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
+}
+
+if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
+	$actions = API::Action()->get([
+		'actionids' => getRequest('g_actionid'),
+		'output' => [],
+		'editable' => true
+	]);
+	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
 
 /*

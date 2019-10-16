@@ -425,6 +425,9 @@ class CHttpTest extends CApiService {
 				'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
 				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'templateid'
 			],
+			'selectSteps' => ['httpstepid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
+				'status_codes', 'follow_redirects', 'retrieve_mode', 'post_type'
+			],
 			'httptestids' => zbx_objectValues($httptests, 'httptestid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -433,20 +436,9 @@ class CHttpTest extends CApiService {
 		foreach ($db_httptests as &$db_httptest) {
 			$db_httptest['headers'] = [];
 			$db_httptest['variables'] = [];
-			$db_httptest['steps'] = [];
+			$db_httptest['steps'] = zbx_toHash($db_httptest['steps'], 'httpstepid');
 		}
 		unset($db_httptest);
-
-		$db_httpsteps = DB::select('httpstep', [
-			'output' => ['httpstepid', 'httptestid', 'name', 'no', 'url', 'timeout', 'posts', 'required',
-				'status_codes', 'follow_redirects', 'retrieve_mode'
-			],
-			'filter' => ['httptestid' => array_keys($db_httptests)]
-		]);
-
-		foreach ($db_httpsteps as $db_httpstep) {
-			$db_httptests[$db_httpstep['httptestid']]['steps'][$db_httpstep['httpstepid']] = $db_httpstep;
-		}
 
 		$names_by_hostid = [];
 
@@ -950,10 +942,8 @@ class CHttpTest extends CApiService {
 	 */
 	private function validateAuthParameters(array &$httptests, $method, array $db_httptests = null) {
 		foreach ($httptests as &$httptest) {
-			if (array_key_exists('authentication', $httptest)
-					|| array_key_exists('http_user', $httptest)
+			if (array_key_exists('authentication', $httptest) || array_key_exists('http_user', $httptest)
 					|| array_key_exists('http_password', $httptest)) {
-
 				$httptest += [
 					'authentication' => ($method === 'validateUpdate')
 						? $db_httptests[$httptest['httptestid']]['authentication']
@@ -967,21 +957,6 @@ class CHttpTest extends CApiService {
 						if ($httptest[$field_name] !== '') {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
-							);
-						}
-					}
-				}
-				else {
-					foreach (['http_user', 'http_password'] as $field_name) {
-						$httptest += [
-							$field_name => ($method === 'validateUpdate')
-								? $db_httptests[$httptest['httptestid']][$field_name]
-								: ''
-						];
-
-						if ($httptest[$field_name] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
 							);
 						}
 					}
@@ -1076,6 +1051,8 @@ class CHttpTest extends CApiService {
 
 					if ($httpstep['retrieve_mode'] == HTTPTEST_STEP_RETRIEVE_MODE_HEADERS) {
 						if (($httpstep['posts'] !== '' && $httpstep['posts'] !== []) || $httpstep['required'] !== '') {
+							$field_name = $httpstep['required'] !== '' ? 'required' : 'posts';
+
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('should be empty'))
 							);

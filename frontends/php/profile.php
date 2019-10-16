@@ -151,22 +151,8 @@ elseif (hasRequest('update')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		$messages = getRequest('messages', []);
-		if (!isset($messages['enabled'])) {
-			$messages['enabled'] = 0;
-		}
-		if (!isset($messages['triggers.recovery'])) {
-			$messages['triggers.recovery'] = 0;
-		}
-		if (!isset($messages['triggers.severities'])) {
-			$messages['triggers.severities'] = [];
-		}
-		if (!array_key_exists('show_suppressed', $messages)) {
-			$messages['show_suppressed'] = ZBX_PROBLEM_SUPPRESSED_FALSE;
-		}
-
 		DBstart();
-		$result = updateMessageSettings($messages);
+		$result = updateMessageSettings(getRequest('messages', []));
 
 		$result = $result && (bool) API::User()->update($user);
 

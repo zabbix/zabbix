@@ -847,18 +847,14 @@ function find_period_end($periods, $time, $max_time) {
 /**
  * Converts Base1000 values to Base1024 and calculate pow
  * Example:
- * 	204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
+ *  204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
  *
- * @param string   $value
- * @param bool|int $step
+ * @param string|int $value
+ * @param string $step
  *
  * @return array
  */
-function convertToBase1024($value, $step = false) {
-	if (!$step) {
-		$step = 1000;
-	}
-
+function convertToBase1024($value, $step = '1000') {
 	if ($value < 0) {
 		$abs = bcmul($value, '-1');
 	}
@@ -887,7 +883,7 @@ function convertToBase1024($value, $step = false) {
 			$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
 				ZBX_PRECISION_10);
 
-			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(ZBX_KIBIBYTE, $valData['pow'])),
 				ZBX_PRECISION_10));
 		}
 	}

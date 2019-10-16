@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "export.h"
 
 extern char		*CONFIG_EXPORT_DIR;
 extern zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;

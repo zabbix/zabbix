@@ -39,12 +39,12 @@ class CSvgGraphArea extends CSvgGraphLine {
 			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA => [
-				'stroke-width' => 0
-			],
 			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['fill'] * 0.1,
-				'fill' => $this->options['color']
+				'fill' => $this->options['color'],
+				'stroke-opacity' => 0.1,
+				'stroke' => $this->options['color'],
+				'stroke-width' => 2
 			]
 		];
 	}

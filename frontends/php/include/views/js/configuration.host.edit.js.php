@@ -10,7 +10,7 @@
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
-		<ul class="interface-bulk <?= ZBX_STYLE_LIST_HOR_CHECK_RADIO ?>">
+		<ul class="interface-bulk <?= ZBX_STYLE_LIST_CHECK_RADIO ?> <?= ZBX_STYLE_HOR_LIST ?>">
 			<li>
 				<input class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>" type="checkbox" id="interfaces_#{iface.interfaceid}_bulk" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
 				<label for="interfaces_#{iface.interfaceid}_bulk"><span></span><?= _('Use bulk requests') ?></label>
@@ -140,6 +140,7 @@
 		function addDraggableIcon(domElement) {
 			domElement.draggable({
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				opacity: 0.6,
 				revert: 'invalid',
 				helper: function(event) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');
@@ -318,8 +319,8 @@
 				jQuery('.interfaceRow').find('input')
 					.removeAttr('id')
 					.removeAttr('name');
-				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
-				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
+				jQuery('.interfaceRow').find('input[type="text"]').prop('readonly', true);
+				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').prop('disabled', true);
 			}
 		}
 	}());
@@ -379,7 +380,7 @@
 				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
 						var bulkList = jQuery('<ul>', {
-							'class': 'interface-bulk <?= ZBX_STYLE_LIST_HOR_CHECK_RADIO ?>'
+							'class': 'interface-bulk <?= ZBX_STYLE_LIST_CHECK_RADIO ?> <?= ZBX_STYLE_HOR_LIST ?>'
 						});
 
 						var bulkItem = jQuery('<li>');
@@ -388,6 +389,7 @@
 						bulkItem.append(jQuery('<input>', {
 							id: 'interfaces_' + hostInterfaceId + '_bulk',
 							type: 'checkbox',
+							class: '<?= ZBX_STYLE_CHECKBOX_RADIO ?>',
 							name: 'interfaces[' + hostInterfaceId + '][bulk]',
 							value: 1,
 							checked: true

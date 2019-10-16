@@ -185,7 +185,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 
 			if (isset ($data['visible_name'])) {
-				$this->zbxTestClickLinkTextWait($data['visible_name']);;
+				$this->zbxTestClickLinkTextWait($data['visible_name']);
 			}
 			else {
 				$this->zbxTestClickLinkTextWait($data['name']);

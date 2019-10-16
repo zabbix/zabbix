@@ -96,15 +96,18 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char		*name;
-	char		*uuid;
-	char		*id;
-	zbx_uint64_t	capacity;
-	zbx_uint64_t	free_space;
-	zbx_uint64_t	uncommitted;
-
+	char			*name;
+	char			*uuid;
+	char			*id;
+	zbx_uint64_t		capacity;
+	zbx_uint64_t		free_space;
+	zbx_uint64_t		uncommitted;
+	zbx_vector_str_t	hv_uuids;
 }
 zbx_vmware_datastore_t;
+
+int	vmware_ds_name_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
 #define ZBX_VMWARE_DEV_TYPE_NIC		1
 #define ZBX_VMWARE_DEV_TYPE_DISK	2
@@ -146,7 +149,7 @@ typedef struct
 	char			*parent_name;
 	char			*parent_type;
 	char			**props;
-	zbx_vector_ptr_t	datastores;
+	zbx_vector_str_t	ds_names;
 	zbx_vector_ptr_t	vms;
 }
 zbx_vmware_hv_t;
@@ -168,6 +171,15 @@ typedef struct
 }
 zbx_vmware_cluster_t;
 
+/* the vmware eventlog state */
+typedef struct
+{
+	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
+	unsigned char	skip_old;	/* skip old event log records */
+
+}
+zbx_vmware_eventlog_state_t;
+
 /* the vmware event data */
 typedef struct
 {
@@ -182,50 +194,51 @@ typedef struct
 {
 	char	*error;
 
-	zbx_hashset_t		hvs;
-	zbx_hashset_t		vms_index;
-	zbx_vector_ptr_t	clusters;
-	zbx_vector_ptr_t	events;			/* vector of pointers to zbx_vmware_event_t structures */
-	int			max_query_metrics;	/* max count of Datastore perfCounters in one request */
+	zbx_hashset_t			hvs;
+	zbx_hashset_t			vms_index;
+	zbx_vector_ptr_t		clusters;
+	zbx_vector_ptr_t		events;			/* vector of pointers to zbx_vmware_event_t structures */
+	int				max_query_metrics;	/* max count of Datastore perfCounters in one request */
+	zbx_vector_vmware_datastore_t	datastores;
 }
 zbx_vmware_data_t;
 
 /* the vmware service data */
 typedef struct
 {
-	char			*url;
-	char			*username;
-	char			*password;
+	char				*url;
+	char				*username;
+	char				*password;
 
 	/* the service type - vCenter or vSphere */
-	unsigned char		type;
+	unsigned char			type;
 
 	/* the service state - see ZBX_VMWARE_STATE_* defines */
-	int			state;
+	int				state;
 
-	int			lastcheck;
-	int			lastperfcheck;
+	int				lastcheck;
+	int				lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
-	int			lastaccess;
+	int				lastaccess;
 
 	/* the vmware service instance version */
-	char			*version;
+	char				*version;
 
 	/* the vmware service instance fullname */
-	char			*fullname;
+	char				*fullname;
 
 	/* the performance counters */
-	zbx_hashset_t		counters;
+	zbx_hashset_t			counters;
 
 	/* list of entities to monitor with performance counters */
-	zbx_hashset_t		entities;
+	zbx_hashset_t			entities;
 
 	/* the service data object that is swapped with a new one during service update */
-	zbx_vmware_data_t	*data;
+	zbx_vmware_data_t		*data;
 
-	/* lastlogsize when vmware.eventlog[] item was polled last time */
-	zbx_uint64_t		eventlog_last_key;
+	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
+	zbx_vmware_eventlog_state_t	eventlog;
 }
 zbx_vmware_service_t;
 

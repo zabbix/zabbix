@@ -602,14 +602,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '☺'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/authentication": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong authentication',
 					'authentication' => '0.1'
 				],
-				'expected_error' => 'Invalid parameter "/1/authentication": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/authentication": an integer is expected.'
 			],
 			// Check web delay.
 			[
@@ -696,37 +696,6 @@ class testWebScenario extends CAPITest {
 			// Check web password used for basic HTTP authentication.
 			[
 				'httptest' => [
-					'name' => 'Api web without http_password',
-					'authentication' => '1',
-					'http_user' => '☺',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_password',
-					'authentication' => '1',
-					'http_user' => 'admin',
-					'http_password' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
 					'name' => 'Api web with long http_password',
 					'authentication' => '1',
 					'http_user' => 'admin',
@@ -757,37 +726,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Incorrect value for field "http_password": should be empty.'
 			],
 			// Check web password used for NTLM  authentication.
-			[
-				'httptest' => [
-					'name' => 'Api web without http_password',
-					'authentication' => '2',
-					'http_user' => 'admin',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_password',
-					'authentication' => '2',
-					'http_user' => 'admin',
-					'http_password' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_password": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with long http_password',
@@ -822,35 +760,6 @@ class testWebScenario extends CAPITest {
 			],
 			[
 				'httptest' => [
-					'name' => 'Api web without http_user',
-					'authentication' => '1',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_user',
-					'authentication' => '1',
-					'http_user' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
 					'name' => 'Api web with long http_user',
 					'authentication' => '1',
 					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
@@ -858,35 +767,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
 			// Check web user name used for NTLM authentication .
-			[
-				'httptest' => [
-					'name' => 'Api web without http_user',
-					'authentication' => '2',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty http_user',
-					'authentication' => '2',
-					'http_user' => '',
-					'steps' => [
-						[
-							'name' => 'Homepage',
-							'url' => 'http://zabbix.com',
-							'no' => 0,
-						]
-					],
-				],
-				'expected_error' => 'Incorrect value for field "http_user": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with long http_user',
@@ -909,28 +789,28 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty retries',
 					'retries' => '',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '1.5',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong retries',
 					'retries' => '1s',
 				],
-				'expected_error' => 'Invalid parameter "/1/retries": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/retries": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -983,21 +863,21 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty status',
 					'status' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong status',
 					'status' => '☺'
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong status',
 					'status' => '0.0'
 				],
-				'expected_error' => 'Invalid parameter "/1/status": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1112,14 +992,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty verify_host',
 					'verify_host' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1133,7 +1013,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong verify_host',
 					'verify_host' => '1.5'
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_host": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_host": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1148,14 +1028,14 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with empty verify_peer',
 					'verify_peer' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '☺',
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [
@@ -1169,7 +1049,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with wrong verify_peer',
 					'verify_peer' => '1.5'
 				],
-				'expected_error' => 'Invalid parameter "/1/verify_peer": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/verify_peer": an integer is expected.'
 			],
 			[
 				'httptest' => [

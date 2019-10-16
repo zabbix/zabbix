@@ -32,7 +32,7 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
-static int		log_level = LOG_LEVEL_WARNING;
+int			zbx_log_level = LOG_LEVEL_WARNING;
 
 #ifdef _WINDOWS
 #	define LOCK_LOG		zbx_mutex_lock(log_access)
@@ -43,9 +43,6 @@ static int		log_level = LOG_LEVEL_WARNING;
 #endif
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
-
-#define ZBX_CHECK_LOG_LEVEL(level)	\
-		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
 #ifdef _WINDOWS
 #	define STDIN_FILENO	_fileno(stdin)
@@ -62,7 +59,7 @@ static int		log_level = LOG_LEVEL_WARNING;
 #ifndef _WINDOWS
 const char	*zabbix_get_log_level_string(void)
 {
-	switch (log_level)
+	switch (zbx_log_level)
 	{
 		case LOG_LEVEL_EMPTY:
 			return "0 (none)";
@@ -84,30 +81,29 @@ const char	*zabbix_get_log_level_string(void)
 
 int	zabbix_increase_log_level(void)
 {
-	if (LOG_LEVEL_TRACE == log_level)
+	if (LOG_LEVEL_TRACE == zbx_log_level)
 		return FAIL;
 
-	log_level = log_level + 1;
+	zbx_log_level = zbx_log_level + 1;
 
 	return SUCCEED;
 }
 
 int	zabbix_decrease_log_level(void)
 {
-	if (LOG_LEVEL_EMPTY == log_level)
+	if (LOG_LEVEL_EMPTY == zbx_log_level)
 		return FAIL;
 
-	log_level = log_level - 1;
+	zbx_log_level = zbx_log_level - 1;
 
 	return SUCCEED;
 }
 #endif
 
-void	zbx_redirect_stdio(const char *filename)
+int	zbx_redirect_stdio(const char *filename)
 {
-	int		fd;
 	const char	default_file[] = ZBX_DEV_NULL;
-	int		open_flags = O_WRONLY;
+	int		open_flags = O_WRONLY, fd;
 
 	if (NULL != filename && '\0' != *filename)
 		open_flags |= O_CREAT | O_APPEND;
@@ -117,7 +113,7 @@ void	zbx_redirect_stdio(const char *filename)
 	if (-1 == (fd = open(filename, open_flags, 0666)))
 	{
 		zbx_error("cannot open \"%s\": %s", filename, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	fflush(stdout);
@@ -133,39 +129,32 @@ void	zbx_redirect_stdio(const char *filename)
 	if (-1 == (fd = open(default_file, O_RDONLY)))
 	{
 		zbx_error("cannot open \"%s\": %s", default_file, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		return FAIL;
 	}
 
 	if (-1 == dup2(fd, STDIN_FILENO))
 		zbx_error("cannot redirect stdin to \"%s\": %s", default_file, zbx_strerror(errno));
 
 	close(fd);
+
+	return SUCCEED;
 }
 
 static void	rotate_log(const char *filename)
 {
 	zbx_stat_t		buf;
 	zbx_uint64_t		new_size;
-	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
+	static zbx_uint64_t	old_size = ZBX_MAX_UINT64; /* redirect stdout and stderr */
 
-	if (0 == CONFIG_LOG_FILE_SIZE || NULL == filename || '\0' == *filename)
+	if (0 != zbx_stat(filename, &buf))
 	{
-		/* redirect only once if log file wasn't specified or there is no log file size limit */
-		if (ZBX_MAX_UINT64 == old_size)
-		{
-			old_size = 0;
-			zbx_redirect_stdio(filename);
-		}
-
+		zbx_redirect_stdio(filename);
 		return;
 	}
 
-	if (0 != zbx_stat(filename, &buf))
-		return;
-
 	new_size = buf.st_size;
 
-	if ((zbx_uint64_t)CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
+	if (0 != CONFIG_LOG_FILE_SIZE && (zbx_uint64_t)CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
@@ -235,10 +224,14 @@ static void	lock_log(void)
 {
 	sigset_t	mask;
 
+	/* block signals to prevent deadlock on log file mutex when signal handler attempts to lock log */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGTERM);	/* block SIGTERM, SIGINT to prevent deadlock on log file mutex */
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
 	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGHUP);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
@@ -286,7 +279,7 @@ void	zbx_handle_log(void)
 int	zabbix_open_log(int type, int level, const char *filename, char **error)
 {
 	log_type = type;
-	log_level = level;
+	zbx_log_level = level;
 
 	if (LOG_TYPE_SYSTEM == type)
 	{
@@ -360,21 +353,6 @@ void	zabbix_close_log(void)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zabbix_check_log_level                                           *
- *                                                                            *
- * Purpose: checks if the specified log level must be logged                  *
- *                                                                            *
- * Return value: SUCCEED - the log level must be logged                       *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zabbix_check_log_level(int level)
-{
-	return ZBX_CHECK_LOG_LEVEL(level);
-}
-
 void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	char		message[MAX_BUFFER_LEN];
@@ -383,16 +361,19 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
 #endif
+
+#ifndef ZBX_ZABBIX_LOG_CHECK
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
-
+#endif
 	if (LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;
 
 		LOCK_LOG;
 
-		rotate_log(log_filename);
+		if (0 != CONFIG_LOG_FILE_SIZE)
+			rotate_log(log_filename);
 
 		if (NULL != (log_file = fopen(log_filename, "a+")))
 		{

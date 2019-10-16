@@ -122,6 +122,8 @@ class CLdap {
 
 	public function checkPass($user, $pass) {
 		if (!$pass) {
+			$this->error = static::ERR_USER_NOT_FOUND;
+
 			return false;
 		}
 

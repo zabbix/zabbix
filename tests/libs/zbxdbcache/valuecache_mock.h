@@ -36,9 +36,9 @@ zbx_vcmock_ds_t;
 
 unsigned char	zbx_mock_str_to_value_type(const char *value_type);
 
-void	zbx_vcmock_ds_init();
-void	zbx_vcmock_ds_destroy();
-void	zbx_vcmock_ds_dump();
+void	zbx_vcmock_ds_init(void);
+void	zbx_vcmock_ds_destroy(void);
+void	zbx_vcmock_ds_dump(void);
 
 int	zbx_vcmock_str_to_cache_mode(const char *mode);
 int	zbx_vcmock_str_to_item_status(const char *str);
@@ -48,7 +48,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 		const zbx_vector_history_record_t *expected_values, const zbx_vector_history_record_t *returned_values);
 
 void	zbx_vcmock_set_available_mem(size_t size);
-size_t	zbx_vcmock_get_available_mem();
+size_t	zbx_vcmock_get_available_mem(void);
 
 void	zbx_vcmock_set_time(zbx_mock_handle_t hitem, const char *key);
 void	zbx_vcmock_set_cache_size(zbx_mock_handle_t hitem, const char *key);

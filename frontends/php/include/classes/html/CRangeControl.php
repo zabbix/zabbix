@@ -23,20 +23,26 @@
  * Class for range control creation.
  */
 class CRangeControl extends CTextBox {
+	/**
+	 * Default CSS class name for HTML root element.
+	 */
+	const ZBX_STYLE_CLASS = 'range-control';
 
-	private $options;
+	/**
+	 * Options array for javascript initialization class.crangecontrol.js plugin.
+	 */
+	private $options = [
+		'min' => 0,
+		'max' => ZBX_MAX_INT32,
+		'step' => 1,
+		'width' => ZBX_TEXTAREA_SMALL_WIDTH
+	];
 
 	public function __construct($name, $value = '') {
 		parent::__construct($name);
 
-		$this->options = [
-			'min' => 0,
-			'max' => ZBX_MAX_INT32,
-			'step' => 1,
-			'width' => ZBX_TEXTAREA_SMALL_WIDTH
-		];
 		$this->setValue($value);
-		$this->addClass(ZBX_STYLE_RANGE_CONTROL);
+		$this->addClass(static::ZBX_STYLE_CLASS);
 		return $this;
 	}
 

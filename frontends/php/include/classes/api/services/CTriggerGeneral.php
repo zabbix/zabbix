@@ -195,12 +195,13 @@ abstract class CTriggerGeneral extends CApiService {
 				'filter' => ['triggerid' => $db_trigger['triggerid']]
 			]);
 
-			$this->updateReal([$trigger], [$db_trigger]);
+			$this->updateReal([$trigger], [$db_trigger], true);
 		}
 		else {
 			$_db_triggers = $this->get([
 				'output' => ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag'],
-				'triggerids' => [$triggerid]
+				'triggerids' => [$triggerid],
+				'nopermissions' => true
 			]);
 
 			foreach ($_db_triggers[0] as $field_name => $value) {
@@ -210,7 +211,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$triggers = [$trigger];
-			$this->createReal($triggers);
+			$this->createReal($triggers, true);
 			$trigger = $triggers[0];
 		}
 
@@ -494,17 +495,24 @@ abstract class CTriggerGeneral extends CApiService {
 
 		switch (get_class($this)) {
 			case 'CTrigger':
+				$error_duplicate = _('Duplicate trigger with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger "%2$s".');
 				break;
 
 			case 'CTriggerPrototype':
+				$error_duplicate = _('Duplicate trigger prototype with name "%1$s".');
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_set = _('Cannot set "%1$s" for trigger prototype "%2$s".');
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
+		$duplicate = CArrayHelper::findDuplicate($triggers, 'description', 'expression');
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s($error_duplicate, $duplicate['description']));
 		}
 
 		$triggerDbFields = [
@@ -865,10 +873,12 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['tags'][]['value']     [IN]
 	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
 	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
+	 * @param bool   $inherited                         [IN] (optional)  If set to true, trigger will be created for
+	 *                                                                   non-editable host/template.
 	 *
 	 * @throws APIException
 	 */
-	protected function createReal(array &$triggers) {
+	protected function createReal(array &$triggers, $inherited = false) {
 		if (!$triggers) {
 			return;
 		}
@@ -892,7 +902,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$triggers_functions = [];
 		$new_tags = [];
-		$this->implode_expressions($new_triggers, null, $triggers_functions);
+		$this->implode_expressions($new_triggers, null, $triggers_functions, $inherited);
 
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
 
@@ -973,10 +983,13 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
 	 * @param int    $db_triggers[<tnum>]['correlation_mode']        [IN]
 	 * @param string $db_triggers[<tnum>]['correlation_tag']         [IN]
+	 * @param bool   $inherited                                      [IN] (optional)  If set to true, trigger will be
+	 *                                                                                created for non-editable
+	 *                                                                                host/template.
 	 *
 	 * @throws APIException
 	 */
-	protected function updateReal(array $triggers, array $db_triggers) {
+	protected function updateReal(array $triggers, array $db_triggers, $inherited = false) {
 		if (!$triggers) {
 			return;
 		}
@@ -1003,7 +1016,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_tags = [];
 		$del_triggertagids = [];
 		$save_triggers = $triggers;
-		$this->implode_expressions($triggers, $db_triggers, $triggers_functions);
+		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
 
 		if ($class === 'CTrigger') {
 			// The list of the triggers with changed priority.
@@ -1150,10 +1163,14 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string     $triggers_functions[<tnum>][]['itemid']     [OUT]
 	 * @param string     $triggers_functions[<tnum>][]['name']       [OUT]
 	 * @param string     $triggers_functions[<tnum>][]['parameter']  [OUT]
+	 * @param bool       $inherited                                  [IN] (optional)  If set to true, triggers will be
+	 *                                                                                created for non-editable
+	 *                                                                                hosts/templates.
 	 *
 	 * @throws APIException if error occurred
 	 */
-	function implode_expressions(array &$triggers, array $db_triggers = null, array &$triggers_functions) {
+	function implode_expressions(array &$triggers, array $db_triggers = null, array &$triggers_functions,
+			$inherited = false) {
 		$class = get_class($this);
 
 		switch ($class) {
@@ -1236,18 +1253,20 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
+		$permission_check = $inherited
+			? ['nopermissions' => true]
+			: ['editable' => true];
+
 		$_db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'status'],
-			'filter' => ['host' => array_keys($hosts_keys)],
-			'editable' => true
-		]);
+			'filter' => ['host' => array_keys($hosts_keys)]
+		] + $permission_check);
 
 		if (count($hosts_keys) != count($_db_hosts)) {
 			$_db_templates = API::Template()->get([
 				'output' => ['templateid', 'host', 'status'],
-				'filter' => ['host' => array_keys($hosts_keys)],
-				'editable' => true
-			]);
+				'filter' => ['host' => array_keys($hosts_keys)]
+			] + $permission_check);
 
 			foreach ($_db_templates as &$_db_template) {
 				$_db_template['hostid'] = $_db_template['templateid'];

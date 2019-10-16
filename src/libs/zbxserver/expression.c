@@ -1816,6 +1816,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
+#define MVAR_EVENT_RECOVERY_NAME	MVAR_EVENT_RECOVERY "NAME}"
 #define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE."
 #define MVAR_EVENT_UPDATE_ACTION	MVAR_EVENT_UPDATE "ACTION}"
 #define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT_UPDATE "DATE}"
@@ -2329,6 +2330,10 @@ static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event,
 	{
 		get_event_tags(r_event, replace_to);
 	}
+	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_NAME))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
+	}
 }
 
 /******************************************************************************
@@ -2676,7 +2681,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 
 	char			c, *replace_to = NULL, sql[64];
 	const char		*m, *replace = NULL;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, found,
+	int			N_functionid, indexed_macro, require_numeric, require_address, ret, res = SUCCEED,
+				pos = 0, found,
 				raw_value;
 	size_t			data_alloc, data_len, replace_len;
 	DC_INTERFACE		interface;
@@ -2710,8 +2716,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 	{
 		indexed_macro = 0;
 		require_numeric = 0;
+		require_address = 0;
 		N_functionid = 1;
 		raw_value = 0;
+		pos = token.loc.l;
 
 		switch (token.type)
 		{
@@ -3987,16 +3995,19 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.ip_orig);
+				require_address = 1;
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
+				require_address = 1;
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.addr);
+				require_address = 1;
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
@@ -4200,6 +4211,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 					ret = get_host_inventory(m, event->trigger.expression, &replace_to,
 							N_functionid);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
+				{
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+				}
 			}
 		}
 
@@ -4221,16 +4236,27 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				zbx_free(replace_to);
 		}
 
-		if (1 == require_numeric && NULL != replace_to)
+		if (NULL != replace_to)
 		{
-			if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+			if (1 == require_numeric)
 			{
-				wrap_negative_double_suffix(&replace_to, NULL);
+				if (SUCCEED == (res = is_double_suffix(replace_to, ZBX_FLAG_DOUBLE_SUFFIX)))
+				{
+					wrap_negative_double_suffix(&replace_to, NULL);
+				}
+				else if (NULL != error)
+				{
+					zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
+							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+				}
 			}
-			else if (NULL != error)
+			else if (1 == require_address && NULL != strstr(replace_to, "{$"))
 			{
-				zbx_snprintf(error, maxerrlen, "Macro '%.*s' value is not numeric",
+				/* Macros should be already expanded. An unexpanded user macro means either unknown */
+				/* macro or macro value validation failure.                                         */
+				zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
 						(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+				res = FAIL;
 			}
 		}
 
@@ -5057,7 +5083,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	zbx_vector_ptr_clear_ext(&unknown_msgs, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&unknown_msgs);
 
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		for (i = 0; i < triggers->values_num; i++)
 		{
@@ -5314,7 +5340,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, const stru
  * Purpose: substitute lld macros in function macro parameters                *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
- *             token  - [IN/OUT] the token with funciton macro location data  *
+ *             token  - [IN/OUT] the token with function macro location data  *
  *             jp_row - [IN] discovery data                                   *
  *             error  - [OUT] error message                                   *
  *             max_error_len - [IN] the size of error buffer                  *

@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -41,9 +40,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
-	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,							null],
+	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN(STYLE_LEFT.','.STYLE_TOP),	null],
+	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN(SHOW_TRIGGERS.','.SHOW_DATA), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -83,7 +82,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.overview.filter.application', getRequest('application'), PROFILE_TYPE_STR);
 
 	// ack status
-	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', ZBX_ACK_STS_ANY), PROFILE_TYPE_INT);
+	CProfile::update('web.overview.filter.ack_status', getRequest('ack_status', 0), PROFILE_TYPE_INT);
 
 	// update host inventory filter
 	$inventoryFields = [];
@@ -124,7 +123,6 @@ $type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
 if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
-$viewStyle = CProfile::get('web.overview.view_style', STYLE_TOP);
 
 $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 
@@ -145,7 +143,7 @@ $page_filter = new CPageFilter([
 
 $data = [
 	'type' => $type,
-	'view_style' => $viewStyle,
+	'view_style' => CProfile::get('web.overview.view_style', STYLE_TOP),
 	'config' => $config,
 	'pageFilter' => $page_filter,
 	'groupid' => $page_filter->groupid,
@@ -192,22 +190,20 @@ if ($type == SHOW_TRIGGERS) {
 			'filter' => [
 				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 			],
-			'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
-			'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null
 		];
 
 		$problem_options = [
+			'show_recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 			'show_suppressed' => $filter['show_suppressed'],
+			'acknowledged' => ($filter['ackStatus'] == EXTACK_OPTION_UNACK) ? false : null,
 			'min_severity' => $filter['showSeverity'],
-			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null,
-			'recent' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'any' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? true : null
+			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];
 
 		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
 
-		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-			$host_options, $trigger_options, $problem_options
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $host_options,
+			$trigger_options, $problem_options
 		);
 	}
 	else {

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "valuecache_test.h"
+
 void	zbx_vc_set_mode(int mode)
 {
 	vc_cache->mode = mode;

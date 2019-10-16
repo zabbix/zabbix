@@ -296,7 +296,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	zbx_ipc_message_init(&message);
 
-	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, 10, &error))
+	if (FAIL == zbx_ipc_socket_open(&alerter_socket, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);
@@ -311,7 +311,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
 
@@ -362,6 +362,11 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		zbx_ipc_message_clean(&message);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 
 	zbx_ipc_socket_close(&alerter_socket);
 }

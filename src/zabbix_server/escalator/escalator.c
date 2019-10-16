@@ -195,7 +195,7 @@ out:
 static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids,
 		const DB_EVENT *event)
 {
-	const char		*__function_name = "get_tag_based_permission";
+	const char		*__function_name = "check_tag_based_permission";
 	char			*sql = NULL, hostgroupid[ZBX_MAX_UINT64_LEN + 1];
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
@@ -280,7 +280,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
+static int	get_trigger_permission(zbx_uint64_t userid, const DB_EVENT *event)
 {
 	const char		*__function_name = "get_trigger_permission";
 	int			perm = PERM_DENY;
@@ -338,7 +338,7 @@ out:
  *                   or permission otherwise                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
+static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid)
 {
 	const char		*__function_name = "get_item_permission";
 	DB_RESULT		result;
@@ -1355,7 +1355,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	DB_ROW		row;
 	int		next_esc_period = 0, esc_period, default_esc_period;
 	ZBX_USER_MSG	*user_msg = NULL;
-	unsigned char	operations = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1383,8 +1382,6 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 	{
 		char		*tmp;
 		zbx_uint64_t	operationid;
-
-		operations = 1;
 
 		ZBX_STR2UINT64(operationid, row[0]);
 
@@ -1449,22 +1446,18 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource || EVENT_SOURCE_INTERNAL == action->eventsource)
 	{
-		if (0 == operations)
-		{
-			result = DBselect(
-					"select null"
-					" from operations"
-					" where actionid=" ZBX_FS_UI64
-						" and esc_step_from>%d"
-						" and recovery=%d",
+		char	*sql;
+
+		sql = zbx_dsprintf(NULL,
+				"select null"
+				" from operations"
+				" where actionid=" ZBX_FS_UI64
+					" and (esc_step_to>%d or esc_step_to=0)"
+					" and recovery=%d",
 					action->actionid, escalation->esc_step, ZBX_OPERATION_MODE_NORMAL);
+		result = DBselectN(sql, 1);
 
-			if (NULL != DBfetch(result))
-				operations = 1;
-			DBfree_result(result);
-		}
-
-		if (1 == operations)
+		if (NULL != DBfetch(result))
 		{
 			next_esc_period = (0 != next_esc_period) ? next_esc_period : default_esc_period;
 			escalation->nextcheck = time(NULL) + next_esc_period;
@@ -1476,6 +1469,9 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const DB_EV
 		}
 		else
 			escalation->status = ESCALATION_STATUS_COMPLETED;
+
+		DBfree_result(result);
+		zbx_free(sql);
 	}
 	else
 		escalation->status = ESCALATION_STATUS_COMPLETED;
@@ -1816,6 +1812,8 @@ static const char	*check_escalation_result_string(int result)
 			return "skip";
 		case ZBX_ESCALATION_PROCESS:
 			return "process";
+		case ZBX_ESCALATION_SUPPRESS:
+			return "suppress";
 		default:
 			return "unknown";
 	}
@@ -1832,14 +1830,16 @@ static const char	*check_escalation_result_string(int result)
  *             action     - [IN]  action responsible for the escalation       *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Return value: ZBX_ESCALATION_CANCEL  - the relevant event, item, trigger   *
- *                                        or host is disabled or deleted      *
- *               ZBX_ESCALATION_DELETE  - escalations was created and         *
- *                                        recovered during maintenance        *
- *               ZBX_ESCALATION_SKIP    - escalation is paused during         *
- *                                        maintenance or dependable trigger   *
- *                                        in problem state                    *
- *               ZBX_ESCALATION_PROCESS - otherwise                           *
+ * Return value: ZBX_ESCALATION_CANCEL   - the relevant event, item, trigger  *
+ *                                         or host is disabled or deleted     *
+ *               ZBX_ESCALATION_DELETE   - escalations was created and        *
+ *                                         recovered during maintenance       *
+ *               ZBX_ESCALATION_SKIP     - escalation is paused during        *
+ *                                         maintenance or dependable trigger  *
+ *                                         in problem state                   *
+ *               ZBX_ESCALATION_SUPPRESS - escalation was created before      *
+ *                                         maintenance period                 *
+ *               ZBX_ESCALATION_PROCESS  - otherwise                          *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, const DB_EVENT *event,
@@ -1904,7 +1904,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		}
 
 		/* suppress paused escalations created before maintenance period */
-		/* until maintenance ends or the escalations are recovered   */
+		/* until maintenance ends or the escalations are recovered       */
 		if (0 == escalation->r_eventid)
 		{
 			ret = ZBX_ESCALATION_SUPPRESS;
@@ -2394,7 +2394,8 @@ cancel_warning:
 
 			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck="
+						"case when r_eventid is null then %d else 0 end", separator,
 						diff->nextcheck);
 				separator = ',';
 
@@ -2551,7 +2552,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
 	{
 		int	esc_nextcheck;
 
@@ -2649,7 +2650,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;)
+	while (ZBX_IS_RUNNING())
 	{
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -2696,4 +2697,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 	}
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+
+	while (1)
+		zbx_sleep(SEC_PER_MIN);
 }

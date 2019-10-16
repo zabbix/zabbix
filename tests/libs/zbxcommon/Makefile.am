@@ -4,12 +4,17 @@ SERVER_tests = \
 	parse_key \
 	replace_key_params_dyn \
 	calculate_item_nextcheck \
+	calculate_item_nextcheck_unreachable \
 	zbx_function_get_param_dyn \
 	zbx_token_find \
 	zbx_interval_preproc \
 	zbx_validate_interval \
 	is_double_suffix \
-	is_double
+	is_double \
+	zbx_trim_float \
+	zbx_trim_integer \
+	zbx_variant_compare \
+	zbx_user_macro_parse
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -61,11 +66,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
@@ -141,6 +146,18 @@ calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+calculate_item_nextcheck_unreachable_SOURCES = \
+	calculate_item_nextcheck_unreachable.c \
+	$(COMMON_SRC_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD = \
+	$(COMMON_LIB_FILES)
+
+calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
+
+calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@
+
+calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 zbx_function_get_param_dyn_SOURCES = \
 	zbx_function_get_param_dyn.c \
@@ -223,5 +240,61 @@ is_double_LDADD += @SERVER_LIBS@
 is_double_LDFLAGS = @SERVER_LDFLAGS@
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_trim_float_SOURCES = \
+	zbx_trim_float.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_float_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_float_LDADD += @SERVER_LIBS@
+
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_float_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_trim_integer_SOURCES = \
+	zbx_trim_integer.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_integer_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_trim_integer_LDADD += @SERVER_LIBS@
+
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_variant_compare_SOURCES = \
+	zbx_variant_compare.c \
+	$(COMMON_SRC_FILES)
+
+zbx_variant_compare_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_variant_compare_LDADD += @SERVER_LIBS@
+
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_user_macro_parse_SOURCES = \
+	zbx_user_macro_parse.c \
+	$(COMMON_SRC_FILES)
+
+zbx_user_macro_parse_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_user_macro_parse_LDADD += @SERVER_LIBS@
+
+zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

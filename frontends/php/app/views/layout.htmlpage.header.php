@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
 $page_title = $data['page']['title'];
@@ -42,25 +43,36 @@ if (!empty($DB['DB'])) {
 		$scripts[] = 'servercheck.js';
 	}
 }
+
+// Show GUI messages in pages with menus and in fullscreen and kiosk mode.
+$show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU')
+	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE]))
+		? intval(!CWebUser::isGuest())
+		: null;
+
 $pageHeader
-	->addCssFile('styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
 	->addJsBeforeScripts(
 		'var PHP_TZ_OFFSET = '.date('Z').','.
 			'PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";'
-);
-
-// show GUI messages in pages with menus and in fullscreen and kiosk mode
-$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU')
-	|| in_array($data['web_layout_mode'], [ZBX_LAYOUT_FULLSCREEN, ZBX_LAYOUT_KIOSKMODE])) ? 1 : 0;
-
-$pageHeader->addJsFile('js/browsers.js');
-$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.$data['user']['lang'].'&showGuiMessaging='.$showGuiMessaging;
-$pageHeader->addJsFile($path);
+	)
+	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
+	->addJsFile((new CUrl('jsLoader.php'))
+		->setArgument('lang', $data['user']['lang'])
+		->setArgument('ver', ZABBIX_VERSION)
+		->setArgument('showGuiMessaging', $show_gui_messaging)
+		->getUrl()
+	);
 
 if ($scripts) {
-	$pageHeader->addJsFile('jsLoader.php?'.'files[]='.implode('&amp;files[]=', $scripts).'&amp;lang='.$data['user']['lang']);
+	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
+		->setArgument('ver', ZABBIX_VERSION)
+		->setArgument('lang', $data['user']['lang'])
+		->setArgument('files', $scripts)
+		->getUrl()
+	);
 }
 $pageHeader->display();
 
 echo '<body lang="'.CWebUser::getLang().'">';
-echo '<output class="'.ZBX_STYLE_MSG_BAD_GLOBAL.'" id="msg-bad-global"></output>';
+echo '<output class="'.ZBX_STYLE_MSG_GLOBAL_FOOTER.' '.ZBX_STYLE_MSG_WARNING.'" id="msg-global-footer"></output>';
