@@ -247,7 +247,7 @@ jQuery(function($) {
 		return this.each(function() {
 			var $obj = $(this);
 
-			options.required_str = $obj.attr('aria-required') === 'undefined' ? 'false' : $obj.attr('aria-required');
+			options.required_str = $obj.attr('aria-required') === undefined ? 'false' : $obj.attr('aria-required');
 			$obj.removeAttr('aria-required');
 
 			var ms = {
