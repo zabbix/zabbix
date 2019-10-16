@@ -1,0 +1,1 @@
+..F....... [ZBX-16605] fixed accessibility of localstorage identifier if cookies are made unaccessible for client side scripts (miks)
