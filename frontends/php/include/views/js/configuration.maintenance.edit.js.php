@@ -23,21 +23,60 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		$(function() {
-			$('#maintenance_type').change(function() {
-				var maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
-				if (maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
-					$('#tags input, #tags button').prop('disabled', true);
-					$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
-				}
-				else {
-					$('#tags input, #tags button').prop('disabled', false);
-					$('#tags input[name$="[tag]"]').attr('placeholder', <?= CJs::encodeJson(_('tag')) ?>);
-					$('#tags input[name$="[value]"]').attr('placeholder', <?= CJs::encodeJson(_('value')) ?>);
-				}
-			});
+		$('#maintenance_type').change(function() {
+			var maintenance_type = $('input[name=maintenance_type]:checked', $(this)).val();
+			if (maintenance_type == <?= MAINTENANCE_TYPE_NODATA ?>) {
+				$('#tags input, #tags button').prop('disabled', true);
+				$('#tags input[name$="[tag]"], #tags input[name$="[value]"]').removeAttr('placeholder');
+			}
+			else {
+				$('#tags input, #tags button').prop('disabled', false);
+				$('#tags input[name$="[tag]"]').attr('placeholder', <?= CJs::encodeJson(_('tag')) ?>);
+				$('#tags input[name$="[value]"]').attr('placeholder', <?= CJs::encodeJson(_('value')) ?>);
+			}
+		});
 
-			$('#tags').dynamicRows({template: '#tag-row-tmpl'});
+		$('#tags').dynamicRows({template: '#tag-row-tmpl'});
+
+		// Maintenance periods.
+		$('#maintenance_periods').on('click', '[data-action]', function() {
+			var btn = $(this),
+				rows = $('#maintenance_periods table > tbody > tr'),
+				params;
+
+			switch (btn.data('action')) {
+				case 'remove':
+					btn.closest('tr').remove();
+					break;
+
+				case 'edit':
+					var row = btn.closest('tr');
+
+					params = {
+						update: 1,
+						index: rows.index(row)
+					};
+
+					row.find('input[type="hidden"]').each(function() {
+						var $input = $(this),
+							name = $input.attr('name').match(/\[([^\]]+)]$/);
+
+						if (name) {
+							params[name[1]] = $input.val();
+						}
+					});
+
+					PopUp("popup.maintenance.period.edit", params, null, btn);
+					break;
+
+				case 'add':
+					params = {
+						index: rows.length
+					}
+
+					PopUp("popup.maintenance.period.edit", params, null, btn);
+					break;
+			}
 		});
 	});
 </script>

@@ -6630,7 +6630,8 @@ ul.checkbox-list {
 }
 
 @each $num, $width in (
-	3: 33.33333%
+	3: 33.33333%,
+	4: 25%
 ) {
 	ul.checkbox-list.col-#{$num} > li {
 		display: inline-block;
