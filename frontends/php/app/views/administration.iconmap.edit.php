@@ -47,7 +47,10 @@ $name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
 $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $form = (new CForm())
-	->setAction((new CUrl('zabbix.php'))->setArgument('action', 'iconmap.update')->getUrl())
+	->setAction((new CUrl('zabbix.php'))
+		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
+		->getUrl()
+	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1);
 

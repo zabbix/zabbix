@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerIconMapUpdate extends CController {
+class CControllerIconMapCreate extends CController {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -27,7 +27,6 @@ class CControllerIconMapUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'iconmapid' => 'fatal | required | db icon_map.iconmapid',
 			'iconmap'   => 'required | array'
 		];
 
@@ -45,22 +44,17 @@ class CControllerIconMapUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$iconmap = (array) $this->getInput('iconmap') + ['mappings' => []];
-		$iconmap['iconmapid'] = $this->getInput('iconmapid');
-
-		$result = (bool) API::IconMap()->update($iconmap);
+		$result = (bool) API::IconMap()->create((array) $this->getInput('iconmap'));
 
 		$url = new CUrl('zabbix.php');
-
 		if ($result) {
 			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.list'));
-			$response->setMessageOk(_('Icon map updated'));
+			$response->setMessageOk(_('Icon map created'));
 		}
 		else {
-			$url->setArgument('iconmapid', $iconmap['iconmapid']);
 			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.edit'));
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update icon map'));
+			$response->setMessageError(_('Cannot create icon map'));
 		}
 
 		$this->setResponse($response);

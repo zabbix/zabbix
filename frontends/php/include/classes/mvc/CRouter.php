@@ -90,6 +90,7 @@ class CRouter {
 		'iconmap.delete'				=> ['CControllerIconMapDelete',						null,					null],
 		'iconmap.edit'					=> ['CControllerIconMapEdit',						'layout.htmlpage',		'administration.iconmap.edit'],
 		'iconmap.list'					=> ['CControllerIconMapList',						'layout.htmlpage',		'administration.iconmap.list'],
+		'iconmap.create'				=> ['CControllerIconMapCreate',						null,					null],
 		'iconmap.update'				=> ['CControllerIconMapUpdate',						null,					null],
 		'image.delete'					=> ['CControllerImageDelete',						null,					null],
 		'image.edit'					=> ['CControllerImageEdit',							'layout.htmlpage',		'administration.image.edit'],
