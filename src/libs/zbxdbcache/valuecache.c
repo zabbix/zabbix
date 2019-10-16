@@ -2394,7 +2394,7 @@ void	zbx_vc_destroy(void)
  * Purpose: resets value cache                                                *
  *                                                                            *
  * Comments: All items and their historical data are removed,                 *
- *           cache working mode, statistics reseted.                          *
+ *           cache working mode, statistics reset.                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_reset(void)

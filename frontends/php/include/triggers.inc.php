@@ -659,7 +659,6 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $groupids
  * @param string $application
- * @param int    $style                               Table display style: either hosts on top or on the left.
  * @param array  $host_options
  * @param array  $trigger_options
  * @param array  $problem_options
@@ -669,8 +668,8 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []) {
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
@@ -729,11 +728,14 @@ function getTriggersOverviewData(array $groupids, $application, $style, array $h
 function getTriggersWithActualSeverity(array $trigger_options, array $problem_options) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+		'show_suppressed' => null,
+		'show_recent' => null,
 		'time_from' => null,
 		'acknowledged' => null
 	];
 
 	$triggers = API::Trigger()->get($trigger_options);
+	CArrayHelper::sort($triggers, ['description']);
 
 	if ($triggers) {
 		$problem_stats = [];
@@ -755,10 +757,8 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
 			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
-			'recent' => array_key_exists('show_recent', $problem_options) ? $problem_options['show_recent'] : null,
-			'acknowledged' => (array_key_exists('acknowledged', $problem_options) && $problem_options['acknowledged'])
-				? false
-				: null,
+			'recent' => $problem_options['show_recent'],
+			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 
@@ -1969,7 +1969,7 @@ function get_item_function_info($expr) {
 	}
 
 	switch (true) {
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_0or1[0],
@@ -1977,8 +1977,8 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)):
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_float[0],
@@ -1986,7 +1986,7 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
 			$expr_part = reset($expr_data->expressions);
 
 			if (!array_key_exists($expr_part['functionName'], $functions)) {
@@ -2095,14 +2095,14 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 		$value = $token['value'];
 
 		switch ($token['type']) {
-			case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 				// replace specific operators with their PHP analogues
 				if (isset($replaceOperators[$token['value']])) {
 					$value = $replaceOperators[$token['value']];
 				}
 
 				break;
-			case CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER:
+			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 				// convert numeric values with suffixes
 				if ($token['data']['suffix'] !== null) {
 					$value = convert($value);

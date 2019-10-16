@@ -222,7 +222,7 @@ out:
   name: 'VALUE'
   return: 'SUCCEED'
 ---
-test case: "LLD function macro missing openning bracket"
+test case: "LLD function macro missing opening bracket"
 in:
   expression: '{{#VALUE}.regsub^[0-9]+, Problem)}'
 out:

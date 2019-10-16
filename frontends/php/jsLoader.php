@@ -123,7 +123,9 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -135,7 +137,10 @@ $tranStrings = [
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Success message' => _('Success message'),
+		'Error message' => _('Error message'),
+		'Warning message' => _('Warning message')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -309,8 +314,11 @@ $tranStrings = [
 ];
 
 if (empty($_GET['files'])) {
+	require_once dirname(__FILE__).'/include/classes/core/CSession.php';
+
 	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
+		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']).';path='.
+			CSession::getDefaultCookiePath());
 	}
 
 	$files = [
