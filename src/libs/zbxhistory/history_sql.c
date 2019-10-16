@@ -378,7 +378,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 	else
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>%d and clock<=%d",
-						end_timestamp - seconds, end_timestamp);
+				end_timestamp - seconds, end_timestamp);
 	}
 
 	result = DBselect("%s", sql);
