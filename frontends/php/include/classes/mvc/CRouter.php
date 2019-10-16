@@ -167,6 +167,7 @@ class CRouter {
 		'valuemap.delete'				=> ['CControllerValuemapDelete',					null,					null],
 		'valuemap.edit'					=> ['CControllerValuemapEdit',						'layout.htmlpage',		'administration.valuemap.edit'],
 		'valuemap.list'					=> ['CControllerValuemapList',						'layout.htmlpage',		'administration.valuemap.list'],
+		'valuemap.create'				=> ['CControllerValuemapCreate',					null,					null],
 		'valuemap.update'				=> ['CControllerValuemapUpdate',					null,					null],
 		'web.view'						=> ['CControllerWebView',							'layout.htmlpage',		'monitoring.web.view'],
 		'widget.actionlog.view'			=> ['CControllerWidgetActionLogView',				'layout.widget',		'monitoring.widget.actionlog.view'],

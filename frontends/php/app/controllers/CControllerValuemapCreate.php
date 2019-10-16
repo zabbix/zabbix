@@ -19,15 +19,10 @@
 **/
 
 
-class CControllerValuemapUpdate extends CController {
-
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+class CControllerValuemapCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'valuemapid'   => 'fatal | required | db valuemaps.valuemapid',
 			'name'         => 'required | string | not_empty | db valuemaps.name',
 			'mappings'     => 'required | array',
 			'form_refresh' => '',
@@ -41,12 +36,9 @@ class CControllerValuemapUpdate extends CController {
 				case self::VALIDATION_ERROR:
 					$url = (new CUrl('zabbix.php'))->setArgument('action', 'valuemap.edit');
 
-					$url->setArgument('valuemapid', $this->getInput('valuemapid'));
-
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-
-					$response->setMessageError(_('Cannot update value map'));
+					$response->setMessageError(_('Cannot add value map'));
 
 					$this->setResponse($response);
 					break;
@@ -61,41 +53,26 @@ class CControllerValuemapUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() != USER_TYPE_SUPER_ADMIN) {
-			return false;
-		}
-
-		$valuemaps = API::ValueMap()->get([
-			'output' => [],
-			'valuemapids' => (array) $this->getInput('valuemapid')
-		]);
-
-		if (!$valuemaps) {
-			return false;
-		}
-
-		return true;
+		return $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction() {
-		$result = (bool) API::ValueMap()->update([
-			'name'       => $this->getInput('name'),
-			'mappings'   => $this->getInput('mappings', []),
-			'valuemapid' => $this->getInput('valuemapid')
+		$result = (bool) API::ValueMap()->create([
+			'name'     => $this->getInput('name'),
+			'mappings' => $this->getInput('mappings')
 		]);
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 			);
-			$response->setMessageOk(_('Value map updated'));
+			$response->setMessageOk(_('Value map added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.edit')
-				->setArgument('valuemapid', $this->getInput('valuemapid'))
 			);
-			$response->setMessageError(_('Cannot update value map'));
+			$response->setMessageError(_('Cannot add value map'));
 			$response->setFormData($this->getInputAll());
 		}
 
