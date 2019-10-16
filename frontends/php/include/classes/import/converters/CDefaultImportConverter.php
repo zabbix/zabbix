@@ -22,7 +22,7 @@
 /**
  * Add tags with default values.
  */
-class CDefaultValuesImportConverter extends CConverter {
+class CDefaultImportConverter extends CConverter {
 
 	protected $rules;
 
