@@ -192,11 +192,11 @@ class CTextTriggerConstructor {
 			foreach ($tokens as $token) {
 				$value = $token['value'];
 				switch ($token['type']) {
-					case CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO:
+					case CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO:
 						$value = $token['data']['function'];
 
 						break;
-					case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+					case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 						if ($token['value'] === 'and' || $token['value'] === 'or' || $token['value'] === 'not') {
 							$value = ' '.$token['value'].' ';
 						}
@@ -232,7 +232,7 @@ class CTextTriggerConstructor {
 	 *
 	 * The tokens are split at the first occurrence of the "and" or "or" operators with respect to parentheses.
 	 *
-	 * @param array $tokens     an array of tokens from the CTriggerExpressionParserResult
+	 * @param array $tokens     an array of tokens from the CTriggerExprParserResult
 	 *
 	 * @return array    an array of token arrays grouped by expression
 	 */
@@ -243,7 +243,7 @@ class CTextTriggerConstructor {
 		$level = 0;
 		foreach ($tokens as $token) {
 			switch ($token['type']) {
-				case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+				case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 					// look for an "or" or "and" operator on the top parentheses level
 					// if such an expression is found, save all of the tokens before it as a separate expression
 					if ($level == 0 && ($token['value'] === 'or' || $token['value'] === 'and')) {
@@ -255,11 +255,11 @@ class CTextTriggerConstructor {
 					}
 
 					break;
-				case CTriggerExpressionParserResult::TOKEN_TYPE_OPEN_BRACE:
+				case CTriggerExprParserResult::TOKEN_TYPE_OPEN_BRACE:
 					$level++;
 
 					break;
-				case CTriggerExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE:
+				case CTriggerExprParserResult::TOKEN_TYPE_CLOSE_BRACE:
 					$level--;
 
 					break;

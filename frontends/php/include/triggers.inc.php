@@ -1941,7 +1941,7 @@ function get_item_function_info($expr) {
 	}
 
 	switch (true) {
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_0or1[0],
@@ -1949,8 +1949,8 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)):
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_float[0],
@@ -1958,7 +1958,7 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
 			$expr_part = reset($expr_data->expressions);
 
 			if (!array_key_exists($expr_part['functionName'], $functions)) {
@@ -2067,14 +2067,14 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 		$value = $token['value'];
 
 		switch ($token['type']) {
-			case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 				// replace specific operators with their PHP analogues
 				if (isset($replaceOperators[$token['value']])) {
 					$value = $replaceOperators[$token['value']];
 				}
 
 				break;
-			case CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER:
+			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 				// convert numeric values with suffixes
 				if ($token['data']['suffix'] !== null) {
 					$value = convert($value);
