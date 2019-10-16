@@ -37,7 +37,7 @@ $widget = (new CWidget())
 	);
 
 $action = (new CUrl('zabbix.php'))
-	->setArgument('action', 'regex.update');
+	->setArgument('action', ($data['regexid'] != 0) ? 'regex.update' : 'regex.create');
 
 if ($data['regexid'] != 0) {
 	$action->setArgument('regexid', $data['regexid']);

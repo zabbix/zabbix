@@ -21,17 +21,12 @@
 
 require_once dirname(__FILE__).'/../../include/regexp.inc.php';
 
-class CControllerRegExUpdate extends CController {
-
-	protected function init() {
-		$this->disableSIDValidation();
-	}
+class CControllerRegExCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
 			'name'         => 'required | string | not_empty | db regexps.name',
 			'test_string'  => 'string | db regexps.test_string',
-			'regexid'      => 'fatal | required | db regexps.regexpid',
 			'expressions'  => 'required | array',
 			'form_refresh' => ''
 		];
@@ -41,13 +36,11 @@ class CControllerRegExUpdate extends CController {
 		if (!$ret) {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
+					$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.edit');
 
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'regex.edit')
-						->setArgument('regexid', $this->getInput('regexid'))
-					);
+					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update regular expression'));
+					$response->setMessageError(_('Cannot add regular expression'));
 					$this->setResponse($response);
 					break;
 
@@ -75,8 +68,7 @@ class CControllerRegExUpdate extends CController {
 		}
 		unset($expression);
 
-		$result = updateRegexp([
-			'regexpid'    => $this->getInput('regexid'),
+		$result = addRegexp([
 			'name'        => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string')
 		], $expressions);
@@ -85,18 +77,16 @@ class CControllerRegExUpdate extends CController {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.list');
 
 			$response = new CControllerResponseRedirect($url);
-			$response->setMessageOk(_('Regular expression updated'));
+			$response->setMessageOk(_('Regular expression added'));
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
 		}
 		else {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.edit')
-				->setArgument('regexid', $this->getInput('regexid'));
+			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.edit');
 
 			$response = new CControllerResponseRedirect($url);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update regular expression'));
+			$response->setMessageError(_('Cannot add regular expression'));
 		}
 
 		$this->setResponse($response);

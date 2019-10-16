@@ -138,6 +138,7 @@ class CRouter {
 		'regex.edit'					=> ['CControllerRegExEdit',							'layout.htmlpage',		'administration.regex.edit'],
 		'regex.list'					=> ['CControllerRegExList',							'layout.htmlpage',		'administration.regex.list'],
 		'regex.test'					=> ['CControllerRegExTest',							null,					null],
+		'regex.create'					=> ['CControllerRegExCreate',						null,					null],
 		'regex.update'					=> ['CControllerRegExUpdate',						null,					null],
 		'report.services'				=> ['CControllerReportServices',					'layout.htmlpage',		'report.services'],
 		'report.status'					=> ['CControllerReportStatus',						'layout.htmlpage',		'report.status'],
