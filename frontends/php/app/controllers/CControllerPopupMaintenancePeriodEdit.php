@@ -23,7 +23,6 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'update' =>				'in 0,1',
 			'refresh' =>			'in 0,1',
 			'index' =>				'required|int32',
 			'days' =>				'array',
@@ -185,9 +184,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		$params['index'] = $data['index'];
 
 		$this->setResponse(new CControllerResponseData([
-			'title' => $data['update']
-				? _('Update maintenance period')
-				: _('Add maintenance period'),
+			'title' => _('Maintenance period'),
 			'errors' => hasErrorMesssages() ? getMessages() : null,
 			'params' => $params,
 			'user' => ['debug_mode' => $this->getDebugMode()]
