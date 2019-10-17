@@ -314,11 +314,6 @@ $tranStrings = [
 
 $js = '';
 if (empty($_GET['files'])) {
-	require_once dirname(__FILE__).'/include/defines.inc.php';
-
-	if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
-		$js .= 'window.localstoragePath = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
-	}
 
 	$files = [
 		'prototype.js',
@@ -341,6 +336,12 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+		require_once dirname(__FILE__).'/include/defines.inc.php';
+
+		if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+			$js .= 'window.localstoragePath = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+		}
+
 		$files[] = 'class.promise.js';
 		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
