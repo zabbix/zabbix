@@ -21,10 +21,6 @@
 
 class CControllerValuemapUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'valuemapid'   => 'fatal | required | db valuemaps.valuemapid',

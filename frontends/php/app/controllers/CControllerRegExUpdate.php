@@ -23,10 +23,6 @@ require_once dirname(__FILE__).'/../../include/regexp.inc.php';
 
 class CControllerRegExUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'name'         => 'required | string | not_empty | db regexps.name',

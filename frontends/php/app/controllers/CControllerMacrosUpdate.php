@@ -21,10 +21,6 @@
 
 class CControllerMacrosUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'macros' => 'array'

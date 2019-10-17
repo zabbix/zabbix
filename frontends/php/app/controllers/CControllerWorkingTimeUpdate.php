@@ -21,10 +21,6 @@
 
 class CControllerWorkingTimeUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'work_period' => 'required | string | not_empty | db config.work_period'

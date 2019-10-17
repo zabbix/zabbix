@@ -21,10 +21,6 @@
 
 class CControllerIconMapCreate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'iconmap'   => 'required | array'

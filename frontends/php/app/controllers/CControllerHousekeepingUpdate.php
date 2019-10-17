@@ -21,10 +21,6 @@
 
 class CControllerHousekeepingUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'hk_trends'           => 'db config.hk_trends',

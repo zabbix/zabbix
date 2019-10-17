@@ -21,10 +21,6 @@
 
 class CControllerTrigSeverityUpdate extends CController {
 
-	protected function init() {
-		$this->disableSIDValidation();
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'severity_name_0'  => 'required | string | not_empty',
