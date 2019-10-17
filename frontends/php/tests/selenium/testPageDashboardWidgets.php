@@ -30,7 +30,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 * Default selected widget type.
 	 * The widget type should not be changed in frontend and in DB.
 	 */
-	public function testPageDashboardWidgets_unchangedWidgetType() {
+	public function testPageDashboardWidgets_checkUnchangedWidgetType() {
 		// Opening widget configuration form for new widget first time.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one()->edit();
@@ -38,15 +38,14 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Opening edit widget form.
-		$widget = $dashboard->getWidget('System information');
-		$form = $widget->edit();
+		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
+		// Check that widget type isn't changed in frontend and in DB.
 		$this->checkLastSelectedWidgetType();
 
 		// Making changes in widget form that are not "Widget type".
-		$widget = $dashboard->getWidget('Problems')->edit();
-		$form->invalidate();
+		$form = $dashboard->getWidget('Problems')->edit();
 		$this->assertEquals('Problems', $form->getField('Type')->getValue());
 		$data =[
 			'Name' => 'check widget type',
@@ -59,8 +58,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Add widget with current default type "Action log".
-		$overlay = $dashboard->addWidget();
-		$form->invalidate();
+		$form = $dashboard->addWidget()->asForm();
 		$form->submit();
 		// Check if widget was added.
 		$dashboard->getWidget('Action log');
@@ -97,7 +95,7 @@ class testPageDashboardWidgets extends CWebTest {
 	/**
 	 * Widget type should be inherited from the one that was selected last time.
 	 */
-	public function testPageDashboardWidgets_rememberWidgetType() {
+	public function testPageDashboardWidgets_checkWidgetTypeRemembering() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		// Opening widget configuration form for new Clock widget.
@@ -110,16 +108,14 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Save edit widget form without changing widget type.
-		$widget = $dashboard->getWidget('System information')->edit();
-		$form->invalidate();
+		$form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $form->getField('Type')->getValue());
 		$form->submit();
 		// Check that widget type is still remembered as Clock.
 		$this->checkLastSelectedWidgetType('Clock', 'clock');
 
 		// Opening edit widget form and change widget type.
-		$widget = $dashboard->getWidget('System information')->edit();
-		$form->invalidate();
+		$form = $dashboard->getWidget('System information')->edit();
 		$form->fill(['Type' => 'Data overview']);
 		$overlay->close();
 		// Check that widget type inherited from previous widget.
