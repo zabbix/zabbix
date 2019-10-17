@@ -50,6 +50,8 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		$ret = ($ret && $this->getInput('refresh', 0)) ? $this->validateTypeSpecificInput() : $ret;
+
 		if (!$ret) {
 			$output = [];
 			$messages = getMessages();
@@ -64,6 +66,67 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		}
 
 		return $ret;
+	}
+
+	protected function validateTypeSpecificInput() {
+		$rules = [
+			'period' => 'int32'
+		];
+		$data = [
+			'period' =>	strval(($this->getInput('period_days', 0) * SEC_PER_DAY)
+				+ ($this->getInput('period_hours', 0) * SEC_PER_HOUR)
+				+ ($this->getInput('period_minutes', 0) * SEC_PER_MIN))
+		];
+
+		switch ($this->getInput('timeperiod_type', null)) {
+			case TIMEPERIOD_TYPE_ONETIME:
+				$parser = new CAbsoluteTimeParser();
+				$parser->parse($this->getInput('start_date'));
+				$start_date = $parser->getDateTime(true);
+
+				if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('d'))) {
+					error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+					return false;
+				}
+
+				break;
+
+			case TIMEPERIOD_TYPE_DAILY:
+				$rules['every'] = 'required|ge 1';
+
+				break;
+
+			case TIMEPERIOD_TYPE_WEEKLY:
+				$rules = [
+					'every'	=>		'required|ge 1',
+					'days' =>		'required|not_empty',
+				];
+
+				break;
+
+			case TIMEPERIOD_TYPE_MONTHLY:
+				$rules['months'] = 'required|not_empty';
+
+				if ($this->getInput('month_date_type', 0)) {
+					$rules['days'] = 'required|not_empty';
+				}
+
+				break;
+		}
+
+		$this->getInputs($data, array_keys($rules));
+
+		if ($data['period'] < 300) {
+			info(_('Incorrect maintenance period (minimum 5 minutes)'));
+
+			return false;
+		}
+
+		$validator = new CNewValidator($data, $rules);
+		$errors = $validator->getAllErrors();
+		array_map('info', $errors);
+
+		return !$errors;
 	}
 
 	protected function checkPermissions() {

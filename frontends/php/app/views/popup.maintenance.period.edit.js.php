@@ -58,9 +58,9 @@ function submitMaintenancePeriod(selector) {
 		dataType: 'json',
 		type: 'post',
 		success: function(response) {
-			$container.parent().find('.msg-bad').remove();
-
 			if ('errors' in response) {
+				$container.parent().find('.msg-bad').remove();
+
 				jQuery(response.errors).insertBefore($container);
 			}
 			else if ('params' in response) {
