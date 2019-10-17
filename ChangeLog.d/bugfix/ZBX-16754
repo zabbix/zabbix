@@ -1,0 +1,1 @@
+........S. [ZBX-16754] fixed trigger not firing for first collected value if it's timestamp is in future (vso)
