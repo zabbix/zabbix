@@ -81,11 +81,13 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		switch ($this->getInput('timeperiod_type', null)) {
 			case TIMEPERIOD_TYPE_ONETIME:
 				$parser = new CAbsoluteTimeParser();
-				$parser->parse($this->getInput('start_date'));
+				$failed = ($parser->parse($this->getInput('start_date')) != CParser::PARSE_SUCCESS);
 				$start_date = $parser->getDateTime(true);
 
-				if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'), $start_date->format('d'))) {
+				if ($failed || !validateDateInterval($start_date->format('Y'), $start_date->format('m'),
+						$start_date->format('d'))) {
 					error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+
 					return false;
 				}
 
