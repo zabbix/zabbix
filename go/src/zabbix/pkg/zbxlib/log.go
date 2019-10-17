@@ -71,46 +71,10 @@ char	*strerror_from_system(unsigned long error)
 	return zbx_strerror(errno);
 }
 
-#define ZBX_DEV_NULL	"/dev/null"
-
 int	zbx_redirect_stdio(const char *filename)
 {
-	const char	default_file[] = ZBX_DEV_NULL;
-	int		open_flags = O_WRONLY, fd;
-
-	if (NULL != filename && '\0' != *filename)
-		open_flags |= O_CREAT | O_APPEND;
-	else
-		filename = default_file;
-
-	if (-1 == (fd = open(filename, open_flags, 0666)))
-	{
-		zbx_error("cannot open \"%s\": %s", filename, zbx_strerror(errno));
-		return FAIL;
-	}
-
-	fflush(stdout);
-	if (-1 == dup2(fd, STDOUT_FILENO))
-		zbx_error("cannot redirect stdout to \"%s\": %s", filename, zbx_strerror(errno));
-
-	fflush(stderr);
-	if (-1 == dup2(fd, STDERR_FILENO))
-		zbx_error("cannot redirect stderr to \"%s\": %s", filename, zbx_strerror(errno));
-
-	close(fd);
-
-	if (-1 == (fd = open(default_file, O_RDONLY)))
-	{
-		zbx_error("cannot open \"%s\": %s", default_file, zbx_strerror(errno));
-		return FAIL;
-	}
-
-	if (-1 == dup2(fd, STDIN_FILENO))
-		zbx_error("cannot redirect stdin to \"%s\": %s", default_file, zbx_strerror(errno));
-
-	close(fd);
-
-	return SUCCEED;
+	// rotation is handled by go logger backend
+	return FAIL;
 }
 
 */
