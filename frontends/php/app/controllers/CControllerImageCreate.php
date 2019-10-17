@@ -19,12 +19,11 @@
 **/
 
 
-class CControllerImageUpdate extends CController {
+class CControllerImageCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
 			'name'      => 'required | not_empty | db images.name',
-			'imageid'   => 'required | fatal | db images.imageid',
 			'imagetype' => 'required | fatal | db images.imagetype'
 		];
 
@@ -35,12 +34,11 @@ class CControllerImageUpdate extends CController {
 				case self::VALIDATION_ERROR:
 					$url = (new CUrl('zabbix.php'))
 						->setArgument('action', 'image.edit')
-						->setArgument('imagetype', $this->getInput('imagetype'))
-						->setArgument('imageid', $this->getInput('imageid'));
+						->setArgument('imagetype', $this->getInput('imagetype'));
 
 					$response = new CControllerResponseRedirect($url);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError('Cannot update image');
+					$response->setMessageError('Cannot create image');
 					$this->setResponse($response);
 					break;
 
@@ -58,12 +56,11 @@ class CControllerImageUpdate extends CController {
 			return false;
 		}
 
-		$images = API::Image()->get(['imageids' => (array) $this->getInput('imageid')]);
-		if (!$images) {
-			return false;
-		}
-
-		$this->image = reset($images);
+		$this->image = [
+			'imageid'   => 0,
+			'imagetype' => $this->getInput('imagetype'),
+			'name'      => $this->getInput('name', '')
+		];
 
 		return true;
 	}
@@ -102,53 +99,43 @@ class CControllerImageUpdate extends CController {
 		if ($error) {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
-				->setArgument('imagetype', $this->getInput('imagetype'))
-				->setArgument('imageid', $this->getInput('imageid'));
+				->setArgument('imagetype', $this->getInput('imagetype'));
 
 			$response = new CControllerResponseRedirect($url);
 			error($error);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError('Cannot update image');
+			$response->setMessageError('Cannot create image');
 
 			return $this->setResponse($response);
 		}
 
-		if ($this->hasInput('imageid')) {
-			$result = API::Image()->update([
-				'imageid' => $this->getInput('imageid'),
-				'name'    => $this->getInput('name'),
-				'image'   => $image
-			]);
-		}
-		else {
-			$result = API::Image()->create([
-				'imagetype' => $this->getInput('imagetype'),
-				'name'      => $this->getInput('name'),
-				'image'     => $image
-			]);
-		}
+		$result = API::Image()->create([
+			'imagetype' => $this->getInput('imagetype'),
+			'name'      => $this->getInput('name'),
+			'image'     => $image
+		]);
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$this->getInput('name').'] updated');
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$this->getInput('name').'] created');
 
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $this->getInput('imagetype'))
 			);
-
-			$response->setMessageOk('Image updated');
+			$response->setMessageOk('Image created');
 		}
 		else {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.edit')
-				->setArgument('imagetype', $this->getInput('imagetype'))
-				->setArgument('imageid', $this->getInput('imageid'));
+				->setArgument('imagetype', $this->getInput('imagetype'));
+
 
 			$response = new CControllerResponseRedirect($url);
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError('Cannot update image');
+			$response->setMessageError('Cannot create image');
 		}
 
 		$this->setResponse($response);
 	}
 }
+

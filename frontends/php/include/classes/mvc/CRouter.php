@@ -95,6 +95,7 @@ class CRouter {
 		'image.delete'					=> ['CControllerImageDelete',						null,					null],
 		'image.edit'					=> ['CControllerImageEdit',							'layout.htmlpage',		'administration.image.edit'],
 		'image.list'					=> ['CControllerImageList',							'layout.htmlpage',		'administration.image.list'],
+		'image.create'					=> ['CControllerImageCreate',						null,					null],
 		'image.update'					=> ['CControllerImageUpdate',						null,					null],
 		'macros.edit'					=> ['CControllerMacrosEdit',						'layout.htmlpage',		'administration.macros.edit'],
 		'macros.update'					=> ['CControllerMacrosUpdate',						null,					null],

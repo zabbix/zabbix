@@ -31,7 +31,7 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm('post', (new CUrl('zabbix.php'))
-		->setArgument('action', 'image.update')
+		->setArgument('action', ($data['imageid'] != 0) ? 'image.update' : 'image.create')
 		->getUrl(), 'multipart/form-data')
 	)
 		->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
