@@ -112,6 +112,9 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 				if ($this->getInput('month_date_type', 0)) {
 					$rules['days'] = 'required|not_empty';
 				}
+				else {
+					$rules['day'] = 'required|ge 1';
+				}
 
 				break;
 		}
