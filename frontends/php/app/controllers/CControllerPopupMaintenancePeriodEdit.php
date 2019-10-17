@@ -23,6 +23,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'update' =>				'in 0,1',
 			'refresh' =>			'in 0,1',
 			'index' =>				'required|int32',
 			'days' =>				'array',

@@ -53,6 +53,7 @@
 					var row = btn.closest('tr');
 
 					params = {
+						update: 1,
 						index: rows.index(row)
 					};
 
