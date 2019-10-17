@@ -1898,7 +1898,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int range_start)
 		range_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
 	else
-		range_end = time(NULL);
+		range_end = ZBX_JAN_2038;
 
 	/* update cache if necessary */
 	if (range_start < range_end)
@@ -1995,7 +1995,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int rang
 		if (NULL != item->head)
 			range_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
-			range_end = time(NULL);
+			range_end = ZBX_JAN_2038;
 
 		vc_try_unlock();
 
