@@ -57,8 +57,7 @@ dist-hook:
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java; \
 	cat $(top_distdir)/go/src/zabbix/pkg/version/version.go|sed "s/{ZABBIX_RC_NUM}/$$branch$$type_num$$type_count/g"| \
 	sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/go/src/zabbix/pkg/version/version.go.new; \
-	mv $(top_distdir)/go/src/zabbix/pkg/version/version.go.new $(top_distdir)/go/src/zabbix/pkg/version/version.go; \
-	rm -f $(top_distdir)/conf_tests.m4
+	mv $(top_distdir)/go/src/zabbix/pkg/version/version.go.new $(top_distdir)/go/src/zabbix/pkg/version/version.go
 
 	rm -rf `find $(top_distdir) -name ".gitignore" -o -name ".gitattributes"`
 	rm -f $(top_distdir)/include/config.h
