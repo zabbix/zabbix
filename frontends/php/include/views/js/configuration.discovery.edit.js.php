@@ -6,10 +6,10 @@
 			(new CHorList([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("javascript: showNewCheckForm(null, '#{dcheckid}');"),
+					->setAttribute('data-action', 'edit'),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
+					->setAttribute('data-action', 'remove')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setId('dcheckRow_#{dcheckid}')
@@ -52,107 +52,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="newDCheckTPL">
-<?=
-	(new CDiv(
-		(new CDiv([
-			(new CFormList())
-				->addRow(
-					(new CLabel(_('Check type'), 'type')),
-					(new CComboBox('type'))
-				)
-				->addRow(
-					(new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
-					(new CTextBox('ports'))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-						->setAriaRequired(),
-					'newCheckPortsRow'
-				)
-				->addRow(
-					(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-					(new CTextBox('snmp_community'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired(),
-					'newCheckCommunityRow'
-				)
-				->addRow(
-					(new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
-					(new CTextBox('key_'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired(),
-					'newCheckKeyRow'
-				)
-				->addRow(
-					(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-					(new CTextBox('snmp_oid'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired()
-						->setAttribute('maxlength', 512),
-					'new_check_snmp_oid_row'
-				)
-				->addRow(
-					(new CLabel(_('Context name'), 'snmpv3_contextname')),
-					(new CTextBox('snmpv3_contextname'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-					'newCheckContextRow'
-				)
-				->addRow(
-					(new CLabel(_('Security name'), 'snmpv3_securityname')),
-					(new CTextBox('snmpv3_securityname'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAttribute('maxlength', 64),
-					'newCheckSecNameRow'
-				)
-				->addRow(
-					new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-					new CComboBox('snmpv3_securitylevel', null, null, [
-						ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
-						ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
-					]),
-					'newCheckSecLevRow'
-				)
-				->addRow(
-					(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-					(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
-						->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-						->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-						->setModern(true),
-					'newCheckAuthProtocolRow'
-				)
-				->addRow(
-					(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase')),
-					(new CTextBox('snmpv3_authpassphrase'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAttribute('maxlength', 64),
-					'newCheckAuthPassRow'
-				)
-				->addRow(
-					(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-					(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
-						->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-						->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-						->setModern(true),
-					'newCheckPrivProtocolRow'
-				)
-				->addRow(
-					(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))->setAsteriskMark(),
-					(new CTextBox('snmpv3_privpassphrase'))
-						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						->setAriaRequired()
-						->setAttribute('maxlength', 64),
-					'newCheckPrivPassRow'
-				),
-			(new CHorList([
-				(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-				(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
-			]))
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
-	))->setId('new_check_form')
-?>
-</script>
+
 <script type="text/javascript">
 	var ZBX_SVC = {
 		ssh: <?= SVC_SSH ?>,
@@ -174,85 +74,6 @@
 	};
 
 	var ZBX_CHECKLIST = {};
-
-	function discoveryCheckDefaultPort(service) {
-		var defPorts = {};
-		defPorts[ZBX_SVC.ssh] = '22';
-		defPorts[ZBX_SVC.ldap] = '389';
-		defPorts[ZBX_SVC.smtp] = '25';
-		defPorts[ZBX_SVC.ftp] = '21';
-		defPorts[ZBX_SVC.http] = '80';
-		defPorts[ZBX_SVC.pop] = '110';
-		defPorts[ZBX_SVC.nntp] = '119';
-		defPorts[ZBX_SVC.imap] = '143';
-		defPorts[ZBX_SVC.tcp] = '0';
-		defPorts[ZBX_SVC.icmp] = '0';
-		defPorts[ZBX_SVC.agent] = '10050';
-		defPorts[ZBX_SVC.snmpv1] = '161';
-		defPorts[ZBX_SVC.snmpv2] = '161';
-		defPorts[ZBX_SVC.snmpv3] = '161';
-		defPorts[ZBX_SVC.https] = '443';
-		defPorts[ZBX_SVC.telnet] = '23';
-
-		service = service.toString();
-
-		return isset(service, defPorts) ? defPorts[service] : 0;
-	}
-
-	function discoveryCheckTypeToString(svcPort) {
-		var defPorts = {};
-		defPorts[ZBX_SVC.ftp] = <?= CJs::encodeJson(_('FTP')) ?>;
-		defPorts[ZBX_SVC.http] = <?= CJs::encodeJson(_('HTTP')) ?>;
-		defPorts[ZBX_SVC.https] = <?= CJs::encodeJson(_('HTTPS')) ?>;
-		defPorts[ZBX_SVC.icmp] = <?= CJs::encodeJson(_('ICMP ping')) ?>;
-		defPorts[ZBX_SVC.imap] = <?= CJs::encodeJson(_('IMAP')) ?>;
-		defPorts[ZBX_SVC.tcp] = <?= CJs::encodeJson(_('TCP')) ?>;
-		defPorts[ZBX_SVC.ldap] = <?= CJs::encodeJson(_('LDAP')) ?>;
-		defPorts[ZBX_SVC.nntp] = <?= CJs::encodeJson(_('NNTP')) ?>;
-		defPorts[ZBX_SVC.pop] = <?= CJs::encodeJson(_('POP')) ?>;
-		defPorts[ZBX_SVC.snmpv1] = <?= CJs::encodeJson(_('SNMPv1 agent')) ?>;
-		defPorts[ZBX_SVC.snmpv2] = <?= CJs::encodeJson(_('SNMPv2 agent')) ?>;
-		defPorts[ZBX_SVC.snmpv3] = <?= CJs::encodeJson(_('SNMPv3 agent')) ?>;
-		defPorts[ZBX_SVC.smtp] = <?= CJs::encodeJson(_('SMTP')) ?>;
-		defPorts[ZBX_SVC.ssh] = <?= CJs::encodeJson(_('SSH')) ?>;
-		defPorts[ZBX_SVC.telnet] = <?= CJs::encodeJson(_('Telnet')) ?>;
-		defPorts[ZBX_SVC.agent] = <?= CJs::encodeJson(_('Zabbix agent')) ?>;
-
-		if (typeof svcPort === 'undefined') {
-			return defPorts;
-		}
-
-		svcPort = parseInt(svcPort, 10);
-
-		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?= CJs::encodeJson(_('Unknown')) ?>;
-	}
-
-	/**
-	 * Checks if type of SNMP.
-	 *
-	 * @param integer type
-	 *
-	 * @return bool
-	 */
-	function typeOfSnmp(type) {
-		var types = {};
-		types[ZBX_SVC.snmpv1] = true;
-		types[ZBX_SVC.snmpv2] = true;
-		types[ZBX_SVC.snmpv3] = true;
-
-		return (typeof types[type] != 'undefined');
-	}
-
-	function toggleInputs(id, state) {
-		jQuery('#' + id).toggle(state);
-
-		if (state) {
-			jQuery('#' + id + ' :input').prop('disabled', false);
-		}
-		else {
-			jQuery('#' + id + ' :input').prop('disabled', true);
-		}
-	}
 
 	/**
 	 * @see init.js add.popup event
@@ -391,359 +212,13 @@
 
 	}
 
-	function showNewCheckForm(e, dcheckId) {
-		var isUpdate = (typeof dcheckId !== 'undefined');
-
-		// remove existing form
-		jQuery('#new_check_form').remove();
-
-		if (jQuery('#new_check_form').length == 0) {
-			var tpl = new Template(jQuery('#newDCheckTPL').html());
-
-			jQuery('#dcheckList').after(tpl.evaluate());
-
-			// display fields dependent from type
-			jQuery('#type').change(function() {
-				updateNewDCheckType(dcheckId);
-			});
-
-			// display addition snmpv3 security level fields dependent from snmpv3 security level
-			jQuery('#snmpv3_securitylevel').change(updateNewDCheckSNMPType);
-
-			// button "add"
-			jQuery('#add_new_dcheck').click(function() {
-				saveNewDCheckForm(dcheckId);
-			});
-
-			// rename button to "update"
-			if (isUpdate) {
-				jQuery('#add_new_dcheck').text(<?= CJs::encodeJson(_('Update')) ?>);
-			}
-
-			// button "remove" form
-			jQuery('#cancel_new_dcheck').click(function() {
-				jQuery('#new_check_form').remove();
-			});
-
-			// port name sorting
-			var svcPorts = discoveryCheckTypeToString(),
-				portNameSvcValue = {},
-				portNameOrder = [];
-
-			for (var key in svcPorts) {
-				portNameOrder.push(svcPorts[key]);
-				portNameSvcValue[svcPorts[key]] = key;
-			}
-
-			portNameOrder.sort();
-
-			for (var i = 0; i < portNameOrder.length; i++) {
-				var portName = portNameOrder[i];
-
-				jQuery('#type').append(jQuery('<option>', {
-					value: portNameSvcValue[portName],
-					text: portName
-				}));
-			}
-		}
-
-		// restore form values
-		if (isUpdate) {
-			var dcheck_inputs = jQuery('#dcheckCell_' + dcheckId + ' input'),
-				check_type = dcheck_inputs.filter('[name="dchecks[' + dcheckId + '][type]"]').val();
-
-			dcheck_inputs.each(function(i, item) {
-				var itemObj = jQuery(item);
-
-				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
-				name = name.substring(0, name.length - 1);
-
-				// ignore "name" value because it is virtual
-				if (name !== 'name') {
-					if (name == 'key_' && typeOfSnmp(check_type)) {
-						// Use key_ value in snmp_oid input.
-
-						jQuery('#snmp_oid').val(itemObj.val());
-					}
-					else if (name === 'host_source' || name === 'name_source') {
-						return true;
-					}
-					else {
-						jQuery('#' + name).val(itemObj.val());
-					}
-
-					// set radio button value
-					var radioObj = jQuery('input[name=' + name + ']');
-
-					if (radioObj.attr('type') == 'radio') {
-						radioObj.prop('checked', false);
-
-						jQuery('#' + name + '_' + itemObj.val()).prop('checked', true);
-					}
-				}
-			});
-		}
-
-		updateNewDCheckType(dcheckId);
-	}
-
-	function updateNewDCheckType(dcheckId) {
-		var dcheckType = parseInt(jQuery('#type').val(), 10);
-
-		var comRowTypes = {};
-		comRowTypes[ZBX_SVC.snmpv1] = true;
-		comRowTypes[ZBX_SVC.snmpv2] = true;
-
-		var secNameRowTypes = {};
-		secNameRowTypes[ZBX_SVC.snmpv3] = true;
-
-		toggleInputs('newCheckPortsRow', (ZBX_SVC.icmp != dcheckType));
-		toggleInputs('newCheckKeyRow', dcheckType == ZBX_SVC.agent);
-		toggleInputs('new_check_snmp_oid_row', typeOfSnmp(dcheckType));
-		toggleInputs('newCheckCommunityRow', isset(dcheckType, comRowTypes));
-		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
-		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
-		toggleInputs('newCheckContextRow', isset(dcheckType, secNameRowTypes));
-
-		// get old type
-		var oldType = jQuery('#type').data('oldType');
-
-		jQuery('#type').data('oldType', dcheckType);
-
-		// type is changed
-		if (ZBX_SVC.icmp != dcheckType && typeof oldType !== 'undefined' && dcheckType != oldType) {
-			// reset values
-			var snmpTypes = [ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
-				ignoreNames = ['druleid', 'name', 'ports', 'type'];
-
-			if (jQuery.inArray(dcheckType, snmpTypes) !== -1 && jQuery.inArray(oldType, snmpTypes) !== -1) {
-				// ignore value reset when changing type from snmp's
-			}
-			else {
-				jQuery('#new_check_form input[type="text"]').each(function(i, item) {
-					var itemObj = jQuery(item);
-
-					if (jQuery.inArray(itemObj.attr('id'), ignoreNames) < 0) {
-						itemObj.val('');
-					}
-				});
-
-				// reset port to default
-				jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
-			}
-		}
-
-		// set default port
-		if (jQuery('#ports').val() == '') {
-			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
-		}
-
-		updateNewDCheckSNMPType();
-	}
-
-	function updateNewDCheckSNMPType() {
-		var dcheckType = parseInt(jQuery('#type').val(), 10),
-			dcheckSecLevType = parseInt(jQuery('#snmpv3_securitylevel').val(), 10);
-
-		var secNameRowTypes = {};
-		secNameRowTypes[ZBX_SVC.snmpv3] = true;
-
-		var showAuthProtocol = (isset(dcheckType, secNameRowTypes)
-			&& (dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>
-				|| dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>));
-		var showAuthPass = (isset(dcheckType, secNameRowTypes)
-			&& (dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>
-				|| dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>));
-		var showPrivProtocol = (isset(dcheckType, secNameRowTypes)
-			&& dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>);
-		var showPrivPass = (isset(dcheckType, secNameRowTypes)
-			&& dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>);
-
-		toggleInputs('newCheckAuthProtocolRow', showAuthProtocol);
-		toggleInputs('newCheckAuthPassRow', showAuthPass);
-		toggleInputs('newCheckPrivProtocolRow', showPrivProtocol);
-		toggleInputs('newCheckPrivPassRow', showPrivPass);
-	}
-
-	function saveNewDCheckForm(dcheckId) {
-		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
-		if (typeof dCheck.snmp_oid != 'undefined') {
-			dCheck.key_ = dCheck.snmp_oid;
-			delete dCheck.snmp_oid;
-		}
-
-		// get check id
-		dCheck.dcheckid = (typeof dcheckId === 'undefined') ? getUniqueId() : dcheckId;
-
-		// check for duplicates
-		for (var zbxDcheckId in ZBX_CHECKLIST) {
-			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
-				if ((typeof dCheck['key_'] === 'undefined' || ZBX_CHECKLIST[zbxDcheckId]['key_'] === dCheck['key_'])
-						&& (typeof dCheck['type'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['type'] === dCheck['type'])
-						&& (typeof dCheck['ports'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['ports'] === dCheck['ports'])
-						&& (typeof dCheck['snmp_community'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmp_community'] === dCheck['snmp_community'])
-						&& (typeof dCheck['snmpv3_authprotocol'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authprotocol'] === dCheck['snmpv3_authprotocol'])
-						&& (typeof dCheck['snmpv3_authpassphrase'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authpassphrase'] === dCheck['snmpv3_authpassphrase'])
-						&& (typeof dCheck['snmpv3_privprotocol'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privprotocol'] === dCheck['snmpv3_privprotocol'])
-						&& (typeof dCheck['snmpv3_privpassphrase'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privpassphrase'] === dCheck['snmpv3_privpassphrase'])
-						&& (typeof dCheck['snmpv3_securitylevel'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
-						&& (typeof dCheck['snmpv3_securityname'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])
-						&& (typeof dCheck['snmpv3_contextname'] === 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
-
-					overlayDialogue({
-						'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
-						'content': jQuery('<span>').text(<?= CJs::encodeJson(_('Check already exists.')) ?>),
-						'buttons': [
-							{
-								'title': <?= CJs::encodeJson(_('Cancel')) ?>,
-								'cancel': true,
-								'focused': true,
-								'action': function() {}
-							}
-						]
-					});
-
-					return null;
-				}
-			}
-		}
-
-		// validate
-		var validationErrors = [],
-			ajaxChecks = {
-				ajaxaction: 'validate',
-				ajaxdata: []
-			};
-
-		switch (parseInt(dCheck.type, 10)) {
-			case ZBX_SVC.agent:
-				ajaxChecks.ajaxdata.push({
-					field: 'itemKey',
-					value: dCheck.key_
-				});
-				break;
-			case ZBX_SVC.snmpv1:
-			case ZBX_SVC.snmpv2:
-				if (dCheck.snmp_community == '') {
-					validationErrors.push(<?= CJs::encodeJson(_('Incorrect SNMP community.')) ?>);
-				}
-			case ZBX_SVC.snmpv3:
-				if (dCheck.key_ == '') {
-					validationErrors.push(<?= CJs::encodeJson(_('Incorrect SNMP OID.')) ?>);
-				}
-				break;
-		}
-
-		if (dCheck.type != ZBX_SVC.icmp) {
-			ajaxChecks.ajaxdata.push({
-				field: 'port',
-				value: dCheck.ports
-			});
-		}
-
-		var jqxhr;
-
-		if (ajaxChecks.ajaxdata.length > 0) {
-			jQuery('#add_new_dcheck').prop('disabled', true);
-
-			var url = new Curl();
-			jqxhr = jQuery.ajax({
-				url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
-				data: ajaxChecks,
-				dataType: 'json',
-				success: function(result) {
-					if (!result.result) {
-						jQuery.each(result.errors, function(i, val) {
-							validationErrors.push(val.error);
-						});
-					}
-				},
-				error: function() {
-					overlayDialogue({
-						'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
-						'content': jQuery('<span>').text(<?= CJs::encodeJson(
-							_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')
-						) ?>),
-						'buttons': [
-							{
-								'title': <?= CJs::encodeJson(_('Cancel')) ?>,
-								'cancel': true,
-								'focused': true,
-								'action': function() {}
-							}
-						]
-					});
-					jQuery('#add_new_dcheck').prop('disabled', false);
-				}
-			});
-		}
-
-		jQuery.when(jqxhr).done(function() {
-			jQuery('#add_new_dcheck').prop('disabled', false);
-
-			if (validationErrors.length) {
-				var content = jQuery('<span>');
-
-				for (var i = 0; i < validationErrors.length; i++) {
-					if (content.html() !== '') {
-						content.append(jQuery('<br>'));
-					}
-					content.append(jQuery('<span>').text(validationErrors[i]));
-				}
-
-				overlayDialogue({
-					'title': <?= CJs::encodeJson(_('Discovery check error')) ?>,
-					'content': content,
-					'buttons': [
-						{
-							'title': <?= CJs::encodeJson(_('Cancel')) ?>,
-							'cancel': true,
-							'focused': true,
-							'action': function() {}
-						}
-					]
-				});
-			}
-			else {
-				dCheck.name = jQuery('#type :selected').text();
-
-				if (typeof dCheck.ports !== 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
-					dCheck.name += ' (' + dCheck.ports + ')';
-				}
-				if (dCheck.key_) {
-					dCheck.name += ' "' + dCheck.key_ + '"';
-				}
-
-				dCheck.host_source = jQuery('[name=host_source]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_DNS ?>';
-				dCheck.name_source = jQuery('[name=name_source]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
-
-				addPopupValues([dCheck]);
-
-				jQuery('#new_check_form').remove();
-			}
-		});
-	}
-
-	jQuery(document).ready(function() {
+	jQuery(function($) {
 		addPopupValues(<?= zbx_jsvalue(array_values($this->data['drule']['dchecks'])) ?>);
 
 		jQuery("input:radio[name='uniqueness_criteria'][value=<?= zbx_jsvalue($this->data['drule']['uniqueness_criteria']) ?>]").attr('checked', 'checked');
 		jQuery("input:radio[name='host_source'][value=<?= zbx_jsvalue($this->data['drule']['host_source']) ?>]").attr('checked', 'checked');
 		jQuery("input:radio[name='name_source'][value=<?= zbx_jsvalue($this->data['drule']['name_source']) ?>]").attr('checked', 'checked');
 
-		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {
 			jQuery('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
@@ -764,6 +239,46 @@
 			}
 			else {
 				jQuery('[name^=dchecks][name$="[' + name + ']"]').val(elm.val());
+			}
+		});
+
+		$('#dcheckList').on('click', '[data-action]', function() {
+			var $btn = $(this),
+				$rows = $('#dcheckList > table > tbody > tr'),
+				params = {};
+
+			params['types'] = $rows.find('input[name$="[type]"]').map(function() {
+				return this.value;
+			}).get();
+
+			switch ($btn.data('action')) {
+				case 'add':
+					params['index'] = $rows.length;
+
+					PopUp('popup.discovery.check.edit', params, null, $btn);
+					break;
+
+				case 'edit':
+					var $row = $btn.closest('tr');
+
+					params['update'] = 1;
+					params['index'] = $rows.index($row);
+
+					$row.find('input[type="hidden"]').each(function() {
+						var $input = $(this),
+							name = $input.attr('name').match(/\[([^\]]+)]$/);
+
+						if (name) {
+							params[name[1]] = $input.val();
+						}
+					});
+
+					PopUp('popup.discovery.check.edit', params, null, $btn);
+					break;
+
+				case 'remove':
+					removeDCheckRow($btn.closest('tr').find('input[name$="[dcheckid]"]').val());
+					break;
 			}
 		});
 	});

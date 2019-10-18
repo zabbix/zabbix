@@ -67,10 +67,13 @@ $discoveryFormList->addRow(
 	(new CDiv(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Type'), _('Actions')])
 			->setFooter(
 				(new CRow(
 					(new CCol(
-						(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+						(new CSimpleButton(_('Add')))
+							->setAttribute('data-action', 'add')
+							->addClass(ZBX_STYLE_BTN_LINK)
 					))->setColSpan(2)
 				))->setId('dcheckListFooter')
 			)

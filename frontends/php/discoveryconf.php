@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'discoveryconf.php';
 $page['type'] = detect_page_type();
+$page['scripts'] = ['class.cviewswitcher.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
