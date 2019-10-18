@@ -1062,6 +1062,8 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 					$db_item['value'] = $db_trigger['value'];
 				}
 
+				$db_item['acknowledged'] = $db_trigger['problem']['acknowledged'];
+
 				unset($db_item);
 			}
 		}
@@ -1124,7 +1126,8 @@ function getItemsDataOverview(array $groupids, $application, $viewMode,
 				'value' => isset($history[$db_item['itemid']]) ? $history[$db_item['itemid']][0]['value'] : null,
 				'units' => $db_item['units'],
 				'valuemapid' => $db_item['valuemapid'],
-				'item_place' => $item_place
+				'item_place' => $item_place,
+				'acknowledged' => array_key_exists('acknowledged', $db_item) ? $db_item['acknowledged'] : 0
 			];
 
 			if (array_key_exists('triggerid', $db_item)) {
@@ -1214,16 +1217,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css = getSeverityStyle($item['severity']);
-
-			// Display event acknowledgement.
-			$ack = getTriggerLastProblems([$item['triggerid']], ['acknowledged']);
-
-			if ($ack) {
-				$ack = reset($ack);
-				$ack = ($ack['acknowledged'] == 1)
-					? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
-					: null;
-			}
+			$ack = ($item['acknowledged'] == 1) ? [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)] : null;
 		}
 
 		if ($item['value'] !== null) {

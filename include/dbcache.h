@@ -456,9 +456,9 @@ typedef struct
 	zbx_vector_ptr_t	correlations;
 	zbx_hashset_t		conditions;
 
-	/* Configuration synchonization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the   */
-	/* current configuration synchonization timestamp.      */
+	/* Configuration synchronization timestamp of the rules. */
+	/* Update the cache if this timesamp is less than the    */
+	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
 zbx_correlation_rules_t;

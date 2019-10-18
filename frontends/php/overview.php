@@ -40,9 +40,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
-	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
-	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,							null],
+	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN(STYLE_LEFT.','.STYLE_TOP),	null],
+	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN(SHOW_TRIGGERS.','.SHOW_DATA), null],
 	// filter
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -123,7 +123,6 @@ $type = CProfile::get('web.overview.type', SHOW_TRIGGERS);
 if (hasRequest('view_style')) {
 	CProfile::update('web.overview.view_style', getRequest('view_style'), PROFILE_TYPE_INT);
 }
-$viewStyle = CProfile::get('web.overview.view_style', STYLE_TOP);
 
 $showTriggers = CProfile::get('web.overview.filter.show_triggers', TRIGGERS_OPTION_RECENT_PROBLEM);
 
@@ -144,7 +143,7 @@ $page_filter = new CPageFilter([
 
 $data = [
 	'type' => $type,
-	'view_style' => $viewStyle,
+	'view_style' => CProfile::get('web.overview.view_style', STYLE_TOP),
 	'config' => $config,
 	'pageFilter' => $page_filter,
 	'groupid' => $page_filter->groupid,
@@ -188,9 +187,7 @@ if ($type == SHOW_TRIGGERS) {
 		$trigger_options = [
 			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'filter' => [
-				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
-			],
+			'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
 
 		$problem_options = [
@@ -201,10 +198,10 @@ if ($type == SHOW_TRIGGERS) {
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];
 
-		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+		$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
 
-		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $viewStyle,
-			$host_options, $trigger_options, $problem_options
+		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $host_options,
+			$trigger_options, $problem_options
 		);
 	}
 	else {

@@ -18,10 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'4.4.0rc1');
-define('ZABBIX_API_VERSION',	'4.4.0');
+define('ZABBIX_VERSION',		'4.4.1rc1');
+define('ZABBIX_API_VERSION',	'4.4.1');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
-define('ZABBIX_DB_VERSION',		4030055);
+define('ZABBIX_DB_VERSION',		4040000);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2019');
@@ -1846,6 +1846,10 @@ define('PROBLEMS_SHOW_TAGS_3', 3);
 define('PROBLEMS_TAG_NAME_FULL',      0);
 define('PROBLEMS_TAG_NAME_SHORTENED', 1);
 define('PROBLEMS_TAG_NAME_NONE',      2);
+
+define('OPERATIONAL_DATA_SHOW_NONE',         0);
+define('OPERATIONAL_DATA_SHOW_SEPARATELY',   1);
+define('OPERATIONAL_DATA_SHOW_WITH_PROBLEM', 2);
 
 // HTTP headers
 /*

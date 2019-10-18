@@ -37,6 +37,7 @@ class CConfiguration extends CApiService {
 				'hosts' =>		['type' => API_IDS],
 				'images' =>		['type' => API_IDS],
 				'maps' =>		['type' => API_IDS],
+				'mediaTypes' =>	['type' => API_IDS],
 				'screens' =>	['type' => API_IDS],
 				'templates' =>	['type' => API_IDS],
 				'valueMaps' =>	['type' => API_IDS]
@@ -110,6 +111,10 @@ class CConfiguration extends CApiService {
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
+				'mediaTypes' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				]],
 				'screens' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
@@ -169,7 +174,7 @@ class CConfiguration extends CApiService {
 		$data = (new CConstantImportConverter($schema))->convert($data);
 
 		// Add default values in place of missed tags.
-		$data = (new CDefaultValuesImportConverter($schema))->convert($data);
+		$data = (new CDefaultImportConverter($schema))->convert($data);
 
 		// Normalize array keys.
 		$data = (new CArrayKeysImportConverter($schema))->convert($data);

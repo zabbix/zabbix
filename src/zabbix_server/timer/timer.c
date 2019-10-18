@@ -91,9 +91,9 @@ static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
 
 	if (0 != (diff->flags & ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_TYPE) && 0 == maintenance_off)
 	{
-		const char	*desription[] = {"with data collection", "without data collection"};
+		const char	*description[] = {"with data collection", "without data collection"};
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", desription[diff->maintenance_type]);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", description[diff->maintenance_type]);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
@@ -754,9 +754,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (maintenance_time != update_time)
 		{
-			maintenance_time = (int)sec;
+			update_time -= update_time % 60;
+			maintenance_time = update_time;
 
-			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - sec)))
+			if (0 > (idle = ZBX_TIMER_DELAY - (zbx_time() - maintenance_time)))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

@@ -196,6 +196,18 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format media types.
+	 *
+	 * @param array $schema       Tag schema from validation class.
+	 * @param array $media_types  Export data.
+	 */
+	public function buildMediaTypes(array $schema, array $media_types) {
+		$media_types = $this->formatMediaTypes($media_types);
+
+		$this->data['media_types'] = $this->build($schema, $media_types, 'media_types');
+	}
+
+	/**
 	 * Format valuemaps.
 	 *
 	 * @param array $schema     Tag schema from validation class.
@@ -297,7 +309,7 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
-				'inventory_mode' => $this->formatHostInventoryMode($host['inventory']),
+				'inventory_mode' => $host['inventory_mode'],
 				'inventory' => $this->formatHostInventory($host['inventory']),
 				'tags' => $this->formatTags($host['tags'])
 			];
@@ -389,6 +401,53 @@ class CConfigurationExportBuilder {
 			$result[] = [
 				'value' => $mapping['value'],
 				'newvalue' => $mapping['newvalue']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format media types.
+	 *
+	 * @param array $media_types
+	 */
+	protected function formatMediaTypes(array $media_types) {
+		$result = [];
+
+		CArrayHelper::sort($media_types, ['name']);
+
+		foreach ($media_types as $media_type) {
+			$result[] = [
+				'name' => $media_type['name'],
+				'type' => $media_type['type'],
+				'smtp_server' => $media_type['smtp_server'],
+				'smtp_port' => $media_type['smtp_port'],
+				'smtp_helo' => $media_type['smtp_helo'],
+				'smtp_email' => $media_type['smtp_email'],
+				'smtp_security' => $media_type['smtp_security'],
+				'smtp_verify_host' => $media_type['smtp_verify_host'],
+				'smtp_verify_peer' => $media_type['smtp_verify_peer'],
+				'smtp_authentication' => $media_type['smtp_authentication'],
+				'username' => $media_type['username'],
+				'password' => $media_type['passwd'],
+				'content_type' => $media_type['content_type'],
+				'script_name' => $media_type['exec_path'],
+				'parameters' => ($media_type['type'] == MEDIA_TYPE_WEBHOOK)
+					? $media_type['parameters']
+					: $media_type['exec_params'],
+				'gsm_modem' => $media_type['gsm_modem'],
+				'status' => $media_type['status'],
+				'max_sessions' => $media_type['maxsessions'],
+				'attempts' => $media_type['maxattempts'],
+				'attempt_interval' => $media_type['attempt_interval'],
+				'script' => $media_type['script'],
+				'timeout' => $media_type['timeout'],
+				'process_tags' => $media_type['process_tags'],
+				'show_event_menu' => $media_type['show_event_menu'],
+				'event_menu_url' => $media_type['event_menu_url'],
+				'event_menu_name' => $media_type['event_menu_name'],
+				'description' => $media_type['description']
 			];
 		}
 
@@ -644,17 +703,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format host inventory mode.
-	 *
-	 * @param array $inventory
-	 *
-	 * @return string
-	 */
-	protected function formatHostInventoryMode(array $data) {
-		return array_key_exists('inventory_mode', $data) ? $data['inventory_mode'] : '';
-	}
-
-	/**
 	 * Format host inventory.
 	 *
 	 * @param array $inventory
@@ -662,7 +710,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostInventory(array $inventory) {
-		unset($inventory['hostid'], $inventory['inventory_mode']);
+		unset($inventory['hostid']);
 
 		return $inventory;
 	}
@@ -723,7 +771,8 @@ class CConfigurationExportBuilder {
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
+				'templates' => $this->formatTemplateLinkage($hostPrototype['templates']),
+				'inventory_mode' => $hostPrototype['inventory_mode']
 			];
 		}
 

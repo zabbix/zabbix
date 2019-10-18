@@ -260,6 +260,7 @@ class CXmlConstantName {
 	const JAVASCRIPT = 'JAVASCRIPT';
 	const PROMETHEUS_PATTERN = 'PROMETHEUS_PATTERN';
 	const PROMETHEUS_TO_JSON = 'PROMETHEUS_TO_JSON';
+	const CSV_TO_JSON = 'CSV_TO_JSON';
 
 	const AND_OR = 'AND_OR';
 	const XML_AND = 'AND';
@@ -268,4 +269,19 @@ class CXmlConstantName {
 
 	// const MATCHES_REGEX = 'MATCHES_REGEX'; // Duplicate.
 	// const NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX'; // Duplicate.
+
+	const EMAIL = 'EMAIL';
+	const SCRIPT = 'SCRIPT';
+	const SMS = 'SMS';
+	const WEBHOOK = 'WEBHOOK';
+
+	// const NONE = 'NONE'; // Duplicate.
+	const STARTTLS = 'STARTTLS';
+	const SSL_OR_TLS = 'SSL_OR_TLS';
+
+	const SMTP_AUTHENTICATION_NONE = 'NONE';
+	const SMTP_AUTHENTICATION_PASSWORD = 'PASSWORD';
+
+	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
+	const CONTENT_TYPE_HTML = 'HTML';
 }
