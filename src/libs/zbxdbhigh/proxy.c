@@ -3171,20 +3171,18 @@ static int	parse_history_data_row_itemid(const struct zbx_json_parse *jp_row, zb
  ******************************************************************************/
 static int	parse_history_data_row_hostkey(const struct zbx_json_parse *jp_row, zbx_host_key_t *hk)
 {
-	char	buffer[MAX_STRING_LEN];
+	size_t str_alloc = 0;
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_HOST, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_HOST, &hk->host, &str_alloc))
 		return FAIL;
 
-	hk->host = zbx_strdup(hk->host, buffer);
+	str_alloc = 0;
 
-	if (SUCCEED != zbx_json_value_by_name(jp_row, ZBX_PROTO_TAG_KEY, buffer, sizeof(buffer)))
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_KEY, &hk->key, &str_alloc))
 	{
 		zbx_free(hk->host);
 		return FAIL;
 	}
-
-	hk->key = zbx_strdup(hk->key, buffer);
 
 	return SUCCEED;
 }

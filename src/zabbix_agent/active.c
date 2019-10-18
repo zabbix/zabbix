@@ -330,7 +330,8 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port)
 {
 	const char		*p;
-	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN],
+	size_t			name_alloc = 0, key_orig_alloc = 0;
+	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], exp_delimiter;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp;
@@ -382,15 +383,18 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 			goto out;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, name, sizeof(name)) || '\0' == *name)
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY, &name, &name_alloc) ||
+				'\0' == *name)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_KEY);
 			continue;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY_ORIG, key_orig, sizeof(key_orig))
-				|| '\0' == *key_orig) {
-			zbx_strlcpy(key_orig, name, sizeof(key_orig));
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY_ORIG, &key_orig, &key_orig_alloc)
+				|| '\0' == *key_orig)
+		{
+			size_t offset = 0;
+			zbx_strcpy_alloc(&key_orig, &key_orig_alloc, &offset, name);
 		}
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DELAY, tmp, sizeof(tmp)) || '\0' == *tmp)
@@ -472,7 +476,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 				goto out;
 			}
 
-			if (SUCCEED != zbx_json_value_by_name(&jp_row, "name", name, sizeof(name)))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, "name", &name, &name_alloc))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", "name");
 				continue;
@@ -519,6 +523,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 out:
 	zbx_vector_str_clear_ext(&received_metrics, zbx_str_free);
 	zbx_vector_str_destroy(&received_metrics);
+	zbx_free(key_orig);
+	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
