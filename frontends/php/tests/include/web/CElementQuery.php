@@ -37,6 +37,8 @@ require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 require_once dirname(__FILE__).'/elements/CMultilineElement.php';
+require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
+require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
