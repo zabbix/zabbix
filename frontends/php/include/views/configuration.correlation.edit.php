@@ -215,8 +215,13 @@ $operation_tab = new CFormList();
 
 $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Details'), _('Action')])
+	->setHeader([_('Action')])
 	->setId('operations_table');
+
+$checked = [
+	ZBX_CORR_OPERATION_CLOSE_OLD => false,
+	ZBX_CORR_OPERATION_CLOSE_NEW => false
+];
 
 if ($data['correlation']['operations']) {
 	foreach ($data['correlation']['operations'] as $operationid => $operation) {
@@ -224,39 +229,28 @@ if ($data['correlation']['operations']) {
 			continue;
 		}
 
-		$operations_table->addRow([
-			getCorrOperationDescription($operation),
-			(new CCol([
-				(new CButton('remove', _('Remove')))
-					->onClick('javascript: removeOperation('.$operationid.');')
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->removeId(),
-				new CVar('operations['.$operationid.']', $operation)
-			]))->addClass(ZBX_STYLE_NOWRAP)
-		], null, 'operations_'.$operationid);
+		$checked[$operation['type']] = true;
 	}
 }
+
+$operations_table->addRow(
+	(new CCheckBox('operations[][type]', '0'))
+		->setChecked($checked[ZBX_CORR_OPERATION_CLOSE_OLD])
+		->setLabel(_('Close old events'))
+		->setId('operationo_0_type')
+);
+
+$operations_table->addRow(
+	(new CCheckBox('operations[][type]', '1'))
+		->setChecked($checked[ZBX_CORR_OPERATION_CLOSE_NEW])
+		->setLabel(_('Close new event'))
+		->setId('operationo_1_type')
+);
 
 $operation_tab
 	->addRow(
 		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
 		(new CDiv([$operations_table]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
-	->addRow(_('New operation'),
-		(new CDiv(
-			(new CTable())
-				->setAttribute('style', 'width: 100%;')
-				->addRow(new CComboBox('new_operation[type]', $data['new_operation']['type'], null,
-					corrOperationTypes()
-				))
-				->addRow(
-					(new CSimpleButton(_('Add')))
-						->onClick('javascript: submitFormWithParam("'.$form->getName().'", "add_operation", "1");')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				)
-		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
