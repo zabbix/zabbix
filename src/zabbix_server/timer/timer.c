@@ -215,7 +215,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 {
 	DB_ROW				row;
 	DB_RESULT			result;
-	zbx_event_suppress_query_t	*query, *query_last = NULL;
+	zbx_event_suppress_query_t	*query = NULL;
 	zbx_event_suppress_data_t	*data = NULL;
 	zbx_uint64_t			eventid;
 	zbx_uint64_pair_t		pair;
@@ -237,7 +237,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 	{
 		ZBX_STR2UINT64(eventid, row[0]);
 
-		if (NULL == query_last || eventid != query_last->eventid)
+		if (NULL == query || eventid != query->eventid)
 		{
 			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
 
@@ -249,8 +249,6 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			zbx_vector_uint64_pair_create(&query->maintenances);
 			zbx_vector_ptr_append(event_queries, query);
 		}
-		else
-			query = query_last;
 
 		if (FAIL == DBis_null(row[3]))
 		{
