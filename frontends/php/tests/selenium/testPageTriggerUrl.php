@@ -55,7 +55,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		$table = $widget->getContent()->asTable();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', '1_trigger_Not_classified');
+		$row = $table->findRow('Triggers', $this->trigger);
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
 		$this->checkTriggerUrl();
@@ -80,7 +80,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', '1_trigger_Not_classified');
+		$row = $table->findRow('Triggers', $this->trigger);
 
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
@@ -166,7 +166,7 @@ class testPageTriggerUrl extends CWebTest {
 				CXPathHelper::escapeQuotes($name).']/../../..')->one()->waitUntilPresent();
 		$table = $screen_item->query('class:list-table')->asTable()->one();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', '1_trigger_Not_classified');
+		$row = $table->findRow('Triggers', $this->trigger);
 
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "na-bg")]')->one()->click();
