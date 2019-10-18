@@ -88,9 +88,7 @@ class testFormAdministrationGeneralAutoRegistration extends CWebTest {
 						'Resource' => 'Auto registration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => 'config.tls_accept: 1 => 2
-config.tls_psk_identity: ******** => ********
-config.tls_psk: ******** => ********'
+						'Details' => "config.tls_accept: 1 => 2\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
 					]
 				]
 			],
@@ -120,9 +118,7 @@ config.tls_psk: ******** => ********'
 						'Resource' => 'Auto registration',
 						'Action' => 'Updated',
 						'ID' => 1,
-						'Details' => 'config.tls_accept: 3 => 1
-config.tls_psk_identity: ******** => ********
-config.tls_psk: ******** => ********'
+						'Details' => "config.tls_accept: 3 => 1\nconfig.tls_psk_identity: ******** => ********\nconfig.tls_psk: ******** => ********"
 					]
 				]
 			]
@@ -146,7 +142,7 @@ config.tls_psk: ******** => ********'
 		$this->assertEquals('Configuration updated', $message->getTitle());
 
 		// Check Audit record about auto registration update.
-		$this->page->login()->open('auditlogs.php');
+		$this->page->open('auditlogs.php');
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
 		// Get first row data.
 		$row = $rows->get(0);
