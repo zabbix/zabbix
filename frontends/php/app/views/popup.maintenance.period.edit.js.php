@@ -68,8 +68,7 @@ function submitMaintenancePeriod(selector) {
 
 				delete response.params.index;
 				jQuery.each(response.params, function(name, value) {
-					console.log(name, value);
-					create_var('maintenanceForm', `timeperiods[${index}][${name}]`, value);
+					create_var('maintenanceForm', 'timeperiods['+index+']['+name+']', value);
 				});
 
 				document.forms.maintenanceForm.submit();
