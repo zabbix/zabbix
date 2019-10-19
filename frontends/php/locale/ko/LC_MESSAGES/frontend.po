@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-13 01:42+0300\n"
+"POT-Creation-Date: 2019-10-20 01:42+0300\n"
 "PO-Revision-Date: 2018-12-04 06:36+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -226,7 +226,7 @@ msgstr "(프록시 없음)"
 msgid "0 - use default port"
 msgstr "0 - 기본 포트 사용"
 
-#: include/triggers.inc.php:1847
+#: include/triggers.inc.php:1875
 msgid "0 or 1"
 msgstr "0 또는 1"
 
@@ -859,7 +859,7 @@ msgstr "모든 태그"
 msgid "All templates"
 msgstr "모든 템플릿"
 
-#: include/triggers.inc.php:1242
+#: include/triggers.inc.php:1270
 #: include/views/configuration.trigger.prototype.edit.php:520
 #: include/views/configuration.trigger.prototype.massupdate.php:173
 #: include/views/configuration.triggers.edit.php:554
@@ -878,7 +878,7 @@ msgstr "허가된 호스트"
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
-#: include/triggers.inc.php:1310
+#: include/triggers.inc.php:1338
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1146
 #: include/views/configuration.correlation.edit.php:94
@@ -1043,7 +1043,7 @@ msgstr "에리어 사이즈"
 msgid "Area type"
 msgstr "에리어 타입"
 
-#: include/items.inc.php:1729
+#: include/items.inc.php:1723
 msgid "Arithmetic"
 msgstr "계산"
 
@@ -1373,7 +1373,7 @@ msgstr "Body와 Header"
 msgid "Bold line"
 msgstr "굵은 선"
 
-#: include/items.inc.php:1744
+#: include/items.inc.php:1738
 msgid "Boolean to decimal"
 msgstr "Boolean 에서 10진수(decimal)로"
 
@@ -2876,7 +2876,7 @@ msgstr "중앙"
 msgid "Certificate"
 msgstr "인증서"
 
-#: include/items.inc.php:1735 latest.php:412 latest.php:425
+#: include/items.inc.php:1729 latest.php:412 latest.php:425
 msgctxt "noun"
 msgid "Change"
 msgstr "변화"
@@ -2896,7 +2896,7 @@ msgstr "변경"
 msgid "Change password"
 msgstr "암호 변경"
 
-#: include/items.inc.php:1738
+#: include/items.inc.php:1732
 msgid "Change per second"
 msgstr "1초 단위의 변경 (per second)"
 
@@ -3943,7 +3943,7 @@ msgstr "커스텀 라벨"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "맵\"%2$s\"의 커스텀라벨 타입요소 \"%1$s\"를 설정해 주십시오."
 
-#: include/items.inc.php:1731
+#: include/items.inc.php:1725
 msgid "Custom multiplier"
 msgstr "승수"
 
@@ -4637,7 +4637,7 @@ msgstr "거부"
 msgid "Dependencies"
 msgstr "의존관계"
 
-#: include/triggers.inc.php:2725
+#: include/triggers.inc.php:2724
 msgid "Dependent"
 msgstr "의존처"
 
@@ -4645,7 +4645,7 @@ msgstr "의존처"
 msgid "Dependent item"
 msgstr "의존 아이템"
 
-#: app/views/popup.generic.php:288 include/triggers.inc.php:2725
+#: app/views/popup.generic.php:288 include/triggers.inc.php:2724
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:81
 #: include/views/configuration.triggers.list.php:207
@@ -4810,7 +4810,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1299
 #: include/html.inc.php:331 include/httptest.inc.php:46
 #: include/items.inc.php:142 include/items.inc.php:145
-#: include/items.inc.php:189 include/triggers.inc.php:2175
+#: include/items.inc.php:189 include/triggers.inc.php:2203
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5544,7 +5544,7 @@ msgstr "트래핑의 활성화"
 #: auditlogs.php:144 include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:45 include/items.inc.php:142
 #: include/items.inc.php:145 include/items.inc.php:186
-#: include/triggers.inc.php:1247 include/triggers.inc.php:2172
+#: include/triggers.inc.php:1275 include/triggers.inc.php:2200
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5646,7 +5646,7 @@ msgstr "이벤트 상관관계 규칙"
 msgid "Event details"
 msgstr "이벤트 세부 내용"
 
-#: include/triggers.inc.php:1237
+#: include/triggers.inc.php:1265
 msgid "Event generation"
 msgstr "이벤트 생성"
 
@@ -5726,7 +5726,7 @@ msgstr "다음 실행"
 msgid "Executed"
 msgstr "실행"
 
-#: include/items.inc.php:1673
+#: include/items.inc.php:1667
 #: include/views/configuration.host.discovery.edit.php:492
 #: include/views/configuration.item.edit.php:640
 #: include/views/configuration.item.prototype.edit.php:571
@@ -6150,7 +6150,7 @@ msgstr "게스트의 패스워드는 비어있어야 합니다"
 msgid "Form data"
 msgstr "폼 데이터"
 
-#: include/items.inc.php:1677 include/views/configuration.item.edit.php:656
+#: include/items.inc.php:1671 include/views/configuration.item.edit.php:656
 #: include/views/configuration.item.prototype.edit.php:585
 msgid "Formula"
 msgstr "식"
@@ -6259,7 +6259,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr "Web페이지 콘텐츠 습득. text로 Web페이지 소스를 리턴."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1393
+#: include/triggers.inc.php:1421
 msgid "Given expression is not a macro"
 msgstr "설정한 조건식은 매크로가 아닙니다"
 
@@ -6702,7 +6702,7 @@ msgstr "높이"
 msgid "Help"
 msgstr "도움말"
 
-#: include/items.inc.php:1746
+#: include/items.inc.php:1740
 msgid "Hexadecimal to decimal"
 msgstr "16진수에서 10진수로"
 
@@ -6823,7 +6823,7 @@ msgstr "가로 위치"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:200
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/forms.inc.php:375 include/hostgroups.inc.php:251
-#: include/maps.inc.php:24 include/triggers.inc.php:1205
+#: include/maps.inc.php:24 include/triggers.inc.php:1233
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.graph.list.php:51
@@ -7150,9 +7150,9 @@ msgstr "같은 호스트의 표시 이름 \"%s\"를 지닌 호스트가 이미 �
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:49
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
-#: include/forms.inc.php:827 include/items.inc.php:1181
+#: include/forms.inc.php:827 include/items.inc.php:1184
 #: include/menu.inc.php:132 include/menu.inc.php:196
-#: include/triggers.inc.php:902
+#: include/triggers.inc.php:934
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:86
 #: include/views/configuration.host.discovery.list.php:55
@@ -7483,7 +7483,7 @@ msgid "Inaccessible item"
 msgstr "접근할 수 없는 아이템"
 
 #: include/classes/screens/CScreenProblem.php:414
-#: include/hostgroups.inc.php:291 include/triggers.inc.php:2327
+#: include/hostgroups.inc.php:291 include/triggers.inc.php:2355
 #: include/views/configuration.host.list.php:190
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
@@ -7496,11 +7496,11 @@ msgstr "접근할 수 없는 맵"
 
 #: include/graphs.inc.php:271 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:209
-#: include/items.inc.php:898 include/triggers.inc.php:2466
+#: include/items.inc.php:898 include/triggers.inc.php:2494
 msgid "Inaccessible template"
 msgstr "접근할 수 없는 템플릿"
 
-#: include/triggers.inc.php:2695 include/triggers.inc.php:2703
+#: include/triggers.inc.php:2694 include/triggers.inc.php:2702
 msgid "Inaccessible trigger"
 msgstr "접속이 안되는 트리거"
 
@@ -7936,7 +7936,7 @@ msgstr "액션 \"%1$s\"의 필터 조건타입이 올바르지 않습니다."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1394
+#: include/triggers.inc.php:1422
 msgid "Incorrect function is used"
 msgstr "잘못된 함수가 이용되어 있습니다."
 
@@ -8027,7 +8027,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "스크린 요소의 아이템의 프로토타입ID \"%1$s\"가 올바르지 않습니다."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1395
+#: include/triggers.inc.php:1423
 msgid "Incorrect item value type"
 msgstr "아이템의 데이터 타입이 올바르지 않습니다."
 
@@ -9305,7 +9305,7 @@ msgstr "키\"%1$s\"가 설정된 아이템은 지정한 호스트 \"%2$s\"에 �
 
 #: app/controllers/CControllerPopupGeneric.php:189
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:378 include/items.inc.php:1162
+#: include/html.inc.php:378 include/items.inc.php:1165
 #: include/views/configuration.application.list.php:64
 #: include/views/configuration.application.list.php:108
 #: include/views/configuration.graph.edit.php:428
@@ -9364,7 +9364,7 @@ msgstr "JMX 엔드 포인트"
 msgid "JMX interfaces"
 msgstr "JMX 인터페이스"
 
-#: include/items.inc.php:1725
+#: include/items.inc.php:1719
 msgid "JSON Path"
 msgstr "JSON Path"
 
@@ -9671,7 +9671,7 @@ msgstr "왼쪽"
 msgid "Left Y"
 msgstr "좌측 Y"
 
-#: include/items.inc.php:1718
+#: include/items.inc.php:1712
 msgid "Left trim"
 msgstr "왼쪽 trim"
 
@@ -10585,7 +10585,7 @@ msgstr "Mozilla Firefox"
 msgid "Multiple"
 msgstr "복수"
 
-#: include/triggers.inc.php:1238
+#: include/triggers.inc.php:1266
 msgid "Multiple PROBLEM events"
 msgstr "장애이벤트를 계속해서 생성"
 
@@ -10873,7 +10873,7 @@ msgstr "다음 스텝"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1244 include/triggers.inc.php:1249
+#: include/triggers.inc.php:1272 include/triggers.inc.php:1277
 #: include/views/administration.users.list.php:111
 #: include/views/administration.users.list.php:115
 #: include/views/configuration.host.prototype.list.php:126
@@ -11462,7 +11462,7 @@ msgid "None"
 msgstr "없음"
 
 #: app/views/popup.generic.php:533 include/graphs.inc.php:24
-#: include/items.inc.php:160 include/triggers.inc.php:1237
+#: include/items.inc.php:160 include/triggers.inc.php:1265
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -11696,18 +11696,18 @@ msgstr "VMware하이퍼바이저상의 가상 머신 수, <url> - VMware서비�
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "inode의 수 혹은 퍼센트. 수치라면 integer를 리턴하고 퍼센트라면 float를 리턴."
 
-#: include/items.inc.php:1742
+#: include/items.inc.php:1736
 msgid "Numeral systems"
 msgstr "수치변환"
 
 #: include/forms.inc.php:352 include/items.inc.php:129
-#: include/triggers.inc.php:1845 include/views/configuration.item.edit.php:676
+#: include/triggers.inc.php:1873 include/views/configuration.item.edit.php:676
 #: include/views/configuration.item.massupdate.php:278
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Numeric (float)"
 msgstr "수치 (float)"
 
-#: include/triggers.inc.php:1846
+#: include/triggers.inc.php:1874
 msgid "Numeric (integer)"
 msgstr "수치 (integer)"
 
@@ -11775,7 +11775,7 @@ msgstr "OS (간이설명)"
 msgid "Oct"
 msgstr "10월"
 
-#: include/items.inc.php:1745
+#: include/items.inc.php:1739
 msgid "Octal to decimal"
 msgstr "8진수에서 10진수로"
 
@@ -12006,7 +12006,7 @@ msgstr "옵션"
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:379
-#: include/triggers.inc.php:1310
+#: include/triggers.inc.php:1338
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1147
 #: include/views/configuration.correlation.edit.php:95
@@ -12780,7 +12780,7 @@ msgstr "장애 발생"
 msgid "Problem display"
 msgstr "장애의 표시"
 
-#: include/triggers.inc.php:1230
+#: include/triggers.inc.php:1258
 #: include/views/js/configuration.triggers.edit.js.php:39
 msgid "Problem expression"
 msgstr "장애의 조건식"
@@ -13070,7 +13070,7 @@ msgstr "수신처 (내림차순)"
 msgid "Recovery"
 msgstr "복구"
 
-#: include/triggers.inc.php:1234
+#: include/triggers.inc.php:1262
 #: include/views/configuration.trigger.prototype.edit.php:273
 #: include/views/configuration.trigger.prototype.edit.php:355
 #: include/views/configuration.triggers.edit.php:297
@@ -13128,7 +13128,7 @@ msgstr "취득불가 아이템의 갱신간격 \"%1$s\"."
 msgid "Regular"
 msgstr "Regular"
 
-#: include/audit.inc.php:49 include/items.inc.php:1715
+#: include/audit.inc.php:49 include/items.inc.php:1709
 #: include/views/configuration.host.discovery.edit.php:615
 msgid "Regular expression"
 msgstr "정규표현식"
@@ -13590,7 +13590,7 @@ msgstr "오른쪽"
 msgid "Right Y"
 msgstr "우측 Y"
 
-#: include/items.inc.php:1717
+#: include/items.inc.php:1711
 msgid "Right trim"
 msgstr "오른쪽 trim"
 
@@ -13778,7 +13778,7 @@ msgstr "SNMPv3 에이전트"
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "SQL수: %1$s (selects: %2$s | executes: %3$s)"
 
-#: include/items.inc.php:1675
+#: include/items.inc.php:1669
 #: include/views/configuration.host.discovery.edit.php:499
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:578
@@ -14439,7 +14439,7 @@ msgstr "LDAP 리페럴을 \"OFF\"로 설정하는데 실패하였습니다."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:196
 #: include/classes/widgets/forms/CWidgetFormProblems.php:197
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:351
-#: include/events.inc.php:167 include/triggers.inc.php:1215
+#: include/events.inc.php:167 include/triggers.inc.php:1243
 #: include/views/configuration.item.list.php:145
 #: include/views/configuration.trigger.prototype.edit.php:65
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -14638,7 +14638,7 @@ msgstr "로그 아웃"
 msgid "Simple"
 msgstr "표준"
 
-#: include/items.inc.php:1737
+#: include/items.inc.php:1731
 msgid "Simple change"
 msgstr "차이"
 
@@ -15038,7 +15038,7 @@ msgstr ""
 msgid "Straight"
 msgstr "Straight"
 
-#: include/items.inc.php:1722
+#: include/items.inc.php:1716
 msgid "Structured data"
 msgstr "계층화 데이터"
 
@@ -15462,7 +15462,7 @@ msgid "Test string"
 msgstr "테스트문자열"
 
 #: include/forms.inc.php:355 include/items.inc.php:135
-#: include/items.inc.php:1713 include/views/configuration.item.edit.php:679
+#: include/items.inc.php:1707 include/views/configuration.item.edit.php:679
 #: include/views/configuration.item.massupdate.php:281
 #: include/views/configuration.item.prototype.edit.php:607
 #: include/views/js/monitoring.sysmaps.js.php:306
@@ -15830,7 +15830,7 @@ msgstr "트렌드"
 #: app/views/popup.services.php:44 include/actions.inc.php:44
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:229 include/maps.inc.php:26
-#: include/triggers.inc.php:1209
+#: include/triggers.inc.php:1237
 #: include/views/configuration.services.edit.php:87
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.parent.list.php:35
@@ -16040,7 +16040,7 @@ msgstr "트리거를 갱신하였습니다"
 
 #: app/controllers/CControllerPopupGeneric.php:135
 #: app/views/monitoring.problem.view.php:145 include/forms.inc.php:441
-#: include/html.inc.php:388 include/triggers.inc.php:876
+#: include/html.inc.php:388 include/triggers.inc.php:908
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:355
@@ -16072,7 +16072,7 @@ msgstr "트리거를 삭제하였습니다"
 msgid "Triggers top 100"
 msgstr "상위 100 트리거"
 
-#: include/items.inc.php:1716
+#: include/items.inc.php:1710
 msgid "Trim"
 msgstr "Trim"
 
@@ -16338,7 +16338,7 @@ msgstr "단위"
 #: include/items.inc.php:171 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:120
-#: include/triggers.inc.php:242 include/triggers.inc.php:2172
+#: include/triggers.inc.php:242 include/triggers.inc.php:2200
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:43
@@ -16364,12 +16364,12 @@ msgstr "알 수 없는 함수."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:535
-#: include/triggers.inc.php:1392
+#: include/triggers.inc.php:1420
 msgid "Unknown host item, no such item in selected host"
 msgstr "알 수 없는 아이템. 선택한 호스트에 그런 아이템은 존재하지 않습니다"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1391
+#: include/triggers.inc.php:1419
 msgid "Unknown host, no such host present in system"
 msgstr "알 수 없는 호스트. 그런 호스트는 존재하지 않습니다"
 
@@ -16387,7 +16387,7 @@ msgstr "알 수 없는 리소스"
 msgid "Unknown step failed: %1$s"
 msgstr "알 수 없는 스텝 실패: %1$s"
 
-#: include/items.inc.php:1332
+#: include/items.inc.php:1326
 msgid "Unknown value type"
 msgstr "알 수 없는 값의 타입"
 
@@ -17568,7 +17568,7 @@ msgstr "X1"
 msgid "X2"
 msgstr "X2"
 
-#: include/items.inc.php:1724
+#: include/items.inc.php:1718
 msgid "XML XPath"
 msgstr "XML XPath"
 
@@ -17674,7 +17674,7 @@ msgstr "연간"
 #: include/classes/screens/CScreenProblem.php:1080
 #: include/classes/screens/CScreenProblem.php:1183 include/events.inc.php:176
 #: include/events.inc.php:376 include/events.inc.php:601
-#: include/triggers.inc.php:1243 include/triggers.inc.php:1248
+#: include/triggers.inc.php:1271 include/triggers.inc.php:1276
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/administration.users.list.php:109
 #: include/views/configuration.host.prototype.list.php:126
