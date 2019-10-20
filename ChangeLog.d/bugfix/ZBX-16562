@@ -1,1 +1,0 @@
-A......... [ZBX-16562] fixed configuration.export method in API improperly formatting "application" property within "httptests" when exporting in JSON format (Ivo)
