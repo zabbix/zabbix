@@ -544,6 +544,10 @@ sub process_index
 		}
 		else
 		{
+			for ($fields)
+			{
+				s/\(\d+\)//g;
+			}
 			print "CREATE${unique} INDEX ${table_name}_$name ON $table_name ($fields);${eol}\n";
 		}
 	}
