@@ -209,7 +209,6 @@
 				jQuery('#' + key + 'row_' + dcheckid).remove();
 			}
 		});
-
 	}
 
 	jQuery(function($) {

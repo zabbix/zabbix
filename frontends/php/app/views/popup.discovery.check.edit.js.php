@@ -59,7 +59,7 @@ jQuery('#type').on('change', function() {
 			]
 		]) ?>);
 	}
-});
+}).trigger('change');
 
 /**
  * Returns a default port number for the specified discovery check type.
@@ -83,7 +83,7 @@ function getDCheckDefaultPort(dcheck_type) {
 		<?= SVC_SNMPv2c ?>: '161',
 		<?= SVC_SNMPv3 ?>: '161',
 		<?= SVC_HTTPS ?>: '443',
-		<?= SVC_TELNET ?>: '23',
+		<?= SVC_TELNET ?>: '23'
 	};
 
 	return (typeof default_ports[dcheck_type] !== 'undefined') ? default_ports[dcheck_type] : '0';
@@ -111,7 +111,20 @@ function submitDCheck(form_name) {
 				jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				addPopupValues([response.params]);
+				var dcheck = response.params,
+					$host_source = $('[name="host_source"]:checked:not([data-id])'),
+					$name_source = $('[name="name_source"]:checked:not([data-id])');
+
+				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
+					dcheck.name += ' (' + dcheck.ports + ')';
+				}
+				if (dcheck.key_) {
+					dcheck.name += ' "' + dcheck.key_ + '"';
+				}
+				dcheck.host_source = $host_source ? $host_source.val() : '<?= ZBX_DISCOVERY_DNS ?>';
+				dcheck.name_source = $name_source ? $name_source.val() : '<?= ZBX_DISCOVERY_UNSPEC ?>';
+
+				addPopupValues([dcheck]);
 				overlayDialogueDestroy(dialogueid);
 			}
 		}

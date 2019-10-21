@@ -29,10 +29,9 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 			'update' =>					'in 0,1',
 			'refresh' =>				'in 0,1',
 			'index' =>					'required|int32',
-			'name' =>					'string',
 			'types' =>					'array',
 
-			'dcheckid' =>				'db dchecks.dcheckid',
+			'dcheckid' =>				'',
 			'type' =>					'db dchecks.type|in '.implode(',', array_keys(discovery_check_type2str())),
 			'ports' =>					'db dchecks.ports',
 			'snmp_community' =>			'db dchecks.snmp_community',
@@ -48,7 +47,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		$ret = ($ret && $this->getInput('refresh', 0)) ? $this->validateInputByType() : $ret;
+		$ret = ($ret && $this->getInput('refresh', 0)) ? $this->checkInputByType() : $ret;
 
 		if (!$ret) {
 			$output = [];
@@ -65,7 +64,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		return $ret;
 	}
 
-	protected function validateInputByType() {
+	protected function checkInputByType() {
 		$fields = [];
 
 		switch ($this->getInput('type', 0)) {
@@ -111,6 +110,9 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 					$fields['snmpv3_privpassphrase'] =	'required';
 				}
 				break;
+
+			case SVC_ICMPPING:
+				$fields['ports'] =						'in 0';
 		}
 
 		$this->getInputs($data, array_keys($fields));
@@ -128,12 +130,14 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 			'type' => SVC_FTP,
 			'ports' => svc_default_port(SVC_FTP)
 		];
-		$data['name'] = discovery_check_type2str($data['type']);
+
+		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
+		$params['name'] = discovery_check_type2str($data['type']);
 
 		$output = [
 			'title' => _('Discovery check'),
 			'errors' => hasErrorMesssages() ? getMessages() : null,
-			'params' => $data,
+			'params' => $params,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
