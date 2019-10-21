@@ -6,6 +6,7 @@ New features:
 .......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
+..F....... [ZBX-16605] fixed accessibility of localstorage identifier if cookies are made unaccessible for client side scripts (miks)
 ........S. [ZBX-16754] fixed trigger not firing for first collected value if it's timestamp is in future (vso)
 ....I..... [ZBX-15211] added key 'tests' for bootstrap.sh when working with cmocka tests (MVekslers)
 ..F....... [ZBX-16542] fixed incorrect displaying of unacknowledged and resolved recent problematic triggers in trigger overview and dashboard widget (averza, Ivo, vmurzins)
