@@ -756,7 +756,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
  *                                                                            *
  * Function: prometheus_filter_init                                           *
  *                                                                            *
- * Purpose: intializes prometheus pattern filter from the specified data      *
+ * Purpose: initializes prometheus pattern filter from the specified data     *
  *                                                                            *
  * Parameters: filter - [IN/OUT] the filter                                   *
  *             data   - [IN] the filter data                                  *

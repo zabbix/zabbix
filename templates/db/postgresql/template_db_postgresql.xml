@@ -4899,7 +4899,7 @@ https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAR
                             <expression>{Template DB PostgreSQL:pgsql.dbstat.deadlocks.rate[&quot;{#DBNAME}&quot;].min(5m)} &gt; {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;}</expression>
                             <recovery_mode>0</recovery_mode>
                             <recovery_expression/>
-                            <name>Database {#DBNAME}: Deadlock occured (over {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
+                            <name>Database {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:&quot;{#DBNAME}&quot;} in 5m)</name>
                             <correlation_mode>0</correlation_mode>
                             <correlation_tag/>
                             <url/>

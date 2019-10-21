@@ -340,9 +340,9 @@ static int	is_recoverable_mysql_error(void)
 	return FAIL;
 }
 #elif defined(HAVE_POSTGRESQL)
-static int	is_recoverable_postgresql_error(const PGconn *conn, const PGresult *pg_result)
+static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult *pg_result)
 {
-	if (CONNECTION_OK != PQstatus(conn))
+	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))

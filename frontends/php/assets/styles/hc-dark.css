@@ -955,7 +955,7 @@ output {
 .timeline-dot::after, .timeline-dot-big::after {
   content: '';
   position: absolute;
-  z-index: 100;
+  z-index: 1;
   display: block;
   width: 4px;
   height: 4px;

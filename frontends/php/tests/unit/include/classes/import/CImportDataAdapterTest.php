@@ -1256,6 +1256,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 									'name' => '{#VMNAME}'
 								]
 							],
+							'inventory_mode' => '0',
 							'templates' => []
 						]
 					],
@@ -2904,7 +2905,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				]
 			]
 		];
-		$source = (new CDefaultValuesImportConverter($schema))->convert($source);
+		$source = (new CDefaultImportConverter($schema))->convert($source);
 
 		$this->assertEquals($source, [
 				'zabbix_export' => [
@@ -3035,7 +3036,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 		$schema = (new CImportValidatorFactory('xml'))->getObject(ZABBIX_EXPORT_VERSION)->getSchema();
 
 		$source = (new CConstantImportConverter($schema))->convert($source);
-		$source = (new CDefaultValuesImportConverter($schema))->convert($source);
+		$source = (new CDefaultImportConverter($schema))->convert($source);
 		$source = (new CArrayKeysImportConverter($schema))->convert($source);
 
 		$adapter = new CImportDataAdapter();

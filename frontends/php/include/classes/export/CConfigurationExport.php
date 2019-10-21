@@ -323,10 +323,10 @@ class CConfigurationExport {
 			'output' => [
 				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
+				'tls_psk', 'inventory_mode'
 			],
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
-			'selectInventory' => true,
+			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
@@ -836,7 +836,7 @@ class CConfigurationExport {
 			$httptest['application'] =
 				($httptest['applicationid'] != 0 && array_key_exists($httptest['applicationid'], $db_applications))
 					? ['name' => $db_applications[$httptest['applicationid']]['name']]
-					: null;
+					: [];
 			unset($httptest['applicationid']);
 		}
 		unset($httptest);

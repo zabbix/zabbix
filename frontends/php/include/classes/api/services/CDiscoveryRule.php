@@ -1968,10 +1968,9 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status'],
+			'output' => ['host', 'name', 'status', 'inventory_mode'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectInventory' => ['inventory_mode'],
 			'selectTemplates' => ['templateid'],
 			'preservekeys' => true
 		]);
@@ -2022,7 +2021,7 @@ class CDiscoveryRule extends CItemGeneral {
 				 * SQL func COALESCE use for template items because they dont have record
 				 * in item_rtdata table and DBFetch convert null to '0'
 				 */
-				$sqlParts = $this->addQuerySelect("COALESCE(ir.error,'') AS error", $sqlParts);
+				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);
 			}
 
 			// add filter fields
