@@ -278,6 +278,7 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
+	 * @param string options['placeholder']			set custom placeholder (optional)
 	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
@@ -310,6 +311,7 @@ jQuery(function($) {
 				'new': 'new',
 				'Select': 'Select'
 			},
+			placeholder: t('type here to search'),
 			data: [],
 			only_hostid: 0,
 			excludeids: [],
@@ -451,8 +453,8 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
-				'placeholder': options.labels['type here to search'],
-				'aria-label': ($label.length ? $label.text() + '. ' : '') + options.labels['type here to search'],
+				'placeholder': options.placeholder,
+				'aria-label': ($label.length ? $label.text() + '. ' : '') + options.placeholder,
 				'aria-required': options.required
 			})
 			.on('keyup change', function(e) {
@@ -1081,18 +1083,19 @@ jQuery(function($) {
 		}
 	}
 
-	function setSearchFieldVisibility(visible, container, options) {
+	function setSearchFieldVisibility(visible, $container, options) {
 		if (visible) {
-			container.removeClass('search-disabled')
+			var $label = $('label[for=' + $container.attr('id') + '_ms]');
+			$container.removeClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
-					placeholder: options.labels['type here to search'],
-					'aria-label': options.labels['type here to search'],
+					placeholder: options.placeholder,
+					'aria-label': ($label.length ? $label.text() + '. ' : '') + options.placeholder,
 					readonly: false
 				});
 		}
 		else {
-			container.addClass('search-disabled')
+			$container.addClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
 					placeholder: '',
