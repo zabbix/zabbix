@@ -1,1 +1,0 @@
-........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)

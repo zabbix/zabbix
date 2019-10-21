@@ -197,7 +197,7 @@ class CMultiselectElement extends CElement {
 
 		$input = $this->query('xpath:.//input[not(@type="hidden")]')->one();
 		foreach ($text as $value) {
-			$input->overwrite($value);
+			$input->overwrite($value)->fireEvent();
 
 			if (!$value) {
 				continue;

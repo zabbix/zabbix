@@ -815,7 +815,7 @@ out:
 ---
 # TC14
 # Test that value cache is switched to low memory mode if value adding failed.
-test case: Try adding value wihout enough space in cache
+test case: Try adding value without enough space in cache
 in:
   history: []
   precache:

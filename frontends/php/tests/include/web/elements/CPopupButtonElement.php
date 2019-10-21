@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -17,17 +18,44 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PREPROC_H
-#define ZABBIX_PREPROC_H
+require_once 'vendor/autoload.php';
 
-#include "common.h"
-#include "module.h"
+require_once dirname(__FILE__).'/../CElement.php';
 
-/* the following functions are implemented differently for server and proxy */
+/**
+ * Global popup button element.
+ */
+class CPopupButtonElement extends CElement {
 
-void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
-void	zbx_preprocessor_flush(void);
-zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
+	/**
+	 * Click on button and select item in popup menu.
+	 *
+	 * @param string|array $text    text of menu item(s)
+	 *
+	 * @return $this
+	 */
+	public function fill($text) {
+		$is_nested = false;
+		if (is_array($text)) {
+			foreach ($text as $item) {
+				if (is_array($item)) {
+					$is_nested = true;
+					break;
+				}
+			}
+		}
 
-#endif /* ZABBIX_PREPROC_H */
+		if (!$is_nested) {
+			$text = [$text];
+		}
+
+		foreach ($text as $item) {
+			$this->click();
+
+			$this->query('xpath://ul[contains(@class, "menu-popup-top")]')->waitUntilVisible()->asPopupMenu()->one()
+					->waitUntilReady()->fill($item);
+		}
+
+		return $this;
+	}
+}
