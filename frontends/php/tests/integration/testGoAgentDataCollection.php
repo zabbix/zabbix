@@ -106,7 +106,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
-			'key' => 'system.hw.cpu[all,model]',
+			'key' => 'system.hw.cpu',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
@@ -219,31 +219,31 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.cpu.util[,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 100.0
+			'treshold' => 0.5
 		],
 		[
 			'key' => 'system.cpu.load[,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 100.0
+			'treshold' => 0.5
 		],
 		[
 			'key' => 'vfs.dev.read[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 500
+			'treshold' => 10
 		],
 		[
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 500
+			'treshold' => 10
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 5.0,
+			'treshold' => 0.5,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
@@ -259,16 +259,16 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'treshold' => 100
 		],
 		[
-			'key' => 'proc.mem[,root]',
+			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
 			'type' => ITEM_TYPE_ZABBIX,
-			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 100000000
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'treshold' => 100.0
 		],
 		[
 			'key' => 'web.page.perf[http://localhost]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'treshold' => 10.0,
+			'treshold' => 1.0,
 			'compareType' => COMPARE_AVERAGE
 		],
 		[
@@ -284,9 +284,9 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'treshold' => 0.05
 		],
 		[
-			'key' => 'system.swap.size[,pfree]',
+			'key' => 'system.swap.size[,total]',
 			'type' => ITEM_TYPE_ZABBIX,
-			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'treshold' => 100
 		],
 		[
@@ -305,14 +305,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'treshold' => 1000000
+			'treshold' => 10000000
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
 			// Maybe, it should e pulled to separate test suite. At this point we just compare it as string.
 			'key' => 'zabbix.stats',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'treshold' => 100
+			'treshold' => 50
 		]
 	];
 
