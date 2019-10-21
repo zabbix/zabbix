@@ -5,6 +5,9 @@ A.F....... [ZBX-12943] implemented host API inventory_mode field as part of host
 ........S. [ZBXNEXT-5481] added support of {TRIGGER.ID} macro in trigger tags (vso)
 
 Bug fixes:
+..F....... [ZBX-16605] fixed accessibility of localstorage identifier if cookies are made unaccessible for client side scripts (miks)
+..F....... [ZBX-16705] fixed when widgets content is not stretched over the whole widget area on Safari (vasilijs)
+..F....... [ZBX-16701] fixed visual overlay of Timeline dots on widget header (vasilijs)
 ..F....... [ZBX-16782] fixed oracle character set mismatch error (gcalenko)
 ........S. [ZBX-16754] fixed trigger not firing for first collected value if it's timestamp is in future (vso)
 ...G...PS. [ZBX-16534] fixed stdout and stderr redirection after external log rotation (akozlovs)
