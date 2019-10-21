@@ -19,33 +19,25 @@
 **/
 
 
+$page_url = (new CUrl('zabbix.php'))->setArgument('action', 'image.list');
 $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setControls((new CTag('nav', true,
 		(new CForm())
 			->cleanItems()
-			->setAction((new CUrl('zabbix.php'))
-				->setArgument('action', 'image.list')
-				->getUrl()
-			)
+			->setAction($page_url->getUrl())
 			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu((new CUrl('zabbix.php'))
-					->setArgument('action', 'image.list')
-					->getUrl()
-				))
+				->addItem(makeAdministrationGeneralMenu($page_url->getUrl()))
 				->addItem([
 					new CLabel(_('Type'), 'imagetype'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('imagetype', (new CUrl('zabbix.php'))
-							->setArgument('action', 'image.list')
+					new CComboBox('imagetype', $page_url
 							->setArgument('imagetype', $data['imagetype'])
 							->getUrl(), 'redirect(this.options[this.selectedIndex].value);', [
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'image.list')
+						$page_url
 							->setArgument('imagetype', IMAGE_TYPE_ICON)
 							->getUrl() => _('Icon'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'image.list')
+						$page_url
 							->setArgument('imagetype', IMAGE_TYPE_BACKGROUND)
 							->getUrl() => _('Background'),
 					])
@@ -75,6 +67,8 @@ else {
 
 	$count = 0;
 	$image_row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+	$edit_url = (new Curl('zabbix.php'))->setArgument('action', 'image.edit');
+
 	foreach ($data['images'] as $image) {
 		$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
 			? new CLink(
@@ -83,9 +77,7 @@ else {
 			)
 			: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 
-		$edit_url = (new Curl('zabbix.php'))
-			->setArgument('action', 'image.edit')
-			->setArgument('imageid', $image['imageid']);
+		$edit_url->setArgument('imageid', $image['imageid']);
 
 		$image_row->addItem(
 			(new CDiv())

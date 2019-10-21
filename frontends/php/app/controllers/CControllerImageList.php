@@ -48,8 +48,8 @@ class CControllerImageList extends CController {
 		$data['imagetype'] = $this->getInput('imagetype', IMAGE_TYPE_ICON);
 
 		$data['images'] = API::Image()->get([
-			'filter' => ['imagetype' => $data['imagetype']],
-			'output' => ['imageid', 'imagetype', 'name']
+			'output' => ['imageid', 'imagetype', 'name'],
+			'filter' => ['imagetype' => $data['imagetype']]
 		]);
 		order_result($data['images'], 'name');
 
