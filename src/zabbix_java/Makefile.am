@@ -4,7 +4,6 @@ EXTRA_DIST = \
 	bin \
 	lib \
 	src \
-	Makefile.am \
 	settings.sh \
 	shutdown.sh \
 	startup.sh

@@ -174,7 +174,7 @@ class CConfiguration extends CApiService {
 		$data = (new CConstantImportConverter($schema))->convert($data);
 
 		// Add default values in place of missed tags.
-		$data = (new CDefaultValuesImportConverter($schema))->convert($data);
+		$data = (new CDefaultImportConverter($schema))->convert($data);
 
 		// Normalize array keys.
 		$data = (new CArrayKeysImportConverter($schema))->convert($data);

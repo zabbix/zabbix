@@ -365,7 +365,8 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL);
+		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL))
+			exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))

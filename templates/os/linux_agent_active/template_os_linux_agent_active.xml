@@ -1075,7 +1075,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <recovery_mode>NONE</recovery_mode>
-                     <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                     <name>System name has changed (new name: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>System name has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>
@@ -1152,7 +1152,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                           <name>System name has changed (new name: {ITEM.VALUE})</name>
                            <expression>{Template Module Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -1266,7 +1266,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                            <expression>{Template Module Linux generic by Zabbix agent active:system.sw.os.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.sw.os.strlen()}&gt;0</expression>
                         </dependency>
                         <dependency>
-                           <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                           <name>System name has changed (new name: {ITEM.VALUE})</name>
                            <expression>{Template Module Linux generic by Zabbix agent active:system.hostname.diff()}=1 and {Template Module Linux generic by Zabbix agent active:system.hostname.strlen()}&gt;0</expression>
                         </dependency>
                      </dependencies>

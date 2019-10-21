@@ -302,6 +302,12 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 
 	ppsd.nextcheck = time(NULL) + UNSUPPORTED_REFRESH_PERIOD;
 
+	if (SUCCEED != init_builtin_counter_indexes())
+	{
+		*error = zbx_strdup(*error, "cannot initialize built-in counter indexes");
+		goto out;
+	}
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

@@ -50,6 +50,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'XML XPath', 'parameter_1' => 'path'],
 						['type' => 'JSONPath', 'parameter_1' => 'path'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Simple change'],
 						['type' => 'Change per second'],
@@ -71,7 +72,7 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'action' => 'Test'
 				]
 			],
-						[
+			[
 				[
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
@@ -180,7 +181,8 @@ class testFormItemPreprocessingTest extends CWebTest {
 					'expected' => TEST_GOOD,
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
-						['type' => 'Change per second']
+						['type' => 'Change per second'],
+						['type' => 'CSV to JSON','parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => false],
 					],
 					'action' => 'Test'
 				]

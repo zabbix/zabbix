@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 4.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-13 01:44+0300\n"
+"POT-Creation-Date: 2019-10-20 01:44+0300\n"
 "PO-Revision-Date: 2019-03-24 15:52+0300\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
@@ -260,7 +260,7 @@ msgstr "(אין מתווך)"
 msgid "0 - use default port"
 msgstr "0 - שימוש בפתחת בררת המחדל"
 
-#: include/triggers.inc.php:1851
+#: include/triggers.inc.php:1879
 msgid "0 or 1"
 msgstr "0 או 1"
 
@@ -932,7 +932,7 @@ msgstr "כל התגיות"
 msgid "All templates"
 msgstr "כל התבניות"
 
-#: include/triggers.inc.php:1246
+#: include/triggers.inc.php:1274
 #: include/views/configuration.trigger.prototype.edit.php:500
 #: include/views/configuration.trigger.prototype.massupdate.php:58
 #: include/views/configuration.triggers.edit.php:527
@@ -952,7 +952,7 @@ msgstr "מארחים מורשים"
 msgid "Alternatively, you can install it manually:"
 msgstr "לחלופין, ניתן להתקין ידנית:"
 
-#: include/triggers.inc.php:1314
+#: include/triggers.inc.php:1342
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:1150
 #: include/views/configuration.correlation.edit.php:94
@@ -1124,7 +1124,7 @@ msgstr "גודל השטח"
 msgid "Area type"
 msgstr "סוג השטח"
 
-#: include/items.inc.php:1733
+#: include/items.inc.php:1727
 msgid "Arithmetic"
 msgstr "חשבוני"
 
@@ -1475,7 +1475,7 @@ msgstr "גוף וכותרות"
 msgid "Bold line"
 msgstr "קו עבה"
 
-#: include/items.inc.php:1746
+#: include/items.inc.php:1740
 msgid "Boolean to decimal"
 msgstr "בוליאני לעשרוני"
 
@@ -1563,7 +1563,7 @@ msgstr "אחוז ניצול המעבד. מחזירה שבר עשרוני"
 msgid "CRLF"
 msgstr ""
 
-#: include/items.inc.php:1730
+#: include/items.inc.php:1724
 msgid "CSV to JSON"
 msgstr ""
 
@@ -3025,7 +3025,7 @@ msgstr "מרכז"
 msgid "Certificate"
 msgstr "אישור"
 
-#: include/items.inc.php:1737 include/items.inc.php:1741 latest.php:413
+#: include/items.inc.php:1731 include/items.inc.php:1735 latest.php:413
 #: latest.php:426
 msgctxt "noun"
 msgid "Change"
@@ -3050,7 +3050,7 @@ msgstr ""
 msgid "Change password"
 msgstr "שינוי ססמה"
 
-#: include/items.inc.php:1742
+#: include/items.inc.php:1736
 msgid "Change per second"
 msgstr "שינויים בשנייה"
 
@@ -3092,15 +3092,15 @@ msgstr "הבדיקה כבר קיימת."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "בדיקת החלק של הביטוי שמתחיל ב־„%1$s“."
 
-#: include/items.inc.php:1774
+#: include/items.inc.php:1768
 msgid "Check for error in JSON"
 msgstr "בדיקת שגיאות ב־JSON"
 
-#: include/items.inc.php:1778
+#: include/items.inc.php:1772
 msgid "Check for error in XML"
 msgstr "בדיקת שגיאות ב־XML"
 
-#: include/items.inc.php:1782
+#: include/items.inc.php:1776
 msgid "Check for error using regular expression"
 msgstr "בדיקה לאיתור שגיאות בעזרת ביטויים רגולריים"
 
@@ -4120,7 +4120,7 @@ msgstr "תווית מותאמת אישית"
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "תווית בהתאמה אישית לרכיבים מסוג „%1$s” במפה „%2$s” לא יכולים להיות ריקים."
 
-#: include/items.inc.php:1734
+#: include/items.inc.php:1728
 msgid "Custom multiplier"
 msgstr "מכפיל מותאם אישית"
 
@@ -4139,7 +4139,7 @@ msgstr "מסכים מותאמים אישית"
 msgid "Custom script"
 msgstr "סקריפט מותאם אישית"
 
-#: include/items.inc.php:1757
+#: include/items.inc.php:1751
 msgid "Custom scripts"
 msgstr "סקריפטים בהתאמה אישית"
 
@@ -4833,7 +4833,7 @@ msgstr "סירוב"
 msgid "Dependencies"
 msgstr "תלויות"
 
-#: include/triggers.inc.php:2729
+#: include/triggers.inc.php:2728
 msgid "Dependent"
 msgstr "תלוי"
 
@@ -4841,7 +4841,7 @@ msgstr "תלוי"
 msgid "Dependent item"
 msgstr "פריט תלוי"
 
-#: app/views/popup.generic.php:289 include/triggers.inc.php:2729
+#: app/views/popup.generic.php:289 include/triggers.inc.php:2728
 #: include/views/configuration.services.edit.php:152
 #: include/views/configuration.trigger.prototype.list.php:82
 #: include/views/configuration.triggers.list.php:240
@@ -5008,7 +5008,7 @@ msgstr "להשבית את תרחישי הרשת הנבחרים?"
 #: include/discovery.inc.php:108 include/hosts.inc.php:1321
 #: include/html.inc.php:331 include/httptest.inc.php:47
 #: include/items.inc.php:140 include/items.inc.php:143
-#: include/items.inc.php:187 include/triggers.inc.php:2179
+#: include/items.inc.php:187 include/triggers.inc.php:2207
 #: include/users.inc.php:86
 #: include/views/administration.general.other.edit.php:57
 #: include/views/administration.usergroups.list.php:44
@@ -5034,11 +5034,11 @@ msgstr "מושבת"
 msgid "Disaster"
 msgstr "אסון"
 
-#: include/items.inc.php:1786
+#: include/items.inc.php:1780
 msgid "Discard unchanged"
 msgstr "התעלמות מכאלו שלא נשמרו"
 
-#: include/items.inc.php:1790
+#: include/items.inc.php:1784
 msgid "Discard unchanged with heartbeat"
 msgstr "התעלמות מכאלו שלא נשמרו בהינף יד"
 
@@ -5257,7 +5257,7 @@ msgstr ""
 msgid "Do you wish to replace the conditional expression?"
 msgstr "להחליף את הביטוי המותנה?"
 
-#: include/items.inc.php:1770
+#: include/items.inc.php:1764
 msgid "Does not match regular expression"
 msgstr "אינו תואם לביטוי רגולרי"
 
@@ -5770,7 +5770,7 @@ msgstr "הפעלת לכידה"
 #: include/discovery.inc.php:107 include/html.inc.php:327
 #: include/httptest.inc.php:46 include/items.inc.php:140
 #: include/items.inc.php:143 include/items.inc.php:184
-#: include/triggers.inc.php:1251 include/triggers.inc.php:2176
+#: include/triggers.inc.php:1279 include/triggers.inc.php:2204
 #: include/views/administration.usergroups.edit.php:73
 #: include/views/administration.usergroups.edit.php:88
 #: include/views/administration.usergroups.edit.php:89
@@ -5881,7 +5881,7 @@ msgstr "כללי יחסים בין אירועים"
 msgid "Event details"
 msgstr "פרטי האירוע"
 
-#: include/triggers.inc.php:1241
+#: include/triggers.inc.php:1269
 msgid "Event generation"
 msgstr "יצירת אירועים"
 
@@ -5966,7 +5966,7 @@ msgstr "הרצה על"
 msgid "Executed"
 msgstr "רץ"
 
-#: include/items.inc.php:1671
+#: include/items.inc.php:1665
 #: include/views/configuration.host.discovery.edit.php:517
 #: include/views/configuration.item.edit.php:631
 #: include/views/configuration.item.prototype.edit.php:559
@@ -6384,7 +6384,7 @@ msgstr "גודל גופן"
 msgid "Form data"
 msgstr "נתוני טופס"
 
-#: include/items.inc.php:1675 include/views/configuration.item.edit.php:649
+#: include/items.inc.php:1669 include/views/configuration.item.edit.php:649
 #: include/views/configuration.item.prototype.edit.php:575
 msgid "Formula"
 msgstr "נוסחה"
@@ -6493,7 +6493,7 @@ msgid "Get content of web page. Returns web page source as text"
 msgstr "קבלת תוכן של עמוד באינטרנט. מחזירה את מקור העמוד כטקסט"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:49
-#: include/triggers.inc.php:1397
+#: include/triggers.inc.php:1425
 msgid "Given expression is not a macro"
 msgstr "הביטוי שסופק אינו מאקרו"
 
@@ -6946,7 +6946,7 @@ msgstr "גובה"
 msgid "Help"
 msgstr "עזרה"
 
-#: include/items.inc.php:1754
+#: include/items.inc.php:1748
 msgid "Hexadecimal to decimal"
 msgstr "הקסדצימלי לעשרוני"
 
@@ -7071,7 +7071,7 @@ msgstr "יישור אופקי"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:205
 #: include/classes/widgets/forms/CWidgetFormProblems.php:206
 #: include/hostgroups.inc.php:248 include/maps.inc.php:24
-#: include/triggers.inc.php:1209
+#: include/triggers.inc.php:1237
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:62
 #: include/views/configuration.graph.list.php:51
@@ -7416,8 +7416,8 @@ msgstr "מארח עם אותו שם התצוגה „%s” כבר קיים."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:66
 #: include/classes/widgets/forms/CWidgetFormWeb.php:49
 #: include/forms.inc.php:222 include/forms.inc.php:673
-#: include/items.inc.php:1179 include/menu.inc.php:134
-#: include/menu.inc.php:198 include/triggers.inc.php:905
+#: include/items.inc.php:1182 include/menu.inc.php:134
+#: include/menu.inc.php:198 include/triggers.inc.php:937
 #: include/views/configuration.copy.elements.php:58
 #: include/views/configuration.graph.list.php:86
 #: include/views/configuration.host.discovery.list.php:55
@@ -7720,7 +7720,7 @@ msgstr "בעבודות תחזוקה"
 msgid "In progress"
 msgstr "בתהליך"
 
-#: include/items.inc.php:1762
+#: include/items.inc.php:1756
 msgid "In range"
 msgstr "בטווח"
 
@@ -7755,7 +7755,7 @@ msgid "Inaccessible item prototype"
 msgstr ""
 
 #: include/classes/screens/CScreenProblem.php:416
-#: include/hostgroups.inc.php:288 include/triggers.inc.php:2331
+#: include/hostgroups.inc.php:288 include/triggers.inc.php:2359
 #: include/views/configuration.host.list.php:238
 #: include/views/inventory.host.view.php:36
 msgid "Inaccessible maintenance"
@@ -7768,11 +7768,11 @@ msgstr "מפה בלתי נגישה"
 
 #: include/graphs.inc.php:292 include/hosts.inc.php:658
 #: include/hosts.inc.php:827 include/httptest.inc.php:210
-#: include/items.inc.php:896 include/triggers.inc.php:2470
+#: include/items.inc.php:896 include/triggers.inc.php:2498
 msgid "Inaccessible template"
 msgstr "תבנית בלתי נגישה"
 
-#: include/triggers.inc.php:2699 include/triggers.inc.php:2707
+#: include/triggers.inc.php:2698 include/triggers.inc.php:2706
 msgid "Inaccessible trigger"
 msgstr "הקפצה בלתי נגישה"
 
@@ -8219,7 +8219,7 @@ msgstr "סוג תנאי מסנן שגוי לפעולה „%1$s”."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1398
+#: include/triggers.inc.php:1426
 msgid "Incorrect function is used"
 msgstr "נעשה שימוש בפונקציה הלא נכונה"
 
@@ -8310,7 +8310,7 @@ msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
 msgstr "סופק מזהה אבטיפוס פריט „%1$s” שגוי לרכיב מסך."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:51
-#: include/triggers.inc.php:1399
+#: include/triggers.inc.php:1427
 msgid "Incorrect item value type"
 msgstr "סוג ערך הפריט שגוי"
 
@@ -9673,7 +9673,7 @@ msgstr "פריט עם המפתח „%1$s” כבר קיים תחת „%2$s”."
 #: app/views/search.php:60 app/views/search.php:64 app/views/search.php:185
 #: app/views/search.php:208 app/views/search.php:212
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:31
-#: include/html.inc.php:378 include/items.inc.php:1160
+#: include/html.inc.php:378 include/items.inc.php:1163
 #: include/views/configuration.application.list.php:64
 #: include/views/configuration.application.list.php:108
 #: include/views/configuration.graph.edit.php:431
@@ -9767,7 +9767,7 @@ msgstr "הפרמטרים של JSON-rpc אינם מערך."
 msgid "JSON-rpc version is not specified."
 msgstr "גרסת ה־JSON-rpc לא צוינה."
 
-#: include/items.inc.php:1726
+#: include/items.inc.php:1720
 #: include/views/configuration.host.discovery.edit.php:718
 msgid "JSONPath"
 msgstr "JSONPath"
@@ -9786,7 +9786,7 @@ msgid "Japanese (ja_JP)"
 msgstr "יפנית (ja_JP)"
 
 #: app/views/administration.mediatype.edit.php:209 include/forms.inc.php:1344
-#: include/items.inc.php:1758 include/views/js/item.preprocessing.js.php:228
+#: include/items.inc.php:1752 include/views/js/item.preprocessing.js.php:228
 msgid "JavaScript"
 msgstr "JavaScript"
 
@@ -10069,7 +10069,7 @@ msgstr "ימין"
 msgid "Left Y"
 msgstr "Y שמאל"
 
-#: include/items.inc.php:1718
+#: include/items.inc.php:1712
 msgid "Left trim"
 msgstr "צמצום משמאל"
 
@@ -10624,7 +10624,7 @@ msgstr "עדכון כמותי של צורות"
 msgid "Master item"
 msgstr "פריט אב"
 
-#: include/items.inc.php:1766
+#: include/items.inc.php:1760
 msgid "Matches regular expression"
 msgstr "תואם לביטוי רגולרי"
 
@@ -11014,7 +11014,7 @@ msgstr "Firefox מבית Mozilla"
 msgid "Multiple"
 msgstr "מרובים"
 
-#: include/triggers.inc.php:1242
+#: include/triggers.inc.php:1270
 msgid "Multiple PROBLEM events"
 msgstr "מגוון אירועי בעיות"
 
@@ -11310,7 +11310,7 @@ msgstr "השלב הבא"
 #: include/classes/screens/CScreenProblem.php:1132
 #: include/classes/screens/CScreenProblem.php:1262 include/events.inc.php:183
 #: include/events.inc.php:385 include/events.inc.php:610
-#: include/triggers.inc.php:1248 include/triggers.inc.php:1253
+#: include/triggers.inc.php:1276 include/triggers.inc.php:1281
 #: include/views/configuration.host.prototype.list.php:126
 #: include/views/configuration.httpconf.list.php:141
 #: include/views/configuration.item.prototype.list.php:102
@@ -11912,7 +11912,7 @@ msgid "None"
 msgstr "ללא"
 
 #: app/views/popup.generic.php:507 include/graphs.inc.php:24
-#: include/items.inc.php:158 include/triggers.inc.php:1241
+#: include/items.inc.php:158 include/triggers.inc.php:1269
 #: include/views/configuration.triggers.list.php:70
 #: include/views/monitoring.history.php:224
 msgid "Normal"
@@ -12149,20 +12149,20 @@ msgstr "מספר המכונות הווירטואליות ב־Hypervisor של VMw
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr "מספר אחוזי ה־inodes. מחזירה מספר שלם וחיובי עבור מספר, שבר עשרוני עבור אחוז"
 
-#: include/items.inc.php:1745 include/items.inc.php:1749
-#: include/items.inc.php:1753
+#: include/items.inc.php:1739 include/items.inc.php:1743
+#: include/items.inc.php:1747
 msgid "Numeral systems"
 msgstr "מערכות ספרתיות"
 
 #: include/forms.inc.php:198 include/items.inc.php:127
-#: include/triggers.inc.php:1849 include/views/configuration.item.edit.php:670
+#: include/triggers.inc.php:1877 include/views/configuration.item.edit.php:670
 #: include/views/configuration.item.massupdate.php:267
 #: include/views/configuration.item.prototype.edit.php:595
 #: include/views/configuration.item.prototype.massupdate.php:262
 msgid "Numeric (float)"
 msgstr "מספרי (שבר עשרוני)"
 
-#: include/triggers.inc.php:1850
+#: include/triggers.inc.php:1878
 msgid "Numeric (integer)"
 msgstr "ספרתי (שלם וחיובי)"
 
@@ -12231,7 +12231,7 @@ msgstr "מערכת הפעלה (קצר)"
 msgid "Oct"
 msgstr "אוק׳"
 
-#: include/items.inc.php:1750
+#: include/items.inc.php:1744
 msgid "Octal to decimal"
 msgstr "אוקטלי לעשרוני"
 
@@ -12483,7 +12483,7 @@ msgstr "אפשרויות"
 #: app/views/monitoring.problem.view.php:228
 #: include/classes/widgets/forms/CWidgetFormProblems.php:95
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:380
-#: include/triggers.inc.php:1314
+#: include/triggers.inc.php:1342
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:1151
 #: include/views/configuration.correlation.edit.php:95
@@ -13343,7 +13343,7 @@ msgstr "נוצרה תקלה"
 msgid "Problem display"
 msgstr "תצוגת תקלה"
 
-#: include/triggers.inc.php:1234
+#: include/triggers.inc.php:1262
 #: include/views/js/configuration.triggers.edit.js.php:20
 msgid "Problem expression"
 msgstr "ביטוי התקלה"
@@ -13413,15 +13413,15 @@ msgstr "אחוז ניצול המעבד. מחזירה שבר עשרוני"
 msgid "Process tags"
 msgstr ""
 
-#: include/items.inc.php:1793 include/items.inc.php:1797
+#: include/items.inc.php:1787 include/items.inc.php:1791
 msgid "Prometheus"
 msgstr "Prometheus"
 
-#: include/items.inc.php:1794
+#: include/items.inc.php:1788
 msgid "Prometheus pattern"
 msgstr "תבנית Prometheus"
 
-#: include/items.inc.php:1798
+#: include/items.inc.php:1792
 msgid "Prometheus to JSON"
 msgstr "Prometheus ל־JSON"
 
@@ -13656,7 +13656,7 @@ msgstr "מען (יורד)"
 msgid "Recovery"
 msgstr "שחזור"
 
-#: include/triggers.inc.php:1238
+#: include/triggers.inc.php:1266
 #: include/views/configuration.trigger.prototype.edit.php:283
 #: include/views/configuration.trigger.prototype.edit.php:366
 #: include/views/configuration.triggers.edit.php:307
@@ -13714,7 +13714,7 @@ msgstr "רענון פריטים בלתי נתמכים „%1$s”."
 msgid "Regular"
 msgstr ""
 
-#: include/audit.inc.php:49 include/items.inc.php:1706
+#: include/audit.inc.php:49 include/items.inc.php:1700
 #: include/views/configuration.host.discovery.edit.php:641
 msgid "Regular expression"
 msgstr "ביטוי רגולרי"
@@ -14194,7 +14194,7 @@ msgstr "ימין"
 msgid "Right Y"
 msgstr "Y ימין"
 
-#: include/items.inc.php:1714
+#: include/items.inc.php:1708
 msgid "Right trim"
 msgstr "צמצום מימין"
 
@@ -14387,7 +14387,7 @@ msgstr "סוכן SNMPv3"
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr "ספירת SQL:‏ %1$s (בחירות: %2$s | הפעלות: %3$s)"
 
-#: include/items.inc.php:1673
+#: include/items.inc.php:1667
 #: include/views/configuration.host.discovery.edit.php:525
 #: include/views/configuration.item.edit.php:640
 #: include/views/configuration.item.prototype.edit.php:567
@@ -15056,7 +15056,7 @@ msgstr "הגדרת ההפניות ב־LDAP ל„כבוי” נכשלה."
 #: include/classes/widgets/forms/CWidgetFormProblems.php:201
 #: include/classes/widgets/forms/CWidgetFormProblems.php:202
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:352
-#: include/events.inc.php:174 include/triggers.inc.php:1219
+#: include/events.inc.php:174 include/triggers.inc.php:1247
 #: include/views/configuration.item.list.php:140
 #: include/views/configuration.trigger.prototype.edit.php:72
 #: include/views/configuration.trigger.prototype.list.php:50
@@ -15263,7 +15263,7 @@ msgstr "יציאה"
 msgid "Simple"
 msgstr "פשוט"
 
-#: include/items.inc.php:1738
+#: include/items.inc.php:1732
 msgid "Simple change"
 msgstr "שינוי פשוט"
 
@@ -15662,8 +15662,8 @@ msgstr ""
 msgid "Straight"
 msgstr "ישירה"
 
-#: include/items.inc.php:1721 include/items.inc.php:1725
-#: include/items.inc.php:1729
+#: include/items.inc.php:1715 include/items.inc.php:1719
+#: include/items.inc.php:1723
 msgid "Structured data"
 msgstr "נתונים מקוננים"
 
@@ -16124,8 +16124,8 @@ msgid "Test subject"
 msgstr "הנבדק"
 
 #: include/forms.inc.php:201 include/items.inc.php:133
-#: include/items.inc.php:1705 include/items.inc.php:1709
-#: include/items.inc.php:1713 include/items.inc.php:1717
+#: include/items.inc.php:1699 include/items.inc.php:1703
+#: include/items.inc.php:1707 include/items.inc.php:1711
 #: include/views/configuration.item.edit.php:673
 #: include/views/configuration.item.massupdate.php:270
 #: include/views/configuration.item.prototype.edit.php:598
@@ -16282,7 +16282,7 @@ msgstr "השנה הזו עד כה"
 msgid "Threshold"
 msgstr "סף"
 
-#: include/items.inc.php:1785 include/items.inc.php:1789
+#: include/items.inc.php:1779 include/items.inc.php:1783
 msgid "Throttling"
 msgstr "האטה"
 
@@ -16519,7 +16519,7 @@ msgstr "מגמות"
 #: app/views/popup.services.php:44 include/actions.inc.php:46
 #: include/audit.inc.php:35 include/classes/graphdraw/CLineGraphDraw.php:481
 #: include/events.inc.php:236 include/maps.inc.php:26
-#: include/triggers.inc.php:1213
+#: include/triggers.inc.php:1241
 #: include/views/configuration.services.edit.php:87
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.services.parent.list.php:35
@@ -16741,7 +16741,7 @@ msgstr "הקפצה עודכנה"
 #: app/views/monitoring.problem.view.php:145 app/views/search.php:36
 #: app/views/search.php:67 app/views/search.php:71 app/views/search.php:185
 #: app/views/search.php:215 app/views/search.php:219 include/forms.inc.php:287
-#: include/html.inc.php:392 include/triggers.inc.php:879
+#: include/html.inc.php:392 include/triggers.inc.php:911
 #: include/views/configuration.action.list.php:32
 #: include/views/configuration.host.discovery.list.php:53
 #: include/views/configuration.host.edit.php:360
@@ -16771,7 +16771,7 @@ msgstr "הקפצות נמחקו"
 msgid "Triggers top 100"
 msgstr "100 ההקפצות המובילות"
 
-#: include/items.inc.php:1710
+#: include/items.inc.php:1704
 msgid "Trim"
 msgstr "צמצום"
 
@@ -17041,7 +17041,7 @@ msgstr "יחידות"
 #: include/items.inc.php:169 include/maintenances.inc.php:39
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:56 include/triggers.inc.php:120
-#: include/triggers.inc.php:244 include/triggers.inc.php:2176
+#: include/triggers.inc.php:244 include/triggers.inc.php:2204
 #: include/users.inc.php:66 include/users.inc.php:89
 #: include/views/configuration.action.edit.php:493
 #: include/views/configuration.triggers.list.php:71
@@ -17067,12 +17067,12 @@ msgstr "פונקציה לא ידועה."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:48
 #: app/controllers/CControllerPopupTriggerExpr.php:535
-#: include/triggers.inc.php:1396
+#: include/triggers.inc.php:1424
 msgid "Unknown host item, no such item in selected host"
 msgstr "פריט מארח לא ידוע, אין כזה פריט במארח הנבחר"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:47
-#: include/triggers.inc.php:1395
+#: include/triggers.inc.php:1423
 msgid "Unknown host, no such host present in system"
 msgstr "מארח לא ידוע, לא קיים כזה מארח במערכת"
 
@@ -17090,7 +17090,7 @@ msgstr "משאב לא ידוע"
 msgid "Unknown step failed: %1$s"
 msgstr "שלב לא ידוע נכשל: %1$s"
 
-#: include/items.inc.php:1330
+#: include/items.inc.php:1324
 msgid "Unknown value type"
 msgstr "סוג הערך לא ידוע"
 
@@ -17829,9 +17829,9 @@ msgstr "נפח אחסון בלתי משותף במכונה וירטואלית ש
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "זמן הפעילות של מכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
-#: include/items.inc.php:1761 include/items.inc.php:1765
-#: include/items.inc.php:1769 include/items.inc.php:1773
-#: include/items.inc.php:1777 include/items.inc.php:1781
+#: include/items.inc.php:1755 include/items.inc.php:1759
+#: include/items.inc.php:1763 include/items.inc.php:1767
+#: include/items.inc.php:1771 include/items.inc.php:1775
 msgid "Validation"
 msgstr "אימות"
 
@@ -18331,7 +18331,7 @@ msgstr "X1"
 msgid "X2"
 msgstr "X2"
 
-#: include/items.inc.php:1722
+#: include/items.inc.php:1716
 msgid "XML XPath"
 msgstr "XML XPath"
 
@@ -18445,7 +18445,7 @@ msgstr "שנתי"
 #: include/classes/screens/CScreenProblem.php:1132
 #: include/classes/screens/CScreenProblem.php:1262 include/events.inc.php:183
 #: include/events.inc.php:385 include/events.inc.php:610
-#: include/triggers.inc.php:1247 include/triggers.inc.php:1252
+#: include/triggers.inc.php:1275 include/triggers.inc.php:1280
 #: include/views/administration.general.valuemapping.list.php:65
 #: include/views/configuration.host.prototype.list.php:126
 #: include/views/configuration.httpconf.list.php:141

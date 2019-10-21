@@ -80,7 +80,9 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ZBX_UNUSED(request);
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_TERMINAL_SERVICES, PCI_TOTAL_SESSIONS);
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%u\\%u",
+			(unsigned int)get_builtin_counter_index(PCI_TERMINAL_SERVICES),
+			(unsigned int)get_builtin_counter_index(PCI_TOTAL_SESSIONS));
 
 	request_tmp.nparam = 1;
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));

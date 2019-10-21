@@ -836,7 +836,7 @@ class CConfigurationExport {
 			$httptest['application'] =
 				($httptest['applicationid'] != 0 && array_key_exists($httptest['applicationid'], $db_applications))
 					? ['name' => $db_applications[$httptest['applicationid']]['name']]
-					: null;
+					: [];
 			unset($httptest['applicationid']);
 		}
 		unset($httptest);

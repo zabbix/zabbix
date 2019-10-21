@@ -183,7 +183,8 @@
 			});
 
 		$div
-			.on('mousemove', function() {
+			// "Mouseenter" is required, since "mousemove" may not always bubble.
+			.on('mouseenter mousemove', function() {
 				enterWidget($obj, data, widget);
 
 				delete data['options']['mousemove_waiting'];

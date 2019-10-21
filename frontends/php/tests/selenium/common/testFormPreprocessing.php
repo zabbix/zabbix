@@ -81,20 +81,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
-			// Structured data. XML XPath.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'XML XPath',
-						'Key' => 'empty-xpath'
-					],
-					'preprocessing' => [
-						['type' => 'XML XPath']
-					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
-				]
-			],
 			// Arithmetic. Custom multiplier.
 			[
 				[
@@ -402,6 +388,20 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
+			// Structured data. XML XPath.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'XML XPath',
+						'Key' => 'empty-xpath'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath']
+					],
+					'error' => 'Incorrect value for field "params": cannot be empty.'
+				]
+			],
 			// Structured data. JSONPath.
 			[
 				[
@@ -599,6 +599,43 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public static function getItemPreprocessingCreateData() {
 		return [
+			// Structured data. CSV to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON empty parameters',
+						'Key' => 'csv-to-json-empty-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON with default parameters',
+						'Key' => 'csv-to-json-with-default-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON', 'parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => true]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON custom parameters',
+						'Key' => 'csv-to-json-custom-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON', 'parameter_1' => ' ', 'parameter_2' => "'", 'parameter_3' => false]
+					]
+				]
+			],
 			// In range.
 			[
 				[
@@ -635,6 +672,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Boolean to decimal'],
@@ -687,6 +725,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
+						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
 						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
@@ -1857,6 +1897,10 @@ abstract class testFormPreprocessing extends CWebTest {
 						'on_fail' => true
 					],
 					[
+						'type' => 'CSV to JSON',
+						'on_fail' => true
+					],
+					[
 						'type' => 'JavaScript',
 						'parameter_1' => 'Test Java Script'
 					],
@@ -2195,6 +2239,14 @@ abstract class testFormPreprocessing extends CWebTest {
 							'error_handler_params' => 'Custom_text'
 						],
 						[
+							'type' => 'CSV to JSON',
+							'parameter_1' => '.',
+							'parameter_2' => '/',
+							'parameter_3' => false,
+							'on_fail' => true,
+							'error_handler' => 'Discard value'
+						],
+						[
 							'type' => 'Does not match regular expression',
 							'parameter_1' => 'Pattern',
 							'on_fail' => true,
@@ -2295,7 +2347,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$step = $steps[$i];
 			$this->assertNotNull($step['type']->getAttribute('readonly'));
 
-			foreach (['parameter_1', 'parameter_2'] as $param) {
+			foreach (['parameter_1', 'parameter_2', 'parameter_3'] as $param) {
 				if (array_key_exists($param, $options)) {
 					$this->assertFalse($step[$param]->detect()->isEnabled());
 				}
@@ -2305,6 +2357,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 			switch ($options['type']) {
 				case 'Regular expression':
+				case 'CSV to JSON':
 				case 'XML XPath':
 				case 'JSONPath':
 				case 'Does not match regular expression':

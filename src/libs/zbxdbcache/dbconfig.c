@@ -9554,7 +9554,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *             hostids_num    - [IN] the number of hostids                    *
  *             validator_func - [IN] an optional validator function           *
  *                                                                            *
- * Return value: The text value with expanded user macros. Uknown or invalid  *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *
