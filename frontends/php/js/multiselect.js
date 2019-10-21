@@ -257,6 +257,7 @@ jQuery(function($) {
 						searches: {},
 						searching: {},
 						selected: {},
+						selecting: false,
 						available: {},
 						available_div: $('<div>', {'class': 'multiselect-available'})
 					}
@@ -538,6 +539,11 @@ jQuery(function($) {
 					$obj.removeClass('active');
 					$('.selected li:selected', $obj).removeClass('selected');
 					cleanSearchInput($obj);
+
+					// Not hiding the "available" list if the "click" event has just been scheduled.
+					if (!ms.values.selecting) {
+						hideAvailable($obj);
+					}
 				});
 
 		return $input;
@@ -659,12 +665,24 @@ jQuery(function($) {
 				'data-id': item.id,
 				'data-label': (item.prefix || '') + item.name
 			})
-				.on('click', function() {
-					select($obj, item.id);
-				})
-				.on('hover', function() {
+				.on('mouseenter', function() {
 					$('li.suggest-hover', ms.values.available_div).removeClass('suggest-hover');
 					$li.addClass('suggest-hover');
+				})
+				.on('mousedown', function() {
+					/*
+					 * The "focusout" event handler of the input will fire right after this event processing is done,
+					 * hiding and detaching the "available" list from the DOM, thus cancelling further event processing,
+					 * including "click", thus not adding the clicked item at all. Therefore:
+					 *   1. Set the flag to inform the "focusout" event handler not to hide the "available" list.
+					 *   2. Hide the "available" list by calling "select" function in the "click" event handler.
+					 */
+					ms.values.selecting = true;
+				})
+				.on('click', function() {
+					select($obj, item.id);
+
+					ms.values.selecting = false;
 				});
 
 		if (!empty(item.prefix)) {
