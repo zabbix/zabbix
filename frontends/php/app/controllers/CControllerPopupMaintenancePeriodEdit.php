@@ -113,7 +113,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 					$rules['days'] = 'required|not_empty';
 				}
 				else {
-					$rules['day'] = 'required|ge 1';
+					$rules['day'] = 'required|ge 1|le 31';
 				}
 
 				break;
