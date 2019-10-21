@@ -191,7 +191,6 @@ if ($type == SHOW_TRIGGERS) {
 				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 			],
 			'skipDependent' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? null : true
-			'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
 		];
 
 		$problem_options = [

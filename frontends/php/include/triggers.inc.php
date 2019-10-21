@@ -760,13 +760,12 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				'has_unresolved_unacknowledged' => false
 			];
 		}
+		unset($trigger);
 
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE && (!$nondependent_triggers
 				|| !array_key_exists($triggerid, $nondependent_triggers))) {
 			$trigger['value'] = TRIGGER_VALUE_FALSE;
 		}
-	}
-	unset($trigger);
 
 		$problems = API::Problem()->get([
 			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
