@@ -3,7 +3,7 @@
 all: build
 
 build:
-	go build
+	GOPATH="${GOPATH}" go build
 
 clean:
 	go clean

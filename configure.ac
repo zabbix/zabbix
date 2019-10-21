@@ -1799,7 +1799,7 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-CGO_LDFLAGS="-Wl,--start-group \
+CGO_LDFLAGS=" \
 	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
@@ -1813,13 +1813,13 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
 	$LIBS $AGENT_LIBS \
-	-Wl,--end-group"
+	"
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)

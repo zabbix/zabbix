@@ -1,3 +1,5 @@
+// +build !linux
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -17,14 +19,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package netif
 
-import (
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/systemrun"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/stats"
-	_ "zabbix/plugins/zabbix/sync"
-)
+import "fmt"
+
+func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
+	err = fmt.Errorf("Unsupported metric.")
+	return
+}
+
+func getDevList() (string, error) {
+	return "", fmt.Errorf("Unsupported metric.")
+}

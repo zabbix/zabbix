@@ -17,14 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package plugins
+package zbxlib
 
-import (
-	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/systemd"
-	_ "zabbix/plugins/systemrun"
-	_ "zabbix/plugins/zabbix/async"
-	_ "zabbix/plugins/zabbix/stats"
-	_ "zabbix/plugins/zabbix/sync"
-)
+/*
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/osx/libspechostnamesysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/osx/libspecsysinfo.a
+*/
+import "C"
