@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup profiles
+ */
 class testPageProblems extends CLegacyWebTest {
 
 	public function testPageProblems_CheckLayout() {
