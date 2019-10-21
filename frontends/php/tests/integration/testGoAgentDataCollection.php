@@ -106,7 +106,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
-			'key' => 'system.hw.cpu',
+			'key' => 'system.hw.cpu[all,model]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
