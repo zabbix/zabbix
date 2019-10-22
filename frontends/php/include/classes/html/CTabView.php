@@ -142,13 +142,13 @@ class CTabView extends CDiv {
 
 		if ($this->selectedTab !== null) {
 			$create_event = 'create: function() {'.
-				'sessionStorage.setItem(localstoragePath + "_tab", '.CJs::encodeJson($this->selectedTab).');'.
+				'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", '.CJs::encodeJson($this->selectedTab).');'.
 			'},';
 			$active_tab = 'active: '.CJs::encodeJson($this->selectedTab).',';
 		}
 		else {
 			$active_tab = 'active: function() {'.
-				'var tab = sessionStorage.getItem(localstoragePath + "_tab");'.
+				'var tab = sessionStorage.getItem(ZBX_SESSION_NAME + "_tab");'.
 				'return tab === null ? 0 : tab;'.
 			'}(),';
 		}
@@ -161,7 +161,7 @@ class CTabView extends CDiv {
 				$disabled_tabs.
 				$active_tab.
 				'activate: function(event, ui) {'.
-					'sessionStorage.setItem(localstoragePath + "_tab", ui.newTab.index().toString());'.
+					'sessionStorage.setItem(ZBX_SESSION_NAME + "_tab", ui.newTab.index().toString());'.
 					'jQuery.cookie("tab", ui.newTab.index().toString());'.
 					$this->tab_change_js.
 				'}'.
