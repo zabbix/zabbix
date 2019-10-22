@@ -1760,6 +1760,33 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	int		utf8_size;
 	unsigned int	codepage;
 
+	int bom_detected_in_utf8 = 0;
+
+	/* try to guess encoding using BOM if it exists */
+	if ('\0' == *encoding || (0 == strcmp(encoding, "UTF-8")))
+	{
+		if ( 3 <= in_size &&
+			((in[0]&0xFF) == 0xEF) &&
+			((in[1]&0xFF) == 0xBB) &&
+			((in[2]&0xFF) == 0xBF))
+		{
+			bom_detected_in_utf8 = 1;
+			encoding = "UTF-8";
+		}
+		else if ( 2 <= in_size &&
+			((in[0]&0xFF) == 0xFF) &&
+			((in[1]&0xFF) == 0xFE))
+		{
+			encoding = "UTF-16";
+		}
+		else if ( 2 <= in_size &&
+			((in[0]&0xFF) == 0xFE) &&
+			((in[1]&0xFF) == 0xFF))
+		{
+			encoding = "UNICODEFFFE";
+		}
+	}
+
 	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
 	{
 		utf8_size = (int)in_size + 1;
@@ -1772,18 +1799,38 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
 			codepage);
 
-	if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
+	if (65001 == codepage)
 	{
+		/* remove BOM */
+		if (bom_detected_in_utf8)
+		{
+			in = in + 3;
+		}
+	}
+	else if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
+	{
+		/* remove BOM */
+		if (0 < (wide_size = (int)in_size / 2) && *((wchar_t *)in) == 0xfeff)
+		{
+			in = in + 2;
+			wide_size--;
+		}
 		wide_string = (wchar_t *)in;
-		wide_size = (int)in_size / 2;
+
 	}
 	else if (1201 == codepage)	/* unicodeFFFE UTF-16, big-endian byte order */
 	{
-		wchar_t	*wide_string_be = (wchar_t *)in;
+		wchar_t *wide_string_be;
 		int	i;
 
-		wide_size = (int)in_size / 2;
+		/* remove BOM */
+		if (0 < (wide_size = (int)in_size / 2) && *((wchar_t *)in) == 0xfffe)
+		{
+			in = in + 2;
+			wide_size--;
+		}
 
+		wide_string_be = (wchar_t *)in;
 
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
@@ -1830,6 +1877,30 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = (char *)zbx_malloc(out, out_alloc);
 
+	/* try to guess encoding using BOM if it exists */
+	if ('\0' == *encoding)
+	{
+		if ( 3 <= in_size &&
+			((in[0]&0xFF) == 0xEF) &&
+			((in[1]&0xFF) == 0xBB) &&
+			((in[2]&0xFF) == 0xBF))
+		{
+			encoding = "UTF-8";
+		}
+		else if ( 2 <= in_size &&
+			((in[0]&0xFF) == 0xFF) &&
+			((in[1]&0xFF) == 0xFE))
+		{
+			encoding = "UTF-16LE";
+		}
+		else if ( 2 <= in_size &&
+			((in[0]&0xFF) == 0xFE) &&
+			((in[1]&0xFF) == 0xFF))
+		{
+			encoding = "UTF-16BE";
+		}
+	}
+
 	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
@@ -1855,6 +1926,15 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	*p = '\0';
 
 	iconv_close(cd);
+
+	/* remove BOM */
+	if ( 3 <= strlen(out) &&
+	     ((out[0]&0xFF) == 0xEF) &&
+	     ((out[1]&0xFF) == 0xBB) &&
+	     ((out[2]&0xFF) == 0xBF))
+	{
+		out = out+3;
+	}
 
 	return out;
 }

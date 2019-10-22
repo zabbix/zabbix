@@ -1,0 +1,208 @@
+---
+# empty text
+test case: empty_text_nothing_happens
+in:
+  enc: ''
+  buffer_length: 0
+  buffer: &buffer
+    - ''
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: &expected_result_buffer
+    - ''
+  return: SUCCEED
+
+---
+test case: bom_is_not_added_to_plain_data_utf8_assumed
+in:
+  enc: ''
+  buffer_length: 6
+  buffer: &buffer
+    - '\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11\x11\x11\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf8_bom_is_removed
+in:
+  enc: ''
+  buffer_length: 9
+  buffer: &buffer
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11\x11\x11\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf8_bom_is_removed2
+in:
+  enc: ''
+  buffer_length: 9
+  buffer: &buffer
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 9
+  expected_result_buffer: &expected_result_buffer
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+  return: FAIL
+
+---
+test case: utf8_bom_is_removed_with_encoding_specified
+in:
+  enc: 'UTF-8'
+  buffer_length: 9
+  buffer: &buffer
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11\x11\x11\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf8_bom_is_removed_empty_text
+in:
+  enc: ''
+  buffer_length: 3
+  buffer: &buffer
+    - '\xEF\xBB\xBF'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: &expected_result_buffer
+    - ''
+  return: SUCCEED
+
+---
+#
+# utf-16 conversion to utf-8
+# echo -n -e '\xff\xfe\x11\x00\x11\x00' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-16LE -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# efbb bf11 11
+#
+test case: utf16_LE_bom_is_removed
+in:
+  enc: ''
+  buffer_length: 6
+  buffer: &buffer
+    - '\xFF\xFE\x11\x00\x11\x00'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+#
+# no BOM, but we still correctly decode the data as encoding was provided
+#
+test case: utf16_LE_noBOM_with_encoding
+in:
+  enc: 'UTF-16LE'
+  buffer_length: 4
+  buffer: &buffer
+    - '\x11\x00\x11\x00'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16_LE_bom_is_removed_empty_text
+in:
+  enc: ''
+  buffer_length: 2
+  buffer: &buffer
+    - '\xFF\xFE'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: &expected_result_buffer
+    - ''
+  return: SUCCEED
+
+---
+#
+# utf-16_BE conversion to utf-8
+# echo -n -e '\xfe\xff\x00\x11\x00\x11' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-16BE -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# efbb bf11 11
+#
+test case: utf16_BE_bom_is_removed
+in:
+  enc: ''
+  buffer_length: 6
+  buffer: &buffer
+    - '\xFE\xFF\x00\x11\x00\x11'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16_BE_noBOM_with_enconding
+in:
+  enc: 'UTF-16BE'
+  buffer_length: 4
+  buffer: &buffer
+    - '\x00\x11\x00\x11'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer: &expected_result_buffer
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16_BE_bom_is_removed_empty_text
+in:
+  enc: ''
+  buffer_length: 2
+  buffer: &buffer
+    - '\xFE\xFF'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: &expected_result_buffer
+    - ''
+  return: SUCCEED
+
+---
+#
+# utf32 conversion to utf-8
+# utf32 without encoding is guessed as utf16:
+# 11 in utf8 is represented in utf32 as \x11\x00\x00\x00
+# \xFF\xFE\x00\x00 is utf-32 BOM
+#
+# So that,
+# echo -n -e '\xFF\xFE\x00\x00\x11\x00\x00\x00' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-32 -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# 11
+#
+# However, if encoding is not specified, we can confuse it with utf-16 LE
+# which also has \xFF\xFE at the beginning, so the the result is different:
+# 00 11 00
+#
+# echo -n -e '\xFF\xFE\x00\x00\x11\x00\x00\x00' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-16 -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# 0011
+#
+test case: utf32_LE_bom_is_removed_incorrect_guess_conversion_to_utf16
+in:
+  enc: ''
+  buffer_length: 8
+  buffer: &buffer
+    - '\xFF\xFE\x00\x00\x11\x00\x00\x00'
+out:
+  expected_result_buffer_length: 3
+  expected_result_buffer: &expected_result_buffer
+    - '\x00\x11\x00'
+  return: SUCCEED
+
