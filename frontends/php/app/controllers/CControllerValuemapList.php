@@ -27,7 +27,7 @@ class CControllerValuemapList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'uncheck' => 'int32'
+			'uncheck' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
