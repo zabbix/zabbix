@@ -19,6 +19,7 @@
 **/
 ?>
 
+
 <script type="text/x-jquery-tmpl" id="macro-row-tmpl">
 	<?= (new CRow([
 			(new CCol(

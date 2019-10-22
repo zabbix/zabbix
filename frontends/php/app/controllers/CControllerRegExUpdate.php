@@ -28,8 +28,7 @@ class CControllerRegExUpdate extends CController {
 			'name'         => 'required | string | not_empty | db regexps.name',
 			'test_string'  => 'string | db regexps.test_string',
 			'regexid'      => 'fatal | required | db regexps.regexpid',
-			'expressions'  => 'required | array',
-			'form_refresh' => ''
+			'expressions'  => 'required | array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -37,7 +36,6 @@ class CControllerRegExUpdate extends CController {
 		if (!$ret) {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
-
 					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 						->setArgument('action', 'regex.edit')
 						->setArgument('regexid', $this->getInput('regexid'))

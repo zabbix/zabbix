@@ -66,7 +66,7 @@ class CControllerRegExTest extends CController {
 				$result['errors'][$id] = $validator->getError();
 			}
 
-			$result['final'] = $result['final'] && $match;
+			$result['final'] = ($result['final'] && $match);
 		}
 
 		$response->success($result);

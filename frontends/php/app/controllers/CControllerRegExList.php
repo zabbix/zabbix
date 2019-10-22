@@ -29,7 +29,7 @@ class CControllerRegExList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'uncheck' => 'int32'
+			'uncheck' => 'in 1'
 		];
 
 		return $this->validateInput($fields);
@@ -43,29 +43,26 @@ class CControllerRegExList extends CController {
 		$data = [
 			'regexes'  => [],
 			'db_exps'  => [],
-			'regexids' => [],
 			'uncheck'  => $this->getInput('uncheck', false)
 		];
 
-		$dbregex = DBselect('SELECT re.* FROM regexps re');
+		$db_regex = DBselect('SELECT re.* FROM regexps re');
 
-		while ($regex = DBfetch($dbregex)) {
+		while ($regex = DBfetch($db_regex)) {
 			$regex['expressions'] = [];
-
 			$data['regexes'][$regex['regexpid']] = $regex;
-			$data['regexids'][$regex['regexpid']] = $regex['regexpid'];
 		}
 
 		order_result($data['regexes'], 'name');
 
-		$dbexpressions = DBselect(
+		$db_expressions = DBselect(
 			'SELECT e.*'.
 			' FROM expressions e'.
-			' WHERE '.dbConditionInt('e.regexpid', $data['regexids']).
+			' WHERE '.dbConditionInt('e.regexpid', array_keys($data['regexes'])).
 			' ORDER BY e.expression_type'
 		);
 
-		while ($expr = DBfetch($dbexpressions)) {
+		while ($expr = DBfetch($db_expressions)) {
 			$data['db_exps'][] = [
 				'regexid' => $expr['regexpid'],
 				'expression' => $expr['expression'],

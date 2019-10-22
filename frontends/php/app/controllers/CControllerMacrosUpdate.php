@@ -84,7 +84,7 @@ class CControllerMacrosUpdate extends CController {
 				$result = (bool) API::UserMacro()->updateGlobal($macros_to_update);
 			}
 
-			// deletehe
+			// delete
 			if ($db_macros) {
 				$result = $result && (bool) API::UserMacro()->deleteGlobal(array_keys($db_macros));
 			}
