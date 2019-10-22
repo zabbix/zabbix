@@ -96,7 +96,7 @@ class makeSqlTest extends CTest {
 	 * @param string $expected_non_oracle
 	 * @param string $expected_oracle
 	 */
-	public function testMakeSql($table_name, $table_alias, $options, $expected_non_oracle, $expected_oracle) {
+	public function test($table_name, $table_alias, $options, $expected_non_oracle, $expected_oracle) {
 		global $DB;
 
 		$sql = DB::makeSql($table_name, $options, $table_alias);
