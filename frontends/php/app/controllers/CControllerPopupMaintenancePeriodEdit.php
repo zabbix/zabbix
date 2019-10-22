@@ -35,7 +35,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 			'period_hours' =>		'int32|ge 0|le 23',
 			'period_minutes' =>		'int32|ge 0|le 59',
 			'start_date' =>			'string',
-
+			'monthly_days' =>		'array',
 			'timeperiodid' =>		'id',
 			'timeperiod_type' =>	'in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY,
 				TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]
@@ -110,7 +110,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 				$rules['months'] = 'required|not_empty';
 
 				if ($this->getInput('month_date_type', 0)) {
-					$rules['days'] = 'required|not_empty';
+					$rules['monthly_days'] = 'required|not_empty';
 				}
 				else {
 					$rules['day'] = 'required|ge 1|le 31';
@@ -157,7 +157,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 				$data['month'] = array_sum($this->getInput('months', []));
 
 				if ($data['month_date_type'] == 1) {
-					$data['dayofweek'] = array_sum($this->getInput('days', []));
+					$data['dayofweek'] = array_sum($this->getInput('monthly_days', []));
 					$data['day'] = 0;
 				}
 			}

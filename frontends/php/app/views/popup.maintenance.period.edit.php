@@ -104,7 +104,7 @@ $form
 		'row_timeperiod_week'
 	)
 	->addRow('',
-		(new CCheckBoxList('days'))
+		(new CCheckBoxList('monthly_days'))
 			->addClass('col-3')
 			->setOptions($days),
 		'row_timeperiod_week_days'
