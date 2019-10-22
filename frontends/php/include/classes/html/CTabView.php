@@ -121,13 +121,19 @@ class CTabView extends CDiv {
 	}
 
 	public function makeJavascript() {
-		if ($this->selectedTab === null) {
-			$active_tab = (int) get_cookie('tab', 0);
-			$create_event = '';
+		$create_event = '';
+
+		if ($this->selectedTab !== null) {
+			$create_event = 'create: function() {'.
+				'sessionStorage.setItem(localstoragePath + "_tab", '.CJs::encodeJson($this->selectedTab).');'.
+			'},';
+			$active_tab = 'active: '.CJs::encodeJson($this->selectedTab).',';
 		}
 		else {
-			$active_tab = $this->selectedTab;
-			$create_event = 'create: function() { jQuery.cookie("tab", '.CJs::encodeJson($this->selectedTab).'); },';
+			$active_tab = 'active: function() {'.
+				'var tab = sessionStorage.getItem(localstoragePath + "_tab");'.
+				'return tab === null ? 0 : tab;'.
+			'}(),';
 		}
 
 		$disabled_tabs = ($this->disabledTabs === null) ? '' : 'disabled: '.CJs::encodeJson($this->disabledTabs).',';
@@ -136,9 +142,9 @@ class CTabView extends CDiv {
 			'jQuery("#'.$this->id.'").tabs({'.
 				$create_event.
 				$disabled_tabs.
-				'active: '.CJs::encodeJson($active_tab).','.
+				$active_tab.
 				'activate: function(event, ui) {'.
-					'jQuery.cookie("tab", ui.newTab.index().toString());'.
+					'sessionStorage.setItem(localstoragePath + "_tab", ui.newTab.index().toString());'.
 					$this->tab_change_js.
 				'}'.
 			'})'.
