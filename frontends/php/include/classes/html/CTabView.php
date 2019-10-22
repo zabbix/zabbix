@@ -22,6 +22,10 @@
 class CTabView extends CDiv {
 
 	protected $id = 'tabs';
+
+	/**
+	 * @var CDiv[]
+	 */
 	protected $tabs = [];
 	protected $headers = [];
 	protected $footer = null;
@@ -101,7 +105,20 @@ class CTabView extends CDiv {
 			$this->addItem($tab);
 		}
 		else {
-			$headersList = (new CList())->addClass(ZBX_STYLE_TABS_NAV);
+			$visible_tab = (int) get_cookie('tab', (int) $this->selectedTab);
+			foreach (array_values($this->tabs) as $index => $tab) {
+				if ($visible_tab == $index) {
+					$tab->setAttribute('aria-hidden', 'false');
+				}
+				else {
+					$tab->setAttribute('style', 'display: none');
+					$tab->setAttribute('aria-hidden', 'true');
+				}
+			}
+
+			$headersList = (new CList())
+				->addClass('ui-tabs-nav')
+				->addClass(ZBX_STYLE_TABS_NAV);
 
 			foreach ($this->headers as $id => $header) {
 				$tabLink = (new CLink($header, '#'.$id))
@@ -145,6 +162,7 @@ class CTabView extends CDiv {
 				$active_tab.
 				'activate: function(event, ui) {'.
 					'sessionStorage.setItem(localstoragePath + "_tab", ui.newTab.index().toString());'.
+					'jQuery.cookie("tab", ui.newTab.index().toString());'.
 					$this->tab_change_js.
 				'}'.
 			'})'.
