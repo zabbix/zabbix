@@ -4654,12 +4654,6 @@ ul.checkbox-list.col-3 > li {
   flex: 0 0 33.33333%;
   max-width: 33.33333%; }
 
-ul.checkbox-list.col-4 > li {
-  display: inline-block;
-  -ms-flex: 0 0 25%;
-  flex: 0 0 25%;
-  max-width: 25%; }
-
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap;

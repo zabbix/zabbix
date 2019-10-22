@@ -33,7 +33,7 @@ if ($data['timeperiodid']) {
 
 $days = [];
 
-foreach (range(1, 7) as $day) {
+foreach ([1,4,6,2,5,7,3] as $day) {
 	$value = 1 << ($day - 1);
 	$days[] = [
 		'name' => getDayOfWeekCaption($day),
@@ -44,7 +44,7 @@ foreach (range(1, 7) as $day) {
 
 $months = [];
 
-foreach (range(1, 12) as $month) {
+foreach ([1,5,9,2,6,10,3,7,11,4,8,12] as $month) {
 	$value = 1 << ($month - 1);
 	$months[] = [
 		'name' => getMonthCaption($month),
@@ -82,7 +82,7 @@ $form
 	)
 	->addRow((new CLabel(_('Month'), 'months'))->setAsteriskMark(),
 		(new CCheckBoxList('months'))
-			->addClass('col-4')
+			->addClass('col-3')
 			->setOptions($months),
 		'row_timeperiod_months'
 	)
