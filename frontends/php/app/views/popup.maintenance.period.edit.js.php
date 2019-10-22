@@ -29,8 +29,8 @@ new CViewSwitcher('timeperiod_type', 'change', <?= CJs::encodeJson([
 		'row_timeperiod_period_at_hours_minutes', 'row_timeperiod_period_length'
 	],
 	TIMEPERIOD_TYPE_MONTHLY =>	['row_timeperiod_months', 'row_timeperiod_date', 'row_timeperiod_day',
-		'row_timeperiod_week', 'row_timeperiod_every', 'row_timeperiod_period_at_hours_minutes',
-		'row_timeperiod_period_length'
+		'row_timeperiod_week', 'row_timeperiod_week_days', 'row_timeperiod_every',
+		'row_timeperiod_period_at_hours_minutes', 'row_timeperiod_period_length'
 	]
 ]) ?>);
 
@@ -38,7 +38,7 @@ jQuery('#month_date_type').change(function() {
 	var value = jQuery('input:checked', this).val();
 
 	jQuery('#row_timeperiod_day').toggle(value == 0);
-	jQuery('#row_timeperiod_week').toggle(value == 1);
+	jQuery('#row_timeperiod_week,#row_timeperiod_week_days').toggle(value == 1);
 });
 
 jQuery('#timeperiod_type').change(function() {

@@ -94,19 +94,20 @@ $form
 		'row_timeperiod_date'
 	)
 	->addRow((new CLabel(_('Day of week'), 'every'))->setAsteriskMark(),
-		[
-			new CComboBox('every', $data['every'], null, [
-				1 => _('first'),
-				2 => _x('second', 'adjective'),
-				3 => _('third'),
-				4 => _('fourth'),
-				5 => _('last')
-			]),
-			(new CCheckBoxList('days'))
-				->addClass('col-3')
-				->setOptions($days),
-		],
+		new CComboBox('every', $data['every'], null, [
+			1 => _('first'),
+			2 => _x('second', 'adjective'),
+			3 => _('third'),
+			4 => _('fourth'),
+			5 => _('last')
+		]),
 		'row_timeperiod_week'
+	)
+	->addRow('',
+		(new CCheckBoxList('days'))
+			->addClass('col-3')
+			->setOptions($days),
+		'row_timeperiod_week_days'
 	)
 	->addRow((new CLabel(_('Day of month'), 'day'))->setAsteriskMark(),
 		(new CNumericBox('day', $data['day'], 2))
