@@ -55,8 +55,7 @@ class CControllerIconMapEdit extends CController {
 		$images = API::Image()->get([
 			'output' => ['imageid', 'name'],
 			'filter' => ['imagetype' => IMAGE_TYPE_ICON],
-			'sortfield' => 'name',
-			'preservekeys' => true
+			'sortfield' => 'name'
 		]);
 		foreach ($images as $icon) {
 			$this->images[$icon['imageid']] = $icon['name'];
@@ -91,6 +90,8 @@ class CControllerIconMapEdit extends CController {
 	}
 
 	protected function doAction() {
+		order_result($this->iconmap['mappings'], 'sortorder');
+
 		$data = [
 			'iconmapid' => $this->getInput('iconmapid', 0),
 			'icon_list' => $this->images,

@@ -63,7 +63,6 @@ $table = (new CTable())
 	->setId('iconMapTable')
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
 
-order_result($data['iconmap']['mappings'], 'sortorder');
 $i = 0;
 foreach ($data['iconmap']['mappings'] as $mapping) {
 	$table->addRow(
@@ -142,7 +141,7 @@ if ($data['iconmapid'] != 0) {
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
 					->setArgument('iconmapid', $data['iconmapid']),
-				_('Delete selected image?')
+				_('Delete icon map?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'iconmap.list')

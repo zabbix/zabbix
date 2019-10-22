@@ -28,7 +28,6 @@ class CRedirectButton extends CSimpleButton {
 	 * @param string      $caption
 	 * @param string|CUrl $url           URL to redirect to
 	 * @param string      $confirmation  confirmation message text
-	 * @param string      $class
 	 */
 	public function __construct($caption, $url, $confirmation = null) {
 		parent::__construct($caption);
@@ -44,6 +43,7 @@ class CRedirectButton extends CSimpleButton {
 	 * @param string|CUrl $url
 	 * @param string|null $confirmation
 	 *
+	 * @return CRedirectButton
 	 */
 	public function setUrl($url, $confirmation = null) {
 		if ($url instanceof CUrl) {

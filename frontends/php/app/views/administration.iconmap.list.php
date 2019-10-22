@@ -37,7 +37,6 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-
 $table = (new CTableInfo())->setHeader([_('Name'), _('Icon map')]);
 
 foreach ($data['iconmaps'] as $icon_map) {

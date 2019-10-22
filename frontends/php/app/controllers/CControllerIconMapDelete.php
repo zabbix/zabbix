@@ -45,7 +45,7 @@ class CControllerIconMapDelete extends CController {
 		}
 
 		return (bool) API::IconMap()->get([
-			'output' => ['iconmapid'],
+			'output' => [],
 			'iconmapids' => (array) $this->getInput('iconmapid'),
 			'editable' => true
 		]);
