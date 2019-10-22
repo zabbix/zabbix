@@ -30,8 +30,7 @@ void	zbx_mock_test_entry(void **state)
 
 	int expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	ssize_t in_buffer_length = zbx_mock_get_parameter_uint64("in.buffer_length");
-	ssize_t	expected_result_buffer_length =
-	  zbx_mock_get_parameter_uint64("out.expected_result_buffer_length");
+	ssize_t	expected_result_buffer_length = zbx_mock_get_parameter_uint64("out.expected_result_buffer_length");
 	char* in_buffer = zbx_yaml_assemble_binary_sequence("in.buffer", in_buffer_length);
 	char* expected_result_buffer = zbx_yaml_assemble_binary_sequence("out.expected_result_buffer",
 									 expected_result_buffer_length);

@@ -1760,31 +1760,29 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	int		utf8_size;
 	unsigned int	codepage;
 
-	int bom_detected_in_utf8 = 0;
+	int bom_detected = 0;
 
 	/* try to guess encoding using BOM if it exists */
-	if ('\0' == *encoding || (0 == strcmp(encoding, "UTF-8")))
+	if ( 3 <= in_size && ((in[0]&0xFF) == 0xEF) && ((in[1]&0xFF) == 0xBB) && ((in[2]&0xFF) == 0xBF))
 	{
-		if ( 3 <= in_size &&
-			((in[0]&0xFF) == 0xEF) &&
-			((in[1]&0xFF) == 0xBB) &&
-			((in[2]&0xFF) == 0xBF))
-		{
-			bom_detected_in_utf8 = 1;
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
 			encoding = "UTF-8";
-		}
-		else if ( 2 <= in_size &&
-			((in[0]&0xFF) == 0xFF) &&
-			((in[1]&0xFF) == 0xFE))
-		{
+	}
+	else if ( 2 <= in_size && ((in[0]&0xFF) == 0xFF) && ((in[1]&0xFF) == 0xFE))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
 			encoding = "UTF-16";
-		}
-		else if ( 2 <= in_size &&
-			((in[0]&0xFF) == 0xFE) &&
-			((in[1]&0xFF) == 0xFF))
-		{
+	}
+	else if ( 2 <= in_size && ((in[0]&0xFF) == 0xFE) && ((in[1]&0xFF) == 0xFF))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
 			encoding = "UNICODEFFFE";
-		}
 	}
 
 	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
@@ -1802,19 +1800,23 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	if (65001 == codepage)
 	{
 		/* remove BOM */
-		if (bom_detected_in_utf8)
+		if (bom_detected)
 		{
 			in = in + 3;
 		}
 	}
-	else if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
+
+	if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
 	{
+		wide_size = (int)in_size / 2;
+
 		/* remove BOM */
-		if (0 < (wide_size = (int)in_size / 2) && *((wchar_t *)in) == 0xfeff)
+		if (bom_detected)
 		{
 			in = in + 2;
 			wide_size--;
 		}
+
 		wide_string = (wchar_t *)in;
 
 	}
@@ -1823,8 +1825,10 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		wchar_t *wide_string_be;
 		int	i;
 
+		wide_size = (int)in_size / 2;
+
 		/* remove BOM */
-		if (0 < (wide_size = (int)in_size / 2) && *((wchar_t *)in) == 0xfffe)
+		if (bom_detected)
 		{
 			in = in + 2;
 			wide_size--;
@@ -1880,22 +1884,15 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	/* try to guess encoding using BOM if it exists */
 	if ('\0' == *encoding)
 	{
-		if ( 3 <= in_size &&
-			((in[0]&0xFF) == 0xEF) &&
-			((in[1]&0xFF) == 0xBB) &&
-			((in[2]&0xFF) == 0xBF))
+		if (3 <= in_size && ((in[0]&0xFF) == 0xEF) && ((in[1]&0xFF) == 0xBB) && ((in[2]&0xFF) == 0xBF))
 		{
 			encoding = "UTF-8";
 		}
-		else if ( 2 <= in_size &&
-			((in[0]&0xFF) == 0xFF) &&
-			((in[1]&0xFF) == 0xFE))
+		else if (2 <= in_size && ((in[0]&0xFF) == 0xFF) && ((in[1]&0xFF) == 0xFE))
 		{
 			encoding = "UTF-16LE";
 		}
-		else if ( 2 <= in_size &&
-			((in[0]&0xFF) == 0xFE) &&
-			((in[1]&0xFF) == 0xFF))
+		else if (2 <= in_size && ((in[0]&0xFF) == 0xFE) && ((in[1]&0xFF) == 0xFF))
 		{
 			encoding = "UTF-16BE";
 		}
@@ -1928,12 +1925,9 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	iconv_close(cd);
 
 	/* remove BOM */
-	if ( 3 <= strlen(out) &&
-	     ((out[0]&0xFF) == 0xEF) &&
-	     ((out[1]&0xFF) == 0xBB) &&
-	     ((out[2]&0xFF) == 0xBF))
+	if (3 <= strlen(out) && ((out[0]&0xFF) == 0xEF) && ((out[1]&0xFF) == 0xBB) && ((out[2]&0xFF) == 0xBF))
 	{
-		out = out+3;
+		out = out + 3;
 	}
 
 	return out;
