@@ -80,6 +80,10 @@ $maintenance_period_table = (new CTable())
 foreach (array_values($data['timeperiods']) as $index => $timeperiod) {
 	$period_data = [];
 
+	if ($timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
+		unset($timeperiod['start_date']);
+	}
+
 	foreach ($timeperiod as $field => $value) {
 		$period_data[] = (new CVar(sprintf('timeperiods[%s][%s]', $index, $field), $value))->removeId();
 	}
