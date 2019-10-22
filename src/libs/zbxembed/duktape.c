@@ -4707,7 +4707,7 @@ struct duk_heaphdr_string {
 #define DUK_TVAL_INCREF_FAST(thr,tv) do { \
 		duk_tval *duk__tv = (tv); \
 		DUK_ASSERT(duk__tv != NULL); \
-		if (DUK_TVAL_NEEDS_REFCOUNT_UPDATE(duk__tv)) { \
+		if (NULL != duk__tv && DUK_TVAL_NEEDS_REFCOUNT_UPDATE(duk__tv)) { \
 			duk_heaphdr *duk__h = DUK_TVAL_GET_HEAPHDR(duk__tv); \
 			DUK_ASSERT(duk__h != NULL); \
 			DUK_ASSERT(DUK_HEAPHDR_HTYPE_VALID(duk__h)); \
@@ -5081,6 +5081,8 @@ struct duk_heaphdr_string {
 #define DUK_TVAL_SET_TVAL_UPDREF_ALT1(thr,tvptr_dst,tvptr_src) do { \
 		duk_tval *tv__dst, *tv__src; duk_heaphdr *h__obj; \
 		tv__dst = (tvptr_dst); tv__src = (tvptr_src); \
+		if (NULL == tv__src || NULL == tv__dst) \
+			break; \
 		DUK_TVAL_INCREF_FAST((thr), tv__src); \
 		if (DUK_TVAL_NEEDS_REFCOUNT_UPDATE(tv__dst)) { \
 			h__obj = DUK_TVAL_GET_HEAPHDR(tv__dst); \
@@ -11712,10 +11714,10 @@ DUK_INTERNAL DUK_COLD void duk_err_uri(duk_hthread *thr) {
  */
 
 DUK_INTERNAL DUK_COLD void duk_default_fatal_handler(void *udata, const char *msg) {
+	msg = msg ? msg : "NULL";
+
 	DUK_UNREF(udata);
 	DUK_UNREF(msg);
-
-	msg = msg ? msg : "NULL";
 
 #if defined(DUK_USE_FATAL_HANDLER)
 	/* duk_config.h provided a custom default fatal handler. */
@@ -29717,6 +29719,7 @@ DUK_LOCAL duk_bool_t duk__parse_string_iso8601_subset(duk_hthread *thr, const ch
 
 	/* During parsing, month and day are one-based; set defaults here. */
 	duk_memzero(parts, sizeof(parts));
+	duk_memzero(dparts, sizeof(dparts));
 	DUK_ASSERT(parts[DUK_DATE_IDX_YEAR] == 0);  /* don't care value, year is mandatory */
 	parts[DUK_DATE_IDX_MONTH] = 1;
 	parts[DUK_DATE_IDX_DAY] = 1;
@@ -30637,6 +30640,7 @@ DUK_LOCAL duk_ret_t duk__set_part_helper(duk_hthread *thr, duk_small_uint_t flag
 	duk_small_uint_t idx_first, idx;
 	duk_small_uint_t i;
 
+	duk_memzero(dparts, sizeof(dparts));
 	nargs = duk_get_top(thr);
 	d = duk__push_this_get_timeval(thr, flags_and_maxnargs);
 	DUK_ASSERT(DUK_ISFINITE(d) || DUK_ISNAN(d));
@@ -30980,6 +30984,7 @@ DUK_INTERNAL duk_ret_t duk_bi_date_constructor(duk_hthread *thr) {
 		return 1;
 	}
 
+	duk_memzero(dparts, sizeof(dparts));
 	duk__set_parts_from_args(thr, dparts, nargs);
 
 	/* Parts are in local time, convert when setting. */
@@ -31005,6 +31010,7 @@ DUK_INTERNAL duk_ret_t duk_bi_date_constructor_utc(duk_hthread *thr) {
 	if (nargs < 2) {
 		duk_push_nan(thr);
 	} else {
+		duk_memzero(dparts, sizeof(dparts));
 		duk__set_parts_from_args(thr, dparts, nargs);
 		d = duk_bi_date_get_timeval_from_dparts(dparts, 0 /*flags*/);
 		duk_push_number(thr, d);
@@ -31449,6 +31455,8 @@ DUK_INTERNAL duk_int_t duk_bi_date_get_local_tzoffset_gmtime(duk_double_t d) {
 	 *
 	 *    https://bugzilla.mozilla.org/show_bug.cgi?id=351066
 	 */
+
+	duk_memzero(dparts, sizeof(dparts));
 
 	duk_bi_date_timeval_to_parts(d, parts, dparts, DUK_DATE_FLAG_EQUIVYEAR /*flags*/);
 	DUK_ASSERT(parts[DUK_DATE_IDX_YEAR] >= 1970 && parts[DUK_DATE_IDX_YEAR] <= 2038);
@@ -39831,7 +39839,7 @@ DUK_INTERNAL duk_ret_t duk_bi_string_prototype_to_string(duk_hthread *thr) {
  */
 
 DUK_INTERNAL duk_ret_t duk_bi_string_prototype_char_at(duk_hthread *thr) {
-	duk_hstring *h;
+	duk_hstring *h __attribute__((unused));
 	duk_int_t pos;
 
 	/* XXX: faster implementation */
@@ -52285,7 +52293,7 @@ DUK_LOCAL void duk__strtable_shrink_inplace(duk_heap *heap) {
 
 #if defined(DUK__STRTAB_RESIZE_CHECK)
 DUK_LOCAL DUK_COLD DUK_NOINLINE void duk__strtable_resize_check(duk_heap *heap) {
-	duk_uint32_t load_factor;  /* fixed point */
+	duk_uint32_t load_factor = 0;  /* fixed point */
 
 	DUK_ASSERT(heap != NULL);
 #if defined(DUK_USE_STRTAB_PTRCOMP)
@@ -52306,7 +52314,8 @@ DUK_LOCAL DUK_COLD DUK_NOINLINE void duk__strtable_resize_check(duk_heap *heap) 
 
 	DUK_ASSERT(heap->st_size >= 16U);
 	DUK_ASSERT((heap->st_size >> 4U) >= 1);
-	load_factor = heap->st_count / (heap->st_size >> 4U);
+	if (0 != heap->st_size >> 4U)
+		load_factor = heap->st_count / (heap->st_size >> 4U);
 
 	DUK_DD(DUK_DDPRINT("resize check string table: size=%lu, count=%lu, load_factor=%lu (fixed point .4; float %lf)",
 	                   (unsigned long) heap->st_size, (unsigned long) heap->st_count,
@@ -58561,7 +58570,7 @@ DUK_INTERNAL duk_bool_t duk_hobject_delprop(duk_hthread *thr, duk_tval *tv_obj, 
 	duk_propdesc desc;
 #endif
 	duk_int_t entry_top;
-	duk_uint32_t arr_idx = DUK__NO_ARRAY_INDEX;
+	duk_uint32_t arr_idx __attribute__ ((unused)) = DUK__NO_ARRAY_INDEX;
 	duk_bool_t rc;
 
 	DUK_DDD(DUK_DDDPRINT("delprop: thr=%p, obj=%p, key=%p (obj -> %!T, key -> %!T)",
@@ -62796,7 +62805,7 @@ DUK_LOCAL duk_bool_t duk__handle_specialfuncs_for_call(duk_hthread *thr, duk_idx
 		 * newTarget is checked but not yet passed onwards.
 		 */
 
-		duk_idx_t top;
+		duk_idx_t top __attribute__((unused));
 
 		DUK_ASSERT(natfunc == duk_bi_reflect_construct);
 		*call_flags |= DUK_CALL_FLAG_CONSTRUCT;
@@ -63663,7 +63672,6 @@ DUK_LOCAL duk_small_uint_t duk__call_setup_act_attempt_tailcall(duk_hthread *thr
 	duk_remove_n(thr, 0, idx_args);  /* may be NORZ */
 
 	idx_func = 0; DUK_UNREF(idx_func);  /* really 'not applicable' anymore, should not be referenced after this */
-	idx_args = 0;
 
 	*out_nargs = ((duk_hcompfunc *) func)->nargs;
 	*out_nregs = ((duk_hcompfunc *) func)->nregs;
@@ -74547,7 +74555,7 @@ DUK_LOCAL DUK__NOINLINE_PERF void duk__handle_break_or_continue(duk_hthread *thr
  * impact in Emscripten (GH-342).  Return value is on value stack top.
  */
 DUK_LOCAL duk_small_uint_t duk__handle_return(duk_hthread *thr, duk_activation *entry_act) {
-	duk_tval *tv1;
+	duk_tval *tv1 __attribute__((unused));
 	duk_tval *tv2;
 #if defined(DUK_USE_COROUTINE_SUPPORT)
 	duk_hthread *resumer;
@@ -79258,7 +79266,7 @@ DUK_INTERNAL duk_bool_t duk_js_compare_helper(duk_hthread *thr, duk_tval *tv_x, 
  */
 
 DUK_LOCAL duk_bool_t duk__js_instanceof_helper(duk_hthread *thr, duk_tval *tv_x, duk_tval *tv_y, duk_bool_t skip_sym_check) {
-	duk_hobject *func;
+	duk_hobject *func __attribute__((unused));
 	duk_hobject *val;
 	duk_hobject *proto;
 	duk_tval *tv;

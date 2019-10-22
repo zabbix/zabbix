@@ -224,7 +224,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
-	zbx_str_uint64_pair_t		*perfvalue;
+	zbx_str_uint64_pair_t		*perfvalue = NULL;
 	int				i, ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t			value;
 
@@ -280,13 +280,13 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	}
 
 	/* VMware returns -1 value if the performance data for the specified period is not ready - ignore it */
-	if (ZBX_MAX_UINT64 == perfvalue->value)
+	if (NULL != perfvalue && ZBX_MAX_UINT64 == perfvalue->value)
 	{
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
-	value = perfvalue->value * coeff;
+	value = perfvalue ? perfvalue->value * coeff : 0;
 	SET_UI64_RESULT(result, value);
 	ret = SYSINFO_RET_OK;
 out:
