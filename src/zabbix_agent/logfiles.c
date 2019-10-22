@@ -1796,11 +1796,9 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 	zbx_offset_t			offset;
 	int				send_err;
 	zbx_uint64_t			lastlogsize1;
-
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
-
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
@@ -1903,9 +1901,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
+							else
+							{
+								zbx_free(item_value);
 
-							zbx_free(item_value);
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
+								ret = SUCCEED;
+								goto out;
+							}
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
@@ -1989,18 +1995,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 									*mtime_sent = *mtime;
 
 								(*s_count)--;
+								zbx_free(item_value);
 							}
 							else
 							{
-								/* Did not manage to send the buffer. */
-								/* Let's try to resend it in the next active process */
-								/* check instead of attempting to do that immediately */
-								/* until we reach limit of max lines per second. */
+								zbx_free(item_value);
+
+								/* Sending of buffer failed. */
+								/* Try to resend it in the next check. */
 								ret = SUCCEED;
 								goto out;
 							}
-
-							zbx_free(item_value);
 						}
 					}
 					else	/* log.count[] or logrt.count[] */
