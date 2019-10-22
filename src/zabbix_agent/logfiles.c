@@ -1796,9 +1796,11 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 	zbx_offset_t			offset;
 	int				send_err;
 	zbx_uint64_t			lastlogsize1;
+
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
+
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
