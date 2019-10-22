@@ -37,7 +37,7 @@ class CControllerImageEdit extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-		else if (!$this->hasInput('imageid') && !$this->hasInput('imagetype')) {
+		elseif (!$this->hasInput('imageid') && !$this->hasInput('imagetype')) {
 			$this->setResponse(new CControllerResponseFatal());
 			$ret = false;
 		}
@@ -65,7 +65,7 @@ class CControllerImageEdit extends CController {
 			return false;
 		}
 
-		$this->image = reset($images);
+		$this->image = $images[0];
 
 		return true;
 	}
