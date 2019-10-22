@@ -839,16 +839,16 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}, $values);
 	}
 
-	$result = '';
+	$condition = '';
 
 	// Process intervals.
 
 	foreach ($intervals as $interval) {
-		if ($result !== '') {
-			$result .= $not_in ? ' AND ' : ' OR ';
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
 		}
 
-		$result .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
+		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
 	}
 
 	// Process individual values.
@@ -856,33 +856,33 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
 
 	foreach ($single_chunks as $chunk) {
-		if ($result !== '') {
-			$result .= $not_in ? ' AND ' : ' OR ';
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
 		}
 
 		if (count($chunk) == 1) {
-			$result .= $field_name.($not_in ? '!=' : '=').$chunk[0];
+			$condition .= $field_name.($not_in ? '!=' : '=').$chunk[0];
 		}
 		else {
-			$result .= $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
+			$condition .= $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 		}
 	}
 
 	if ($has_zero) {
-		if ($result !== '') {
-			$result .= $not_in ? ' AND ' : ' OR ';
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
 		}
 
-		$result .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
 	if (!$not_in) {
 		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
-			$result = '('.$result.')';
+			$condition = '('.$condition.')';
 		}
 	}
 
-	return $result;
+	return $condition;
 }
 
 /**
