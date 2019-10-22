@@ -1,1 +1,1 @@
-...G...... [ZBX-16596] fixed BOM not being ignored when using agent on Windows (arimdjonoks)
+...G...... [ZBX-16596] use BOM to detect encoding and remove it when using vfs.file.contents, vfs.file.regex and vfs.file.regmatch (arimdjonoks)
