@@ -518,7 +518,6 @@ if ($data['action']['operations']) {
 								'actionid' => $data['actionid'],
 								'operationtype' => $operation['operationtype'],
 								'update' => 1,
-								// 'data' => $operation + ['id' => $operationid]
 								'operation' => $operation_for_popup
 							]).', null, this);')
 							->addClass(ZBX_STYLE_BTN_LINK),
@@ -545,7 +544,6 @@ if ($data['action']['operations']) {
 								'actionid' => $data['actionid'],
 								'operationtype' => $operation['operationtype'],
 								'update' => 1,
-								// 'data' => $operation + ['id' => $operationid]
 								'operation' => $operation_for_popup
 							]).', null, this);')
 							->addClass(ZBX_STYLE_BTN_LINK),
