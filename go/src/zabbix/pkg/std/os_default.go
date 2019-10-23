@@ -23,49 +23,6 @@
 // mocking in tests where necessary
 package std
 
-import (
-	"io"
-	"os"
-)
-
-// File interface is used to mock os.File structure
-type File interface {
-	io.Reader
-	io.Closer
-}
-
-// Os interface is used to mock os package
-type Os interface {
-	Open(name string) (File, error)
-	Stat(name string) (os.FileInfo, error)
-	IsExist(err error) bool
-}
-
-// A FileMode represents a file's mode and permission bits.
-type FileMode uint32
-
-// wrappers for standard os functionality
-
-type sysOs struct {
-}
-
-func (o *sysOs) Open(name string) (File, error) {
-	return os.Open(name)
-}
-
-func (o *sysOs) Stat(name string) (os.FileInfo, error) {
-	return os.Stat(name)
-}
-
-func (o *sysOs) IsExist(err error) bool {
-	return os.IsExist(err)
-}
-
-// NewOs returns Os interface that forwards supported methods to os package.
-func NewOs() Os {
-	return &sysOs{}
-}
-
 // NewMockOs returns Os interface that replaces supported os package functionality with mock functions.
 func NewMockOs() Os {
 	return &sysOs{}

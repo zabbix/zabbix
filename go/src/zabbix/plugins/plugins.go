@@ -21,8 +21,6 @@ package plugins
 
 import (
 	_ "zabbix/plugins/log"
-	_ "zabbix/plugins/proc"
-	_ "zabbix/plugins/systemd"
 	_ "zabbix/plugins/systemrun"
 	_ "zabbix/plugins/zabbix/async"
 	_ "zabbix/plugins/zabbix/stats"
