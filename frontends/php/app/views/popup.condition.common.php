@@ -52,7 +52,8 @@ switch ($data['type']) {
 		$form_list->addRow(_('Condition type'), $condition_type_combobox);
 
 		// Old|New event tag form elements.
-		if ($condition_type == ZBX_CORR_CONDITION_OLD_EVENT_TAG || $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG) {
+		if ($condition_type == ZBX_CORR_CONDITION_OLD_EVENT_TAG
+				|| $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG) {
 			$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 				->setModern(true)
 				->addValue(corrConditionOperatorToString(
@@ -439,7 +440,10 @@ switch ($data['type']) {
 
 			$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 				->setModern(true)
-				->addValue($combobox_options[CONDITION_TYPE_DOBJECT][CONDITION_OPERATOR_EQUAL], CONDITION_OPERATOR_EQUAL);
+				->addValue(
+					$combobox_options[CONDITION_TYPE_DOBJECT][CONDITION_OPERATOR_EQUAL],
+					CONDITION_OPERATOR_EQUAL
+				);
 			$new_condition_value = new CComboBox('value', null, null, $dobject_options);
 
 			$form_list
@@ -486,7 +490,10 @@ switch ($data['type']) {
 
 			$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 				->setModern(true)
-				->addValue($combobox_options[CONDITION_TYPE_DSTATUS][CONDITION_OPERATOR_EQUAL], CONDITION_OPERATOR_EQUAL);
+				->addValue(
+					$combobox_options[CONDITION_TYPE_DSTATUS][CONDITION_OPERATOR_EQUAL],
+					CONDITION_OPERATOR_EQUAL
+				);
 			$new_condition_value = new CComboBox('value', null, null, $dstatus_options);
 
 			$form_list

@@ -288,7 +288,10 @@ switch ($data['operationtype']) {
 				"jQuery('#".zbx_formatDomId('operation[opmessage][default_msg]')."').on('change', function() {".
 					"var default_message = jQuery(this).is(':checked');".
 
-					"jQuery('#".zbx_formatDomId('operation[opmessage][subject]').",#".zbx_formatDomId('operation[opmessage][message]')."')".
+					"jQuery('".
+						"#".zbx_formatDomId('operation[opmessage][subject]').",".
+						"#".zbx_formatDomId('operation[opmessage][message]').
+					"')".
 						".closest('li')".
 						".toggle(!default_message);".
 				"});".
@@ -335,7 +338,7 @@ switch ($data['operationtype']) {
 
 		// For new target list.
 		$checked_current_host = array_key_exists('0', $opr_data['opcommand_hst'])
-			? $opr_data['opcommand_hst']['0']['hostid'] == '0'
+			? ($opr_data['opcommand_hst']['0']['hostid'] == '0')
 			: false;
 		if ($checked_current_host) {
 			unset($opr_data['opcommand_hst']['0']);
@@ -537,21 +540,21 @@ switch ($data['operationtype']) {
 					->setAriaRequired()
 			);
 
-			$inline_js .= $commmand_textarea->getPostJS();
+		$inline_js .= $commmand_textarea->getPostJS();
 
-			$inline_js .=
-				"jQuery('#select_operation_opcommand_script').click(function(event) {".
-					"PopUp('popup.generic', {".
-						"srctbl: 'scripts',".
-						"srcfld1: 'scriptid',".
-						"srcfld2: 'name',".
-						"dstfrm: 'popup.operation',".
-						"dstfld1: 'operation_opcommand_scriptid',".
-						"dstfld2: 'operation_opcommand_script'".
-					"}, null, event.target);".
-				"});";
+		$inline_js .=
+			"jQuery('#select_operation_opcommand_script').click(function(event) {".
+				"PopUp('popup.generic', {".
+					"srctbl: 'scripts',".
+					"srcfld1: 'scriptid',".
+					"srcfld2: 'name',".
+					"dstfrm: 'popup.operation',".
+					"dstfld1: 'operation_opcommand_scriptid',".
+					"dstfld2: 'operation_opcommand_script'".
+				"}, null, event.target);".
+			"});";
 
-			$inline_js .= "showOpTypeForm();";
+		$inline_js .= "showOpTypeForm();";
 		break;
 
 	case OPERATION_TYPE_HOST_ADD:
@@ -580,6 +583,7 @@ switch ($data['operationtype']) {
 		foreach($opr_data['opgroup'] as &$val) {
 			$val['name'] = $groups[$val['groupid']]['name'];
 		}
+		unset($val);
 
 		$opr_groups = (new CMultiSelect([
 			'name' => 'operation[groupids][]',
@@ -616,10 +620,10 @@ switch ($data['operationtype']) {
 			'preservekeys' => true
 		]);
 
-
 		foreach($opr_data['optemplate'] as &$val) {
 			$val['name'] = $templates[$val['templateid']]['name'];
 		}
+		unset($val);
 
 		$opr_templates = (new CMultiSelect([
 			'name' => 'operation[templateids][]',

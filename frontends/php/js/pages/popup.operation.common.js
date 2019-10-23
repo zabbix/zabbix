@@ -39,7 +39,7 @@ function submitOperationPopup(response) {
 
 	for (var i in inputs) {
 		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
-			if (i == 'opmessage' || i == 'opcommand' || i == 'opinventory') {
+			if (i === 'opmessage' || i === 'opcommand' || i === 'opinventory') {
 				for (var j in inputs[i]) {
 					if (inputs[i].hasOwnProperty(j)) {
 						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + ']', inputs[i][j], false);
@@ -49,14 +49,35 @@ function submitOperationPopup(response) {
 			else if (i === 'opconditions') {
 				for (var j in inputs[i]) {
 					if (inputs[i].hasOwnProperty(j)) {
-						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + '][conditiontype]', inputs[i][j]['conditiontype'], false);
-						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + '][operator]', inputs[i][j]['operator'], false);
-						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + '][value]', inputs[i][j]['value'], false);
+						create_var(
+							'action.edit',
+							input_name + '[' + i + ']' + '[' + j + '][conditiontype]',
+							inputs[i][j]['conditiontype'],
+							false
+						);
+						create_var(
+							'action.edit',
+							input_name + '[' + i + ']' + '[' + j + '][operator]',
+							inputs[i][j]['operator'],
+							false
+						);
+						create_var(
+							'action.edit',
+							input_name + '[' + i + ']' + '[' + j + '][value]',
+							inputs[i][j]['value'],
+							false
+						);
 					}
 				}
 			}
-			else if (i === 'opmessage_grp' || i === 'opmessage_usr' || i === 'opcommand_grp'
-				|| i === 'opcommand_hst' || i === 'opgroup' || i === 'optemplate') {
+			else if ([
+				'opmessage_grp',
+				'opmessage_usr',
+				'opcommand_grp',
+				'opcommand_hst',
+				'opgroup',
+				'optemplate'
+			].indexOf(i) !== -1) {
 				for (var j in inputs[i]) {
 					if (inputs[i].hasOwnProperty(j)) {
 						create_var(

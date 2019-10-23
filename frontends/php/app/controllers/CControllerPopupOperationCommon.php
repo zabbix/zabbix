@@ -36,7 +36,9 @@ class CControllerPopupOperationCommon extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
