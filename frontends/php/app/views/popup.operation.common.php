@@ -305,32 +305,20 @@ switch ($data['operationtype']) {
 		}
 
 		foreach (['scriptid', 'publickey', 'privatekey', 'username', 'password', 'port', 'command'] as $field_name) {
-			if (array_key_exists($field_name, $opr_data['opcommand'])) {
-				$opr_data['opcommand'][$field_name] = $opr_data['opcommand'][$field_name];
-				continue;
+			if (!array_key_exists($field_name, $opr_data['opcommand'])) {
+				$opr_data['opcommand'][$field_name] = '';
 			}
-
-			$opr_data['opcommand'][$field_name] = '';
 		}
 
-		if (array_key_exists('type', $opr_data['opcommand'])) {
-			$opr_data['opcommand']['type'] = $opr_data['opcommand']['type'];
-		}
-		else {
+		if (!array_key_exists('type', $opr_data['opcommand'])) {
 			$opr_data['opcommand']['type'] = ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT;
 		}
 
-		if (array_key_exists('execute_on', $opr_data['opcommand'])) {
-			$opr_data['opcommand']['execute_on'] = $opr_data['opcommand']['execute_on'];
-		}
-		else {
+		if (!array_key_exists('execute_on', $opr_data['opcommand'])) {
 			$opr_data['opcommand']['execute_on'] = ZBX_SCRIPT_EXECUTE_ON_AGENT;
 		}
 
-		if (array_key_exists('authtype', $opr_data['opcommand'])) {
-			$opr_data['opcommand']['authtype'] = $opr_data['opcommand']['authtype'];
-		}
-		else {
+		if (!array_key_exists('authtype', $opr_data['opcommand'])) {
 			$opr_data['opcommand']['authtype'] = ITEM_AUTHTYPE_PASSWORD;
 		}
 
