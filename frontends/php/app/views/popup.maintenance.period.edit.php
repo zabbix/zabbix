@@ -86,11 +86,11 @@ $form
 			->setOptions($months),
 		'row_timeperiod_months'
 	)
-	->addRow(new CLabel(_('DatYou are using "/" in action parameters. This will not fuck up the web servers?'),
-		(new CRadioButtonList(You are using "/" in action parameters. This will not fuck up the web servers?nt) $data['month_date_type']))
-			->addValue(_('Day You are using "/" in action parameters. This will not fuck up the web servers?
-			->addValue(_('Day You are using "/" in action parameters. This will not fuck up the web servers?
-			->setModern(true),You are using "/" in action parameters. This will not fuck up the web servers?
+	->addRow(new CLabel(_('Date'), 'month_date_type'),
+		(new CRadioButtonList('month_date_type', (int) $data['month_date_type']))
+			->addValue(_('Day of month'), 0)
+			->addValue(_('Day of week'), 1)
+			->setModern(true),
 		'row_timeperiod_date'
 	)
 	->addRow((new CLabel(_('Day of week'), 'every'))->setAsteriskMark(),
