@@ -111,11 +111,11 @@ if ($data['valuemapid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			(new CSubmitButton(_('Clone'), 'action', 'valuemap.clone'))->setId('clone'),
-			new CButtonDelete($confirm_message, (new CUrl('zabbix.php'))
-				->setArgument('action', 'valuemap.delete')
-				->setArgument('valuemapids', (array) $data['valuemapid'])
-				->getUrl()
-			),
+			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'valuemap.delete')
+					->setArgument('valuemapids', (array) $data['valuemapid']),
+				$confirm_message
+			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'valuemap.list')
 				->getUrl()
