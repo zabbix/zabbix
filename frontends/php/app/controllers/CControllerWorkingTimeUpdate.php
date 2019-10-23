@@ -39,6 +39,7 @@ class CControllerWorkingTimeUpdate extends CController {
 					$response->setMessageError(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
