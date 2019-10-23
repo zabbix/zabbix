@@ -606,11 +606,11 @@ function overlayDialogue(params, trigger_elmnt, xhr) {
 				body_height = body.height();
 
 			if (body_height != Math.floor(body_height)) {
-				// The scrollHeight in IE11 is often about a half pixel less than the height.
+				// The body height is often about a half pixel less than the height.
 				body_height = Math.floor(body_height) + 1;
 			}
 
-			// A fix for IE11 and Edge to stop popup width flickering when having vertical scrollbar.
+			// A fix for IE and Edge to stop popup width flickering when having vertical scrollbar.
 			body.css('overflow-y', body_scroll_height > body_height ? 'scroll' : 'hidden');
 
 			overlay_dialogue.css({
