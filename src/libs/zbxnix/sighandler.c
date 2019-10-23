@@ -117,14 +117,16 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		if (0 == sig_exiting)
 		{
 			sig_exiting = 1;
-			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
-					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
-					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-					"reason:%d]. Exiting ...",
-					sig, get_signal_name(sig),
-					SIG_CHECKED_FIELD(siginfo, si_pid),
-					SIG_CHECKED_FIELD(siginfo, si_uid),
-					SIG_CHECKED_FIELD(siginfo, si_code));
+
+			/* temporary hides false positive coverity defect */
+			int zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+			zabbix_log(zbx_log_level_temp,
+				   "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+				   "reason:%d]. Exiting ...",
+				   sig, get_signal_name(sig),
+				   SIG_CHECKED_FIELD(siginfo, si_pid),
+				   SIG_CHECKED_FIELD(siginfo, si_uid),
+				   SIG_CHECKED_FIELD(siginfo, si_code));
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_free_on_signal();
