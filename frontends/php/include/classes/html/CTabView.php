@@ -111,7 +111,7 @@ class CTabView extends CDiv {
 					$tab->setAttribute('aria-hidden', 'false');
 				}
 				else {
-					$tab->setAttribute('style', 'display: none');
+					$tab->addStyle('display: none');
 					$tab->setAttribute('aria-hidden', 'true');
 				}
 			}
@@ -148,8 +148,7 @@ class CTabView extends CDiv {
 		}
 		else {
 			$active_tab = 'active: function() {'.
-				'var tab = sessionStorage.getItem(ZBX_SESSION_NAME + "_tab");'.
-				'return tab === null ? 0 : tab;'.
+				'return sessionStorage.getItem(ZBX_SESSION_NAME + "_tab") || 0;'.
 			'}(),';
 		}
 
@@ -165,7 +164,6 @@ class CTabView extends CDiv {
 					'jQuery.cookie("tab", ui.newTab.index().toString());'.
 					$this->tab_change_js.
 				'}'.
-			'})'.
-			'.css("visibility", "visible");';
+			'})';
 	}
 }
