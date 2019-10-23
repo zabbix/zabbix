@@ -540,7 +540,15 @@ sub process_index
 			{
 				s/,/`,`/g;
 			}
-			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` (`$fields`);${eol}\n";
+
+			my $quote_index = "`$fields`";
+
+			for ($quote_index)
+			{
+				s/\)`/\)/g;
+				s/\(/`\(/g;
+			}
+			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` ($quote_index);${eol}\n";
 		}
 		else
 		{
