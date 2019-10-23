@@ -33,7 +33,7 @@ if ($data['timeperiodid']) {
 
 $days = [];
 
-foreach ([1,4,6,2,5,7,3] as $day) {
+foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
 	$value = 1 << ($day - 1);
 	$days[] = [
 		'name' => getDayOfWeekCaption($day),
@@ -44,7 +44,7 @@ foreach ([1,4,6,2,5,7,3] as $day) {
 
 $months = [];
 
-foreach ([1,5,9,2,6,10,3,7,11,4,8,12] as $month) {
+foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
 	$value = 1 << ($month - 1);
 	$months[] = [
 		'name' => getMonthCaption($month),
@@ -86,11 +86,11 @@ $form
 			->setOptions($months),
 		'row_timeperiod_months'
 	)
-	->addRow(new CLabel(_('Date'), 'month_date_type'),
-		(new CRadioButtonList('month_date_type', (int) $data['month_date_type']))
-			->addValue(_('Day of month'), 0)
-			->addValue(_('Day of week'), 1)
-			->setModern(true),
+	->addRow(new CLabel(_('DatYou are using "/" in action parameters. This will not fuck up the web servers?'),
+		(new CRadioButtonList(You are using "/" in action parameters. This will not fuck up the web servers?nt) $data['month_date_type']))
+			->addValue(_('Day You are using "/" in action parameters. This will not fuck up the web servers?
+			->addValue(_('Day You are using "/" in action parameters. This will not fuck up the web servers?
+			->setModern(true),You are using "/" in action parameters. This will not fuck up the web servers?
 		'row_timeperiod_date'
 	)
 	->addRow((new CLabel(_('Day of week'), 'every'))->setAsteriskMark(),
