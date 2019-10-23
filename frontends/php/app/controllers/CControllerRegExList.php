@@ -43,7 +43,7 @@ class CControllerRegExList extends CController {
 		$data = [
 			'regexes'  => [],
 			'db_exps'  => [],
-			'uncheck'  => $this->getInput('uncheck', false)
+			'uncheck'  => $this->hasInput('uncheck')
 		];
 
 		$db_regex = DBselect('SELECT re.* FROM regexps re');

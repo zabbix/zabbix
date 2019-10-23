@@ -60,7 +60,7 @@ foreach($data['db_exps'] as $exp) {
 		$values[$exp['regexid']] = 1;
 	}
 	else {
-		$values[$exp['regexid']]++;
+		$values[$exp['regexid']] ++;
 	}
 
 	if (!isset($expressions[$exp['regexid']])) {

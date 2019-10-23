@@ -79,17 +79,14 @@ class CControllerMacrosUpdate extends CController {
 		if ($macros_to_update || $db_macros || $macros) {
 			DBstart();
 
-			// update
 			if ($macros_to_update) {
 				$result = (bool) API::UserMacro()->updateGlobal($macros_to_update);
 			}
 
-			// delete
 			if ($db_macros) {
 				$result = $result && (bool) API::UserMacro()->deleteGlobal(array_keys($db_macros));
 			}
 
-			// create
 			if ($macros) {
 				$result = $result && (bool) API::UserMacro()->createGlobal(array_values($macros));
 			}

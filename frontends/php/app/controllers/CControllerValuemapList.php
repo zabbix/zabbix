@@ -55,7 +55,7 @@ class CControllerValuemapList extends CController {
 		$data = [
 			'sort' => $sortfield,
 			'sortorder' => $sortorder,
-			'uncheck' => $this->getInput('uncheck', false)
+			'uncheck' => $this->hasInput('uncheck')
 		];
 
 		$data['valuemaps'] = API::ValueMap()->get([
