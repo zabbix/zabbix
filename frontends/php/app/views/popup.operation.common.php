@@ -658,7 +658,7 @@ switch ($data['operationtype']) {
 
 	case OPERATION_TYPE_HOST_INVENTORY:
 		$form_list->addRow(
-			(new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]'))->setAsteriskMark(),
+			(new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]')),
 			(new CRadioButtonList('operation[opinventory][inventory_mode]',
 				(int) $opr_data['opinventory']['inventory_mode']
 			))
