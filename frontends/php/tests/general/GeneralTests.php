@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/function_DBconnect.php';
 require_once dirname(__FILE__).'/function_DBclose.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
+require_once dirname(__FILE__).'/makeSqlTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
 require_once dirname(__FILE__).'/dbConditionIdTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
@@ -38,6 +39,7 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBclose');
 		$suite->addTestSuite('function_DBselect');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
+		$suite->addTestSuite('makeSqlTest');
 		$suite->addTestSuite('dbConditionIntTest');
 		$suite->addTestSuite('dbConditionIdTest');
 		$suite->addTestSuite('dbConditionStringTest');
