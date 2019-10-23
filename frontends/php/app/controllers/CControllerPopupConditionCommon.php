@@ -46,7 +46,7 @@ abstract class CControllerPopupConditionCommon extends CController {
 	}
 
 	protected function checkPermissions() {
-		return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]);
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
 	protected function doAction() {
