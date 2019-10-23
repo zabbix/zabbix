@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+/**
+ * Discovery checks popup
+ */
 class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function init() {
@@ -26,29 +30,18 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'update' =>					'in 0,1',
-			'refresh' =>				'in 0,1',
-			'index' =>					'required|int32',
-			'types' =>					'array',
-
-			'dcheckid' =>				'',
-			'type' =>					'db dchecks.type|in '.implode(',', array_keys(discovery_check_type2str())),
-			'ports' =>					'db dchecks.ports',
-			'snmp_community' =>			'db dchecks.snmp_community',
-			'key_' =>					'db dchecks.key_',
-			'snmpv3_contextname' =>		'db dchecks.snmpv3_contextname',
-			'snmpv3_securityname' =>	'db dchecks.snmpv3_securityname',
-			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel',
-			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol',
-			'snmpv3_authpassphrase' =>	'db dchecks.snmpv3_authpassphrase',
-			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol',
-			'snmpv3_privpassphrase' =>	'db dchecks.snmpv3_privpassphrase'
+			'index' => 'required|int32',
+			'update' => 'in 1',
+			'validate' => 'in 1',
+			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
+			'dcheckid' => 'string'
 		];
 
+		if (getRequest('update', 0) || getRequest('validate', 0)) {
+			$fields += $this->getAdditionallyFields();
+		}
+
 		$ret = $this->validateInput($fields);
-
-		$ret = ($ret && $this->getInput('refresh', 0)) ? $this->checkInputByType() : $ret;
-
 		if (!$ret) {
 			$output = [];
 
@@ -64,10 +57,15 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkInputByType() {
+	/**
+	 * Get additionally inpuf field rules for validation.
+	 *
+	 * @return array
+	 */
+	protected function getAdditionallyFields() {
 		$fields = [];
 
-		switch ($this->getInput('type', 0)) {
+		switch (getRequest('type', SVC_FTP)) {
 			case SVC_SSH:
 			case SVC_LDAP:
 			case SVC_SMTP:
@@ -79,45 +77,58 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 			case SVC_TCP:
 			case SVC_HTTPS:
 			case SVC_TELNET:
-				$fields['ports'] =						'required';
+				$fields['ports'] = 'int32|required';
 				break;
 
 			case SVC_AGENT:
-				$fields['ports'] =						'required';
-				$fields['key_'] =						'required';
+				$fields['ports'] = 'int32|required';
+				$fields['key_'] = 'required|not_empty';
 				break;
 
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
-				$fields['ports'] =						'required';
-				$fields['snmp_community'] =				'required';
-				$fields['snmp_oid'] =					'required';
+				$fields['ports'] = 'int32|required';
+				$fields['snmp_community'] = 'required|not_empty';
+				$fields['snmp_oid'] = 'string';
+				if (getRequest('validate', 0)) {
+					$fields['snmp_oid'] .= '|not_empty|required';
+				}
+				$fields['key_'] = 'string';
+				if (getRequest('update', 0)) {
+					$fields['key_'] .= '|not_empty|required';
+				}
 				break;
 
 			case SVC_SNMPv3:
-				$fields['ports'] =						'required';
-				$fields['key_'] =						'required';
-				$fields['snmpv3_securitylevel'] =		'in '.ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV.','.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.','.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV;
+				$fields['ports'] = 'int32|required';
+				$fields['snmp_oid'] = 'string';
+				if (getRequest('validate', 0)) {
+					$fields['snmp_oid'] .= '|not_empty|required';
+				}
+				$fields['key_'] = 'string';
+				if (getRequest('update', 0)) {
+					$fields['key_'] .= '|not_empty|required';
+				}
+				$fields['snmpv3_securitylevel'] = 'in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 
-				$snmpv3_securitylevel = $this->getInput('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
+				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				if ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 						|| $snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					$fields['snmpv3_authprotocol'] =	'in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA;
+					$fields['snmpv3_authprotocol'] = 'in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA;
+					$fields['snmpv3_authpassphrase'] = 'string';
 				}
 
 				if ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					$fields['snmpv3_privprotocol'] = 	'in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES;
-					$fields['snmpv3_privpassphrase'] =	'required';
+					$fields['snmpv3_privprotocol'] = 'in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES;
+					$fields['snmpv3_privpassphrase'] = 'required|not_empty';
 				}
 				break;
 
 			case SVC_ICMPPING:
-				$fields['ports'] =						'in 0';
+				$fields['ports'] = 'in 0';
 		}
 
-		$this->getInputs($data, array_keys($fields));
-
-		return !(new CNewValidator($data, $fields))->getAllErrors();
+		return $fields;
 	}
 
 	protected function checkPermissions() {
@@ -125,24 +136,31 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInputAll() + [
-			'update' => 0,
+		$data = array_merge([
 			'type' => SVC_FTP,
 			'ports' => svc_default_port(SVC_FTP)
-		];
+		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
 		$params['name'] = discovery_check_type2str($data['type']);
 
+		if ($this->getInput('validate', 0)) {
+			return $this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson(['params' => $params])]))->disableView()
+			);
+		}
+
 		$output = [
 			'title' => _('Discovery check'),
-			'errors' => hasErrorMesssages() ? getMessages() : null,
+			'errors' => null,
 			'params' => $params,
+			'index' => $this->getInput('index'),
+			'update' => $this->getInput('update', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$this->setResponse(new CControllerResponseData($output + $data));
+		$this->setResponse(new CControllerResponseData($output));
 	}
 }

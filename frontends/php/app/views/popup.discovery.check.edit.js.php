@@ -46,8 +46,6 @@ new CViewSwitcher('type', 'change', <?= CJs::encodeJson([
 jQuery('#type').on('change', function() {
 	var dcheck_type = jQuery(this).val();
 
-	jQuery('#ports').val(getDCheckDefaultPort(dcheck_type));
-
 	if (dcheck_type == '<?= SVC_SNMPv3 ?>') {
 		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= CJs::encodeJson([
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
@@ -59,76 +57,10 @@ jQuery('#type').on('change', function() {
 			]
 		]) ?>);
 	}
-}).trigger('change');
+});
 
-/**
- * Returns a default port number for the specified discovery check type.
- *
- * @param {string} dcheck_type  Discovery check type.
- *
- * @returns {string}
- */
-function getDCheckDefaultPort(dcheck_type) {
-	var default_ports = {
-		<?= SVC_SSH ?>: '22',
-		<?= SVC_LDAP ?>: '389',
-		<?= SVC_SMTP ?>: '25',
-		<?= SVC_FTP ?>:  '21',
-		<?= SVC_HTTP ?>: '80',
-		<?= SVC_POP ?>: '110',
-		<?= SVC_NNTP ?>: '119',
-		<?= SVC_IMAP ?>: '143',
-		<?= SVC_AGENT ?>: '10050',
-		<?= SVC_SNMPv1 ?>: '161',
-		<?= SVC_SNMPv2c ?>: '161',
-		<?= SVC_SNMPv3 ?>: '161',
-		<?= SVC_HTTPS ?>: '443',
-		<?= SVC_TELNET ?>: '23'
-	};
-
-	return (typeof default_ports[dcheck_type] !== 'undefined') ? default_ports[dcheck_type] : '0';
-}
-
-/**
- * Sends discovery check form data to the server for validation before adding it to the main form.
- *
- * @param {string} form_name  Form name that is sent to the server for validation.
- */
-function submitDCheck(form_name) {
-	var $form = jQuery(window.document.forms[form_name]),
-		dialogueid = $form.closest("[data-dialogueid]").data('dialogueid');
-
-	$form.trimValues(['#ports', '#key_', 'input[name^="snmp"]']);
-
-	sendAjaxData('zabbix.php', {
-		data: $form.serialize(),
-		dataType: 'json',
-		method: 'POST',
-		success: function(response) {
-			$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
-
-			if (typeof response.errors !== 'undefined') {
-				jQuery(response.errors).insertBefore($form);
-			}
-			else {
-				var dcheck = response.params,
-					$host_source = $('[name="host_source"]:checked:not([data-id])'),
-					$name_source = $('[name="name_source"]:checked:not([data-id])');
-
-				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
-					dcheck.name += ' (' + dcheck.ports + ')';
-				}
-				if (dcheck.key_) {
-					dcheck.name += ' "' + dcheck.key_ + '"';
-				}
-				dcheck.host_source = $host_source ? $host_source.val() : '<?= ZBX_DISCOVERY_DNS ?>';
-				dcheck.name_source = $name_source ? $name_source.val() : '<?= ZBX_DISCOVERY_UNSPEC ?>';
-
-				addPopupValues([dcheck]);
-				overlayDialogueDestroy(dialogueid);
-			}
-		}
-	});
+if (jQuery('#type').val() == '<?= SVC_SNMPv3 ?>') {
+	jQuery('#type').trigger('change');
 }
 
 <?php return ob_get_clean(); ?>

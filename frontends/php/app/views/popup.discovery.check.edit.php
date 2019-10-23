@@ -18,38 +18,51 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $discovery_ckeck_types = discovery_check_type2str();
 order_result($discovery_ckeck_types);
 
+$form = (new CForm())
+	->cleanItems()
+	->setName('dcheck_form')
+	->addVar('action', 'popup.discovery.check.edit')
+	->addVar('validate', 1)
+	->addVar('index', $data['index']);
+
+if ($data['params']['dcheckid']) {
+	$form->addVar('dcheckid', $data['params']['dcheckid']);
+}
+
 $form_list = (new CFormList())
+	->cleanItems()
 	->addRow(
 		(new CLabel(_('Check type'), 'type')),
-		(new CComboBox('type', $data['type'], null, $discovery_ckeck_types))
+		(new CComboBox('type', $data['params']['type'], 'setDCheckDefaultPort()', $discovery_ckeck_types))
 	)
 	->addRow(
 		(new CLabel(_('Port range'), 'ports'))->setAsteriskMark(),
-		(new CTextBox('ports', $data['ports']))
+		(new CTextBox('ports', $data['params']['ports']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_ports'
 	)
 	->addRow(
 		(new CLabel(_('Key'), 'key_'))->setAsteriskMark(),
-		(new CTextBox('key_', $data['key_']))
+		(new CTextBox('key_', $data['params']['key_']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_key'
 	)
 	->addRow(
 		(new CLabel(_('SNMP community'), 'snmp_community'))->setAsteriskMark(),
-		(new CTextBox('snmp_community', $data['snmp_community']))
+		(new CTextBox('snmp_community', $data['params']['snmp_community']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired(),
 		'row_dcheck_snmp_community'
 	)
 	->addRow(
 		(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-		(new CTextBox('snmp_oid', $data['snmp_oid']))
+		(new CTextBox('snmp_oid', $data['params']['key_']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 			->setAttribute('maxlength', 512),
@@ -57,20 +70,20 @@ $form_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Context name'), 'snmpv3_contextname')),
-		(new CTextBox('snmpv3_contextname', $data['snmpv3_contextname']))
+		(new CTextBox('snmpv3_contextname', $data['params']['snmpv3_contextname']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		'row_dcheck_snmpv3_contextname'
 	)
 	->addRow(
 		(new CLabel(_('Security name'), 'snmpv3_securityname')),
-		(new CTextBox('snmpv3_securityname', $data['snmpv3_securityname']))
+		(new CTextBox('snmpv3_securityname', $data['params']['snmpv3_securityname']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_securityname'
 	)
 	->addRow(
 		new CLabel(_('Security level'), 'snmpv3_securitylevel'),
-		new CComboBox('snmpv3_securitylevel', $data['snmpv3_securitylevel'], null, [
+		new CComboBox('snmpv3_securitylevel', $data['params']['snmpv3_securitylevel'], null, [
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => 'noAuthNoPriv',
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
@@ -79,7 +92,7 @@ $form_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Authentication protocol'), 'snmpv3_authprotocol')),
-		(new CRadioButtonList('snmpv3_authprotocol', $data['snmpv3_authprotocol']))
+		(new CRadioButtonList('snmpv3_authprotocol', (int) $data['params']['snmpv3_authprotocol']))
 			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
 			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 			->setModern(true),
@@ -87,14 +100,14 @@ $form_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Authentication passphrase'), 'snmpv3_authpassphrase')),
-		(new CTextBox('snmpv3_authpassphrase', $data['snmpv3_authpassphrase']))
+		(new CTextBox('snmpv3_authpassphrase', $data['params']['snmpv3_authpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_authpassphrase'
 	)
 	->addRow(
 		(new CLabel(_('Privacy protocol'), 'snmpv3_privprotocol')),
-		(new CRadioButtonList('snmpv3_privprotocol', $options['snmpv3_privprotocol']))
+		(new CRadioButtonList('snmpv3_privprotocol', (int) $data['params']['snmpv3_privprotocol']))
 			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
 			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 			->setModern(true),
@@ -102,37 +115,25 @@ $form_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('Privacy passphrase'), 'snmpv3_privpassphrase'))->setAsteriskMark(),
-		(new CTextBox('snmpv3_privpassphrase', $data['snmpv3_privpassphrase']))
+		(new CTextBox('snmpv3_privpassphrase', $data['params']['snmpv3_privpassphrase']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
 			->setAttribute('maxlength', 64),
 		'row_dcheck_snmpv3_privpassphrase'
 	);
 
-$form = (new CForm())
-	->cleanItems()
-	->setName('dcheck_form')
-	->addVar('action', 'popup.discovery.check.edit')
-	->addVar('refresh', 1)
-	->addVar('update', $data['update'])
-	->addVar('index', $data['index'])
-	->addItem($form_list);
-
-if ($data['dcheckid']) {
-	$form->addVar('dcheckid', $data['dcheckid']);
-}
+$form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],
-	'params' => $data['params'],
 	'script_inline' => require 'app/views/popup.discovery.check.edit.js.php',
-	'body' => (new CDiv([$data['errors'], $form]))->toString(),
+	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => $data['update'] ? _('Update') : _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'submitDCheck("'.$form->getName().'");'
+			'action' => 'submitDCheck();'
 		]
 	]
 ];

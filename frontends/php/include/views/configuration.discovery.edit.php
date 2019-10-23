@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Discovery rules'));
 
-// create form
+// Create form.
 $discoveryForm = (new CForm())
 	->setName('discoveryForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
@@ -32,7 +32,7 @@ if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
 }
 
-// create form list
+// Create form list.
 $discoveryFormList = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -42,7 +42,7 @@ $discoveryFormList = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-// append proxy to form list
+// Append proxy to form list.
 $proxyComboBox = (new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']))
 	->addItem(0, _('No proxy'));
 foreach ($this->data['proxies'] as $proxy) {
@@ -83,7 +83,7 @@ $discoveryFormList->addRow(
 		->setId('dcheckList')
 );
 
-// append uniqueness criteria to form list
+// Append uniqueness criteria to form list.
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
 	(new CDiv(
 		(new CRadioButtonList('uniqueness_criteria', (int) $this->data['drule']['uniqueness_criteria']))
@@ -94,7 +94,7 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
-// append host source to form list
+// Append host source to form list.
 $discoveryFormList->addRow(_('Host name'),
 	(new CDiv(
 		(new CRadioButtonList('host_source', $this->data['drule']['host_source']))
@@ -106,7 +106,7 @@ $discoveryFormList->addRow(_('Host name'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
-// append name source to form list
+// Append name source to form list.
 $discoveryFormList->addRow(_('Visible name'),
 	(new CDiv(
 		(new CRadioButtonList('name_source', $this->data['drule']['name_source']))
@@ -119,19 +119,18 @@ $discoveryFormList->addRow(_('Visible name'),
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
-// append status to form list
+// Append status to form list.
 $status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
 	? true
 	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
 
 $discoveryFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
-// append tabs to form
+// Append tabs to form.
 $discoveryTabs = (new CTabView())->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
 
-// append buttons to form
-if (isset($this->data['druleid']))
-{
+// Append buttons to form.
+if (isset($this->data['druleid'])) {
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
