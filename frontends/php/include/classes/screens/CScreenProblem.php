@@ -1116,6 +1116,12 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $paging, $footer]), true, $this->data);
 		}
 		else {
+			/*
+			 * Search limit performs +1 selection to know if limit was exceeded, this will assure that csv has
+			 * "search_limit" records at most.
+			 */
+			array_splice($data['problems'], $this->config['search_limit']);
+
 			$csv = [];
 
 			$csv[] = [
