@@ -63,6 +63,7 @@ class CControllerMiscConfigEdit extends CController {
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'editable' => true
 		]);
+		order_result($data['discovery_groups'], 'name');
 
 		$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM usrgrp u'));
 		order_result($data['alert_usrgrps'], 'name');

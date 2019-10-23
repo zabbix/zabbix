@@ -67,10 +67,10 @@ class CControllerTrigDisplayUpdate extends CController {
 	protected function doAction() {
 		$update_values = [
 			'custom_color'        => $this->getInput('custom_color', EVENT_CUSTOM_COLOR_DISABLED),
-			'problem_unack_style' => $this->getInput('problem_unack_style'),
-			'problem_ack_style'   => $this->getInput('problem_ack_style'),
-			'ok_unack_style'      => $this->getInput('ok_unack_style'),
-			'ok_ack_style'        => $this->getInput('ok_ack_style'),
+			'problem_unack_style' => $this->getInput('problem_unack_style', 0),
+			'problem_ack_style'   => $this->getInput('problem_ack_style', 0),
+			'ok_unack_style'      => $this->getInput('ok_unack_style', 0),
+			'ok_ack_style'        => $this->getInput('ok_ack_style', 0),
 			'ok_period'           => $this->getInput('ok_period'),
 			'blink_period'        => $this->getInput('blink_period')
 		];
@@ -94,6 +94,7 @@ class CControllerTrigDisplayUpdate extends CController {
 				'ok_ack_color'        => _('Acknowledged RESOLVED events')
 			];
 
+			// Validation in doAction method?
 			foreach ($color_caption as $field => $caption) {
 				if (!$color_validator->validate($this->getInput($field))) {
 					error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));

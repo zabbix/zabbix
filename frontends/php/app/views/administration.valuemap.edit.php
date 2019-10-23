@@ -38,7 +38,7 @@ $widget = (new CWidget())
 
 $form = (new CForm())
 	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', ($data['valuemapid'] != 0) ? 'valuemap.update' : 'valuemap.create')
+		->setArgument('action', ($data['valuemapid'] == 0) ? 'valuemap.create' : 'valuemap.update')
 		->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
