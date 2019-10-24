@@ -237,7 +237,7 @@ switch ($data['operationtype']) {
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			);
-		// no break;
+		// break; is not missing here
 
 	// Notify all involvied form elements.
 	case OPERATION_TYPE_ACK_MESSAGE:
@@ -266,7 +266,7 @@ switch ($data['operationtype']) {
 		else {
 			$form_list->addRow(_('Send only to'), $media_type_combobox);
 		}
-		// no break;
+		// break; is not missing here
 
 	// Notify all involved form elements.
 	case OPERATION_TYPE_RECOVERY_MESSAGE:
@@ -650,7 +650,7 @@ switch ($data['operationtype']) {
 
 	case OPERATION_TYPE_HOST_INVENTORY:
 		$form_list->addRow(
-			(new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]')),
+			new CLabel(_('Inventory mode'), 'operation[opinventory][inventory_mode]'),
 			(new CRadioButtonList('operation[opinventory][inventory_mode]',
 				(int) $opr_data['opinventory']['inventory_mode']
 			))
