@@ -733,17 +733,17 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		'acknowledged' => null
 	];
 
+	$triggers = API::Trigger()->get(['preservekeys' => true] + $trigger_options);
+
 	$nondependent_trigger_options = [
 		'output' => [],
-		'selectHosts' => null,
-		'selectDependencies' => null,
+		'triggerids' => array_keys($triggers),
 		'skipDependent' => true,
-		'sortfield' => ''
-	] + $trigger_options;
+		'preservekeys' => true
+	];
 
 	$nondependent_triggers = API::Trigger()->get($nondependent_trigger_options);
 
-	$triggers = API::Trigger()->get($trigger_options);
 	CArrayHelper::sort($triggers, ['description']);
 
 	if ($triggers) {
@@ -760,8 +760,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				'has_unresolved_unacknowledged' => false
 			];
 
-			if ($trigger['value'] == TRIGGER_VALUE_TRUE && (!$nondependent_triggers
-					|| !array_key_exists($triggerid, $nondependent_triggers))) {
+			if ($trigger['value'] == TRIGGER_VALUE_TRUE && !array_key_exists($triggerid, $nondependent_triggers)) {
 				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 		}
@@ -779,7 +778,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		foreach ($problems as $problem) {
 			$triggerid = $problem['objectid'];
 
-			if ($problem['r_eventid'] == 0) {
+			if ($problem['r_eventid'] == 0 && array_key_exists($triggerid, $nondependent_triggers)) {
 				$triggers[$triggerid]['resolved'] = false;
 			}
 
