@@ -24,6 +24,8 @@
  */
 class CControllerPopupDiscoveryCheckEdit extends CController {
 
+	const DEFAULT_TYPE = SVC_FTP;
+
 	protected function init() {
 		$this->disableSIDvalidation();
 	}
@@ -137,8 +139,8 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function doAction() {
 		$data = array_merge([
-			'type' => SVC_FTP,
-			'ports' => svc_default_port(SVC_FTP)
+			'type' => self::DEFAULT_TYPE,
+			'ports' => svc_default_port(self::DEFAULT_TYPE)
 		], $this->getInputAll());
 
 		$params = array_intersect_key($data, DB::getSchema('dchecks')['fields']);
