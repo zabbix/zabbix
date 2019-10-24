@@ -27,7 +27,8 @@ class CControllerRegExCreate extends CController {
 		$fields = [
 			'name'         => 'required | string | not_empty | db regexps.name',
 			'test_string'  => 'string | db regexps.test_string',
-			'expressions'  => 'required | array'
+			'expressions'  => 'required | array',
+			'form_refresh' => ''
 		];
 
 		$ret = $this->validateInput($fields);
