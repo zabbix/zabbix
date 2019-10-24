@@ -78,9 +78,12 @@ class CControllerRegExDelete extends CController {
 				count($this->db_regexes)
 			));
 
+			DBstart();
 			foreach ($audit as $msg) {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, $msg);
 			}
+
+			DBend(true);
 		}
 		else {
 			$response->setMessageError(_n('Cannot delete regular expression', 'Cannot delete regular expressions',

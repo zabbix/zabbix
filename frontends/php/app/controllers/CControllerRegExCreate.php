@@ -67,6 +67,7 @@ class CControllerRegExCreate extends CController {
 		}
 		unset($expression);
 
+		DBstart();
 		$result = addRegexp([
 			'name'        => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string')
@@ -81,6 +82,15 @@ class CControllerRegExCreate extends CController {
 			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
 		}
 		else {
+			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.edit');
+
+			$response = new CControllerResponseRedirect($url);
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot add regular expression'));
+		}
+
+		$result = DBend($result);
+		if (!$result) {
 			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.edit');
 
 			$response = new CControllerResponseRedirect($url);

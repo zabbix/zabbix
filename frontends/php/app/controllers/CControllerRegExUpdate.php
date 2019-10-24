@@ -69,6 +69,7 @@ class CControllerRegExUpdate extends CController {
 		}
 		unset($expression);
 
+		DBstart();
 		$result = updateRegexp([
 			'regexpid'    => $this->getInput('regexid'),
 			'name'        => $this->getInput('name'),
@@ -84,6 +85,17 @@ class CControllerRegExUpdate extends CController {
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
 		}
 		else {
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'regex.edit')
+				->setArgument('regexid', $this->getInput('regexid'));
+
+			$response = new CControllerResponseRedirect($url);
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update regular expression'));
+		}
+
+		$result = DBend($result);
+		if (!$result) {
 			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'regex.edit')
 				->setArgument('regexid', $this->getInput('regexid'));
