@@ -39,14 +39,16 @@ abstract class CControllerPopupConditionCommon extends CController {
 				$output['errors'] = $messages->toString();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions() {
-		return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]);
+		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
 
 	protected function doAction() {
@@ -61,7 +63,9 @@ abstract class CControllerPopupConditionCommon extends CController {
 				$output = $this->getManuallyValidatedFields();
 			}
 
-			$this->setResponse((new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => CJs::encodeJson($output)]))->disableView()
+			);
 		}
 		else {
 			$output = $this->getControllerResponseData();

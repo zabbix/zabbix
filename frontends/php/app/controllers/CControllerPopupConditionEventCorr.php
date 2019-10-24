@@ -48,7 +48,11 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 
 		if ($this->hasInput('condition_type')) {
 			if ($this->getInput('condition_type') != $last_type) {
-				CProfile::update('popup.condition.events_last_type', $this->getInput('condition_type'), PROFILE_TYPE_INT);
+				CProfile::update(
+					'popup.condition.events_last_type',
+					$this->getInput('condition_type'),
+					PROFILE_TYPE_INT
+				);
 				$last_type = $this->getInput('condition_type');
 			}
 		}

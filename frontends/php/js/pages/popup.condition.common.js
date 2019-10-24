@@ -27,7 +27,8 @@ function submitConditionPopup(response) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
-		inputs = response.inputs;
+		inputs = response.inputs,
+		dialog;
 
 	for (var i in inputs) {
 		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
@@ -44,7 +45,16 @@ function submitConditionPopup(response) {
 		}
 	}
 
-	submitFormWithParam(form_name, form_param, '1');
+	if (form_param === 'add_opcondition') {
+		dialog = overlays_stack[overlays_stack.length - 1];
+		overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+
+		dialog = overlays_stack[overlays_stack.length - 1];
+		PopUp('popup.action.operation.edit', jQuery(document.forms['popup.operation']).serialize(), dialog.dialogueid);
+	}
+	else {
+		submitFormWithParam(form_name, form_param, '1');
+	}
 }
 
 /**
