@@ -1,0 +1,1 @@
+A......... [ZBX-16805] fixed when the HttpTest API selects too many entries from the httpstep table when editing a specific Web scenario (vasilijs)
