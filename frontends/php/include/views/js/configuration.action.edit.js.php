@@ -268,7 +268,6 @@
 
 		// clone button
 		jQuery('#clone').click(function() {
-			console.log('11');
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
