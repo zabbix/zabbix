@@ -1771,7 +1771,6 @@ if test "x$found_iconv" != "xyes"; then
 fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
-
 AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
@@ -1799,7 +1798,13 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-CGO_LDFLAGS=" \
+if test "x$ARCH" != "xosx"; then
+	LD_START_GROUP=-Wl,--start-group
+	LD_END_GROUP=-Wl,--end-group
+fi
+
+CGO_CFLAGS=$TLS_CFLAGS
+CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
 	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
@@ -1818,8 +1823,10 @@ CGO_LDFLAGS=" \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-	$LIBS $AGENT_LIBS \
+	$LIBS $AGENT_LIBS $LD_END_GROUP \
 	"
+	
+AC_SUBST(CGO_CFLAGS)	
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
