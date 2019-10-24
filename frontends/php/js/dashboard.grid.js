@@ -183,7 +183,8 @@
 			});
 
 		$div
-			.on('mousemove', function() {
+			// "Mouseenter" is required, since "mousemove" may not always bubble.
+			.on('mouseenter mousemove', function() {
 				enterWidget($obj, data, widget);
 
 				delete data['options']['mousemove_waiting'];
@@ -2581,6 +2582,10 @@
 	function setModeEditDashboard($obj, data) {
 		$obj.addClass('dashbrd-mode-edit');
 
+		// Recaltulate minimal height and expand dashboard to the whole screen.
+		data.minimalHeight = calculateGridMinHeight($obj);
+		resizeDashboardGrid($obj, data);
+
 		data['widgets'].forEach(function(widget) {
 			widget['rf_rate'] = 0;
 			setWidgetModeEdit($obj, data, widget);
@@ -2827,8 +2832,6 @@
 
 				data.new_widget_placeholder.updateLabelVisibility();
 			});
-
-		return;
 	}
 
 	function setWidgetModeEdit($obj, data, widget) {

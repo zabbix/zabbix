@@ -492,7 +492,7 @@ and are waiting to be executed.</description>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <recovery_mode>NONE</recovery_mode>
-                     <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                     <name>System name has changed (new name: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>System name has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>

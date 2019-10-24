@@ -19,9 +19,9 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[4.4.0])
+AC_INIT([Zabbix],[5.0.0alpha1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1881,7 +1881,6 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-sinclude([conf_tests.m4])
 m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
 
 AC_OUTPUT([

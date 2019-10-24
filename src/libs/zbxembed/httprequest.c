@@ -307,12 +307,15 @@ static duk_ret_t	es_httprequest_delete(duk_context *ctx)
 static duk_ret_t	es_httprequest_status(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
-	long				response_code;
+	long			response_code;
+	CURLcode		err;
 
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "internal scripting error: null object");
 
-	curl_easy_getinfo(request->handle, CURLINFO_RESPONSE_CODE, &response_code);
+	if (CURLE_OK != (err = curl_easy_getinfo(request->handle, CURLINFO_RESPONSE_CODE, &response_code)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
+
 	duk_push_number(ctx, (duk_double_t)response_code);
 
 	return 1;

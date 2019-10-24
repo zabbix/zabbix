@@ -2,7 +2,8 @@
 
 noinst_LIBRARIES = libzbxdbupgrade.a
 
-libzbxdbupgrade_a_SOURCES = dbupgrade.c \
+libzbxdbupgrade_a_SOURCES = \
+	dbupgrade.c \
 	dbupgrade_2010.c \
 	dbupgrade_2020.c \
 	dbupgrade_2030.c \
@@ -19,4 +20,5 @@ libzbxdbupgrade_a_SOURCES = dbupgrade.c \
 	dbupgrade_4020.c \
 	dbupgrade_4030.c \
 	dbupgrade_4040.c \
+	dbupgrade_4050.c \
 	dbupgrade.h

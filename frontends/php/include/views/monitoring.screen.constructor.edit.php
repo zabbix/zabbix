@@ -142,7 +142,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 					'dstfld1' => 'resourceid'
 				], $this->data['screen']['templateid'] ? [
 					'templated_hosts' => '1',
-					'only_hostid' => $data['screen']['templateid']
+					'hostid' => $data['screen']['templateid']
 				] : [
 					'real_hosts' => '1',
 					'with_graphs' => '1'
@@ -200,7 +200,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 						'dstfld1' => 'resourceid'
 					], $this->data['screen']['templateid'] ? [
 						'templated_hosts' => '1',
-						'only_hostid' => $data['screen']['templateid']
+						'hostid' => $data['screen']['templateid']
 					] : [
 						'real_hosts' => '1'
 					]),

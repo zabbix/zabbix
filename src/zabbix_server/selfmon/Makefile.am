@@ -2,4 +2,6 @@
 
 noinst_LIBRARIES = libzbxselfmon.a
 
-libzbxselfmon_a_SOURCES = selfmon.c selfmon.h
+libzbxselfmon_a_SOURCES = \
+	selfmon.c \
+	selfmon.h

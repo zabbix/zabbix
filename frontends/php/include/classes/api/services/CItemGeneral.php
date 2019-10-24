@@ -366,21 +366,13 @@ abstract class CItemGeneral extends CApiService {
 						);
 					}
 
-					if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-						// Remove flexible and scheduling intervals and leave only the delay part.
-						$item['delay'] = $delay;
-					}
 					// If there are scheduling intervals or intervals with macros, skip the next check calculation.
-					elseif (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+					if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
 							&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('Item will not be refreshed. Please enter a correct update interval.')
 						);
 					}
-				}
-				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-					// Remove flexible and scheduling intervals and leave only the delay part.
-					$item['delay'] = $delay;
 				}
 			}
 

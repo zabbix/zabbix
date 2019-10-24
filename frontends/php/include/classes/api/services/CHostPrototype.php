@@ -37,7 +37,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupPrototypes' => null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
-			'selectInventory' 		=> null,
 			'editable'				=> false,
 			'nopermissions'			=> null,
 			'sortfield'    			=> '',
@@ -94,6 +93,28 @@ class CHostPrototype extends CHostBase {
 		return $result;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
+			$sqlParts['select']['inventory_mode'] =
+				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
+				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
+			$sqlParts['left_join'][] = [
+				'from' => 'host_inventory hinv',
+				'on' => $this->tableAlias().'.'.$this->pk().'=hinv.hostid'
+			];
+
+			$sqlParts['left_table'] = array_search($this->tableName().' '.$this->tableAlias(), $sqlParts['from']);
+		}
+
+		return $sqlParts;
+	}
+
+
 	/**
 	 * Check for duplicated names.
 	 *
@@ -147,9 +168,7 @@ class CHostPrototype extends CHostBase {
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory' =>			['type' => API_OBJECT, 'fields' => [
-				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -262,12 +281,11 @@ class CHostPrototype extends CHostBase {
 			];
 
 			// inventory
-			if (isset($hostPrototype['inventory']['inventory_mode'])
-					&& ($hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $hostPrototype['inventory']['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
+			if (array_key_exists('inventory_mode', $hostPrototype)
+					&& $hostPrototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 				$hostPrototypeInventory[] = [
 					'hostid' => $hostPrototype['hostid'],
-					'inventory_mode' => $hostPrototype['inventory']['inventory_mode']
+					'inventory_mode' => $hostPrototype['inventory_mode']
 				];
 			}
 		}
@@ -288,7 +306,7 @@ class CHostPrototype extends CHostBase {
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
 
 		// save inventory
-		DB::insert('host_inventory', $hostPrototypeInventory, false);
+		DB::insertBatch('host_inventory', $hostPrototypeInventory, false);
 
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -322,9 +340,7 @@ class CHostPrototype extends CHostBase {
 				'group_prototypeid' =>	['type' => API_ID],
 				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('hstgrp', 'name')]
 			]],
-			'inventory' =>			['type' => API_OBJECT, 'fields' => [
-				'inventory_mode' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
-			]],
+			'inventory_mode' =>		['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -479,95 +495,93 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Updates the host prototypes and propagates the changes to linked hosts and templates.
 	 *
-	 * @param array $hostPrototypes
+	 * @param array $host_prototypes
 	 *
 	 * @return array
 	 */
-	protected function updateReal(array $hostPrototypes) {
+	protected function updateReal(array $host_prototypes) {
 		// save the host prototypes
-		foreach ($hostPrototypes as $hostPrototype) {
-			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
+		foreach ($host_prototypes as $host_prototype) {
+			DB::updateByPk($this->tableName(), $host_prototype['hostid'], $host_prototype);
 		}
 
-		$exHostPrototypes = $this->get([
-			'output' => ['hostid'],
+		$ex_host_prototypes = $this->get([
+			'output' => ['hostid', 'inventory_mode'],
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'selectInventory' => API_OUTPUT_EXTEND,
-			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
+			'hostids' => zbx_objectValues($host_prototypes, 'hostid'),
 			'preservekeys' => true
 		]);
 
 		// update related objects
-		$inventoryCreate = [];
-		$inventoryDeleteIds = [];
-		foreach ($hostPrototypes as $key => $hostPrototype) {
-			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
+		$inventory_create = [];
+		$inventory_deleteids = [];
+		foreach ($host_prototypes as $key => $host_prototype) {
+			$ex_host_prototype = $ex_host_prototypes[$host_prototype['hostid']];
 
 			// group prototypes
-			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
-					$groupPrototype['hostid'] = $hostPrototype['hostid'];
+			if (isset($host_prototype['groupPrototypes'])) {
+				foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+					$group_prototype['hostid'] = $host_prototype['hostid'];
 				}
-				unset($groupPrototype);
+				unset($group_prototype);
 
 				// save group prototypes
-				$exGroupPrototypes = zbx_toHash(
-					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
+				$ex_group_prototypes = zbx_toHash(
+					array_merge($ex_host_prototype['groupLinks'], $ex_host_prototype['groupPrototypes']),
 					'group_prototypeid'
 				);
-				$modifiedGroupPrototypes = [];
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					if (isset($groupPrototype['group_prototypeid'])) {
-						unset($exGroupPrototypes[$groupPrototype['group_prototypeid']]);
+				$modified_group_prototypes = [];
+				foreach ($host_prototype['groupPrototypes'] as $group_prototype) {
+					if (isset($group_prototype['group_prototypeid'])) {
+						unset($ex_group_prototypes[$group_prototype['group_prototypeid']]);
 					}
 
-					$modifiedGroupPrototypes[] = $groupPrototype;
+					$modified_group_prototypes[] = $group_prototype;
 				}
-				if ($exGroupPrototypes) {
-					$this->deleteGroupPrototypes(array_keys($exGroupPrototypes));
+				if ($ex_group_prototypes) {
+					$this->deleteGroupPrototypes(array_keys($ex_group_prototypes));
 				}
-				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
+				$host_prototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modified_group_prototypes);
 			}
 
 			// templates
-			if (isset($hostPrototype['templates'])) {
-				$existingTemplateIds = zbx_objectValues($exHostPrototype['templates'], 'templateid');
-				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
-				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), [$hostPrototype['hostid']]);
-				$this->link(array_diff($newTemplateIds, $existingTemplateIds), [$hostPrototype['hostid']]);
+			if (isset($host_prototype['templates'])) {
+				$existing_templateids = zbx_objectValues($ex_host_prototype['templates'], 'templateid');
+				$new_templateids = zbx_objectValues($host_prototype['templates'], 'templateid');
+				$this->unlink(array_diff($existing_templateids, $new_templateids), [$host_prototype['hostid']]);
+				$this->link(array_diff($new_templateids, $existing_templateids), [$host_prototype['hostid']]);
 			}
 
 			// inventory
-			if (isset($hostPrototype['inventory']) ) {
-				$inventory = zbx_array_mintersect(['inventory_mode'], $hostPrototype['inventory']);
-
-				if (array_key_exists('inventory_mode', $inventory)
-					&& ($inventory['inventory_mode'] == HOST_INVENTORY_MANUAL
-						|| $inventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-
-					if ($exHostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED) {
-						DB::update('host_inventory', [
-							'values' => $inventory,
-							'where' => ['hostid' => $hostPrototype['hostid']]
-						]);
-					}
-					else {
-						$inventoryCreate[] = $inventory + ['hostid' => $hostPrototype['hostid']];
-					}
+			if (array_key_exists('inventory_mode', $host_prototype)) {
+				if ($host_prototype['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					$inventory_deleteids[] = $host_prototype['hostid'];
 				}
 				else {
-					$inventoryDeleteIds[] = $hostPrototype['hostid'];
+					$inventory = ['inventory_mode' => $host_prototype['inventory_mode']];
+
+					if ($ex_host_prototype['inventory_mode'] != HOST_INVENTORY_DISABLED) {
+						if ($host_prototype['inventory_mode'] != $ex_host_prototype['inventory_mode']) {
+							DB::update('host_inventory', [
+								'values' => $inventory,
+								'where' => ['hostid' => $host_prototype['hostid']]
+							]);
+						}
+					}
+					else {
+						$inventory_create[] = $inventory + ['hostid' => $host_prototype['hostid']];
+					}
 				}
 			}
 		}
 
 		// save inventory
-		DB::insert('host_inventory', $inventoryCreate, false);
-		DB::delete('host_inventory', ['hostid' => $inventoryDeleteIds]);
+		DB::insertBatch('host_inventory', $inventory_create, false);
+		DB::delete('host_inventory', ['hostid' => $inventory_deleteids]);
 
-		return $hostPrototypes;
+		return $host_prototypes;
 	}
 
 	/**
@@ -841,7 +855,6 @@ class CHostPrototype extends CHostBase {
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
 			'selectDiscoveryRule' => ['itemid'],
-			'selectInventory' => ['inventory_mode']
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
@@ -1117,6 +1130,28 @@ class CHostPrototype extends CHostBase {
 			$sqlParts['where'][] = ($options['inherited']) ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
 		}
 
+		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
+			if ($options['filter']['inventory_mode'] !== null) {
+				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
+
+				$inventory_mode_where = [];
+				$null_position = array_search(HOST_INVENTORY_DISABLED, $inventory_mode_query);
+
+				if ($null_position !== false) {
+					unset($inventory_mode_query[$null_position]);
+					$inventory_mode_where[] = 'hinv.inventory_mode IS NULL';
+				}
+
+				if ($null_position === false || $inventory_mode_query) {
+					$inventory_mode_where[] = dbConditionInt('hinv.inventory_mode', $inventory_mode_query);
+				}
+
+				$sqlParts['where'][] = (count($inventory_mode_where) > 1)
+					? '('.implode(' OR ', $inventory_mode_where).')'
+					: $inventory_mode_where[0];
+			}
+		}
+
 		return $sqlParts;
 	}
 
@@ -1234,29 +1269,6 @@ class CHostPrototype extends CHostBase {
 						: '0';
 				}
 			}
-		}
-
-		// adding inventory
-		if ($options['selectInventory'] !== null) {
-			$inventory = API::getApiService()->select('host_inventory', [
-				'output' => ['hostid', 'inventory_mode'],
-				'filter' => ['hostid' => $hostPrototypeIds],
-				'preservekeys' => true
-			]);
-
-			foreach ($hostPrototypeIds as $host_prototypeid) {
-				// There is no DB record if inventory mode is HOST_INVENTORY_DISABLED.
-				if (!array_key_exists($host_prototypeid, $inventory)) {
-					$inventory[$host_prototypeid] = [
-						'hostid' => (string) $host_prototypeid,
-						'inventory_mode' => (string) HOST_INVENTORY_DISABLED
-					];
-				}
-			}
-
-			$relation_map = $this->createRelationMap($result, 'hostid', 'hostid');
-			$inventory = $this->unsetExtraFields($inventory, ['hostid', 'inventory_mode'], $options['selectInventory']);
-			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
 		return $result;
