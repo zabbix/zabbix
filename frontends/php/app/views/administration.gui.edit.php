@@ -19,8 +19,6 @@
 **/
 
 
-$this->includeJSfile('app/views/administration.gui.edit.js.php');
-
 $widget = (new CWidget())
 	->setTitle(_('GUI'))
 	->setControls((new CTag('nav', true,
@@ -50,6 +48,7 @@ $gui_tab = (new CFormList())
 		(new CCheckBox('dropdown_first_remember'))
 			->setLabel(_('remember selected'))
 			->setChecked($data['dropdown_first_remember'] == 1)
+			->setUncheckedValue('0')
 	])
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))
@@ -63,6 +62,7 @@ $gui_tab = (new CFormList())
 	)
 	->addRow(_('Show warning if Zabbix server is down'),
 		(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
+			->setUncheckedValue('0')
 			->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
 	);
 

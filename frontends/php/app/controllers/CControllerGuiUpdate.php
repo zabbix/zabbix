@@ -26,10 +26,10 @@ class CControllerGuiUpdate extends CController {
 		$fields = [
 			'default_theme'           => 'required | db config.default_theme | in '.implode(',', $themes),
 			'dropdown_first_entry'    => 'required | db config.dropdown_first_entry | in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,
-			'dropdown_first_remember' => '           db config.dropdown_first_remember | in 1',
+			'dropdown_first_remember' => '           db config.dropdown_first_remember | in 0,1',
 			'search_limit'            => 'required | db config.search_limit | int32 | ge 1',
 			'max_in_table'            => 'required | db config.max_in_table | int32 | ge 1',
-			'server_check_interval'   => '           db config.server_check_interval | in '.SERVER_CHECK_INTERVAL
+			'server_check_interval'   => '           db config.server_check_interval | in 0,'.SERVER_CHECK_INTERVAL
 		];
 
 		$ret = $this->validateInput($fields);

@@ -28,10 +28,10 @@ class CControllerTrigDisplayUpdate extends CController {
 			'problem_ack_color'   => 'string',
 			'ok_unack_color'      => 'string',
 			'ok_ack_color'        => 'string',
-			'problem_unack_style' => 'required | nt32 | in 0,1',
-			'problem_ack_style'   => 'required | nt32 | in 0,1',
-			'ok_unack_style'      => 'required | nt32 | in 0,1',
-			'ok_ack_style'        => 'required | nt32 | in 0,1',
+			'problem_unack_style' => 'required | int32 | in 0,1',
+			'problem_ack_style'   => 'required | int32 | in 0,1',
+			'ok_unack_style'      => 'required | int32 | in 0,1',
+			'ok_ack_style'        => 'required | int32 | in 0,1',
 			'ok_period'           => 'required | string | not_empty',
 			'blink_period'        => 'required | string | not_empty'
 		];
