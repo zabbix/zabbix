@@ -27,10 +27,23 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4050000(void)
+extern unsigned char	program_type;
+
+static int	DBpatch_4050000(void)
 {
-	*** Feel free to use this function for the first DB patch! ***
-}*/
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sortorder'"
+				" where idx='web.adm.valuemapping.php.sortorder'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.valuemap.list.sort'"
+				" where idx='web.adm.valuemapping.php.sort'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -38,6 +51,6 @@ DBPATCH_START(4050)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(4050000, 0, 1)*/
+DBPATCH_ADD(4050000, 0, 1)
 
 DBPATCH_END()
