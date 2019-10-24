@@ -24,6 +24,9 @@
  */
 class CControllerPopupDiscoveryCheckEdit extends CController {
 
+	/**
+	 * Default check type
+	 */
 	const DEFAULT_TYPE = SVC_FTP;
 
 	protected function init() {
@@ -67,7 +70,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 	protected function getAdditionallyFields() {
 		$fields = [];
 
-		switch (getRequest('type', SVC_FTP)) {
+		switch (getRequest('type', self::DEFAULT_TYPE)) {
 			case SVC_SSH:
 			case SVC_LDAP:
 			case SVC_SMTP:
