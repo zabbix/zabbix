@@ -254,8 +254,21 @@
 	}
 
 	jQuery(document).ready(function() {
+		var remove_operationid = function() {
+			var operationid_RegExp = /^(operations|recovery_operations|ack_operations)\[\d+\]\[operationid\]$/;
+
+			jQuery('input[name^=operations], input[name^=recovery_operations], input[name^=ack_operations]')
+				.each(function() {
+					// Intentional usage of JS Prototype.
+					if ($(this).getAttribute('name').match(operationid_RegExp)) {
+						$(this).remove();
+					}
+				});
+		};
+
 		// clone button
 		jQuery('#clone').click(function() {
+			console.log('11');
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
