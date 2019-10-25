@@ -27,23 +27,16 @@ class CControllerWorkingTimeUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+		$ret = ($ret && $this->validateWorkingTime($this->getInput('work_period')));
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'workingtime.edit')
-						->getUrl()
-					);
-					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configuration'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'workingtime.edit')
+				->getUrl()
+			);
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
+			$this->setResponse($response);
 		}
 
 		return $ret;
@@ -59,17 +52,6 @@ class CControllerWorkingTimeUpdate extends CController {
 			->getUrl()
 		);
 
-		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
-		if ($time_period_parser->parse($this->getInput('work_period')) != CParser::PARSE_SUCCESS) {
-			error(_s('Field "%1$s" is not correct: %2$s', _('Working time'), _('a time period is expected')));
-
-			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update configuration'));
-			$this->setResponse($response);
-
-			return;
-		}
-
 		DBstart();
 		$result = update_config(['work_period' => $this->getInput('work_period')]);
 		$result = DBend($result);
@@ -83,5 +65,17 @@ class CControllerWorkingTimeUpdate extends CController {
 		}
 
 		$this->setResponse($response);
+	}
+
+	protected function validateWorkingTime($working_time) {
+		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
+
+		if ($time_period_parser->parse($working_time) != CParser::PARSE_SUCCESS) {
+			error(_s('Field "%1$s" is not correct: %2$s', _('Working time'), _('a time period is expected')));
+
+			return false;
+		}
+
+		return true;
 	}
 }
