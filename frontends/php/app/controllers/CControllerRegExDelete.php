@@ -68,9 +68,9 @@ class CControllerRegExDelete extends CController {
 					'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
 				);
 			}
-
-			$result = DBend(true);
 		}
+
+		$result = DBend($result);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 		if ($result) {
