@@ -167,14 +167,14 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to ExtendedInput element.
+	 * Cast object to CompositeInput element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CExtendedInputElement
+	 * @return CCompositeInputElement
 	 */
-	public function asExtendedInput($options = []) {
-		return $this->cast(CExtendedInputElement::class, $options);
+	public function asCompositeInput($options = []) {
+		return $this->cast(CCompositeInputElement::class, $options);
 	}
 
 	/**
@@ -204,7 +204,7 @@ trait CastableTrait {
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CMultifieldTableElement
+	 * @return CPopupMenuElement
 	 */
 	public function asPopupMenu($options = []) {
 		return $this->cast(CPopupMenuElement::class, $options);

@@ -133,6 +133,22 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
+	 * Get collection of multiselect controls (buttons).
+	 *
+	 * @return CElement
+	 */
+	public function getControls() {
+		$xpath = 'xpath:.//button';
+		$buttons = [];
+
+		foreach ($this->query($xpath)->all() as $button) {
+			$buttons[$button->getText()] = $button;
+		}
+
+		return new CElementCollection($buttons);
+	}
+
+	/**
 	 * Open selection overlay dialog.
 	 *
 	 * @param mixed $context  overlay dialog context (hostgroup / host)
@@ -140,7 +156,10 @@ class CMultiselectElement extends CElement {
 	 * @return COverlayDialogElement
 	 */
 	public function edit($context = null) {
-		$this->query('xpath:.//button')->one()->click();
+		/* TODO: extend the function for composite elements with two buttons,
+		 * Example of such multiselect: [ Input field ] ( Select item ) ( Select prototype )
+		 */
+		$this->getControls()->first()->click();
 
 		return COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($context);
 	}
@@ -200,6 +219,16 @@ class CMultiselectElement extends CElement {
 			return false;
 		}
 
-		return $this->query('xpath:.//button')->one()->isEnabled($enabled);
+		if ((parent::getAttribute('aria-disabled') === 'true') !== $enabled) {
+			return false;
+		}
+
+		foreach ($this->getControls() as $control) {
+			if ($control->isEnabled() !== $enabled) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

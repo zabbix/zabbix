@@ -20,15 +20,15 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/CExtendedInputElement.php';
+require_once dirname(__FILE__).'/CCompositeInputElement.php';
 
 /**
- * Extended input element.
+ * Color picker element.
  */
-class CColorPickerElement extends CExtendedInputElement {
+class CColorPickerElement extends CCompositeInputElement {
 
 	/**
-	 * Overwrite extended input value.
+	 * Overwrite composite input value.
 	 *
 	 * @inheritdoc
 	 */

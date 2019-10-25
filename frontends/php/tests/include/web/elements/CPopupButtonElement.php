@@ -40,6 +40,7 @@ class CPopupButtonElement extends CElement {
 			foreach ($text as $item) {
 				if (is_array($item)) {
 					$is_nested = true;
+					break;
 				}
 			}
 		}

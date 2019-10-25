@@ -399,8 +399,10 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		foreach ($attributes as $key => $value) {
-			if (is_numeric($key) && $this->getAttribute($value) === null) {
-				return false;
+			if (is_numeric($key)) {
+				if ($this->getAttribute($value) === null) {
+					return false;
+				}
 			}
 			elseif ($this->getAttribute($key) !== $value) {
 				return false;
@@ -553,7 +555,7 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
-			return $this->asExtendedInput($options);
+			return $this->asCompositeInput($options);
 		}
 
 		if (in_array('input-color-picker', $class)) {

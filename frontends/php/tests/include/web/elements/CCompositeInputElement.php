@@ -23,12 +23,12 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Extended input element.
+ * Composite input element.
  */
-class CExtendedInputElement extends CElement {
+class CCompositeInputElement extends CElement {
 
 	/**
-	 * Get extended input field.
+	 * Get composite input field.
 	 *
 	 * @return type
 	 */
@@ -37,7 +37,7 @@ class CExtendedInputElement extends CElement {
 	}
 
 	/**
-	 * Select extended input value.
+	 * Select composite input value.
 	 *
 	 * @inheritdoc
 	 */
@@ -48,7 +48,7 @@ class CExtendedInputElement extends CElement {
 	}
 
 	/**
-	 * Overwrite extended input value.
+	 * Overwrite composite input value.
 	 *
 	 * @inheritdoc
 	 */
@@ -74,6 +74,6 @@ class CExtendedInputElement extends CElement {
 	 * @return string
 	 */
 	public function getValue() {
-		return $this->query('xpath:./input')->one()->getValue();
+		return $this->getInput()->getValue();
 	}
 }

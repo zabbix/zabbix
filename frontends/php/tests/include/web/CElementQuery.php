@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 require_once dirname(__FILE__).'/elements/CMultilineElement.php';
 require_once dirname(__FILE__).'/elements/CColorPickerElement.php';
-require_once dirname(__FILE__).'/elements/CExtendedInputElement.php';
+require_once dirname(__FILE__).'/elements/CCompositeInputElement.php';
 require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
 require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 
@@ -460,7 +460,7 @@ class CElementQuery implements IWaitable {
 				'/table',
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
-			'CExtendedInputElement'		=> [
+			'CCompositeInputElement'	=> [
 				'/div[contains(@class, "range-control")]',
 				'/div[contains(@class, "calendar-control")]'
 			],

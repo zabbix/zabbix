@@ -31,16 +31,31 @@ class CPopupMenuElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://ul[contains(@class, "menu-popup-top")]'))->asPopupMenu()->waitUntilPresent();
+		return (new CElementQuery('xpath://ul[contains(@class, "menu-popup-top")]'))->asPopupMenu();
 	}
 
 	/**
-	 * Get popup titles as text.
+	 * Get collection of popup menu titles.
 	 *
 	 * @return array
 	 */
 	public function getTitles() {
-		return $this->query('xpath:.//h3')->all()->asText();
+		return $this->query('xpath:.//h3')->all();
+	}
+
+	/**
+	 * Check if titles exists.
+	 *
+	 * @param string|array $titles    titles to be searched for
+	 *
+	 * @return boolean
+	 */
+	public function hasTitles($titles) {
+		if (!is_array($titles)) {
+			$titles = [$titles];
+		}
+
+		return count(array_diff($titles, $this->getTitles()->asText())) === 0;
 	}
 
 	/**
@@ -53,20 +68,18 @@ class CPopupMenuElement extends CElement {
 	}
 
 	/**
-	 * Check if item exists.
+	 * Check if items exists.
 	 *
-	 * @param string $text    item to be searched for
+	 * @param string|array $items    items to be searched for
 	 *
 	 * @return boolean
 	 */
-	public function hasItem($text) {
-		foreach ($this->getItems()->asText() as $item) {
-			if (strpos($item, $text) !== false) {
-				return true;
-			}
+	public function hasItems($items) {
+		if (!is_array($items)) {
+			$items = [$items];
 		}
 
-		return false;
+		return count(array_diff($items, $this->getItems()->asText())) === 0;
 	}
 
 

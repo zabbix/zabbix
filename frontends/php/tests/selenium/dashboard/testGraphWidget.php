@@ -125,7 +125,7 @@ class testGraphWidget extends CWebTest {
 		// Check error message.
 		$message = $form->getOverlayMessage();
 		$this->assertTrue($message->isBad());
-		$this->assertEquals($message->getLines()->count(), count($data['error']));
+		$this->assertEquals(count($data['error']), $message->getLines()->count());
 		foreach ($data['error'] as $error) {
 			$this->assertTrue($message->hasLine($error));
 		}
@@ -1817,7 +1817,7 @@ class testGraphWidget extends CWebTest {
 
 			$last = count($data_sets) - 1;
 			// Amount of data sets on frontend.
-			$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all(false)->count();
+			$count_sets = $form->query('xpath://li[contains(@class, "list-accordion-item")]')->all()->count();
 
 			foreach ($data_sets as $key => $data_set) {
 				$mapping = [
@@ -1831,7 +1831,7 @@ class testGraphWidget extends CWebTest {
 				// Open next dataset, if it exist on frontend.
 				if ($key !== $last && $key + 1 < $count_sets) {
 					$key += 2;
-					$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$key.']//button')->one()->highlight()->click();
+					$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$key.']//button')->one()->click();
 					$form->invalidate();
 				}
 				// Press "Add new data set" button, except for last data set.
@@ -1850,7 +1850,7 @@ class testGraphWidget extends CWebTest {
 		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
 
 		// Check if override already exist in list, if not, add new override.
-		$items = $form->query('class:overrides-list-item')->all(false);
+		$items = $form->query('class:overrides-list-item')->all();
 		if ($items->count() === 0) {
 			$form->query('button:Add new override')->one()->click();
 		}
@@ -1866,7 +1866,7 @@ class testGraphWidget extends CWebTest {
 			foreach ($overrides as $key => $override) {
 				$mapping = [
 					'options' => [
-						'selector' => 'xpath://button[@data-row="'.$key.'"]',
+						'selector' => 'xpath://button[@data-row='.CXPathHelper::escapeQuotes($key).']',
 						'class' => CPopupButtonElement::class
 					],
 					'host' => 'id:or_'.$key.'_hosts',
@@ -1917,7 +1917,7 @@ class testGraphWidget extends CWebTest {
 			// Open next data set, if exist.
 			if ($key !== $last) {
 				$key += 2;
-				$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$key.']//button')->one()->highlight()->click();
+				$form->query('xpath:(//li[contains(@class, "list-accordion-item")])['.$key.']//button')->one()->click();
 				$form->invalidate();
 			}
 		}
@@ -2060,7 +2060,7 @@ class testGraphWidget extends CWebTest {
 
 	public static function getWidgetCancelData() {
 		return [
-			// dd new graph widget.
+			// Add new graph widget.
 			[
 				[
 					'main_fields' => [
@@ -2102,7 +2102,7 @@ class testGraphWidget extends CWebTest {
 		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widgetConfg"]')
 				->asOverlayDialog()->one();
-		$overlay->cancel();
+		$overlay->close();
 
 		// Check canceled graph widget.
 		$dashboard = CDashboardElement::find()->one();
@@ -2276,7 +2276,7 @@ class testGraphWidget extends CWebTest {
 		$axis = $data['Data set']['Y-axis'];
 
 		if (array_key_exists('Overrides', $data)) {
-			$axis = 'both';
+			$axis = 'Both';
 			$form->selectTab('Overrides');
 			$this->setOverrides($data['Overrides']);
 		}
@@ -2300,7 +2300,7 @@ class testGraphWidget extends CWebTest {
 				$this->assertFalse($this->query('id', 'lefty_static_units')->one()->isEnabled());
 				break;
 
-			case 'both';
+			case 'Both';
 				$this->assertEnabledFields($lefty_fields, true, true);
 				$this->assertEnabledFields($righty_fields, true, true);
 				$this->assertFalse($this->query('id', 'righty_static_units')->one()->isEnabled());
@@ -2313,13 +2313,14 @@ class testGraphWidget extends CWebTest {
 	 * Check that fields are enabled or disabled.
 	 *
 	 * @param array $fields			array of checked fields
-	 * @param bollean $enabled		fields state are enabled
+	 * @param boolean $enabled		fields state are enabled
 	 * @param boolean $id			is used field id instead of field name
 	 */
 	private function assertEnabledFields($fields, $enabled = true, $id = false) {
 		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
 
 		foreach ($fields as $field) {
+			// TODO: Should be fixed after updated to latest version. Implemeneted in DEV-1256.
 			$element = $id ? $form->query('id', $field)->one() : $form->getField($field);
 			$this->assertTrue($element->isEnabled($enabled));
 		}
@@ -2328,11 +2329,15 @@ class testGraphWidget extends CWebTest {
 	/*
 	 * Debug button sometime overlaps widget edit icon, after widget creation.
 	 */
+	public static function setDebugMode($value) {
+		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
+	}
+
 	public function disableDebugMode() {
-		DBexecute("UPDATE usrgrp SET debug_mode=0 WHERE usrgrpid=7");
+		self::setDebugMode(0);
 	}
 
 	public static function enableDebugMode() {
-		DBexecute("UPDATE usrgrp SET debug_mode=1 WHERE usrgrpid=7");
+		self::setDebugMode(1);
 	}
 }
