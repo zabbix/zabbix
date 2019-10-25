@@ -78,30 +78,19 @@ class CControllerRegExUpdate extends CController {
 		], $expressions);
 
 		if ($result) {
-			$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.list');
-
-			$response = new CControllerResponseRedirect($url);
-			$response->setMessageOk(_('Regular expression updated'));
-
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$this->getInput('name'));
-		}
-		else {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.edit')
-				->setArgument('regexid', $this->getInput('regexid'));
-
-			$response = new CControllerResponseRedirect($url);
-			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot update regular expression'));
 		}
 
 		$result = DBend($result);
-		if (!$result) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.edit')
-				->setArgument('regexid', $this->getInput('regexid'));
 
-			$response = new CControllerResponseRedirect($url);
+		if ($result) {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
+			$response->setMessageOk(_('Regular expression updated'));
+		}
+		else {
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'regex.edit')
+				->setArgument('regexid', $this->getInput('regexid')));
 			$response->setFormData($this->getInputAll());
 			$response->setMessageError(_('Cannot update regular expression'));
 		}

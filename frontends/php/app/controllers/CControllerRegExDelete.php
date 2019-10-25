@@ -58,17 +58,18 @@ class CControllerRegExDelete extends CController {
 	}
 
 	protected function doAction() {
-		$audit = [];
-		$regexids = [];
-		foreach ($this->db_regexes as $db_regex) {
-			$regexids[] = $db_regex['regexpid'];
-			$audit[] = 'Id ['.$db_regex['regexpid'].'] '._('Name').' ['.$db_regex['name'].']';
-		}
-
 		DBstart();
-		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexids));
+		$regexpids = zbx_objectValues($this->db_regexes, 'regexpid');
+		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regexpids));
+
 		if ($result) {
-			$result = DBend($result);
+			foreach ($this->db_regexes as $regex) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP,
+					'Id ['.$regex['regexpid'].'] '._('Name').' ['.$regex['name'].']'
+				);
+			}
+
+			$result = DBend(true);
 		}
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
@@ -77,13 +78,6 @@ class CControllerRegExDelete extends CController {
 			$response->setMessageOk(_n('Regular expression deleted', 'Regular expressions deleted',
 				count($this->db_regexes)
 			));
-
-			DBstart();
-			foreach ($audit as $msg) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, $msg);
-			}
-
-			DBend(true);
 		}
 		else {
 			$response->setMessageError(_n('Cannot delete regular expression', 'Cannot delete regular expressions',
