@@ -36,28 +36,28 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'index' => 'required|int32', // Count of exists checks.
-			'update' => 'in 1',
 			'validate' => 'in 1',
-			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
 
 			'dcheckid' => 'string',
-			'ports' =>					'db dchecks.ports',
-			'snmp_community' =>			'db dchecks.snmp_community',
-			'key_' =>					'db dchecks.key_',
-			'snmpv3_contextname' =>		'db dchecks.snmpv3_contextname',
-			'snmpv3_securityname' =>	'db dchecks.snmpv3_securityname',
-			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel',
-			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol',
-			'snmpv3_authpassphrase' =>	'db dchecks.snmpv3_authpassphrase',
-			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol',
-			'snmpv3_privpassphrase' =>	'db dchecks.snmpv3_privpassphrase'
+			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
+			'ports' => 'string|not_empty|db dchecks.ports',
+			'snmp_community' => 'string|not_empty|db dchecks.snmp_community',
+			'key_' => 'string|not_empty|db dchecks.key_',
+			'snmpv3_contextname' => 'string|db dchecks.snmpv3_contextname',
+			'snmpv3_securityname' => 'string|db dchecks.snmpv3_securityname',
+			'snmpv3_securitylevel' => 'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
+			'snmpv3_authprotocol' => 'db dchecks.snmpv3_authprotocol|in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA,
+			'snmpv3_authpassphrase' => 'string|db dchecks.snmpv3_authpassphrase',
+			'snmpv3_privprotocol' => 'db dchecks.snmpv3_privprotocol|in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES,
+			'snmpv3_privpassphrase' => 'string|not_empty|db dchecks.snmpv3_privpassphrase'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			if ($this->getInput('update', 0) || $this->getInput('validate', 0)) {
-				$ret = $this->validateFormInputs();
+		if ($this->hasInput('ports')) {
+			if (!validate_port_list($this->getInput('ports'))) {
+				info(_('Incorrect port range.'));
+				$ret = false;
 			}
 		}
 
@@ -74,65 +74,6 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Validate form fields.
-	 *
-	 * @return array
-	 */
-	protected function validateFormInputs() {
-		$fields = [
-			'ports' => 'not_empty',
-			'type' => 'in '.implode(',', array_keys(discovery_check_type2str()))
-		];
-
-		switch ($this->getInput('type', self::DEFAULT_TYPE)) {
-			case SVC_AGENT:
-				$fields['key_'] = 'not_empty';
-				break;
-
-			case SVC_SNMPv1:
-			case SVC_SNMPv2c:
-				$fields['snmp_community'] = 'not_empty';
-				$fields['key_'] = 'string|not_empty';
-				break;
-
-			case SVC_SNMPv3:
-				$fields['key_'] = 'string|not_empty';
-				$fields['snmpv3_contextname'] = 'string';
-				$fields['snmpv3_securityname'] = 'string';
-				$fields['snmpv3_securitylevel'] = 'in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
-
-				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
-				if ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-						|| $snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					$fields['snmpv3_authprotocol'] = 'in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA;
-					$fields['snmpv3_authpassphrase'] = 'string';
-				}
-
-				if ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					$fields['snmpv3_privprotocol'] = 'in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES;
-					$fields['snmpv3_privpassphrase'] = 'string|not_empty';
-				}
-				break;
-
-			case SVC_ICMPPING:
-				$fields['ports'] = 'in 0';
-		}
-
-		$data = [];
-		$this->getInputs($data, array_keys($fields));
-
-		$validator = new CNewValidator($data, $fields);
-		array_map('info', $validator->getAllErrors());
-
-		if (!validate_port_list($this->getInput('ports'))) {
-			info(_('Incorrect port range.'));
-			return false;
-		}
-
-		return !$validator->isError();
 	}
 
 	protected function checkPermissions() {

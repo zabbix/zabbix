@@ -85,6 +85,11 @@
 
 			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheckRowTPL').html()).evaluate(value));
 
+			value.host_source = jQuery('[name=host_source]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_DNS ?>';
+			value.name_source = jQuery('[name=name_source]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
+
 			for (var field_name in value) {
 				if (value.hasOwnProperty(field_name)) {
 					var $input = jQuery('<input>', {
@@ -96,6 +101,7 @@
 					jQuery('#dcheckCell_' + value.dcheckid).append($input);
 				}
 			}
+
 		}
 
 		var updateNewValue = function(value) {
@@ -373,22 +379,27 @@
 	 */
 	function validateDCheckDuplicate() {
 		var $form = jQuery(document.forms['dcheck_form']),
-			dCheck = $form.serializeJSON(),
-			dcheckId = jQuery('#dcheckid').val();
+			dcheckId = jQuery('#dcheckid').val(),
+			dCheck = $form
+				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+				.serializeJSON(),
+			fields_name = ['key_', 'type', 'ports', 'snmp_community', 'snmpv3_authprotocol',
+				'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'snmpv3_securitylevel',
+				'snmpv3_securityname', 'snmpv3_contextname'
+			];
 
 		dCheck.dcheckid = dcheckId ? dcheckId : getUniqueId();
 
 		for (var zbxDcheckId in ZBX_CHECKLIST) {
-			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
-				var fields_name = ['key_', 'type', 'ports', 'snmp_community', 'snmpv3_authprotocol',
-					'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'snmpv3_securitylevel',
-					'snmpv3_securityname', 'snmpv3_contextname'
-				];
+			if (ZBX_CHECKLIST[zbxDcheckId]['type'] !== dCheck['type']) {
+				continue;
+			}
 
+			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
 				var duplicate_fields = fields_name
 					.map(function(value) { // Check if field is undefined or empty or values equels with exist checks.
 						return typeof dCheck[value] === 'undefined'
-							|| (dCheck[value] === '' || dCheck[value] === '0')
+							|| dCheck[value] === ''
 							|| ZBX_CHECKLIST[zbxDcheckId][value] === dCheck[value];
 					})
 					.filter(function(value) { // Remove false value from array.

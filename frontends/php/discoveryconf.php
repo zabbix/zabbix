@@ -287,13 +287,57 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if (!empty($data['drule']['dchecks'])) {
-		foreach ($data['drule']['dchecks'] as $id => $dcheck) {
-			$data['drule']['dchecks'][$id]['name'] = discovery_check2str(
-				$dcheck['type'],
-				isset($dcheck['key_']) ? $dcheck['key_'] : '',
-				isset($dcheck['ports']) ? $dcheck['ports'] : ''
+		$data['drule']['dchecks'] = array_map(function($value) {
+			$data = [
+				'type' => $value['type'],
+				'dcheckid' => $value['dcheckid'],
+				'ports' => $value['ports'],
+				'uniq' => array_key_exists('uniq', $value) ? $value['uniq'] : null,
+				'host_source' => $value['host_source'],
+				'name_source' => $value['name_source']
+			];
+
+			$data['name'] = discovery_check2str(
+				$value['type'],
+				isset($value['key_']) ? $value['key_'] : '',
+				isset($value['ports']) ? $value['ports'] : ''
 			);
-		}
+
+			switch($value['type']) {
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+					$data['snmp_community'] = $value['snmp_community'];
+					// break; is not missing here
+				case SVC_AGENT:
+					$data['key_'] = $value['key_'];
+					break;
+				case SVC_SNMPv3:
+					$data += [
+						'key_' => $value['key_'],
+						'snmpv3_contextname' => $value['snmpv3_contextname'],
+						'snmpv3_securityname' => $value['snmpv3_securityname'],
+						'snmpv3_securitylevel' => $value['snmpv3_securitylevel'],
+					];
+
+					if ($value['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
+							|| $value['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+						$data += [
+							'snmpv3_authprotocol' => $value['snmpv3_authprotocol'],
+							'snmpv3_authpassphrase' => $value['snmpv3_authpassphrase']
+						];
+					}
+
+					if ($value['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+						$data += [
+							'snmpv3_privprotocol' => $value['snmpv3_privprotocol'],
+							'snmpv3_privpassphrase' => $value['snmpv3_privpassphrase']
+						];
+					}
+					break;
+			}
+
+			return $data;
+		}, $data['drule']['dchecks']);
 
 		order_result($data['drule']['dchecks'], 'name');
 	}
