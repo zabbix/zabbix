@@ -31,14 +31,20 @@ if ($data['timeperiodid']) {
 	$form->addVar('timeperiodid', $data['timeperiodid']);
 }
 
-$days = [];
+$days_weekly = [];
+$days_monthly = [];
 
 foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
 	$value = 1 << ($day - 1);
-	$days[] = [
+	$days_weekly[] = [
 		'name' => getDayOfWeekCaption($day),
 		'value' => $value,
-		'checked' => (bool) ($value & $data['dayofweek'])
+		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY && ($value & $data['dayofweek']))
+	];
+	$days_monthly[] = [
+		'name' => getDayOfWeekCaption($day),
+		'value' => $value,
+		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['dayofweek']))
 	];
 }
 
@@ -77,7 +83,7 @@ $form
 	->addRow((new CLabel(_('Day of week'), 'days'))->setAsteriskMark(),
 		(new CCheckBoxList('days'))
 			->addClass(ZBX_STYLE_COLUMNS_3)
-			->setOptions($days),
+			->setOptions($days_weekly),
 		'row_timeperiod_dayofweek'
 	)
 	->addRow((new CLabel(_('Month'), 'months'))->setAsteriskMark(),
@@ -106,7 +112,7 @@ $form
 	->addRow('',
 		(new CCheckBoxList('monthly_days'))
 			->addClass(ZBX_STYLE_COLUMNS_3)
-			->setOptions($days),
+			->setOptions($days_monthly),
 		'row_timeperiod_week_days'
 	)
 	->addRow((new CLabel(_('Day of month'), 'day'))->setAsteriskMark(),
