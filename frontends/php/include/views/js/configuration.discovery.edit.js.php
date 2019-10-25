@@ -265,7 +265,6 @@
 				case 'edit':
 					var $row = $btn.closest('tr');
 
-					params['update'] = 1;
 					params['index'] = $rows.index($row);
 
 					$row.find('input[type="hidden"]').each(function() {
