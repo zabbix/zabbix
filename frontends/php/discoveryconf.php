@@ -102,11 +102,6 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 
 		foreach ($ajaxData as $check) {
 			switch ($check['field']) {
-				case 'port':
-					if (!validate_port_list($check['value'])) {
-						$ajaxResponse->error(_('Incorrect port range.'));
-					}
-					break;
 				case 'itemKey':
 					if ($item_key_parser->parse($check['value']) != CParser::PARSE_SUCCESS) {
 						$ajaxResponse->error(

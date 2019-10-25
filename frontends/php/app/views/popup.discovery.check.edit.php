@@ -62,10 +62,11 @@ $form_list = (new CFormList())
 	)
 	->addRow(
 		(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-		(new CTextBox('snmp_oid', $data['params']['key_']))
+		(new CTextBox('key_', $data['params']['key_']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
-			->setAttribute('maxlength', 512),
+			->setAttribute('maxlength', 512)
+			->setId('snmp_oid'),
 		'row_dcheck_snmp_oid'
 	)
 	->addRow(

@@ -35,18 +35,32 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'index' => 'required|int32',
+			'index' => 'required|int32', // Count of exists checks.
 			'update' => 'in 1',
 			'validate' => 'in 1',
 			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
-			'dcheckid' => 'string'
+
+			'dcheckid' => 'string',
+			'ports' =>					'db dchecks.ports',
+			'snmp_community' =>			'db dchecks.snmp_community',
+			'key_' =>					'db dchecks.key_',
+			'snmpv3_contextname' =>		'db dchecks.snmpv3_contextname',
+			'snmpv3_securityname' =>	'db dchecks.snmpv3_securityname',
+			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel',
+			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol',
+			'snmpv3_authpassphrase' =>	'db dchecks.snmpv3_authpassphrase',
+			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol',
+			'snmpv3_privpassphrase' =>	'db dchecks.snmpv3_privpassphrase'
 		];
 
-		if (getRequest('update', 0) || getRequest('validate', 0)) {
-			$fields += $this->getAdditionallyFields();
+		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			if ($this->getInput('update', 0) || $this->getInput('validate', 0)) {
+				$ret = $this->validateFormInputs();
+			}
 		}
 
-		$ret = $this->validateInput($fields);
 		if (!$ret) {
 			$output = [];
 
@@ -63,57 +77,31 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 	}
 
 	/**
-	 * Get additionally inpuf field rules for validation.
+	 * Validate form fields.
 	 *
 	 * @return array
 	 */
-	protected function getAdditionallyFields() {
-		$fields = [];
+	protected function validateFormInputs() {
+		$fields = [
+			'ports' => 'not_empty',
+			'type' => 'in '.implode(',', array_keys(discovery_check_type2str()))
+		];
 
-		switch (getRequest('type', self::DEFAULT_TYPE)) {
-			case SVC_SSH:
-			case SVC_LDAP:
-			case SVC_SMTP:
-			case SVC_FTP:
-			case SVC_HTTP:
-			case SVC_POP:
-			case SVC_NNTP:
-			case SVC_IMAP:
-			case SVC_TCP:
-			case SVC_HTTPS:
-			case SVC_TELNET:
-				$fields['ports'] = 'int32|required';
-				break;
-
+		switch ($this->getInput('type', self::DEFAULT_TYPE)) {
 			case SVC_AGENT:
-				$fields['ports'] = 'int32|required';
-				$fields['key_'] = 'required|not_empty';
+				$fields['key_'] = 'not_empty';
 				break;
 
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
-				$fields['ports'] = 'int32|required';
-				$fields['snmp_community'] = 'required|not_empty';
-				$fields['snmp_oid'] = 'string';
-				if (getRequest('validate', 0)) {
-					$fields['snmp_oid'] .= '|not_empty|required';
-				}
-				$fields['key_'] = 'string';
-				if (getRequest('update', 0)) {
-					$fields['key_'] .= '|not_empty|required';
-				}
+				$fields['snmp_community'] = 'not_empty';
+				$fields['key_'] = 'string|not_empty';
 				break;
 
 			case SVC_SNMPv3:
-				$fields['ports'] = 'int32|required';
-				$fields['snmp_oid'] = 'string';
-				if (getRequest('validate', 0)) {
-					$fields['snmp_oid'] .= '|not_empty|required';
-				}
-				$fields['key_'] = 'string';
-				if (getRequest('update', 0)) {
-					$fields['key_'] .= '|not_empty|required';
-				}
+				$fields['key_'] = 'string|not_empty';
+				$fields['snmpv3_contextname'] = 'string';
+				$fields['snmpv3_securityname'] = 'string';
 				$fields['snmpv3_securitylevel'] = 'in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]);
 
 				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
@@ -125,7 +113,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 				if ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					$fields['snmpv3_privprotocol'] = 'in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES;
-					$fields['snmpv3_privpassphrase'] = 'required|not_empty';
+					$fields['snmpv3_privpassphrase'] = 'string|not_empty';
 				}
 				break;
 
@@ -133,7 +121,18 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 				$fields['ports'] = 'in 0';
 		}
 
-		return $fields;
+		$data = [];
+		$this->getInputs($data, array_keys($fields));
+
+		$validator = new CNewValidator($data, $fields);
+		array_map('info', $validator->getAllErrors());
+
+		if (!validate_port_list($this->getInput('ports'))) {
+			info(_('Incorrect port range.'));
+			return false;
+		}
+
+		return !$validator->isError();
 	}
 
 	protected function checkPermissions() {

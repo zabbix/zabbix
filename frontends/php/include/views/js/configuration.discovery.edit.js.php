@@ -325,23 +325,17 @@
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
 
-		$form.trimValues(['#ports', '#key_', 'input[name^="snmp"]']);
-
 		$form
 			.parent()
 			.find(".<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>")
 			.remove();
 
-		if ($form.find('#snmp_oid').val() != '') {
-			$form.find('#key_').val($form.find('#snmp_oid').val());
-		}
-
-		if (validateDCheckDuplicate()) {
-			return false;
-		}
+		var formData = jQuery(document.forms['dcheck_form'])
+			.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+			.serialize();
 
 		sendAjaxData('zabbix.php', {
-			data: $form.serialize(),
+			data: formData,
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
@@ -349,6 +343,10 @@
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
+				if (validateDCheckDuplicate()) {
+					return false;
+				}
+
 				var dcheck = response.params,
 					$host_source = jQuery('[name="host_source"]:checked:not([data-id])'),
 					$name_source = jQuery('[name="name_source"]:checked:not([data-id])');
@@ -382,18 +380,9 @@
 
 		for (var zbxDcheckId in ZBX_CHECKLIST) {
 			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
-				var fields_name = [
-					'key_',
-					'type',
-					'ports',
-					'snmp_community',
-					'snmpv3_authprotocol',
-					'snmpv3_authpassphrase',
-					'snmpv3_privprotocol',
-					'snmpv3_privpassphrase',
-					'snmpv3_securitylevel',
-					'snmpv3_securityname',
-					'snmpv3_contextname'
+				var fields_name = ['key_', 'type', 'ports', 'snmp_community', 'snmpv3_authprotocol',
+					'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'snmpv3_securitylevel',
+					'snmpv3_securityname', 'snmpv3_contextname'
 				];
 
 				var duplicate_fields = fields_name
