@@ -1244,9 +1244,10 @@ output {
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
   .table-forms .multiple-field-margin input, .table-forms .multiple-field-margin select {
-    margin-right: 3px; }
-  .table-forms .multiple-field-margin input:not(:first-child), .table-forms .multiple-field-margin select:not(:first-child) {
+    margin-right: 3px;
     margin-left: 3px; }
+  .table-forms .multiple-field-margin input:first-child, .table-forms .multiple-field-margin select:first-child {
+    margin-left: 0; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {

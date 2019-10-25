@@ -1908,9 +1908,10 @@ output {
 	.multiple-field-margin {
 		input, select {
 			margin-right: 3px;
-		}
-		input:not(:first-child), select:not(:first-child) {
 			margin-left: 3px;
+		}
+		input:first-child, select:first-child {
+			margin-left: 0;
 		}
 	}
 
