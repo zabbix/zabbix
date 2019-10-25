@@ -24,12 +24,12 @@ class CControllerGuiUpdate extends CController {
 	protected function checkInput() {
 		$themes = array_keys(Z::getThemes());
 		$fields = [
-			'default_theme'           => 'required | db config.default_theme | in '.implode(',', $themes),
-			'dropdown_first_entry'    => 'required | db config.dropdown_first_entry | in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,
-			'dropdown_first_remember' => 'required | db config.dropdown_first_remember | in 0,1',
-			'search_limit'            => 'required | db config.search_limit | int32 | ge 1| le 999999',
-			'max_in_table'            => 'required | db config.max_in_table | int32 | ge 1| le 99999',
-			'server_check_interval'   => 'required | db config.server_check_interval | in 0,'.SERVER_CHECK_INTERVAL
+			'default_theme'           => 'required|in '.implode(',', $themes).'|db config.default_theme',
+			'dropdown_first_entry'    => 'required|db config.dropdown_first_entry|in '.ZBX_DROPDOWN_FIRST_NONE.','.ZBX_DROPDOWN_FIRST_ALL,
+			'dropdown_first_remember' => 'required|db config.dropdown_first_remember|in 0,1',
+			'search_limit'            => 'required|db config.search_limit|ge 1|le 999999',
+			'max_in_table'            => 'required|db config.max_in_table|ge 1|le 99999',
+			'server_check_interval'   => 'required|db config.server_check_interval|in 0,'.SERVER_CHECK_INTERVAL
 		];
 
 		$ret = $this->validateInput($fields);
@@ -45,6 +45,7 @@ class CControllerGuiUpdate extends CController {
 					$response->setMessageError(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
