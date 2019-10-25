@@ -60,20 +60,12 @@ class CControllerTrigSeverityUpdate extends CController {
 		$ret &= $this->validateColors($color_fields);
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-
-				default:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'trigseverity.edit')
-					);
-					$response->setMessageError(_('Cannot update configuration'));
-					$response->setFormData($this->getInputAll());
-					$this->setResponse($response);
-					break;
-			}
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'trigseverity.edit')
+			);
+			$response->setMessageError(_('Cannot update configuration'));
+			$response->setFormData($this->getInputAll());
+			$this->setResponse($response);
 		}
 
 		return $ret;
