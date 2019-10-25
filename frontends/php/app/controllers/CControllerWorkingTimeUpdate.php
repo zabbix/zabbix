@@ -67,6 +67,11 @@ class CControllerWorkingTimeUpdate extends CController {
 		$this->setResponse($response);
 	}
 
+	/**
+	 * @param string $working_time
+	 *
+	 * @return bool
+	 */
 	protected function validateWorkingTime($working_time) {
 		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 

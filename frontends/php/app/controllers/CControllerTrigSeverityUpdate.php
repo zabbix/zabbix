@@ -106,6 +106,11 @@ class CControllerTrigSeverityUpdate extends CController {
 		$this->setResponse($response);
 	}
 
+	/**
+	 * @param array $fields
+	 *
+	 * @return bool
+	 */
 	protected function validateColors($fields) {
 		$color_validator = new CColorValidator();
 
