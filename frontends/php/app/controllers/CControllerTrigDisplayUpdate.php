@@ -21,13 +21,23 @@
 
 class CControllerTrigDisplayUpdate extends CController {
 
+	/**
+	 * @var array
+	 */
+	protected $color_caption;
+
+	protected function init() {
+		$this->color_captions = [
+			'problem_unack_color' => _('Unacknowledged PROBLEM events'),
+			'problem_ack_color'   => _('Acknowledged PROBLEM events'),
+			'ok_unack_color'      => _('Unacknowledged RESOLVED events'),
+			'ok_ack_color'        => _('Acknowledged RESOLVED events')
+		];
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'custom_color'        => 'int32 | in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
-			'problem_unack_color' => 'string',
-			'problem_ack_color'   => 'string',
-			'ok_unack_color'      => 'string',
-			'ok_ack_color'        => 'string',
 			'problem_unack_style' => 'required | int32 | in 0,1',
 			'problem_ack_style'   => 'required | int32 | in 0,1',
 			'ok_unack_style'      => 'required | int32 | in 0,1',
@@ -36,25 +46,27 @@ class CControllerTrigDisplayUpdate extends CController {
 			'blink_period'        => 'required | string | not_empty'
 		];
 
-		$ret = $this->validateInput($fields);
+		$color_fields = [
+			'problem_unack_color' => 'string',
+			'problem_ack_color'   => 'string',
+			'ok_unack_color'      => 'string',
+			'ok_ack_color'        => 'string'
+		];
+
+		$ret = $this->validateInput($fields + $color_fields);
+		if ($this->getInput('custom_color') == EVENT_CUSTOM_COLOR_ENABLED) {
+			$ret &= $this->validateColors($color_fields);
+		}
 
 		if (!$ret) {
-			switch ($this->getValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'trigdisplay.edit')
-					);
+			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'trigdisplay.edit')
+			);
 
-					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update configuration'));
+			$response->setFormData($this->getInputAll());
+			$response->setMessageError(_('Cannot update configuration'));
 
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse($response);
 		}
 
 		return $ret;
@@ -84,25 +96,6 @@ class CControllerTrigDisplayUpdate extends CController {
 			$update_values['problem_ack_color']   = $this->getInput('problem_ack_color');
 			$update_values['ok_unack_color']      = $this->getInput('ok_unack_color');
 			$update_values['ok_ack_color']        = $this->getInput('ok_ack_color');
-
-			$color_validator = new CColorValidator();
-
-			$color_caption = [
-				'problem_unack_color' => _('Unacknowledged PROBLEM events'),
-				'problem_ack_color'   => _('Acknowledged PROBLEM events'),
-				'ok_unack_color'      => _('Unacknowledged RESOLVED events'),
-				'ok_ack_color'        => _('Acknowledged RESOLVED events')
-			];
-
-			foreach ($color_caption as $field => $caption) {
-				if (!$color_validator->validate($this->getInput($field))) {
-					error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
-					$response->setMessageError(_('Cannot update configuration'));
-					$response->setFormData($this->getInputAll());
-
-					return $this->setResponse($response);
-				}
-			}
 		}
 
 		DBstart();
@@ -118,5 +111,19 @@ class CControllerTrigDisplayUpdate extends CController {
 		}
 
 		$this->setResponse($response);
+	}
+
+	protected function validateColors($fields) {
+		$color_validator = new CColorValidator();
+
+		foreach (array_keys($fields) as $field) {
+			if (!$color_validator->validate($this->getInput($field))) {
+				$caption = $this->color_captions[$field];
+				error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
