@@ -55,7 +55,7 @@ foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
 	$months[] = [
 		'name' => getMonthCaption($month),
 		'value' => $value,
-		'checked' => (bool) ($value & $data['month'])
+		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['month']))
 	];
 }
 
