@@ -676,6 +676,16 @@ AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for linker options --start-group/--end-group)
+saved_LDFLAGS="$LDFLAGS"
+LDFLAGS="-Wl,--start-group -Wl,--end-group"
+AC_TRY_LINK([], [], 
+HAVE_START_GROUP="yes"
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+)
+LDFLAGS="$saved_LDFLAGS"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1798,7 +1808,7 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-if test "x$ARCH" != "xosx"; then
+if test "x$HAVE_START_GROUP" = "xyes"; then
 	LD_START_GROUP=-Wl,--start-group
 	LD_END_GROUP=-Wl,--end-group
 fi
