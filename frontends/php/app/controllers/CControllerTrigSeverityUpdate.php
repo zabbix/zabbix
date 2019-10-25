@@ -21,26 +21,59 @@
 
 class CControllerTrigSeverityUpdate extends CController {
 
+	/**
+	 * @var array
+	 */
+	protected $color_captions;
+
+	protected function init() {
+		$this->color_captions = [
+			'severity_color_0' => _('Not classified'),
+			'severity_color_1' => _('Information'),
+			'severity_color_2' => _('Warning'),
+			'severity_color_3' => _('Average'),
+			'severity_color_4' => _('High'),
+			'severity_color_5' => _('Disaster')
+		];
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'severity_name_0'  => 'required | string | not_empty',
-			'severity_color_0' => 'required | string | not_empty',
 			'severity_name_1'  => 'required | string | not_empty',
-			'severity_color_1' => 'required | string | not_empty',
 			'severity_name_2'  => 'required | string | not_empty',
-			'severity_color_2' => 'required | string | not_empty',
 			'severity_name_3'  => 'required | string | not_empty',
-			'severity_color_3' => 'required | string | not_empty',
 			'severity_name_4'  => 'required | string | not_empty',
+			'severity_name_5'  => 'required | string | not_empty'
+		];
+
+		$color_fields = [
+			'severity_color_0' => 'required | string | not_empty',
+			'severity_color_1' => 'required | string | not_empty',
+			'severity_color_2' => 'required | string | not_empty',
+			'severity_color_3' => 'required | string | not_empty',
 			'severity_color_4' => 'required | string | not_empty',
-			'severity_name_5'  => 'required | string | not_empty',
 			'severity_color_5' => 'required | string | not_empty'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields + $color_fields);
+		$ret &= $this->validateColors($color_fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			switch ($this->GetValidationError()) {
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+
+				default:
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'trigseverity.edit')
+					);
+					$response->setMessageError(_('Cannot update configuration'));
+					$response->setFormData($this->getInputAll());
+					$this->setResponse($response);
+					break;
+			}
 		}
 
 		return $ret;
@@ -54,27 +87,6 @@ class CControllerTrigSeverityUpdate extends CController {
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'trigseverity.edit')
 		);
-
-		$color_validator = new CColorValidator();
-
-		$color_caption = [
-			'severity_color_0' => _('Not classified'),
-			'severity_color_1' => _('Information'),
-			'severity_color_2' => _('Warning'),
-			'severity_color_3' => _('Average'),
-			'severity_color_4' => _('High'),
-			'severity_color_5' => _('Disaster')
-		];
-
-		foreach ($color_caption as $field => $caption) {
-			if (!$color_validator->validate($this->getInput($field))) {
-				error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
-				$response->setMessageError(_('Cannot update configuration'));
-				$response->setFormData($this->getInputAll());
-
-				return $this->setResponse($response);
-			}
-		}
 
 		$result = update_config([
 			'severity_name_0'  => $this->getInput('severity_name_0'),
@@ -100,5 +112,19 @@ class CControllerTrigSeverityUpdate extends CController {
 		}
 
 		$this->setResponse($response);
+	}
+
+	protected function validateColors($fields) {
+		$color_validator = new CColorValidator();
+
+		foreach (array_keys($fields) as $field) {
+			if (!$color_validator->validate($this->getInput($field))) {
+				$caption = $this->color_captions[$field];
+				error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
