@@ -173,7 +173,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 				'day' =>				1,
 				'period_days' =>		floor($data['period'] / SEC_PER_DAY),
 				'period_hours' =>		floor(($data['period'] % SEC_PER_DAY) / SEC_PER_HOUR),
-				'period_minutes' => 	floor((($data['period'] % SEC_PER_DAY) % SEC_PER_DAY) / SEC_PER_MIN),
+				'period_minutes' => 	floor((($data['period'] % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN),
 				'hour' =>				sprintf("%02d", floor($data['start_time'] / SEC_PER_HOUR)),
 				'minute' =>				sprintf("%02d", floor(($data['start_time'] % SEC_PER_HOUR) / SEC_PER_MIN)),
 				'month_date_type' =>	($data['timeperiod_type'] != TIMEPERIOD_TYPE_MONTHLY || $data['day'] > 0)
