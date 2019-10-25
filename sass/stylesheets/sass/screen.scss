@@ -1905,6 +1905,15 @@ output {
 		}
 	}
 
+	.multiple-field-margin {
+		input, select {
+			margin-right: 3px;
+		}
+		input:not(:first-child), select:not(:first-child) {
+			margin-left: 3px;
+		}
+	}
+
 	h4 {
 		margin-bottom: -5px;
 	}

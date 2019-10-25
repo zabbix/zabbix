@@ -136,7 +136,8 @@ $form
 			(new CNumericBox('minute', $data['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		],
-		'row_timeperiod_period_at_hours_minutes'
+		'row_timeperiod_period_at_hours_minutes',
+		ZBX_STYLE_MULTIPLE_FIELD_MARGIN
 	)
 	->addRow((new CLabel(_('Maintenance period length'), 'period_days'))->setAsteriskMark(),
 		[
@@ -148,7 +149,8 @@ $form
 			new CComboBox('period_minutes', $data['period_minutes'], null, range(0, 59)),
 			_('Minutes')
 		],
-		'row_timeperiod_period_length'
+		'row_timeperiod_period_length',
+		ZBX_STYLE_MULTIPLE_FIELD_MARGIN
 	);
 
 $output = [
