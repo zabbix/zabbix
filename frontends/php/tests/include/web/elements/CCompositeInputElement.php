@@ -69,11 +69,16 @@ class CCompositeInputElement extends CElement {
 	}
 
 	/**
-	 * Get value of ExtendedInput element.
-	 *
-	 * @return string
+	 * @inheritdoc
 	 */
 	public function getValue() {
 		return $this->getInput()->getValue();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		return $this->getInput()->checkValue($expected, $raise_exception);
 	}
 }

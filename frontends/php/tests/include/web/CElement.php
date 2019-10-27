@@ -458,7 +458,7 @@ class CElement extends CBaseElement implements IWaitable {
 	public function click($force = false) {
 		try {
 			return parent::click();
-		} catch (UnrecognizedExceptionException $exception) {
+		} catch (Exception $exception) {
 			if (!$force) {
 				throw $exception;
 			}
@@ -519,7 +519,7 @@ class CElement extends CBaseElement implements IWaitable {
 	public function detect($options = []) {
 
 		$tag = $this->getTagName();
-		if ($tag === 'textarea' ) {
+		if ($tag === 'textarea') {
 			return $this->asElement($options);
 		}
 
@@ -580,5 +580,41 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public static function onNotSupportedMethod($method) {
 		throw new Exception('Method "'.$method.'" is not supported by "'.static::class.'" class elements.');
+	}
+
+	/**
+	 * Check element value.
+	 *
+	 * @param mixed $expected    expected value of the element
+	 *
+	 * @return boolean
+	 *
+	 * @throws Exception
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		$value = $this->getValue();
+
+		if (is_array($value)) {
+			if (!is_array($expected)) {
+				$expected = [$expected];
+			}
+
+			foreach (['value', 'expected'] as $var) {
+				$values = [];
+				foreach ($$var as $item) {
+					$values[] = '"'.$item.'"';
+				}
+
+				sort($values);
+
+				$$var = implode(', ', $values);
+			}
+		}
+
+		if ($expected != $value && $raise_exception) {
+			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
+		}
+
+		return ($expected == $value);
 	}
 }

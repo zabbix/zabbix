@@ -1,0 +1,155 @@
+---
+test case: "successfully parsed #1"
+in:
+  start_id: 100
+  count1: 1
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid=100
+  sqlora_regex: select \* from items where itemid=100
+  sqlite_regex: select \* from items where itemid=100
+---
+test case: "successfully parsed #4"
+in:
+  start_id: 100
+  count1: 4
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(100,(?:\d+,){2}103\)
+  sqlora_regex: select \* from items where itemid in \(100,(?:\d+,){2}103\)
+  sqlite_regex: select \* from items where itemid in \(100,(?:\d+,){2}103\)
+---
+test case: "successfully parsed #10"
+in:
+  start_id: 100
+  count1: 10
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(100,(?:\d+,){8}109\)
+  sqlora_regex: select \* from items where itemid between 100 and 109
+  sqlite_regex: select \* from items where itemid in \(100,(?:\d+,){8}109\)
+---
+test case: "successfully parsed #951"
+in:
+  start_id: 1000
+  count1: 951
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \(itemid in \(1000,(?:\d+,){948}1949\) or itemid in \(1950\)
+  sqlora_regex: select \* from items where itemid between 1000 and 1950
+  sqlite_regex: select \* from items where \(itemid in \(1000,(?:\d+,){948}1949\) or itemid in \(1950\)
+---
+test case: "successfully parsed #1000"
+in:
+  start_id: 1000
+  count1: 1000
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \(itemid in \(1000,(?:\d+,){948}1949\) or itemid in \(1950,(?:\d+,){48}1999\)\)
+  sqlora_regex: select \* from items where itemid between 1000 and 1999
+  sqlite_regex: select \* from items where \(itemid in \(1000,(?:\d+,){948}1949\) or itemid in \(1950,(?:\d+,){48}1999\)\)
+---
+test case: "successfully parsed #2000"
+in:
+  start_id: 100
+  count1: 2000
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \(itemid in \(100,(?:\d++,){948}1049\) or itemid in \(1050,(?:\d++,){948}1999\) or itemid in \(2000,(?:\d++,){98}2099\)\)
+  sqlora_regex: select \* from items where itemid between 100 and 2099
+  sqlite_regex: select \* from items where \(itemid in \(100,(?:\d++,){948}1049\) or itemid in \(1050,(?:\d++,){948}1999\) or itemid in \(2000,(?:\d++,){98}2099\)\)
+---
+test case: "successfully parsed #902501"
+in:
+  start_id: 0
+  count1: 902501
+  count2: 0
+  shift: 0
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where \((?:itemid in \((?:\d++,)++\d++\) or ){950}itemid in \(902500\)\)
+  sqlora_regex: select \* from items where itemid between 0 and 902500
+  sqlite_regex: select \* from items where \((?:\((?:itemid in \((?:\d++,)++\d++\) or ){949}itemid in \((?:\d++,)++\d++\)\) or ){1}\(itemid in \(902500\)\)\)
+---
+test case: "successfully parsed #4x2"
+in:
+  start_id: 10
+  count1: 4
+  count2: 0
+  shift: 100
+  repeat: 1
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(10,(?:\d+,){6}113\)
+  sqlora_regex: select \* from items where itemid in \(10,(?:\d+,){6}113\)
+  sqlite_regex: select \* from items where itemid in \(10,(?:\d+,){6}113\)
+---
+test case: "successfully parsed #5x2"
+in:
+  start_id: 10
+  count1: 5
+  count2: 0
+  shift: 100
+  repeat: 1
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(10,(?:\d+,){8}114\)
+  sqlora_regex: select \* from items where \(itemid between 10 and 14 or itemid between 110 and 114\)
+  sqlite_regex: select \* from items where itemid in \(10,(?:\d+,){8}114\)
+---
+test case: "successfully parsed #5x4x1"
+in:
+  start_id: 10
+  count1: 5
+  count2: 4
+  shift: 100
+  repeat: 0
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(10,(?:\d+,){7}113\)
+  sqlora_regex: select \* from items where \(itemid between 10 and 14 or itemid in \(110,(?:\d+,){2}113\)\)
+  sqlite_regex: select \* from items where itemid in \(10,(?:\d+,){7}113\)
+---
+test case: "successfully parsed #5x4x2"
+in:
+  start_id: 10
+  count1: 5
+  count2: 4
+  shift: 100
+  repeat: 1
+  field_name: itemid
+  sql_where: select * from items where
+out:
+  sql_regex: select \* from items where itemid in \(10,(?:\d+,){16}313\)
+  sqlora_regex: select \* from items where \(itemid between 10 and 14 or itemid between 210 and 214 or itemid in \(110,(?:\d+,){6}313\)\)
+  sqlite_regex: select \* from items where itemid in \(10,(?:\d+,){16}313\)
+...

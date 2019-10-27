@@ -51,6 +51,13 @@ class CCheckboxElement extends CElement {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		return $this->isChecked();
+	}
+
+	/**
 	 * Set checkbox state to checked.
 	 *
 	 * @return $this
@@ -100,15 +107,5 @@ class CCheckboxElement extends CElement {
 	 */
 	public function fill($checked) {
 		return $this->set($checked);
-	}
-
-	/**
-	 * Alias for isChecked.
-	 * @see self::isChecked
-	 *
-	 * @return boolean
-	 */
-	public function getValue() {
-		return $this->isChecked();
 	}
 }

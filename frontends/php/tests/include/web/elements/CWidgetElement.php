@@ -40,12 +40,21 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
+	 * Get header of widget.
+	 *
+	 * @return string
+	 */
+	public function getHeaderText() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head")]/h4')->one()->getText();
+	}
+
+	/**
 	 * Get content of widget.
 	 *
 	 * @return CElement
 	 */
 	public function getContent() {
-		return $this->query('xpath:.//div[@class="dashbrd-grid-widget-content"]')->one();
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-content")]')->one();
 	}
 
 	/**
@@ -89,3 +98,4 @@ class CWidgetElement extends CElement {
 		};
 	}
 }
+

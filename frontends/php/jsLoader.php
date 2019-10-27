@@ -23,6 +23,7 @@
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/locales.inc.php';
+require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // if we must provide language constants on language different from English
 if (isset($_GET['lang'])) {
@@ -44,8 +45,6 @@ if (isset($_GET['lang'])) {
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
 }
-
-require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = [
@@ -123,7 +122,9 @@ $tranStrings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Release to create a new widget.' => _('Release to create a new widget.'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
-		'Adjust widget refresh interval' => _('Adjust widget refresh interval')
+		'Adjust widget refresh interval' => _('Adjust widget refresh interval'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -135,7 +136,10 @@ $tranStrings = [
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?')
+		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Success message' => _('Success message'),
+		'Error message' => _('Error message'),
+		'Warning message' => _('Warning message')
 	],
 	'class.calendar.js' => [
 		'S_CALENDAR' => _('Calendar'),
@@ -308,10 +312,8 @@ $tranStrings = [
 	]
 ];
 
+$js = '';
 if (empty($_GET['files'])) {
-	if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-		header('Set-Cookie: localstoragePath='.crc32($_COOKIE['zbx_sessionid']));
-	}
 
 	$files = [
 		'prototype.js',
@@ -334,6 +336,12 @@ if (empty($_GET['files'])) {
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {
+		require_once dirname(__FILE__).'/include/defines.inc.php';
+
+		if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
+			$js .= 'window.localstoragePath = "'.crc32($_COOKIE[ZBX_SESSION_NAME]).'";';
+		}
+
 		$files[] = 'class.promise.js';
 		$files[] = 'class.localstorage.js';
 		$files[] = 'class.browsertab.js';
@@ -347,7 +355,7 @@ else {
 	$files = $_GET['files'];
 }
 
-$js = 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
+$js .= 'if (typeof(locale) === "undefined") { var locale = {}; }'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $origStr => $str) {

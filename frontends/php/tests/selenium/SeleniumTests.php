@@ -45,6 +45,7 @@ require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageItems.php';
 require_once dirname(__FILE__).'/testPageItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
+require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
@@ -158,6 +159,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageTriggers');
+		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageLatestData');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
@@ -246,7 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testGraphWidget');
+//		$suite->addTestSuite('testGraphWidget');
 
 		return $suite;
 	}

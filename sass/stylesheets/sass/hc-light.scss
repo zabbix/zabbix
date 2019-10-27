@@ -33,7 +33,6 @@ $font-alt-color: #333;
 $body-bg-color: #fff;
 $overlay-bg-color: #000;
 
-
 // UI
 $ui-bg-color: #fff;
 $ui-bg-selected-color: #333;
@@ -52,7 +51,6 @@ $table-border-color: #888;
 
 $ui-tab-bg-selected-color: #888;
 
-
 // FORMS
 $form-font-color: #000;
 $form-bg-color: #fff;
@@ -68,6 +66,12 @@ $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
 $input-placeholder-color: #777;
+
+// ERROR MESSAGES
+$msg-bad-color: $red;
+$msg-good-color: $green;
+$msg-warning-color: #b37e12;
+$msg-warning-border-color: #ffb319;
 
 // BUTTONS
 $btn-font-color: #fff;
@@ -120,6 +124,9 @@ $problem-unack-fg-color: #cc0000;
 $problem-ack-fg-color: #cc0000;
 $ok-unack-fg-color: #009900;
 $ok-ack-fg-color: #009900;
+
+// MULTISELECT
+$multiselect-selected-bg-color: #777;
 
 .status-na-bg, .status-info-bg, .status-warning-bg, .status-average-bg, .status-high-bg, .status-disaster-bg {
 	border-color: rgba($ui-bg-color, .2) !important;
@@ -560,15 +567,12 @@ ul.top-nav-icons {
 
 	.multiselect-list {
 
-		li {
+		li.selected {
 
-			&.selected {
-
-				.subfilter-enabled,
-				.subfilter-disable-btn {
-					background-color: #777;
-					@include box-shadow(0 0 0 1px rgba($blue, 1));
-				}
+			.subfilter-enabled,
+			.subfilter-disable-btn,
+			.subfilter-disable-btn:active {
+				@include box-shadow(0 0 0 1px rgba($blue, 1));
 			}
 		}
 	}
@@ -1049,35 +1053,12 @@ td.inactive-bg {
 }
 
 // ERROR MESSAGES
-.msg-bad {
-	.link-action {
-		color: $red;
+.msg-bad,
+.msg-good,
+.msg-warning {
 
-		.arrow-up {
-			border-bottom-color: $red;
-		}
-		.arrow-down {
-			border-top-color: $red;
-		}
-		&:hover {
+	.link-action:hover {
 		color: $link-hover-color;
-		}
-	}
-}
-
-.msg-good {
-	.link-action {
-		color: $green;
-
-		.arrow-up {
-			border-bottom-color: $green;
-		}
-		.arrow-down {
-			border-top-color: $green;
-		}
-		&:hover {
-		color: $link-hover-color;
-		}
 	}
 }
 

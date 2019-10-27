@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../CElement.php';
  * Checkbox list element.
  */
 class CCheckboxListElement extends CElement {
+
 	/**
 	 * Get collection of checkboxes.
 	 *
@@ -137,34 +138,26 @@ class CCheckboxListElement extends CElement {
 	}
 
 	/**
-	 * Get checkbox labels with checked state.
-	 *
-	 * @return array
-	 */
-	public function getValue() {
-		$values = [];
-		foreach ($this->getCheckboxes() as $checkbox) {
-			if (!$checkbox->isChecked()) {
-				continue;
-			}
-
-			$label = $checkbox->getText();
-			if ($label === null) {
-				throw new Exception('Failed to get checkbox label name');
-			}
-
-			$values[] = $label;
-		}
-
-		return $values;
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
 		$xpath = 'xpath:.//input[@type="checkbox"][not(@disabled)]';
 
 		return (($this->getCheckboxes()->count() === $this->query($xpath)->count()) === $enabled);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getValue() {
+		$value = [];
+
+		foreach ($this->getCheckboxes() as $checkbox) {
+			if ($checkbox->isChecked() && ($label = $checkbox->getLabel()) !== null) {
+				$value[] = $label->getText();
+			}
+		}
+
+		return $value;
 	}
 }
