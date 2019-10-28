@@ -4511,6 +4511,7 @@ out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	psk_for_cb = NULL;
+
 	return ret;
 }
 #endif
