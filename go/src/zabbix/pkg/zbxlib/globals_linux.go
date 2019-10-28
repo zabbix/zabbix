@@ -1,5 +1,3 @@
-// +build linux
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,30 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+package zbxlib
 
-import (
-	"reflect"
-	"testing"
-	"time"
-	"zabbix/pkg/std"
-)
-
-func TestFileSize(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	impl.timeout = time.Second * 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.size returned error %s", err.Error())
-	} else {
-		if filesize, ok := result.(int64); !ok {
-			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if filesize != 4 {
-				t.Errorf("vfs.file.size returned invalid result")
-			}
-		}
-	}
-}
+/*
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a
+#cgo LDFLAGS: ${SRCDIR}/../../../../../src/libs/zbxsysinfo/linux/libspecsysinfo.a
+*/
+import "C"

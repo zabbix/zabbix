@@ -1,4 +1,4 @@
-// +build linux
+// +build !linux
 
 /*
 ** Zabbix
@@ -19,30 +19,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+package netif
 
-import (
-	"reflect"
-	"testing"
-	"time"
-	"zabbix/pkg/std"
-)
+import "fmt"
 
-func TestFileSize(t *testing.T) {
-	stdOs = std.NewMockOs()
+func getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
+	err = fmt.Errorf("Unsupported metric.")
+	return
+}
 
-	impl.timeout = time.Second * 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.size returned error %s", err.Error())
-	} else {
-		if filesize, ok := result.(int64); !ok {
-			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if filesize != 4 {
-				t.Errorf("vfs.file.size returned invalid result")
-			}
-		}
-	}
+func getDevList() (string, error) {
+	return "", fmt.Errorf("Unsupported metric.")
 }

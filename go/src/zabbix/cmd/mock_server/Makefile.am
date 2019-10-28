@@ -3,14 +3,14 @@
 all: build
 
 build:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go build
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOPATH="${GOPATH}" go build
 
 clean:
 	CGO_LDFLAGS="${CGO_LDFLAGS}" go clean
 
 install:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go install
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOPATH="${GOPATH}" go install
 
 check:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test
 

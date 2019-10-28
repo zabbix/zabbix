@@ -1,3 +1,5 @@
+// +build !linux
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -26,14 +28,10 @@ package zbxlib
 
 #include "common.h"
 #include "sysinfo.h"
-#include "module.h"
-typedef int (*zbx_agent_check_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -43,19 +41,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -66,71 +52,61 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-static int execute_check(const char *key, zbx_agent_check_t check_func, char **value, char **error)
-{
-	int ret = FAIL;
-	char **pvalue;
-	AGENT_RESULT result;
-	AGENT_REQUEST request;
-
-	init_request(&request);
-	init_result(&result);
-	if (SUCCEED != parse_item_key(key, &request))
-	{
-		*value = zbx_strdup(NULL, "Invalid item key format.");
-		goto out;
-	}
-	if (SYSINFO_RET_OK != check_func(&request, &result))
-	{
-		if (0 != ISSET_MSG(&result))
-		{
-			*error = zbx_strdup(NULL, result.msg);
-		}
-		else
-			*error = zbx_strdup(NULL, "Unknown error.");
-		goto out;
-	}
-
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
-		*value = zbx_strdup(NULL, *pvalue);
-
-	ret = SUCCEED;
-out:
-	free_result(&result);
-	free_request(&request);
-	return ret;
-}
-
 */
 import "C"
 
 import (
-	"errors"
-	"fmt"
 	"unsafe"
-	"zabbix/pkg/itemutil"
 )
 
-func ExecuteCheck(key string, params []string) (result *string, err error) {
-	cfunc := resolveMetric(key)
+func resolveMetric(key string) (cfunc unsafe.Pointer) {
+	switch key {
+	case "system.localtime":
+		return unsafe.Pointer(C.SYSTEM_LOCALTIME)
+	case "net.dns":
+		return unsafe.Pointer(C.NET_DNS)
+	case "net.dns.record":
+		return unsafe.Pointer(C.NET_DNS_RECORD)
+	case "system.boottime":
+		return unsafe.Pointer(C.SYSTEM_BOOTTIME)
+	case "web.page.get":
+		return unsafe.Pointer(C.WEB_PAGE_GET)
+	case "web.page.perf":
+		return unsafe.Pointer(C.WEB_PAGE_PERF)
+	case "web.page.regexp":
+		return unsafe.Pointer(C.WEB_PAGE_REGEXP)
+	case "net.tcp.listen":
+		return unsafe.Pointer(C.NET_TCP_LISTEN)
+	case "net.tcp.port":
+		return unsafe.Pointer(C.NET_TCP_PORT)
+	case "net.tcp.service", "net.udp.service":
+		return unsafe.Pointer(C.CHECK_SERVICE)
+	case "net.tcp.service.perf", "net.udp.service.perf":
+		return unsafe.Pointer(C.CHECK_SERVICE_PERF)
+	case "net.udp.listen":
+		return unsafe.Pointer(C.NET_UDP_LISTEN)
+	case "system.cpu.load":
+		return unsafe.Pointer(C.SYSTEM_CPU_LOAD)
+	case "system.users.num":
+		return unsafe.Pointer(C.SYSTEM_USERS_NUM)
+	case "vfs.dir.count":
+		return unsafe.Pointer(C.VFS_DIR_COUNT)
+	case "vfs.dir.size":
+		return unsafe.Pointer(C.VFS_DIR_SIZE)
+	case "vfs.file.md5sum":
+		return unsafe.Pointer(C.VFS_FILE_MD5SUM)
+	case "vfs.file.regmatch":
+		return unsafe.Pointer(C.VFS_FILE_REGMATCH)
+	case "vfs.fs.discovery":
+		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
+	case "vfs.fs.inode":
+		return unsafe.Pointer(C.VFS_FS_INODE)
+	case "vfs.fs.size":
+		return unsafe.Pointer(C.VFS_FS_SIZE)
+	case "vm.memory.size":
+		return unsafe.Pointer(C.VM_MEMORY_SIZE)
 
-	if cfunc == nil {
-		return nil, fmt.Errorf("Unsupported metric %s", key)
+	default:
+		return
 	}
-
-	var cvalue, cerrmsg *C.char
-	ckey := C.CString(itemutil.MakeKey(key, params))
-	if C.execute_check(ckey, C.zbx_agent_check_t(cfunc), &cvalue, &cerrmsg) == Succeed {
-		if cvalue != nil {
-			value := C.GoString(cvalue)
-			result = &value
-		}
-		C.free(unsafe.Pointer(cvalue))
-
-	} else {
-		err = errors.New(C.GoString(cerrmsg))
-		C.free(unsafe.Pointer(cerrmsg))
-	}
-	C.free(unsafe.Pointer(ckey))
-	return
 }
