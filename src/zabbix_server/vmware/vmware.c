@@ -508,7 +508,7 @@ static int	zbx_http_post(CURL *easyhandle, const char *request, ZBX_HTTPPAGE **r
  ******************************************************************************/
 static int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc, char **error)
 {
-	xmlDoc		*doc;
+	xmlDoc		*doc = NULL;
 	ZBX_HTTPPAGE	*resp;
 	int		ret = SUCCEED;
 
