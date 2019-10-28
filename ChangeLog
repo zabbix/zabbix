@@ -57,6 +57,11 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
 
 --------------------------------------------------------------------------------
+Changes for 4.4.1
+
+4.4.1rc1 was released as 4.4.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.4.1rc1
 
 New features:
@@ -275,6 +280,11 @@ Bug fixes:
 ..F....... [ZBX-10786] added placeholder for "Required string" field in web monitoring (vasilijs)
 ..F....... [ZBX-16153] fixed 500 Internal Server Error when trying to preview pie/exploded graph without items (rlataria)
 ..F....... [ZBX-16204] fixed undefined offset in CControllerWidgetProblemHostsView (rlataria)
+
+--------------------------------------------------------------------------------
+Changes for 4.2.8
+
+4.2.8rc1 was released as 4.2.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.2.8rc1
@@ -890,6 +900,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.14
+
+4.0.14rc1 was released as 4.0.14 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.14rc1
