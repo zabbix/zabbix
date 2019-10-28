@@ -238,7 +238,7 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		return nil, fmt.Errorf("Unsupported item key: %s", key)
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
-	return unsafe.Pointer(C.new_metric(ckey, C.ulong(lastLogsize), C.int(mtime), C.int(flags))), nil
+	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 
 func FreeActiveMetric(data unsafe.Pointer) {
@@ -248,7 +248,7 @@ func FreeActiveMetric(data unsafe.Pointer) {
 func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
-	var clastLogsizeSent, clastLogsizeLast C.ulong
+	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cmtimeSent, cmtimeLast C.int
 	C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeSent, &cmtimeSent)
 	clastLogsizeLast = clastLogsizeSent
@@ -263,7 +263,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 	// add cached results
 	var cvalue *C.char
-	var clastlogsize C.ulong
+	var clastlogsize C.zbx_uint64_t
 	var cstate, cmtime C.int
 	for i := 0; C.get_log_value(result, C.int(i), &cvalue, &cstate, &clastlogsize, &cmtime) != C.FAIL; i++ {
 		var value string

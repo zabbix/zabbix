@@ -1,5 +1,3 @@
-// +build linux
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA
@@ -19,30 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+package plugins
 
 import (
-	"reflect"
-	"testing"
-	"time"
-	"zabbix/pkg/std"
+	_ "zabbix/plugins/kernel"
+	_ "zabbix/plugins/net/netif"
+	_ "zabbix/plugins/proc"
+	_ "zabbix/plugins/system/cpucollector"
+	_ "zabbix/plugins/system/uname"
+	_ "zabbix/plugins/system/uptime"
+	_ "zabbix/plugins/systemd"
+	_ "zabbix/plugins/vfs/dev"
+	_ "zabbix/plugins/vfs/file"
 )
-
-func TestFileSize(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	impl.timeout = time.Second * 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.size returned error %s", err.Error())
-	} else {
-		if filesize, ok := result.(int64); !ok {
-			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if filesize != 4 {
-				t.Errorf("vfs.file.size returned invalid result")
-			}
-		}
-	}
-}

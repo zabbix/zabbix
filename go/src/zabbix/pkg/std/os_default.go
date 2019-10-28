@@ -1,4 +1,4 @@
-// +build linux
+// +build !linux
 
 /*
 ** Zabbix
@@ -19,30 +19,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+// package std is used to create wrappers for standard Go functions to support
+// mocking in tests where necessary
+package std
 
-import (
-	"reflect"
-	"testing"
-	"time"
-	"zabbix/pkg/std"
-)
-
-func TestFileSize(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	impl.timeout = time.Second * 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
-	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.size returned error %s", err.Error())
-	} else {
-		if filesize, ok := result.(int64); !ok {
-			t.Errorf("vfs.file.size returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if filesize != 4 {
-				t.Errorf("vfs.file.size returned invalid result")
-			}
-		}
-	}
+// NewMockOs returns Os interface that replaces supported os package functionality with mock functions.
+func NewMockOs() Os {
+	return &sysOs{}
 }
