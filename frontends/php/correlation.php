@@ -407,6 +407,23 @@ if (hasRequest('form')) {
 		];
 	}
 
+	$checked = [
+		ZBX_CORR_OPERATION_CLOSE_OLD => false,
+		ZBX_CORR_OPERATION_CLOSE_NEW => false
+	];
+
+	if ($data['correlation']['operations']) {
+		foreach ($data['correlation']['operations'] as $operationid => $operation) {
+			if (!array_key_exists($operation['type'], $data['allowedOperations'])) {
+				continue;
+			}
+
+			$checked[$operation['type']] = true;
+		}
+	}
+
+	$data['correlation']['operations'] = $checked;
+
 	// Render view.
 	$correlationView = new CView('configuration.correlation.edit', $data);
 	$correlationView->render();

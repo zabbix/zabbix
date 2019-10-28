@@ -218,33 +218,18 @@ $operations_table = (new CTable())
 	->setHeader([_('Action')])
 	->setId('operations_table');
 
-$checked = [
-	ZBX_CORR_OPERATION_CLOSE_OLD => false,
-	ZBX_CORR_OPERATION_CLOSE_NEW => false
-];
-
-if ($data['correlation']['operations']) {
-	foreach ($data['correlation']['operations'] as $operationid => $operation) {
-		if (!array_key_exists($operation['type'], $data['allowedOperations'])) {
-			continue;
-		}
-
-		$checked[$operation['type']] = true;
-	}
-}
-
 $operations_table->addRow(
-	(new CCheckBox('operations[][type]', '0'))
-		->setChecked($checked[ZBX_CORR_OPERATION_CLOSE_OLD])
+	(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
+		->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
 		->setLabel(_('Close old events'))
-		->setId('operationo_0_type')
+		->setId('operation_0_type')
 );
 
 $operations_table->addRow(
-	(new CCheckBox('operations[][type]', '1'))
-		->setChecked($checked[ZBX_CORR_OPERATION_CLOSE_NEW])
+	(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
+		->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
 		->setLabel(_('Close new event'))
-		->setId('operationo_1_type')
+		->setId('operation_1_type')
 );
 
 $operation_tab
