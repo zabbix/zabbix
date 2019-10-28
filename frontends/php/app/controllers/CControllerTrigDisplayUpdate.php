@@ -37,7 +37,7 @@ class CControllerTrigDisplayUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color'        => 'int32 | in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
+			'custom_color'        => 'required | int32 | in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
 			'problem_unack_style' => 'required | int32 | in 0,1',
 			'problem_ack_style'   => 'required | int32 | in 0,1',
 			'ok_unack_style'      => 'required | int32 | in 0,1',
@@ -54,7 +54,7 @@ class CControllerTrigDisplayUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields + $color_fields);
-		if ($this->getInput('custom_color') == EVENT_CUSTOM_COLOR_ENABLED) {
+		if ($ret && $this->getInput('custom_color') == EVENT_CUSTOM_COLOR_ENABLED) {
 			$ret &= $this->validateColors($color_fields);
 		}
 
