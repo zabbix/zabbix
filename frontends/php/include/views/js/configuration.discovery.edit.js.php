@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="dcheckRowTPL">
+<script type="text/x-jquery-tmpl" id="dcheck-row-tpl">
 	<?= (new CRow([
 			(new CCol(
 				(new CDiv('#{name}'))->addClass(ZBX_STYLE_WORDWRAP)
@@ -16,7 +16,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="uniqRowTPL">
+<script type="text/x-jquery-tmpl" id="unique-row-tpl">
 	<?=	(new CListItem([
 			(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
@@ -28,7 +28,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="hostSourceRowTPL">
+<script type="text/x-jquery-tmpl" id="host-source-row-tpl">
 	<?=	(new CListItem([
 			(new CInput('radio', 'host_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
@@ -40,7 +40,7 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="nameSourceRowTPL">
+<script type="text/x-jquery-tmpl" id="name-source-row-tpl">
 	<?=	(new CListItem([
 			(new CInput('radio', 'name_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
@@ -78,12 +78,12 @@
 			https: <?= SVC_HTTPS ?>,
 			telnet: <?= SVC_TELNET ?>
 		},
-			availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
+			available_device_types = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
 
 		var addNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
 
-			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheckRowTPL').html()).evaluate(value));
+			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tpl').html()).evaluate(value));
 
 			value.host_source = jQuery('[name=host_source]:checked:not([data-id])').val()
 					|| '<?= ZBX_DISCOVERY_DNS ?>';
@@ -168,15 +168,15 @@
 			}
 
 			var elements = {
-				uniqueness_criteria: ['ip',  new Template(jQuery('#uniqRowTPL').html()).evaluate(value)],
-				host_source: ['chk_dns', new Template(jQuery('#hostSourceRowTPL').html()).evaluate(value)],
-				name_source: ['chk_host', new Template(jQuery('#nameSourceRowTPL').html()).evaluate(value)]
+				uniqueness_criteria: ['ip',  new Template(jQuery('#unique-row-tpl').html()).evaluate(value)],
+				host_source: ['chk_dns', new Template(jQuery('#host-source-row-tpl').html()).evaluate(value)],
+				name_source: ['chk_host', new Template(jQuery('#name-source-row-tpl').html()).evaluate(value)]
 			};
 
 			jQuery.each(elements, function(key, param) {
 				var	$obj = jQuery('#' + key + '_row_' + value.dcheckid);
 
-				if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
+				if (jQuery.inArray(parseInt(value.type, 10), available_device_types) > -1) {
 					var new_obj = param[1];
 					if ($obj.length) {
 						var checked_id = jQuery('input:radio[name=' + key + ']:checked').attr('id');
@@ -236,7 +236,7 @@
 			jQuery('#name').focus();
 		});
 
-		jQuery('#host_source,#name_source').on('change', 'input', function() {
+		jQuery('#host_source, #name_source').on('change', 'input', function() {
 			var $elem = jQuery(this),
 				name = $elem.attr('name');
 
@@ -265,6 +265,7 @@
 				case 'edit':
 					var $row = $btn.closest('tr');
 
+					params['update'] = 1;
 					params['index'] = $rows.index($row);
 
 					$row.find('input[type="hidden"]').each(function() {

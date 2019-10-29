@@ -37,6 +37,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		$fields = [
 			'index' => 'required|int32', // Count of exists checks.
 			'validate' => 'in 1',
+			'update' => 'in 1',
 
 			'dcheckid' => 'string',
 			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
