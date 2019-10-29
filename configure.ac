@@ -679,7 +679,7 @@ AC_MSG_RESULT(no))
 AC_MSG_CHECKING(for linker options --start-group/--end-group)
 saved_LDFLAGS="$LDFLAGS"
 LDFLAGS="-Wl,--start-group -Wl,--end-group"
-AC_TRY_LINK([], [], 
+AC_TRY_LINK([], [],
 HAVE_START_GROUP="yes"
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no)
@@ -1833,10 +1833,9 @@ CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-	$LIBS $AGENT_LIBS $LD_END_GROUP \
-	"
-	
-AC_SUBST(CGO_CFLAGS)	
+	$LIBS $AGENT_LIBS $LD_END_GROUP"
+
+AC_SUBST(CGO_CFLAGS)
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
