@@ -81,12 +81,12 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->assertEquals($type, $form->getField('Type')->getValue());
 
 		if ($db_type) {
-			$this->assertEquals($db_type, CDBHelper::getValue('SELECT value_str FROM profiles'.
-					' WHERE userid=1 AND idx="web.dashbrd.last_widget_type"'));
+			$this->assertEquals($db_type, CDBHelper::getValue("SELECT value_str FROM profiles".
+					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
 		}
 		else {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM profiles'.
-					' WHERE userid=1 AND idx="web.dashbrd.last_widget_type"'));
+			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM profiles".
+					" WHERE userid=1 AND idx='web.dashbrd.last_widget_type'"));
 		}
 
 		$overlay->close();
