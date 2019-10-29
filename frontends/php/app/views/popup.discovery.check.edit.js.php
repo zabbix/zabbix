@@ -56,7 +56,13 @@ jQuery('#type').on('change', function() {
 				'row_dcheck_snmpv3_privprotocol', 'row_dcheck_snmpv3_privpassphrase'
 			]
 		]) ?>);
+
+		jQuery('#snmpv3_securitylevel').on('change', function() {
+			jQuery(window).trigger('resize');
+		})
 	}
+
+	jQuery(window).trigger('resize');
 });
 
 if (jQuery('#type').val() == '<?= SVC_SNMPv3 ?>') {

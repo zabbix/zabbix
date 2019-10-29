@@ -98,7 +98,6 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 		$output = [
 			'title' => _('Discovery check'),
-			'errors' => null,
 			'params' => $params,
 			'index' => $this->getInput('index'),
 			'update' => $this->getInput('update', 0),

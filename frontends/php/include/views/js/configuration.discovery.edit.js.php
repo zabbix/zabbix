@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="dcheck-row-tpl">
+<script type="text/x-jquery-tmpl" id="dcheck-row-tmpl">
 	<?= (new CRow([
 			(new CCol(
 				(new CDiv('#{name}'))->addClass(ZBX_STYLE_WORDWRAP)
@@ -16,8 +16,8 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="unique-row-tpl">
-	<?=	(new CListItem([
+<script type="text/x-jquery-tmpl" id="unique-row-tmpl">
+	<?= (new CListItem([
 			(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setId('uniqueness_criteria_#{dcheckid}'),
@@ -28,8 +28,8 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="host-source-row-tpl">
-	<?=	(new CListItem([
+<script type="text/x-jquery-tmpl" id="host-source-row-tmpl">
+	<?= (new CListItem([
 			(new CInput('radio', 'host_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setAttribute('data-id', '#{dcheckid}')
@@ -40,8 +40,8 @@
 			->toString()
 	?>
 </script>
-<script type="text/x-jquery-tmpl" id="name-source-row-tpl">
-	<?=	(new CListItem([
+<script type="text/x-jquery-tmpl" id="name-source-row-tmpl">
+	<?= (new CListItem([
 			(new CInput('radio', 'name_source', '_#{dcheckid}'))
 				->addClass(ZBX_STYLE_CHECKBOX_RADIO)
 				->setAttribute('data-id', '#{dcheckid}')
@@ -83,7 +83,7 @@
 		var addNewValue = function(value) {
 			ZBX_CHECKLIST[value.dcheckid] = value;
 
-			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tpl').html()).evaluate(value));
+			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tmpl').html()).evaluate(value));
 
 			value.host_source = jQuery('[name=host_source]:checked:not([data-id])').val()
 					|| '<?= ZBX_DISCOVERY_DNS ?>';
@@ -168,9 +168,9 @@
 			}
 
 			var elements = {
-				uniqueness_criteria: ['ip',  new Template(jQuery('#unique-row-tpl').html()).evaluate(value)],
-				host_source: ['chk_dns', new Template(jQuery('#host-source-row-tpl').html()).evaluate(value)],
-				name_source: ['chk_host', new Template(jQuery('#name-source-row-tpl').html()).evaluate(value)]
+				uniqueness_criteria: ['ip',  new Template(jQuery('#unique-row-tmpl').html()).evaluate(value)],
+				host_source: ['chk_dns', new Template(jQuery('#host-source-row-tmpl').html()).evaluate(value)],
+				name_source: ['chk_host', new Template(jQuery('#name-source-row-tmpl').html()).evaluate(value)]
 			};
 
 			jQuery.each(elements, function(key, param) {
@@ -209,10 +209,10 @@
 		};
 
 		jQuery.each(elements, function(key, def) {
-			var obj = jQuery('#' + key + dcheckid);
+			var $obj = jQuery('#' + key + dcheckid);
 
-			if (obj.length) {
-				if (obj.is(':checked')) {
+			if ($obj.length) {
+				if ($obj.is(':checked')) {
 					jQuery('#' + key + def).prop('checked', true);
 				}
 				jQuery('#' + key + 'row_' + dcheckid).remove();
@@ -253,11 +253,13 @@
 		jQuery('#dcheckList').on('click', '[data-action]', function() {
 			var $btn = jQuery(this),
 				$rows = jQuery('#dcheckList > table > tbody > tr'),
-				params = {};
+				params;
 
 			switch ($btn.data('action')) {
 				case 'add':
-					params['index'] = $rows.length;
+					params = {
+						index: $rows.length
+					};
 
 					PopUp('popup.discovery.check.edit', params, null, $btn);
 					break;
@@ -265,8 +267,10 @@
 				case 'edit':
 					var $row = $btn.closest('tr');
 
-					params['update'] = 1;
-					params['index'] = $rows.index($row);
+					params = {
+						update: 1,
+						index: $rows.index($row)
+					}
 
 					$row.find('input[type="hidden"]').each(function() {
 						var $input = jQuery(this),
@@ -327,6 +331,9 @@
 	 */
 	function submitDCheck(form_name) {
 		var $form = jQuery(document.forms['dcheck_form']),
+			data = $form
+				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
+				.serialize(),
 			dialogueid = $form
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
@@ -336,12 +343,8 @@
 			.find(".<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>")
 			.remove();
 
-		var formData = jQuery(document.forms['dcheck_form'])
-			.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
-			.serialize();
-
 		sendAjaxData('zabbix.php', {
-			data: formData,
+			data: data,
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
@@ -353,9 +356,7 @@
 					return false;
 				}
 
-				var dcheck = response.params,
-					$host_source = jQuery('[name="host_source"]:checked:not([data-id])'),
-					$name_source = jQuery('[name="name_source"]:checked:not([data-id])');
+				var dcheck = response.params;
 
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
 					dcheck.name += ' (' + dcheck.ports + ')';
@@ -363,8 +364,8 @@
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
 				}
-				dcheck.host_source = $host_source ? $host_source.val() : '<?= ZBX_DISCOVERY_DNS ?>';
-				dcheck.name_source = $name_source ? $name_source.val() : '<?= ZBX_DISCOVERY_UNSPEC ?>';
+				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_DNS ?>';
+				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				addPopupValues([dcheck]);
 				overlayDialogueDestroy(dialogueid);
@@ -379,8 +380,8 @@
 	 */
 	function validateDCheckDuplicate() {
 		var $form = jQuery(document.forms['dcheck_form']),
-			dcheckId = jQuery('#dcheckid').val(),
-			dCheck = $form
+			dcheckid = jQuery('#dcheckid').val(),
+			dcheck = $form
 				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
 				.serializeJSON(),
 			fields_name = ['key_', 'type', 'ports', 'snmp_community', 'snmpv3_authprotocol',
@@ -388,19 +389,19 @@
 				'snmpv3_securityname', 'snmpv3_contextname'
 			];
 
-		dCheck.dcheckid = dcheckId ? dcheckId : getUniqueId();
+		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
-		for (var zbxDcheckId in ZBX_CHECKLIST) {
-			if (ZBX_CHECKLIST[zbxDcheckId]['type'] !== dCheck['type']) {
+		for (var zbx_dcheckid in ZBX_CHECKLIST) {
+			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
 				continue;
 			}
 
-			if (typeof dcheckId === 'undefined' || (typeof dcheckId !== 'undefined') && dcheckId != zbxDcheckId) {
+			if (typeof dcheckid === 'undefined' || (typeof dcheckid !== 'undefined') && dcheckid != zbx_dcheckid) {
 				var duplicate_fields = fields_name
 					.map(function(value) { // Check if field is undefined or empty or values equels with exist checks.
-						return typeof dCheck[value] === 'undefined'
-							|| dCheck[value] === ''
-							|| ZBX_CHECKLIST[zbxDcheckId][value] === dCheck[value];
+						return typeof dcheck[value] === 'undefined'
+							|| dcheck[value] === ''
+							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
 					})
 					.filter(function(value) { // Remove false value from array.
 						return !!value;
