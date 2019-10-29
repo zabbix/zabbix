@@ -39,12 +39,12 @@ foreach ([1, 4, 6, 2, 5, 7, 3] as $day) {
 	$days_weekly[] = [
 		'name' => getDayOfWeekCaption($day),
 		'value' => $value,
-		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY && ($value & $data['dayofweek']))
+		'checked' => ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY && (bool) ($value & $data['dayofweek']))
 	];
 	$days_monthly[] = [
 		'name' => getDayOfWeekCaption($day),
 		'value' => $value,
-		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['dayofweek']))
+		'checked' => ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && (bool) ($value & $data['dayofweek']))
 	];
 }
 
