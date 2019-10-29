@@ -2335,8 +2335,7 @@ ZABBIX.apps.map = (function($) {
 				if (this.data.label_type == CMap.LABEL_TYPE_LABEL) {
 					this.data.inherited_label = this.data.label;
 				}
-
-				if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
+				else if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
 					if (this.data.elementtype != Selement.TYPE_IMAGE) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}
