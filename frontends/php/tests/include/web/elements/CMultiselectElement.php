@@ -214,7 +214,7 @@ class CMultiselectElement extends CElement {
 			$text = [$text];
 		}
 
-		$input = $this->query('xpath:.//input[not(@type="hidden")]')->one();
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one();
 		foreach ($text as $value) {
 			$input->overwrite($value)->fireEvent();
 
@@ -307,11 +307,7 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		if (parent::isEnabled() !== $enabled) {
-			return false;
-		}
-
-		if ((parent::getAttribute('aria-disabled') === 'true') !== $enabled) {
+		if (!$this->query('xpath:.//input[not(@type="hidden")]|textarea')->one()->isEnabled($enabled)) {
 			return false;
 		}
 

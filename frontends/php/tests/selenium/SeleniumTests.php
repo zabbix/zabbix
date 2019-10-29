@@ -248,7 +248,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-//		$suite->addTestSuite('testGraphWidget');
+		$suite->addTestSuite('testGraphWidget');
 
 		return $suite;
 	}

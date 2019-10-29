@@ -433,23 +433,16 @@ class CElement extends CBaseElement implements IWaitable {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
+	* @inheritdoc
+	*/
 	public function isEnabled($enabled = true) {
-		if (parent::isEnabled() !== $enabled) {
-			return !$enabled;
-		}
-
 		$classes = explode(' ', parent::getAttribute('class'));
-		if ((!array_intersect(['disabled', 'readonly'], $classes)) !== $enabled) {
-			return !$enabled;
-		}
 
-		if ((parent::getAttribute('readonly') === null) !== $enabled) {
-			return !$enabled;
-		}
+		$is_enabled = parent::isEnabled()
+				&& (!array_intersect(['disabled', 'readonly'], $classes))
+				&& (parent::getAttribute('readonly') === null);
 
-		return $enabled;
+		return $is_enabled === $enabled;
 	}
 
 	/**
@@ -566,7 +559,7 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
-		self::addWarning('No specific element was detected');
+		CTest::addWarning('No specific element was detected');
 
 		return $this;
 	}

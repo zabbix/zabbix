@@ -77,7 +77,7 @@ class testGraphWidget extends CWebTest {
 		$widget = $dashboard->getWidget($name);
 		$widget->getContent()->query('class:svg-graph')->waitUntilVisible();
 		$dashboard->save();
-		$message = CMessageElement::find()->one();
+		$message = CMessageElement::find()->waitUntilPresent()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 	}
@@ -88,7 +88,7 @@ class testGraphWidget extends CWebTest {
 	private function executeValidation($data, $tab) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget(CTestArrayHelper::get($data, 'Widget name', []));
 
 		$this->fillDataSets(CTestArrayHelper::get($data, 'Data set', []));
@@ -117,7 +117,7 @@ class testGraphWidget extends CWebTest {
 				$form->fill($data[$tab]);
 		}
 
-		$form->submit();
+		$this->query('xpath://button[@class="dialogue-widget-save"]')->one()->click();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
@@ -630,7 +630,7 @@ class testGraphWidget extends CWebTest {
 			[
 				[
 					'Axes' => [
-						'lefty_min' => 'abc'
+						'id:lefty_min' => 'abc'
 					],
 					'error' => 'Invalid parameter "Min": a number is expected.'
 				]
@@ -638,7 +638,7 @@ class testGraphWidget extends CWebTest {
 			[
 				[
 					'Axes' => [
-						'lefty_max' => 'abc'
+						'id:lefty_max' => 'abc'
 					],
 					'error' => 'Invalid parameter "Max": a number is expected.'
 				]
@@ -646,8 +646,8 @@ class testGraphWidget extends CWebTest {
 			[
 				[
 					'Axes' => [
-						'lefty_min' => '10',
-						'lefty_max' => '5',
+						'id:lefty_min' => '10',
+						'id:lefty_max' => '5'
 					],
 					'error' => 'Invalid parameter "Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -655,8 +655,8 @@ class testGraphWidget extends CWebTest {
 			[
 				[
 					'Axes' => [
-						'lefty_min' => '-5',
-						'lefty_max' => '-10',
+						'id:lefty_min' => '-5',
+						'id:lefty_max' => '-10'
 					],
 					'error' => 'Invalid parameter "Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -670,7 +670,7 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'righty_min' => 'abc'
+						'id:righty_min' => 'abc'
 					],
 					'error' => 'Invalid parameter "Min": a number is expected.'
 				]
@@ -683,7 +683,7 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'righty_max' => 'abc'
+						'id:righty_max' => 'abc'
 					],
 					'error' => 'Invalid parameter "Max": a number is expected.'
 				]
@@ -696,8 +696,8 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'righty_min' => '10',
-						'righty_max' => '5',
+						'id:righty_min' => '10',
+						'id:righty_max' => '5'
 					],
 					'error' => 'Invalid parameter "Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -710,8 +710,8 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'righty_min' => '-5',
-						'righty_max' => '-10',
+						'id:righty_min' => '-5',
+						'id:righty_max' => '-10'
 					],
 					'error' => 'Invalid parameter "Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -730,8 +730,8 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'lefty_max' => 'abc',
-						'righty_max' => 'abc',
+						'id:lefty_max' => 'abc',
+						'id:righty_max' => 'abc'
 					],
 					'error' => [
 						'Invalid parameter "Max": a number is expected.',
@@ -752,10 +752,10 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'lefty_min' => '-5',
-						'lefty_max' => '-10',
-						'righty_min' => '10',
-						'righty_max' => '5',
+						'id:lefty_min' => '-5',
+						'id:lefty_max' => '-10',
+						'id:righty_min' => '10',
+						'id:righty_max' => '5'
 					],
 					'error' => [
 						'Invalid parameter "Max": Y axis MAX value must be greater than Y axis MIN value.',
@@ -776,10 +776,10 @@ class testGraphWidget extends CWebTest {
 						]
 					],
 					'Axes' => [
-						'lefty_min' => 'abc',
-						'lefty_max' => 'def',
-						'righty_min' => '!@#',
-						'righty_max' => '(',
+						'id:lefty_min' => 'abc',
+						'id:lefty_max' => 'def',
+						'id:righty_min' => '!@#',
+						'id:righty_max' => '('
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -1239,14 +1239,10 @@ class testGraphWidget extends CWebTest {
 						'To' => 'now'
 					],
 					'Axes' => [
-						'fields' => [
-							'righty_min' => '-15',
-							'righty_max' => '155.5'
-						],
-						'units' => [
-							'righty_units' => 'Static',
-							'righty_static_units' => 'MB'
-						]
+						'id:righty_min' => '-15',
+						'id:righty_max' => '155.5',
+						'id:righty_units' => 'Static',
+						'id:righty_static_units' => 'MB'
 					],
 					'Overrides' => [
 						'host' => 'One host',
@@ -1303,11 +1299,9 @@ class testGraphWidget extends CWebTest {
 						'To' => 'now'
 					],
 					'Axes' => [
-						'fields' => [
-							'Left Y' => false,
-							'Right Y' => false,
-							'X-Axis' => false
-						]
+						'Left Y' => false,
+						'Right Y' => false,
+						'X-Axis' => false
 					],
 					'Legend' => [
 						'Show legend' => false
@@ -1373,17 +1367,13 @@ class testGraphWidget extends CWebTest {
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
-						'fields' => [
-							'lefty_min' => '5',
-							'lefty_max' => '15.5',
-							'righty_min' => '-15',
-							'righty_max' => '-5'
-						],
-						'units' => [
-							'lefty_units' => 'Static',
-							'lefty_static_units' => 'MB',
-							'righty_units' => 'Static',
-						]
+						'id:lefty_min' => '5',
+						'id:lefty_max' => '15.5',
+						'id:righty_min' => '-15',
+						'id:righty_max' => '-5',
+						'id:lefty_units' => 'Static',
+						'id:lefty_static_units' => 'MB',
+						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
 						'Number of rows' => '5'
@@ -1453,7 +1443,7 @@ class testGraphWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testGraphWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 
 		$this->fillForm($data, $form);
@@ -1501,14 +1491,10 @@ class testGraphWidget extends CWebTest {
 						'To' => 'now'
 					],
 					'Axes' => [
-						'fields' => [
-							'righty_min' => '-15',
-							'righty_max' => '155.5'
-						],
-						'units' => [
-							'righty_units' => 'Static',
-							'righty_static_units' => 'MB'
-						]
+						'id:righty_min' => '-15',
+						'id:righty_max' => '155.5',
+						'id:righty_units' => 'Static',
+						'id:righty_static_units' => 'MB'
 					],
 					'Overrides' => [
 						'host' => 'One host',
@@ -1567,11 +1553,9 @@ class testGraphWidget extends CWebTest {
 						'To' => 'now'
 					],
 					'Axes' => [
-						'fields' => [
-							'Left Y' => false,
-							'Right Y' => false,
-							'X-Axis' => false
-						]
+						'Left Y' => false,
+						'Right Y' => false,
+						'X-Axis' => false
 					],
 					'Legend' => [
 						'Show legend' => false
@@ -1628,20 +1612,16 @@ class testGraphWidget extends CWebTest {
 						'To' => '2018-11-15 14:20'
 					],
 					'Axes' => [
-						'fields' => [
-							'Left Y' => true,
-							'Right Y' => true,
-							'X-Axis' => true,
-							'lefty_min' => '5',
-							'lefty_max' => '15.5',
-							'righty_min' => '-15',
-							'righty_max' => '-5'
-						],
-						'units' => [
-							'lefty_units' => 'Static',
-							'lefty_static_units' => 'MB',
-							'righty_units' => 'Static',
-						]
+						'Left Y' => true,
+						'Right Y' => true,
+						'X-Axis' => true,
+						'id:lefty_min' => '5',
+						'id:lefty_max' => '15.5',
+						'id:righty_min' => '-15',
+						'id:righty_max' => '-5',
+						'id:lefty_units' => 'Static',
+						'id:lefty_static_units' => 'MB',
+						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
 						'Show legend' => true,
@@ -1712,7 +1692,7 @@ class testGraphWidget extends CWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testGraphWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget('Test cases for update');
 
 		$this->fillForm($data, $form);
@@ -1733,7 +1713,7 @@ class testGraphWidget extends CWebTest {
 		$name = 'Test cases for simple update and deletion';
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget($name);
 		$form->submit();
 		$this->saveGraphWidget($name);
@@ -1752,7 +1732,7 @@ class testGraphWidget extends CWebTest {
 
 		$this->fillDataSets(CTestArrayHelper::get($data, 'Data set', []));
 
-		$tabs = ['Displaying options', 'Time period', 'Legend'];
+		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend'];
 		foreach ($tabs as $tab) {
 			if (array_key_exists($tab, $data)) {
 				$form->selectTab($tab);
@@ -1760,19 +1740,11 @@ class testGraphWidget extends CWebTest {
 			}
 		}
 
-		if (array_key_exists('Axes', $data)) {
-			$form->selectTab('Axes');
-			$form->fill(CTestArrayHelper::get($data['Axes'], 'fields', []));
-
-			foreach (CTestArrayHelper::get($data, 'Axes.units', []) as $id => $value) {
-				$element = $form->query('id', $id)->one()->detect();
-				$element->fill($value);
-			}
-		}
-
 		if (array_key_exists('Problems', $data)) {
 			$form->selectTab('Problems');
+			CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 			$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
+			CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 
 			if (array_key_exists('tags', $data['Problems'])) {
 				$this->setTags($data['Problems']['tags'], 'id:tags_table_tags');
@@ -1910,9 +1882,7 @@ class testGraphWidget extends CWebTest {
 			}
 
 			// Check other field values.
-			foreach (CTestArrayHelper::get($data_set, 'fields', []) as $field => $value) {
-				$this->assertEquals($value, $form->getValue($field));
-			}
+			$form->checkValue(CTestArrayHelper::get($data_set, 'fields', []));
 
 			// Open next data set, if exist.
 			if ($key !== $last) {
@@ -1922,38 +1892,22 @@ class testGraphWidget extends CWebTest {
 			}
 		}
 
-		$tabs = ['Displaying options', 'Time period', 'Legend'];
+		$tabs = ['Displaying options', 'Time period', 'Axes','Legend'];
 		foreach ($tabs as $tab) {
 			if (array_key_exists($tab, $data)) {
 				$form->selectTab($tab);
-				foreach ($data[$tab] as $field => $value) {
-					$this->assertEquals($value, $form->getValue($field));
-				}
-			}
-		}
-
-		if (array_key_exists('Axes', $data)) {
-			$form->selectTab('Axes');
-			foreach (CTestArrayHelper::get($data, 'Axes.fields', []) as $field => $value) {
-				$this->assertEquals($value, $form->getValue($field));
-			}
-
-			foreach (CTestArrayHelper::get($data, 'Axes.units', []) as $id => $value) {
-				$element = $form->query('id', $id)->one()->detect();
-				$this->assertEquals($value, $element->getValue());
+				$form->checkValue($data[$tab]);
 			}
 		}
 
 		if (array_key_exists('Problems', $data)) {
 			$form->selectTab('Problems');
-			foreach (CTestArrayHelper::get($data, 'Problems.fields', []) as $field => $value) {
-				if ($field === 'Problem hosts') {
-					$element = $this->query('id:problemhosts')->one();
-					$this->assertEquals(implode(", ", $value['values']), $element->getValue());
-					continue;
-				}
-				$this->assertEquals($value, $form->getValue($field));
+			if (CTestArrayHelper::get($data, 'Problems.fields.Problem hosts', false)) {
+				$element = $this->query('id:problemhosts')->one();
+				$this->assertEquals(implode(', ', $data['Problems']['fields']['Problem hosts']['values']), $element->getValue());
+				unset($data['Problems']['fields']['Problem hosts']);
 			}
+			$form->checkValue(CTestArrayHelper::get($data, 'Problems.fields', []));
 
 			if (array_key_exists('tags', $data['Problems'])) {
 				$this->assertTags($data['Problems']['tags'], 'id:tags_table_tags');
@@ -1996,7 +1950,7 @@ class testGraphWidget extends CWebTest {
 
 					foreach ($override['options'] as $option) {
 						if (is_array($option) && count($option) === 2) {
-							$this->assertContains(implode(": ", $option), $options_text);
+							$this->assertContains(implode(': ', $option), $options_text);
 						}
 					}
 				}
@@ -2042,7 +1996,7 @@ class testGraphWidget extends CWebTest {
 	public function testGraphWidget_cancelDashboardUpdate($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
@@ -2096,7 +2050,7 @@ class testGraphWidget extends CWebTest {
 	public function testGraphWidget_cancelWidget($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
@@ -2121,7 +2075,7 @@ class testGraphWidget extends CWebTest {
 	public function testGraphWidget_Delete() {
 		$name = 'Test cases for simple update and deletion';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
@@ -2129,7 +2083,7 @@ class testGraphWidget extends CWebTest {
 
 		$dashboard->save();
 		$this->page->waitUntilReady();
-		$message = CMessageElement::find()->one();
+		$message = CMessageElement::find()->waitUntilPresent()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
@@ -2145,7 +2099,7 @@ class testGraphWidget extends CWebTest {
 	 * Test disabled fields in "Data set" tab.
 	 */
 	public function testGraphWidget_DatasetDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 
 		foreach (['Line', 'Points', 'Staircase'] as $option) {
@@ -2171,52 +2125,48 @@ class testGraphWidget extends CWebTest {
 	 * Test "From" and "To" fields in tab "Time period" by check/uncheck "Set custom time period".
 	 */
 	public function testGraphWidget_TimePeriodDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 		$form->selectTab('Time period');
 
-		$fields = ['From' => 'time_from', 'To' => 'time_to'];
-		$this->assertEnabledFields($fields, false, true);
+		$fields = ['From', 'To'];
+		$this->assertEnabledFields($fields, false);
 
 		$form->fill(['Set custom time period' => true]);
-		$this->assertEnabledFields($fields, true, true);
+		$this->assertEnabledFields($fields, true);
 	}
 
 	/*
 	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testGraphWidget_LegendDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 		$form->selectTab('Legend');
-		$this->assertEnabledFields(['Number of rows']);
+		$this->assertEnabledFields('Number of rows');
 		$form->fill(['Show legend' => false]);
-		$this->assertEnabledFields(['Number of rows'], false);
+		$this->assertEnabledFields('Number of rows', false);
 	}
 
 	public function testGraphWidget_ProblemsDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 		$form->selectTab('Problems');
 
-		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags'];
-		$this->assertEnabledFields($fields, false);
-
-		$mapping = [
-			'problem hosts' => 'problemhosts',
-			'problem hosts button' => 'problemhosts_select',
-			'tag' => 'tags_0_tag',
-			'tag operator' => 'tags_0_operator_0',
-			'tag value' => 'tags_0_value',
-			'tag remove button' => 'tags_0_remove',
-			'tag add button' => 'tags_add'
+		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags', 'Problem hosts'];
+		$tag_elements = [
+			'id:evaltype',				// Tag type.
+			'id:tags_0_tag',			// Tag name.
+			'id:tags_0_operator_0',		// Tag operator.
+			'id:tags_0_value',			// Tag value
+			'id:tags_0_remove',			// Tag remove button.
+			'id:tags_add'				// Tagg add button.
 		];
-		$this->assertEnabledFields($mapping, false, true);
+		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
 
 		// Set "Show problems" and check that fields enabled now.
 		$form->fill(['Show problems' => true]);
-		$this->assertEnabledFields($fields, true);
-		$this->assertEnabledFields($mapping, true, true);
+		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
 	}
 
 	public static function getAxesDisabledFieldsData() {
@@ -2269,7 +2219,7 @@ class testGraphWidget extends CWebTest {
 	 * @dataProvider getAxesDisabledFieldsData
 	 */
 	public function testGraphWidget_AxesDisabledFields($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=103');
 		$form = $this->openGraphWidget();
 
 		$form->fill($data['Data set']);
@@ -2282,29 +2232,29 @@ class testGraphWidget extends CWebTest {
 		}
 
 		$form->selectTab('Axes');
-		$lefty_fields = ['lefty', 'lefty_min', 'lefty_max', 'lefty_units'];
-		$righty_fields = ['righty', 'righty_min', 'righty_max', 'righty_units'];
+		$lefty_fields = ['id:lefty', 'id:lefty_min', 'id:lefty_max', 'id:lefty_units'];
+		$righty_fields = ['id:righty', 'id:righty_min', 'id:righty_max', 'id:righty_units'];
 
 		switch ($axis) {
 			case 'Right':
-				$lefty_fields[] = 'lefty_static_units';
-				$this->assertEnabledFields($lefty_fields, false, true);
-				$this->assertEnabledFields($righty_fields, true, true);
-				$this->assertFalse($this->query('id', 'righty_static_units')->one()->isEnabled());
+				$lefty_fields[] = 'id:lefty_static_units';
+				$this->assertEnabledFields($lefty_fields, false);
+				$this->assertEnabledFields($righty_fields, true);
+				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());
 				break;
 
 			case 'Left':
-				$righty_fields[] = 'righty_static_units';
-				$this->assertEnabledFields($lefty_fields, true, true);
-				$this->assertEnabledFields($righty_fields, false, true);
-				$this->assertFalse($this->query('id', 'lefty_static_units')->one()->isEnabled());
+				$righty_fields[] = 'id:righty_static_units';
+				$this->assertEnabledFields($lefty_fields, true);
+				$this->assertEnabledFields($righty_fields, false);
+				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 
 			case 'Both';
-				$this->assertEnabledFields($lefty_fields, true, true);
-				$this->assertEnabledFields($righty_fields, true, true);
-				$this->assertFalse($this->query('id', 'righty_static_units')->one()->isEnabled());
-				$this->assertFalse($this->query('id', 'lefty_static_units')->one()->isEnabled());
+				$this->assertEnabledFields($lefty_fields, true);
+				$this->assertEnabledFields($righty_fields, true);
+				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());
+				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 		}
 	}
@@ -2316,13 +2266,15 @@ class testGraphWidget extends CWebTest {
 	 * @param boolean $enabled		fields state are enabled
 	 * @param boolean $id			is used field id instead of field name
 	 */
-	private function assertEnabledFields($fields, $enabled = true, $id = false) {
+	private function assertEnabledFields($fields, $enabled = true) {
 		$form = $this->query('id:widget_dialogue_form')->asForm()->one();
 
+		if (!is_array($fields)) {
+			$fields = [$fields];
+		}
+
 		foreach ($fields as $field) {
-			// TODO: Should be fixed after updated to latest version. Implemeneted in DEV-1256.
-			$element = $id ? $form->query('id', $field)->one() : $form->getField($field);
-			$this->assertTrue($element->isEnabled($enabled));
+			$this->assertTrue($form->getField($field)->isEnabled($enabled));
 		}
 	}
 
