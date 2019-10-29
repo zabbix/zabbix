@@ -37,7 +37,14 @@ class CControllerIconMapUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		if ($this->getUserType() == USER_TYPE_SUPER_ADMIN) {
+			return (bool) API::IconMap()->get([
+				'output' => [],
+				'iconmapids' => (array) $this->getInput('iconmapid')
+			]);
+		}
+
+		return false;
 	}
 
 	protected function doAction() {
