@@ -32,18 +32,18 @@ ob_start(); ?>
 		$or_button = $('#add_key_or'),
 		$expt_type = $('#expr_type'),
 		$add_button = $('#add_exp'),
-		data = $expr_table.data('rows') || [];
+		data = $expr_table.data('rows')||[];
 
 	// Expression parts table.
-	$expr_parts_table.on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function() {
-		var $row = $(this).closest('tr');
+	$expr_parts_table.on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function () {
+		var row = $(this).closest('tr');
 
-		if (!$row.siblings().length) {
+		if (!row.siblings().length) {
 			$and_button.prop('disabled', false);
 			$or_button.prop('disabled', false);
 		}
 
-		$row.remove();
+		row.remove();
 	});
 
 	// Button AND, OR click handler.
@@ -52,7 +52,7 @@ ob_start(); ?>
 
 	// Expression sortable table rows initialization.
 	if (data) {
-		data.each(function(row_data) {
+		data.each(function (row_data) {
 			$expr_table.find('tbody').append(trigger_row_tmpl.evaluate(row_data));
 		});
 
@@ -71,24 +71,24 @@ ob_start(); ?>
 		containment: '#expressions_list tbody',
 		tolerance: 'pointer',
 		opacity: 0.6
-	}).on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function() {
-		var $row = $(this).closest('tr');
+	}).on('click', '.<?= ZBX_STYLE_BTN_LINK ?>', function () {
+		var row = $(this).closest('tr');
 
-		if ($row.siblings().length == 1) {
+		if (row.siblings().length == 1) {
 			$expr_table.sortable('disable');
 			$expr_table.find('td.<?= ZBX_STYLE_TD_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 		}
 
-		$row.remove();
+		row.remove();
 	});
 
 	// Button Add click handler.
-	$add_button.on('click', function() {
+	$add_button.on('click', function () {
 		var expression = [],
 			$inputs = $('[name^="keys["]'),
 			$keywords = $inputs.filter('[name$="[value]"]');
 
-		$inputs.filter('[name$="[type]"]').each(function(i, el) {
+		$inputs.filter('[name$="[type]"]').each(function (i, el) {
 			expression.push(el.value + '(' + $keywords[i].value + ')');
 			$(el).closest('tr').remove();
 		});
