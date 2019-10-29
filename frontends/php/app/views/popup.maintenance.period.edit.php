@@ -69,13 +69,13 @@ $form
 		]))
 	)
 	->addRow((new CLabel(_('Every day(s)'), 'every'))->setAsteriskMark(),
-		(new CNumericBox('every', $data['every'], 3))
+		(new CNumericBox('every', $data['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY ? $data['every'] : 1, 3))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_timeperiod_every_day'
 	)
 	->addRow((new CLabel(_('Every week(s)'), 'every'))->setAsteriskMark(),
-		(new CNumericBox('every', $data['every'], 2))
+		(new CNumericBox('every', $data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY ? $data['every'] : 1, 2))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_timeperiod_every_week'
@@ -100,7 +100,7 @@ $form
 		'row_timeperiod_date'
 	)
 	->addRow((new CLabel(_('Day of week'), 'every'))->setAsteriskMark(),
-		new CComboBox('every', $data['every'], null, [
+		new CComboBox('every', $data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY? $data['every'] : 1, null, [
 			1 => _('first'),
 			2 => _x('second', 'adjective'),
 			3 => _('third'),
