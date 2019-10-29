@@ -32,7 +32,6 @@ A......... [ZBX-16562] fixed configuration.export method in API improperly forma
 ........S. [ZBX-16002] added new macro EVENT.RECOVERY.NAME to display recovery event name in recovery alerts (akozlovs)
 ...G...P.. [ZBX-16512] fixed false item insertion into the queue after maintenance (akozlovs)
 ...G...... [ZBX-15685] fixed zabbix_sender failing to report the error due to closed connection (arimdjonoks)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 A......... [ZBX-16702] fixed error in the elastic search clearing history (vasilijs)
 ..F....... [ZBX-10805] fixed log items graphs drawing with numeric values like trapper items (vasilijs)
 A......... [ZBX-16604] fixed occurrence of an undefined index in discovered graph configuration (vasilijs)
