@@ -66,7 +66,7 @@ $form
 			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
 			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
 			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
-		]))
+		]))->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow((new CLabel(_('Every day(s)'), 'every'))->setAsteriskMark(),
 		(new CNumericBox('every', $data['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY ? $data['every'] : 1, 3))
