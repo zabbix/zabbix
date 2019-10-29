@@ -211,34 +211,20 @@ $correlation_tab
 	);
 
 // Operations tab.
-$operation_tab = new CFormList();
-
-$operations_table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Action')])
-	->setId('operations_table');
-
-$operations_table->addRow(
-	(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
-		->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
-		->setLabel(_('Close old events'))
-		->setId('operation_0_type')
-);
-
-$operations_table->addRow(
-	(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
-		->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
-		->setLabel(_('Close new event'))
-		->setId('operation_1_type')
-);
-
-$operation_tab
+$operation_tab = (new CFormList())
 	->addRow(
-		(new CLabel(_('Operations'), $operations_table->getId()))->setAsteriskMark(),
-		(new CDiv([$operations_table]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
+		_('Close old events'),
+		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_OLD))
+			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_OLD])
+			->setId('operation_0_type')
+	)
+	->addRow(
+		_('Close new event'),
+		(new CCheckBox('operations[][type]', ZBX_CORR_OPERATION_CLOSE_NEW))
+			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
+			->setId('operation_1_type')
+	)
+	->addRow('', (new CDiv((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())));
 
 // Append tabs to form.
 $correlation_tabs = (new CTabView())
