@@ -29,7 +29,7 @@ class CControllerPopupTriggerWizard extends CController {
 	protected function checkInput() {
 		$fields = [
 			'description' =>	'string',
-			'itemid' =>			'db items.itemid',
+			'itemid' =>			'required|db items.itemid',
 			'triggerid' =>		'db triggers.triggerid',
 			'type' =>			'in 0,1',
 			'expressions' =>	'array',
@@ -91,7 +91,7 @@ class CControllerPopupTriggerWizard extends CController {
 			'description' => $this->getInput('description', ''),
 			'itemid' => $this->getInput('itemid', 0),
 			'type' => $this->getInput('type', 0),
-			'priority' => $this->getInput('priority', 0),
+			'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 			'comments' => $this->getInput('comments', ''),
 			'url' => $this->getInput('url', ''),
 			'status' => ($this->hasInput('status') || !$this->hasInput('save'))
@@ -116,6 +116,8 @@ class CControllerPopupTriggerWizard extends CController {
 
 		// Save trigger.
 		if ($this->hasInput('save')) {
+			$trigger_valid = true;
+
 			$item = API::Item()->get([
 				'output' => ['key_'],
 				'selectHosts' => ['host'],
@@ -125,7 +127,6 @@ class CControllerPopupTriggerWizard extends CController {
 
 			$item = reset($item);
 			$host = reset($item['hosts']);
-			$trigger_valid = true;
 
 			// Trigger validation.
 			if ($page_options['description'] === '') {
