@@ -139,42 +139,53 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInputAll() + [
-			'update' =>			0,
-			'timeperiod_type'	=> TIMEPERIOD_TYPE_ONETIME,
-			'every' =>			1,
-			'dayofweek' =>		0,
-			'start_date' =>		date(ZBX_DATE_TIME),
-			'period' =>			SEC_PER_HOUR,
-			'start_time' =>		12 * SEC_PER_HOUR
+		$data = [
+			'update' =>				0,
+			'timeperiod_type' => 	TIMEPERIOD_TYPE_ONETIME,
+			'every' =>				1,
+			'day' =>				1,
+			'dayofweek' =>			0,
+			'start_date' =>			date(ZBX_DATE_TIME),
+			'period' =>				SEC_PER_HOUR,
+			'start_time' =>			12 * SEC_PER_HOUR
 		];
+		$fields = [
+			TIMEPERIOD_TYPE_ONETIME =>	['start_date'],
+			TIMEPERIOD_TYPE_DAILY =>	['every', 'start_time', 'hour', 'minute'],
+			TIMEPERIOD_TYPE_WEEKLY =>	['dayofweek', 'every', 'start_time', 'hour', 'minute', 'days'],
+			TIMEPERIOD_TYPE_MONTHLY =>	['day', 'dayofweek', 'month', 'months', 'month_date_type', 'monthly_days',
+				'start_time', 'hour', 'minute'
+			]
+		];
+		$this->getInputs($data, ['update', 'refresh', 'index', 'period_days', 'period', 'period_hours',
+			'period_minutes', 'timeperiodid', 'timeperiod_type'
+		]);
+
+		if (array_key_exists($data['timeperiod_type'], $fields)) {
+			$this->getInputs($data, $fields[$data['timeperiod_type']]);
+		}
 
 		if ($this->getInput('refresh', 0)) {
-			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-				$data['every'] = 0;
-			}
-			else if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
+			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 				$data['dayofweek'] = array_sum($this->getInput('days', []));
 			}
-			else if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
-				$data['every'] = 0;
+			elseif ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 				$data['month'] = array_sum($this->getInput('months', []));
 
 				if ($data['month_date_type'] == 1) {
 					$data['dayofweek'] = array_sum($this->getInput('monthly_days', []));
-					$data['day'] = 0;
+					unset($data['day']);
 				}
 			}
 
 			$data['period'] = ($data['period_days'] * SEC_PER_DAY) + ($data['period_hours'] * SEC_PER_HOUR)
 				+ ($data['period_minutes'] * SEC_PER_MIN);
-
 			$data['start_time'] = ($data['hour'] * SEC_PER_HOUR) + ($data['minute'] * SEC_PER_MIN);
+			$data += DB::getDefaults('timeperiods');
 		}
 		else {
 			// Initialize form fields from database field values.
 			$data += [
-				'day' =>				1,
 				'period_days' =>		floor($data['period'] / SEC_PER_DAY),
 				'period_hours' =>		floor(($data['period'] % SEC_PER_DAY) / SEC_PER_HOUR),
 				'period_minutes' => 	floor((($data['period'] % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN),
