@@ -43,8 +43,7 @@ class CControllerIconMapClone extends CController {
 
 		return (bool) API::IconMap()->get([
 			'output' => [],
-			'iconmapids' => (array) $this->getInput('iconmapid'),
-			'editable' => true
+			'iconmapids' => (array) $this->getInput('iconmapid')
 		]);
 	}
 

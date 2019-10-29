@@ -68,8 +68,7 @@ class CControllerIconMapEdit extends CController {
 			$iconmaps = API::IconMap()->get([
 				'output' => ['iconmapid', 'name', 'default_iconid'],
 				'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
-				'iconmapids' => (array) $this->getInput('iconmapid'),
-				'editable' => true
+				'iconmapids' => (array) $this->getInput('iconmapid')
 			]);
 
 			if (!$iconmaps) {
