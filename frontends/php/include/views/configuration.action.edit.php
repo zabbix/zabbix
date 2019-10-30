@@ -1111,7 +1111,7 @@ if (!empty($data['new_operation'])) {
 			}
 
 			$label = num2letter($i);
-			$cond_value = ($opcondition['value'] == 1) ? _('Ack') : _('Not Ack');
+			$cond_value = $opcondition['value'] ? _('Ack') : _('Not Ack');
 			$labelCol = (new CCol($label))
 				->addClass('label')
 				->setAttribute('data-conditiontype', $opcondition['conditiontype'])
