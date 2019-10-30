@@ -107,11 +107,6 @@ function validateOperationPopup() {
 
 	url.setArgument('validate', 1);
 
-	$form
-		.parent()
-		.find(".msg-bad, .msg-good")
-		.remove();
-
 	return jQuery
 		.ajax({
 			url: url.getUrl(),
@@ -121,6 +116,11 @@ function validateOperationPopup() {
 		})
 		.done(function (response) {
 			if (typeof response.errors !== "undefined") {
+				$form
+					.parent()
+					.find(".msg-bad")
+					.remove();
+
 				return jQuery(response.errors).insertBefore($form);
 			}
 
