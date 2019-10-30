@@ -60,7 +60,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_free(expected_result_buffer);
 		zbx_free(result_buffer);
 
-		if ( SUCCEED != expected_result)
+		if (SUCCEED != expected_result)
 			fail_msg("Expected differences but result is the same");
 	}
 }
