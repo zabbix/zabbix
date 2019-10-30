@@ -273,7 +273,7 @@ class CFormElement extends CElement {
 	 */
 	public function getOverlayMessage() {
 		return $this->parents('class:overlay-dialogue-body')->one()
-				->query('tag:output')->waitUntilPresent()->asMessage()->one();
+				->query('tag:output')->asMessage()->waitUntilVisible()->one();
 	}
 
 	/**

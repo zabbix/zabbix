@@ -117,7 +117,8 @@ class testGraphWidget extends CWebTest {
 				$form->fill($data[$tab]);
 		}
 
-		$this->query('xpath://button[@class="dialogue-widget-save"]')->one()->click();
+		sleep(2);
+		$form->submit();
 
 		if (!is_array($data['error'])) {
 			$data['error'] = [$data['error']];
@@ -125,7 +126,10 @@ class testGraphWidget extends CWebTest {
 		// Check error message.
 		$message = $form->getOverlayMessage();
 		$this->assertTrue($message->isBad());
-		$this->assertEquals(count($data['error']), $message->getLines()->count());
+		$count = count($data['error']);
+		$message->query('xpath:./div[@class="msg-details"]/ul/li['.$count.']')->waitUntilPresent();
+		$this->assertEquals($count, $message->getLines()->count());
+
 		foreach ($data['error'] as $error) {
 			$this->assertTrue($message->hasLine($error));
 		}
