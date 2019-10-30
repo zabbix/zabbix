@@ -342,7 +342,8 @@ switch ($data['operationtype']) {
 			: false;
 		if ($checked_current_host) {
 			unset($opr_data['opcommand_hst']['0']);
-		} else {
+		}
+		else {
 			$checked_current_host = array_key_exists('opcommand_chst', $opr_data);
 		}
 
