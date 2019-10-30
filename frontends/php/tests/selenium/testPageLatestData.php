@@ -30,10 +30,94 @@ class testPageLatestData extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Host', 'Name', 'Last check', 'Last value', 'Change']);
 	}
 
-// Check that no real host or template names displayed
+	// Check that no real host or template names displayed
 	public function testPageLatestData_NoHostNames() {
 		$this->zbxTestLogin('latest.php');
 		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
 		$this->zbxTestCheckNoRealHostnames();
+	}
+
+	public static function getItemDescription() {
+		return [
+			// Item without description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Log'
+				]
+			],
+			// Item with plain text in the description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Log_2',
+					'description' => 'Non-clickable description'
+				]
+			],
+			// Item with only 1 url in description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog',
+					'description' => 'https://zabbix.com'
+				]
+			],
+			// Item with text and url in description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog_2',
+					'description' => 'The following url should be clickable: https://zabbix.com'
+				]
+			],
+			// Item with multiple urls in description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Character',
+					'description' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
+				]
+			],
+			// Item with text and 2 urls in description.
+			[
+				[
+					'Item name' => 'item_testPageHistory_CheckLayout_Text',
+					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career',
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getItemDescription
+	 */
+	public function testPageLatestData_checkItemDescription($data) {
+		// Open Latest data for host 'testPageHistory_CheckLayout'
+		$this->page->login()->open('latest.php?hostids%5B%5D=15003&application=&select=&show_without_data=1&filter_set=1');
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Find rows from the data provider and click on the description icon if such should persist.
+		$xpath = './/div[@class="action-container"]/span[text()='.
+				CXPathHelper::escapeQuotes($data['Item name']).']/../..';
+		$row = $table->query('xpath', $xpath)->asTableRow(['parent' => $table])->one();
+
+		if (CTestArrayHelper::get($data,'description', false)) {
+			$row->query('class:icon-description')->one()->click()->waitUntilReady();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+
+			// Verify the real description with the expected one.
+			$this->assertEquals($data['description'], $overlay->getText());
+
+			// Get urls form description.
+			$urls = [];
+			preg_match_all('/https?:\/\/\S+/', $data['description'], $urls);
+			// Verify that each of the urls is clickable.
+			foreach ($urls[0] as $url) {
+				$this->assertTrue($overlay->query('xpath:./a[@href="'.$url.'"]')->one()->isClickable());
+			}
+
+			// Verify that the tool-tip can be closed.
+			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$this->assertFalse($overlay->isDisplayed());
+		}
+		// If the item has no description the description icon should not be there.
+		else {
+			$this->assertTrue($row->query('class:icon-description')->count() === 0);
+		}
 	}
 }
