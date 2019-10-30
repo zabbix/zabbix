@@ -1759,25 +1759,24 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	char		*utf8_string = NULL;
 	int		utf8_size;
 	unsigned int	codepage;
-
-	int bom_detected = 0;
+	int 	 	bom_detected = 0;
 
 	/* try to guess encoding using BOM if it exists */
-	if (3 <= in_size && (0xef == (in[0]&0xff)) && (0xbb == (in[1]&0xff)) && (0xbf == (in[2]&0xff)))
+	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
 	{
 		bom_detected = 1;
 
 		if ('\0' == *encoding)
 			encoding = "UTF-8";
 	}
-	else if (2 <= in_size && (0xff == (in[0]&0xff)) && (0xfe == (in[1]&0xff)))
+	else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
 	{
 		bom_detected = 1;
 
 		if ('\0' == *encoding)
 			encoding = "UTF-16";
 	}
-	else if (2 <= in_size && (0xfe == (in[0]&0xff)) && (0xff == (in[1]&0xff)))
+	else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
 	{
 		bom_detected = 1;
 
@@ -1801,9 +1800,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	{
 		/* remove BOM */
 		if (bom_detected)
-		{
-			in = in + 3;
-		}
+			in += 3;
 	}
 
 	if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
@@ -1813,7 +1810,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		/* remove BOM */
 		if (bom_detected)
 		{
-			in = in + 2;
+			in += 2;
 			wide_size--;
 		}
 
@@ -1830,7 +1827,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		/* remove BOM */
 		if (bom_detected)
 		{
-			in = in + 2;
+			in += 2;
 			wide_size--;
 		}
 
@@ -1884,15 +1881,15 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	/* try to guess encoding using BOM if it exists */
 	if ('\0' == *encoding)
 	{
-		if (3 <= in_size && (0xef == (in[0]&0xff)) && (0xbb == (in[1]&0xff)) && (0xbf == (in[2]&0xff)))
+		if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
 		{
 			encoding = "UTF-8";
 		}
-		else if (2 <= in_size && (0xff == (in[0]&0xff)) && (0xfe == (in[1]&0xff)))
+		else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
 		{
 			encoding = "UTF-16LE";
 		}
-		else if (2 <= in_size && (0xfe == (in[0]&0xff)) && (0xff == (in[1]&0xff)))
+		else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
 		{
 			encoding = "UTF-16BE";
 		}
@@ -1925,10 +1922,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	iconv_close(cd);
 
 	/* remove BOM */
-	if (3 <= strlen(out) && (0xef == (out[0]&0xff)) && (0xbb == (out[1]&0xff)) && (0xbf == (out[2]&0xff)))
-	{
-		memmove(out, out+3, strlen(out)-2);
-	}
+	if (3 <= p - out && 0 == strncmp("\xef\xbb\xbf", out, 3))
+		memmove(out, out + 3, (size_t)(p - out - 2));
 
 	return out;
 }
