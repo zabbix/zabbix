@@ -1,5 +1,5 @@
 <!-- Trigger Actions-->
-<script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
+<script type="text/x-jquery-tmpl" id="opmsg-usrgrp-row-tmpl">
 <tr id="#{row}#{usrgrpid}">
 	<td>
 		<input name="operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
@@ -11,7 +11,7 @@
 </tr>
 </script>
 
-<script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
+<script type="text/x-jquery-tmpl" id="opmsg-user-row-tmpl">
 <tr id="#{row}#{id}">
 	<td>
 		<input name="operation[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
@@ -82,7 +82,7 @@
 						continue;
 					}
 
-					var tpl = new Template(jQuery('#opmsgUserRowTPL').html());
+					var tpl = new Template(jQuery('#opmsg-user-row-tmpl').html());
 					var $container = jQuery('#' + list.parentId);
 					$container.before(tpl.evaluate(value));
 					break;
@@ -92,7 +92,7 @@
 						continue;
 					}
 
-					var tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
+					var tpl = new Template(jQuery('#opmsg-usrgrp-row-tmpl').html());
 					var $container = jQuery('#' + list.parentId);
 					$container.before(tpl.evaluate(value));
 					break;
@@ -205,6 +205,8 @@
 			.toggle(show_publickey)
 			.find(':input')
 			.prop('disabled', !show_publickey);
+
+		jQuery(window).trigger('resize');
 	}
 
 	function processTypeOfCalculation() {
