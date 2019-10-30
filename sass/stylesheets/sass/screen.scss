@@ -1905,13 +1905,9 @@ output {
 		}
 	}
 
-	.multiple-field-margin {
-		input, select {
-			margin-right: 3px;
-			margin-left: 3px;
-		}
-		input:first-child, select:first-child {
-			margin-left: 0;
+	.form-fields-inline {
+		label {
+			margin: 0 3px;
 		}
 	}
 

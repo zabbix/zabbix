@@ -132,25 +132,25 @@ $form
 		[
 			(new CNumericBox('hour', $data['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-			':',
+			new CLabel(':'),
 			(new CNumericBox('minute', $data['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		],
 		'row_timeperiod_period_at_hours_minutes',
-		ZBX_STYLE_MULTIPLE_FIELD_MARGIN
+		ZBX_STYLE_FORM_FIELDS_INLINE
 	)
 	->addRow((new CLabel(_('Maintenance period length'), 'period_days'))->setAsteriskMark(),
 		[
 			(new CNumericBox('period_days', $data['period_days'], 3))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-			_('Days'),
+			new CLabel(_('Days'), 'period_days'),
 			new CComboBox('period_hours', $data['period_hours'], null, range(0, 23)),
-			_('Hours'),
+			new CLabel(_('Hours'), 'period_hours'),
 			new CComboBox('period_minutes', $data['period_minutes'], null, range(0, 59)),
-			_('Minutes')
+			new CLabel(_('Minutes'), 'period_minutes')
 		],
 		'row_timeperiod_period_length',
-		ZBX_STYLE_MULTIPLE_FIELD_MARGIN
+		ZBX_STYLE_FORM_FIELDS_INLINE
 	);
 
 $output = [
