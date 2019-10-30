@@ -21,7 +21,16 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Icon mapping'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setControls((new CTag('nav', true,
+		(new CForm())
+			->cleanItems()
+			->addItem((new CList())
+				->addItem(new CSubmit('form', _('Create icon map')))
+			)
+		))
+			->setAttribute('aria-label', _('Content controls'))
+	);
 
 $iconMapTable = (new CTableInfo())
 	->setHeader([
