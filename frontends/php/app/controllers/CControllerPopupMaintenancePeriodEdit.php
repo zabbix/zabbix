@@ -154,7 +154,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 			TIMEPERIOD_TYPE_DAILY =>	['every', 'start_time', 'hour', 'minute'],
 			TIMEPERIOD_TYPE_WEEKLY =>	['dayofweek', 'every', 'start_time', 'hour', 'minute', 'days'],
 			TIMEPERIOD_TYPE_MONTHLY =>	['day', 'dayofweek', 'month', 'months', 'month_date_type', 'monthly_days',
-				'start_time', 'hour', 'minute'
+				'start_time', 'hour', 'minute', 'every'
 			]
 		];
 		$this->getInputs($data, ['update', 'refresh', 'index', 'period_days', 'period', 'period_hours',
@@ -175,6 +175,9 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 				if ($data['month_date_type'] == 1) {
 					$data['dayofweek'] = array_sum($this->getInput('monthly_days', []));
 					unset($data['day']);
+				}
+				else {
+					unset($data['every']);
 				}
 			}
 
