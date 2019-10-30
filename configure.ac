@@ -1695,7 +1695,7 @@ SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
-	if test "x$go" = "xno"; then
+	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
 fi
