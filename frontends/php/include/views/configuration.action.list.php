@@ -19,22 +19,34 @@
 **/
 
 
+$event_sources = [
+	EVENT_SOURCE_TRIGGERS => _('Triggers'),
+	EVENT_SOURCE_DISCOVERY => _('Discovery'),
+	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
+	EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+];
+
+$event_sources_submenu = [];
+foreach ($event_sources as $source => $label) {
+	$event_sources_submenu['eventsource_'.$source] = [
+		'label' => $label,
+		'clickCallback' => 'jQuery("#eventsource").val('.$source.'); jQuery("#eventsource").closest("form").submit();'
+	];
+}
+
 $widget = (new CWidget())
-	->setTitle(_('Actions'))
+	->setTitle(array_key_exists($data['eventsource'], $event_sources) ? $event_sources[$data['eventsource']] : null)
+	->setTitleSubmenu([
+		'main_section' => [
+			'label' => _('Event source'),
+			'items' => $event_sources_submenu
+		]
+	])
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
+			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
 			->addItem((new CList())
-				->addItem([
-					new CLabel(_('Event source'), 'eventsource'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('eventsource', $data['eventsource'], 'submit()', [
-						EVENT_SOURCE_TRIGGERS => _('Triggers'),
-						EVENT_SOURCE_DISCOVERY => _('Discovery'),
-						EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
-						EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
-					])
-				])
 				->addItem(new CSubmit('form', _('Create action')))
 			)
 		))

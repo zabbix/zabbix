@@ -23,15 +23,7 @@ require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Macros'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.macros.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $table = (new CTable())
 	->setId('tbl_macros')

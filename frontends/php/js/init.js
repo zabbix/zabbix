@@ -126,58 +126,67 @@ jQuery(function($) {
 		});
 	});
 
-	function showMenuPopup($obj, data, event) {
+	function showMenuPopup($obj, data, options, event) {
+		var sections;
+
 		switch (data.type) {
 			case 'history':
-				data = getMenuPopupHistory(data);
+				sections = getMenuPopupHistory(data);
 				break;
 
 			case 'host':
-				data = getMenuPopupHost(data, $obj);
+				sections = getMenuPopupHost(data, $obj);
 				break;
 
 			case 'map_element_submap':
-				data = getMenuPopupMapElementSubmap(data);
+				sections = getMenuPopupMapElementSubmap(data);
 				break;
 
 			case 'map_element_group':
-				data = getMenuPopupMapElementGroup(data);
+				sections = getMenuPopupMapElementGroup(data);
 				break;
 
 			case 'map_element_trigger':
-				data = getMenuPopupMapElementTrigger(data);
+				sections = getMenuPopupMapElementTrigger(data);
 				break;
 
 			case 'map_element_image':
-				data = getMenuPopupMapElementImage(data);
+				sections = getMenuPopupMapElementImage(data);
 				break;
 
 			case 'refresh':
-				data = getMenuPopupRefresh(data, $obj);
+				sections = getMenuPopupRefresh(data, $obj);
 				break;
 
 			case 'trigger':
-				data = getMenuPopupTrigger(data, $obj);
+				sections = getMenuPopupTrigger(data, $obj);
 				break;
 
 			case 'trigger_macro':
-				data = getMenuPopupTriggerMacro(data);
+				sections = getMenuPopupTriggerMacro(data);
 				break;
 
 			case 'dashboard':
-				data = getMenuPopupDashboard(data, $obj);
+				sections = getMenuPopupDashboard(data, $obj);
 				break;
 
 			case 'item':
-				data = getMenuPopupItem(data, $obj);
+				sections = getMenuPopupItem(data, $obj);
 				break;
 
 			case 'item_prototype':
-				data = getMenuPopupItemPrototype(data);
+				sections = getMenuPopupItemPrototype(data);
 				break;
+
+			case 'submenu':
+				sections = getMenuPopupSubmenu(data);
+				break;
+
+			default:
+				return;
 		}
 
-		$obj.menuPopup(data, event);
+		$obj.menuPopup(sections, event, options);
 	}
 
 	/**
@@ -203,20 +212,51 @@ jQuery(function($) {
 		overlayPreloaderDestroy(event.data.id, event.data.xhr);
 	}
 
+	function isAjaxRequiredForMenuPopupType(type) {
+		switch (type) {
+			case 'submenu':
+				return false;
+
+			default:
+				return true;
+		}
+	}
+
+	function updateMenuPopupOptions($obj, data, event) {
+		data.options = data.options || {};
+
+		switch (data.type) {
+			case 'submenu':
+				data.options = $.extend({
+					position: {
+						of: $obj,
+						my: 'left top',
+						at: 'left bottom+10'
+					}
+				}, data.options);
+				break;
+
+			default:
+				data.options = $.extend({
+					position: {
+						of: event,
+						my: 'left top',
+						at: 'left bottom'
+					}
+				}, data.options);
+				break;
+		}
+	}
+
 	/**
 	 * Build menu popup for given elements.
 	 */
 	$(document).on('keydown click', '[data-menu-popup]', function(event) {
 		var $obj = $(this),
-			data = $obj.data('menu-popup'),
-			position_target = event.target;
+			data = $obj.data('menu-popup');
 
 		if (event.type === 'keydown' && event.which != 13) {
 			return;
-		}
-		else if (event.type === 'contextmenu' || (IE && $obj.closest('svg').length > 0)
-			|| event.originalEvent.detail !== 0) {
-			position_target = event;
 		}
 
 		// Manually trigger event for menuPopupPreloaderCloseHandler call for the previous preloader.
@@ -224,45 +264,47 @@ jQuery(function($) {
 			$(document).trigger('click');
 		}
 
-		var	$preloader = createMenuPopupPreloader(),
-			url = new Curl('zabbix.php');
+		// Close other action menus and prevent focus jumping before opening a new popup.
+		$('.menu-popup-top').menuPopup('close', null, false);
 
-		url.setArgument('action', 'menu.popup');
-		url.setArgument('type', data.type);
+		// Update data.options based on menu type.
+		updateMenuPopupOptions($obj, data, event);
 
-		var xhr = $.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			data: {
-				data: data.data
-			},
-			dataType: 'json',
-			beforeSend: function() {
-				// Close other action menus and prevent focus jumping before opening a new popup.
-				$('.menu-popup-top').menuPopup('close', null, false);
-				setTimeout(function(){
-					$preloader
-						.fadeIn(200)
-						.position({
-							of: position_target,
-							my: 'left top',
-							at: 'left bottom'
-						});
-				}, 500);
-			},
-			success: function(resp) {
+		if (isAjaxRequiredForMenuPopupType(data.type)) {
+			var	$preloader = createMenuPopupPreloader();
+
+			addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+
+			setTimeout(function() {
+				$preloader.fadeIn(200).position(data.options.position);
+			}, 500);
+
+			var url = new Curl('zabbix.php');
+
+			url.setArgument('action', 'menu.popup');
+			url.setArgument('type', data.type);
+
+			var xhr = $.ajax({
+					url: url.getUrl(),
+					method: 'POST',
+					data: {
+						data: data.data
+					},
+					dataType: 'json'
+				});
+
+			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, event);
-			},
-			error: function() {
-			}
-		});
+				showMenuPopup($obj, resp.data, data.options, event);
+			});
 
-		addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
-
-		$(document)
-			.off('click', menuPopupPreloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+			$(document)
+				.off('click', menuPopupPreloaderCloseHandler)
+				.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
+		}
+		else {
+			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), data.options, event);
+		}
 
 		return false;
 	});

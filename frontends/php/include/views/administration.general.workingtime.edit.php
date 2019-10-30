@@ -21,15 +21,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Working time'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.workingtime.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $workingTimeView = (new CTabView())
 	->addTab('workingTime', _('Working time'),

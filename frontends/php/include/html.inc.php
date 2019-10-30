@@ -752,31 +752,34 @@ function makePageFooter($with_version = true) {
 }
 
 /**
- * Renders a drop-down menu for the Administration->General section.
+ * Get drop-down submenu item list for the Administration->General section.
  *
- * @param string $selected
- *
- * @return CComboBox
+ * @return array  Menu definition for CWidget::setTitleSubmenu.
  */
-function makeAdministrationGeneralMenu($selected) {
+function getAdministrationGeneralSubmenu() {
 	$autoreg_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
-	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
-		'adm.gui.php' => _('GUI'),
-		$autoreg_url => _('Auto registration'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]);
+	return [
+		'main_section' => [
+			'label' => _('Content controls'),
+			'items' => [
+				'adm.gui.php' => _('GUI'),
+				$autoreg_url => _('Auto registration'),
+				'adm.housekeeper.php' => _('Housekeeping'),
+				'adm.images.php' => _('Images'),
+				'adm.iconmapping.php' => _('Icon mapping'),
+				'adm.regexps.php' => _('Regular expressions'),
+				'adm.macros.php' => _('Macros'),
+				'adm.valuemapping.php' => _('Value mapping'),
+				'adm.workingtime.php' => _('Working time'),
+				'adm.triggerseverities.php' => _('Trigger severities'),
+				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+				'adm.other.php' => _('Other'),
+			],
+		],
+	];
 }
 
 /**

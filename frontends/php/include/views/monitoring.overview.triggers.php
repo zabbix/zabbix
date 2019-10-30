@@ -74,25 +74,33 @@ if ($blink_period > 0) {
 $web_layout_mode = CView::getLayoutMode();
 
 $widget = (new CWidget())
-	->setTitle(_('Overview'))
+	->setTitle(_('Triggers'))
+	->setTitleSubmenu([
+		'main_section' => [
+			'label' => _('Type'),
+			'items' => [
+				'type_'.SHOW_TRIGGERS => [
+					'label' => _('Triggers'),
+					'clickCallback' => 'jQuery("#type").val('.SHOW_TRIGGERS.'); jQuery("#type").closest("form").submit();'
+				],
+				'type_'.SHOW_DATA => [
+					'label' => _('Data'),
+					'clickCallback' => 'jQuery("#type").val('.SHOW_DATA.'); jQuery("#type").closest("form").submit();'
+				],
+			]
+		]
+	])
 	->setWebLayoutMode($web_layout_mode)
 	->setControls(new CList([
 		(new CForm('get'))
 			->cleanItems()
 			->setAttribute('aria-label', _('Main filter'))
+			->addItem(new CInput('hidden', 'type', $this->data['type']))
 			->addItem((new CList())
 				->addItem([
 					new CLabel(_('Group'), 'groupid'),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$this->data['pageFilter']->getGroupsCB()
-				])
-				->addItem([
-					new CLabel(_('Type'), 'type'),
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					new CComboBox('type', $this->data['type'], 'submit()', [
-						SHOW_TRIGGERS => _('Triggers'),
-						SHOW_DATA => _('Data')
-					])
 				])
 				->addItem([
 					new CLabel(_('Hosts location'), 'view_style'),
