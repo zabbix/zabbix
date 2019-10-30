@@ -224,7 +224,7 @@ $operation_tab = (new CFormList())
 			->setChecked($data['correlation']['operations'][ZBX_CORR_OPERATION_CLOSE_NEW])
 			->setId('operation_1_type')
 	)
-	->addRow('', (new CDiv((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())));
+	->addRow('', (new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())));
 
 // Append tabs to form.
 $correlation_tabs = (new CTabView())
