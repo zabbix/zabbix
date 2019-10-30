@@ -46,7 +46,6 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ..F....... [ZBX-16681] fixed displaying of "Acknowledge" menu option for "Not classified" problems in the Trigger overview page (Sasha)
 ...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)
 ...G...... [ZBX-16680] fixed freeing locked resources when Zabbix agent cannot be started and has to exit with failure (viktors)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 ..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
 ...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
 ........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)
@@ -55,6 +54,13 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ........S. [ZBX-16677] fixed empty sql query DBexecute_overflowed_sql call during host availability update (atumilovics)
 ........S. [ZBX-16383] adjusted timer sleeping period to process maintenances each minute at 00 seconds (wiper)
 .........T [ZBX-16737] changed agent.ping type to ZABBIX_PASSIVE in Template Module Zabbix agent (vitaly)
+
+--------------------------------------------------------------------------------
+Changes for 4.4.2rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.4.1
@@ -109,7 +115,6 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ..F....... [ZBX-16681] fixed displaying of "Acknowledge" menu option for "Not classified" problems in the Trigger overview page (Sasha)
 ...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)
 ...G...... [ZBX-16680] fixed freeing locked resources when Zabbix agent cannot be started and has to exit with failure (viktors)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 ..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
 ...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
 ........S. [ZBX-16683] fixed race condition between history syncer and escalator that caused recovery operations being delayed by step duration (vso)
@@ -324,7 +329,6 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 ..F....... [ZBX-15135] fixed incorrect triggers being displayed in Availability report when filtering by template (averza, Ivo)
 ..F....... [ZBX-16681] fixed displaying of "Acknowledge" menu option for "Not classified" problems in the Trigger overview page (Sasha)
 ...G...... [ZBX-16428] fixed SIGBUS crash when mmap memory is not accessible (atumilovics)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 ...G...... [ZBX-16680] fixed freeing locked resources when Zabbix agent cannot be started and has to exit with failure (viktors)
 ..F....... [ZBX-16666] fixed trailing slash being set in cookie path (talbergs)
 ...G...... [ZBX-16612] fixed possibility of high CPU usage on Windows (vso)
@@ -902,6 +906,13 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.15rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 4.0.14
 
 4.0.14rc1 was released as 4.0.14 without any changes
@@ -936,7 +947,6 @@ A......... [ZBX-16562] fixed configuration.export method in API improperly forma
 ........S. [ZBX-16002] added new macro EVENT.RECOVERY.NAME to display recovery event name in recovery alerts (akozlovs)
 ...G...P.. [ZBX-16512] fixed false item insertion into the queue after maintenance (akozlovs)
 ...G...... [ZBX-15685] fixed zabbix_sender failing to report the error due to closed connection (arimdjonoks)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 A......... [ZBX-16702] fixed error in the elastic search clearing history (vasilijs)
 ..F....... [ZBX-10805] fixed log items graphs drawing with numeric values like trapper items (vasilijs)
 A......... [ZBX-16604] fixed occurrence of an undefined index in discovered graph configuration (vasilijs)
