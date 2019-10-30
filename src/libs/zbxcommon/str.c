@@ -1759,7 +1759,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	char		*utf8_string = NULL;
 	int		utf8_size;
 	unsigned int	codepage;
-	int 	 	bom_detected = 0;
+	int		bom_detected = 0;
 
 	/* try to guess encoding using BOM if it exists */
 	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
