@@ -117,7 +117,7 @@ switch ($data['type']) {
 
 		// Old|New event tag value form elements.
 		if ($condition_type == ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE
-			|| $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE) {
+				|| $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE) {
 			$combobox_options = [];
 			foreach (getOperatorsByCorrConditionType($condition_type) as $value) {
 				$combobox_options[$value] = corrConditionOperatorToString($value);

@@ -49,13 +49,11 @@ class CControllerPopupOperationCommon extends CController {
 			return true;
 		}
 
-		$actionPermissions = API::Action()->get([
-			'output' => ['actionid'],
+		return (bool) API::Action()->get([
+			'output' => [],
 			'actionids' => $this->getInput('actionid'),
 			'editable' => true
 		]);
-
-		return !empty($actionPermissions);
 	}
 
 	protected function doAction() {
@@ -88,79 +86,78 @@ class CControllerPopupOperationCommon extends CController {
 				]))->disableView()
 			);
 		}
-		else {
-			$data = $this->getInput('operation', [
-				'operationtype' => OPERATION_TYPE_MESSAGE,
-				'esc_period' => 0,
-				'esc_step_from' => 1,
-				'esc_step_to' => 1,
-				'evaltype' => 0
-			]);
 
-			$data += ['operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE)];
+		$data = $this->getInput('operation', [
+			'operationtype' => OPERATION_TYPE_MESSAGE,
+			'esc_period' => 0,
+			'esc_step_from' => 1,
+			'esc_step_to' => 1,
+			'evaltype' => 0
+		]);
 
-			if (hasRequest('opcondition')) {
-				$conditions = [];
-				if (hasRequest('operation')) {
-					$oper = getRequest('operation');
-				}
-				if (array_key_exists('opconditions', $oper)) {
-					$conditions = $oper['opconditions'];
-				}
-				$new_condition = getRequest('opcondition');
+		$data += ['operationtype' => $this->getInput('operationtype', OPERATION_TYPE_MESSAGE)];
 
-				foreach ($conditions as $condition) {
-					if (isset($new_condition) && $new_condition['conditiontype'] == $condition['conditiontype']) {
-						switch ($new_condition['conditiontype']) {
-							case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-								if ($new_condition['value'] === $condition['value']) {
-									unset($new_condition);
-								}
-								break;
-						}
+		if (hasRequest('opcondition')) {
+			$conditions = [];
+			if (hasRequest('operation')) {
+				$oper = getRequest('operation');
+			}
+			if (array_key_exists('opconditions', $oper)) {
+				$conditions = $oper['opconditions'];
+			}
+			$new_condition = getRequest('opcondition');
+
+			foreach ($conditions as $condition) {
+				if (isset($new_condition) && $new_condition['conditiontype'] == $condition['conditiontype']) {
+					switch ($new_condition['conditiontype']) {
+						case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+							if ($new_condition['value'] === $condition['value']) {
+								unset($new_condition);
+							}
+							break;
 					}
-				}
-
-				if (isset($new_condition)) {
-					$conditions[] = $new_condition;
-				}
-
-				$data['opconditions'] = $conditions;
-
-				try {
-					CAction::validateOperationConditions($data['opconditions']);
-				}
-				catch (APIException $e) {
-					return $this->setResponse(
-						(new CControllerResponseData([
-							'main_block' => CJs::encodeJson([
-								'errors' => $e->getMessage()
-							])
-						]))->disableView()
-					);
 				}
 			}
 
-			$output = [
-				'title' => _('Operation details'),
-				'command' => '',
-				'message' => '',
-				'errors' => null,
-				'action' => $this->getAction(),
-				'data' => $data,
-				'type' => $this->getInput('type'),
-				'source' => $this->getInput('source'),
-				'actionid' => $this->getInput('actionid', '0'),
-				'update' => $this->getInput('update', '0'),
-				'allowed_operations' => getAllowedOperations($this->getInput('source')),
-				'operationtype' => $this->getInput('operationtype', 0),
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
-			];
+			if (isset($new_condition)) {
+				$conditions[] = $new_condition;
+			}
 
-			return $this->setResponse(new CControllerResponseData($output));
+			$data['opconditions'] = $conditions;
+
+			try {
+				CAction::validateOperationConditions($data['opconditions']);
+			}
+			catch (APIException $e) {
+				return $this->setResponse(
+					(new CControllerResponseData([
+						'main_block' => CJs::encodeJson([
+							'errors' => $e->getMessage()
+						])
+					]))->disableView()
+				);
+			}
 		}
+
+		$output = [
+			'title' => _('Operation details'),
+			'command' => '',
+			'message' => '',
+			'errors' => null,
+			'action' => $this->getAction(),
+			'data' => $data,
+			'type' => $this->getInput('type'),
+			'source' => $this->getInput('source'),
+			'actionid' => $this->getInput('actionid', '0'),
+			'update' => $this->getInput('update', '0'),
+			'allowed_operations' => getAllowedOperations($this->getInput('source')),
+			'operationtype' => $this->getInput('operationtype', 0),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+
+		return $this->setResponse(new CControllerResponseData($output));
 	}
 
 	/**

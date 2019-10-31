@@ -68,8 +68,8 @@ function submitConditionPopup(response) {
  * Validate popup form.
  */
 function validateConditionPopup() {
-	var $form = jQuery(document.forms["popup.condition"]),
-		url = new Curl($form.attr("action"));
+	var $form = jQuery(document.forms['popup.condition']),
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
 
@@ -77,13 +77,13 @@ function validateConditionPopup() {
 		.ajax({
 			url: url.getUrl(),
 			data: $form.serialize(),
-			dataType: "json",
-			type: "post"
+			dataType: 'json',
+			method: 'POST'
 		})
 		.done(function(response) {
 			$form.parent().find('.msg-bad').remove();
 
-			if (typeof response.errors !== "undefined") {
+			if (typeof response.errors !== 'undefined') {
 				return jQuery(response.errors).insertBefore($form);
 			}
 

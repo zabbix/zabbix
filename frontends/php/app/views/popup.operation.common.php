@@ -239,7 +239,7 @@ switch ($data['operationtype']) {
 			);
 		// break; is not missing here
 
-	// Notify all involvied form elements.
+	// Notify all involved form elements.
 	case OPERATION_TYPE_ACK_MESSAGE:
 		// Media types elements.
 		$media_types = API::MediaType()->get([
@@ -451,7 +451,7 @@ switch ($data['operationtype']) {
 		$inline_js .= $target_list_multiselect_host->getPostJS();
 		$inline_js .= $target_list_multiselect_hostgroup->getPostJS();
 
-		$userScript = [
+		$user_script = [
 			new CVar('operation[opcommand][scriptid]', $opr_data['opcommand']['scriptid']),
 			(new CTextBox('operation[opcommand][script]', $opr_data['opcommand']['script'], true))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -478,7 +478,7 @@ switch ($data['operationtype']) {
 			)
 			->addRow(
 				(new CLabel(_('Script name'), 'operation_opcommand_script'))->setAsteriskMark(),
-				(new CDiv($userScript))->addClass(ZBX_STYLE_NOWRAP)
+				(new CDiv($user_script))->addClass(ZBX_STYLE_NOWRAP)
 			)
 			// Script.
 			->addRow(
@@ -674,16 +674,16 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 	$allowed_opconditions = get_opconditions_by_eventsource(EVENT_SOURCE_TRIGGERS);
 	$grouped_opconditions = [];
 
-	$operationConditionsTable = (new CTable())
+	$opcondition_table = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setId('operationConditionTable')
 		->setHeader([_('Label'), _('Name'), _('Action')]);
 
 	$i = 0;
 
-	$operationConditionStringValues = actionOperationConditionValueToString($opr_data['opconditions']);
+	$opcondition_string_values = actionOperationConditionValueToString($opr_data['opconditions']);
 
-	foreach ($opr_data['opconditions'] as $cIdx => $opcondition) {
+	foreach ($opr_data['opconditions'] as $index => $opcondition) {
 		if (!array_key_exists('conditiontype', $opcondition) || !$opcondition['conditiontype']) {
 			$opcondition['conditiontype'] = 0;
 		}
@@ -702,10 +702,10 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 			->addClass('label')
 			->setAttribute('data-conditiontype', $opcondition['conditiontype'])
 			->setAttribute('data-formulaid', $label);
-		$operationConditionsTable->addRow([
+		$opcondition_table->addRow([
 				$labelCol,
 				getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-					$operationConditionStringValues[$cIdx], ''
+					$opcondition_string_values[$index], ''
 				),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -723,7 +723,7 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 		$i++;
 	}
 
-	$calcTypeComboBox = (new CComboBox(
+	$calc_type_combobox = (new CComboBox(
 		'operation[evaltype]',
 		$opr_data['evaltype'],
 		'processOperationTypeOfCalculation()',
@@ -735,14 +735,14 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 	))->setId('operationEvaltype');
 
 	$form_list->addRow(_('Type of calculation'), [
-		$calcTypeComboBox,
+		$calc_type_combobox,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan())->setId('operationConditionLabel')
 	]);
 
 	$inline_js .= "processOperationTypeOfCalculation();";
 
-	$operationConditionsTable->addRow([
+	$opcondition_table->addRow([
 		(new CSimpleButton(_('Add')))
 			->onClick('return PopUp("popup.operation.condition.edit",'.CJs::encodeJson([
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
@@ -752,7 +752,7 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 	]);
 
 	$form_list->addRow(_('Conditions'),
-		(new CDiv($operationConditionsTable))
+		(new CDiv($opcondition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	);

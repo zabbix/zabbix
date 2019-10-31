@@ -70,14 +70,8 @@ function submitOperationPopup(response) {
 					}
 				}
 			}
-			else if ([
-				'opmessage_grp',
-				'opmessage_usr',
-				'opcommand_grp',
-				'opcommand_hst',
-				'opgroup',
-				'optemplate'
-			].indexOf(i) !== -1) {
+			else if (['opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate']
+					.indexOf(i) !== -1) {
 				for (var j in inputs[i]) {
 					if (inputs[i].hasOwnProperty(j)) {
 						create_var(
@@ -103,7 +97,7 @@ function submitOperationPopup(response) {
  */
 function validateOperationPopup() {
 	var $form = jQuery(document.forms['popup.operation']),
-		url = new Curl($form.attr("action"));
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
 
@@ -111,15 +105,12 @@ function validateOperationPopup() {
 		.ajax({
 			url: url.getUrl(),
 			data:  $form.serialize(),
-			dataType: "json",
-			type: "post"
+			dataType: 'json',
+			method: 'POST'
 		})
 		.done(function (response) {
-			if (typeof response.errors !== "undefined") {
-				$form
-					.parent()
-					.find(".msg-bad")
-					.remove();
+			if (typeof response.errors !== 'undefined') {
+				$form.parent().find('.msg-bad').remove();
 
 				return jQuery(response.errors).insertBefore($form);
 			}
