@@ -212,7 +212,14 @@ jQuery(function($) {
 		overlayPreloaderDestroy(event.data.id, event.data.xhr);
 	}
 
-	function isAjaxRequiredForMenuPopupType(type) {
+	/**
+	 * Is request to a server required to process and update the data passed to the popup menu?
+	 *
+	 * @param string type  A menu popup type.
+	 *
+	 * @returns boolean
+	 */
+	function isServerRequestRequired(type) {
 		switch (type) {
 			case 'submenu':
 				return false;
@@ -222,29 +229,28 @@ jQuery(function($) {
 		}
 	}
 
-	function updateMenuPopupOptions($obj, data, event) {
-		data.options = data.options || {};
-
+	/**
+	 * Make a default position object for the menu popup, based on it's type.
+	 *
+	 * @param object $obj   Menu popup opener object.
+	 * @param object data   Menu popup data object.
+	 * @param object event  Original opener event.
+	 */
+	function makeDefaultPosition($obj, data, event) {
 		switch (data.type) {
 			case 'submenu':
-				data.options = $.extend({
-					position: {
-						of: $obj,
-						my: 'left top',
-						at: 'left bottom+10'
-					}
-				}, data.options);
-				break;
+				return {
+					of: $obj,
+					my: 'left top',
+					at: 'left bottom+10'
+				};
 
 			default:
-				data.options = $.extend({
-					position: {
-						of: event,
-						my: 'left top',
-						at: 'left bottom'
-					}
-				}, data.options);
-				break;
+				return {
+					of: event,
+					my: 'left top',
+					at: 'left bottom'
+				};
 		}
 	}
 
@@ -267,16 +273,18 @@ jQuery(function($) {
 		// Close other action menus and prevent focus jumping before opening a new popup.
 		$('.menu-popup-top').menuPopup('close', null, false);
 
-		// Update data.options based on menu type.
-		updateMenuPopupOptions($obj, data, event);
+		// Create options object based on original options.
+		var options = $.extend({
+			position: makeDefaultPosition($obj, data, event)
+		}, data.options || {});
 
-		if (isAjaxRequiredForMenuPopupType(data.type)) {
+		if (isServerRequestRequired(data.type)) {
 			var	$preloader = createMenuPopupPreloader();
 
 			addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
 
 			setTimeout(function() {
-				$preloader.fadeIn(200).position(data.options.position);
+				$preloader.fadeIn(200).position(options.position);
 			}, 500);
 
 			var url = new Curl('zabbix.php');
@@ -295,7 +303,7 @@ jQuery(function($) {
 
 			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, data.options, event);
+				showMenuPopup($obj, resp.data, options, event);
 			});
 
 			$(document)
@@ -303,7 +311,7 @@ jQuery(function($) {
 				.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 		}
 		else {
-			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), data.options, event);
+			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), options, event);
 		}
 
 		return false;

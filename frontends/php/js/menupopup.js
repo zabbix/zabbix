@@ -788,6 +788,21 @@ function getMenuPopupItemPrototype(options) {
 	}];
 }
 
+/**
+ * Get menu popup submenu section data.
+ *
+ * @param object options['submenu']                                    List of menu sections.
+ * @param object options['submenu'][section]                           An individual section definition.
+ * @param string options['submenu'][section]['label']                  Non-clickable section label.
+ * @param object options['submenu'][section]['items']                  List of menu items of the section.
+ * @param string options['submenu'][section]['items'][url]             Menu item label for the given url.
+ * @param object options['submenu'][section]['items'][key]             Menu item with a submenu.
+ * @param object options['submenu'][section]['items'][key]['label']    Non-clickable subsection label.
+ * @param object options['submenu'][section]['items'][key]['items']    List of menu items of the subsection.
+ * @param object options['submenu'][section]['items'][key]['items'][]  More levels of submenu.
+ *
+ * @returns array
+ */
 function getMenuPopupSubmenu(options) {
 	var transform = function(sections) {
 			var result = [];
@@ -798,9 +813,6 @@ function getMenuPopupSubmenu(options) {
 					for (var item_key in sections[key]) {
 						if (item_key === 'items') {
 							item[item_key] = transform(sections[key][item_key]);
-						}
-						else if (item_key === 'clickCallback') {
-							item[item_key] = new Function(sections[key][item_key]);
 						}
 						else {
 							item[item_key] = sections[key][item_key];

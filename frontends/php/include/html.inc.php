@@ -775,7 +775,7 @@ function getAdministrationGeneralSubmenu() {
 				'adm.workingtime.php' => _('Working time'),
 				'adm.triggerseverities.php' => _('Trigger severities'),
 				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-				'adm.other.php' => _('Other'),
+				'adm.other.php' => _('Other')
 			],
 		],
 	];
