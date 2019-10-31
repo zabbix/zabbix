@@ -1,0 +1,202 @@
+---
+test case: empty text nothing happens
+# empty text
+in:
+  encoding: ''
+  buffer_length: 0
+  buffer: buffer
+    - ''
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer: expected_result_buffer ''
+  return: SUCCEED
+
+---
+test case: bom is not added to plain data utf8 assumed
+in:
+  encoding: ''
+  buffer_length: 6
+  buffer: &buffer
+    - '\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer: *buffer
+  return: SUCCEED
+
+---
+test case: utf8 bom is removed
+in:
+  encoding: ''
+  buffer_length: 9
+  buffer:
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer:
+    - '\x11\x11\x11\x11\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf8 bom is removed2
+in:
+  encoding: ''
+  buffer_length: 9
+  buffer: &buffer
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 9
+  expected_result_buffer: *buffer
+  return: FAIL
+
+---
+test case: utf8 bom is removed with encoding specified
+in:
+  encoding: 'UTF-8'
+  buffer_length: 9
+  buffer:
+    - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
+out:
+  expected_result_buffer_length: 6
+  expected_result_buffer:
+    - '\x11\x11\x11\x11\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf8 bom is removed empty text
+in:
+  encoding: ''
+  buffer_length: 3
+  buffer:
+    - '\xEF\xBB\xBF'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+
+---
+test case: utf16 LE bom is removed
+#
+# utf-16 conversion to utf-8
+# echo -n -e '\xff\xfe\x11\x00\x11\x00' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-16LE -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# efbb bf11 11
+#
+in:
+  encoding: ''
+  buffer_length: 6
+  buffer:
+    - '\xFF\xFE\x11\x00\x11\x00'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer:
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16 LE noBOM with encoding
+#
+# no BOM, but we still correctly decode the data as encoding was provided
+#
+in:
+  encoding: 'UTF-16LE'
+  buffer_length: 4
+  buffer:
+    - '\x11\x00\x11\x00'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer:
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16 LE bom is removed empty text
+in:
+  encoding: ''
+  buffer_length: 2
+  buffer:
+    - '\xFF\xFE'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+
+---
+test case: utf16 BE bom is removed
+#
+# utf-16_BE conversion to utf-8
+# echo -n -e '\xfe\xff\x00\x11\x00\x11' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-16BE -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# efbb bf11 11
+#
+in:
+  encoding: ''
+  buffer_length: 6
+  buffer:
+    - '\xFE\xFF\x00\x11\x00\x11'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer:
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16 BE noBOM with enconding
+in:
+  encoding: 'UTF-16BE'
+  buffer_length: 4
+  buffer:
+    - '\x00\x11\x00\x11'
+out:
+  expected_result_buffer_length: 2
+  expected_result_buffer:
+    - '\x11\x11'
+  return: SUCCEED
+
+---
+test case: utf16 BE bom is removed empty text
+in:
+  encoding: ''
+  buffer_length: 2
+  buffer:
+    - '\xFE\xFF'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+
+---
+test case: utf32 LE bom is removed incorrect guess conversion to utf16
+#
+# utf32 conversion to utf-8
+# utf32 without encoding is guessed as utf16:
+# 11 in utf8 is represented in utf32 as \x11\x00\x00\x00
+# \xFF\xFE\x00\x00 is utf-32 BOM
+#
+# So that,
+# echo -n -e '\xFF\xFE\x00\x00\x11\x00\x00\x00' > /tmp/bytes
+# iconv /tmp/bytes -f UTF-32 -t UTF-8 -o /tmp/utf8
+# xxd /tmp/utf8
+# 11
+#
+# However, if encoding is not specified, we can confuse it with utf-16 LE
+# which also has \xFF\xFE at the beginning, so the the result is different:
+# 00 11 00
+#
+# which then reads as an empty string
+#
+in:
+  encoding: ''
+  buffer_length: 8
+  buffer:
+    - '\xFF\xFE\x00\x00\x11\x00\x00\x00'
+out:
+  expected_result_buffer_length: 0
+  expected_result_buffer:
+    - ''
+  return: SUCCEED
+...
