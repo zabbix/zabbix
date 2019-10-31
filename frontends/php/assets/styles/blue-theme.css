@@ -4611,6 +4611,8 @@ svg {
     padding-bottom: 2px; }
   .list-vertical-accordion .list-accordion-item-closed {
     height: 30px; }
+    .list-vertical-accordion .list-accordion-item-closed .multiselect input.input[type="text"] {
+      display: inline-block; }
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
       display: none; }
 
