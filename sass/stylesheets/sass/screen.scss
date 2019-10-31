@@ -6611,12 +6611,6 @@ svg {
 		@extend .multiselect-collapsed;
 		height: 30px;
 
-		.multiselect {
-			input.input[type="text"] {
-				display: inline-block;
-			}
-		}
-
 		.list-accordion-item-body {
 			display: none;
 		}
