@@ -960,6 +960,9 @@ jQuery(function($) {
 	 * @param string sections[n]['label']  Section title (optional).
 	 * @param array  sections[n]['items']  Section menu data (see createMenuItem() for available options).
 	 * @param object event                 Menu popup call event.
+	 * @param object options               Menu popup options (optional).
+	 * @param object options['class']      Menu popup additional class name (optional).
+	 * @param object options['position']   Menu popup position object (optional).
 	 *
 	 * @see createMenuItem()
 	 */

@@ -776,8 +776,8 @@ function getAdministrationGeneralSubmenu() {
 				'adm.triggerseverities.php' => _('Trigger severities'),
 				'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 				'adm.other.php' => _('Other')
-			],
-		],
+			]
+		]
 	];
 }
 
