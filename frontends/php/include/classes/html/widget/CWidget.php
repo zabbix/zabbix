@@ -124,7 +124,8 @@ class CWidget {
 						'options' => [
 							'class' => ZBX_STYLE_PAGE_TITLE_SUBMENU
 						]
-					]);
+					])
+					->setAttribute('aria-label', _('Content controls: submenu'));
 			}
 
 			$divs[] = new CDiv($title_tag);

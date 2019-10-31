@@ -63,9 +63,9 @@ if ($zabbixServer->getError()) {
 }
 
 $submenu_source = [
-	QUEUE_OVERVIEW => _('Overview'),
-	QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
-	QUEUE_DETAILS => _('Details')
+	QUEUE_OVERVIEW => _('Queue overview'),
+	QUEUE_OVERVIEW_BY_PROXY => _('Queue overview by proxy'),
+	QUEUE_DETAILS => _('Queue details')
 ];
 
 $submenu = [];
@@ -77,16 +77,10 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
-$title = _('Queue');
-if (array_key_exists($config, $submenu_source)) {
-	$title .= NAME_DELIMITER.$submenu_source[$config];
-}
-
 $widget = (new CWidget())
-	->setTitle($title)
+	->setTitle(array_key_exists($config, $submenu_source) ? $submenu_source[$config] : null)
 	->setTitleSubmenu([
 		'main_section' => [
-			'label' => _('Queue of items to be updated'),
 			'items' => $submenu
 		]
 	]);

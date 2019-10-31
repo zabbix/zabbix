@@ -20,10 +20,10 @@
 
 
 $submenu_source = [
-	EVENT_SOURCE_TRIGGERS => _('Triggers'),
-	EVENT_SOURCE_DISCOVERY => _('Discovery'),
-	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
-	EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+	EVENT_SOURCE_TRIGGERS => _('Trigger actions'),
+	EVENT_SOURCE_DISCOVERY => _('Discovery actions'),
+	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration actions'),
+	EVENT_SOURCE_INTERNAL => _('Internal actions')
 ];
 
 $submenu = [];
@@ -35,16 +35,10 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
-$title = _('Actions');
-if (array_key_exists($data['eventsource'], $submenu_source)) {
-	$title .= NAME_DELIMITER.$submenu_source[$data['eventsource']];
-}
-
 $widget = (new CWidget())
-	->setTitle($title)
+	->setTitle(array_key_exists($data['eventsource'], $submenu_source) ? $submenu_source[$data['eventsource']] : null)
 	->setTitleSubmenu([
 		'main_section' => [
-			'label' => _('Event source'),
 			'items' => $submenu
 		]
 	])

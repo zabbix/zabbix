@@ -37,8 +37,8 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 $web_layout_mode = CView::getLayoutMode();
 
 $submenu_source = [
-	SHOW_TRIGGERS => _('Triggers'),
-	SHOW_DATA => _('Data')
+	SHOW_TRIGGERS => _('Overview triggers'),
+	SHOW_DATA => _('Overview data')
 ];
 
 $submenu = [];
@@ -50,16 +50,10 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
-$title = _('Overview');
-if (array_key_exists($this->data['type'], $submenu_source)) {
-	$title .= NAME_DELIMITER.$submenu_source[$this->data['type']];
-}
-
 $widget = (new CWidget())
-	->setTitle($title)
+	->setTitle(array_key_exists($this->data['type'], $submenu_source) ? $submenu_source[$this->data['type']] : null)
 	->setTitleSubmenu([
 		'main_section' => [
-			'label' => _('Type'),
 			'items' => $submenu
 		]
 	])
