@@ -28,7 +28,16 @@ function submitConditionPopup(response) {
 		form_param = response.form.param,
 		input_name = response.form.input_name,
 		inputs = response.inputs,
-		dialog;
+		cond_dialogueid = jQuery(document.forms["popup.condition"])
+			.closest('[data-dialogueid]')
+			.data('dialogueid'),
+		opr_dialogueid = jQuery(document.forms['popup.operation'])
+			.closest('[data-dialogueid]')
+			.data('dialogueid');
+
+	if (!cond_dialogueid) {
+		return false;
+	}
 
 	for (var i in inputs) {
 		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
@@ -46,11 +55,9 @@ function submitConditionPopup(response) {
 	}
 
 	if (form_param === 'add_opcondition') {
-		dialog = overlays_stack[overlays_stack.length - 1];
-		overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
+		overlayDialogueDestroy(cond_dialogueid);
 
-		dialog = overlays_stack[overlays_stack.length - 1];
-		PopUp('popup.action.operation.edit', jQuery(document.forms['popup.operation']).serialize(), dialog.dialogueid);
+		PopUp('popup.action.operation.edit', jQuery(document.forms['popup.operation']).serialize(), opr_dialogueid);
 	}
 	else {
 		submitFormWithParam(form_name, form_param, '1');
@@ -66,11 +73,6 @@ function validateConditionPopup() {
 
 	url.setArgument('validate', 1);
 
-	$form
-		.parent()
-		.find(".msg-bad, .msg-good")
-		.remove();
-
 	return jQuery
 		.ajax({
 			url: url.getUrl(),
@@ -79,6 +81,11 @@ function validateConditionPopup() {
 			type: "post"
 		})
 		.done(function(response) {
+			$form
+				.parent()
+				.find(".msg-bad")
+				.remove();
+
 			if (typeof response.errors !== "undefined") {
 				return jQuery(response.errors).insertBefore($form);
 			}
