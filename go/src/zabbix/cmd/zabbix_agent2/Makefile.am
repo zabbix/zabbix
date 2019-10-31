@@ -16,15 +16,15 @@ GOLDFLAGS += -X main.confDefault=${AGENT2_CONFIG_FILE}
 all: build
 
 build:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go build -ldflags="${GOLDFLAGS}"
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOPATH="${GOPATH}" go build -ldflags="${GOLDFLAGS}"
 
 clean:
 	go clean
 
 install:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go install -ldflags="${GOLDFLAGS}"
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOPATH="${GOPATH}" go install -ldflags="${GOLDFLAGS}"
 	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "../../conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
 
 check:
-	CGO_LDFLAGS="${CGO_LDFLAGS}" go test
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test
 

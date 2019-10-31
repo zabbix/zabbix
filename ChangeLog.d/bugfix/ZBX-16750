@@ -1,1 +1,0 @@
-...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)

@@ -2275,6 +2275,7 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 		return;
 
 	pair.first = dep_itemid;
+	pair.second = 0;
 	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{

@@ -190,8 +190,6 @@ class CCheckBox extends CInput {
 			$this->removeId();
 		}
 
-		$this->setEnabled($this->enabled && !$this->readonly);
-
 		return $hidden.parent::toString($destroy).$label->toString();
 	}
 }

@@ -62,8 +62,6 @@ class CInput extends CTag {
 	 * @param bool $value
 	 */
 	public function setEnabled($value) {
-		$this->enabled = $value;
-
 		if ($value) {
 			$this->removeAttribute('disabled');
 		}
@@ -72,5 +70,21 @@ class CInput extends CTag {
 		}
 
 		return $this;
+	}
+
+	public function removeAttribute($name) {
+		if ($name === 'disabled') {
+			$this->enabled = false;
+		}
+
+		return parent::removeAttribute($name);
+	}
+
+	public function setAttribute($name, $value) {
+		if ($name === 'disabled') {
+			$this->enabled = ($value !== 'disabled');
+		}
+
+		return parent::setAttribute($name, $value);
 	}
 }

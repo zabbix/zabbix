@@ -566,7 +566,7 @@ and {Template Module Interfaces SNMPv1:net.if.out.errors[ifOutErrors.{#SNMPINDEX
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template Module Interfaces SNMPv1</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>

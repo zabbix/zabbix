@@ -1279,7 +1279,7 @@ Template tooling version used: 0.32</description>
                         <name>System load</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1301,7 +1301,7 @@ Template tooling version used: 0.32</description>
                         <name>CPU usage{#SINGLETON}</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1323,7 +1323,7 @@ Template tooling version used: 0.32</description>
                         <name>Memory usage</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1345,7 +1345,7 @@ Template tooling version used: 0.32</description>
                         <name>Swap usage</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1367,7 +1367,7 @@ Template tooling version used: 0.32</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1389,7 +1389,7 @@ Template tooling version used: 0.32</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1411,7 +1411,7 @@ Template tooling version used: 0.32</description>
                         <key>vfs.dev.util[diskIOLA1.{#SNMPINDEX}]</key>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1433,7 +1433,7 @@ Template tooling version used: 0.32</description>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Linux SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
