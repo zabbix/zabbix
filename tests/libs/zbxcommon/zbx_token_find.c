@@ -165,6 +165,12 @@ static void	compare_token_lld_func_macro_values(const char *expression, zbx_toke
 	}
 }
 
+static void	compare_token_macro_values(const char *expression, zbx_token_t *token)
+{
+	compare_token("Invalid token", "out.token", expression, token->loc);
+	compare_token("Invalid macro", "out.macro", expression, token->data.macro.name);
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*expression;
@@ -202,6 +208,9 @@ void	zbx_mock_test_entry(void **state)
 				break;
 			case ZBX_TOKEN_LLD_MACRO:
 				compare_token_lld_macro_values(expression, &token);
+				break;
+			case ZBX_TOKEN_MACRO:
+				compare_token_macro_values(expression, &token);
 				break;
 		}
 	}

@@ -1557,4 +1557,6 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 #define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 
+int	zbx_str_extract(const char *text, size_t len, char **value);
+
 #endif
