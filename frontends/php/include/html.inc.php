@@ -763,7 +763,7 @@ function getAdministrationGeneralSubmenu() {
 
 	return [
 		'main_section' => [
-			'label' => _('Content controls'),
+			'label' => _('General'),
 			'items' => [
 				'adm.gui.php' => _('GUI'),
 				$autoreg_url => _('Auto registration'),

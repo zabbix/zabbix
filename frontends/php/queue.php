@@ -62,27 +62,32 @@ if ($zabbixServer->getError()) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 
-$queue_views = [
+$submenu_source = [
 	QUEUE_OVERVIEW => _('Overview'),
 	QUEUE_OVERVIEW_BY_PROXY => _('Overview by proxy'),
 	QUEUE_DETAILS => _('Details')
 ];
 
-$queue_views_submenu = [];
-foreach ($queue_views as $queue_view => $label) {
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
 	$url = (new CUrl('queue.php'))
-		->setArgument('config', $queue_view)
+		->setArgument('config', $value)
 		->getUrl();
 
-	$queue_views_submenu[$url] = $label;
+	$submenu[$url] = $label;
+}
+
+$title = _('Queue');
+if (array_key_exists($config, $submenu_source)) {
+	$title .= NAME_DELIMITER.$submenu_source[$config];
 }
 
 $widget = (new CWidget())
-	->setTitle(array_key_exists($config, $queue_views) ? $queue_views[$config] : null)
+	->setTitle($title)
 	->setTitleSubmenu([
 		'main_section' => [
 			'label' => _('Queue of items to be updated'),
-			'items' => $queue_views_submenu
+			'items' => $submenu
 		]
 	]);
 

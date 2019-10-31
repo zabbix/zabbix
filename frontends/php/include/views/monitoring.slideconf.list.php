@@ -23,7 +23,6 @@ $widget = (new CWidget())
 	->setTitle(_('Slide shows'))
 	->setTitleSubmenu([
 		'main_section' => [
-			'label' => _('Screens'),
 			'items' => [
 				'screens.php' => _('Screens'),
 				'slides.php' => _('Slide shows')

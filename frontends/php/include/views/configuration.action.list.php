@@ -19,27 +19,33 @@
 **/
 
 
-$event_sources = [
+$submenu_source = [
 	EVENT_SOURCE_TRIGGERS => _('Triggers'),
 	EVENT_SOURCE_DISCOVERY => _('Discovery'),
 	EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
 	EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
 ];
 
-$event_sources_submenu = [];
-foreach ($event_sources as $source => $label) {
-	$event_sources_submenu['eventsource_'.$source] = [
-		'label' => $label,
-		'clickCallback' => 'jQuery("#eventsource").val('.$source.'); jQuery("#eventsource").closest("form").submit();'
-	];
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('actionconf.php'))
+		->setArgument('eventsource', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
+$title = _('Actions');
+if (array_key_exists($data['eventsource'], $submenu_source)) {
+	$title .= NAME_DELIMITER.$submenu_source[$data['eventsource']];
 }
 
 $widget = (new CWidget())
-	->setTitle(array_key_exists($data['eventsource'], $event_sources) ? $event_sources[$data['eventsource']] : null)
+	->setTitle($title)
 	->setTitleSubmenu([
 		'main_section' => [
 			'label' => _('Event source'),
-			'items' => $event_sources_submenu
+			'items' => $submenu
 		]
 	])
 	->setControls((new CTag('nav', true,

@@ -36,21 +36,31 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 // header right
 $web_layout_mode = CView::getLayoutMode();
 
+$submenu_source = [
+	SHOW_TRIGGERS => _('Triggers'),
+	SHOW_DATA => _('Data')
+];
+
+$submenu = [];
+foreach ($submenu_source as $value => $label) {
+	$url = (new CUrl('overview.php'))
+		->setArgument('type', $value)
+		->getUrl();
+
+	$submenu[$url] = $label;
+}
+
+$title = _('Overview');
+if (array_key_exists($this->data['type'], $submenu_source)) {
+	$title .= NAME_DELIMITER.$submenu_source[$this->data['type']];
+}
+
 $widget = (new CWidget())
-	->setTitle(_('Data'))
+	->setTitle($title)
 	->setTitleSubmenu([
 		'main_section' => [
 			'label' => _('Type'),
-			'items' => [
-				'type_'.SHOW_TRIGGERS => [
-					'label' => _('Triggers'),
-					'clickCallback' => 'jQuery("#type").val('.SHOW_TRIGGERS.'); jQuery("#type").closest("form").submit();'
-				],
-				'type_'.SHOW_DATA => [
-					'label' => _('Data'),
-					'clickCallback' => 'jQuery("#type").val('.SHOW_DATA.'); jQuery("#type").closest("form").submit();'
-				],
-			]
+			'items' => $submenu
 		]
 	])
 	->setWebLayoutMode($web_layout_mode)

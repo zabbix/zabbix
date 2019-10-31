@@ -417,15 +417,15 @@ ul.top-nav-icons {
     box-sizing: border-box;
     height: 25px; }
     .header-title a.link-action h1 {
-      padding-right: 1.1em; }
+      padding-right: 1em; }
       .header-title a.link-action h1::after {
         content: '';
         position: absolute;
         top: 50%;
         right: .1em;
-        margin-top: -.2em;
-        width: .4em;
-        height: .4em;
+        margin-top: -.1em;
+        width: .3em;
+        height: .3em;
         border-right: 2px solid #000;
         border-bottom: 2px solid #000;
         transform: rotate(45deg);
