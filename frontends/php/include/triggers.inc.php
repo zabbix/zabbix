@@ -690,7 +690,6 @@ function getTriggersOverviewData(array $groupids, $application, array $host_opti
 		'selectHosts' => ['hostid', 'name'],
 		'hostids' => $hostids,
 		'monitored' => true,
-		'skipDependent' => true,
 		'sortfield' => 'description',
 		'selectDependencies' => ['triggerid'],
 		'preservekeys' => true
@@ -734,7 +733,17 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		'acknowledged' => null
 	];
 
-	$triggers = API::Trigger()->get($trigger_options);
+	$triggers = API::Trigger()->get(['preservekeys' => true] + $trigger_options);
+
+	$nondependent_trigger_options = [
+		'output' => [],
+		'triggerids' => array_keys($triggers),
+		'skipDependent' => true,
+		'preservekeys' => true
+	];
+
+	$nondependent_triggers = API::Trigger()->get($nondependent_trigger_options);
+
 	CArrayHelper::sort($triggers, ['description']);
 
 	if ($triggers) {
@@ -750,6 +759,10 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 				'has_resolved_unacknowledged' => false,
 				'has_unresolved_unacknowledged' => false
 			];
+
+			if ($trigger['value'] == TRIGGER_VALUE_TRUE && !array_key_exists($triggerid, $nondependent_triggers)) {
+				$trigger['value'] = TRIGGER_VALUE_FALSE;
+			}
 		}
 		unset($trigger);
 
@@ -765,7 +778,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 		foreach ($problems as $problem) {
 			$triggerid = $problem['objectid'];
 
-			if ($problem['r_eventid'] == 0) {
+			if ($problem['r_eventid'] == 0 && array_key_exists($triggerid, $nondependent_triggers)) {
 				$triggers[$triggerid]['resolved'] = false;
 			}
 
