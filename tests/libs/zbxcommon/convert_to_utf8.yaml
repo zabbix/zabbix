@@ -2,7 +2,7 @@
 test case: empty text nothing happens
 # empty text
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 0
   buffer: buffer
     - ''
@@ -14,7 +14,7 @@ out:
 ---
 test case: bom is not added to plain data utf8 assumed
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 6
   buffer: &buffer
     - '\x11\x11\x11\x11\x11\x11'
@@ -26,7 +26,7 @@ out:
 ---
 test case: utf8 bom is removed
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 9
   buffer:
     - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
@@ -39,7 +39,7 @@ out:
 ---
 test case: utf8 bom is removed2
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 9
   buffer: &buffer
     - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
@@ -51,7 +51,7 @@ out:
 ---
 test case: utf8 bom is removed with encoding specified
 in:
-  enc: 'UTF-8'
+  encoding: 'UTF-8'
   buffer_length: 9
   buffer:
     - '\xEF\xBB\xBF\x11\x11\x11\x11\x11\x11'
@@ -64,7 +64,7 @@ out:
 ---
 test case: utf8 bom is removed empty text
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 3
   buffer:
     - '\xEF\xBB\xBF'
@@ -84,7 +84,7 @@ test case: utf16 LE bom is removed
 # efbb bf11 11
 #
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 6
   buffer:
     - '\xFF\xFE\x11\x00\x11\x00'
@@ -100,7 +100,7 @@ test case: utf16 LE noBOM with encoding
 # no BOM, but we still correctly decode the data as encoding was provided
 #
 in:
-  enc: 'UTF-16LE'
+  encoding: 'UTF-16LE'
   buffer_length: 4
   buffer:
     - '\x11\x00\x11\x00'
@@ -113,7 +113,7 @@ out:
 ---
 test case: utf16 LE bom is removed empty text
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 2
   buffer:
     - '\xFF\xFE'
@@ -133,7 +133,7 @@ test case: utf16 BE bom is removed
 # efbb bf11 11
 #
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 6
   buffer:
     - '\xFE\xFF\x00\x11\x00\x11'
@@ -146,7 +146,7 @@ out:
 ---
 test case: utf16 BE noBOM with enconding
 in:
-  enc: 'UTF-16BE'
+  encoding: 'UTF-16BE'
   buffer_length: 4
   buffer:
     - '\x00\x11\x00\x11'
@@ -159,7 +159,7 @@ out:
 ---
 test case: utf16 BE bom is removed empty text
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 2
   buffer:
     - '\xFE\xFF'
@@ -190,7 +190,7 @@ test case: utf32 LE bom is removed incorrect guess conversion to utf16
 # which then reads as an empty string
 #
 in:
-  enc: ''
+  encoding: ''
   buffer_length: 8
   buffer:
     - '\xFF\xFE\x00\x00\x11\x00\x00\x00'
