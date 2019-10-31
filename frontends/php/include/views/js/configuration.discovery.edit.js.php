@@ -340,6 +340,7 @@
 				.data('dialogueid');
 
 		if (!dialogueid) {
+			submit_dcheck_lock = false;
 			return false;
 		}
 
@@ -354,6 +355,7 @@
 				.remove();
 
 			if (typeof response.errors !== 'undefined') {
+				submit_dcheck_lock = false;
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
@@ -369,6 +371,7 @@
 				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (validateDCheckDuplicate()) {
+					submit_dcheck_lock = false;
 					return false;
 				}
 
