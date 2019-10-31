@@ -645,71 +645,75 @@ class CScript extends CApiService {
 	/**
 	 * Returns all the scripts that are available on each given host.
 	 *
-	 * @param $hostIds
+	 * @param $hostids
 	 *
 	 * @return array
 	 */
-	public function getScriptsByHosts($hostIds) {
-		zbx_value2array($hostIds);
+	public function getScriptsByHosts($hostids) {
+		zbx_value2array($hostids);
 
-		$scriptsByHost = [];
+		$scripts_by_host = [];
 
-		if (!$hostIds) {
-			return $scriptsByHost;
+		if (!$hostids) {
+			return $scripts_by_host;
 		}
 
-		foreach ($hostIds as $hostId) {
-			$scriptsByHost[$hostId] = [];
+		foreach ($hostids as $hostid) {
+			$scripts_by_host[$hostid] = [];
 		}
 
 		$scripts = $this->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'sortfield' => 'name',
 			'preservekeys' => true
 		]);
 
+		$scripts = $this->addRelatedGroupsAndHosts([
+			'selectGroups' => null,
+			'selectHosts' => ['hostid']
+		], $scripts, $hostids);
+
 		if ($scripts) {
 			// resolve macros
-			$macrosData = [];
-			foreach ($scripts as $scriptId => $script) {
+			$macros_data = [];
+			foreach ($scripts as $scriptid => $script) {
 				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
-						if (isset($scriptsByHost[$host['hostid']])) {
-							$macrosData[$host['hostid']][$scriptId] = $script['confirmation'];
+						if (isset($scripts_by_host[$host['hostid']])) {
+							$macros_data[$host['hostid']][$scriptid] = $script['confirmation'];
 						}
 					}
 				}
 			}
-			if ($macrosData) {
-				$macrosData = CMacrosResolverHelper::resolve([
+			if ($macros_data) {
+				$macros_data = CMacrosResolverHelper::resolve([
 					'config' => 'scriptConfirmation',
-					'data' => $macrosData
+					'data' => $macros_data
 				]);
 			}
 
-			foreach ($scripts as $scriptId => $script) {
+			foreach ($scripts as $scriptid => $script) {
 				$hosts = $script['hosts'];
 				unset($script['hosts']);
 				// set script to host
 				foreach ($hosts as $host) {
-					$hostId = $host['hostid'];
+					$hostid = $host['hostid'];
 
-					if (isset($scriptsByHost[$hostId])) {
-						$size = count($scriptsByHost[$hostId]);
-						$scriptsByHost[$hostId][$size] = $script;
+					if (isset($scripts_by_host[$hostid])) {
+						$size = count($scripts_by_host[$hostid]);
+						$scripts_by_host[$hostid][$size] = $script;
 
 						// set confirmation text with resolved macros
-						if (isset($macrosData[$hostId][$scriptId]) && $script['confirmation']) {
-							$scriptsByHost[$hostId][$size]['confirmation'] = $macrosData[$hostId][$scriptId];
+						if (isset($macros_data[$hostid][$scriptid]) && $script['confirmation']) {
+							$scripts_by_host[$hostid][$size]['confirmation'] = $macros_data[$hostid][$scriptid];
 						}
 					}
 				}
 			}
 		}
 
-		return $scriptsByHost;
+		return $scripts_by_host;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -726,13 +730,29 @@ class CScript extends CApiService {
 	/**
 	 * Applies relational subselect onto already fetched result.
 	 *
-	 * @param $options array
-	 * @param $result array
-	 * @return $result array
+	 * @param  array $options
+	 * @param  array $result
+	 *
+	 * @return array $result
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		return $this->addRelatedGroupsAndHosts($options, $result);
+	}
+
+	/**
+	 * Applies relational subselect onto already fetched result.
+	 *
+	 * @param  array $options
+	 * @param  mixed $options['selectGroups']
+	 * @param  mixed $options['selectHosts']
+	 * @param  array $result
+	 * @param  array $hostids                  An additional filter by hostids, which will be added to "hosts" key.
+	 *
+	 * @return array $result
+	 */
+	private function addRelatedGroupsAndHosts(array $options, array $result, array $hostids = null) {
 		$is_groups_select = $options['selectGroups'] !== null && $options['selectGroups'];
 		$is_hosts_select = $options['selectHosts'] !== null && $options['selectHosts'];
 
@@ -748,7 +768,7 @@ class CScript extends CApiService {
 			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
 
 			// If any script belongs to all host groups.
-			if ($script['groupid'] === '0') {
+			if ($script['groupid'] == 0) {
 				$group_search_names = null;
 			}
 
@@ -789,19 +809,31 @@ class CScript extends CApiService {
 			$host_groups_with_write_access = $host_groups;
 		}
 
+		$nested = [];
+		foreach ($host_groups as $groupid => $group) {
+			$name = $group['name'];
+
+			while (($pos = strrpos($name, '/')) !== false) {
+				$name = substr($name, 0, $pos);
+				$nested[$name][$groupid] = true;
+			}
+		}
+
 		$hstgrp_branch = [];
 		foreach ($host_groups as $groupid => $group) {
 			$hstgrp_branch[$groupid] = [$groupid => true];
-			foreach ($host_groups as $n_groupid => $n_group) {
-				if (strpos($n_group['name'], $group['name'].'/') === 0) {
-					$hstgrp_branch[$groupid][$n_groupid] = true;
-				}
+			if (array_key_exists($group['name'], $nested)) {
+				$hstgrp_branch[$groupid] += $nested[$group['name']];
 			}
 		}
 
 		if ($is_hosts_select) {
 			$sql = 'SELECT hostid,groupid FROM hosts_groups'.
 				' WHERE '.dbConditionInt('groupid', array_keys($host_groups));
+			if ($hostids !== null) {
+				$sql .= ' AND '.dbConditionInt('hostid', $hostids);
+			}
+
 			$db_group_hosts = DBSelect($sql);
 
 			$all_hostids = [];
@@ -828,7 +860,7 @@ class CScript extends CApiService {
 		);
 
 		foreach ($result as &$script) {
-			if ($script['groupid'] === '0') {
+			if ($script['groupid'] == 0) {
 				$script_groups = ($script['host_access'] == PERM_READ_WRITE)
 					? $host_groups_with_write_access
 					: $host_groups;

@@ -190,6 +190,7 @@ if ($type == SHOW_TRIGGERS) {
 			'filter' => [
 				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
 			],
+			'skipDependent' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? null : true
 		];
 
 		$problem_options = [
@@ -200,7 +201,7 @@ if ($type == SHOW_TRIGGERS) {
 			'time_from' => $filter['statusChange'] ? (time() - $filter['statusChangeDays'] * SEC_PER_DAY) : null
 		];
 
-		$groupids = $data['pageFilter']->groupids !== null ? $data['pageFilter']->groupids : [];
+		$groupids = ($data['pageFilter']->groupids !== null) ? $data['pageFilter']->groupids : [];
 
 		list($hosts, $triggers) = getTriggersOverviewData($groupids, $filter['application'], $host_options,
 			$trigger_options, $problem_options

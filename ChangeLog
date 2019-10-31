@@ -1,3 +1,15 @@
+Changes for 4.0.15rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.14
+
+4.0.14rc1 was released as 4.0.14 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.14rc1
 
 New features:
@@ -6,8 +18,27 @@ New features:
 .......PS. [ZBXNEXT-5422] quoted numbers are now accepted by JSONPath aggregate functions (atumilovics)
 
 Bug fixes:
+..F....... [ZBX-16605] fixed accessibility of localstorage identifier if cookies are made unaccessible for client side scripts (miks)
+........S. [ZBX-16754] fixed trigger not firing for first collected value if it's timestamp is in future (vso)
+....I..... [ZBX-15211] added key 'tests' for bootstrap.sh when working with cmocka tests (MVekslers)
+..F....... [ZBX-16542] fixed incorrect displaying of unacknowledged and resolved recent problematic triggers in trigger overview and dashboard widget (averza, Ivo, vmurzins)
+A......... [ZBX-16749] improved performance and memory consumption of script.getscriptsbyhosts() method (Sasha)
+........S. [ZBX-16725] fixed detection of fping minimal interval (MVekslers)
+A......... [ZBX-16562] fixed configuration.export method in API improperly formatting "application" property within "httptests" when exporting in JSON format (Ivo)
+........S. [ZBX-15222] fixed housekeeper to cleanup history not only for current item type of information but also for other previously selected types (vso)
+.......... [ZBX-16481] fixed spelling issues in the code (arimdjonoks)
+...G...... [ZBX-15675] added support for more than 64 CPUs in Windows agent (kalimulin)
+.........T [ZBX-16770] fixed value mapping in Template Net HP Comware HH3C SNMP (vitaly)
+...G...PS. [ZBX-16534] fixed stdout and stderr redirection after external log rotation (akozlovs)
+.......PS. [ZBX-16368] fixed fping double call (akozlovs)
+...G...PS. [ZBX-16317] fixed log.h is not self-sufficient (akozlovs)
+........S. [ZBX-16711] ensuring errbuf is emptied before every curl_easy_perform request (arimdjonoks)
+.......PS. [ZBX-16664] fixed IPMI poller skips processing if one of the elements is missing information (akozlovs)
+........S. [ZBX-16671] fixed server crashing when linking web scenario template (arimdjonoks)
+...G...PS. [ZBX-16750] fixed broken validation of peer certificate issuer and subject strings in TLS connect, fixed logging (Andris)
+........S. [ZBX-16002] added new macro EVENT.RECOVERY.NAME to display recovery event name in recovery alerts (akozlovs)
+...G...P.. [ZBX-16512] fixed false item insertion into the queue after maintenance (akozlovs)
 ...G...... [ZBX-15685] fixed zabbix_sender failing to report the error due to closed connection (arimdjonoks)
-...G...... [ZBX-16220] fixed missing warning logs for failed active checks sending to the server (atumilovics)
 A......... [ZBX-16702] fixed error in the elastic search clearing history (vasilijs)
 ..F....... [ZBX-10805] fixed log items graphs drawing with numeric values like trapper items (vasilijs)
 A......... [ZBX-16604] fixed occurrence of an undefined index in discovered graph configuration (vasilijs)

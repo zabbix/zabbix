@@ -21,7 +21,7 @@
 /**
  * Class for storing the result returned by the trigger expression parser.
  */
-class CTriggerExpressionParserResult extends CParserResult {
+class CTriggerExprParserResult extends CParserResult {
 
 	const TOKEN_TYPE_OPEN_BRACE = 0;
 	const TOKEN_TYPE_CLOSE_BRACE = 1;
@@ -59,7 +59,7 @@ class CTriggerExpressionParserResult extends CParserResult {
 	/**
 	 * Return the expression tokens.
 	 *
-	 * @see CTriggerExpressionParserResult::$token    for the structure of a token array
+	 * @see CTriggerExprParserResult::$token    for the structure of a token array
 	 *
 	 * @return array
 	 */

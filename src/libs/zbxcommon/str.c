@@ -438,7 +438,7 @@ void	del_zeros(char *s)
 
 			if (1 == trim)
 			{
-				/* don't touch invalid numbers with more than one decimal seprator */
+				/* don't touch invalid numbers with more than one decimal separator */
 				return;
 			}
 
@@ -762,7 +762,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcatf                                                     *
  *                                                                            *
- * Purpose: dynamical cating of formated strings                              *
+ * Purpose: dynamical cating of formatted strings                             *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -1759,6 +1759,30 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	char		*utf8_string = NULL;
 	int		utf8_size;
 	unsigned int	codepage;
+	int		bom_detected = 0;
+
+	/* try to guess encoding using BOM if it exists */
+	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UTF-8";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UTF-16";
+	}
+	else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
+	{
+		bom_detected = 1;
+
+		if ('\0' == *encoding)
+			encoding = "UNICODEFFFE";
+	}
 
 	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
 	{
@@ -1772,18 +1796,42 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
 			codepage);
 
+	if (65001 == codepage)
+	{
+		/* remove BOM */
+		if (bom_detected)
+			in += 3;
+	}
+
 	if (1200 == codepage)		/* Unicode UTF-16, little-endian byte order */
 	{
-		wide_string = (wchar_t *)in;
 		wide_size = (int)in_size / 2;
+
+		/* remove BOM */
+		if (bom_detected)
+		{
+			in += 2;
+			wide_size--;
+		}
+
+		wide_string = (wchar_t *)in;
+
 	}
 	else if (1201 == codepage)	/* unicodeFFFE UTF-16, big-endian byte order */
 	{
-		wchar_t	*wide_string_be = (wchar_t *)in;
+		wchar_t *wide_string_be;
 		int	i;
 
 		wide_size = (int)in_size / 2;
 
+		/* remove BOM */
+		if (bom_detected)
+		{
+			in += 2;
+			wide_size--;
+		}
+
+		wide_string_be = (wchar_t *)in;
 
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
@@ -1830,6 +1878,23 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = (char *)zbx_malloc(out, out_alloc);
 
+	/* try to guess encoding using BOM if it exists */
+	if ('\0' == *encoding)
+	{
+		if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
+		{
+			encoding = "UTF-8";
+		}
+		else if (2 <= in_size && 0 == strncmp("\xff\xfe", in, 2))
+		{
+			encoding = "UTF-16LE";
+		}
+		else if (2 <= in_size && 0 == strncmp("\xfe\xff", in, 2))
+		{
+			encoding = "UTF-16BE";
+		}
+	}
+
 	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
@@ -1855,6 +1920,10 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	*p = '\0';
 
 	iconv_close(cd);
+
+	/* remove BOM */
+	if (3 <= p - out && 0 == strncmp("\xef\xbb\xbf", out, 3))
+		memmove(out, out + 3, (size_t)(p - out - 2));
 
 	return out;
 }
@@ -4268,7 +4337,7 @@ int	num_param(const char *p)
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
@@ -4417,7 +4486,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_param_len(const char *p, int num, size_t *sz)
@@ -4547,7 +4616,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 char	*get_param_dyn(const char *p, int num)
@@ -4610,7 +4679,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
  *      cb        - [IN] callback function                                    *
  *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error messsage                                      *
+ *      error     - [OUT] error message                                       *
  *      maxerrlen - [IN] error size                                           *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *
@@ -4871,7 +4940,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, size_t max_len)
@@ -4906,7 +4975,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)

@@ -1,1 +1,0 @@
-........S. [ZBX-16711] ensuring errbuf is emptied before every curl_easy_perform request (arimdjonoks)

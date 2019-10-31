@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup profiles
+ */
 class testGeneric extends CLegacyWebTest {
 
 	public static function provider() {
