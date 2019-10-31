@@ -20,6 +20,9 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @backup profiles
+ */
 class testPageProblems extends CLegacyWebTest {
 
 	public function testPageProblems_CheckLayout() {
@@ -157,7 +160,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestClickWait('spanid10084');
 
 		// Type application
-		$this->zbxTestInputType('filter_application', 'Processes');
+		$this->zbxTestInputType('filter_application', 'General');
 
 		// Select trigger
 		$this->zbxTestClickButtonMultiselect('filter_triggerids_');

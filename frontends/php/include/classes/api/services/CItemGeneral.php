@@ -366,21 +366,13 @@ abstract class CItemGeneral extends CApiService {
 						);
 					}
 
-					if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-						// Remove flexible and scheduling intervals and leave only the delay part.
-						$item['delay'] = $delay;
-					}
 					// If there are scheduling intervals or intervals with macros, skip the next check calculation.
-					elseif (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
+					if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
 							&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_('Item will not be refreshed. Please enter a correct update interval.')
 						);
 					}
-				}
-				elseif ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-					// Remove flexible and scheduling intervals and leave only the delay part.
-					$item['delay'] = $delay;
 				}
 			}
 
@@ -1242,7 +1234,8 @@ abstract class CItemGeneral extends CApiService {
 	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
 	 *                                                                  21 - ZBX_PREPROC_SCRIPT;
 	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
-	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON.
+	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON;
+	 *                                                                  24 - ZBX_PREPROC_CSV_TO_JSON.
 	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
 	 *                                                                 option. Multiple parameters are separated by LF
 	 *                                                                 (\n) character.
@@ -1542,6 +1535,64 @@ abstract class CItemGeneral extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 									'params', _('invalid Prometheus pattern')
 								));
+							}
+						}
+						break;
+
+					case ZBX_PREPROC_CSV_TO_JSON:
+						if (is_array($preprocessing['params'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
+								|| $preprocessing['params'] === false) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
+							);
+						}
+
+						$params = explode("\n", $preprocessing['params']);
+
+						$params_cnt = count($params);
+						if ($params_cnt > 3) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+						}
+						elseif ($params_cnt == 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('second parameter is expected')
+							));
+						}
+						elseif ($params_cnt == 2) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+								'params', _('third parameter is expected')
+							));
+						}
+						else {
+							// Correct amount of parameters, but check if they are valid.
+
+							if (mb_strlen($params[0]) > 1) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('value of first parameter is too long')
+								));
+							}
+
+							if (mb_strlen($params[1]) > 1) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('value of second parameter is too long')
+								));
+							}
+
+							$with_header_row_validator = new CLimitedSetValidator([
+								'values' => [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER]
+							]);
+
+							if (!$with_header_row_validator->validate($params[2])) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect value for field "%1$s": %2$s.', 'params',
+										_s('value of third parameter must be one of %1$s',
+											implode(', ', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])
+										)
+									)
+								);
 							}
 						}
 						break;

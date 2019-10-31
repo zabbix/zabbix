@@ -197,11 +197,14 @@ class CMultiselectElement extends CElement {
 
 		$input = $this->query('xpath:.//input[not(@type="hidden")]')->one();
 		foreach ($text as $value) {
-			$input->overwrite($value);
+			$input->overwrite($value)->fireEvent();
+
+			if (!$value) {
+				continue;
+			}
 
 			$content = CXPathHelper::escapeQuotes($value);
-			try
-			{
+			try {
 				$element = $this->query('xpath', implode('|', [
 					'.//ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
 					'.//ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]/span[text()='.$content.']'

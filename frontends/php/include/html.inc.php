@@ -877,7 +877,9 @@ function makeActionIcon(array $icon_data) {
 	}
 
 	if (array_key_exists('hint', $icon_data)) {
-		$icon->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+		$icon
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint($icon_data['hint'], '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
 	}
 	elseif (array_key_exists('title', $icon_data)) {
 		$icon->setTitle($icon_data['title']);
@@ -890,6 +892,20 @@ function makeActionIcon(array $icon_data) {
 	}
 
 	return $icon;
+}
+
+/**
+ * Renders an icon for a description.
+ *
+ * @param string $description
+ *
+ * @return CSpan
+ */
+function makeDescriptionIcon($description) {
+	return (new CSpan())
+		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
+		->setHint(zbx_str2links($description), '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
 }
 
 /**

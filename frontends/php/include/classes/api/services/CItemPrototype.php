@@ -41,7 +41,7 @@ class CItemPrototype extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON
 	];
 
 	public function __construct() {
@@ -757,7 +757,7 @@ class CItemPrototype extends CItemGeneral {
 				'url' => '',
 				'query_fields' => '',
 				'timeout' => $defaults['timeout'],
-				'status_codes' => '',
+				'status_codes' => $defaults['status_codes'],
 				'follow_redirects' => $defaults['follow_redirects'],
 				'request_method' => $defaults['request_method'],
 				'allow_traps' => $defaults['allow_traps'],

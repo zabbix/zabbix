@@ -27,11 +27,72 @@ class C42ImportConverter extends CConverter {
 	public function convert($data) {
 		$data['zabbix_export']['version'] = '4.4';
 
+		if (array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['hosts'] = $this->convertInventoryMode($data['zabbix_export']['hosts']);
+			$data['zabbix_export']['hosts'] = $this->convertTlsAccept($data['zabbix_export']['hosts']);
+		}
+
 		if (array_key_exists('screens', $data['zabbix_export'])) {
 			$data['zabbix_export']['screens'] = $this->convertScreens($data['zabbix_export']['screens']);
 		}
 
+		$data['zabbix_export'] = $this->convertFormat($data['zabbix_export']);
+
 		return $data;
+	}
+
+	/**
+	 * Convert inventory mode.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function convertInventoryMode(array $hosts) {
+		foreach ($hosts as &$host) {
+			$host['inventory_mode'] = CXmlConstantValue::INV_MODE_MANUAL;
+
+			if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
+				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+				unset($host['inventory']['inventory_mode']);
+			}
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Convert tsl_accept tag.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function convertTlsAccept(array $hosts) {
+		$const = [
+			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
+			CXmlConstantValue::TLS_PSK => [CXmlConstantName::TLS_PSK],
+			3 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_PSK],
+			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
+			5 => [CXmlConstantName::NO_ENCRYPTION, CXmlConstantName::TLS_CERTIFICATE],
+			6 => [CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE],
+			7 => [
+				CXmlConstantName::NO_ENCRYPTION,
+				CXmlConstantName::TLS_PSK, CXmlConstantName::TLS_CERTIFICATE
+			]
+		];
+
+		foreach ($hosts as &$host) {
+			if (array_key_exists('tls_accept', $host)) {
+				$host['tls_accept'] = ($host['tls_accept'] === '')
+					? $const[CXmlConstantValue::NO_ENCRYPTION]
+					: $const[$host['tls_accept']];
+			}
+		}
+		unset($host);
+
+		return $hosts;
 	}
 
 	/**
@@ -67,5 +128,119 @@ class C42ImportConverter extends CConverter {
 		}
 
 		return $screen_items;
+	}
+
+	/**
+	 * Update imported data array to format used starting from Zabbix version 4.4.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected function convertFormat(array $data) {
+		$schema = (new C44XmlValidator('xml'))->getSchema();
+
+		foreach ($schema['rules'] as $tag => $tag_rules) {
+			if (!array_key_exists($tag, $data)) {
+				continue;
+			}
+
+			$data[$tag] = $this->convertEmptyTags($data[$tag], $tag_rules);
+		}
+
+		return $this->convertValueToConstant($data, $schema);
+	}
+
+	/**
+	 * Convert values to human readable constants.
+	 *
+	 * @param array|string $data
+	 * @param array        $rules
+	 *
+	 * @return array|string
+	 */
+	protected function convertValueToConstant($data, array $rules) {
+		if ($rules['type'] & XML_STRING) {
+			if (!array_key_exists('in', $rules)) {
+				return $data;
+			}
+
+			$data = $rules['in'][$data];
+		}
+		elseif ($rules['type'] & XML_ARRAY) {
+			foreach ($rules['rules'] as $tag => $tag_rules) {
+				if (array_key_exists($tag, $data)) {
+					if (array_key_exists('ex_rules', $tag_rules)) {
+						$tag_rules = call_user_func($tag_rules['ex_rules'], $data);
+					}
+					$data[$tag] = $this->convertValueToConstant($data[$tag], $tag_rules);
+				}
+			}
+		}
+		elseif ($rules['type'] & XML_INDEXED_ARRAY) {
+			$prefix = $rules['prefix'];
+
+			if (is_array($data)) {
+				foreach ($data as $tag => $value) {
+					$data[$tag] = $this->convertValueToConstant($value, $rules['rules'][$prefix]);
+				}
+			}
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Delete empty non-required tags.
+	 *
+	 * @param array|string $data
+	 * @param array        $rules
+	 *
+	 * @return array|string
+	 */
+	protected function convertEmptyTags($data, $rules) {
+		if ($rules['type'] & XML_ARRAY) {
+			foreach ($rules['rules'] as $tag => $tag_rules) {
+				if (array_key_exists($tag, $data)) {
+					if ($tag_rules['type'] & XML_STRING) {
+						if ($data[$tag] === '') {
+							if ($tag_rules['type'] & XML_REQUIRED) {
+								continue;
+							}
+							unset($data[$tag]);
+						}
+						continue;
+					}
+
+					if ($data[$tag] === '' || count($data[$tag]) == 0) {
+						if ($tag_rules['type'] & XML_REQUIRED) {
+							continue;
+						}
+
+						unset($data[$tag]);
+						continue;
+					}
+
+					$data[$tag] = $this->convertEmptyTags($data[$tag], $tag_rules);
+
+					if ($data[$tag] === '') {
+						unset($data[$tag]);
+					}
+				}
+			}
+		}
+		elseif ($rules['type'] & XML_INDEXED_ARRAY) {
+			$prefix = $rules['prefix'];
+
+			foreach ($data as $tag => $value) {
+				$data[$tag] = $this->convertEmptyTags($value, $rules['rules'][$prefix]);
+			}
+		}
+
+		if (is_array($data) && count($data) == 0) {
+			return '';
+		}
+
+		return $data;
 	}
 }

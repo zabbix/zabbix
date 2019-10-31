@@ -417,7 +417,7 @@ $divTabs->addTab('tags-tab', _('Tags'), $tags_view->render());
 
 // macros
 if (!$macros) {
-	$macro = ['macro' => '', 'value' => ''];
+	$macro = ['macro' => '', 'value' => '', 'description' => ''];
 	if ($data['show_inherited_macros']) {
 		$macro['type'] = ZBX_PROPERTY_OWN;
 	}

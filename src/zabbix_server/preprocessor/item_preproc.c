@@ -369,7 +369,7 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op_type       - [IN] the operation type                        *
- *             history_value - [IN/OUT] the historical (previuous) data       *
+ *             history_value - [IN/OUT] the historical (previous) data        *
  *             history_ts    - [IN/OUT] the timestamp of the historical data  *
  *             errmsg        - [OUT] error message                            *
  *                                                                            *
@@ -1743,6 +1743,338 @@ static int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *par
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_preproc_csv_to_json_add_field                               *
+ *                                                                            *
+ * Purpose: convert CSV format metrics to JSON format                         *
+ *                                                                            *
+ * Parameters: json    - [IN/OUT] json object                                 *
+ *             names   - [IN/OUT] column names                                *
+ *             field   - [IN] field                                           *
+ *             num     - [IN] field number                                    *
+ *             num_max - [IN] maximum number of fields                        *
+ *             header  - [IN] header line option                              *
+ *             errmsg  - [OUT] error message                                  *
+ *                                                                            *
+ * Return value: SUCCEED - the field was added successfully                   *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_csv_to_json_add_field(struct zbx_json *json, char ***names, char *field, unsigned int num,
+		unsigned int num_max, unsigned int header, char **errmsg)
+{
+	char	**fld_names = *names;
+
+	if (0 < num_max && num >= num_max && 1 == header)
+	{
+		*errmsg = zbx_strdup(*errmsg,
+				"cannot convert CSV to JSON: data row contains more fields than header row");
+		return FAIL;
+	}
+
+	if (NULL == field)
+		field = "";
+
+	if (0 == num_max && 1 == header)
+	{
+		unsigned int	i;
+
+		for (i = 0; i < num; i++)
+		{
+			if (0 == strcmp(fld_names[i], field))
+			{
+				*errmsg = zbx_dsprintf(*errmsg,
+						"cannot convert CSV to JSON: duplicated column name \"%s\"", field);
+				return FAIL;
+			}
+		}
+
+		fld_names = zbx_realloc(fld_names, (num + 1) * sizeof(char*));
+		fld_names[num] = zbx_strdup(NULL, field);
+		*names = fld_names;
+	}
+	else
+	{
+		if (0 == num)
+			zbx_json_addobject(json, NULL);
+
+		if (0 == header)
+		{
+			char	num_buf[ZBX_MAX_UINT64_LEN];
+
+			zbx_snprintf(num_buf, ZBX_MAX_UINT64_LEN, "%u", num + 1);
+			zbx_json_addstring(json, num_buf, field, ZBX_JSON_TYPE_STRING);
+		}
+		else
+			zbx_json_addstring(json, fld_names[num], field, ZBX_JSON_TYPE_STRING);
+
+		if (ZBX_MAX_RECV_DATA_SIZE <= json->buffer_allocated)
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: input data is too large");
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: item_preproc_csv_to_json                                         *
+ *                                                                            *
+ * Purpose: convert CSV format metrics to JSON format                         *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg)
+{
+#define CSV_STATE_FIELD		0
+#define CSV_STATE_DELIM		1
+#define CSV_STATE_FIELD_QUOTED	2
+
+	unsigned int	fld_num = 0, fld_num_max = 0, hdr_line, state = CSV_STATE_DELIM;
+	char		*field, *field_esc = NULL, **field_names = NULL, *data, *value_out = NULL,
+			delim[ZBX_MAX_BYTES_IN_UTF8_CHAR], quote[ZBX_MAX_BYTES_IN_UTF8_CHAR];
+	struct zbx_json	json;
+	size_t		data_len, delim_sz = 1, quote_sz = 0, step;
+	int		ret = SUCCEED;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	delim[0] = ',';
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+	data = value->data.str;
+	data_len = strlen(value->data.str);
+
+#define CSV_SEP_LINE	"sep="
+	if (0 == zbx_strncasecmp(data, CSV_SEP_LINE, ZBX_CONST_STRLEN(CSV_SEP_LINE)))
+	{
+		char	*p;
+		size_t	del_sz;
+
+		p = value->data.str + ZBX_CONST_STRLEN(CSV_SEP_LINE);
+
+		if (NULL == (field = strpbrk(p, "\r\n")))
+			field = data + data_len;
+
+		if (0 < (del_sz = zbx_utf8_char_len(p)) && p + del_sz == field)
+		{
+			memcpy(delim, p, del_sz);
+			delim_sz = del_sz;
+
+			if ('\0' == *field)
+				data = field;
+			else if ('\r' == *field)
+				data = field + 2;
+			else
+				data = field + 1;
+		}
+	}
+#undef CSV_SEP_LINE
+
+	if ('\n' != *params)
+	{
+		if (NULL == (field = strchr(params, '\n')))
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot find second parameter");
+			return FAIL;
+		}
+
+		if (0 == (delim_sz = zbx_utf8_char_len(params)) || params + delim_sz != field)
+		{
+			*errmsg = zbx_strdup(*errmsg, "invalid first parameter");
+			return FAIL;
+		}
+
+		memcpy(delim, params, delim_sz);
+		params = field;
+	}
+
+	if ('\n' != *(++params))
+	{
+		if (NULL == (field = strchr(params, '\n')))
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot find third parameter");
+			return FAIL;
+		}
+
+		if (0 == (quote_sz = zbx_utf8_char_len(params)) || params + quote_sz != field)
+		{
+			*errmsg = zbx_strdup(*errmsg, "invalid second parameter");
+			return FAIL;
+		}
+
+		memcpy(quote, params, quote_sz);
+		params = field;
+	}
+
+	hdr_line = ('1' == *(++params) ? 1 : 0);
+
+	if ('\0' == *data)
+		goto out;
+
+	for (field = NULL; value->data.str + data_len >= data; data += step)
+	{
+		step = zbx_utf8_char_len(data);
+
+		if (CSV_STATE_FIELD_QUOTED != state)
+		{
+			if ('\r' == *data)
+			{
+				*data = '\0';
+
+				if ('\n' != *(++data) && '\0' != *data)
+				{
+					*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: unsupported line "
+							"break");
+					ret = FAIL;
+					goto out;
+				}
+			}
+
+			if ('\n' == *data || '\0' == *data)
+			{
+				if (CSV_STATE_FIELD == state || 1 == hdr_line || 0 != fld_num)
+				{
+					*data = '\0';
+
+					do
+					{
+						if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json,
+								&field_names, field, fld_num, fld_num_max, hdr_line,
+								errmsg)))
+							goto out;
+
+						field = NULL;
+						zbx_free(field_esc);
+					} while (++fld_num < fld_num_max && 1 == hdr_line);
+
+					if (fld_num > fld_num_max)
+						fld_num_max = fld_num;
+
+					fld_num = 0;
+				}
+				else
+					zbx_json_addobject(&json, NULL);
+
+				zbx_json_close(&json);
+				state = CSV_STATE_DELIM;
+			}
+			else if (0 == memcmp(data, delim, delim_sz))
+			{
+				*data = '\0';
+
+				if (FAIL == (ret = item_preproc_csv_to_json_add_field(&json,
+						&field_names, field, fld_num, fld_num_max, hdr_line,
+						errmsg)))
+					goto out;
+
+				field = NULL;
+				zbx_free(field_esc);
+				fld_num++;
+				state = CSV_STATE_DELIM;
+			}
+			else if (0 < quote_sz && 0 == memcmp(data, quote, quote_sz) && CSV_STATE_DELIM == state)
+			{
+				state = CSV_STATE_FIELD_QUOTED;
+			}
+			else if (CSV_STATE_FIELD != state)
+			{
+				field = data;
+				state = CSV_STATE_FIELD;
+			}
+		}
+		else if (0 < quote_sz && 0 == memcmp(data, quote, quote_sz))
+		{
+			char	*data_next = data + quote_sz;
+
+			if (0 == memcmp(data_next, quote, quote_sz))
+			{
+				if (NULL == field)
+					field = data;
+
+				*data_next = '\0';
+				field_esc = zbx_dsprintf(field_esc, "%s%s", ZBX_NULL2EMPTY_STR(field_esc), field);
+				field = NULL;
+				data = data_next;
+			}
+			else if ('\r' == *data_next || '\n' == *data_next || '\0' == *data_next ||
+					0 == memcmp(data_next, delim, delim_sz))
+			{
+				state = CSV_STATE_FIELD;
+				*data = '\0';
+
+				if (NULL != field_esc)
+				{
+					field_esc = zbx_dsprintf(field_esc, "%s%s", field_esc,
+							ZBX_NULL2EMPTY_STR(field));
+					field = field_esc;
+				}
+			}
+			else
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: delimiter character or "
+						"end of line are not detected after quoted field \"%.*s\"",
+						(int)(data - field), field);
+				ret = FAIL;
+				goto out;
+			}
+		}
+		else if (NULL == field)
+		{
+			field = data;
+		}
+
+		if (0 == step)
+		{
+			*errmsg = zbx_strdup(*errmsg, "cannot convert CSV to JSON: invalid UTF-8 character in value");
+			ret = FAIL;
+			goto out;
+		}
+	}
+
+	if (CSV_STATE_FIELD_QUOTED == state)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot convert CSV to JSON: unclosed quoted field \"%s\"", field);
+		ret = FAIL;
+	}
+
+out:
+	if (SUCCEED == ret)
+	{
+		value_out = zbx_strdup(NULL, json.buffer);
+		zbx_variant_clear(value);
+		zbx_variant_set_str(value, value_out);
+	}
+
+	if (1 == hdr_line)
+	{
+		if (0 == fld_num_max)
+			fld_num_max = fld_num;
+
+		for (fld_num = 0; fld_num < fld_num_max; fld_num++)
+			zbx_free(field_names[fld_num]);
+
+		zbx_free(field_names);
+	}
+
+	zbx_free(field_esc);
+	zbx_json_free(&json);
+
+	return ret;
+#undef CSV_STATE_FIELD
+#undef CSV_STATE_DELIM
+#undef CSV_STATE_FIELD_QUOTED
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_item_preproc                                                 *
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -1839,6 +2171,9 @@ int	zbx_item_preproc(unsigned char value_type, zbx_variant_t *value, const zbx_t
 			break;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 			ret = item_preproc_prometheus_to_json(value, op->params, error);
+			break;
+		case ZBX_PREPROC_CSV_TO_JSON:
+			ret = item_preproc_csv_to_json(value, op->params, error);
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "unknown preprocessing operation");

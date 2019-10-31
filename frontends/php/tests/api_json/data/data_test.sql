@@ -42,10 +42,10 @@ INSERT INTO valuemaps (valuemapid,name) VALUES (101,'API value map delete');
 INSERT INTO valuemaps (valuemapid,name) VALUES (102,'API value map delete2');
 INSERT INTO valuemaps (valuemapid,name) VALUES (103,'API value map delete3');
 INSERT INTO valuemaps (valuemapid,name) VALUES (104,'API value map delete4');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (904,100,'One','Online');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (905,100,'Two','Offline');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (906,102,'Three','Other');
-INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (907,103,'Four','Unknown');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9904,100,'One','Online');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9905,100,'Two','Offline');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9906,102,'Three','Other');
+INSERT INTO mappings (mappingid,valuemapid,value,newvalue) VALUES (9907,103,'Four','Unknown');
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, alias, passwd, autologin, autologout, lang, refresh, type, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '5fce1b3e34b520afeffb37ce08c7cd66', 0, 0, 'en_GB', '30s', 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (6, 8, 4);
@@ -176,11 +176,15 @@ INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,descript
 INSERT INTO scripts (groupid,scriptid,host_access,name,command,usrgrpid,description) VALUES (90023,90023,2,'90023-acc-read','date',NULL,'');
 
 -- global macro
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (15,'{$API_MACRO_FOR_DELETE}','abc');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1');
-INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (17,'{$API_MACRO_FOR_DELETE2}','2');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (13,'{$API_MACRO_FOR_UPDATE1}','update','desc');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (14,'{$API_MACRO_FOR_UPDATE2}','update','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (15,'{$API_MACRO_FOR_DELETE}','abc','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (16,'{$API_MACRO_FOR_DELETE1}','1','');
+INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (17,'{$API_MACRO_FOR_DELETE2}','2','');
+
+-- host macro
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (1,90020,'{$HOST_MACRO_1}','value','description');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (2,90020,'{$HOST_MACRO_2}','value','');
 
 -- icon map
 INSERT INTO icon_map (iconmapid, name, default_iconid) VALUES (1,'API icon map',2);
@@ -785,28 +789,28 @@ INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,his
 INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110013,50009,50022,0,4,'API LLD rule get preprocessing','apilldrulegetpreprocessing','30s','90d',0,0,'','',1,'','');
 
 -- LLD macro paths
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1,110006,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (2,110006,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (3,110006,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (4,110006,'{#D}','$.list[:4].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (5,110006,'{#E}','$.list[:5].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (6,110007,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (7,110007,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (8,110007,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (9,110008,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (10,110008,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (11,110008,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (12,110010,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (13,110010,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (14,110010,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (15,110011,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (16,110011,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (17,110011,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (18,110012,'{#A}','$.list[:1].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (19,110012,'{#B}','$.list[:2].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (20,110012,'{#C}','$.list[:3].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (21,110012,'{#D}','$.list[:4].type');
-INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (22,110012,'{#E}','$.list[:5].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (991,110006,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (992,110006,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (993,110006,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (994,110006,'{#D}','$.list[:4].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (995,110006,'{#E}','$.list[:5].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (996,110007,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (997,110007,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (998,110007,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (999,110008,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1000,110008,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1001,110008,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1002,110010,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1003,110010,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1004,110010,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1005,110011,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1006,110011,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1007,110011,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1008,110012,'{#A}','$.list[:1].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1009,110012,'{#B}','$.list[:2].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1010,110012,'{#C}','$.list[:3].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1011,110012,'{#D}','$.list[:4].type');
+INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (1012,110012,'{#E}','$.list[:5].type');
 
 -- LLD preprocessing
 INSERT INTO item_preproc (item_preprocid,itemid,step,type,params,error_handler,error_handler_params) VALUES (9900,110006,1,5,'^abc$

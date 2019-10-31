@@ -2275,6 +2275,7 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 		return;
 
 	pair.first = dep_itemid;
+	pair.second = 0;
 	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 	{
@@ -9554,7 +9555,7 @@ static int	dc_expression_user_macro_validator(const char *value)
  *             hostids_num    - [IN] the number of hostids                    *
  *             validator_func - [IN] an optional validator function           *
  *                                                                            *
- * Return value: The text value with expanded user macros. Uknown or invalid  *
+ * Return value: The text value with expanded user macros. Unknown or invalid *
  *               macros will be left unresolved.                              *
  *                                                                            *
  * Comments: The returned value must be freed by the caller.                  *

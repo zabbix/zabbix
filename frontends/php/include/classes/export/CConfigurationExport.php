@@ -58,6 +58,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
+			'mediaTypes' => [],
 			'valueMaps' => []
 		];
 
@@ -74,6 +75,7 @@ class CConfigurationExport {
 			'screens' => [],
 			'images' => [],
 			'maps' => [],
+			'mediaTypes' => [],
 			'valueMaps' => []
 		];
 
@@ -140,36 +142,33 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			$simple_triggers = [];
+			$schema = (new CImportValidatorFactory('xml'))
+				->getObject(ZABBIX_EXPORT_VERSION)
+				->getSchema();
 
-			if ($this->data['groups']) {
-				$this->builder->buildGroups($this->data['groups']);
+			$simple_triggers = [];
+			if ($this->data['triggers']) {
+				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers']);
 			}
 
-			if ($this->data['triggers']) {
-				foreach ($this->data['triggers'] as $triggerid => $trigger) {
-					if (count($trigger['items']) == 1 && $trigger['items'][0]['type'] != ITEM_TYPE_HTTPTEST
-							&& $trigger['items'][0]['templateid'] == 0) {
-						$simple_triggers[] = $trigger;
-						unset($this->data['triggers'][$triggerid]);
-					}
-				}
+			if ($this->data['groups']) {
+				$this->builder->buildGroups($schema['rules']['groups'], $this->data['groups']);
 			}
 
 			if ($this->data['templates']) {
-				$this->builder->buildTemplates($this->data['templates'], $simple_triggers);
+				$this->builder->buildTemplates($schema['rules']['templates'], $this->data['templates'], $simple_triggers);
 			}
 
 			if ($this->data['hosts']) {
-				$this->builder->buildHosts($this->data['hosts'], $simple_triggers);
+				$this->builder->buildHosts($schema['rules']['hosts'], $this->data['hosts'], $simple_triggers);
 			}
 
 			if ($this->data['triggers']) {
-				$this->builder->buildTriggers($this->data['triggers']);
+				$this->builder->buildTriggers($schema['rules']['triggers'], $this->data['triggers']);
 			}
 
 			if ($this->data['graphs']) {
-				$this->builder->buildGraphs($this->data['graphs']);
+				$this->builder->buildGraphs($schema['rules']['graphs'], $this->data['graphs']);
 			}
 
 			if ($this->data['screens']) {
@@ -184,8 +183,12 @@ class CConfigurationExport {
 				$this->builder->buildMaps($this->data['maps']);
 			}
 
+			if ($this->data['mediaTypes']) {
+				$this->builder->buildMediaTypes($schema['rules']['media_types'], $this->data['mediaTypes']);
+			}
+
 			if ($this->data['valueMaps']) {
-				$this->builder->buildValueMaps($this->data['valueMaps']);
+				$this->builder->buildValueMaps($schema['rules']['value_maps'], $this->data['valueMaps']);
 			}
 
 			return $this->writer->write($this->builder->getExport());
@@ -229,6 +232,10 @@ class CConfigurationExport {
 
 		if ($options['maps']) {
 			$this->gatherMaps($options['maps']);
+		}
+
+		if ($options['mediaTypes']) {
+			$this->gatherMediaTypes($options['mediaTypes']);
 		}
 	}
 
@@ -316,10 +323,10 @@ class CConfigurationExport {
 			'output' => [
 				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
-				'tls_psk'
+				'tls_psk', 'inventory_mode'
 			],
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
-			'selectInventory' => true,
+			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
@@ -560,7 +567,7 @@ class CConfigurationExport {
 		]);
 
 		$itemids = [];
-		foreach ($hosts as $hostid => $host_data) {
+		foreach ($hosts as $host_data) {
 			foreach ($host_data['items'] as $item) {
 				$itemids[$item['itemid']] = $item['key_'];
 			}
@@ -829,7 +836,7 @@ class CConfigurationExport {
 			$httptest['application'] =
 				($httptest['applicationid'] != 0 && array_key_exists($httptest['applicationid'], $db_applications))
 					? ['name' => $db_applications[$httptest['applicationid']]['name']]
-					: null;
+					: [];
 			unset($httptest['applicationid']);
 		}
 		unset($httptest);
@@ -1092,6 +1099,26 @@ class CConfigurationExport {
 		unset($image);
 
 		$this->data['images'] = $images;
+	}
+
+	/**
+	 * Get media types for export builder from database.
+	 *
+	 * @param array $mediatypeids
+	 *
+	 * return array
+	 */
+	protected function gatherMediaTypes(array $mediatypeids) {
+		$this->data['mediaTypes'] = API::MediaType()->get([
+			'output' => ['name', 'type', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
+				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type',
+				'exec_path', 'exec_params', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval',
+				'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
+				'description', 'parameters'
+			],
+			'mediatypeids' => $mediatypeids,
+			'preservekeys' => true
+		]);
 	}
 
 	/**

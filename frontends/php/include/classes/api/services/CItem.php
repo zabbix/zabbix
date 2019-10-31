@@ -41,7 +41,7 @@ class CItem extends CItemGeneral {
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
 		ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON
+		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON
 	];
 
 	public function __construct() {
@@ -1216,7 +1216,7 @@ class CItem extends CItemGeneral {
 				 * SQL func COALESCE use for template items because they dont have record
 				 * in item_rtdata table and DBFetch convert null to '0'
 				 */
-				$sqlParts = $this->addQuerySelect("COALESCE(ir.error,'') AS error", $sqlParts);
+				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);
 			}
 
 			if ($options['selectHosts'] !== null) {

@@ -22,6 +22,8 @@
 				.closest('li')
 				.hide();
 
+			$('li[id^="row_webhook_"]').hide();
+
 			switch (media_type) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication, #content_type' )
@@ -31,8 +33,6 @@
 					toggleSecurityOptions();
 					toggleAuthenticationOptions();
 					setMaxSessionsType(media_type);
-
-					$('#passwd').parent().prev().find('label').removeClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
@@ -42,6 +42,11 @@
 
 				case '<?= MEDIA_TYPE_SMS ?>':
 					$('#gsm_modem').closest('li').show();
+					setMaxSessionsType(media_type);
+					break;
+
+				case '<?= MEDIA_TYPE_WEBHOOK ?>':
+					$('li[id^="row_webhook_"]').show();
 					setMaxSessionsType(media_type);
 					break;
 			}
@@ -95,6 +100,12 @@
 		$('input[name=smtp_authentication]').change(function() {
 			toggleAuthenticationOptions();
 		});
+
+		$('#show_event_menu').change(function() {
+			$('#event_menu_url, #event_menu_name').prop('disabled', !$(this).is(':checked'));
+		});
+
+		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
