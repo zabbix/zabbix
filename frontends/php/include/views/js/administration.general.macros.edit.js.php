@@ -13,6 +13,11 @@
 					->setAttribute('placeholder', _('value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					->setAttribute('placeholder', _('description'))
+			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol(
 				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')

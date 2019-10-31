@@ -87,7 +87,6 @@ if (getRequest('parent_discoveryid')) {
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
-			'selectInventory' => ['inventory_mode'],
 			'editable' => true
 		]);
 		$hostPrototype = reset($hostPrototype);
@@ -149,9 +148,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'templates' => getRequest('templates', [])
 	];
 
-	// If 'inventory' is present, API requires 'inventory_mode' to have a value, but templated prototypes don't have it.
 	if (hasRequest('inventory_mode')) {
-		$newHostPrototype['inventory']['inventory_mode'] = getRequest('inventory_mode');
+		$newHostPrototype['inventory_mode'] = getRequest('inventory_mode');
 	}
 
 	// API requires 'templateid' property.
@@ -283,9 +281,7 @@ if (hasRequest('form')) {
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 			'templates' => [],
-			'inventory' => [
-				'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode'])
-			],
+			'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
 		'groups' => [],
@@ -304,7 +300,7 @@ if (hasRequest('form')) {
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => ['groupid', 'name'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectMacros' => ['macro', 'value'],
+		'selectMacros' => ['macro', 'value', 'description'],
 		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	]);
@@ -331,12 +327,9 @@ if (hasRequest('form')) {
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['host_prototype']['hostid'] != 0) {
+
 			// When opening existing host prototype, display all values from database.
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
-
-			if (!array_key_exists('inventory_mode', $data['host_prototype']['inventory'])) {
-				$data['host_prototype']['inventory']['inventory_mode'] = HOST_INVENTORY_DISABLED;
-			}
 
 			$groupids = zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid');
 			$data['groups'] = API::HostGroup()->get([

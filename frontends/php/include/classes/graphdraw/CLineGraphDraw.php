@@ -264,7 +264,7 @@ class CLineGraphDraw extends CGraphDraw {
 			$items[] = $item;
 		}
 
-		$results = Manager::History()->getGraphAggregation($items, $this->from_time, $this->to_time, $x);
+		$results = Manager::History()->getGraphAggregationByWidth($items, $this->from_time, $this->to_time, $x);
 
 		foreach ($items as $item) {
 			if (!array_key_exists($item['itemid'], $this->data)) {
@@ -2623,6 +2623,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$delay = $this->items[$item]['delay'];
 
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
+						|| ($this->items[$item]['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+							&& preg_match('/^(event)?log(rt)?\[/', $this->items[$item]['key_']))
 						|| ($this->items[$item]['has_scheduling_intervals'] && $delay == 0)) {
 					$draw = true;
 				}

@@ -438,7 +438,7 @@ void	del_zeros(char *s)
 
 			if (1 == trim)
 			{
-				/* don't touch invalid numbers with more than one decimal seprator */
+				/* don't touch invalid numbers with more than one decimal separator */
 				return;
 			}
 
@@ -762,7 +762,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Function: zbx_strdcatf                                                     *
  *                                                                            *
- * Purpose: dynamical cating of formated strings                              *
+ * Purpose: dynamical cating of formatted strings                             *
  *                                                                            *
  * Return value: new pointer of string                                        *
  *                                                                            *
@@ -1250,6 +1250,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "lld manager";
 		case ZBX_PROCESS_TYPE_LLDWORKER:
 			return "lld worker";
+		case ZBX_PROCESS_TYPE_ALERTSYNCER:
+			return "alert syncer";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -1954,60 +1956,6 @@ size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen)
 	}
 
 	return sz;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_replace_utf8                                                 *
- *                                                                            *
- * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
- *                                                                            *
- * Parameters: text - [IN] pointer to the first char                          *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_replace_utf8(const char *text)
-{
-	int	n;
-	char	*out, *p;
-
-	out = p = (char *)zbx_malloc(NULL, strlen(text) + 1);
-
-	while ('\0' != *text)
-	{
-		if (0 == (*text & 0x80))		/* ASCII */
-			n = 1;
-		else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 is a start of 2-byte sequence */
-			n = 2;
-		else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 is a start of 3-byte sequence */
-			n = 3;
-		else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 is a start of 4-byte sequence */
-			n = 4;
-		else
-			goto bad;
-
-		if (1 == n)
-			*p++ = *text++;
-		else
-		{
-			*p++ = ZBX_UTF8_REPLACE_CHAR;
-
-			while (0 != n)
-			{
-				if ('\0' == *text)
-					goto bad;
-				n--;
-				text++;
-			}
-		}
-	}
-
-	*p = '\0';
-	return out;
-bad:
-	zbx_free(out);
-	return NULL;
 }
 
 /******************************************************************************
@@ -4272,7 +4220,7 @@ int	num_param(const char *p)
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
@@ -4421,7 +4369,7 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_param_len(const char *p, int num, size_t *sz)
@@ -4551,7 +4499,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 char	*get_param_dyn(const char *p, int num)
@@ -4614,7 +4562,7 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
  *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
  *      cb        - [IN] callback function                                    *
  *      cb_data   - [IN] callback function custom data                        *
- *      error     - [OUT] error messsage                                      *
+ *      error     - [OUT] error message                                       *
  *      maxerrlen - [IN] error size                                           *
  *                                                                            *
  * Return value: SUCCEED - function executed successfully                     *
@@ -4875,7 +4823,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	get_key_param(char *param, int num, char *buf, size_t max_len)
@@ -4910,7 +4858,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:  delimeter for parameters is ','                                 *
+ * Comments:  delimiter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
 int	num_key_param(char *param)
@@ -5129,4 +5077,31 @@ void	zbx_trim_integer(char *str)
 void	zbx_trim_float(char *str)
 {
 	zbx_trim_number(str, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_component_version                                        *
+ *                                                                            *
+ * Purpose: extracts protocol version from value                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     value      - [IN] textual representation of version                    *
+ *                                                                            *
+ * Return value: The protocol version if it was successfully extracted,       *
+ *               otherwise -1                                                 *
+ ******************************************************************************/
+int	zbx_get_component_version(char *value)
+{
+	char	*pminor, *ptr;
+
+	if (NULL == (pminor = strchr(value, '.')))
+		return FAIL;
+
+	*pminor++ = '\0';
+
+	if (NULL != (ptr = strchr(pminor, '.')))
+		*ptr = '\0';
+
+	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
 }

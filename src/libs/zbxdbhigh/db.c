@@ -37,6 +37,7 @@ typedef struct
 	int		now;
 	unsigned short	port;
 	unsigned short	flag;
+	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
 
@@ -716,13 +717,99 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
 			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "task_remote_command") ||
-			0 == strcmp(tablename, "task_remote_command_result"))
+			0 == strcmp(tablename, "autoreg_host"))
 		return DCget_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
 }
+
+#define MAX_EXPRESSIONS	950
+#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
+
+#ifdef HAVE_ORACLE
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_condition_alloc_btw                                        *
+ *                                                                            *
+ * Purpose: Takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condition is generated from the given  *
+ *          list of values as a mix of <fieldname> BETWEEN <id1> AND <idN>"   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elements in 'values' array         *
+ *             seq_len    - [OUT] - array of sequential chains                *
+ *             seq_num    - [OUT] - length of seq_len                         *
+ *             in_num     - [OUT] - number of id for 'IN'                     *
+ *             between_num- [OUT] - number of sequential chains for 'BETWEEN' *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBadd_condition_alloc_btw(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num, int **seq_len, int *seq_num, int *in_num, int *between_num)
+{
+	int		i, len, first, start;
+	zbx_uint64_t	value;
+
+	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
+	/* An isolated value is represented as a sequence with length 1. */
+	*seq_len = (int *)zbx_malloc(*seq_len, num * sizeof(int));
+
+	for (i = 1, *seq_num = 0, value = values[0], len = 1; i < num; i++)
+	{
+		if (values[i] != ++value)
+		{
+			if (MIN_NUM_BETWEEN <= len)
+				(*between_num)++;
+			else
+				*in_num += len;
+
+			(*seq_len)[(*seq_num)++] = len;
+			len = 1;
+			value = values[i];
+		}
+		else
+			len++;
+	}
+
+	if (MIN_NUM_BETWEEN <= len)
+		(*between_num)++;
+	else
+		*in_num += len;
+
+	(*seq_len)[(*seq_num)++] = len;
+
+	if (MAX_EXPRESSIONS < *in_num || 1 < *between_num || (0 < *in_num && 0 < *between_num))
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+	/* compose "between"s */
+	for (i = 0, first = 1, start = 0; i < *seq_num; i++)
+	{
+		if (MIN_NUM_BETWEEN <= (*seq_len)[i])
+		{
+			if (1 != first)
+			{
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			}
+			else
+				first = 0;
+
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+					fieldname, values[start], values[start + (*seq_len)[i] - 1]);
+		}
+
+		start += (*seq_len)[i];
+	}
+
+	if (0 < *in_num && 0 < *between_num)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -745,13 +832,11 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num)
 {
-#define MAX_EXPRESSIONS	950
-#define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
-
-	int		i, start, len, seq_num, first;
-	int		between_num = 0, in_num = 0, in_cnt;
-	zbx_uint64_t	value;
+#ifdef HAVE_ORACLE
+	int		start, between_num = 0, in_num = 0, seq_num;
 	int		*seq_len = NULL;
+#endif
+	int		i, in_cnt;
 #if defined(HAVE_SQLITE3)
 	int		expr_num, expr_cnt = 0;
 #endif
@@ -759,83 +844,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
-
-	/* Store lengths of consecutive sequences of values in a temporary array 'seq_len'. */
-	/* An isolated value is represented as a sequence with length 1. */
-	seq_len = (int *)zbx_malloc(seq_len, num * sizeof(int));
-
-	for (i = 1, seq_num = 0, value = values[0], len = 1; i < num; i++)
-	{
-		if (values[i] != ++value)
-		{
-			if (MIN_NUM_BETWEEN <= len)
-				between_num++;
-			else
-				in_num += len;
-
-			seq_len[seq_num++] = len;
-			len = 1;
-			value = values[i];
-		}
-		else
-			len++;
-	}
-
-	if (MIN_NUM_BETWEEN <= len)
-		between_num++;
-	else
-		in_num += len;
-
-	seq_len[seq_num++] = len;
-
-	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
-		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-
-#if defined(HAVE_SQLITE3)
-	expr_num = between_num + (in_num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
-
-	if (MAX_EXPRESSIONS < expr_num)
-		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
-#endif
-	/* compose "between"s */
-	for (i = 0, first = 1, start = 0; i < seq_num; i++)
-	{
-		if (MIN_NUM_BETWEEN <= seq_len[i])
-		{
-			if (1 != first)
-			{
-#if defined(HAVE_SQLITE3)
-				if (MAX_EXPRESSIONS == ++expr_cnt)
-				{
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
-					expr_cnt = 0;
-				}
-				else
-#endif
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
-			}
-			else
-				first = 0;
-
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					fieldname, values[start], values[start + seq_len[i] - 1]);
-		}
-
-		start += seq_len[i];
-	}
-
-	if (0 < in_num && 0 < between_num)
-	{
-#if defined(HAVE_SQLITE3)
-		if (MAX_EXPRESSIONS == ++expr_cnt)
-		{
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
-			expr_cnt = 0;
-		}
-		else
-#endif
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
-	}
+#ifdef HAVE_ORACLE
+	DBadd_condition_alloc_btw(sql, sql_alloc, sql_offset, fieldname, values, num, &seq_len, &seq_num, &in_num,
+			&between_num);
 
 	if (1 < in_num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -846,15 +857,40 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 		if (MIN_NUM_BETWEEN > seq_len[i])
 		{
 			if (1 == in_num)
+#else
+	if (MAX_EXPRESSIONS < num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+
+#if	defined(HAVE_SQLITE3)
+	expr_num = (num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
+
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+#endif
+
+	if (1 < num)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
+
+	/* compose "in"s */
+	for (i = 0, in_cnt = 0; i < num; i++)
+	{
+			if (1 == num)
+#endif
 			{
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname,
+#ifdef HAVE_ORACLE
 						values[start]);
+#else
+						values[i]);
+#endif
 				break;
 			}
 			else
 			{
+#ifdef HAVE_ORACLE
 				do
 				{
+#endif
 					if (MAX_EXPRESSIONS == in_cnt)
 					{
 						in_cnt = 0;
@@ -876,8 +912,10 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 #endif
 					}
 
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
 					in_cnt++;
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",",
+#ifdef HAVE_ORACLE
+							values[start++]);
 				}
 				while (0 != --seq_len[i]);
 			}
@@ -886,19 +924,30 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 			start += seq_len[i];
 	}
 
+	zbx_free(seq_len);
+
 	if (1 < in_num)
+#else
+							values[i]);
+			}
+	}
+
+	if (1 < num)
+#endif
 	{
 		(*sql_offset)--;
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 	}
 
-	zbx_free(seq_len);
-
 #if defined(HAVE_SQLITE3)
 	if (MAX_EXPRESSIONS < expr_num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 #endif
+#ifdef HAVE_ORACLE
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
+#else
+	if (MAX_EXPRESSIONS < num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
@@ -1078,8 +1127,8 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Function: zbx_check_user_permissions                                       *
  *                                                                            *
- * Purpose: check if user has access rights to information - full name, alias,*
- *          Email, SMS, Jabber, etc                                           *
+ * Purpose: check if user has access rights to information - full name,       *
+ *          alias, Email, SMS, etc                                            *
  *                                                                            *
  * Parameters: userid           - [IN] user who owns the information          *
  *             recipient_userid - [IN] user who will receive the information  *
@@ -1207,13 +1256,14 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
  *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 
 	zbx_vector_ptr_create(&autoreg_hosts);
 
-	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, host_metadata, flag, now);
+	DBregister_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
 	DBregister_host_flush(&autoreg_hosts, proxy_hostid);
 
 	DBregister_host_clean(&autoreg_hosts);
@@ -1255,7 +1305,8 @@ static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
 }
 
 void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, const char *host_metadata, unsigned short flag, int now)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
+		int now)
 {
 	zbx_autoreg_host_t	*autoreg_host;
 	int 			i;
@@ -1278,6 +1329,7 @@ void	DBregister_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, 
 	autoreg_host->ip = zbx_strdup(NULL, ip);
 	autoreg_host->dns = zbx_strdup(NULL, dns);
 	autoreg_host->port = port;
+	autoreg_host->connection_type = connection_type;
 	autoreg_host->host_metadata = zbx_strdup(NULL, host_metadata);
 	autoreg_host->flag = flag;
 	autoreg_host->now = now;
@@ -1426,7 +1478,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
@@ -1453,7 +1505,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_hostid = DBget_maxid_num("autoreg_host", create);
 
 		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
-				"listen_dns", "listen_port", "host_metadata", "flags", NULL);
+				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
 	}
 
 	if (0 != (update = autoreg_hosts->values_num - create))
@@ -1474,7 +1526,8 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
-					(int)autoreg_host->port, autoreg_host->host_metadata, autoreg_host->flag);
+					(int)autoreg_host->port, (int)autoreg_host->connection_type,
+					autoreg_host->host_metadata, autoreg_host->flag);
 		}
 		else
 		{
@@ -1488,11 +1541,12 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 						"listen_dns='%s',"
 						"listen_port=%hu,"
 						"host_metadata='%s',"
+						"tls_accepted='%u',"
 						"flags=%hu,"
 						"proxy_hostid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->flag,
-				DBsql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
+				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->connection_type,
+				autoreg_host->flag, DBsql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);
@@ -1521,7 +1575,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 		ts.sec = autoreg_host->now;
 		zbx_add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_host->autoreg_hostid,
-				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+				&ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL);
 	}
 
 	zbx_process_events(NULL, NULL);
@@ -1547,7 +1601,7 @@ void	DBregister_host_clean(zbx_vector_ptr_t *autoreg_hosts)
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		const char *host_metadata, unsigned short flag)
+		unsigned int connection_type, const char *host_metadata, unsigned short flag)
 {
 	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
@@ -1557,10 +1611,11 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 	host_metadata_esc = DBdyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata,flags)"
+			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
 			" values"
-			" (%d,'%s','%s','%s',%d,'%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc, (int)flag);
+			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
+			(int)flag);
 
 	zbx_free(host_metadata_esc);
 	zbx_free(dns_esc);
@@ -2569,7 +2624,6 @@ retry_oracle:
 #	else
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, sql_command);
 #	endif
-
 		for (j = 0; j < self->fields.values_num; j++)
 		{
 			const zbx_db_value_t	*value = &values[j];

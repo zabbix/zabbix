@@ -1847,8 +1847,11 @@ static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_re
 			if (FAIL == vch_item_add_chunk(item, nslots, item->tail))
 				goto out;
 
-			item->tail->last_value = nslots - 1;
-			item->tail->first_value = nslots;
+			if (NULL != item->tail)
+			{
+				item->tail->last_value = nslots - 1;
+				item->tail->first_value = nslots;
+			}
 		}
 
 		/* copy values to chunk */
@@ -1898,7 +1901,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int range_start)
 		range_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
 	else
-		range_end = time(NULL);
+		range_end = ZBX_JAN_2038;
 
 	/* update cache if necessary */
 	if (range_start < range_end)
@@ -1995,7 +1998,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int rang
 		if (NULL != item->head)
 			range_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 		else
-			range_end = time(NULL);
+			range_end = ZBX_JAN_2038;
 
 		vc_try_unlock();
 
@@ -2391,7 +2394,7 @@ void	zbx_vc_destroy(void)
  * Purpose: resets value cache                                                *
  *                                                                            *
  * Comments: All items and their historical data are removed,                 *
- *           cache working mode, statistics reseted.                          *
+ *           cache working mode, statistics reset.                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_reset(void)

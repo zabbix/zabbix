@@ -106,7 +106,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function transformToPositionTypes(array $types) {
-		foreach (['macros', 'macros_n', 'macro_funcs_n'] as $type) {
+		foreach (['macros', 'macros_n', 'macros_an', 'macro_funcs_n'] as $type) {
 			if (array_key_exists($type, $types)) {
 				$patterns = [];
 				foreach ($types[$type] as $key => $_patterns) {
@@ -127,6 +127,7 @@ class CMacrosResolverGeneral {
 	 * @param bool   $types['usermacros']
 	 * @param array  $types['macros'][<macro_patterns>]
 	 * @param array  $types['macros_n'][<macro_patterns>]
+	 * @param array  $types['macros_an'][<macro_patterns>]
 	 * @param array  $types['macro_funcs_n'][<macro_patterns>]
 	 * @param bool   $types['references']
 	 * @param bool   $types['lldmacros']
@@ -140,6 +141,7 @@ class CMacrosResolverGeneral {
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
+		$extract_macros_an = array_key_exists('macros_an', $types);
 		$extract_macro_funcs_n = array_key_exists('macro_funcs_n', $types);
 		$extract_references = array_key_exists('references', $types);
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
@@ -155,11 +157,19 @@ class CMacrosResolverGeneral {
 		}
 
 		if ($extract_macros_n) {
-			$macro_n_parser = new CMacroParser($types['macros_n'], ['allow_reference' => true]);
+			$macro_n_parser = new CMacroParser($types['macros_n'], ['ref_type' => CMacroParser::REFERENCE_NUMERIC]);
+		}
+
+		if ($extract_macros_an) {
+			$macro_an_parser = new CMacroParser($types['macros_an'],
+				['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
+			);
 		}
 
 		if ($extract_macro_funcs_n) {
-			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'], ['allow_reference' => true]);
+			$macro_func_n_parser = new CMacroFunctionParser($types['macro_funcs_n'],
+				['ref_type' => CMacroParser::REFERENCE_NUMERIC]
+			);
 		}
 
 		if ($extract_references) {
@@ -191,6 +201,10 @@ class CMacrosResolverGeneral {
 			elseif ($extract_macros_n && $macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $macro_n_parser->getMatch();
 				$pos += $macro_n_parser->getLength() - 1;
+			}
+			elseif ($extract_macros_an && $macro_an_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $macro_an_parser->getMatch();
+				$pos += $macro_an_parser->getLength() - 1;
 			}
 			elseif ($extract_macro_funcs_n && $macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $macro_func_n_parser->getMatch();
@@ -229,6 +243,7 @@ class CMacrosResolverGeneral {
 	 * @param bool   $types['usermacros']
 	 * @param array  $types['macros'][][<macro_patterns>]
 	 * @param array  $types['macros_n'][][<macro_patterns>]
+	 * @param array  $types['macros_an'][][<macro_patterns>]
 	 * @param array  $types['macro_funcs_n'][][<macro_patterns>]
 	 * @param bool   $types['references']
 	 * @param bool   $types['lldmacros']
@@ -241,6 +256,7 @@ class CMacrosResolverGeneral {
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
+		$extract_macros_an = array_key_exists('macros_an', $types);
 		$extract_macro_funcs_n = array_key_exists('macro_funcs_n', $types);
 		$extract_references = array_key_exists('references', $types);
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
@@ -265,8 +281,21 @@ class CMacrosResolverGeneral {
 			$macros['macros_n'] = [];
 
 			foreach ($types['macros_n'] as $key => $macro_patterns) {
-				$types['macros_n'][$key] = new CMacroParser($macro_patterns, ['allow_reference' => true]);
+				$types['macros_n'][$key] = new CMacroParser($macro_patterns,
+					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
+				);
 				$macros['macros_n'][$key] = [];
+			}
+		}
+
+		if ($extract_macros_an) {
+			$macros['macros_an'] = [];
+
+			foreach ($types['macros_an'] as $key => $macro_patterns) {
+				$types['macros_an'][$key] = new CMacroParser($macro_patterns,
+					['ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC]
+				);
+				$macros['macros_an'][$key] = [];
 			}
 		}
 
@@ -274,7 +303,9 @@ class CMacrosResolverGeneral {
 			$macros['macro_funcs_n'] = [];
 
 			foreach ($types['macro_funcs_n'] as $key => $macro_patterns) {
-				$types['macro_funcs_n'][$key] = new CMacroFunctionParser($macro_patterns, ['allow_reference' => true]);
+				$types['macro_funcs_n'][$key] = new CMacroFunctionParser($macro_patterns,
+					['ref_type' => CMacroParser::REFERENCE_NUMERIC]
+				);
 				$macros['macro_funcs_n'][$key] = [];
 			}
 		}
@@ -321,9 +352,22 @@ class CMacrosResolverGeneral {
 						if ($macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macros['macros_n'][$key][$macro_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getN()
+								'f_num' => $macro_n_parser->getReference()
 							];
 							$pos += $macro_n_parser->getLength() - 1;
+							continue 2;
+						}
+					}
+				}
+
+				if ($extract_macros_an) {
+					foreach ($types['macros_an'] as $key => $macro_an_parser) {
+						if ($macro_an_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macros['macros_an'][$key][$macro_an_parser->getMatch()] = [
+								'macro' => $macro_an_parser->getMacro(),
+								'f_num' => $macro_an_parser->getReference()
+							];
+							$pos += $macro_an_parser->getLength() - 1;
 							continue 2;
 						}
 					}
@@ -350,7 +394,7 @@ class CMacrosResolverGeneral {
 
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getN(),
+								'f_num' => $macro_n_parser->getReference(),
 								'function' => $function_parser->getFunction(),
 								'parameters' => $function_parameters
 							];
@@ -688,31 +732,52 @@ class CMacrosResolverGeneral {
 	 * @param array $macros[<functionid>][<macro>]  An array of the tokens.
 	 * @param array $macro_values
 	 * @param array $triggers
-	 * @param bool  $events                         Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param array $options
+	 * @param bool  $options['events]               Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool  $options['html]
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], $events = false) {
+	protected function getItemMacros(array $macros, array $macro_values, array $triggers = [], array $options = []) {
 		if (!$macros) {
 			return $macro_values;
 		}
 
+		$options += [
+			'events' => false,
+			'html' => false
+		];
+
 		$functions = DBfetchArray(DBselect(
-			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
+			'SELECT f.triggerid,f.functionid,i.itemid,i.hostid,i.name,i.key_,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
 				' JOIN items i ON f.itemid=i.itemid'.
 				' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
+		$functions = CMacrosResolverHelper::resolveItemNames($functions);
+
 		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				$clock = null;
+				$value = null;
+
 				switch ($m) {
 					case 'ITEM.VALUE':
-						if ($events) {
+						if ($options['events']) {
 							$trigger = $triggers[$function['triggerid']];
-							$value = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+
+							if (is_array($history)) {
+								if (array_key_exists('clock', $history)) {
+									$clock = $history['clock'];
+								}
+								if (array_key_exists('value', $history)) {
+									$value = $history['value'];
+								}
+							}
 							break;
 						}
 						// break; is not missing here
@@ -720,14 +785,17 @@ class CMacrosResolverGeneral {
 					case 'ITEM.LASTVALUE':
 						$history = Manager::History()->getLastValues([$function], 1, ZBX_HISTORY_PERIOD);
 
-						$value = array_key_exists($function['itemid'], $history)
-							? $history[$function['itemid']][0]['value']
-							: null;
+						if (array_key_exists($function['itemid'], $history)) {
+							$clock = $history[$function['itemid']][0]['clock'];
+							$value = $history[$function['itemid']][0]['value'];
+						}
 						break;
 				}
 
-				if ($value !== null) {
-					foreach ($tokens as $token) {
+				foreach ($tokens as $token) {
+					$macro_value = UNRESOLVED_MACRO_STRING;
+
+					if ($value !== null) {
 						if (array_key_exists('function', $token)) {
 							if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
 								continue;
@@ -760,9 +828,46 @@ class CMacrosResolverGeneral {
 						else {
 							$macro_value = formatHistoryValue($value, $function);
 						}
-
-						$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 					}
+
+					if ($options['html']) {
+						$macro_value = str_replace(["\r\n", "\n"], [" "], $macro_value);
+						$hint_table = (new CTable())
+							->addClass('list-table')
+							->addRow([
+								new CCol($function['name_expanded']),
+								new CCol(
+									($clock !== null)
+										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
+										: UNRESOLVED_MACRO_STRING
+								),
+								new CCol($macro_value),
+								new CCol(
+									($function['value_type'] == ITEM_VALUE_TYPE_FLOAT
+											|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
+										? new CLink(_('Graph'), (new CUrl('history.php'))
+											->setArgument('action', HISTORY_GRAPH)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
+										)
+										: new CLink(_('History'), (new CUrl('history.php'))
+											->setArgument('action', HISTORY_VALUES)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
+										)
+								)
+							]);
+						$macro_value = new CSpan([
+							(new CSpan())
+								->addClass('main-hint')
+								->setHint($hint_table),
+							(new CLinkAction($macro_value))
+								->addClass('hint-item')
+								->setAttribute('data-hintbox', '1')
+						]);
+					}
+
+					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 				}
 			}
 		}

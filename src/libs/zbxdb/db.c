@@ -91,7 +91,7 @@ zbx_ibm_db2_handle_t;
 
 static zbx_ibm_db2_handle_t	ibm_db2;
 
-static int	IBM_DB2server_status();
+static int	IBM_DB2server_status(void);
 static int	zbx_ibm_db2_success(SQLRETURN ret);
 static int	zbx_ibm_db2_success_ext(SQLRETURN ret);
 static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
@@ -340,9 +340,9 @@ static int	is_recoverable_mysql_error(void)
 	return FAIL;
 }
 #elif defined(HAVE_POSTGRESQL)
-static int	is_recoverable_postgresql_error(const PGconn *conn, const PGresult *pg_result)
+static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult *pg_result)
 {
-	if (CONNECTION_OK != PQstatus(conn))
+	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
@@ -2239,7 +2239,7 @@ void	DBfree_result(DB_RESULT result)
 
 #ifdef HAVE_IBM_DB2
 /* server status: SQL_CD_TRUE or SQL_CD_FALSE */
-static int	IBM_DB2server_status()
+static int	IBM_DB2server_status(void)
 {
 	int	server_status = SQL_CD_TRUE;
 

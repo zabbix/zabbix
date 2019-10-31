@@ -578,7 +578,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *parameters, co
 	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL, buf[ZBX_MAX_UINT64_LEN];
 	double				arg2_dbl;
-	zbx_uint64_t			arg2_ui64, arg2_2_ui64;
+	zbx_uint64_t			arg2_ui64 = 0, arg2_2_ui64 = 0;
 	zbx_value_type_t		arg1_type;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
@@ -3123,8 +3123,8 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 			"select newvalue"
 			" from mappings"
 			" where valuemapid=" ZBX_FS_UI64
-				" and value='%s'",
-			valuemapid, value_esc);
+				" and value" ZBX_SQL_STRCMP,
+			valuemapid, ZBX_SQL_STRVAL_EQ(value_esc));
 	zbx_free(value_esc);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))

@@ -2,4 +2,5 @@
 
 noinst_LIBRARIES = libzbxlog.a
 
-libzbxlog_a_SOURCES = log.c
+libzbxlog_a_SOURCES = \
+	log.c

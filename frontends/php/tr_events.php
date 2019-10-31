@@ -87,6 +87,19 @@ if (!$events) {
 }
 $event = reset($events);
 
+$event['comments'] = ($trigger['comments'] !== '')
+	? CMacrosResolverHelper::resolveTriggerDescription(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'comments' => $trigger['comments'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		['events' => true]
+	)
+	: '';
+
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
@@ -102,6 +115,32 @@ if ($event['r_eventid'] != 0) {
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
 	}
+}
+
+if ($trigger['opdata'] !== '') {
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
+		[
+			'triggerid' => $trigger['triggerid'],
+			'expression' => $trigger['expression'],
+			'opdata' => $trigger['opdata'],
+			'clock' => $event['clock'],
+			'ns' => $event['ns']
+		],
+		[
+			'events' => true,
+			'html' => true
+		]
+	)))
+		->addClass('opdata')
+		->addClass(ZBX_STYLE_WORDWRAP);
+}
+else {
+	$db_items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'triggerids' => $event['objectid']
+	]);
+	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
+	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
 $config = select_config();
@@ -131,7 +170,8 @@ $mediatypes = API::Mediatype()->get([
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
-			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))->setHeader(_('Trigger details')),
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
+				->setHeader(_('Trigger details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
 				make_event_details($event,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')

@@ -71,7 +71,6 @@ class CProblem extends CApiService {
 			'any'						=> null,	// (internal) true if need not filtred by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
 			'tags'						=> null,
-			'recent'					=> null,
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
@@ -401,6 +400,22 @@ class CProblem extends CApiService {
 
 		$eventids = array_keys($result);
 
+		// Adding operational data.
+		if ($this->outputIsRequested('opdata', $options['output'])) {
+			$problems = DBFetchArrayAssoc(DBselect(
+				'SELECT p.eventid,p.clock,p.ns,t.triggerid,t.expression,t.opdata'.
+				' FROM problem p'.
+				' JOIN triggers t ON t.triggerid=p.objectid'.
+				' WHERE '.dbConditionInt('p.eventid', $eventids)
+			), 'eventid');
+
+			foreach ($result as $eventid => $problem) {
+				$result[$eventid]['opdata'] = ($problems[$eventid]['opdata'] !== '')
+					? CMacrosResolverHelper::resolveTriggerOpdata($problems[$eventid], ['events' => true])
+					: '';
+			}
+		}
+
 		// adding acknowledges
 		if ($options['selectAcknowledges'] !== null) {
 			if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
@@ -484,6 +499,43 @@ class CProblem extends CApiService {
 				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
 			}
 			unset($row);
+		}
+
+		// Resolve webhook urls.
+		if ($this->outputIsRequested('urls', $options['output'])) {
+			$tags_options = [
+				'output' => ['eventid', 'tag', 'value'],
+				'filter' => ['eventid' => $eventids]
+			];
+			$tags = DBselect(DB::makeSql('problem_tag', $tags_options));
+
+			$events = [];
+
+			foreach ($result as $event) {
+				$events[$event['eventid']]['tags'] = [];
+			}
+
+			while ($tag = DBfetch($tags)) {
+				$events[$tag['eventid']]['tags'][] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+
+			$urls = DB::select('media_type', [
+				'output' => ['event_menu_url', 'event_menu_name'],
+				'filter' => [
+					'type' => MEDIA_TYPE_WEBHOOK,
+					'status' => MEDIA_TYPE_STATUS_ACTIVE,
+					'show_event_menu' => ZBX_EVENT_MENU_SHOW
+				]
+			]);
+
+			$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
+
+			foreach ($events as $eventid => $event) {
+				$result[$eventid]['urls'] = $event['urls'];
+			}
 		}
 
 		// Adding event tags.

@@ -243,6 +243,7 @@ typedef struct _DC_TRIGGER
 	char			*error;
 	char			*new_error;
 	char			*correlation_tag;
+	char			*opdata;
 	zbx_timespec_t		timespec;
 	int			lastchange;
 	unsigned char		topoindex;
@@ -358,6 +359,7 @@ typedef struct
 	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
+	unsigned char	autoreg_tls_accept;
 	char		*db_extension;
 
 	/* housekeeping related configuration data */
@@ -365,13 +367,14 @@ typedef struct
 }
 zbx_config_t;
 
-#define ZBX_CONFIG_FLAGS_SEVERITY_NAME			0x00000001
-#define ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID		0x00000002
-#define ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE		0x00000004
-#define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
-#define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
-#define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
-#define ZBX_CONFIG_FLAGS_DB_EXTENSION			0x00000040
+#define ZBX_CONFIG_FLAGS_SEVERITY_NAME			__UINT64_C(0x0000000000000001)
+#define ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID		__UINT64_C(0x0000000000000002)
+#define ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE		__UINT64_C(0x0000000000000004)
+#define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		__UINT64_C(0x0000000000000008)
+#define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		__UINT64_C(0x0000000000000010)
+#define ZBX_CONFIG_FLAGS_HOUSEKEEPER			__UINT64_C(0x0000000000000020)
+#define ZBX_CONFIG_FLAGS_DB_EXTENSION			__UINT64_C(0x0000000000000040)
+#define ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT		__UINT64_C(0x0000000000000080)
 
 /* possible values for database extensions (if flag ZBX_CONFIG_FLAGS_DB_EXTENSION set) */
 #define ZBX_CONFIG_DB_EXTENSION_TIMESCALE		"timescaledb"
@@ -453,9 +456,9 @@ typedef struct
 	zbx_vector_ptr_t	correlations;
 	zbx_hashset_t		conditions;
 
-	/* Configuration synchonization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the   */
-	/* current configuration synchonization timestamp.      */
+	/* Configuration synchronization timestamp of the rules. */
+	/* Update the cache if this timesamp is less than the    */
+	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
 zbx_correlation_rules_t;
@@ -644,6 +647,7 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
+int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
@@ -716,8 +720,10 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int pr
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len);
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
+void	DCget_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
+		unsigned char *psk_buf, size_t psk_buf_len);
 
 void	DCget_user_macro(const zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression);

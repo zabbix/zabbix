@@ -74,6 +74,16 @@
 			}
 		},
 
+		remove: function(screen) {
+			if (typeof screen.id !== 'undefined' && typeof this.screens[screen.id] !== 'undefined') {
+				if (typeof this.screens[screen.id].timeoutHandler !== 'undefined') {
+					window.clearTimeout(this.screens[screen.id].timeoutHandler);
+				}
+
+				delete this.screens[screen.id];
+			}
+		},
+
 		refresh: function(id) {
 			var screen = this.screens[id];
 
@@ -214,10 +224,6 @@
 					},
 					screen.interval
 				);
-
-				// refresh time control actual time
-				clearTimeout(timeControl.timeRefreshTimeoutHandler);
-				timeControl.refreshTime();
 			}
 		},
 

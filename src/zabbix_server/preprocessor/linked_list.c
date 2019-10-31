@@ -301,7 +301,7 @@ void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator)
  *             iterator2 - [IN] second list iterator                          *
  *                                                                            *
  * Return value: SUCCEED is returned if both iterator point at the same item, *
- *               FAIL otheriwse.                                              *
+ *               FAIL otherwise.                                              *
  *                                                                            *
  ******************************************************************************/
 int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2)

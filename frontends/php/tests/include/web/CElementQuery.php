@@ -37,6 +37,8 @@ require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 require_once dirname(__FILE__).'/elements/CMultilineElement.php';
+require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
+require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -106,11 +108,11 @@ class CElementQuery implements IWaitable {
 	protected $options = [];
 
 	/**
-	 * Shared web driver instance.
+	 * Shared web page instance.
 	 *
-	 * @var RemoteWebDriver
+	 * @var CPage
 	 */
-	protected static $driver;
+	protected static $page;
 
 	/**
 	 * Initialize element query by specified selector.
@@ -120,7 +122,7 @@ class CElementQuery implements IWaitable {
 	 */
 	public function __construct($type, $locator = null) {
 		$this->class = 'CElement';
-		$this->context = self::$driver;
+		$this->context = static::getDriver();
 
 		if ($type !== null) {
 			$this->by = static::getSelector($type, $locator);
@@ -190,12 +192,12 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
-	 * Set web driver instance.
+	 * Set web page instance.
 	 *
-	 * @param RemoteWebDriver $driver    web driver instance to be set
+	 * @param CPage $page    web page instance to be set
 	 */
-	public static function setDriver($driver) {
-		self::$driver = $driver;
+	public static function setPage($page) {
+		self::$page = $page;
 	}
 
 	/**
@@ -204,7 +206,20 @@ class CElementQuery implements IWaitable {
 	 * @return RemoteWebDriver
 	 */
 	public static function getDriver() {
-		return self::$driver;
+		if (self::$page === null) {
+			return null;
+		}
+
+		return self::$page->getDriver();
+	}
+
+	/**
+	 * Get web page instance.
+	 *
+	 * @return CPage
+	 */
+	public static function getPage() {
+		return self::$page;
 	}
 
 	/**
@@ -229,7 +244,7 @@ class CElementQuery implements IWaitable {
 	 * @return WebDriverWait
 	 */
 	public static function wait() {
-		return self::$driver->wait(20, self::WAIT_ITERATION);
+		return static::getDriver()->wait(20, self::WAIT_ITERATION);
 	}
 
 	/**
@@ -287,7 +302,7 @@ class CElementQuery implements IWaitable {
 	 */
 	public function one($should_exist = true) {
 		$class = $this->class;
-		$parent = ($this->context !== self::$driver) ? $this->context : null;
+		$parent = ($this->context !== static::getDriver()) ? $this->context : null;
 
 		try {
 			$element = $this->context->findElement($this->by);
@@ -420,7 +435,12 @@ class CElementQuery implements IWaitable {
 		$target = $this;
 
 		return function () use ($target) {
-			return $target->one()->isVisible();
+			$element = $target->one(false);
+			if ($element === null) {
+				return false;
+			}
+
+			return $element->isVisible();
 		};
 	}
 
@@ -449,7 +469,10 @@ class CElementQuery implements IWaitable {
 				'/ul[@class="radio-list-control"]',
 				'/div/ul[@class="radio-list-control"]' // TODO: remove after fix DEV-1071.
 			],
-			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CCheckboxListElement'		=> [
+				'/ul[@class="checkbox-list col-3"]',
+				'/ul[@class="list-check-radio"]'
+			],
 			'CTableElement'				=> [
 				'/table',
 				'/*[@class="table-forms-separator"]/table'

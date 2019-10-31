@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/CHost.php';
-require_once dirname(__FILE__).'/CItem.php';
 require_once dirname(__FILE__).'/testAPIInfo.php';
 require_once dirname(__FILE__).'/testAction.php';
 require_once dirname(__FILE__).'/testApplication.php';
@@ -29,6 +27,8 @@ require_once dirname(__FILE__).'/testCorrelation.php';
 require_once dirname(__FILE__).'/testDRule.php';
 require_once dirname(__FILE__).'/testHistory.php';
 require_once dirname(__FILE__).'/testHost.php';
+require_once dirname(__FILE__).'/testHostInventory.php';
+require_once dirname(__FILE__).'/testHostPrototypeInventory.php';
 require_once dirname(__FILE__).'/testHostGroup.php';
 require_once dirname(__FILE__).'/testIconMap.php';
 require_once dirname(__FILE__).'/testItem.php';
@@ -50,17 +50,17 @@ class ApiJsonTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
-//		$suite->addTestSuite('API_JSON_Host');
-//		$suite->addTestSuite('API_JSON_Item');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testApplication');
 		$suite->addTestSuite('testConfiguration');
-		$suite->addTestSuite('testDependentItems');
+//		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testHistory');
 		$suite->addTestSuite('testHost');
+		$suite->addTestSuite('testHostInventory');
+		$suite->addTestSuite('testHostPrototypeInventory');
 		$suite->addTestSuite('testHostGroup');
 		$suite->addTestSuite('testIconMap');
 		$suite->addTestSuite('testItem');

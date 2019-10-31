@@ -2329,7 +2329,7 @@ out:
     misses: 0
 ---
 # TC40
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get interval of values when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2381,7 +2381,7 @@ out:
     misses: 3
 ---
 # TC41
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2425,7 +2425,7 @@ out:
     misses: 2
 ---
 # TC42
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values during interval when using nanoseconds in end time
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2469,7 +2469,7 @@ out:
     misses: 2
 ---
 # TC43
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get number of values during interval when using nanoseconds in end time and not enough data
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2521,7 +2521,7 @@ out:
     misses: 3
 ---
 # TC44
-# Test that all data from end timestamp second is cached and the required data is returned */ 
+# Test that all data from end timestamp second is cached and the required data is returned
 test case: Get 1 value during interval when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2563,7 +2563,7 @@ out:
     misses: 1
 ---
 # TC45
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned
 test case: Get 1 value during interval when using nanoseconds in end time (2) 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2611,7 +2611,7 @@ out:
     misses: 1
 ---
 # TC46
-# Test that values withing the interval end second but not matching nanoseconds are not returned */ 
+# Test that values within the interval end second but not matching nanoseconds are not returned
 test case: Get 10 values during interval when using nanoseconds in end time 
 include: &include zbx_vc_get_values.inc.yaml
 in:
@@ -2670,7 +2670,7 @@ out:
     misses: 0
 ---
 # TC47
-# Test empty requests in low memory mode */ 
+# Test empty requests in low memory mode
 test case: Get number of uncached item values from interval when cache working in low memory mode
 in:
   history:
@@ -2726,4 +2726,379 @@ out:
     mode: ZBX_VC_MODE_LOWMEM
     hits: 0
     misses: 1
+---
+test case: Value target time is with future timestamp
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 0
+    count: 1
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      status:
+      active_range: 60
+      values_total: 1
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 1
+---
+test case: Value target time is with future timestamp and there are more values with future timestamp
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 0
+    count: 1
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 1
+---
+test case: Value target time is with future timestamp but count also requires value from past
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:58:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 0
+    count: 2
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row2
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 61
+      values_total: 2
+      db_cached_from: 2017-01-10 09:58:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
+---
+test case: Value target time is with future timestamp but count also requires present value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:59:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 0
+    count: 2
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row2
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 09:59:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
+---
+test case: Value target time is with future timestamp but count also requires present value and no past values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:58:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 09:59:00.000000000 +00:00
+    - &row3
+      value: 0.3
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 0
+    count: 2
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row3
+  - *row2
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row2
+      - *row3
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 09:59:00.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
+# Seconds
+---
+test case: Value target time is with future timestamp
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 1
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      status:
+      active_range: 60
+      values_total: 1
+      db_cached_from: 2017-01-10 09:59:59.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 1
+---
+test case: Value target time is with future timestamp and there are more values with future timestamp for seconds
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 1
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 09:59:59.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 1
+---
+test case: Value target time is with future timestamp but seconds also requires value from past
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:58:00.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 181
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row2
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 122
+      values_total: 2
+      db_cached_from: 2017-01-10 09:56:59 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
+---
+test case: Value target time is with future timestamp but seconds also requires present value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:59:58.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:58.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 3
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row2
+  - *row1
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row1
+      - *row2
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 09:59:57.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
+---
+test case: Value target time is with future timestamp but seconds also requires present value and no past values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - &row1
+      value: 0.1
+      ts: 2017-01-10 09:59:57.000000000 +00:00
+    - &row2
+      value: 0.2
+      ts: 2017-01-10 09:59:59.000000000 +00:00
+    - &row3
+      value: 0.3
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  test:
+    time: 2017-01-10 09:59:59.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    seconds: 2
+    count: 0
+    end: 2017-01-10 10:00:00.000000000 +00:00
+out:
+  values:
+  - *row3
+  - *row2
+  cache:
+    items:
+    - itemid: 1
+      value type: ITEM_VALUE_TYPE_FLOAT
+      data:
+      - *row2
+      - *row3
+      status:
+      active_range: 60
+      values_total: 2
+      db_cached_from: 2017-01-10 09:59:58.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 2
 ...

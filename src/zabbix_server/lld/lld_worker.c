@@ -101,7 +101,8 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 						item.host.host, item.key_orig);
 
 				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
-						ITEM_STATE_NORMAL, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL);
+						ITEM_STATE_NORMAL, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL,
+						NULL);
 			}
 			else
 			{
@@ -110,7 +111,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 				zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, itemid, &ts,
 						ITEM_STATE_NOTSUPPORTED, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-						error);
+						NULL, error);
 			}
 
 			zbx_process_events(NULL, NULL);
@@ -152,7 +153,8 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs);
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
 
 		DCconfig_items_apply_changes(&diffs);
 

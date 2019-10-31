@@ -148,6 +148,7 @@ else {
 	$dashboard_options = [
 		'max-rows' => DASHBOARD_MAX_ROWS,
 		'max-columns' => DASHBOARD_MAX_COLUMNS,
+		'widget-min-rows' => DASHBOARD_WIDGET_MIN_ROWS,
 		'widget-max-rows' => DASHBOARD_WIDGET_MAX_ROWS,
 		'editable' => $data['dashboard']['editable'],
 		'edit_mode' => $data['dashboard_edit_mode'],
@@ -163,7 +164,6 @@ else {
 	// must be done before adding widgets, because it causes dashboard to resize.
 	if ($data['show_timeselector']) {
 		$this->addPostJS(
-			'timeControl.useTimeRefresh('.CWebUser::getRefresh().');'.
 			'timeControl.addObject("scrollbar", '.CJs::encodeJson($data['timeline']).', '.
 				CJs::encodeJson($data['timeControlData']).
 			');'.

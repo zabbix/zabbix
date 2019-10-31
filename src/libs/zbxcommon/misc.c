@@ -154,10 +154,10 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 void	zbx_timespec(zbx_timespec_t *ts)
 {
-	ZBX_THREAD_LOCAL static zbx_timespec_t	last_ts = {0, 0};
-	ZBX_THREAD_LOCAL static int		corr = 0;
+	static ZBX_THREAD_LOCAL zbx_timespec_t	last_ts = {0, 0};
+	static ZBX_THREAD_LOCAL int		corr = 0;
 #ifdef _WINDOWS
-	ZBX_THREAD_LOCAL static LARGE_INTEGER	tickPerSecond = {0};
+	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
 #else
 	struct timeval	tv;
@@ -182,7 +182,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 		if (TRUE == QueryPerformanceCounter(&tick))
 		{
-			ZBX_THREAD_LOCAL static LARGE_INTEGER	last_tick = {0};
+			static ZBX_THREAD_LOCAL LARGE_INTEGER	last_tick = {0};
 
 			if (0 < last_tick.QuadPart)
 			{
@@ -1055,7 +1055,7 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function recursively calls itself for each filter fragment. *
@@ -1179,7 +1179,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
  *             var_len - [IN] the maximum number of characters for a filter   *
  *                       variable (<from>, <to>, <step>)                      *
  *                                                                            *
- * Return value: SUCCEED - the fitler was successfully parsed                 *
+ * Return value: SUCCEED - the filter was successfully parsed                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if a filter already exists. This         *
@@ -2211,7 +2211,58 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 
 	return nextcheck;
 }
+/******************************************************************************
+ *                                                                            *
+ * Function: calculate_item_nextcheck_unreachable                             *
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for item on unreachable host        *
+ *                                                                            *
+ * Parameters: simple_interval  - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] preprocessed custom intervals          *
+ *             disable_until    - [IN] timestamp for next check               *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+		time_t disable_until)
+{
+	int	nextcheck = 0;
+	time_t	next_interval, tmax, scheduled_check = 0;
 
+	/* first try to parse out and calculate scheduled intervals */
+	if (NULL != custom_intervals)
+		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
+
+	/* Try to find the nearest 'nextcheck' value with condition */
+	/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
+	/* possible to check the item within a year, fail. */
+
+	nextcheck = disable_until;
+	tmax = disable_until + SEC_PER_YEAR;
+
+	if (NULL != custom_intervals)
+	{
+		while (nextcheck < tmax)
+		{
+			if (0 != get_current_delay(simple_interval, custom_intervals->flexible, nextcheck))
+				break;
+
+			/* find the flexible interval change */
+			if (FAIL == get_next_delay_interval(custom_intervals->flexible, nextcheck, &next_interval))
+			{
+				nextcheck = ZBX_JAN_2038;
+				break;
+			}
+			nextcheck = next_interval;
+		}
+	}
+
+	if (0 != scheduled_check && scheduled_check < nextcheck)
+		nextcheck = (int)scheduled_check;
+
+	return nextcheck;
+}
 /******************************************************************************
  *                                                                            *
  * Function: calculate_proxy_nextcheck                                        *
@@ -2754,36 +2805,6 @@ int	_wis_uint(const wchar_t *wide_string)
 	return SUCCEED;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Function: is_int_prefix                                                    *
- *                                                                            *
- * Purpose: check if the beginning of string is a signed integer              *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the beginning of string is a signed integer       *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- ******************************************************************************/
-int	is_int_prefix(const char *str)
-{
-	size_t	i = 0;
-
-	while (' ' == str[i])	/* trim left spaces */
-		i++;
-
-	if ('-' == str[i] || '+' == str[i])
-		i++;
-
-	if (0 == isdigit(str[i]))
-		return FAIL;
-
-	return SUCCEED;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -3712,3 +3733,36 @@ void	zbx_update_env(double time_now)
 #endif
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_agent_item_nextcheck                                  *
+ *                                                                            *
+ * Purpose: calculate item nextcheck for zabix agent type items               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, unsigned char state, int now,
+		int refresh_unsupported, int *nextcheck, char **error)
+{
+	if (ITEM_STATE_NORMAL == state)
+	{
+		int			simple_interval;
+		zbx_custom_interval_t	*custom_intervals;
+
+		if (SUCCEED != zbx_interval_preproc(delay, &simple_interval, &custom_intervals, error))
+		{
+			*nextcheck = ZBX_JAN_2038;
+			return FAIL;
+		}
+
+		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, simple_interval, custom_intervals, now);
+		zbx_custom_interval_free(custom_intervals);
+	}
+	else	/* for items notsupported for other reasons use refresh_unsupported interval */
+	{
+		*nextcheck = calculate_item_nextcheck(itemid, ITEM_TYPE_ZABBIX, refresh_unsupported, NULL, now);
+	}
+
+	return SUCCEED;
+}
+

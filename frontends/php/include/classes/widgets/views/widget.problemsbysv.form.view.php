@@ -71,6 +71,9 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_type']), CWidgetHelper:
 // Layout.
 $form_list->addRow(CWidgetHelper::getLabel($fields['layout']), CWidgetHelper::getRadioButtonList($fields['layout']));
 
+// Show operational data.
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_opdata']), CWidgetHelper::getRadioButtonList($fields['show_opdata']));
+
 // Show suppressed problems.
 $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 	CWidgetHelper::getCheckBox($fields['show_suppressed'])
@@ -80,11 +83,6 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_suppressed']),
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['hide_empty_groups']),
 	CWidgetHelper::getCheckBox($fields['hide_empty_groups'])
-);
-
-// Show latest values.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_latest_values']),
-	CWidgetHelper::getCheckBox($fields['show_latest_values'])
 );
 
 // Problem display.

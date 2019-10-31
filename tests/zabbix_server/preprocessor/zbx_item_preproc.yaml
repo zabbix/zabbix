@@ -1959,4 +1959,66 @@ in:
 out:
   return: FAIL
   error: custom error
+---
+test case: csv_to_json1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      sep=.
+      A.B.C
+      1.2.3
+  step:
+    type: ZBX_PREPROC_CSV_TO_JSON
+    params: "\n\n1"
+out:
+  return: SUCCEED
+  value: '[{"A":"1","B":"2","C":"3"},{"A":"","B":"","C":""}]'
+---
+test case: csv_to_json2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      sep=.
+      A.`B.``B`.C
+      1.`2`.`3.`
+  step:
+    type: ZBX_PREPROC_CSV_TO_JSON
+    params: "\n`\n1"
+out:
+  return: SUCCEED
+  value: '[{"A":"1","B.`B":"2","C":"3."},{"A":"","B.`B":"","C":""}]'
+---
+test case: csv_to_json3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 1,2,3
+  step:
+    type: ZBX_PREPROC_CSV_TO_JSON
+    params: "\n\n0"
+out:
+  return: SUCCEED
+  value: '[{"1":"1","2":"2","3":"3"}]'
+---
+test case: csv_to_json4
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      A,B,C
+      1,2,3,4
+  step:
+    type: ZBX_PREPROC_PROMETHEUS_TO_JSON
+    params: "\n\n1"
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
+out:
+  return: FAIL
+  error: custom error
 ...

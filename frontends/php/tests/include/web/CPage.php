@@ -53,13 +53,17 @@ class CPage {
 	 */
 	public function __construct() {
 		$options = new ChromeOptions();
-		$options->addArguments(['--no-sandbox', '--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT]);
+		$options->addArguments([
+			'--no-sandbox',
+			'--enable-font-antialiasing=false',
+			'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT
+		]);
 
 		$this->driver = RemoteWebDriver::create('http://localhost:4444/wd/hub',
 				DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options)
 		);
 
-		CElementQuery::setDriver($this->driver);
+		CElementQuery::setPage($this);
 	}
 
 	/**
@@ -200,11 +204,34 @@ class CPage {
 	}
 
 	/**
+	 * Set width and height of viewport.
+	 *
+	 * @param int $width
+	 * @param int $height
+	 */
+	protected function setViewport($width, $height) {
+		try {
+			CommandExecutor::executeCustom($this->driver, [
+				'cmd' => 'Emulation.setDeviceMetricsOverride',
+				'params' => [
+					'width'				=> $width,
+					'height'			=> $height,
+					'deviceScaleFactor'	=> 1,
+					'mobile'			=> false,
+					'fitWindow'			=> false
+				]
+			]);
+		} catch (Exception $exception) {
+			// Code is not missing here.
+		}
+	}
+
+	/**
 	 * Take screenshot of current page.
 	 *
 	 * @return string
 	 */
-	public function takeScreenshot() {
+	protected function takePageScreenshot() {
 		try {
 			if (!$this->driver->executeScript('return !!window.chrome;')) {
 				throw new Exception();
@@ -218,19 +245,36 @@ class CPage {
 			$height = (int)$this->driver->executeScript('return document.documentElement.getHeight();') - 1;
 
 			if ($height > self::DEFAULT_PAGE_HEIGHT) {
-				CommandExecutor::executeCustom($this->driver, [
-					'cmd' => 'Emulation.setVisibleSize',
-					'params' => [
-						'width' => self::DEFAULT_PAGE_WIDTH,
-						'height' => $height
-					]
-				]);
+				$this->setViewport(self::DEFAULT_PAGE_WIDTH, $height);
 			}
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
 
-		return $this->driver->takeScreenshot();
+		$screenshot = $this->driver->takeScreenshot();
+
+		if (isset($height) && $height > self::DEFAULT_PAGE_HEIGHT) {
+			$this->setViewport(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT);
+		}
+
+		return $screenshot;
+	}
+
+	/**
+	 * Take screenshot of current page or page element.
+	 *
+	 * @param CElement|null $element    page element to get screenshot of
+	 *
+	 * @return string
+	 */
+	public function takeScreenshot($element = null) {
+		$screenshot = $this->takePageScreenshot();
+
+		if ($element !== null) {
+			$screenshot = CImageHelper::getImageRegion($screenshot, $element->getRect());
+		}
+
+		return $screenshot;
 	}
 
 	/**
@@ -324,5 +368,14 @@ class CPage {
 	 */
 	public function query($type, $locator = null) {
 		return new CElementQuery($type, $locator);
+	}
+
+	/**
+	 * Get web driver instance.
+	 *
+	 * @return RemoteWebDriver
+	 */
+	public function getDriver() {
+		return $this->driver;
 	}
 }

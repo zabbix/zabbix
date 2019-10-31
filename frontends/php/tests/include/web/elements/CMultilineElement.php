@@ -121,6 +121,12 @@ class CMultilineElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return in_array('multilineinput-disabled', explode(' ', $this->getAttribute('class'))) !== $enabled;
+		$is_enabled = parent::isEnabled($enabled)
+				&& !array_intersect(
+					['multilineinput-disabled', 'multilineinput-readonly'],
+					explode(' ', $this->getAttribute('class'))
+				);
+
+		return $is_enabled === $enabled;
 	}
 }

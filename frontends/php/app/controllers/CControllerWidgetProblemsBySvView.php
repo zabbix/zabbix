@@ -48,7 +48,7 @@ class CControllerWidgetProblemsBySvView extends CControllerWidget {
 			'layout' => $fields['layout'],
 			'show_suppressed' => $fields['show_suppressed'],
 			'hide_empty_groups' => $fields['hide_empty_groups'],
-			'show_latest_values' => $fields['show_latest_values'],
+			'show_opdata' => $fields['show_opdata'],
 			'ext_ack' => $fields['ext_ack'],
 			'show_timeline' => $fields['show_timeline']
 		];

@@ -116,7 +116,18 @@ $scripts[] =
 			'onRightYChange();'.
 		'}'.
 
-		'data.fields = JSON.stringify($form.serializeJSON());'.
+		'var form_fields = $form.serializeJSON();'.
+		'if ("ds" in form_fields) {'.
+			'for (var i in form_fields.ds) {'.
+				'form_fields.ds[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.ds[i]);'.
+			'}'.
+		'}'.
+		'if ("or" in form_fields) {'.
+			'for (var i in form_fields.or) {'.
+				'form_fields.or[i] = jQuery.extend({"hosts":[], "items":[]}, form_fields.or[i]);'.
+			'}'.
+		'}'.
+		'data.fields = JSON.stringify(form_fields);'.
 
 		'jQuery.ajax({'.
 			'url: url.getUrl(),'.
@@ -133,8 +144,7 @@ $scripts[] =
 				'}'.
 			'}'.
 		'});'.
-	'}'.
-	'onGraphConfigChange();';
+	'}';
 
 $scripts[] =
 	/**
@@ -147,11 +157,20 @@ $scripts[] =
 	'function updateVariableOrder(obj, row_selector, var_prefix) {'.
 		'jQuery.each([10000, 0], function(index, value) {'.
 			'jQuery(row_selector, obj).each(function(i) {'.
+				'jQuery(".multiselect[data-params]", this).each(function() {'.
+					'var name = jQuery(this).multiSelect("getOption", "name");'.
+					'if (name !== null) {'.
+						'jQuery(this).multiSelect("modify", {'.
+							'name: name.replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
+						'});'.
+					'}'.
+				'});'.
+
 				'jQuery(\'[name^="\' + var_prefix + \'["]\', this).filter(function() {'.
-					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z]+\]/);'.
+					'return jQuery(this).attr("name").match(/[a-z]+\[\d+\]\[[a-z_]+\]/);'.
 				'}).each(function() {'.
 					'jQuery(this).attr("name", '.
-						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z]+\])/, "$1" + (value + i) + "$2")'.
+						'jQuery(this).attr("name").replace(/([a-z]+\[)\d+(\]\[[a-z_]+\])/, "$1" + (value + i) + "$2")'.
 					');'.
 				'});'.
 			'});'.
@@ -224,7 +243,7 @@ $tab_problems = (new CFormList())
 		CWidgetHelper::getCheckBox($fields['graph_item_problems'])
 	)
 	->addRow(CWidgetHelper::getLabel($fields['problemhosts']),
-		CWidgetHelper::getHostsPatternTextBox($fields['problemhosts'], $form_name)
+		CWidgetHelper::getHostPatternSelect($fields['problemhosts'], $form_name)
 	)
 	->addRow(CWidgetHelper::getLabel($fields['severities']),
 		CWidgetHelper::getSeverities($fields['severities'], $data['config'])
@@ -233,7 +252,7 @@ $tab_problems = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']))
 	->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
 
-$scripts[] = 'jQuery("#problemhosts").autoGrowTextarea({maxHeight: 100});';
+$scripts[] = $fields['problemhosts']->getJavascript();
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
@@ -261,7 +280,8 @@ $form_tabs = (new CTabView())
 $form->addItem($form_tabs);
 $scripts[] = $form_tabs->makeJavascript();
 
-$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, textarea, select", onGraphConfigChange);';
+$scripts[] = 'jQuery("#'.$form_tabs->getId().'").on("change", "input, select, .multiselect", onGraphConfigChange);';
+$scripts[] = 'onGraphConfigChange();';
 
 return [
 	'form' => $form,
