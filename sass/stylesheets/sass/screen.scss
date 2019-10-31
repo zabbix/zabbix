@@ -6242,6 +6242,21 @@ a.overlay-close-btn {
 	background: $action-preloader-bg-color;
 }
 
+button.is-loading::after {
+	background: none;
+	box-shadow: none;
+	width: 15px;
+	height: 15px;
+}
+
+button.is-loading::before {
+	background: none;
+}
+
+button.is-loading {
+	position: relative;
+}
+
 @keyframes load {
 	to { @include rotate(360); }
 }

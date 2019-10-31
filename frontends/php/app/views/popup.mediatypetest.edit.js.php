@@ -37,17 +37,7 @@ function mediatypeTestSend(formname) {
 
 	$form_fields.prop('disabled', true);
 
-	jQuery('<span></span>')
-		.addClass('is-loading')
-		.insertAfter($submit_btn)
-		.css({
-			'position': 'relative',
-			'margin-right': '30px'
-		});
-
-	$submit_btn
-		.prop('disabled', true)
-		.hide();
+	$submit_btn.prop('disabled', true).addClass('is-loading');
 
 	jQuery.ajax({
 		url: url.getUrl(),
@@ -61,14 +51,11 @@ function mediatypeTestSend(formname) {
 			}
 
 			$form_fields.prop('disabled', false);
-
-			jQuery('.is-loading').remove();
-			$submit_btn
-				.prop('disabled', false)
-				.show();
+			$submit_btn.prop('disabled', false).removeClass('is-loading');
 		},
 		error: function(request, status, error) {
 			if (request.status == 200) {
+				$submit_btn.prop('disabled', false).removeClass('is-loading');
 				alert(error);
 			}
 			else if (window.document.forms[formname]) {

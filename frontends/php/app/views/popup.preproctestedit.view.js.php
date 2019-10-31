@@ -69,17 +69,7 @@ function itemPreprocessingTest(form) {
 				jQuery('#prev_value, #prev_time').prop('disabled', true);
 			}
 
-			jQuery('<span>')
-				.addClass('is-loading')
-				.insertAfter(jQuery('.submit-test-btn'))
-				.css({
-					'position': 'relative',
-					'margin-right': '30px'
-				});
-
-			jQuery('.submit-test-btn')
-				.prop('disabled', true)
-				.hide();
+			jQuery('.submit-test-btn').prop('disabled', true).addClass('is-loading');
 
 			// Clean previous results.
 			jQuery('[id^="preproc-test-step-"][id$="-result"]').empty();
@@ -116,10 +106,7 @@ function itemPreprocessingTest(form) {
 				jQuery('#prev_value, #prev_time').prop('disabled', false);
 			}
 
-			jQuery('.is-loading').remove();
-			jQuery('.submit-test-btn')
-				.prop('disabled', false)
-				.show();
+			jQuery('.submit-test-btn').prop('disabled', false).removeClass('is-loading');
 		},
 		dataType: 'json',
 		type: 'post'

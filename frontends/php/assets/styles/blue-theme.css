@@ -4336,7 +4336,23 @@ td[class] + td.disaster-bg {
   display: flex;
   align-items: center;
   margin: 0;
-  z-index: 1010; }
+  z-index: 1010;
+  padding: 7px; }
+
+.is-loading.menu-popup-preloader::before {
+  background: #ebeef0; }
+
+button.is-loading::after {
+  background: none;
+  box-shadow: none;
+  width: 15px;
+  height: 15px; }
+
+button.is-loading::before {
+  background: none; }
+
+button.is-loading {
+  position: relative; }
 
 @keyframes load {
   to {
