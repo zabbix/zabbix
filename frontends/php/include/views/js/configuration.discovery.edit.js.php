@@ -329,7 +329,13 @@
 	 *
 	 * @param {string} form_name  Form name that is sent to the server for validation.
 	 */
+	var submit_dcheck_lock = false;
 	function submitDCheck(form_name) {
+		if (submit_dcheck_lock) {
+			return false;
+		}
+		submit_dcheck_lock = true;
+
 		var $form = jQuery(document.forms['dcheck_form']),
 			data = $form
 				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
@@ -338,24 +344,24 @@
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
 
-		$form
-			.parent()
-			.find(".<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>")
-			.remove();
+		if (!dialogueid) {
+			return false;
+		}
 
-		sendAjaxData('zabbix.php', {
+		return sendAjaxData('zabbix.php', {
 			data: data,
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
+			$form
+				.parent()
+				.find(".<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>")
+				.remove();
+
 			if (typeof response.errors !== 'undefined') {
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				if (validateDCheckDuplicate()) {
-					return false;
-				}
-
 				var dcheck = response.params;
 
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
@@ -367,8 +373,14 @@
 				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_DNS ?>';
 				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
+				if (validateDCheckDuplicate()) {
+					return false;
+				}
+
 				addPopupValues([dcheck]);
 				overlayDialogueDestroy(dialogueid);
+
+				submit_dcheck_lock = false;
 			}
 		});
 	}
