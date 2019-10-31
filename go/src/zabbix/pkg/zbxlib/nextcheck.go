@@ -47,7 +47,7 @@ func GetNextcheck(itemid uint64, delay string, from time.Time, unsupported bool,
 		state = ItemStateNormal
 	}
 	now := from.Unix()
-	ret := C.zbx_get_agent_item_nextcheck(C.ulong(itemid), cdelay, C.uchar(state), C.int(now),
+	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.uchar(state), C.int(now),
 		C.int(refresh_unsupported), &cnextcheck, &cerr)
 
 	if ret != Succeed {

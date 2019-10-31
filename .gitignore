@@ -110,6 +110,7 @@ tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
+tests/libs/zbxcommon/zbx_str_extract
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_trim_float
 tests/libs/zbxcommon/zbx_trim_integer
@@ -128,6 +129,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
+tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_open_path

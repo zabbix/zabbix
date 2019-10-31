@@ -892,6 +892,31 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 }
 
 /**
+ * Return SQL for COALESCE like select. For fields with type NCHAR, NVARCHAR or NTEXT in Oracle NVL should be used
+ * instead of COALESCE because it will not check that all arguments have same type.
+ *
+ * @param string     $field_name       Field name to be used in returned query part.
+ * @param int|string $default_value    Default value to be returned.
+ * @param string     $alias            Alias to be used in 'AS' query part.
+ * @return string
+ */
+function dbConditionCoalesce($field_name, $default_value, $alias = '') {
+	global $DB;
+
+	if (is_string($default_value)) {
+		$default_value = ($default_value == '') ? '\'\'' : zbx_dbstr($default_value);
+	}
+
+	$query = (($DB['TYPE'] == ZBX_DB_ORACLE) ? 'NVL(' : 'COALESCE(').$field_name.','.$default_value.')';
+
+	if ($alias) {
+		$query .= ' AS '.$alias;
+	}
+
+	return $query;
+}
+
+/**
  * Transform DB cursor to array.
  *
  * @return array

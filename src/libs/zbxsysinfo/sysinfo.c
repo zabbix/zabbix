@@ -469,7 +469,7 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 
 	for (c = suppressed_chars; '\0' != *c; c++)
 	{
-		if (NULL == strchr(param, *c))
+		if (NULL == param || NULL == strchr(param, *c))
 			continue;
 
 		buf = (char *)zbx_malloc(buf, buf_alloc);

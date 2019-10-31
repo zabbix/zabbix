@@ -40,6 +40,43 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 	 */
 	public static function getLLDPreprocessingCreateData() {
 		return [
+			// Structured data. CSV to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON empty parameters',
+						'Key' => 'csv-to-json-empty-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON with default parameters',
+						'Key' => 'csv-to-json-with-default-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON', 'parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => true]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'CSV to JSON custom parameters',
+						'Key' => 'csv-to-json-custom-parameters'
+					],
+					'preprocessing' => [
+						['type' => 'CSV to JSON', 'parameter_1' => ' ', 'parameter_2' => "'", 'parameter_3' => false]
+					]
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -65,6 +102,7 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 					],
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
@@ -83,6 +121,8 @@ class testFormLowLevelDiscoveryPreprocessing extends testFormPreprocessing {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => 'expression1', 'parameter_2' => '\1'],
 						['type' => 'Regular expression', 'parameter_1' => 'expression2', 'parameter_2' => '\2'],
+						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
+						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test1'],
 						['type' => 'JSONPath', 'parameter_1' => '$.data.test2'],
 						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern1'],

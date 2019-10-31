@@ -674,7 +674,7 @@ class testPageOverview extends CLegacyWebTest {
 						'triggers.php?form=update&triggerid',
 						'action=showgraph&itemid'
 					],
-					'links_text' => ['Problems', 'Acknowledge', 'Configuration', '1_item']
+					'links_text' => ['Problems', 'Acknowledge', 'Configuration', 'Trigger URL', '1_item']
 				]
 			],
 			[

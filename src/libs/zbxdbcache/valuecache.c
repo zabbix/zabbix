@@ -1847,8 +1847,11 @@ static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_re
 			if (FAIL == vch_item_add_chunk(item, nslots, item->tail))
 				goto out;
 
-			item->tail->last_value = nslots - 1;
-			item->tail->first_value = nslots;
+			if (NULL != item->tail)
+			{
+				item->tail->last_value = nslots - 1;
+				item->tail->first_value = nslots;
+			}
 		}
 
 		/* copy values to chunk */

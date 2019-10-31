@@ -112,82 +112,9 @@ import (
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {
-	var cfunc unsafe.Pointer
-	switch key {
-	case "system.localtime":
-		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "net.dns":
-		cfunc = unsafe.Pointer(C.NET_DNS)
-	case "net.dns.record":
-		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
-	case "proc.mem":
-		cfunc = unsafe.Pointer(C.PROC_MEM)
-	case "proc.num":
-		cfunc = unsafe.Pointer(C.PROC_NUM)
-	case "system.boottime":
-		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
-	case "web.page.get":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_GET)
-	case "web.page.perf":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_PERF)
-	case "web.page.regexp":
-		cfunc = unsafe.Pointer(C.WEB_PAGE_REGEXP)
-	case "net.tcp.listen":
-		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
-	case "net.tcp.port":
-		cfunc = unsafe.Pointer(C.NET_TCP_PORT)
-	case "net.tcp.service", "net.udp.service":
-		cfunc = unsafe.Pointer(C.CHECK_SERVICE)
-	case "net.tcp.service.perf", "net.udp.service.perf":
-		cfunc = unsafe.Pointer(C.CHECK_SERVICE_PERF)
-	case "net.udp.listen":
-		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
-	case "sensor":
-		cfunc = unsafe.Pointer(C.GET_SENSOR)
-	case "system.cpu.load":
-		cfunc = unsafe.Pointer(C.SYSTEM_CPU_LOAD)
-	case "system.cpu.switches":
-		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
-	case "system.cpu.intr":
-		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
-	case "system.hw.chassis":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_CHASSIS)
-	case "system.hw.cpu":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_CPU)
-	case "system.hw.devices":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_DEVICES)
-	case "system.hw.macaddr":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
-	case "system.sw.os":
-		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
-	case "system.sw.packages":
-		cfunc = unsafe.Pointer(C.SYSTEM_SW_PACKAGES)
-	case "system.swap.in":
-		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
-	case "system.swap.out":
-		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
-	case "system.swap.size":
-		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_SIZE)
-	case "system.users.num":
-		cfunc = unsafe.Pointer(C.SYSTEM_USERS_NUM)
-	case "vfs.dir.count":
-		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
-	case "vfs.dir.size":
-		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
-	case "vfs.file.md5sum":
-		cfunc = unsafe.Pointer(C.VFS_FILE_MD5SUM)
-	case "vfs.file.regmatch":
-		cfunc = unsafe.Pointer(C.VFS_FILE_REGMATCH)
-	case "vfs.fs.discovery":
-		cfunc = unsafe.Pointer(C.VFS_FS_DISCOVERY)
-	case "vfs.fs.inode":
-		cfunc = unsafe.Pointer(C.VFS_FS_INODE)
-	case "vfs.fs.size":
-		cfunc = unsafe.Pointer(C.VFS_FS_SIZE)
-	case "vm.memory.size":
-		cfunc = unsafe.Pointer(C.VM_MEMORY_SIZE)
+	cfunc := resolveMetric(key)
 
-	default:
+	if cfunc == nil {
 		return nil, fmt.Errorf("Unsupported metric %s", key)
 	}
 

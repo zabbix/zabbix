@@ -955,7 +955,7 @@ output {
 .timeline-dot::after, .timeline-dot-big::after {
   content: '';
   position: absolute;
-  z-index: 100;
+  z-index: 1;
   display: block;
   width: 4px;
   height: 4px;
@@ -2423,6 +2423,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-widget-content {
   flex-grow: 1;
   margin-top: 2rem;
+  box-sizing: border-box;
+  height: calc(100% - 2rem);
   padding-bottom: 8px;
   overflow: auto;
   border: 1px solid #444;
@@ -2455,6 +2457,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   transition: height .3s, margin-top .3s, box-shadow .3s; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
+  height: 100%;
   padding-top: 8px; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head {
   height: 2rem;

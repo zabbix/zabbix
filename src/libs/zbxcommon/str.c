@@ -3362,6 +3362,122 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_token_parse_macro_segment                                    *
+ *                                                                            *
+ * Purpose: parses macro name segment                                         *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             segment    - [IN] the segment start                            *
+ *             strict     - [OUT] 1 - macro contains only standard characters *
+ *                                    (upper case alphanumeric characters,    *
+ *                                     dots and underscores)                  *
+ *                                0 - the last segment contains lowercase or  *
+ *                                    quoted characters                       *
+ *             next       - [OUT] offset of the next character after the      *
+ *                                segment                                     *
+ *                                                                            *
+ * Return value: SUCCEED - the segment was parsed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_macro_segment(const char *expression, const char *segment, int *strict, int *next)
+{
+	const char	*ptr = segment;
+
+	if ('"' != *ptr)
+	{
+		for (*strict = 1; '\0' != *ptr; ptr++)
+		{
+			if (0 != isalpha((unsigned char)*ptr))
+			{
+				if (0 == isupper((unsigned char)*ptr))
+					*strict = 0;
+				continue;
+			}
+
+			if (0 != isdigit((unsigned char)*ptr))
+				continue;
+
+			if ('_' == *ptr)
+				continue;
+
+			break;
+		}
+
+		/* check for empty segment */
+		if (ptr == segment)
+			return FAIL;
+
+		*next = ptr - expression;
+	}
+	else
+	{
+		for (*strict = 0, ptr++; '"' != *ptr; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
+
+			if ('\\' == *ptr)
+			{
+				ptr++;
+				if ('\\' != *ptr && '"' != *ptr)
+					return FAIL;
+			}
+		}
+
+		/* check for empty segment */
+		if (1 == ptr - segment)
+			return FAIL;
+
+		*next = ptr - expression + 1;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_macro_name                                       *
+ *                                                                            *
+ * Purpose: parses macro name                                                 *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             ptr        - [IN] the beginning of macro name                  *
+ *             loc        - [OUT] the macro name location                     *
+ *                                                                            *
+ * Return value: SUCCEED - the simple macro was parsed successfully           *
+ *               FAIL    - macro does not point at valid macro                *
+ *                                                                            *
+ * Comments: Note that the character following macro name must be inspected   *
+ *           to draw any conclusions. For example for normal macros it must   *
+ *           be '}' or it's not a valid macro.                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_macro_name(const char *expression, const char *ptr, zbx_strloc_t *loc)
+{
+	int	strict, offset, ret;
+
+	loc->l = ptr - expression;
+
+	while (SUCCEED == (ret = zbx_token_parse_macro_segment(expression, ptr, &strict, &offset)))
+	{
+		if (0 == strict && expression + loc->l == ptr)
+			return FAIL;
+
+		ptr = expression + offset;
+
+		if ('.' != *ptr || 0 == strict)
+		{
+			loc->r = ptr - expression - 1;
+			break;
+		}
+		ptr++;
+	}
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_macro                                            *
  *                                                                            *
  * Purpose: parses normal macro token                                         *
@@ -3380,35 +3496,23 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
  ******************************************************************************/
 static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
-	const char		*ptr;
-	size_t			offset;
+	zbx_strloc_t		loc;
 	zbx_token_macro_t	*data;
 
-	/* find the end of simple macro by validating its name until the closing bracket } */
-	for (ptr = macro + 1; '}' != *ptr; ptr++)
-	{
-		if ('\0' == *ptr)
-			return FAIL;
-
-		if (SUCCEED != is_macro_char(*ptr))
-			return FAIL;
-	}
-
-	/* empty macro name */
-	if (1 == ptr - macro)
+	if (SUCCEED != zbx_token_parse_macro_name(expression, macro + 1, &loc))
 		return FAIL;
 
-	offset = macro - expression;
+	if ('}' != expression[loc.r + 1])
+		return FAIL;
 
 	/* initialize token */
 	token->type = ZBX_TOKEN_MACRO;
-	token->loc.l = offset;
-	token->loc.r = offset + (ptr - macro);
+	token->loc.l = loc.l - 1;
+	token->loc.r = loc.r + 1;
 
 	/* initialize token data */
 	data = &token->data.macro;
-	data->name.l = offset + 1;
-	data->name.r = token->loc.r - 1;
+	data->name = loc;
 
 	return SUCCEED;
 }
@@ -3674,26 +3778,35 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
 static int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
 	const char	*ptr;
-	int		macro_offset;
 
 	if ('#' == macro[2])
-		macro_offset = 3;
-	else
-		macro_offset = 2;
-
-	/* find the end of the nested macro by validating its name until the closing bracket } */
-	for (ptr = macro + macro_offset; '}' != *ptr; ptr++)
 	{
-		if ('\0' == *ptr)
-			return FAIL;
+		/* find the end of the nested macro by validating its name until the closing bracket '}' */
+		for (ptr = macro + 3; '}' != *ptr; ptr++)
+		{
+			if ('\0' == *ptr)
+				return FAIL;
 
-		if (SUCCEED != is_macro_char(*ptr))
+			if (SUCCEED != is_macro_char(*ptr))
+				return FAIL;
+		}
+
+		/* empty macro name */
+		if (3 == ptr - macro)
 			return FAIL;
 	}
+	else
+	{
+		zbx_strloc_t	loc;
 
-	/* empty macro name */
-	if (macro_offset == ptr - macro)
-		return FAIL;
+		if (SUCCEED != zbx_token_parse_macro_name(expression, macro + 2, &loc))
+			return FAIL;
+
+		if ('}' != expression[loc.r + 1])
+			return FAIL;
+
+		ptr = expression + loc.r + 1;
+	}
 
 	/* Determine the token type.                                                   */
 	/* Nested macros formats:                                                      */
@@ -5090,6 +5203,7 @@ void	zbx_trim_float(char *str)
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
  *               otherwise -1                                                 *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_get_component_version(char *value)
 {
@@ -5104,4 +5218,74 @@ int	zbx_get_component_version(char *value)
 		*ptr = '\0';
 
 	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_str_extract                                                  *
+ *                                                                            *
+ * Purpose: extracts value from a string, unquoting if necessary              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    text  - [IN] the text containing value to extract                       *
+ *    len   - [IN] length (in bytes) of the value to extract.                 *
+ *            It can be 0. It must not exceed length of 'text' string.        *
+ *    value - [OUT] the extracted value                                       *
+ *                                                                            *
+ * Return value: SUCCEED - the value was extracted successfully               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: When unquoting value only " and \ character escapes are accepted.*
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_str_extract(const char *text, size_t len, char **value)
+{
+	char		*tmp, *out;
+	const char	*in;
+
+	tmp = zbx_malloc(NULL, len + 1);
+
+	if (0 == len)
+	{
+		*tmp = '\0';
+		*value = tmp;
+		return SUCCEED;
+	}
+
+	if ('"' != *text)
+	{
+		memcpy(tmp, text, len);
+		tmp[len] = '\0';
+		*value = tmp;
+		return SUCCEED;
+	}
+
+	if (2 > len)
+		goto fail;
+
+	for (out = tmp, in = text + 1; '"' != *in; in++)
+	{
+		if ((size_t)(in - text) >= len - 1)
+			goto fail;
+
+		if ('\\' == *in)
+		{
+			if ((size_t)(++in - text) >= len - 1)
+				goto fail;
+
+			if ('"' != *in && '\\' != *in)
+				goto fail;
+		}
+		*out++ = *in;
+	}
+
+	if ((size_t)(in - text) != len - 1)
+		goto fail;
+
+	*out = '\0';
+	*value = tmp;
+	return SUCCEED;
+fail:
+	zbx_free(tmp);
+	return FAIL;
 }

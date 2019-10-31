@@ -1464,7 +1464,7 @@ output {
 %timeline-dot {
 	content: '';
 	position: absolute;
-	z-index: 100;
+	z-index: 1;
 	display: block;
 	width: 4px;
 	height: 4px;
@@ -3544,6 +3544,8 @@ $form-icon-btn: (
 .dashbrd-grid-widget-content {
 	flex-grow: 1;
 	margin-top: 2rem;
+	box-sizing: border-box;
+	height: calc(100% - 2rem);
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
@@ -3604,6 +3606,7 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-content {
 			margin-top: 0;
+			height: 100%;
 			padding-top: 8px;
 		}
 
@@ -7485,7 +7488,6 @@ table.preprocessing-test-results {
 		background: $host-avail-total-bg-color;
 	}
 }
-
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
