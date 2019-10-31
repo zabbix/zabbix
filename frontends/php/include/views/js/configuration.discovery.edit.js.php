@@ -85,11 +85,6 @@
 
 			jQuery('#dcheckListFooter').before(new Template(jQuery('#dcheck-row-tmpl').html()).evaluate(value));
 
-			value.host_source = jQuery('[name=host_source]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_DNS ?>';
-			value.name_source = jQuery('[name=name_source]:checked:not([data-id])').val()
-					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
-
 			for (var field_name in value) {
 				if (value.hasOwnProperty(field_name)) {
 					var $input = jQuery('<input>', {
