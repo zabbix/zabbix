@@ -143,7 +143,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
 		$trigger['opdata'],
-		$expression,
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$data['tags'][$triggerid]
 	]);

@@ -222,7 +222,7 @@ foreach ($data['items'] as $item) {
 		($data['hostid'] == 0) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
-		CHtml::encode($item['key_']),
+		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],

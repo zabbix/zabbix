@@ -317,7 +317,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$hosts,
 		$description,
 		$trigger['opdata'],
-		$expression,
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]
