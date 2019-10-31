@@ -28,7 +28,7 @@ function submitConditionPopup(response) {
 		form_param = response.form.param,
 		input_name = response.form.input_name,
 		inputs = response.inputs,
-		cond_dialogueid = jQuery(document.forms["popup.condition"])
+		cond_dialogueid = jQuery(document.forms['popup.condition'])
 			.closest('[data-dialogueid]')
 			.data('dialogueid'),
 		opr_dialogueid = jQuery(document.forms['popup.operation'])
@@ -81,10 +81,7 @@ function validateConditionPopup() {
 			type: "post"
 		})
 		.done(function(response) {
-			$form
-				.parent()
-				.find(".msg-bad")
-				.remove();
+			$form.parent().find('.msg-bad').remove();
 
 			if (typeof response.errors !== "undefined") {
 				return jQuery(response.errors).insertBefore($form);
