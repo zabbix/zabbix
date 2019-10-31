@@ -574,7 +574,7 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading threshold sensor", (unsigned int)err);
-		h->ret = NETWORK_ERROR;
+		h->ret = NOTSUPPORTED;
 		goto out;
 	}
 
@@ -906,7 +906,7 @@ static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *va
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while reading control", (unsigned int)err);
-		h->ret = NETWORK_ERROR;
+		h->ret = NOTSUPPORTED;
 		goto out;
 	}
 
@@ -960,7 +960,7 @@ static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *c
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fail: %s", __function_name, zbx_strerror(err));
 
 		h->err = zbx_dsprintf(h->err, "error 0x%x while set control", (unsigned int)err);
-		h->ret = NETWORK_ERROR;
+		h->ret = NOTSUPPORTED;
 		h->done = 1;
 		return;
 	}

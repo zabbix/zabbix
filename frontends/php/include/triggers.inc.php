@@ -659,7 +659,6 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @param array  $groupids
  * @param string $application
- * @param int    $style                               Table display style: either hosts on top or on the left.
  * @param array  $host_options
  * @param array  $trigger_options
  * @param array  $problem_options
@@ -669,8 +668,8 @@ function replace_template_dependencies($deps, $hostid) {
  *
  * @return array
  */
-function getTriggersOverviewData(array $groupids, $application, $style, array $host_options = [],
-		array $trigger_options = [], array $problem_options = []) {
+function getTriggersOverviewData(array $groupids, $application, array $host_options = [], array $trigger_options = [],
+		array $problem_options = []) {
 	$problem_options += [
 		'min_severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE,
@@ -738,52 +737,87 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	$triggers = API::Trigger()->get($trigger_options);
 	CArrayHelper::sort($triggers, ['description']);
 
-	$problem_triggerids = [];
+	if ($triggers) {
+		$problem_stats = [];
 
-	foreach ($triggers as $triggerid => &$trigger) {
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE
-				|| (array_key_exists('only_true', $trigger_options) && $trigger_options['only_true'])) {
-			$problem_triggerids[] = $triggerid;
+		foreach ($triggers as $triggerid => &$trigger) {
 			$trigger['priority'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-		}
-	}
-	unset($trigger);
+			$trigger['resolved'] = true;
 
-	if ($problem_triggerids) {
+			$problem_stats[$triggerid] = [
+				'has_resolved' => false,
+				'has_unresolved' => false,
+				'has_resolved_unacknowledged' => false,
+				'has_unresolved_unacknowledged' => false
+			];
+		}
+		unset($trigger);
+
 		$problems = API::Problem()->get([
-			'output' => ['eventid', 'acknowledged', 'objectid', 'severity'],
-			'objectids' => $problem_triggerids,
+			'output' => ['eventid', 'acknowledged', 'objectid', 'severity', 'r_eventid'],
+			'objectids' => array_keys($triggers),
 			'suppressed' => ($problem_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from']
 		]);
 
-		$objectids = [];
-
 		foreach ($problems as $problem) {
-			if ($triggers[$problem['objectid']]['priority'] < $problem['severity']) {
-				$triggers[$problem['objectid']]['priority'] = $problem['severity'];
-				$triggers[$problem['objectid']]['problem']['eventid'] = $problem['eventid'];
-				$triggers[$problem['objectid']]['problem']['acknowledged'] = $problem['acknowledged'];
+			$triggerid = $problem['objectid'];
+
+			if ($problem['r_eventid'] == 0) {
+				$triggers[$triggerid]['resolved'] = false;
 			}
-			$objectids[$problem['objectid']] = true;
+
+			$triggers[$triggerid]['problem']['eventid'] = $problem['eventid'];
+
+			if ($triggers[$triggerid]['priority'] < $problem['severity']) {
+				$triggers[$triggerid]['priority'] = $problem['severity'];
+			}
+
+			if ($problem['r_eventid'] == 0) {
+				$problem_stats[$triggerid]['has_unresolved'] = true;
+				if ($problem['acknowledged'] == 0 && $problem['severity'] >= $problem_options['min_severity']) {
+					$problem_stats[$triggerid]['has_unresolved_unacknowledged'] = true;
+				}
+			}
+			else {
+				$problem_stats[$triggerid]['has_resolved'] = true;
+				if ($problem['acknowledged'] == 0 && $problem['severity'] >= $problem_options['min_severity']) {
+					$problem_stats[$triggerid]['has_resolved_unacknowledged'] = true;
+				}
+			}
 		}
 
-		foreach ($triggers as $triggerid => $trigger) {
-			if (array_key_exists($triggerid, $objectids) && $trigger['priority'] >= $problem_options['min_severity']) {
+		foreach ($triggers as $triggerid => &$trigger) {
+			$stats = $problem_stats[$triggerid];
+
+			$trigger['problem']['acknowledged'] = (
+				// Trigger has only resolved problems, all acknowledged.
+				($stats['has_resolved'] && !$stats['has_resolved_unacknowledged'] && !$stats['has_unresolved'])
+					// Trigger has unresolved problems, all acknowledged.
+					|| ($stats['has_unresolved'] && !$stats['has_unresolved_unacknowledged'])
+			) ? 1 : 0;
+
+			$trigger['value'] = ($triggers[$triggerid]['resolved'] === true)
+				? TRIGGER_VALUE_FALSE
+				: TRIGGER_VALUE_TRUE;
+
+			if (($stats['has_resolved'] || $stats['has_unresolved'])
+					&& $trigger['priority'] >= $problem_options['min_severity']) {
 				continue;
 			}
 
 			if (!array_key_exists('only_true', $trigger_options)
 					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
 				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
-				$triggers[$triggerid]['value'] = TRIGGER_VALUE_FALSE;
+				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 			else {
 				unset($triggers[$triggerid]);
 			}
 		}
+		unset($trigger);
 	}
 
 	return $triggers;
@@ -850,11 +884,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority']
+				'priority' => $trigger['priority'],
+				'problem' => $trigger['problem']
 			];
-			if (array_key_exists('problem', $trigger)) {
-				$trigger_data['problem'] = $trigger['problem'];
-			}
 
 			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = $trigger_data;
 			$trcounter[$host['name']][$trigger_name]++;
@@ -956,16 +988,12 @@ function getTriggerOverviewCells($trigger, $dependencies, $pageFile, $screenid =
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$ack = null;
+			$eventid = $trigger['problem']['eventid'];
+			$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
+		}
 
-			if (array_key_exists('problem', $trigger)) {
-				$eventid = $trigger['problem']['eventid'];
-				$acknowledge = ['backurl' => ($screenid !== null) ? $pageFile.'?screenid='.$screenid : $pageFile];
-
-				if ($trigger['problem']['acknowledged'] == 1) {
-					$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
-				}
-			}
+		if ($trigger['problem']['acknowledged'] == 1) {
+			$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 		}
 
 		$desc = array_key_exists($trigger['triggerid'], $dependencies)
@@ -1941,7 +1969,7 @@ function get_item_function_info($expr) {
 	}
 
 	switch (true) {
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_0or1[0],
@@ -1949,8 +1977,8 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)):
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO)):
 			$result = [
 				'type' => T_ZBX_STR,
 				'value_type' => $rule_float[0],
@@ -1958,7 +1986,7 @@ function get_item_function_info($expr) {
 			];
 			break;
 
-		case ($expression->hasTokenOfType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
+		case ($expression->hasTokenOfType(CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO)):
 			$expr_part = reset($expr_data->expressions);
 
 			if (!array_key_exists($expr_part['functionName'], $functions)) {
@@ -2067,14 +2095,14 @@ function evalExpressionData($expression, $replaceFunctionMacros) {
 		$value = $token['value'];
 
 		switch ($token['type']) {
-			case CTriggerExpressionParserResult::TOKEN_TYPE_OPERATOR:
+			case CTriggerExprParserResult::TOKEN_TYPE_OPERATOR:
 				// replace specific operators with their PHP analogues
 				if (isset($replaceOperators[$token['value']])) {
 					$value = $replaceOperators[$token['value']];
 				}
 
 				break;
-			case CTriggerExpressionParserResult::TOKEN_TYPE_NUMBER:
+			case CTriggerExprParserResult::TOKEN_TYPE_NUMBER:
 				// convert numeric values with suffixes
 				if ($token['data']['suffix'] !== null) {
 					$value = convert($value);
@@ -2610,35 +2638,6 @@ function isReadableTriggers(array $triggerids) {
 		'triggerids' => $triggerids,
 		'countOutput' => true
 	]);
-}
-
-/**
- * Get last problems by given trigger IDs.
- *
- * @param array $triggerids
- * @param array $output         List of output fields.
- *
- * @return array
- */
-function getTriggerLastProblems(array $triggerids, array $output) {
-	$problems = DBfetchArray(DBselect(
-		'SELECT '.implode(',e.', $output).
-		' FROM events e'.
-		' JOIN ('.
-			'SELECT e2.source,e2.object,e2.objectid,MAX(clock) AS clock'.
-			' FROM events e2'.
-			' WHERE e2.source='.EVENT_SOURCE_TRIGGERS.
-				' AND e2.object='.EVENT_OBJECT_TRIGGER.
-				' AND e2.value='.TRIGGER_VALUE_TRUE.
-				' AND '.dbConditionInt('e2.objectid', $triggerids).
-			' GROUP BY e2.source,e2.object,e2.objectid'.
-		') e3 ON e3.source=e.source'.
-			' AND e3.object=e.object'.
-			' AND e3.objectid=e.objectid'.
-			' AND e3.clock=e.clock'
-	));
-
-	return $problems;
 }
 
 /**

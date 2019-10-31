@@ -2394,7 +2394,8 @@ cancel_warning:
 
 			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK))
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck="
+						"case when r_eventid is null then %d else 0 end", separator,
 						diff->nextcheck);
 				separator = ',';
 

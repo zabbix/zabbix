@@ -28,6 +28,48 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CMultiselectElement extends CElement {
 
 	/**
+	 * Multiselect fill modes.
+	 */
+	const MODE_SELECT	= 0;
+	const MODE_TYPE		= 1;
+
+	protected static $default_mode = self::MODE_TYPE;
+	protected $mode;
+
+	/**
+	 * @inheritdoc
+	 */
+	public function __construct(RemoteWebElement $element, $options = []) {
+		parent::__construct($element, $options);
+
+		if ($this->mode === null) {
+			$this->mode = self::$default_mode;
+		}
+	}
+
+	/**
+	 * Set default fill mode.
+	 *
+	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 */
+	public static function setDefaultFillMode($mode) {
+		self::$default_mode = $mode;
+	}
+
+	/**
+	 * Set fill mode.
+	 *
+	 * @param integer $mode    MODE_SELECT or MODE_TYPE
+	 *
+	 * @return $this
+	 */
+	public function setFillMode($mode) {
+		$this->mode = $mode;
+
+		return $this;
+	}
+
+	/**
 	 * Remove all elements from multiselect.
 	 *
 	 * @return $this
@@ -146,6 +188,46 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function type($text) {
+		if (!is_array($text)) {
+			$text = [$text];
+		}
+
+		$input = $this->query('xpath:.//input[not(@type="hidden")]')->one();
+		foreach ($text as $value) {
+			$input->overwrite($value)->fireEvent();
+
+			if (!$value) {
+				continue;
+			}
+
+			$content = CXPathHelper::escapeQuotes($value);
+			try {
+				$element = $this->query('xpath', implode('|', [
+					'.//ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'.//ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]/span[text()='.$content.']'
+				]))->waitUntilPresent();
+			}
+			catch (NoSuchElementException $exception) {
+				throw new Exception('Cannot find value with label "'.$value.'" in multiselect element.');
+			}
+
+			$element->one()->click();
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function overwrite($text) {
+		return $this->clear()->type($text);
+	}
+
+	/**
 	 * Alias for selectMultiple.
 	 * @see self::selectMultiple
 	 *
@@ -155,6 +237,10 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function fill($labels, $context = null) {
+		if ($this->mode !== self::MODE_SELECT && $this->mode !== self::MODE_TYPE) {
+			throw new Exception('Unknown fill mode is set for multiselect element.');
+		}
+
 		$this->clear();
 
 		if ($context === null && is_array($labels)) {
@@ -172,14 +258,23 @@ class CMultiselectElement extends CElement {
 						$label = $label['values'];
 					}
 
-					$this->selectMultiple($label, $context);
+					if ($this->mode === self::MODE_SELECT) {
+						$this->selectMultiple($label, $context);
+					}
+					else {
+						$this->type($label);
+					}
 				}
 
 				return $this;
 			}
 		}
 
-		return $this->selectMultiple($labels, $context);
+		if ($this->mode === self::MODE_SELECT) {
+			return $this->selectMultiple($labels, $context);
+		}
+
+		return $this->type($labels);
 	}
 
 	/**

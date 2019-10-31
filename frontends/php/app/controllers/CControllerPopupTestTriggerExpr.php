@@ -29,10 +29,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 	private $data_table_rows = [];
 	private $allowed_testing = true;
 	private $supported_token_types = [
-		CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO => 1,
-		CTriggerExpressionParserResult::TOKEN_TYPE_MACRO => 1,
-		CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO => 1,
-		CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO => 1
+		CTriggerExprParserResult::TOKEN_TYPE_FUNCTION_MACRO => 1,
+		CTriggerExprParserResult::TOKEN_TYPE_MACRO => 1,
+		CTriggerExprParserResult::TOKEN_TYPE_USER_MACRO => 1,
+		CTriggerExprParserResult::TOKEN_TYPE_LLD_MACRO => 1
 	];
 
 	protected function init() {

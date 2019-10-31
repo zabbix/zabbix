@@ -149,66 +149,6 @@
 		</sequential>
 	</macrodef>
 
-	<target name="create-db-mysql" if="${with.mysql}">
-		<sequential>
-			<exec executable="mysql" failonerror="on">
-				<arg line="-u${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="-e &quot;DROP DATABASE IF EXISTS ${DBNAME}&quot;"/>
-			</exec>
-			<exec executable="mysql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="-e &quot;CREATE DATABASE IF NOT EXISTS ${DBNAME}&quot;"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/schema.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/images.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-			<exec executable="mysql" input="database/mysql/data.sql" failonerror="on">
-				<arg line="-u ${DBUSER}"/>
-				<arg line="-p${DBPASSWORD}" if:set="DBPASSWORD"/>
-				<arg line="${DBNAME}"/>
-			</exec>
-		</sequential>
-	</target>
-
-	<target name="create-db-postgresql" if="${with.postgresql}">
-		<sequential>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-c &quot;DROP DATABASE IF EXISTS ${DBNAME};&quot;"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-c &quot;CREATE DATABASE ${DBNAME};&quot;"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/schema.sql"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/images.sql"/>
-			</exec>
-			<exec executable="psql" failonerror="on">
-				<arg line="-U ${DBUSER}"/>
-				<arg line="-d ${DBNAME}"/>
-				<arg line="-f database/postgresql/data.sql"/>
-			</exec>
-		</sequential>
-	</target>
-
-	<target name="create-db" depends="create-db-mysql,create-db-postgresql"/>
-
 	<target name="make-db-mysql" unless="${with.mysql}">
 		<!-- Build Zabbix with postgresql database -->
 		<sequential>
@@ -294,7 +234,9 @@
 		<!-- Build Zabbix with cmocka tests -->
 		<delete dir="tests_results"/>
 		<mkdir dir="tests_results"/>
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./bootstrap.sh" failonerror="on">
+			<arg line="tests"/>
+		</exec>
 		<propertyselector property="conf.list" delimiter="," match="cmocka-(.*)" select="\1"/>
 		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
 		<for list="${conf.list}" param="name" delimiter=",">
@@ -341,7 +283,9 @@
 			<arg line="src"/>
 			<arg line="-zerocounters"/>
 		</exec>
-		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./bootstrap.sh" failonerror="on">
+			<arg line="tests"/>
+		</exec>
 		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
@@ -370,7 +314,7 @@
 		</for>
 	</target>
 
-	<target name="build-dist" depends="create-db,make-gcc,make-db"/>
+	<target name="build-dist" depends="make-gcc,make-db"/>
 
 	<target name="make-dist">
 		<!-- Create & build Zabbix distribution -->

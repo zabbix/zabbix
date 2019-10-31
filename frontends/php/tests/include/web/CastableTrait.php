@@ -189,6 +189,17 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to PopupMenu element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CPopupMenuElement
+	 */
+	public function asPopupMenu($options = []) {
+		return $this->cast(CPopupMenuElement::class, $options);
+	}
+
+	/**
 	 * Cast object to base RemoteWebElement.
 	 *
 	 * @param array $options    additional casting options
@@ -208,5 +219,16 @@ trait CastableTrait {
 	 */
 	public function asMultiline($options = []) {
 		return $this->cast(CMultilineElement::class, $options);
+	}
+
+	/**
+	 * Cast object to PopupButton element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CPopupButtonElement
+	 */
+	public function asPopupButton($options = []) {
+		return $this->cast(CPopupButtonElement::class, $options);
 	}
 }
