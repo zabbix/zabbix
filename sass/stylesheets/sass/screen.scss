@@ -229,7 +229,9 @@ pre {
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	word-break: break-all;  // For the Internet Explorer.
+	word-break: break-word; // Override for the other browsers.
+	overflow-wrap: break-word;
 }
 
 .top-nav-container {

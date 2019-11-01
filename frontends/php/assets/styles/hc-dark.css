@@ -173,7 +173,9 @@ pre {
 
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
-  word-wrap: break-word; }
+  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word; }
 
 .top-nav-container {
   background-color: #000;
