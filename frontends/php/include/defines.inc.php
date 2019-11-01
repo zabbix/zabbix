@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'4.4.0');
-define('ZABBIX_API_VERSION',	'4.4.0');
+define('ZABBIX_VERSION',		'5.0.0alpha1');
+define('ZABBIX_API_VERSION',	'5.0.0');
 define('ZABBIX_EXPORT_VERSION',	'4.4');
 define('ZABBIX_DB_VERSION',		4040000);
 
@@ -1546,7 +1546,6 @@ define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');
 define('ZBX_STYLE_CLOCK', 'clock');
-define('ZBX_STYLE_COLUMNS_3', 'col-3');
 define('ZBX_STYLE_SYSMAP', 'sysmap');
 define('ZBX_STYLE_NAVIGATIONTREE', 'navtree');
 define('ZBX_STYLE_CHECKBOX_LIST', 'checkbox-list');
@@ -1781,6 +1780,8 @@ define('ZBX_STYLE_FIELD_LABEL_ASTERISK', 'form-label-asterisk');
 
 // HTML column layout.
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
+define('ZBX_STYLE_COLUMNS_2', 'columns-2');
+define('ZBX_STYLE_COLUMNS_3', 'columns-3');
 // column occupies x% width of column wrapper
 define('ZBX_STYLE_COLUMN_5', 'column-5');
 define('ZBX_STYLE_COLUMN_10', 'column-10');
@@ -1793,6 +1794,7 @@ define('ZBX_STYLE_COLUMN_50', 'column-50');
 define('ZBX_STYLE_COLUMN_75', 'column-75');
 define('ZBX_STYLE_COLUMN_90', 'column-90');
 define('ZBX_STYLE_COLUMN_95', 'column-95');
+
 // column visual options
 define('ZBX_STYLE_COLUMN_CENTER', 'column-center');
 define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');

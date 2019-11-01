@@ -463,7 +463,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept"
 			" from config"
-			" order by configid")))	/* if you change number of colums in DBselect(), */
+			" order by configid")))	/* if you change number of columns in DBselect(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
 	{
 		return FAIL;
@@ -502,7 +502,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
  *     On success this function produces a changeset with 0 or 1 record       *
  *     because 'config_autoreg_tls' table can have no more than 1 record.     *
  *     If in future you want to support multiple autoregistration PSKs and/or *
- *     select more colums in DBselect() then do not forget to sync changes    *
+ *     select more columns in DBselect() then do not forget to sync changes   *
  *     with DCsync_autoreg_config() !!!                                       *
  *                                                                            *
  ******************************************************************************/
@@ -516,7 +516,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 	if (NULL == (result = DBselect("select tls_psk_identity,tls_psk"
 			" from config_autoreg_tls"
-			" order by autoreg_tlsid")))	/* if you change number of colums in DBselect(), */
+			" order by autoreg_tlsid")))	/* if you change number of columns in DBselect(), */
 							/* adjust CONFIG_AUTOREG_TLS_FIELD_COUNT */
 	{
 		return FAIL;
@@ -2613,7 +2613,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
  *                                                                            *
  * Function: dbsync_compare_action_op                                         *
  *                                                                            *
- * Purpose: compares action opereation class and flushes update row if        *
+ * Purpose: compares action operation class and flushes update row if         *
  *          necessary                                                         *
  *                                                                            *
  * Parameter: sync     - [OUT] the changeset                                  *

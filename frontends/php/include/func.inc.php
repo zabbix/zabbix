@@ -101,7 +101,7 @@ function get_cookie($name, $default_value = null) {
 }
 
 function zbx_setcookie($name, $value, $time = null) {
-	setcookie($name, $value, isset($time) ? $time : 0, null, null, HTTPS, true);
+	setcookie($name, $value, isset($time) ? $time : 0, CSession::getDefaultCookiePath(), null, HTTPS, true);
 	$_COOKIE[$name] = $value;
 }
 
@@ -1440,26 +1440,6 @@ function zbx_toCSV($values) {
 	}
 
 	return $csv;
-}
-
-function zbx_array_mintersect($keys, $array) {
-	$result = [];
-
-	foreach ($keys as $field) {
-		if (is_array($field)) {
-			foreach ($field as $sub_field) {
-				if (isset($array[$sub_field])) {
-					$result[$sub_field] = $array[$sub_field];
-					break;
-				}
-			}
-		}
-		elseif (isset($array[$field])) {
-			$result[$field] = $array[$field];
-		}
-	}
-
-	return $result;
 }
 
 function zbx_str2links($text) {

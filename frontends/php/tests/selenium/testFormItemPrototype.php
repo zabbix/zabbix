@@ -1101,44 +1101,31 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('units');
 		}
 
-		switch ($type) {
-			case 'Zabbix agent':
-			case 'Simple check':
-			case 'SNMPv1 agent':
-			case 'SNMPv2 agent':
-			case 'SNMPv3 agent':
-			case 'Zabbix internal':
-			case 'Zabbix aggregate':
-			case 'External check':
-			case 'Database monitor':
-			case 'IPMI agent':
-			case 'SSH agent':
-			case 'TELNET agent':
-			case 'JMX agent':
-			case 'Calculated':
-				$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', 'Action']);
-				$this->zbxTestAssertVisibleId('delayFlexTable');
+		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
+		if ($type === 'SNMP trap' || $type === 'Zabbix trapper') {
+			$this->zbxTestTextNotVisibleOnPage(['Custom intervals', 'Interval', 'Period']);
+			$this->zbxTestAssertNotVisibleId('delayFlexTable');
 
-				$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
-				$this->zbxTestAssertVisibleId('delay_flex_0_delay');
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
+			$this->zbxTestTextNotVisibleOnPage(['Flexible', 'Scheduling']);
+			$this->zbxTestAssertNotVisibleId('delay_flex_0_delay');
+			$this->zbxTestAssertNotVisibleId('delay_flex_0_period');
+			$this->zbxTestAssertNotVisibleId('interval_add');
+		}
+		else {
+			$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', 'Action']);
+			$this->zbxTestAssertVisibleId('delayFlexTable');
 
-				$this->zbxTestAssertVisibleId('delay_flex_0_period');
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'size', 20);
-				$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'placeholder', '1-7,00:00-24:00');
-				$this->zbxTestAssertVisibleId('interval_add');
-				break;
-			default:
-				$this->zbxTestTextNotVisibleOnPage(['Custom intervals', 'Interval', 'Period']);
-				$this->zbxTestAssertNotVisibleId('delayFlexTable');
+			$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);
+			$this->zbxTestAssertVisibleId('delay_flex_0_delay');
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'size', 20);
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_delay']", 'placeholder', '50s');
 
-				$this->zbxTestTextNotVisibleOnPage(['Flexible', 'Scheduling']);
-				$this->zbxTestAssertNotVisibleId('delay_flex_0_delay');
-				$this->zbxTestAssertNotVisibleId('delay_flex_0_period');
-				$this->zbxTestAssertNotVisibleId('interval_add');
+			$this->zbxTestAssertVisibleId('delay_flex_0_period');
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'size', 20);
+			$this->zbxTestAssertAttribute("//input[@id='delay_flex_0_period']", 'placeholder', '1-7,00:00-24:00');
+			$this->zbxTestAssertVisibleId('interval_add');
 		}
 
 		$this->zbxTestTextPresent('History storage period');

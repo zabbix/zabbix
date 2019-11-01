@@ -37,6 +37,8 @@ require_once dirname(__FILE__).'/elements/CRangeControlElement.php';
 require_once dirname(__FILE__).'/elements/CCheckboxListElement.php';
 require_once dirname(__FILE__).'/elements/CMultifieldTableElement.php';
 require_once dirname(__FILE__).'/elements/CMultilineElement.php';
+require_once dirname(__FILE__).'/elements/CPopupMenuElement.php';
+require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -467,7 +469,10 @@ class CElementQuery implements IWaitable {
 				'/ul[@class="radio-list-control"]',
 				'/div/ul[@class="radio-list-control"]' // TODO: remove after fix DEV-1071.
 			],
-			'CCheckboxListElement'		=> '/ul[@class="checkbox-list col-3"]',
+			'CCheckboxListElement'		=> [
+				'/ul[contains(@class, "checkbox-list")]',
+				'/ul[contains(@class, "list-check-radio")]'
+			],
 			'CTableElement'				=> [
 				'/table',
 				'/*[@class="table-forms-separator"]/table'

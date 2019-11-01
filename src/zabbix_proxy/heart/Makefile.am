@@ -2,4 +2,6 @@
 
 noinst_LIBRARIES = libzbxheart.a
 
-libzbxheart_a_SOURCES = heart.c heart.h
+libzbxheart_a_SOURCES = \
+	heart.c \
+	heart.h

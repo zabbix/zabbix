@@ -50,15 +50,14 @@ class C42ImportConverter extends CConverter {
 	 */
 	protected function convertInventoryMode(array $hosts) {
 		foreach ($hosts as &$host) {
+			$host['inventory_mode'] = CXmlConstantValue::INV_MODE_MANUAL;
+
 			if (array_key_exists('inventory', $host) && array_key_exists('inventory_mode', $host['inventory'])) {
 				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 				unset($host['inventory']['inventory_mode']);
-
-				if (count($host['inventory']) == 0 || $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-					unset($host['inventory']);
-				}
 			}
 		}
+		unset($host);
 
 		return $hosts;
 	}

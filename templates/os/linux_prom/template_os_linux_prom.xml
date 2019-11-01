@@ -888,7 +888,7 @@ nodename</params>
                   <trigger>
                      <expression>{diff()}=1 and {strlen()}&gt;0</expression>
                      <recovery_mode>NONE</recovery_mode>
-                     <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                     <name>System name has changed (new name: {ITEM.VALUE})</name>
                      <priority>INFO</priority>
                      <description>System name has changed. Ack to close.</description>
                      <manual_close>YES</manual_close>
@@ -956,7 +956,7 @@ machine</params>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
-                           <name>Systen name has changed (new name: {ITEM.VALUE})</name>
+                           <name>System name has changed (new name: {ITEM.VALUE})</name>
                            <expression>{Template OS Linux by Prom:system.name[node_exporter].diff()}=1 and {Template OS Linux by Prom:system.name[node_exporter].strlen()}&gt;0</expression>
                         </dependency>
                      </dependencies>
@@ -2422,7 +2422,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2451,7 +2451,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>System load</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2473,7 +2473,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>CPU usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -2495,7 +2495,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Memory usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -2517,7 +2517,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Swap usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -2539,7 +2539,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -2561,7 +2561,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -2583,7 +2583,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk average waiting time</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -2605,7 +2605,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>
@@ -2627,7 +2627,7 @@ As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Linux by Prom</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>6</y>

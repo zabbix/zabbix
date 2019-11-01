@@ -334,12 +334,12 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)|<p>-</p>|`{TEMPLATE_NAME:system.localtime.fuzzytime({$SYSTEM.FUZZYTIME.MAX})}=0`|WARNING|<p>Manual close: YES</p>|
-|Systen name has changed (new name: {ITEM.VALUE})|<p>System name has changed. Ack to close.</p>|`{TEMPLATE_NAME:system.hostname.diff()}=1 and {TEMPLATE_NAME:system.hostname.strlen()}>0`|INFO|<p>Manual close: YES</p>|
+|System name has changed (new name: {ITEM.VALUE})|<p>System name has changed. Ack to close.</p>|`{TEMPLATE_NAME:system.hostname.diff()}=1 and {TEMPLATE_NAME:system.hostname.strlen()}>0`|INFO|<p>Manual close: YES</p>|
 |Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})|<p>-</p>|`{TEMPLATE_NAME:kernel.maxfiles.last()}<{$KERNEL.MAXFILES.MIN}`|INFO||
 |Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})|<p>-</p>|`{TEMPLATE_NAME:kernel.maxproc.last()}<{$KERNEL.MAXPROC.MIN}`|INFO|<p>**Depends on**:</p><p>- Getting closer to process limit (over 80% used)</p>|
 |Getting closer to process limit (over 80% used)|<p>-</p>|`{TEMPLATE_NAME:proc.num.last()}/{Template Module Linux generic by Zabbix agent active:kernel.maxproc.last()}*100>80`|WARNING||
-|Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p>|`{TEMPLATE_NAME:system.sw.os.diff()}=1 and {TEMPLATE_NAME:system.sw.os.strlen()}>0`|INFO|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Systen name has changed (new name: {ITEM.VALUE})</p>|
-|/etc/passwd has been changed|<p>-</p>|`{TEMPLATE_NAME:vfs.file.cksum[/etc/passwd].diff()}>0`|INFO|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- Systen name has changed (new name: {ITEM.VALUE})</p>|
+|Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p>|`{TEMPLATE_NAME:system.sw.os.diff()}=1 and {TEMPLATE_NAME:system.sw.os.strlen()}>0`|INFO|<p>Manual close: YES</p><p>**Depends on**:</p><p>- System name has changed (new name: {ITEM.VALUE})</p>|
+|/etc/passwd has been changed|<p>-</p>|`{TEMPLATE_NAME:vfs.file.cksum[/etc/passwd].diff()}>0`|INFO|<p>Manual close: YES</p><p>**Depends on**:</p><p>- Operating system description has changed</p><p>- System name has changed (new name: {ITEM.VALUE})</p>|
 |{HOST.NAME} has been restarted (uptime < 10m)|<p>The host uptime is less than 10 minutes</p>|`{TEMPLATE_NAME:system.uptime.last()}<10m`|WARNING|<p>Manual close: YES</p>|
 
 ## Feedback

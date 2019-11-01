@@ -1441,7 +1441,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	time_t	nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
-	double	time_now;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1467,11 +1466,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
-		zbx_update_env(time_now);
-		now = (int)time_now;
+		zbx_update_env(zbx_time());
 
-		if (now >= nextsend)
+		if ((now = time(NULL)) >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);
 			nextsend = time(NULL) + 1;

@@ -369,7 +369,7 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             op_type       - [IN] the operation type                        *
- *             history_value - [IN/OUT] the historical (previuous) data       *
+ *             history_value - [IN/OUT] the historical (previous) data        *
  *             history_ts    - [IN/OUT] the timestamp of the historical data  *
  *             errmsg        - [OUT] error message                            *
  *                                                                            *

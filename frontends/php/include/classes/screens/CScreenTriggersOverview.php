@@ -38,7 +38,7 @@ class CScreenTriggersOverview extends CScreenBase {
 		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 		list($hosts, $triggers) = getTriggersOverviewData((array) $this->screenitem['resourceid'],
-			$this->screenitem['application'], $this->screenitem['style']
+			$this->screenitem['application']
 		);
 
 		$table = getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'], $this->screenid);
