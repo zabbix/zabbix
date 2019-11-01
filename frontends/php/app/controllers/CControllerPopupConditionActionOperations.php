@@ -24,11 +24,6 @@
  */
 class CControllerPopupConditionActionOperations extends CControllerPopupConditionCommon {
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getCheckInputs() {
 		return [
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
@@ -40,27 +35,14 @@ class CControllerPopupConditionActionOperations extends CControllerPopupConditio
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return string
-	 */
 	protected function getConditionLastType() {
 		return CONDITION_TYPE_EVENT_ACKNOWLEDGED;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	protected function validateFieldsManually() {
 		return true;
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getManuallyValidatedFields() {
 		return [
 			'form' => [
@@ -76,11 +58,6 @@ class CControllerPopupConditionActionOperations extends CControllerPopupConditio
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getControllerResponseData() {
 		return [
 			'title' => _('New condition'),

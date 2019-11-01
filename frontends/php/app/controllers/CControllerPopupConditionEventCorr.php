@@ -24,12 +24,7 @@
  */
 class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon {
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
-	protected function getCheckInputs() {
+		protected function getCheckInputs() {
 		return [
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_EVENT_CORR,
 			'validate' => 'in 1',
@@ -38,13 +33,8 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return string
-	 */
 	protected function getConditionLastType() {
-		$last_type = CProfile::get('popup.condition.events_last_type', 0);
+		$last_type = CProfile::get('popup.condition.events_last_type', ZBX_CORR_CONDITION_OLD_EVENT_TAG);
 
 		if ($this->hasInput('condition_type')) {
 			if ($this->getInput('condition_type') != $last_type) {
@@ -60,9 +50,6 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		return $last_type;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	protected function validateFieldsManually() {
 		$validator = new CEventCorrCondValidator();
 		if (!$validator->validate([
@@ -78,11 +65,6 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		}
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getManuallyValidatedFields() {
 		return [
 			'form' => [
@@ -102,11 +84,6 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getControllerResponseData() {
 		return [
 			'title' => _('New condition'),

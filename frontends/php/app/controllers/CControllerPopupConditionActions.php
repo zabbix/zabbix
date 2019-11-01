@@ -24,11 +24,6 @@
  */
 class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getCheckInputs() {
 		return [
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
@@ -39,17 +34,12 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return string
-	 */
 	protected function getConditionLastType() {
 		$default = [
-			EVENT_SOURCE_TRIGGERS => 3,
-			EVENT_SOURCE_DISCOVERY => 7,
-			EVENT_SOURCE_AUTO_REGISTRATION => 22,
-			EVENT_SOURCE_INTERNAL => 15
+			EVENT_SOURCE_TRIGGERS => CONDITION_TYPE_TRIGGER_NAME,
+			EVENT_SOURCE_DISCOVERY => CONDITION_TYPE_DHOST_IP,
+			EVENT_SOURCE_AUTO_REGISTRATION => CONDITION_TYPE_HOST_NAME,
+			EVENT_SOURCE_INTERNAL => CONDITION_TYPE_APPLICATION
 		];
 
 		$last_type = CProfile::get(
@@ -73,11 +63,6 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		return $last_type;
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getManuallyValidatedFields() {
 		return [
 			'form' => [
@@ -94,9 +79,6 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		];
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	protected function validateFieldsManually() {
 		$validator = new CActionCondValidator();
 		if (!$validator->validate([
@@ -109,11 +91,6 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 		}
 	}
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @return array
-	 */
 	protected function getControllerResponseData() {
 		return [
 			'title' => _('New condition'),
