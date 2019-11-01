@@ -23,11 +23,11 @@ class CControllerUsergroupCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name'         => 'required|not_empty|string',
+			'name'         => 'required|not_empty|db usrgrp.name',
 			'userids'      => 'array_db users.userid',
-			'gui_access'   => 'required|db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' => 'required|db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode'   => 'required|db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'gui_access'   => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode'   => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 
 			'group_rights' => 'array',
 			'tag_filters'  => 'array',
@@ -64,14 +64,10 @@ class CControllerUsergroupCreate extends CController {
 
 	protected function doAction() {
 		$user_group = [
-			'name'         => $this->getInput('name'),
-			'users_status' => $this->getInput('users_status'),
-			'gui_access'   => $this->getInput('gui_access'),
-			'debug_mode'   => $this->getInput('debug_mode'),
-			'userids'      => $this->getInput('userids', []),
-			'tag_filters'  => $this->getInput('tag_filters', []),
-			'rights'       => []
+			'rights' => []
 		];
+
+		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userids', 'tag_filters']);
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 
@@ -86,8 +82,6 @@ class CControllerUsergroupCreate extends CController {
 
 		$result = (bool) API::UserGroup()->create($user_group);
 
-		$form_data = $this->getInputAll();
-
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.list')
@@ -97,12 +91,12 @@ class CControllerUsergroupCreate extends CController {
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
 				->setArgument('action', 'usergroup.edit')
+				->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
 				->getUrl()
 			);
 			$response->setMessageError(_('Cannot add group'));
-			$response->setFormData($form_data);
+			$response->setFormData($this->getInputAll());
 		}
 
 		$this->setResponse($response);
