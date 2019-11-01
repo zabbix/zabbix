@@ -257,11 +257,30 @@ jQuery(function($) {
 						searches: {},
 						searching: {},
 						selected: {},
-						selecting: false,
 						available: {},
-						available_div: $('<div>', {'class': 'multiselect-available'})
+						available_div: $('<div>', {'class': 'multiselect-available'}),
+
+						/*
+						 * Indicates a false click on an available list, but not on some actual item.
+						 * In such case the "focusout" event (IE) of the search input should not be processed.
+						 */
+						available_false_click: false
 					}
 				};
+
+			ms.values.available_div.on('mousedown', 'li', function() {
+				/*
+				 * Cancel event propagation if actual available item was clicked.
+				 * As a result, the "focusout" event of the search input will not fire in all browsers.
+				 */
+				return false;
+			});
+
+			if (IE) {
+				ms.values.available_div.on('mousedown', function() {
+					ms.values.available_false_click = true;
+				});
+			}
 
 			$obj.data('multiSelect', ms);
 
@@ -289,8 +308,6 @@ jQuery(function($) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 						$('input[type="text"]', $obj).focus();
-
-						return false;
 					}
 				});
 
@@ -536,12 +553,14 @@ jQuery(function($) {
 					$obj.addClass('active');
 				})
 				.on('focusout', function() {
-					$obj.removeClass('active');
-					$('.selected li:selected', $obj).removeClass('selected');
-					cleanSearchInput($obj);
-
-					// Not hiding the "available" list if the "click" event has just been scheduled.
-					if (!ms.values.selecting) {
+					if (ms.values.available_false_click) {
+						ms.values.available_false_click = false;
+						$('input[type="text"]', $obj).focus();
+					}
+					else {
+						$obj.removeClass('active');
+						$('.selected li:selected', $obj).removeClass('selected');
+						cleanSearchInput($obj);
 						hideAvailable($obj);
 					}
 				});
@@ -669,20 +688,8 @@ jQuery(function($) {
 					$('li.suggest-hover', ms.values.available_div).removeClass('suggest-hover');
 					$li.addClass('suggest-hover');
 				})
-				.on('mousedown', function() {
-					/*
-					 * The "focusout" event handler of the input will fire right after this event processing is done,
-					 * hiding and detaching the "available" list from the DOM, thus cancelling further event processing,
-					 * including "click", thus not adding the clicked item at all. Therefore:
-					 *   1. Set the flag to inform the "focusout" event handler not to hide the "available" list.
-					 *   2. Hide the "available" list by calling "select" function in the "click" event handler.
-					 */
-					ms.values.selecting = true;
-				})
 				.on('click', function() {
 					select($obj, item.id);
-
-					ms.values.selecting = false;
 				});
 
 		if (!empty(item.prefix)) {
@@ -870,7 +877,7 @@ jQuery(function($) {
 		$available.data('hide_handler', hide_handler);
 
 		$obj.parents().add(window).one('scroll', hide_handler);
-		$(window).one('resize click', hide_handler);
+		$(window).one('resize', hide_handler);
 
 		var obj_offset = $obj.offset(),
 			obj_padding_y = $obj.outerHeight() - $obj.height(),
@@ -935,7 +942,7 @@ jQuery(function($) {
 
 		var hide_handler = $available.data('hide_handler');
 		$obj.parents().add(window).off('scroll', hide_handler);
-		$(window).off('resize click', hide_handler);
+		$(window).off('resize', hide_handler);
 
 		$available.removeData(['obj', 'hide_handler']);
 	}
