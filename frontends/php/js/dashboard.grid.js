@@ -2389,6 +2389,12 @@
 					data: ajax_data,
 					dataType: 'json',
 					beforeSend: function() {
+						/*
+						 * Clear the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to center the popup while the widget form is being loaded.
+						 */
+						jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
+
 						body.empty()
 							.append($('<div>')
 								// The smallest possible size of configuration dialog.
@@ -2403,6 +2409,14 @@
 								));
 					},
 					success: function(resp) {
+						/*
+						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
+						 * to have actual data for the popup positioning.
+						 */
+						if (data.dialogue['widget_type'] === 'svggraph') {
+							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
+						}
+
 						body.empty();
 						body.append(resp.body);
 						if (typeof(resp.debug) !== 'undefined') {
@@ -2424,13 +2438,6 @@
 						$('.dialogue-widget-save', footer).prop('disabled', false);
 					},
 					complete: function() {
-						if (data.dialogue['widget_type'] === 'svggraph') {
-							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
-						}
-						else {
-							jQuery('[data-dialogueid="widgetConfg"]').removeClass('sticked-to-top');
-						}
-
 						if (data.dialogue.widget === null
 								&& !findEmptyPosition($this, data, data.dialogue.widget_type)) {
 							showMessageExhausted(data);
