@@ -112,7 +112,7 @@ switch ($data['type']) {
 			$form_list
 				->addRow(_('Old tag'), $new_condition_oldtag)
 				->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-				->addRow(_('New tag'), $new_condition_oldtag);
+				->addRow(_('New tag'), $new_condition_newtag);
 		}
 
 		// Old|New event tag value form elements.

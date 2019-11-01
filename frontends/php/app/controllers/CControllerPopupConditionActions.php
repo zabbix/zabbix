@@ -81,14 +81,18 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 
 	protected function validateFieldsManually() {
 		$validator = new CActionCondValidator();
-		if (!$validator->validate([
+		$validate = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
 			'value' => getRequest('value'),
 			'value2' => getRequest('value2'),
 			'operator' => $this->getInput('operator')
-		])) {
+		]);
+
+		if (!$validate) {
 			error($validator->getError());
 		}
+
+		return $validate;
 	}
 
 	protected function getControllerResponseData() {

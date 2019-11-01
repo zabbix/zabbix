@@ -24,7 +24,7 @@
  */
 class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon {
 
-		protected function getCheckInputs() {
+	protected function getCheckInputs() {
 		return [
 			'type' => 'required|in '.ZBX_POPUP_CONDITION_TYPE_EVENT_CORR,
 			'validate' => 'in 1',
@@ -52,7 +52,7 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 
 	protected function validateFieldsManually() {
 		$validator = new CEventCorrCondValidator();
-		if (!$validator->validate([
+		$validate = $validator->validate([
 			'type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
 			'tag' => getRequest('tag'),
@@ -60,9 +60,13 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'newtag' => getRequest('newtag'),
 			'value' => getRequest('value'),
 			'groupids' => getRequest('groupids')
-		])) {
+		]);
+
+		if (!$validate) {
 			error($validator->getError());
 		}
+
+		return $validate;
 	}
 
 	protected function getManuallyValidatedFields() {

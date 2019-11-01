@@ -29,7 +29,7 @@ class CActionCondValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($condition) {
-		// build validators
+		// Build validators.
 		$discoveryCheckTypeValidator = new CLimitedSetValidator([
 			'values' => array_keys(discovery_check_type2str())
 		]);
@@ -54,13 +54,13 @@ class CActionCondValidator extends CValidator {
 		]);
 
 		$conditionValue = $condition['value'];
-		// validate condition values depending on condition type
+		// Validate condition values depending on condition type.
 		switch ($condition['conditiontype']) {
 			case CONDITION_TYPE_HOST_GROUP:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -73,10 +73,10 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_TEMPLATE:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -89,10 +89,10 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_TRIGGER:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -105,10 +105,10 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_HOST:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -121,10 +121,10 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_DRULE:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -145,10 +145,10 @@ class CActionCondValidator extends CValidator {
 				break;
 
 			case CONDITION_TYPE_PROXY:
-				if (!is_array($conditionValue) || zbx_empty($conditionValue)) {
+				if (zbx_empty($conditionValue)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
-				else {
+				elseif (is_array($conditionValue)) {
 					foreach ($conditionValue as $value) {
 						if ($value == 0) {
 							$this->setError(
@@ -256,14 +256,14 @@ class CActionCondValidator extends CValidator {
 				if (!is_string($condition['value2']) || $condition['value2'] === '') {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value2', _('cannot be empty')));
 				}
-				elseif (!is_string($condition['value'])) {
+				elseif (!is_string($conditionValue)) {
 					$this->setError(
 						_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
 					);
 				}
-				elseif (array_key_exists('operator', $condition) && $condition['value'] === ''
-					&& ($condition['operator'] == CONDITION_OPERATOR_LIKE
-						|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE)) {
+				elseif (array_key_exists('operator', $condition) && $conditionValue === ''
+						&& ($condition['operator'] == CONDITION_OPERATOR_LIKE
+							|| $condition['operator'] == CONDITION_OPERATOR_NOT_LIKE)) {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;
