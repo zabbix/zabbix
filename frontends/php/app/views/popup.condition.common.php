@@ -428,7 +428,7 @@ switch ($data['type']) {
 
 			$form_list
 				->addRow(_('Operator'), $operator)
-				->addRow(_('Discovery checks'), $dcheck_popup_select);
+				->addRow(_('Discovery check'), $dcheck_popup_select);
 		}
 
 		// Discovery object form elements.
@@ -530,7 +530,7 @@ switch ($data['type']) {
 
 			$form_list
 				->addRow(_('Operator'), $operator)
-				->addRow(_('Proxies'), $proxy_multiselect);
+				->addRow(_('Proxy'), $proxy_multiselect);
 		}
 
 		// Received value form elements.
@@ -620,7 +620,7 @@ switch ($data['type']) {
 
 			$form_list
 				->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-				->addRow(_('Event types'), $new_condition_value);
+				->addRow(_('Event type'), $new_condition_value);
 		}
 		break;
 
