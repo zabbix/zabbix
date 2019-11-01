@@ -18,7 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class DBTest extends PHPUnit_Framework_TestCase {
+
+require_once dirname(__FILE__).'/../include/CTest.php';
+require_once dirname(__FILE__).'/../../include/db.inc.php';
+
+class makeSqlTest extends CTest {
 
 	public function dataProvider() {
 		return [
@@ -33,7 +37,8 @@ class DBTest extends PHPUnit_Framework_TestCase {
 					'sortfield' => ['host', 'name'],
 					'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
 				],
-				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid IN (9998,9999,10000,10001,10002,10003) AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
+				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid IN (9998,9999,10000,10001,10002,10003) AND h.maintenanceid=1 ORDER BY h.host DESC,h.name',
+				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid BETWEEN 9998 AND 10003 AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
 			],
 			[
 				'hosts', null,
@@ -46,6 +51,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 					'sortfield' => ['host', 'name'],
 					'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
 				],
+				'SELECT hostid,host,name FROM hosts WHERE hostid IN (10001,10002,10003) AND maintenanceid=1 ORDER BY host DESC,name',
 				'SELECT hostid,host,name FROM hosts WHERE hostid IN (10001,10002,10003) AND maintenanceid=1 ORDER BY host DESC,name'
 			],
 			[
@@ -54,6 +60,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 					'countOutput' => true,
 					'hostids' => [10001]
 				],
+				'SELECT COUNT(h.*) AS rowscount FROM hosts h WHERE h.hostid=10001',
 				'SELECT COUNT(h.*) AS rowscount FROM hosts h WHERE h.hostid=10001'
 			],
 			[
@@ -62,6 +69,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 					'countOutput' => true,
 					'hostids' => [10001, 10002, 10003]
 				],
+				'SELECT COUNT(*) AS rowscount FROM hosts WHERE hostid IN (10001,10002,10003)',
 				'SELECT COUNT(*) AS rowscount FROM hosts WHERE hostid IN (10001,10002,10003)'
 			],
 			[
@@ -73,6 +81,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 						'type' => [0, 1]
 					]
 				],
+				'SELECT userid FROM users WHERE userid=2 AND type IN (0,1)',
 				'SELECT userid FROM users WHERE userid=2 AND type IN (0,1)'
 			]
 		];
@@ -81,12 +90,17 @@ class DBTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 *
-	 * @param string $xml
-	 * @param mixed  $expected
+	 * @param string $table_name
+	 * @param string $table_alias
+	 * @param array  $options
+	 * @param string $expected_non_oracle
+	 * @param string $expected_oracle
 	 */
-	public function testMakeSql($table_name, $table_alias, $options, $expected) {
-		$sql = DB::makeSql($table_name, $options, $table_alias);
-		$this->assertEquals($expected, $sql);
-	}
+	public function test($table_name, $table_alias, $options, $expected_non_oracle, $expected_oracle) {
+		global $DB;
 
+		$sql = DB::makeSql($table_name, $options, $table_alias);
+
+		$this->assertEquals($DB['TYPE'] == ZBX_DB_ORACLE ? $expected_oracle : $expected_non_oracle, $sql);
+	}
 }
