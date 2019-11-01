@@ -842,7 +842,7 @@ if (!empty($data['new_operation'])) {
 			$data['new_operation']['opconditions']
 		);
 
-		foreach ($data['new_operation']['opconditions'] as $cIdx => $opcondition) {
+		foreach (array_values($data['new_operation']['opconditions']) as $cIdx => $opcondition) {
 			if (!isset($opcondition['conditiontype'])) {
 				$opcondition['conditiontype'] = 0;
 			}
@@ -863,9 +863,10 @@ if (!empty($data['new_operation'])) {
 				->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow([
 					$labelCol,
-					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-						$operationConditionStringValues[$cIdx], ''
-					),
+					// getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
+					// 	$operationConditionStringValues[$cIdx], ''
+					// ),
+					$operationConditionStringValues[$cIdx],
 					(new CCol([
 						(new CButton('remove', _('Remove')))
 							->onClick('javascript: removeOperationCondition('.$i.');')

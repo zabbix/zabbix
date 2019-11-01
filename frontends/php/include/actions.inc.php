@@ -334,7 +334,7 @@ function actionOperationConditionValueToString(array $conditions) {
 
 	foreach ($conditions as $condition) {
 		if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
-			$result[] = $condition['value'] ? _('Ack') : _('Not Ack');
+			$result[] = $condition['value'] ? _('Event is acknowledged') : _('Event is not acknowledged');
 		}
 	}
 

@@ -134,9 +134,6 @@ if (isset($_REQUEST['actionid'])) {
 if (hasRequest('cancel_new_operation')) {
 	unset($_REQUEST['new_operation']);
 }
-elseif (hasRequest('cancel_new_opcondition')) {
-	unset($_REQUEST['new_opcondition']);
-}
 elseif (hasRequest('cancel_new_recovery_operation')) {
 	unset($_REQUEST['new_recovery_operation']);
 }

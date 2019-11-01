@@ -117,13 +117,12 @@ switch ($data['type']) {
 
 		// Old|New event tag value form elements.
 		if ($condition_type == ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE
-			|| $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE) {
-			$combobox_options = [];
+				|| $condition_type == ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE) {
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
 			foreach (getOperatorsByCorrConditionType($condition_type) as $value) {
-				$combobox_options[$value] = corrConditionOperatorToString($value);
+				$operator->addValue(corrConditionOperatorToString($value), $value);
 			}
 
-			$operator = new CComboBox('operator', null, null, $combobox_options);
 			$new_condition_tag = (new CTextAreaFlexible('tag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
@@ -211,24 +210,22 @@ switch ($data['type']) {
 
 		// Trigger severity form elements.
 		if ($condition_type == CONDITION_TYPE_TRIGGER_SEVERITY) {
-			$config = select_config();
-
-			$severity_names = [];
-			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-				$severity_names[] = getSeverityName($severity, $config);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_TRIGGER_SEVERITY] as $key => $value) {
+				$operator->addValue($value, $key);
 			}
-
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_TRIGGER_SEVERITY]);
-			$new_condition_value = new CComboBox('value', null, null, $severity_names);
 
 			$form_list
 				->addRow(_('Operator'), $operator)
-				->addRow(_('Severity'), $new_condition_value);
+				->addRow(_('Severity'), new CSeverity(['name' => 'value', 'value' => null]));
 		}
 
 		// Application form elements.
 		if ($condition_type == CONDITION_TYPE_APPLICATION) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_APPLICATION]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_APPLICATION] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 			$inline_js .= $new_condition_value->getPostJS();
@@ -312,7 +309,10 @@ switch ($data['type']) {
 
 		// Tag form elements.
 		if ($condition_type == CONDITION_TYPE_EVENT_TAG) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_EVENT_TAG]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_EVENT_TAG] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 			$inline_js .= $new_condition_value->getPostJS();
@@ -324,7 +324,10 @@ switch ($data['type']) {
 
 		// Tag value form elements.
 		if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_EVENT_TAG_VALUE]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_EVENT_TAG_VALUE] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value2 = (new CTextAreaFlexible('value2'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
@@ -535,7 +538,10 @@ switch ($data['type']) {
 
 		// Received value form elements.
 		if ($condition_type == CONDITION_TYPE_DVALUE) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_DVALUE]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_DVALUE] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 			$inline_js .= $new_condition_value->getPostJS();
@@ -578,7 +584,10 @@ switch ($data['type']) {
 
 		// Discovery uptime|downtime form elements.
 		if ($condition_type == CONDITION_TYPE_DUPTIME) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_DUPTIME]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_MORE_EQUAL))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_DUPTIME] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CNumericBox('value', 600, 15))->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 
 			$form_list
@@ -588,7 +597,10 @@ switch ($data['type']) {
 
 		// Host name form elements.
 		if ($condition_type == CONDITION_TYPE_HOST_NAME) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_HOST_NAME]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_LIKE))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_HOST_NAME] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 			$inline_js .= $new_condition_value->getPostJS();
@@ -600,7 +612,10 @@ switch ($data['type']) {
 
 		// Host metadata form elements.
 		if ($condition_type == CONDITION_TYPE_HOST_METADATA) {
-			$operator = new CComboBox('operator', null, null, $combobox_options[CONDITION_TYPE_HOST_METADATA]);
+			$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_LIKE))->setModern(true);
+			foreach ($combobox_options[CONDITION_TYPE_HOST_METADATA] as $key => $value) {
+				$operator->addValue($value, $key);
+			}
 			$new_condition_value = (new CTextAreaFlexible('value'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 			$inline_js .= $new_condition_value->getPostJS();
@@ -653,14 +668,14 @@ switch ($data['type']) {
 			->setModern(true)
 			->addValue(condition_operator2str(CONDITION_OPERATOR_EQUAL), CONDITION_OPERATOR_EQUAL);
 
-		$condition_value = new CComboBox('value', '', null, [
-			EVENT_NOT_ACKNOWLEDGED => _('Not Ack'),
-			EVENT_ACKNOWLEDGED => _('Ack')
-		]);
+		$condition_value = (new CRadioButtonList('value', EVENT_NOT_ACKNOWLEDGED))
+			->setModern(true)
+			->addValue(_('No'), EVENT_NOT_ACKNOWLEDGED)
+			->addValue(_('Yes'), EVENT_ACKNOWLEDGED);
 
 		$form_list
 			->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-			->addRow(_('Acknowledge'), $condition_value);
+			->addRow(_('Acknowledged'), $condition_value);
 		break;
 }
 
