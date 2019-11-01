@@ -928,6 +928,7 @@ $form_list
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items' , 'description'))
 			->setReadonly($discovered_item)
 	)
 	// Append status to form list.

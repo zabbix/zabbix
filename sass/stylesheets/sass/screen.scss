@@ -4559,6 +4559,13 @@ $form-icon-btn: (
 		@extend %webkit-scrollbar;
 	}
 
+	.hintbox-description {
+		overflow: auto;
+		max-height: 240px;
+		max-width: 800px;
+		@extend %webkit-scrollbar;
+	}
+
 	.msg-bad,
 	.msg-good,
 	.msg-warning {
@@ -6620,33 +6627,15 @@ svg {
 	}
 }
 
-ul.checkbox-list {
-	line-height: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	> li {
-		ms-flex: 0 0 100%;
-		flex: 0 0 100%;
-		max-width: 100%;
-		-webkit-box-flex: 0;
+.checkbox-list {
+	li {
+		margin-top: 4px;
 	}
 }
-
-@each $num, $width in (
-	3: 33.33333%
-) {
-	ul.checkbox-list.col-#{$num} > li {
-		display: inline-block;
-		-ms-flex: 0 0 $width;
-		flex: 0 0 $width;
-		max-width: $width;
-	}
-}
-
 
 .columns-wrapper {
-
-	$columns: (
+	$column-count: (2, 3);
+	$column-size: (
 		5: 5%,
 		10: 10%,
 		15: 15%,
@@ -6667,10 +6656,33 @@ ul.checkbox-list {
 		-webkit-box-flex: 0;
 	}
 
-	/**
-	 * Dynamically generated classes, e.g. .column-50.
-	 */
-	@each $class, $width in $columns {
+	// Dynamically generated classes for the columns count:
+	//  .columns-2
+	//  .columns-3
+	@each $count in $column-count {
+		&.columns-#{$count} > {
+			div, li {
+				display: block;
+				-ms-flex: 0 0 (100% / $count);
+				flex: 0 0 (100% / $count);
+				max-width: (100% / $count);
+			}
+		}
+	}
+
+	// Dynamically generated classes for the column width:
+	//  .column-5
+	//  .column-10
+	//  .column-15
+	//  .column-20
+	//  .column-33
+	//  .column-35
+	//  .column-40
+	//  .column-50
+	//  .column-75
+	//  .column-90
+	//  .column-95
+	@each $class, $width in $column-size {
 		.column-#{$class} {
 			-ms-flex: 0 0 $width;
 			flex: 0 0 $width;
