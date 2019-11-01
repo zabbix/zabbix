@@ -4503,6 +4503,9 @@ tr.cursor-move td * {
 .graph-wrapper {
   display: inline; }
 
+.widget-url {
+  display: block; }
+
 .clock {
   padding: 0 10px;
   height: 99%;
