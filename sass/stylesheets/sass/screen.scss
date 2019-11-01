@@ -4523,7 +4523,6 @@ $form-icon-btn: (
 			}
 
 			.columns-wrapper {
-				flex-wrap: nowrap;
 
 				.column-50:last-of-type {
 					margin-left: 10px;
@@ -6657,6 +6656,10 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+
+	&.columns-nowrap {
+		flex-wrap: nowrap;
+	}
 
 	[class^=column-] {
 		-webkit-box-flex: 0;

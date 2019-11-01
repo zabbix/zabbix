@@ -3108,10 +3108,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       padding: 0 10px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper {
-        flex-wrap: nowrap; }
-        .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
-          margin-left: 10px; }
+      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
+        margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0px 0px 10px 0px; }
@@ -4653,6 +4651,8 @@ svg {
 .columns-wrapper {
   display: flex;
   flex-wrap: wrap; }
+  .columns-wrapper.columns-nowrap {
+    flex-wrap: nowrap; }
   .columns-wrapper [class^=column-] {
     -webkit-box-flex: 0; }
   .columns-wrapper.columns-2 > div, .columns-wrapper.columns-2 > li {
