@@ -82,12 +82,14 @@ $form
 	)
 	->addRow((new CLabel(_('Day of week'), 'days'))->setAsteriskMark(),
 		(new CCheckBoxList('days'))
+			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setOptions($days_weekly),
 		'row_timeperiod_dayofweek'
 	)
 	->addRow((new CLabel(_('Month'), 'months'))->setAsteriskMark(),
 		(new CCheckBoxList('months'))
+			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setOptions($months),
 		'row_timeperiod_months'
@@ -111,6 +113,7 @@ $form
 	)
 	->addRow('',
 		(new CCheckBoxList('monthly_days'))
+			->addClass(ZBX_STYLE_COLUMNS)
 			->addClass(ZBX_STYLE_COLUMNS_3)
 			->setOptions($days_monthly),
 		'row_timeperiod_week_days'
