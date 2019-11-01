@@ -27,8 +27,7 @@ function submitConditionPopup(response) {
 	var form_name = response.form.name,
 		form_param = response.form.param,
 		input_name = response.form.input_name,
-		inputs = response.inputs,
-		dialog;
+		inputs = response.inputs;
 
 	for (var i in inputs) {
 		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
@@ -45,16 +44,7 @@ function submitConditionPopup(response) {
 		}
 	}
 
-	if (form_param === 'add_opcondition') {
-		dialog = overlays_stack[overlays_stack.length - 1];
-		overlayDialogueDestroy(dialog.dialogueid, dialog.xhr);
-
-		dialog = overlays_stack[overlays_stack.length - 1];
-		PopUp('popup.action.operation.edit', jQuery(document.forms['popup.operation']).serialize(), dialog.dialogueid);
-	}
-	else {
-		submitFormWithParam(form_name, form_param, '1');
-	}
+	submitFormWithParam(form_name, form_param, '1');
 }
 
 /**
@@ -66,11 +56,6 @@ function validateConditionPopup() {
 
 	url.setArgument('validate', 1);
 
-	$form
-		.parent()
-		.find(".msg-bad, .msg-good")
-		.remove();
-
 	return jQuery
 		.ajax({
 			url: url.getUrl(),
@@ -79,6 +64,11 @@ function validateConditionPopup() {
 			type: "post"
 		})
 		.done(function (response) {
+			$form
+				.parent()
+				.find(".msg-bad")
+				.remove();
+
 			if (typeof response.errors !== "undefined") {
 				return jQuery(response.errors).insertBefore($form);
 			}
