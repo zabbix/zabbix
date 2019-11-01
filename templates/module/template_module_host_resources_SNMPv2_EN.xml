@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-   <version>3.4</version>
+   <version>4.0</version>
    <date>2015-12-30T14:41:30Z</date>
    <groups>
       <group>
@@ -9,11 +9,12 @@
    </groups>
    <templates>
       <template>
-         <template>Template Module HOST-RESOURCES-MIB SNMPv2</template>
-         <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
-         <description>HOST-RESOURCES-MIB: CPU, Memory and Storage version: 0.15&#13;
-MIBs used:&#13;
-HOST-RESOURCES-MIB</description>
+         <template>Template Module HOST-RESOURCES-MIB storage SNMPv2</template>
+         <name>Template Module HOST-RESOURCES-MIB storage SNMPv2</name>
+         <description>MIBs used:&#13;
+HOST-RESOURCES-MIB&#13;
+&#13;
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -21,26 +22,17 @@ HOST-RESOURCES-MIB</description>
          </groups>
          <applications>
             <application>
-               <name>CPU</name>
-            </application>
-            <application>
-               <name>Internal items</name>
-            </application>
-            <application>
-               <name>Memory</name>
-            </application>
-            <application>
                <name>Storage</name>
             </application>
          </applications>
          <items/>
          <discovery_rules>
             <discovery_rule>
-               <name>CPU Discovery</name>
+               <name>Storage discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]</snmp_oid>
-               <key>hrProcessorLoad.discovery</key>
+               <snmp_oid>discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]</snmp_oid>
+               <key>vfs.fs.discovery[snmp]</key>
                <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
@@ -60,21 +52,180 @@ HOST-RESOURCES-MIB</description>
                <privatekey/>
                <port/>
                <filter>
-                  <evaltype>0</evaltype>
+                  <evaltype>1</evaltype>
                   <formula/>
-                  <conditions/>
+                  <conditions>
+                     <condition>
+                        <macro>{#FSTYPE}</macro>
+                        <value>{$VFS.FS.FSTYPE.MATCHES}</value>
+                        <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSTYPE}</macro>
+                        <value>{$VFS.FS.FSTYPE.NOT_MATCHES}</value>
+                        <operator>9</operator>
+                        <formulaid>B</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSNAME}</macro>
+                        <value>{$VFS.FS.FSNAME.MATCHES}</value>
+                        <operator>8</operator>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#FSNAME}</macro>
+                        <value>{$VFS.FS.FSNAME.NOT_MATCHES}</value>
+                        <operator>9</operator>
+                        <formulaid>D</formulaid>
+                     </condition>
+                  </conditions>
                </filter>
                <lifetime>30d</lifetime>
-               <description>HOST-RESOURCES-MIB::hrProcessorTable discovery</description>
+               <description>HOST-RESOURCES-MIB::hrStorage discovery with storage filter.</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>#{#SNMPINDEX}: CPU utilization</name>
+                     <name>{#FSNAME}: Used space</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}</snmp_oid>
-                     <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
+                     <key>vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: HOST-RESOURCES-MIB&#13;
+The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications/>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>{#ALLOC_UNITS}</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Filesystem {#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#FSNAME}: Total space</name>
+                     <type>4</type>
+                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
+                     <key>vfs.fs.total[hrStorageSize.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
+                     <trends>365d</trends>
+                     <status>0</status>
+                     <value_type>3</value_type>
+                     <allowed_hosts/>
+                     <units>B</units>
+                     <snmpv3_contextname/>
+                     <snmpv3_securityname/>
+                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                     <snmpv3_authpassphrase/>
+                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                     <snmpv3_privpassphrase/>
+                     <params/>
+                     <ipmi_sensor/>
+                     <authtype>0</authtype>
+                     <username/>
+                     <password/>
+                     <publickey/>
+                     <privatekey/>
+                     <port/>
+                     <description>MIB: HOST-RESOURCES-MIB&#13;
+The size of the storage represented by this entry, in units of hrStorageAllocationUnits.&#13;
+This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.&#13;
+For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</description>
+                     <inventory_link>0</inventory_link>
+                     <applications/>
+                     <valuemap/>
+                     <logtimefmt/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>{#ALLOC_UNITS}</params>
+                        </step>
+                     </preprocessing>
+                     <jmx_endpoint/>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Filesystem {#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
+                  </item_prototype>
+                  <item_prototype>
+                     <name>{#FSNAME}: Space utilization</name>
+                     <type>15</type>
+                     <snmp_community/>
+                     <snmp_oid/>
+                     <key>vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
                      <trends>365d</trends>
                      <status>0</status>
                      <value_type>0</value_type>
@@ -87,7 +238,7 @@ HOST-RESOURCES-MIB</description>
                      <snmpv3_authpassphrase/>
                      <snmpv3_privprotocol>0</snmpv3_privprotocol>
                      <snmpv3_privpassphrase/>
-                     <params/>
+                     <params>(last("vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]")/last("vfs.fs.total[hrStorageSize.{#SNMPINDEX}]"))*100</params>
                      <ipmi_sensor/>
                      <authtype>0</authtype>
                      <username/>
@@ -95,70 +246,131 @@ HOST-RESOURCES-MIB</description>
                      <publickey/>
                      <privatekey/>
                      <port/>
-                     <description>MIB: HOST-RESOURCES-MIB&#13;
-The average, over the last minute, of the percentage of time that this processor was not idle.&#13;
-Implementations may approximate this one minute smoothing period if necessary.</description>
+                     <description>Space utilization in % for {#FSNAME}</description>
                      <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>CPU</name>
-                        </application>
-                     </applications>
+                     <applications/>
                      <valuemap/>
                      <logtimefmt/>
                      <preprocessing/>
                      <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
+                     <application_prototypes>
+                        <application_prototype>
+                           <name>Filesystem {#FSNAME}</name>
+                        </application_prototype>
+                     </application_prototypes>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv2:system.cpu.util[hrProcessorLoad.{#SNMPINDEX}].avg(5m)}&gt;{$CPU_UTIL_MAX}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>#{#SNMPINDEX}: High CPU utilization</name>
+                     <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})&#13;
+Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.&#13;
+ Second condition should be one of the following:&#13;
+ - The disk free space is less than 5G.&#13;
+ - The disk will be full in less than 24 hours.</description>
                      <type>0</type>
-                     <manual_close>0</manual_close>
+                     <manual_close>1</manual_close>
                      <dependencies/>
+                     <tags/>
+                  </trigger_prototype>
+                  <trigger_prototype>
+                     <expression>{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and&#13;
+(({Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;10G or {Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                     <recovery_mode>0</recovery_mode>
+                     <recovery_expression/>
+                     <name>{#FSNAME}: Disk space is low (used &gt; {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)</name>
+                     <correlation_mode>0</correlation_mode>
+                     <correlation_tag/>
+                     <url/>
+                     <status>0</status>
+                     <priority>2</priority>
+                     <description>Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})&#13;
+Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.&#13;
+ Second condition should be one of the following:&#13;
+ - The disk free space is less than 10G.&#13;
+ - The disk will be full in less than 24 hours.</description>
+                     <type>0</type>
+                     <manual_close>1</manual_close>
+                     <dependencies>
+                        <dependency>
+                           <name>{#FSNAME}: Disk space is critically low (used &gt; {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)</name>
+                           <expression>{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].last()}&gt;{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and&#13;
+(({Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.total[hrStorageSize.{#SNMPINDEX}].last()}-{Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.used[hrStorageUsed.{#SNMPINDEX}].last()})&lt;5G or {Template Module HOST-RESOURCES-MIB storage SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].timeleft(1h,,100)}&lt;1d)</expression>
+                           <recovery_expression/>
+                        </dependency>
+                     </dependencies>
                      <tags/>
                   </trigger_prototype>
                </trigger_prototypes>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>#{#SNMPINDEX}: CPU utilization</name>
-                     <width>900</width>
-                     <height>200</height>
+                     <name>{#FSNAME}: Disk space usage</name>
+                     <width>600</width>
+                     <height>340</height>
                      <yaxismin>0</yaxismin>
                      <yaxismax>100</yaxismax>
                      <show_work_period>1</show_work_period>
                      <show_triggers>1</show_triggers>
-                     <type>0</type>
+                     <type>2</type>
                      <show_legend>1</show_legend>
-                     <show_3d>0</show_3d>
+                     <show_3d>1</show_3d>
                      <percent_left>0.0000</percent_left>
                      <percent_right>0.0000</percent_right>
-                     <ymin_type_1>1</ymin_type_1>
-                     <ymax_type_1>1</ymax_type_1>
+                     <ymin_type_1>0</ymin_type_1>
+                     <ymax_type_1>0</ymax_type_1>
                      <ymin_item_1>0</ymin_item_1>
                      <ymax_item_1>0</ymax_item_1>
                      <graph_items>
                         <graph_item>
                            <sortorder>0</sortorder>
-                           <drawtype>5</drawtype>
-                           <color>1A7C11</color>
+                           <drawtype>0</drawtype>
+                           <color>969696</color>
                            <yaxisside>0</yaxisside>
-                           <calc_fnc>2</calc_fnc>
+                           <calc_fnc>9</calc_fnc>
+                           <type>2</type>
+                           <item>
+                              <host>Template Module HOST-RESOURCES-MIB storage SNMPv2</host>
+                              <key>vfs.fs.total[hrStorageSize.{#SNMPINDEX}]</key>
+                           </item>
+                        </graph_item>
+                        <graph_item>
+                           <sortorder>1</sortorder>
+                           <drawtype>0</drawtype>
+                           <color>C80000</color>
+                           <yaxisside>0</yaxisside>
+                           <calc_fnc>9</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Module HOST-RESOURCES-MIB SNMPv2</host>
-                              <key>system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]</key>
+                              <host>Template Module HOST-RESOURCES-MIB storage SNMPv2</host>
+                              <key>vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -166,13 +378,80 @@ Implementations may approximate this one minute smoothing period if necessary.</
                </graph_prototypes>
                <host_prototypes/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
             </discovery_rule>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$VFS.FS.FSNAME.MATCHES}</macro>
+               <value>.+</value>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FSNAME.NOT_MATCHES}</macro>
+               <value>^(/dev|/sys|/run|/proc|.+/shm$)</value>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FSTYPE.MATCHES}</macro>
+               <value>.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$</value>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.FSTYPE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.PUSED.MAX.CRIT}</macro>
+               <value>90</value>
+            </macro>
+            <macro>
+               <macro>{$VFS.FS.PUSED.MAX.WARN}</macro>
+               <value>80</value>
+            </macro>
+         </macros>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module HOST-RESOURCES-MIB memory SNMPv2</template>
+         <name>Template Module HOST-RESOURCES-MIB memory SNMPv2</name>
+         <description>MIBs used:&#13;
+HOST-RESOURCES-MIB&#13;
+&#13;
+Template tooling version used: 0.33</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>Memory</name>
+            </application>
+         </applications>
+         <items/>
+         <discovery_rules>
             <discovery_rule>
-               <name>Memory Discovery</name>
+               <name>Memory discovery</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
-               <key>memory.discovery</key>
+               <snmp_oid>discovery[{#MEMNAME},1.3.6.1.2.1.25.2.3.1.3,{#MEMTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]</snmp_oid>
+               <key>vm.memory.discovery</key>
                <delay>1h</delay>
                <status>0</status>
                <allowed_hosts/>
@@ -192,20 +471,32 @@ Implementations may approximate this one minute smoothing period if necessary.</
                <privatekey/>
                <port/>
                <filter>
-                  <evaltype>2</evaltype>
+                  <evaltype>1</evaltype>
                   <formula/>
                   <conditions>
                      <condition>
-                        <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+2$</value>
+                        <macro>{#MEMTYPE}</macro>
+                        <value>{$MEMORY.TYPE.MATCHES}</value>
                         <operator>8</operator>
+                        <formulaid>A</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MEMTYPE}</macro>
+                        <value>{$MEMORY.TYPE.NOT_MATCHES}</value>
+                        <operator>9</operator>
                         <formulaid>B</formulaid>
                      </condition>
                      <condition>
-                        <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+hrStorageRam</value>
+                        <macro>{#MEMNAME}</macro>
+                        <value>{$MEMORY.NAME.MATCHES}</value>
                         <operator>8</operator>
-                        <formulaid>A</formulaid>
+                        <formulaid>C</formulaid>
+                     </condition>
+                     <condition>
+                        <macro>{#MEMNAME}</macro>
+                        <value>{$MEMORY.NAME.NOT_MATCHES}</value>
+                        <operator>9</operator>
+                        <formulaid>D</formulaid>
                      </condition>
                   </conditions>
                </filter>
@@ -213,63 +504,18 @@ Implementations may approximate this one minute smoothing period if necessary.</
                <description>HOST-RESOURCES-MIB::hrStorage discovery with memory filter</description>
                <item_prototypes>
                   <item_prototype>
-                     <name>#{#SNMPINDEX}: Memory units</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: HOST-RESOURCES-MIB&#13;
-The size, in bytes, of the data objects allocated from this pool.&#13;
-If this entry is monitoring sectors, blocks, buffers, or packets, for example,&#13;
-this number will commonly be greater than one. Otherwise this number will typically be one.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Internal items</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>#{#SNMPINDEX}: Used memory in units</name>
+                     <name>{#MEMNAME}: Used memory</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
+                     <key>vm.memory.used[hrStorageUsed.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
+                     <trends>365d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
                      <allowed_hosts/>
-                     <units>units</units>
+                     <units>B</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -290,29 +536,52 @@ The amount of the storage represented by this entry that is allocated, in units 
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal items</name>
+                           <name>Memory</name>
                         </application>
                      </applications>
                      <valuemap/>
                      <logtimefmt/>
-                     <preprocessing/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>{#ALLOC_UNITS}</params>
+                        </step>
+                     </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
-                     <master_item_prototype/>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
                   </item_prototype>
                   <item_prototype>
-                     <name>#{#SNMPINDEX}: Total memory in units</name>
+                     <name>{#MEMNAME}: Total memory</name>
                      <type>4</type>
                      <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
                      <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>vm.memory.units.total[hrStorageSize.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
+                     <key>vm.memory.total[hrStorageSize.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
+                     <trends>365d</trends>
                      <status>0</status>
                      <value_type>3</value_type>
                      <allowed_hosts/>
-                     <units>units</units>
+                     <units>B</units>
                      <snmpv3_contextname/>
                      <snmpv3_securityname/>
                      <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -335,108 +604,47 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <inventory_link>0</inventory_link>
                      <applications>
                         <application>
-                           <name>Internal items</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>#{#SNMPINDEX}: Used memory</name>
-                     <type>15</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>vm.memory.used[memoryUsed.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>B</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params>(last(vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}])*last(vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]))</params>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Used memory in Bytes</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
                            <name>Memory</name>
                         </application>
                      </applications>
                      <valuemap/>
                      <logtimefmt/>
-                     <preprocessing/>
+                     <preprocessing>
+                        <step>
+                           <type>1</type>
+                           <params>{#ALLOC_UNITS}</params>
+                        </step>
+                     </preprocessing>
                      <jmx_endpoint/>
                      <application_prototypes/>
-                     <master_item_prototype/>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
                   </item_prototype>
                   <item_prototype>
-                     <name>#{#SNMPINDEX}: Total memory</name>
+                     <name>{#MEMNAME}: Memory utilization</name>
                      <type>15</type>
                      <snmp_community/>
                      <snmp_oid/>
-                     <key>vm.memory.total[memoryTotal.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>B</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params>(last(vm.memory.units.total[hrStorageSize.{#SNMPINDEX}])*last(vm.memory.units[hrStorageAllocationUnits.{#SNMPINDEX}]))</params>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Total memory in Bytes</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Memory</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>#{#SNMPINDEX}: Memory utilization</name>
-                     <type>15</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}]</key>
-                     <delay>3m</delay>
-                     <history>30d</history>
+                     <key>vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]</key>
+                     <delay>1m</delay>
+                     <history>7d</history>
                      <trends>365d</trends>
                      <status>0</status>
                      <value_type>0</value_type>
@@ -449,7 +657,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <snmpv3_authpassphrase/>
                      <snmpv3_privprotocol>0</snmpv3_privprotocol>
                      <snmpv3_privpassphrase/>
-                     <params>(last(vm.memory.units.used[hrStorageUsed.{#SNMPINDEX}])/last(vm.memory.units.total[hrStorageSize.{#SNMPINDEX}]))*100</params>
+                     <params>last("vm.memory.used[hrStorageUsed.{#SNMPINDEX}]")/last("vm.memory.total[hrStorageSize.{#SNMPINDEX}]")*100</params>
                      <ipmi_sensor/>
                      <authtype>0</authtype>
                      <username/>
@@ -469,21 +677,40 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                      <preprocessing/>
                      <jmx_endpoint/>
                      <application_prototypes/>
-                     <master_item_prototype/>
+                     <timeout>3s</timeout>
+                     <url/>
+                     <query_fields/>
+                     <posts/>
+                     <status_codes>200</status_codes>
+                     <follow_redirects>1</follow_redirects>
+                     <post_type>0</post_type>
+                     <http_proxy/>
+                     <headers/>
+                     <retrieve_mode>0</retrieve_mode>
+                     <request_method>0</request_method>
+                     <output_format>0</output_format>
+                     <allow_traps>0</allow_traps>
+                     <ssl_cert_file/>
+                     <ssl_key_file/>
+                     <ssl_key_password/>
+                     <verify_peer>0</verify_peer>
+                     <verify_host>0</verify_host>
+                     <master_item/>
                   </item_prototype>
                </item_prototypes>
                <trigger_prototypes>
                   <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv2:vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$MEMORY_UTIL_MAX}</expression>
+                     <expression>{Template Module HOST-RESOURCES-MIB memory SNMPv2:vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}].min(5m)}&gt;{$MEMORY.UTIL.MAX}</expression>
                      <recovery_mode>0</recovery_mode>
                      <recovery_expression/>
-                     <name>#{#SNMPINDEX}: High memory utilization</name>
+                     <name>{#MEMNAME}: High memory utilization ( &gt;{$MEMORY.UTIL.MAX}% for 5m)</name>
                      <correlation_mode>0</correlation_mode>
                      <correlation_tag/>
                      <url/>
                      <status>0</status>
                      <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
+                     <description>Last value: {ITEM.LASTVALUE1}&#13;
+The system is running out of free memory.</description>
                      <type>0</type>
                      <manual_close>0</manual_close>
                      <dependencies/>
@@ -492,7 +719,7 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                </trigger_prototypes>
                <graph_prototypes>
                   <graph_prototype>
-                     <name>#{#SNMPINDEX}: Memory utilization</name>
+                     <name>{#MEMNAME}: Memory utilization</name>
                      <width>900</width>
                      <height>200</height>
                      <yaxismin>0</yaxismin>
@@ -517,8 +744,8 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                            <calc_fnc>2</calc_fnc>
                            <type>0</type>
                            <item>
-                              <host>Template Module HOST-RESOURCES-MIB SNMPv2</host>
-                              <key>vm.memory.pused[memoryUsedPercentage.{#SNMPINDEX}]</key>
+                              <host>Template Module HOST-RESOURCES-MIB memory SNMPv2</host>
+                              <key>vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]</key>
                            </item>
                         </graph_item>
                      </graph_items>
@@ -526,16 +753,84 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                </graph_prototypes>
                <host_prototypes/>
                <jmx_endpoint/>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
             </discovery_rule>
-            <discovery_rule>
-               <name>Storage Discovery</name>
+         </discovery_rules>
+         <httptests/>
+         <macros>
+            <macro>
+               <macro>{$MEMORY.NAME.MATCHES}</macro>
+               <value>.*</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY.NAME.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY.TYPE.MATCHES}</macro>
+               <value>.*(\.2|hrStorageRam)$</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY.TYPE.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
+            <macro>
+               <macro>{$MEMORY.UTIL.MAX}</macro>
+               <value>90</value>
+            </macro>
+         </macros>
+         <templates/>
+         <screens/>
+      </template>
+      <template>
+         <template>Template Module HOST-RESOURCES-MIB CPU SNMPv2</template>
+         <name>Template Module HOST-RESOURCES-MIB CPU SNMPv2</name>
+         <description>Requires server of Zabbix 4.0.14rc1, 4.2.8rc1, 4.4.0rc1 and newer.&#13;
+&#13;
+MIBs used:&#13;
+HOST-RESOURCES-MIB&#13;
+&#13;
+Template tooling version used: 0.33</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications>
+            <application>
+               <name>CPU</name>
+            </application>
+         </applications>
+         <items>
+            <item>
+               <name>CPU utilization</name>
                <type>4</type>
                <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-               <snmp_oid>discovery[{#SNMPVALUE},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]</snmp_oid>
-               <key>storage.discovery</key>
-               <delay>1h</delay>
+               <snmp_oid>discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]</snmp_oid>
+               <key>system.cpu.util</key>
+               <delay>1m</delay>
+               <history>7d</history>
+               <trends>365d</trends>
                <status>0</status>
+               <value_type>0</value_type>
                <allowed_hosts/>
+               <units>%</units>
                <snmpv3_contextname/>
                <snmpv3_securityname/>
                <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -551,356 +846,212 @@ For example, the amount of main memory allocated to a buffer pool might be modif
                <publickey/>
                <privatekey/>
                <port/>
-               <filter>
-                  <evaltype>2</evaltype>
-                  <formula/>
-                  <conditions>
-                     <condition>
-                        <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+(4|9)</value>
-                        <operator>8</operator>
-                        <formulaid>B</formulaid>
-                     </condition>
-                     <condition>
-                        <macro>{#STORAGE_TYPE}</macro>
-                        <value>.+(hrStorageFixedDisk|hrStorageFlashMemory)</value>
-                        <operator>8</operator>
-                        <formulaid>A</formulaid>
-                     </condition>
-                  </conditions>
-               </filter>
-               <lifetime>30d</lifetime>
-               <description>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</description>
-               <item_prototypes>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Storage units</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.4.{#SNMPINDEX}</snmp_oid>
-                     <key>vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units/>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: HOST-RESOURCES-MIB&#13;
-The size, in bytes, of the data objects allocated from this pool.&#13;
-If this entry is monitoring sectors, blocks, buffers, or packets, for example,&#13;
-this number will commonly be greater than one.  Otherwise this number will typically be one.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Internal items</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Used storage in units</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}</snmp_oid>
-                     <key>vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>units</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: HOST-RESOURCES-MIB&#13;
-The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Internal items</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Total space in units</name>
-                     <type>4</type>
-                     <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
-                     <snmp_oid>1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}</snmp_oid>
-                     <key>vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>1w</history>
-                     <trends>0d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>units</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params/>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>MIB: HOST-RESOURCES-MIB&#13;
-The size of the storage represented by this entry, in units of hrStorageAllocationUnits.&#13;
-This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.&#13;
-For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Internal items</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Used space</name>
-                     <type>15</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>vfs.fs.used[storageUsed.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>B</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params>(last(vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}])*last(vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]))</params>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Used storage in Bytes</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Storage</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Total space</name>
-                     <type>15</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>vfs.fs.total[storageTotal.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>3</value_type>
-                     <allowed_hosts/>
-                     <units>B</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params>(last(vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}])*last(vfs.fs.units[hrStorageAllocationUnits.{#SNMPINDEX}]))</params>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Total space in Bytes</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Storage</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-                  <item_prototype>
-                     <name>{#SNMPVALUE}: Storage utilization</name>
-                     <type>15</type>
-                     <snmp_community/>
-                     <snmp_oid/>
-                     <key>vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]</key>
-                     <delay>5m</delay>
-                     <history>30d</history>
-                     <trends>365d</trends>
-                     <status>0</status>
-                     <value_type>0</value_type>
-                     <allowed_hosts/>
-                     <units>%</units>
-                     <snmpv3_contextname/>
-                     <snmpv3_securityname/>
-                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                     <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                     <snmpv3_authpassphrase/>
-                     <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                     <snmpv3_privpassphrase/>
-                     <params>(last(vfs.fs.units.used[hrStorageUsed.{#SNMPINDEX}])/last(vfs.fs.units.total[hrStorageSize.{#SNMPINDEX}]))*100</params>
-                     <ipmi_sensor/>
-                     <authtype>0</authtype>
-                     <username/>
-                     <password/>
-                     <publickey/>
-                     <privatekey/>
-                     <port/>
-                     <description>Storage utilization in % for {#SNMPVALUE}</description>
-                     <inventory_link>0</inventory_link>
-                     <applications>
-                        <application>
-                           <name>Storage</name>
-                        </application>
-                     </applications>
-                     <valuemap/>
-                     <logtimefmt/>
-                     <preprocessing/>
-                     <jmx_endpoint/>
-                     <application_prototypes/>
-                     <master_item_prototype/>
-                  </item_prototype>
-               </item_prototypes>
-               <trigger_prototypes>
-                  <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: Disk space is critically low</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>3</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies/>
-                     <tags/>
-                  </trigger_prototype>
-                  <trigger_prototype>
-                     <expression>{Template Module HOST-RESOURCES-MIB SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_WARN}</expression>
-                     <recovery_mode>0</recovery_mode>
-                     <recovery_expression/>
-                     <name>{#SNMPVALUE}: Disk space is low</name>
-                     <correlation_mode>0</correlation_mode>
-                     <correlation_tag/>
-                     <url/>
-                     <status>0</status>
-                     <priority>2</priority>
-                     <description>Last value: {ITEM.LASTVALUE1}.</description>
-                     <type>0</type>
-                     <manual_close>0</manual_close>
-                     <dependencies>
-                        <dependency>
-                           <name>{#SNMPVALUE}: Disk space is critically low</name>
-                           <expression>{Template Module HOST-RESOURCES-MIB SNMPv2:vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}].avg(5m)}&gt;{$STORAGE_UTIL_CRIT}</expression>
-                           <recovery_expression/>
-                        </dependency>
-                     </dependencies>
-                     <tags/>
-                  </trigger_prototype>
-               </trigger_prototypes>
-               <graph_prototypes/>
-               <host_prototypes/>
+               <description>MIB: HOST-RESOURCES-MIB&#13;
+The average, over the last minute, of the percentage of time that processors was not idle.&#13;
+Implementations may approximate this one minute smoothing period if necessary.</description>
+               <inventory_link>0</inventory_link>
+               <applications>
+                  <application>
+                     <name>CPU</name>
+                  </application>
+               </applications>
+               <valuemap/>
+               <logtimefmt/>
+               <preprocessing>
+                  <step>
+                     <type>12</type>
+                     <params>$..['{#CPU.UTIL}'].avg()</params>
+                  </step>
+               </preprocessing>
                <jmx_endpoint/>
-            </discovery_rule>
-         </discovery_rules>
+               <timeout>3s</timeout>
+               <url/>
+               <query_fields/>
+               <posts/>
+               <status_codes>200</status_codes>
+               <follow_redirects>1</follow_redirects>
+               <post_type>0</post_type>
+               <http_proxy/>
+               <headers/>
+               <retrieve_mode>0</retrieve_mode>
+               <request_method>0</request_method>
+               <output_format>0</output_format>
+               <allow_traps>0</allow_traps>
+               <ssl_cert_file/>
+               <ssl_key_file/>
+               <ssl_key_password/>
+               <verify_peer>0</verify_peer>
+               <verify_host>0</verify_host>
+               <master_item/>
+            </item>
+         </items>
+         <discovery_rules/>
          <httptests/>
          <macros>
             <macro>
-               <macro>{$CPU_UTIL_MAX}</macro>
+               <macro>{$CPU.UTIL.CRIT}</macro>
                <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$MEMORY_UTIL_MAX}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$STORAGE_UTIL_CRIT}</macro>
-               <value>90</value>
-            </macro>
-            <macro>
-               <macro>{$STORAGE_UTIL_WARN}</macro>
-               <value>80</value>
             </macro>
          </macros>
          <templates/>
          <screens/>
       </template>
+      <template>
+         <template>Template Module HOST-RESOURCES-MIB SNMPv2</template>
+         <name>Template Module HOST-RESOURCES-MIB SNMPv2</name>
+         <description>HOST-RESOURCES-MIB: CPU, memory and storage(vfs.fs.file) linked together.&#13;
+&#13;
+Template tooling version used: 0.33</description>
+         <groups>
+            <group>
+               <name>Templates/Modules</name>
+            </group>
+         </groups>
+         <applications/>
+         <items/>
+         <discovery_rules/>
+         <httptests/>
+         <macros/>
+         <templates>
+            <template>
+               <name>Template Module HOST-RESOURCES-MIB CPU SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module HOST-RESOURCES-MIB memory SNMPv2</name>
+            </template>
+            <template>
+               <name>Template Module HOST-RESOURCES-MIB storage SNMPv2</name>
+            </template>
+         </templates>
+         <screens>
+            <screen>
+               <name>System performance</name>
+               <hsize>2</hsize>
+               <vsize>3</vsize>
+               <screen_items>
+                  <screen_item>
+                     <resourcetype>0</resourcetype>
+                     <width>750</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>0</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <style>0</style>
+                     <url/>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <resource>
+                        <name>CPU utilization</name>
+                        <host>Template Module HOST-RESOURCES-MIB SNMPv2</host>
+                     </resource>
+                     <max_columns>3</max_columns>
+                     <application/>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
+                     <width>750</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>1</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <style>0</style>
+                     <url/>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <resource>
+                        <name>{#MEMNAME}: Memory utilization</name>
+                        <host>Template Module HOST-RESOURCES-MIB SNMPv2</host>
+                     </resource>
+                     <max_columns>3</max_columns>
+                     <application/>
+                  </screen_item>
+                  <screen_item>
+                     <resourcetype>20</resourcetype>
+                     <width>750</width>
+                     <height>100</height>
+                     <x>0</x>
+                     <y>2</y>
+                     <colspan>1</colspan>
+                     <rowspan>1</rowspan>
+                     <elements>25</elements>
+                     <valign>0</valign>
+                     <halign>0</halign>
+                     <style>0</style>
+                     <url/>
+                     <dynamic>0</dynamic>
+                     <sort_triggers>0</sort_triggers>
+                     <resource>
+                        <name>{#FSNAME}: Disk space usage</name>
+                        <host>Template Module HOST-RESOURCES-MIB SNMPv2</host>
+                     </resource>
+                     <max_columns>3</max_columns>
+                     <application/>
+                  </screen_item>
+               </screen_items>
+            </screen>
+         </screens>
+      </template>
    </templates>
-   <graphs/>
-   <triggers/>
+   <graphs>
+      <graph>
+         <name>CPU utilization</name>
+         <width>900</width>
+         <height>200</height>
+         <yaxismin>0</yaxismin>
+         <yaxismax>100</yaxismax>
+         <show_work_period>1</show_work_period>
+         <show_triggers>1</show_triggers>
+         <type>0</type>
+         <show_legend>1</show_legend>
+         <show_3d>0</show_3d>
+         <percent_left>0.0000</percent_left>
+         <percent_right>0.0000</percent_right>
+         <ymin_type_1>1</ymin_type_1>
+         <ymax_type_1>1</ymax_type_1>
+         <ymin_item_1>0</ymin_item_1>
+         <ymax_item_1>0</ymax_item_1>
+         <graph_items>
+            <graph_item>
+               <sortorder>0</sortorder>
+               <drawtype>5</drawtype>
+               <color>1A7C11</color>
+               <yaxisside>0</yaxisside>
+               <calc_fnc>2</calc_fnc>
+               <type>0</type>
+               <item>
+                  <host>Template Module HOST-RESOURCES-MIB CPU SNMPv2</host>
+                  <key>system.cpu.util</key>
+               </item>
+            </graph_item>
+         </graph_items>
+      </graph>
+   </graphs>
+   <triggers>
+      <trigger>
+         <expression>{Template Module HOST-RESOURCES-MIB CPU SNMPv2:system.cpu.util.min(5m)}&gt;{$CPU.UTIL.CRIT}</expression>
+         <recovery_mode>0</recovery_mode>
+         <recovery_expression/>
+         <name>High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)</name>
+         <correlation_mode>0</correlation_mode>
+         <correlation_tag/>
+         <url/>
+         <status>0</status>
+         <priority>2</priority>
+         <description>Current utilization: {ITEM.LASTVALUE1}&#13;
+CPU utilization is too high. The system might be slow to respond.</description>
+         <type>0</type>
+         <manual_close>0</manual_close>
+         <dependencies/>
+         <tags/>
+      </trigger>
+   </triggers>
    <value_maps/>
 </zabbix_export>
