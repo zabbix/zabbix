@@ -46,20 +46,7 @@ class CControllerPopupConditionActionOperations extends CControllerPopupConditio
 	 * @return string
 	 */
 	protected function getConditionLastType() {
-		$last_type = CProfile::get('popup.condition.operations_last_type', 14);
-
-		if (hasRequest('condition_type')) {
-			if (getRequest('condition_type') != $last_type) {
-				CProfile::update(
-					'popup.condition.operations_last_type',
-					getRequest('condition_type'),
-					PROFILE_TYPE_INT
-				);
-				$last_type = getRequest('condition_type');
-			}
-		}
-
-		return $last_type;
+		return CONDITION_TYPE_EVENT_ACKNOWLEDGED;
 	}
 
 	/**
