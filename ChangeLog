@@ -59,8 +59,29 @@ A......... [ZBX-16604] fixed occurrence of an undefined index in discovered grap
 Changes for 4.4.2rc1
 
 New features:
+....I..... [ZBXNEXT-5532] disabled guest user by default (talbergs)
+..F....... [ZBXNEXT-5500] added scrollbars for item and problem descriptions (ashubin)
+.........T [ZBXNEXT-5493] updated "Template OS Windows SNMP template","Template Module Interfaces Windows SNMPv2" (mchudinov)
+.........T [ZBX-16540] fixed "Template Module HOST-RESOURCES-MIB SNMPv2","Template Net Arista SNMPv2" (mchudinov)
+..F....... [ZBXNEXT-4825] implemented in Monitoring -> Problems the button "Export to CSV" to export all pages (talbergs)
 
 Bug fixes:
+..F....... [ZBX-16812] fixed problems by severity widget problem duplication (talbergs)
+..F....... [ZBX-16815] fixed widget form positioing when changing widget type from Graph to any other type (averza)
+..F....... [ZBX-16706] fixed unneeded padding for dashboard URL widget (averza)
+..F....... [ZBX-16784] fixed Oracle performance by using "between" operator in SQL queries (averza)
+..F....... [ZBX-16579] fixed long text wrapping in the latest data history (averza)
+...G...PS. [ZBX-16767] fixed possible null pointer arithmetic; thanks to Mikhail Grigorev for the patch (asestakovs)
+....I..... [ZBX-16744] fixed GO compiler check during configuration (viktors)
+..F....... [ZBX-16817] fixed missing maxlength property for global macros description field (miks)
+A......... [ZBX-16500] fixed SLA calculation when requested time window starts during the service time; fixed downtime time calculation (miks)
+A......... [ZBX-16805] fixed when the HttpTest API selects too many entries from the httpstep table when editing a specific Web scenario (vasilijs)
+..F....... [ZBX-10618] fixed disappearing dependent trigger cells and rows in overview (vasilijs)
+...G...... [ZBX-16596] added handling of BOM to detect encoding for vfs.file.contents, vfs.file.regex and vfs.file.regmatch (arimdjonoks)
+........S. [ZBX-16719] added support of EVENT.TAGS.<name> macros to trigger based notifications (wiper)
+..F....... [ZBX-16771] fixed wrong Tab number being remembered when several browser tabs are in use (talbergs)
+..F....... [ZBX-16548] fixed sort order in plain text screen (talbergs)
+..F....... [ZBX-16721] fixed checkboxes of "Connections from host" in host prototype encryption tab not being disabled (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 4.4.1
