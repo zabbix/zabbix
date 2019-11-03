@@ -1,1 +1,0 @@
-...G...... [ZBX-16596] added handling of BOM to detect encoding for vfs.file.contents, vfs.file.regex and vfs.file.regmatch (arimdjonoks)

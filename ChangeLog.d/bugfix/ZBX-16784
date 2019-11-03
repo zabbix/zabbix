@@ -1,1 +1,0 @@
-..F....... [ZBX-16784] fixed Oracle performance by using "between" operator in SQL queries (averza)
