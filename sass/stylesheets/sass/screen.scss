@@ -1614,6 +1614,7 @@ output {
 		padding-bottom: 2px;
 
 		li {
+			display: block; // Override ".table-forms li".
 			margin: 2px 2px 0 0;
 			overflow: hidden;
 			white-space: nowrap;
