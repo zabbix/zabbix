@@ -42,22 +42,15 @@ class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
 			EVENT_SOURCE_INTERNAL => CONDITION_TYPE_APPLICATION
 		];
 
-		$last_type = CProfile::get(
-			'popup.condition.actions_last_type',
-			$default[$this->getInput('source')],
+		$last_type = CProfile::get('popup.condition.actions_last_type', $default[$this->getInput('source')],
 			$this->getInput('source')
 		);
 
-		if ($this->hasInput('condition_type')) {
-			if ($this->getInput('condition_type') != $last_type) {
-				CProfile::update(
-					'popup.condition.actions_last_type',
-					$this->getInput('condition_type'),
-					PROFILE_TYPE_INT,
-					$this->getInput('source')
-				);
-				$last_type = $this->getInput('condition_type');
-			}
+		if ($this->hasInput('condition_type') && $this->getInput('condition_type') != $last_type) {
+			CProfile::update('popup.condition.actions_last_type', $this->getInput('condition_type'),
+				PROFILE_TYPE_INT, $this->getInput('source')
+			);
+			$last_type = $this->getInput('condition_type');
 		}
 
 		return $last_type;

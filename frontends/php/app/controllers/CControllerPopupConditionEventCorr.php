@@ -36,15 +36,9 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 	protected function getConditionLastType() {
 		$last_type = CProfile::get('popup.condition.events_last_type', ZBX_CORR_CONDITION_OLD_EVENT_TAG);
 
-		if ($this->hasInput('condition_type')) {
-			if ($this->getInput('condition_type') != $last_type) {
-				CProfile::update(
-					'popup.condition.events_last_type',
-					$this->getInput('condition_type'),
-					PROFILE_TYPE_INT
-				);
-				$last_type = $this->getInput('condition_type');
-			}
+		if ($this->hasInput('condition_type') && $this->getInput('condition_type') != $last_type) {
+			CProfile::update('popup.condition.events_last_type', $this->getInput('condition_type'), PROFILE_TYPE_INT);
+			$last_type = $this->getInput('condition_type');
 		}
 
 		return $last_type;

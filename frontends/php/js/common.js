@@ -440,7 +440,7 @@ function PopUp(action, options, dialogueid, trigger_elmnt) {
 				.addClass('preloader-container')
 				.append(jQuery('<div>').addClass('preloader'))
 			),
-		'class': 'modal-popup' + (action === 'popup.generic' ? ' modal-popup-generic' : ''),
+		'class': 'modal-popup' + ((action === 'popup.generic') ? ' modal-popup-generic' : ''),
 		'buttons': [],
 		'dialogueid': (typeof dialogueid === 'undefined' || !dialogueid) ? getOverlayDialogueId() : dialogueid
 	};

@@ -36,6 +36,17 @@ class CEventCorrCondValidator extends CValidator {
 		$value = array_key_exists('value', $condition) ? $condition['value'] : null;
 		$groupids = array_key_exists('groupids', $condition) ? $condition['groupids'] : null;
 
+		$condition_type_validator = new CLimitedSetValidator([
+			'values' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,	ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,	ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+			]
+		]);
+
+		if (!$condition_type_validator->validate($condition['type'])) {
+			$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'type', _('incorrect condition type')));
+		}
+
 		// validate condition values depending on condition type
 		switch ($condition['type']) {
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
@@ -85,9 +96,6 @@ class CEventCorrCondValidator extends CValidator {
 					$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'value', _('cannot be empty')));
 				}
 				break;
-
-			default:
-				$this->setError(_('Incorrect condition type.'));
 		}
 
 		// If no error is not set, return true.

@@ -27,8 +27,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function validValuesProvider()
-	{
+	public function validValuesProvider() {
 		return [
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
@@ -170,8 +169,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider()
-	{
+	public function invalidValuesProvider() {
 		return [
 			[[],
 				[
@@ -346,7 +344,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'conditiontype' => CONDITION_TYPE_SUPPRESSED,
 					'value' => 123,
 				],
-				'Action condition value must be empty.'
+				'Incorrect value for field "value": should be empty.'
 			],
 			[[],
 				[
