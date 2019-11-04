@@ -418,38 +418,12 @@
 					});
 
 				if (duplicate_fields.length === fields_name.length) { // If all fields return true for checks.
-					jQuery(createErrorMsg("<?= _('Check already exists.') ?>")).insertBefore($form);
+					jQuery(makeMessageBox('bad', "<?= _('Check already exists.') ?>", null, true, false)).insertBefore($form);
 					return true;
 				}
 			}
 		}
 
 		return false;
-	}
-
-	/**
-	 * Create error message jQuery element.
-	 *
-	 * @param {string} msg  Error message.
-	 *
-	 * @return {object}
-	 */
-	function createErrorMsg(msg) {
-		return jQuery('<output/>')
-			.addClass('<?= ZBX_STYLE_MSG_BAD ?>')
-			.attr({role: 'contentinfo', 'aria-label': t('Error message')})
-			.append(
-				jQuery('<div/>')
-					.addClass('<?= ZBX_STYLE_MSG_DETAILS ?>')
-					.append(
-						jQuery('<ul/>')
-							.append(
-								jQuery('<li/>').append(msg)
-							)
-					),
-				jQuery('<button/>')
-					.addClass('<?= ZBX_STYLE_OVERLAY_CLOSE_BTN ?>')
-					.attr({title: t('Close'), onclick: "jQuery(this).closest('.<?= ZBX_STYLE_MSG_BAD ?>').remove();"})
-			);
 	}
 </script>

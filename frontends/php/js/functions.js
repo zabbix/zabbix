@@ -1053,13 +1053,13 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 
 	if (show_close_box) {
 		var $button = jQuery('<button>')
-				.addClass('overlay-close-btn')
-				.attr('title', t('Close'))
-				.click(function() {
-					jQuery(this)
-						.closest('.' + classes[index])
-						.remove();
-				});
+			.addClass('overlay-close-btn')
+			.attr('title', t('Close'))
+			.click(function () {
+				jQuery(this)
+					.closest('.' + classes[type])
+					.remove();
+			});
 		$msg_box.append($button);
 	}
 
