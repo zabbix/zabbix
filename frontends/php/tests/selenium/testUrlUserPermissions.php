@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  * @on-before removeGuestFromDisabledGroup
  * @on-after addGuestToDisabledGroup
  */
-
 class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function data() {
@@ -789,7 +788,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
 	public static function removeGuestFromDisabledGroup() {
-		DBexecute('DELETE FROM users_groups WHERE id=3');
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 
 	public function addGuestToDisabledGroup() {
