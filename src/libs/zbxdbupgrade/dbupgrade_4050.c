@@ -27,11 +27,6 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4050000(void)
-{
-	*** Feel free to use this function for the first DB patch! ***
-}*/
-
 static int	DBpatch_4050000(void)
 {
 	return DBdrop_foreign_key("items", 1);
