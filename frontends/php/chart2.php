@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 $page['file'] = 'chart2.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
+define('ZBX_PAGE_NO_HEADER', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
