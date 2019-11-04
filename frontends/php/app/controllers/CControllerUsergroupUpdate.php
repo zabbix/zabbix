@@ -91,9 +91,9 @@ class CControllerUsergroupUpdate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.list')
-				->setArgument('uncheck', 1)
 				->getUrl()
 			);
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_('Group updated'));
 		}
 		else {

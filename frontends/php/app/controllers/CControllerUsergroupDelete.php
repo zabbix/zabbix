@@ -46,12 +46,13 @@ class CControllerUsergroupDelete extends CController {
 
 		$deleted = count($usrgrpids);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
-		$response->setFormData(['uncheck' => '1']);
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 
 		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
 			$response->setMessageOk(_n('Group deleted', 'Groups deleted', $deleted));
 		}
 		else {
