@@ -166,7 +166,13 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		}
 
 		if ($this->getInput('refresh', 0)) {
-			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
+			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
+				$parser = new CAbsoluteTimeParser();
+				$parser->parse($data['start_date']);
+				$start_date = $parser->getDateTime(true);
+				$data['start_date'] = $start_date->format(ZBX_DATE_TIME);
+			}
+			elseif ($data['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 				$data['dayofweek'] = array_sum($this->getInput('days', []));
 			}
 			elseif ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
