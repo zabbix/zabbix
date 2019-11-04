@@ -24,11 +24,11 @@ class CControllerUsergroupUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'usrgrpid'     => 'required|db usrgrp.usrgrpid',
-			'name'         => 'required|not_empty|string',
+			'name'         => 'not_empty|db usrgrp.name',
 			'userids'      => 'array_db users.userid',
-			'gui_access'   => 'required|db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' => 'required|db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode'   => 'required|db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'gui_access'   => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode'   => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 
 			'group_rights' => 'array',
 			'tag_filters'  => 'array',
@@ -45,7 +45,6 @@ class CControllerUsergroupUpdate extends CController {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('usrgrpid', $this->getInput('usrgrpid'))
 						->setArgument('action', 'usergroup.edit')
 						->getUrl()
 					);
@@ -69,17 +68,12 @@ class CControllerUsergroupUpdate extends CController {
 
 	protected function doAction() {
 		$user_group = [
-			'usrgrpid'     => $this->getInput('usrgrpid'),
-			'name'         => $this->getInput('name'),
-			'users_status' => $this->getInput('users_status'),
-			'gui_access'   => $this->getInput('gui_access'),
-			'debug_mode'   => $this->getInput('debug_mode'),
-			'userids'      => $this->getInput('userids', []),
-			'tag_filters'  => $this->getInput('tag_filters', []),
-			'rights'       => []
+			'rights' => []
 		];
 
-		sdfile($this->getInput( 'group_rights' ));
+		$this->getInputs($user_group, ['usrgrpid', 'name', 'users_status', 'gui_access', 'debug_mode', 'userids',
+			'tag_filters'
+		]);
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 
@@ -93,8 +87,6 @@ class CControllerUsergroupUpdate extends CController {
 		}
 
 		$result = (bool) API::UserGroup()->update($user_group);
-
-		$form_data = $this->getInputAll();
 
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -110,7 +102,7 @@ class CControllerUsergroupUpdate extends CController {
 				->getUrl()
 			);
 			$response->setMessageError(_('Cannot update group'));
-			$response->setFormData($form_data);
+			$response->setFormData($this->getInputAll());
 		}
 
 		$this->setResponse($response);
