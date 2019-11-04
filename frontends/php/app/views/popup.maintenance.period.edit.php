@@ -119,7 +119,7 @@ $form
 		'row_timeperiod_week_days'
 	)
 	->addRow((new CLabel(_('Day of month'), 'day'))->setAsteriskMark(),
-		(new CNumericBox('day', $data['day'], 2))
+		(new CNumericBox('day', ($data['month_date_type'] == 0) ? $data['day'] : 1, 2))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired(),
 		'row_timeperiod_day'
