@@ -55,14 +55,14 @@ foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
 	$months[] = [
 		'name' => getMonthCaption($month),
 		'value' => $value,
-		'checked' => (bool) ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && ($value & $data['month']))
+		'checked' => ($data['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY && (bool) ($value & $data['month']))
 	];
 }
 
 $form
 	->addRow((new CLabel(_('Period type'), 'timeperiod_type')),
 		(new CComboBox('timeperiod_type', $data['timeperiod_type'], null, [
-			TIMEPERIOD_TYPE_ONETIME => _('One time only'),
+			TIMEPERIOD_TYPE_ONETIME	=> _('One time only'),
 			TIMEPERIOD_TYPE_DAILY	=> _('Daily'),
 			TIMEPERIOD_TYPE_WEEKLY	=> _('Weekly'),
 			TIMEPERIOD_TYPE_MONTHLY	=> _('Monthly')
@@ -120,8 +120,8 @@ $form
 	)
 	->addRow((new CLabel(_('Day of month'), 'day'))->setAsteriskMark(),
 		(new CNumericBox('day', $data['day'], 2))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-		->setAriaRequired(),
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setAriaRequired(),
 		'row_timeperiod_day'
 	)
 	->addRow((new CLabel(_('Date'), 'start_date'))->setAsteriskMark(),
@@ -132,28 +132,23 @@ $form
 		'row_timepreiod_start_date'
 	)
 	->addRow(new CLabel(_('At (hour:minute)'), 'hour'),
-		[
-			(new CNumericBox('hour', $data['hour'], 2))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-			new CLabel(':'),
-			(new CNumericBox('minute', $data['minute'], 2))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-		],
-		'row_timeperiod_period_at_hours_minutes',
-		ZBX_STYLE_FORM_FIELDS_INLINE
+		(new CDiv([
+			(new CNumericBox('hour', $data['hour'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			' : ',
+			(new CNumericBox('minute', $data['minute'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
+		'row_timeperiod_period_at_hours_minutes'
 	)
 	->addRow((new CLabel(_('Maintenance period length'), 'period_days'))->setAsteriskMark(),
-		[
-			(new CNumericBox('period_days', $data['period_days'], 3))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+		(new CDiv([
+			(new CNumericBox('period_days', $data['period_days'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			new CLabel(_('Days'), 'period_days'),
 			new CComboBox('period_hours', $data['period_hours'], null, range(0, 23)),
 			new CLabel(_('Hours'), 'period_hours'),
 			new CComboBox('period_minutes', $data['period_minutes'], null, range(0, 59)),
 			new CLabel(_('Minutes'), 'period_minutes')
-		],
-		'row_timeperiod_period_length',
-		ZBX_STYLE_FORM_FIELDS_INLINE
+		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
+		'row_timeperiod_period_length'
 	);
 
 $output = [
