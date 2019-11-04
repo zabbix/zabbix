@@ -1084,15 +1084,29 @@ output {
     padding: 0;
     margin: 0; }
   .multiselect .multiselect-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     padding-left: 2px;
     padding-bottom: 2px; }
     .multiselect .multiselect-list li {
-      display: inline-block;
-      margin: 2px 14px 0 0;
-      white-space: nowrap; }
+      display: block;
+      margin: 2px 2px 0 0;
+      overflow: hidden;
+      white-space: nowrap;
+      cursor: default; }
       .multiselect .multiselect-list li .subfilter-enabled {
-        padding: 0 9px 0 4px;
+        display: flex;
+        flex-direction: row;
+        padding: 0 3px 0 4px;
         line-height: 18px; }
+        .multiselect .multiselect-list li .subfilter-enabled > span:first-child {
+          overflow: hidden;
+          text-overflow: ellipsis; }
+        .multiselect .multiselect-list li .subfilter-enabled > .subfilter-disable-btn {
+          position: relative;
+          left: 3px;
+          flex-shrink: 0; }
       .multiselect .multiselect-list li.selected .subfilter-enabled,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
@@ -1154,13 +1168,10 @@ output {
   color: #000;
   font-weight: bold; }
 
-.available {
+.multiselect-available {
   position: absolute;
-  z-index: 1000;
-  margin-top: 1px;
+  z-index: 20000;
   border: 1px solid #383838;
-  border-top: none;
-  max-height: 400px;
   overflow-y: auto;
   -webkit-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
@@ -4172,10 +4183,6 @@ a.link-action {
   width: 18px;
   height: 18px;
   line-height: 18px;
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  right: -12px;
   color: #fff;
   background-color: #333;
   -webkit-border-radius: 2px;
@@ -4381,11 +4388,11 @@ a.link-action {
   padding: 10px 0 0 0;
   text-align: center; }
 
-.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-description::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-description::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-description::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-description::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #999; }
-.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-description::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-description::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #f9f9f9;
   border: 1px solid #adadad; }
 
@@ -4565,9 +4572,10 @@ svg {
         min-height: 22px;
         width: 85px; }
       .overrides-options-list > li > div > .subfilter-disable-btn {
-        border: none !important;
+        position: absolute;
         right: 0px;
-        top: 0px; }
+        top: 0px;
+        border: 0; }
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 

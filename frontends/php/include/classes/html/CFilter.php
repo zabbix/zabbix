@@ -339,24 +339,13 @@ class CFilter extends CDiv {
 	 */
 	private function getJS() {
 		$id = '#'.$this->getId();
-		$js = 'var multiselects = jQuery("'.$id.'").tabs('.
-			CJs::encodeJson($this->tabs_options).
-		').show().find(".multiselect");'.
 
-		'if (multiselects.length && multiselects.multiSelect) {'.
-			'multiselects.multiSelect("resize");'.
-		'}';
+		$js = 'jQuery("'.$id.'").tabs('.CJs::encodeJson($this->tabs_options).').show();';
 
 		if ($this->idx !== null && $this->idx !== '') {
-			$idx = $this->idx.'.active';
 			$js .= 'jQuery("'.$id.'").on("tabsactivate", function(e, ui) {'.
-				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0,'.
-					'multiselects = jQuery(".multiselect", ui.newPanel);'.
-				'updateUserProfile("'.$idx.'", active, []);'.
-
-				'if (multiselects.length) {'.
-					'multiselects.multiSelect("resize");'.
-				'}'.
+				'var active = ui.newPanel.length ? jQuery(this).tabs("option", "active") + 1 : 0;'.
+				'updateUserProfile("'.$this->idx.'.active", active, []);'.
 
 				'if (active) {'.
 					'jQuery("[autofocus=autofocus]", ui.newPanel).focus();'.

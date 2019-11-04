@@ -1661,17 +1661,35 @@ output {
 	}
 
 	.multiselect-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
 		padding-left: 2px;
 		padding-bottom: 2px;
 
 		li {
-			display: inline-block;
-			margin: 2px 14px 0 0;
+			display: block; // Override ".table-forms li".
+			margin: 2px 2px 0 0;
+			overflow: hidden;
 			white-space: nowrap;
+			cursor: default;
 
 			.subfilter-enabled {
-				padding: 0 9px 0 4px;
+				display: flex;
+				flex-direction: row;
+				padding: 0 3px 0 4px;
 				line-height: 18px;
+
+				& > span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				& > .subfilter-disable-btn {
+					position: relative;
+					left: 3px;
+					flex-shrink: 0;
+				}
 			}
 
 			&.selected {
@@ -1755,13 +1773,10 @@ output {
 	@extend .multiselect-suggest;
 }
 
-.available {
+.multiselect-available {
 	position: absolute;
-	z-index: 1000;
-	margin-top: 1px;
+	z-index: 20000;
 	border: 1px solid $action-border-color;
-	border-top: none;
-	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
@@ -6076,10 +6091,6 @@ a.overlay-close-btn {
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	right: -12px;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -6574,9 +6585,10 @@ svg {
 			}
 
 			> .subfilter-disable-btn {
-				border: none !important;
+				position: absolute;
 				right: 0px;
 				top: 0px;
+				border: 0;
 
 				&:focus,
 				&:hover {
