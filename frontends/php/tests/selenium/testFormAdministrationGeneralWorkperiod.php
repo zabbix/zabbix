@@ -30,7 +30,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	* @dataProvider WorkingTime
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
-		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestLogin('zabbix.php?action=gui.edit');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
@@ -45,7 +45,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$sqlHash = 'SELECT * FROM config ORDER BY configid';
 		$oldHash = CDBHelper::getHash($sqlHash);
 
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->zbxTestLogin('zabbix.php?action=workingtime.edit');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
@@ -120,7 +120,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 			[
 				'work_period' => '',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": cannot be empty.'
 			],
 			[
 				'work_period' => '{WORKING_HOURS}',
@@ -149,7 +149,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod($work_period, $expected, $msg) {
-		$this->zbxTestLogin('adm.workingtime.php');
+		$this->zbxTestLogin('zabbix.php?action=workingtime.edit');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 
@@ -164,7 +164,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 				$this->assertEquals($work_period, $result['work_period']);
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update configuration');
 				$this->zbxTestTextPresent($msg);
 				break;
 		}
