@@ -23,8 +23,10 @@ class CControllerUsergroupMassUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpids' => 'required|array_db usrgrp.usrgrpid',
-			'update' => 'required|array'
+			'usrgrpids'    => 'required|array_db usrgrp.usrgrpid',
+			'gui_access'   => 'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' => 'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode'   => 'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,51 +43,62 @@ class CControllerUsergroupMassUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$update = $this->getInput('update');
+		$user_group = [];
+
+		$this->getInputs($user_group, ['gui_access', 'users_status', 'debug_mode']);
+
 		$user_groups = [];
 		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
-			$user_groups[] = ['usrgrpid' => $usrgrpid] + $update;
+			$user_groups[] = ['usrgrpid' => $usrgrpid] + $user_group;
 		}
 
 		$result = (bool) API::UserGroup()->update($user_groups);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
-		$response = new CControllerResponseRedirect($url->getUrl());
-		$response->setFormData(['uncheck' => '1']);
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 
-		list($msg_ok, $msg_error) = $this->getUpdateMessages($update, count($user_groups));
+		$update_message = $this->getUpdateMessage($result);
 
-		$result
-			? $response->setMessageOk($msg_ok)
-			: $response->setMessageError($msg_error);
+		if ($result) {
+			$response->setFormData(['uncheck' => '1']);
+			$response->setMessageOk($update_message);
+		}
+		else {
+			$response->setMessageError($update_message);
+		}
 
 		$this->setResponse($response);
 	}
 
 	/**
-	 * @param array $update
-	 * @param int $count
+	 * @param bool $result
 	 *
-	 * @return array
+	 * @return string
 	 */
-	protected function getUpdateMessages(array $update, $count) {
-		switch (key($update)) {
-			case 'users_status':
-				if ($update['users_status'] == GROUP_STATUS_ENABLED) {
-					$msg_ok = _n('User group enabled', 'User groups enabled', $count);
-					$msg_error = _n('Cannot enable user group', 'Cannot enable user groups', $count);
-				}
-				else {
-					$msg_ok = _n('User group disabled', 'User groups disabled', $count);
-					$msg_error = _n('Cannot disable user group', 'Cannot disable user groups', $count);
-				}
-				break;
-			case 'debug_mode':
-				$msg_ok = _('Debug mode updated');
-				$msg_error = _('Cannot update debug mode');
-				break;
+	private function getUpdateMessage($result) {
+		if ($this->hasInput('gui_access')) {
+			$message = $result ? _('Frontend access updated') : _('Cannot update frontend access');
+		}
+		elseif ($this->hasInput('users_status')) {
+			$updated = count($this->getInput('usrgrpids'));
+
+			if ($this->getInput('users_status') == GROUP_STATUS_ENABLED) {
+				$message = $result
+					? _n('User group enabled', 'User groups enabled', $updated)
+					: _n('Cannot enable user group', 'Cannot enable user groups', $updated);
+			}
+			else {
+				$message = $result
+					? _n('User group disabled', 'User groups disabled', $updated)
+					: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
+			}
+		}
+		else {
+			$message = $result ? _('Debug mode updated') : _('Cannot update debug mode');
 		}
 
-		return [$msg_ok, $msg_error];
+		return $message;
 	}
 }

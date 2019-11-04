@@ -142,7 +142,6 @@ class CRouter {
 		'usergroup.list'				=> ['CControllerUsergroupList',						'layout.htmlpage',		'administration.usergroup.list'],
 		'usergroup.massupdate'			=> ['CControllerUsergroupMassUpdate',				null,					null],
 		'usergroup.update'				=> ['CControllerUsergroupUpdate',					null,					null],
-		'usergroup.update_guiaccess'	=> ['CControllerUsergroupUpdateGuiAccess',			null,					null],
 		'userprofile.edit'				=> ['CControllerUserProfileEdit',					'layout.htmlpage',		'administration.user.edit'],
 		'userprofile.update'			=> ['CControllerUserProfileUpdate',					null,					null],
 		'web.view'						=> ['CControllerWebView',							'layout.htmlpage',		'monitoring.web.view'],
