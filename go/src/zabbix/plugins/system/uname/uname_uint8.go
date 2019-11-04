@@ -1,4 +1,4 @@
-// +build !linux,amd64
+// +build linux,arm linux,ppc64le linux,s390x
 
 /*
 ** Zabbix
@@ -19,11 +19,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// package std is used to create wrappers for standard Go functions to support
-// mocking in tests where necessary
-package std
+package uname
 
-// NewMockOs returns Os interface that replaces supported os package functionality with mock functions.
-func NewMockOs() Os {
-	return &sysOs{}
+func arrayToString(unameArray *[65]uint8) string {
+	var byteString [65]byte
+	var indexLength int
+	for ; indexLength < len(unameArray); indexLength++ {
+		if 0 == unameArray[indexLength] {
+			break
+		}
+		byteString[indexLength] = uint8(unameArray[indexLength])
+	}
+	return string(byteString[:indexLength])
 }
+

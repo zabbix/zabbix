@@ -5,4 +5,3 @@ SUBDIRS = \
 	empty \
 	filewatcher \
 	log
-

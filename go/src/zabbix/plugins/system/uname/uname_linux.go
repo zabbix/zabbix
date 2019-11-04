@@ -24,18 +24,6 @@ import (
 	"syscall"
 )
 
-func arrayToString(unameArray *[65]int8) string {
-	var byteString [65]byte
-	var indexLength int
-	for ; indexLength < len(unameArray); indexLength++ {
-		if 0 == unameArray[indexLength] {
-			break
-		}
-		byteString[indexLength] = uint8(unameArray[indexLength])
-	}
-	return string(byteString[:indexLength])
-}
-
 func getUname() (uname string, err error) {
 	var utsname syscall.Utsname
 	if err = syscall.Uname(&utsname); err != nil {

@@ -9,4 +9,3 @@ SUBDIRS = \
 	vfs \
 	zabbix \
 	net
-

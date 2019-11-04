@@ -5,4 +5,3 @@ clean:
 
 check:
 	go test
-
