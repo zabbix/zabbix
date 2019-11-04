@@ -59,46 +59,16 @@ class CControllerUsergroupMassUpdate extends CController {
 			->getUrl()
 		);
 
-		$update_message = $this->getUpdateMessage($result);
+		$updated = count($user_groups);
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk($update_message);
+			$response->setMessageOk(_n('User group updated', 'User groups updated', $updated));
 		}
 		else {
-			$response->setMessageError($update_message);
+			$response->setMessageError(_n('Cannot update user group', 'Cannot update user groups', $updated));
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @param bool $result
-	 *
-	 * @return string
-	 */
-	private function getUpdateMessage($result) {
-		if ($this->hasInput('gui_access')) {
-			$message = $result ? _('Frontend access updated') : _('Cannot update frontend access');
-		}
-		elseif ($this->hasInput('users_status')) {
-			$updated = count($this->getInput('usrgrpids'));
-
-			if ($this->getInput('users_status') == GROUP_STATUS_ENABLED) {
-				$message = $result
-					? _n('User group enabled', 'User groups enabled', $updated)
-					: _n('Cannot enable user group', 'Cannot enable user groups', $updated);
-			}
-			else {
-				$message = $result
-					? _n('User group disabled', 'User groups disabled', $updated)
-					: _n('Cannot disable user group', 'Cannot disable user groups', $updated);
-			}
-		}
-		else {
-			$message = $result ? _('Debug mode updated') : _('Cannot update debug mode');
-		}
-
-		return $message;
 	}
 }

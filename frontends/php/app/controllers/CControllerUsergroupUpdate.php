@@ -49,7 +49,7 @@ class CControllerUsergroupUpdate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot update group'));
+					$response->setMessageError(_('Cannot update user group'));
 					$this->setResponse($response);
 					break;
 
@@ -94,7 +94,7 @@ class CControllerUsergroupUpdate extends CController {
 				->getUrl()
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Group updated'));
+			$response->setMessageOk(_('User group updated'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -102,7 +102,7 @@ class CControllerUsergroupUpdate extends CController {
 				->setArgument('usrgrpid', $this->getInput('usrgrpid'))
 				->getUrl()
 			);
-			$response->setMessageError(_('Cannot update group'));
+			$response->setMessageError(_('Cannot update user group'));
 			$response->setFormData($this->getInputAll());
 		}
 

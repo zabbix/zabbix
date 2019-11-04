@@ -48,7 +48,7 @@ class CControllerUsergroupCreate extends CController {
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
-					$response->setMessageError(_('Cannot add group'));
+					$response->setMessageError(_('Cannot add user group'));
 					$this->setResponse($response);
 					break;
 
@@ -91,14 +91,14 @@ class CControllerUsergroupCreate extends CController {
 				->getUrl()
 			);
 			$response->setFormData(['uncheck' => '1']);
-			$response->setMessageOk(_('Group added'));
+			$response->setMessageOk(_('User group added'));
 		}
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
 				->getUrl()
 			);
-			$response->setMessageError(_('Cannot add group'));
+			$response->setMessageError(_('Cannot add user group'));
 			$response->setFormData($this->getInputAll());
 		}
 

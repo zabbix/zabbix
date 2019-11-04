@@ -73,7 +73,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			}
 
 			$this->zbxTestClick('update');
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 		}
 
 		// Logout as super admin and login as simple user.

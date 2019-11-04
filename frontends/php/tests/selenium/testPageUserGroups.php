@@ -65,7 +65,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Group updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
@@ -96,7 +96,7 @@ class testPageUserGroups extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User cannot add himself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
-			$this->zbxTestTextPresent('User group disabled');
+			$this->zbxTestTextPresent('User group updated');
 		}
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
@@ -128,7 +128,7 @@ class testPageUserGroups extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group enabled');
+		$this->zbxTestTextPresent('User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -154,7 +154,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('Debug mode updated');
+		$this->zbxTestTextPresent('User group updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -180,7 +180,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('Debug mode updated');
+		$this->zbxTestTextPresent('User group updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
 		$this->assertEquals(1, CDBHelper::getCount($sql));
