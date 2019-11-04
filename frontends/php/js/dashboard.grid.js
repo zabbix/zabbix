@@ -2395,7 +2395,7 @@
 						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
 						 * to have actual data for the popup positioning.
 						 */
-						if (response.options.stick_to_top) {
+						if (resp.options.stick_to_top) {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
 						}
 
