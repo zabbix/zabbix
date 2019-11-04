@@ -22,7 +22,7 @@
 /**
  * Actions new condition popup.
  */
-class CControllerPopupConditionActions extends CControllerPopupConditionCommon {
+class CControllerPopupConditionActionsEdit extends CControllerPopupConditionCommon {
 
 	protected function getCheckInputs() {
 		return [
