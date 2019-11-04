@@ -168,7 +168,7 @@ class testItemState extends CIntegrationTest {
 		$id = 0;
 
 		foreach (self::$items as &$item) {
-			 $item['itemid'] = $itemids[$id++];
+			$item['itemid'] = $itemids[$id++];
 		}
 
 		file_put_contents(PSV_FILE_NAME, '1');

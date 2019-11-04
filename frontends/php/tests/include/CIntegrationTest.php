@@ -874,7 +874,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param boolean      $incremental   flag to be used to enable incremental read
 	 * @param integer      $iterations    iteration count
 	 * @param integer      $delay         iteration delay
- 	 * @param integer      $timestamp     timestamp
+	 * @param integer      $timestamp     timestamp
 	 *
 	 * @throws Exception    on failed wait operation or missing/invalid timestamp
 	 */
