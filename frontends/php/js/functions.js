@@ -1055,7 +1055,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		var $button = jQuery('<button>')
 				.addClass('overlay-close-btn')
 				.attr('title', t('Close'))
-				.click(function () {
+				.click(function() {
 					jQuery(this)
 						.closest('.' + msg_class)
 						.remove();
