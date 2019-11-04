@@ -418,7 +418,8 @@
 					});
 
 				if (duplicate_fields.length === fields_name.length) { // If all fields return true for checks.
-					jQuery(makeMessageBox('bad', "<?= _('Check already exists.') ?>", null, true, false)).insertBefore($form);
+					jQuery(makeMessageBox('bad', "<?= _('Check already exists.') ?>", null, true, false))
+						.insertBefore($form);
 					return true;
 				}
 			}
