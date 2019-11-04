@@ -85,6 +85,7 @@ class CControllerUsergroupCreate extends CController {
 		if ($result) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.list')
+				->setArgument('uncheck', 1)
 				->getUrl()
 			);
 			$response->setMessageOk(_('Group added'));
