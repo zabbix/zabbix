@@ -109,19 +109,6 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Resize multiselect selected text
-		 *
-		 * @return jQuery
-		 */
-		resize: function() {
-			return this.each(function() {
-				var $obj = $(this);
-
-				resizeAllSelectedTexts($obj);
-			});
-		},
-
-		/**
 		 * Enable multi select UI control.
 		 *
 		 * @return jQuery
@@ -658,7 +645,6 @@ jQuery(function($) {
 
 		$('.selected ul', $obj).append($li);
 
-		resizeSelectedText($obj, $li);
 		cleanSearch($obj);
 	}
 
@@ -1020,42 +1006,6 @@ jQuery(function($) {
 		cleanSearchInput($obj);
 		cleanSearchHistory($obj);
 		updateSearchFieldVisibility($obj);
-	}
-
-	function resizeSelectedText($obj, $li) {
-		var	li_margins = $li.outerWidth(true) - $li.width(),
-			$span = $('span.subfilter-enabled', $li),
-			span_paddings = $span.outerWidth(true) - $span.width(),
-			max_width = $('.selected ul', $obj).width() - li_margins - span_paddings,
-			$text = $('span:first-child', $span);
-
-		if ($text.width() > max_width) {
-			var t = $text.text();
-			var l = t.length;
-
-			while ($text.width() > max_width && l != 0) {
-				$text.text(t.substring(0, --l) + '...');
-			}
-		}
-	}
-
-	function resizeAllSelectedTexts($obj) {
-		var ms = $obj.data('multiSelect');
-
-		$('.selected li', $obj).each(function() {
-			var $li = $(this),
-				id = $li.data('id'),
-				$span = $('span.subfilter-enabled', $li),
-				$text = $('span:first-child', $span),
-				t = empty(ms.values.selected[id].prefix)
-					? ms.values.selected[id].name
-					: ms.values.selected[id].prefix + ms.values.selected[id].name;
-
-			// Rewrite previous text to original.
-			$text.text(t);
-
-			resizeSelectedText($obj, $li);
-		});
 	}
 
 	function updateSearchFieldVisibility($obj) {
