@@ -1094,27 +1094,15 @@ output {
     padding: 0;
     margin: 0; }
   .multiselect .multiselect-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     padding-left: 2px;
     padding-bottom: 2px; }
     .multiselect .multiselect-list li {
-      margin: 2px 2px 0 0;
-      overflow: hidden;
+      display: inline-block;
+      margin: 2px 14px 0 0;
       white-space: nowrap; }
       .multiselect .multiselect-list li .subfilter-enabled {
-        display: flex;
-        flex-direction: row;
-        padding: 0 3px 0 4px;
+        padding: 0 9px 0 4px;
         line-height: 18px; }
-        .multiselect .multiselect-list li .subfilter-enabled > span:first-child {
-          overflow: hidden;
-          text-overflow: ellipsis; }
-        .multiselect .multiselect-list li .subfilter-enabled > .subfilter-disable-btn {
-          position: relative;
-          left: 3px;
-          flex-shrink: 0; }
       .multiselect .multiselect-list li.selected .subfilter-enabled,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
@@ -3755,6 +3743,10 @@ td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-
   width: 18px;
   height: 18px;
   line-height: 18px;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: -12px;
   color: #f2f2f2;
   background-color: #4f4f4f;
   -webkit-border-radius: 2px;
@@ -4142,10 +4134,9 @@ svg {
         min-height: 22px;
         width: 85px; }
       .overrides-options-list > li > div > .subfilter-disable-btn {
-        position: absolute;
+        border: none !important;
         right: 0px;
-        top: 0px;
-        border: 0; }
+        top: 0px; }
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 

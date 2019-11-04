@@ -1506,6 +1506,9 @@ ZABBIX.apps.map = (function($) {
 
 						$('#link-connect-to').show();
 						this.form.show();
+
+						// resize multiselect
+						$('.multiselect').multiSelect('resize');
 					}
 
 					// only one shape is selected
