@@ -34,6 +34,10 @@ class testPageDashboard extends CLegacyWebTest {
 	public $mapTest = 'Test map 1';
 	public $mapTestId = 3;
 
+	/**
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 */
 	public function testPageDashboard_CheckLayoutForDifferentUsers() {
 		$users = ['super-admin', 'admin', 'user', 'guest'];
 		foreach ($users as $user) {
@@ -222,5 +226,16 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }
