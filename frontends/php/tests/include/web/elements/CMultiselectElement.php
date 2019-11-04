@@ -307,7 +307,17 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		if (!$this->query('xpath:.//input[not(@type="hidden")]|textarea')->one()->isEnabled($enabled)) {
+		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
+		if ($input === null && $enabled) {
+			return false;
+		}
+
+		if ($input !== null && !$input->isEnabled($enabled)) {
+			return false;
+		}
+
+		$multiselect = $this->query('class:multiselect')->one(false);
+		if ($multiselect && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
 			return false;
 		}
 
