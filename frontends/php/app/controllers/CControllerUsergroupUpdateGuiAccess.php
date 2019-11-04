@@ -23,8 +23,8 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpids' => 'required | array_db usrgrp.usrgrpid',
-			'gui_access' => 'required | in ' . implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])
+			'usrgrpids' => 'required|array_db usrgrp.usrgrpid',
+			'gui_access' => 'required|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -45,14 +45,18 @@ class CControllerUsergroupUpdateGuiAccess extends CController {
 		$gui_access = $this->getInput('gui_access');
 
 		foreach ($this->getInput('usrgrpids') as $usrgrpid) {
-			$user_groups[] = compact('usrgrpid', 'gui_access');
+			$user_groups[] = [
+				'usrgrpid' => $usrgrpid,
+				'gui_access' => $gui_access
+			];
 		}
 
 		$result = (bool) API::UserGroup()->update($user_groups);
 
-		$url = (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list');
-
-		$response = new CControllerResponseRedirect($url->getUrl());
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.list')
+			->getUrl()
+		);
 		$response->setFormData(['uncheck' => '1']);
 
 		if ($result) {
