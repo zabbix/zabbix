@@ -20,6 +20,11 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @on-before removeGuestFromDisabledGroup
+ * @on-after addGuestToDisabledGroup
+ */
+
 class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function data() {
@@ -767,11 +772,10 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		}
 	}
 
-	public function testUrlUserPermissions_DisableGuest() {
-		DBexecute("INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)");
-	}
-
 	/**
+	 * @on-before addGuestToDisabledGroup
+	 * @on-after removeGuestFromDisabledGroup
+	 *
 	 * @dataProvider data
 	 */
 	public function testUrlUserPermissions_DisabledGuest($data) {
@@ -781,7 +785,14 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 	}
 
-	public function testUrlUserPermissions_EnableGuest() {
-		DBexecute("DELETE FROM users_groups WHERE id=150");
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE id=3');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }
