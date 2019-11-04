@@ -96,20 +96,6 @@ jQuery(function($) {
 		},
 
 		/**
-		 * Resize multiselect selected text
-		 *
-		 * @return jQuery
-		 */
-		resize: function() {
-			return this.each(function() {
-				var obj = $(this);
-				var ms = $(this).data('multiSelect');
-
-				resizeAllSelectedTexts(obj, ms.options, ms.values);
-			});
-		},
-
-		/**
 		 * Insert outside data
 		 *
 		 * @param object    multiselect value object
@@ -816,8 +802,6 @@ jQuery(function($) {
 
 			$('.selected ul', obj).append(li);
 
-			resizeSelectedText(li, obj);
-
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
 				setSearchFieldVisibility(false, obj, options);
@@ -960,40 +944,6 @@ jQuery(function($) {
 
 	function cleanSearchInput(obj) {
 		$('input[type="text"]', obj).val('');
-	}
-
-	function resizeSelectedText(li, obj) {
-		var	li_margins = li.outerWidth(true) - li.width(),
-			span = $('span.subfilter-enabled', li),
-			span_paddings = span.outerWidth(true) - span.width(),
-			max_width = $('.selected ul', obj).width() - li_margins - span_paddings,
-			text = $('span:first-child', span);
-
-		if (text.width() > max_width) {
-			var t = text.text();
-			var l = t.length;
-
-			while (text.width() > max_width && l != 0) {
-				text.text(t.substring(0, --l) + '...');
-			}
-		}
-	}
-
-	function resizeAllSelectedTexts(obj, options, values) {
-		$('.selected li', obj).each(function() {
-			var li = $(this),
-				id = li.data('id'),
-				span = $('span.subfilter-enabled', li),
-				text = $('span:first-child', span),
-				t = empty(values.selected[id].prefix)
-					? values.selected[id].name
-					: values.selected[id].prefix + values.selected[id].name;
-
-			// rewrite previous text to original
-			text.text(t);
-
-			resizeSelectedText(li, obj);
-		});
 	}
 
 	function scrollAvailable(obj) {
