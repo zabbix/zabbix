@@ -4029,7 +4029,7 @@ tr.cursor-move td * {
 
 .clock {
   padding: 0 10px;
-  height: 99%;
+  height: 100%;
   width: auto; }
 
 .clock-svg {
