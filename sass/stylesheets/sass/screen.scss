@@ -5741,16 +5741,14 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
+	display: flex;
 	padding: 0 10px;
 	height: 100%;
-	width: auto;
 }
 
 .clock-svg {
-	max-height: 100%;
-	max-width: 100%;
-	display: block;
-	margin: 0 auto;
+	height: 100%;
+	width: 100%;
 }
 
 .time-zone {

@@ -4004,15 +4004,13 @@ tr.cursor-move td * {
   display: block; }
 
 .clock {
+  display: flex;
   padding: 0 10px;
-  height: 100%;
-  width: auto; }
+  height: 100%; }
 
 .clock-svg {
-  max-height: 100%;
-  max-width: 100%;
-  display: block;
-  margin: 0 auto; }
+  height: 100%;
+  width: 100%; }
 
 .time-zone {
   margin: 0 0 .5em 0;
