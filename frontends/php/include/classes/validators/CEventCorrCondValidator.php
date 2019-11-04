@@ -47,7 +47,7 @@ class CEventCorrCondValidator extends CValidator {
 			$this->setError(_s('Incorrect value for field "%1$s": %2$s.', 'type', _('incorrect condition type')));
 		}
 
-		// validate condition values depending on condition type
+		// Validate condition values depending on condition type.
 		switch ($condition['type']) {
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:

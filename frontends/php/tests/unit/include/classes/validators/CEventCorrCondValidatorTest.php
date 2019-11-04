@@ -27,8 +27,7 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function validValuesProvider()
-	{
+	public function validValuesProvider() {
 		return [
 			[[], [
 				'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
@@ -131,8 +130,7 @@ class CEventCorrCondValidatorTest extends CValidatorTest {
 		];
 	}
 
-	public function invalidValuesProvider()
-	{
+	public function invalidValuesProvider() {
 		return [
 			[[],
 				[

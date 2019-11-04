@@ -863,9 +863,6 @@ if (!empty($data['new_operation'])) {
 				->setAttribute('data-formulaid', $label);
 			$operationConditionsTable->addRow([
 					$labelCol,
-					// getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-					// 	$operationConditionStringValues[$cIdx], ''
-					// ),
 					$operationConditionStringValues[$cIdx],
 					(new CCol([
 						(new CButton('remove', _('Remove')))
