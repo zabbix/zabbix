@@ -92,7 +92,6 @@ class CControllerUsergroupCreate extends CController {
 		else {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.edit')
-				->setArgument('usrgrpid', $this->getInput('usrgrpid', 0))
 				->getUrl()
 			);
 			$response->setMessageError(_('Cannot add group'));
