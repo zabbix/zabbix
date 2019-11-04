@@ -1261,9 +1261,9 @@ int	main(int argc, char **argv)
 	if (INPUT_FILE)
 	{
 		FILE	*in;
-		char	*in_line = NULL, *key_value = NULL;
+		char	*in_line = NULL, *key = NULL, *key_value = NULL;
 		int	buffer_count = 0;
-		size_t	in_line_alloc = MAX_BUFFER_LEN;
+		size_t	key_alloc = 0, in_line_alloc = MAX_BUFFER_LEN;
 		double	last_send = 0;
 
 		if (0 == strcmp(INPUT_FILE, "-"))
@@ -1289,9 +1289,9 @@ int	main(int argc, char **argv)
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
-			char		hostname[MAX_STRING_LEN], *key = NULL, clock[32];
+			char		hostname[MAX_STRING_LEN], clock[32];
 			int		read_more = 0;
-			size_t		key_alloc = 0, key_value_alloc = 0;
+			size_t		key_value_alloc = 0;
 			const char	*p;
 
 			/* line format: <hostname> <key> [<timestamp>] <value> */
