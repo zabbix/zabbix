@@ -40,7 +40,10 @@ class CControllerIconMapCreate extends CController {
 	}
 
 	protected function doAction() {
-		$result = (bool) API::IconMap()->create((array) $this->getInput('iconmap'));
+		$iconmap = (array) $this->getInput('iconmap');
+
+		$iconmap['name'] = trim($iconmap['name']);
+		$result = (bool) API::IconMap()->create($iconmap);
 
 		$url = new CUrl('zabbix.php');
 		if ($result) {
