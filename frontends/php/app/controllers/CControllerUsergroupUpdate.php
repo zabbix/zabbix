@@ -68,12 +68,12 @@ class CControllerUsergroupUpdate extends CController {
 
 	protected function doAction() {
 		$user_group = [
+			'userids' => $this->getInput('userids', []),
+			'tag_filters' => $this->getInput('tag_filters', []),
 			'rights' => []
 		];
 
-		$this->getInputs($user_group, ['usrgrpid', 'name', 'users_status', 'gui_access', 'debug_mode', 'userids',
-			'tag_filters'
-		]);
+		$this->getInputs($user_group, ['usrgrpid', 'name', 'users_status', 'gui_access', 'debug_mode']);
 
 		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
 
