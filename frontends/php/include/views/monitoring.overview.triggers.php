@@ -74,8 +74,8 @@ if ($blink_period > 0) {
 $web_layout_mode = CView::getLayoutMode();
 
 $submenu_source = [
-	SHOW_TRIGGERS => _('Overview triggers'),
-	SHOW_DATA => _('Overview data')
+	SHOW_TRIGGERS => _('Trigger overview'),
+	SHOW_DATA => _('Data overview')
 ];
 
 $submenu = [];

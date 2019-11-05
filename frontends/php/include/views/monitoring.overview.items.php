@@ -37,8 +37,8 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 $web_layout_mode = CView::getLayoutMode();
 
 $submenu_source = [
-	SHOW_TRIGGERS => _('Overview triggers'),
-	SHOW_DATA => _('Overview data')
+	SHOW_TRIGGERS => _('Trigger overview'),
+	SHOW_DATA => _('Data overview')
 ];
 
 $submenu = [];
