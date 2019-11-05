@@ -69,6 +69,7 @@ class CControllerValuemapEdit extends CController {
 			}
 			else {
 				$this->valuemap = reset($valuemaps);
+				order_result($this->valuemap['mappings'], 'value');
 			}
 		}
 		else {
