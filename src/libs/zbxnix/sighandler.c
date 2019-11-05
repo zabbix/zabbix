@@ -120,8 +120,9 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		{
 			sig_exiting = 1;
 
-			/* temporary hides false positive coverity defect */
-			zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+			/* temporary variable is used to avoid compiler warning */
+			zbx_log_level_temp = sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
+					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 			zabbix_log(zbx_log_level_temp,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
 				"reason:%d]. Exiting ...",
