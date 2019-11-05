@@ -217,7 +217,7 @@ jQuery(function($) {
 					'new': t('new'),
 					'Select': t('Select')
 				},
-				data: {},
+				data: [],
 				only_hostid: 0,
 				excludeids: [],
 				addNew: false,
