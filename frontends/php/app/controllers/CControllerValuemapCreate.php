@@ -58,7 +58,7 @@ class CControllerValuemapCreate extends CController {
 
 	protected function doAction() {
 		$result = (bool) API::ValueMap()->create([
-			'name'     => $this->getInput('name'),
+			'name'     => trim($this->getInput('name')),
 			'mappings' => $this->getInput('mappings')
 		]);
 
