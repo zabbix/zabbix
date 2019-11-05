@@ -50,13 +50,11 @@ class CControllerMacrosEdit extends CController {
 			$data['macros'] = $this->getInput('macros');
 		}
 		else {
-			$data['macros'] = API::UserMacro()->get([
+			$data['macros'] = array_values(order_macros(API::UserMacro()->get([
 				'output' => ['globalmacroid', 'macro', 'value', 'description'],
 				'globalmacro' => true
-			]);
+			]), 'macro'));
 		}
-
-		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
 		if (!$data['macros']) {
 			$data['macros'][] = ['macro' => '', 'value' => '', 'description' => ''];
