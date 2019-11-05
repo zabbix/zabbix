@@ -92,23 +92,20 @@ class CControllerUsergroupEdit extends CController {
 			return false;
 		}
 
-		if ($this->getInput('usrgrpid', 0) == 0) {
-			return true;
+		if ($this->hasInput('usrgrpid')) {
+			$user_groups = API::UserGroup()->get([
+				'output'           => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
+				'selectTagFilters' => ['groupid', 'tag', 'value'],
+				'usrgrpids'        => $this->getInput('usrgrpid'),
+				'editable'         => true
+			]);
+
+			if (!$user_groups) {
+				return false;
+			}
+
+			$this->user_group = $user_groups[0];
 		}
-
-		$this->user_group = API::UserGroup()->get([
-			'output'           => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
-			'usrgrpids'        => (array) $this->getInput('usrgrpid'),
-			'selectTagFilters' => ['groupid', 'tag', 'value'],
-			'preservekeys'     => true,
-			'editable'         => true
-		]);
-
-		if (!$this->user_group) {
-			return false;
-		}
-
-		$this->user_group = $this->user_group[$this->getInput('usrgrpid')];
 
 		return true;
 	}
