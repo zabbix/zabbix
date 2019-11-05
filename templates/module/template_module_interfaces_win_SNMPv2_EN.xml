@@ -20,7 +20,7 @@ Known Issues:&#13;
 &#13;
   Description: 32bit counters are used in this template (since 64bit are not supported by Windows OS). If busy interfaces return incorrect bits sent/received - set update interval to 1m or less.&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Modules</name>
@@ -400,6 +400,7 @@ and&#13;
                      <name>Interface {#IFNAME}({#IFALIAS}): High bandwidth usage ( &gt; {$IF.UTIL.MAX:"{#IFNAME}"}% )</name>
                      <opdata>In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}</opdata>
                      <priority>WARNING</priority>
+                     <description>The network interface utilization is close to its estimated maximum bandwidth.</description>
                      <manual_close>YES</manual_close>
                      <dependencies>
                         <dependency>
@@ -506,8 +507,7 @@ and {Template Module Interfaces Windows SNMPv2:net.if.out.errors[ifOutErrors.{#S
             </macro>
             <macro>
                <macro>{$NET.IF.IFADMINSTATUS.MATCHES}</macro>
-               <value>^.*</value>
-               <description>Ignore notPresent(6)</description>
+               <value>^.*$</value>
             </macro>
             <macro>
                <macro>{$NET.IF.IFADMINSTATUS.NOT_MATCHES}</macro>
@@ -528,7 +528,7 @@ and {Template Module Interfaces Windows SNMPv2:net.if.out.errors[ifOutErrors.{#S
             </macro>
             <macro>
                <macro>{$NET.IF.IFDESCR.NOT_MATCHES}</macro>
-               <value>CHANGE_IF_NEEDED</value>
+               <value>Miniport|Virtual|Teredo|Kernel|Loopback|Bluetooth|HTTPS|6to4|QoS|Layer|isatap|ISATAP</value>
             </macro>
             <macro>
                <macro>{$NET.IF.IFNAME.MATCHES}</macro>
@@ -570,7 +570,7 @@ and {Template Module Interfaces Windows SNMPv2:net.if.out.errors[ifOutErrors.{#S
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template Module Interfaces Windows SNMPv2</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>

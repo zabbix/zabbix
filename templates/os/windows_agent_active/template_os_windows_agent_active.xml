@@ -1346,7 +1346,7 @@ return JSON.stringify({"data": output})</params>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template Module Windows network by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1651,7 +1651,7 @@ Template tooling version used: 0.32</description>
                         <name>CPU usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1673,7 +1673,7 @@ Template tooling version used: 0.32</description>
                         <key>perf_counter_en["\System\Processor Queue Length"]</key>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1695,7 +1695,7 @@ Template tooling version used: 0.32</description>
                         <name>Memory utilization</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1717,7 +1717,7 @@ Template tooling version used: 0.32</description>
                         <name>Swap usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1739,7 +1739,7 @@ Template tooling version used: 0.32</description>
                         <name>{#FSNAME}: Disk space usage</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1761,7 +1761,7 @@ Template tooling version used: 0.32</description>
                         <name>{#DEVNAME}: Disk read/write rates</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>3</y>
@@ -1783,7 +1783,7 @@ Template tooling version used: 0.32</description>
                         <name>{#DEVNAME}: Disk utilization and queue</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>4</y>
@@ -1805,7 +1805,7 @@ Template tooling version used: 0.32</description>
                         <name>Interface {#IFNAME}({#IFALIAS}): Network traffic</name>
                         <host>Template OS Windows by Zabbix agent active</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>5</y>

@@ -1,3 +1,5 @@
+// +build linux,amd64
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2019 Zabbix SIA

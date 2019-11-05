@@ -2,4 +2,3 @@
 
 clean:
 	go clean
-

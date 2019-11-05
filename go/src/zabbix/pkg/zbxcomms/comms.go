@@ -21,6 +21,7 @@ package zbxcomms
 
 import (
 	"bytes"
+	"compress/zlib"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -31,7 +32,9 @@ import (
 	"zabbix/pkg/tls"
 )
 
-const headerSize = 13
+const headerSize = 4 + 1 + 4 + 4
+const tcpProtocol = byte(0x01)
+const zlibCompress = byte(0x02)
 
 const (
 	connStateAccept = iota + 1
@@ -84,14 +87,21 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, args ...in
 
 func write(w io.Writer, data []byte) error {
 	var b bytes.Buffer
+	var zb bytes.Buffer
+	var err error
 
-	b.Grow(len(data) + headerSize)
-	b.Write([]byte{'Z', 'B', 'X', 'D', 0x01})
-	err := binary.Write(&b, binary.LittleEndian, uint64(len(data)))
-	if nil != err {
+	z := zlib.NewWriter(&zb)
+	z.Write(data)
+	z.Close()
+	b.Grow(zb.Len() + headerSize)
+	b.Write([]byte{'Z', 'B', 'X', 'D', tcpProtocol | zlibCompress})
+	if err = binary.Write(&b, binary.LittleEndian, uint32(zb.Len())); nil != err {
 		return err
 	}
-	b.Write(data)
+	if err = binary.Write(&b, binary.LittleEndian, uint32(len(data))); nil != err {
+		return err
+	}
+	b.Write(zb.Bytes())
 	_, err = w.Write(b.Bytes())
 
 	return err
@@ -115,6 +125,7 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
 	var b [2048]byte
+	var reservedSize uint32
 
 	s := b[:]
 	if pending != nil {
@@ -149,7 +160,8 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Message is using unsupported protocol.")
 	}
 
-	if s[4] != 0x01 {
+	flags := s[4]
+	if 0 == (flags & tcpProtocol) {
 		return nil, fmt.Errorf("Message is using unsupported protocol version.")
 	}
 
@@ -163,7 +175,14 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Message is longer than expected.")
 	}
 
+	if 0 != (flags & zlibCompress) {
+		reservedSize = binary.LittleEndian.Uint32(s[9:13])
+	}
+
 	if int(expectedSize) == total-headerSize {
+		if 0 != (flags & zlibCompress) {
+			return uncompress(s[headerSize:total], reservedSize)
+		}
 		return s[headerSize:total], nil
 	}
 
@@ -191,7 +210,29 @@ func read(r io.Reader, pending []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Message size is shorted or longer than expected.")
 	}
 
+	if 0 != (flags & zlibCompress) {
+		return uncompress(s[:total], reservedSize)
+	}
 	return s[:total], nil
+}
+
+func uncompress(data []byte, expLen uint32) ([]byte, error) {
+	var b bytes.Buffer
+
+	b.Grow(int(expLen))
+	z, err := zlib.NewReader(bytes.NewReader(data))
+	if nil != err {
+		return nil, fmt.Errorf("Unable to uncompress message: '%s'", err)
+	}
+	len, err := b.ReadFrom(z)
+	z.Close()
+	if nil != err {
+		return nil, fmt.Errorf("Unable to uncompress message: '%s'", err)
+	}
+	if len != int64(expLen) {
+		return nil, fmt.Errorf("Uncompressed message size %d instead of expected %d.", len, expLen)
+	}
+	return b.Bytes(), nil
 }
 
 func (c *Connection) Read(timeout time.Duration) (data []byte, err error) {

@@ -43,26 +43,16 @@ jQuery(function($) {
 	$.fn.multiSelectHelper = function(options) {
 		options = $.extend({objectOptions: {}}, options);
 
-		// url
-		options.url = new Curl('jsrpc.php', false);
-		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
-		options.url.setArgument('method', 'multiselect.get');
-		options.url.setArgument('objectName', options.objectName);
+		var curl = new Curl('jsrpc.php', false);
+		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		curl.setArgument('method', 'multiselect.get');
+		curl.setArgument('objectName', options.objectName);
 
 		for (var key in options.objectOptions) {
-			options.url.setArgument(key, options.objectOptions[key]);
+			curl.setArgument(key, options.objectOptions[key]);
 		}
 
-		options.url = options.url.getUrl();
-
-		// labels
-		options.labels = {
-			'No matches found': t('No matches found'),
-			'More matches found...': t('More matches found...'),
-			'type here to search': t('type here to search'),
-			'new': t('new'),
-			'Select': t('Select')
-		};
+		options.url = curl.getUrl();
 
 		return this.each(function() {
 			$(this).empty().multiSelect(options);
@@ -79,40 +69,27 @@ jQuery(function($) {
 		 * @return array    array of multiselect value objects
 		 */
 		getData: function() {
-			var ms = this.first().data('multiSelect'),
-				data = [];
+			var $obj = $(this).first(),
+				ms = $obj.data('multiSelect');
 
+			var data = [];
 			for (var id in ms.values.selected) {
 				var item = ms.values.selected[id];
 
-				data[data.length] = {
+				data.push({
 					id: id,
 					name: item.name,
 					prefix: (typeof item.prefix === 'undefined') ? '' : item.prefix
-				};
+				});
 			}
 
 			return data;
 		},
 
 		/**
-		 * Resize multiselect selected text
-		 *
-		 * @return jQuery
-		 */
-		resize: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					ms = $obj.data('multiSelect');
-
-				resizeAllSelectedTexts($obj, ms.options, ms.values);
-			});
-		},
-
-		/**
 		 * Insert outside data
 		 *
-		 * @param array    array of multiselect value objects
+		 * @param object    multiselect value object
 		 *
 		 * @return jQuery
 		 */
@@ -121,20 +98,63 @@ jQuery(function($) {
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				// clean input if selectedLimit == 1
 				if (ms.options.selectedLimit == 1) {
 					for (var id in ms.values.selected) {
-						removeSelected(id, $obj, ms.values, ms.options);
+						removeSelected($obj, id);
 					}
-
-					cleanAvailable(items[0], ms.values);
 				}
 
 				for (var i = 0, l = items.length; i < l; i++) {
-					addSelected(items[i], $obj, ms.values, ms.options);
+					addSelected($obj, items[i]);
 				}
 
 				$obj.trigger('change', ms);
+			});
+		},
+
+		/**
+		 * Enable multi select UI control.
+		 *
+		 * @return jQuery
+		 */
+		enable: function() {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				if (ms.options.disabled === true) {
+					$obj.removeAttr('aria-disabled');
+					$('.multiselect-list', $obj).removeClass('disabled');
+					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
+					$obj.append(makeMultiSelectInput($obj));
+
+					ms.options.disabled = false;
+
+					cleanSearch($obj);
+				}
+			});
+		},
+
+		/**
+		 * Disable multi select UI control.
+		 *
+		 * @return jQuery
+		 */
+		disable: function() {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				if (ms.options.disabled === false) {
+					$obj.attr('aria-disabled', true);
+					$('.multiselect-list', $obj).addClass('disabled');
+					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
+					$('input[type="text"]', $obj).remove();
+
+					ms.options.disabled = true;
+
+					cleanSearch($obj);
+				}
 			});
 		},
 
@@ -149,65 +169,12 @@ jQuery(function($) {
 					ms = $obj.data('multiSelect');
 
 				for (var id in ms.values.selected) {
-					removeSelected(id, $obj, ms.values, ms.options);
+					removeSelected($obj, id);
 				}
 
-				cleanAvailable($obj, ms.values);
+				cleanSearch($obj);
+
 				$obj.trigger('change', ms);
-			});
-		},
-
-		/**
-		 * Disable multi select UI control.
-		 *
-		 * @return jQuery
-		 */
-		disable: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					$wrapper = $obj.parent('.' + ZBX_STYLE_CLASS),
-					ms = $obj.data('multiSelect');
-
-				if (ms.options.disabled === false) {
-					$obj.attr('aria-disabled', true);
-					$('.multiselect-list', $obj).addClass('disabled');
-					$('.multiselect-button > button', $wrapper).prop('disabled', true);
-					$('input[type=text]', $wrapper).remove();
-					cleanAvailable($obj, ms.values);
-					$('.available', $wrapper).remove();
-
-					ms.options.disabled = true;
-				}
-			});
-		},
-
-		/**
-		 * Enable multi select UI control.
-		 *
-		 * @return jQuery
-		 */
-		enable: function() {
-			return this.each(function() {
-				var $obj = $(this),
-					$wrapper = $obj.parent('.' + ZBX_STYLE_CLASS),
-					ms = $obj.data('multiSelect');
-
-				if (ms.options.disabled === true) {
-					var $input = makeMultiSelectInput($obj);
-					$obj.removeAttr('aria-disabled');
-					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $wrapper).prop('disabled', false);
-					$obj.append($input);
-					makeSuggsetionsBlock($obj);
-
-					// set readonly
-					if (ms.options.selectedLimit != 0 && $('.selected li', $obj).length >= ms.options.selectedLimit) {
-						setSearchFieldVisibility(false, $obj, ms.options);
-					}
-
-					ms.values.isAvailableOpened = true;
-					ms.options.disabled = false;
-				}
 			});
 		},
 
@@ -219,32 +186,39 @@ jQuery(function($) {
 		modify: function(options) {
 			return this.each(function() {
 				var $obj = $(this),
-					ms = $(this).data('multiSelect');
+					ms = $obj.data('multiSelect');
 
-				for (var ms_key in ms.options) {
-					if (ms_key in options) {
-						ms.options[ms_key] = options[ms_key];
+				var addNew_modified = ('addNew' in options) && options['addNew'] != ms.options['addNew'];
+
+				for (var key in ms.options) {
+					if (key in options) {
+						ms.options[key] = options[key];
 					}
+				}
 
+				if (addNew_modified) {
 					/*
-					 * When changing the option "addNew" few things need to happen:
-					 *   1) previous search results must be cleared, in case same search string is requested. So
-					 *      a new request is sent and new results are received. With or without "(new)".
-					 *   2) Already selected "(new)" items must be hidden and disabled, so that they are not sent
-					 *      when form is submitted.
-					 *   3) Already visible block with results must be hidden. It will reappear on new search.
+					 * When modifying the "addNew" option, few things must be done:
+					 *   1. Search input must be reset.
+					 *   2. The already selected "(new)" items must be either hidden and disabled or shown and enabled.
+					 *      Note: hidden and disabled items will not submit to the server.
+					 *   3. The "change" trigger must fire.
 					 */
-					if (ms_key === 'addNew') {
-						cleanLastSearch($obj);
 
-						$('input[name*="[new]"]', $obj)
-							.prop('disabled', !ms.options[ms_key])
-							.each(function() {
-								$('.selected li[data-id="' + this.value + '"]', $obj).toggle(ms.options[ms_key]);
+					cleanSearch($obj);
+
+					$('input[name*="[new]"]', $obj)
+						.prop('disabled', !ms.options['addNew'])
+						.each(function() {
+							var id = $(this).val();
+							$('.selected li[data-id]', $obj).each(function() {
+								if ($(this).data('id') == id) {
+									$(this).toggle(ms.options['addNew']);
+								}
 							});
+						});
 
-						hideAvailable($obj);
-					}
+					$obj.trigger('change', ms);
 				}
 			});
 		},
@@ -257,8 +231,10 @@ jQuery(function($) {
 		getOption: function(key) {
 			var ret = null;
 			this.each(function() {
-				if (typeof $(this).data('multiSelect') !== 'undefined') {
-					ret = $(this).data('multiSelect').options[key];
+				var $obj = $(this);
+
+				if ($obj.data('multiSelect') !== undefined) {
+					ret = $obj.data('multiSelect').options[key];
 				}
 			});
 
@@ -278,7 +254,7 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
-	 * @param array  options['excludeids']			the list of excluded ids (optional)
+	 * @param array  options['excludeids']			an array of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -295,604 +271,466 @@ jQuery(function($) {
 	 * @return object
 	 */
 	$.fn.multiSelect = function(options) {
-		// call a public method
+		// Call a public method.
 		if (methods[options]) {
 			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
 		var defaults = {
-			url: '',
-			name: '',
-			labels: {
-				'No matches found': 'No matches found',
-				'More matches found...': 'More matches found...',
-				'type here to search': 'type here to search',
-				'new': 'new',
-				'Select': 'Select'
-			},
-			data: [],
-			only_hostid: 0,
-			excludeids: [],
-			addNew: false,
-			defaultValue: null,
-			disabled: false,
-			selectedLimit: 0,
-			limit: 20,
-			popup: [],
-			styles: []
-		};
+				url: '',
+				name: '',
+				labels: {
+					'No matches found': t('No matches found'),
+					'More matches found...': t('More matches found...'),
+					'type here to search': t('type here to search'),
+					'new': t('new'),
+					'Select': t('Select')
+				},
+				data: {},
+				only_hostid: 0,
+				excludeids: [],
+				addNew: false,
+				defaultValue: null,
+				disabled: false,
+				selectedLimit: 0,
+				limit: 20,
+				popup: {},
+				styles: {}
+			};
+
 		options = $.extend({}, defaults, options);
 
 		return this.each(function() {
 			var $obj = $(this);
 
-			if (typeof $obj.data('multiSelect') !== 'undefined') {
+			if ($obj.data('multiSelect') !== undefined) {
 				return;
 			}
 
-			options = $.extend({}, {
-				required: $obj.attr('aria-required') || false
-			}, options);
-
-			var ms = {
-				options: options,
-				values: {
-					search: '',
-					width: parseInt($obj.css('width')),
-					isWaiting: false,
-					isAjaxLoaded: true,
-					isMoreMatchesFound: false,
-					isAvailableOpened: false,
-					selected: {},
-					available: {}
-				}
-			};
-
+			options.required_str = $obj.attr('aria-required') === undefined ? 'false' : $obj.attr('aria-required');
 			$obj.removeAttr('aria-required');
 
-			// store the configuration in the elements data
+			var ms = {
+					options: options,
+					values: {
+						search: '',
+						searches: {},
+						searching: {},
+						selected: {},
+						available: {},
+						available_div: $('<div>', {'class': 'multiselect-available'}),
+
+						/*
+						 * Indicates a false click on an available list, but not on some actual item.
+						 * In such case the "focusout" event (IE) of the search input should not be processed.
+						 */
+						available_false_click: false
+					}
+				};
+
+			ms.values.available_div.on('mousedown', 'li', function() {
+				/*
+				 * Cancel event propagation if actual available item was clicked.
+				 * As a result, the "focusout" event of the search input will not fire in all browsers.
+				 */
+				return false;
+			});
+
+			if (IE) {
+				ms.values.available_div.on('mousedown', function() {
+					ms.values.available_false_click = true;
+				});
+			}
+
 			$obj.data('multiSelect', ms);
 
-			var values = ms.values;
-
-			// add wrap
 			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
-				css: options.styles
+				css: ms.options.styles
 			}));
 
-			// selected
-			var $selected_div = $('<div>', {
-				'class': 'selected'
-			});
-			var $selected_ul = $('<ul>', {
-				'class': 'multiselect-list'
-			});
+			var $selected_div = $('<div>', {'class': 'selected'}),
+				$selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
 			$obj.append($selected_div.append($selected_ul));
 
-			if (options.disabled) {
+			if (ms.options.disabled) {
+				$obj.attr('aria-disabled', true);
 				$selected_ul.addClass('disabled');
 			}
 			else {
 				$obj.append(makeMultiSelectInput($obj));
 			}
 
-			// available
-			if (!options.disabled) {
-				makeSuggsetionsBlock($obj);
-			}
+			$obj
+				.on('mousedown', function() {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+						$obj.addClass('active');
+						$('.selected li.selected', $obj).removeClass('selected');
+						$('input[type="text"]', $obj).focus();
+					}
+				});
 
-			// preload data
-			if (empty(options.data)) {
-				setDefaultValue($obj, options);
+			if (empty(ms.options.data)) {
+				addDefaultValue($obj);
 			}
 			else {
-				loadSelected(options.data, $obj, values, options);
+				$.each(ms.options.data, function(i, item) {
+					addSelected($obj, item);
+				});
 			}
 
-			cleanLastSearch($obj);
-
-			// draw popup link
-			if (options.popup.parameters != null) {
-				var popup_options = options.popup.parameters;
-
-				if (typeof popup_options['only_hostid'] !== 'undefined') {
-					options.only_hostid = popup_options['only_hostid'];
+			if (ms.options.popup.parameters != null) {
+				if (typeof ms.options.popup.parameters['only_hostid'] !== 'undefined') {
+					ms.options.only_hostid = ms.options.popup.parameters['only_hostid'];
 				}
 
-				var $popup_button = $('<button>', {
-					type: 'button',
-					'class': 'btn-grey',
-					text: options.labels['Select']
-				});
+				var popup_button = $('<button>', {
+						type: 'button',
+						'class': 'btn-grey',
+						text: ms.options.labels['Select']
+					});
 
-				if (options.disabled) {
-					$popup_button.prop('disabled', true);
+				if (ms.options.disabled) {
+					popup_button.prop('disabled', true);
 				}
 
-				$popup_button.on('click', function(event) {
-					return PopUp('popup.generic', popup_options, null, event.target);
+				popup_button.on('click', function(event) {
+					return PopUp('popup.generic', ms.options.popup.parameters, null, event.target);
 				});
 
-				$obj.parent().append($('<div>', {
-					'class': 'multiselect-button'
-				}).append($popup_button));
+				$obj.after($('<div>', {'class': 'multiselect-button'}).append(popup_button));
 			}
 		});
 	};
 
-	function makeSuggsetionsBlock($obj) {
-		var ms = $obj.data('multiSelect'),
-			values = ms.values,
-			$available = $('<div>', {
-				'class': 'available',
-				css: { display: 'none' }
-			});
-
-		// multi select
-		$obj.append($available)
-			.focusout(function() {
-				setTimeout(function() {
-					if (!values.isAvailableOpened && $('.available', $obj).is(':visible')) {
-						hideAvailable($obj);
-					}
-				}, 200);
-			});
-	}
-
 	function makeMultiSelectInput($obj) {
 		var ms = $obj.data('multiSelect'),
-			values = ms.values,
-			options = ms.options,
 			$label = $('label[for=' + $obj.attr('id') + '_ms]'),
 			$aria_live = $('[aria-live]', $obj),
 			$input = $('<input>', {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
-				'placeholder': options.labels['type here to search'],
-				'aria-label': ($label.length ? $label.text() + '. ' : '') + options.labels['type here to search'],
-				'aria-required': options.required
+				'placeholder': ms.options.labels['type here to search'],
+				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
+				'aria-required': ms.options.required_str
 			})
-			.on('keyup change', function(e) {
+				.on('keyup', function(e) {
+					switch (e.which) {
+						case KEY.ARROW_DOWN:
+						case KEY.ARROW_LEFT:
+						case KEY.ARROW_RIGHT:
+						case KEY.ARROW_UP:
+						case KEY.ESCAPE:
+							return false;
+					}
 
-				if (typeof e.which === 'undefined') {
-					return false;
-				}
+					clearSearchTimeout($obj);
 
-				switch (e.which) {
-					case KEY.ARROW_DOWN:
-					case KEY.ARROW_LEFT:
-					case KEY.ARROW_RIGHT:
-					case KEY.ARROW_UP:
+					// Maximum results selected already?
+					if (ms.options.selectedLimit != 0 && $('.selected li', $obj).length >= ms.options.selectedLimit) {
 						return false;
-					case KEY.ESCAPE:
-						cleanSearchInput($obj);
-						return false;
-				}
+					}
 
-				if (options.selectedLimit != 0 && $('.selected li', $obj).length >= options.selectedLimit) {
-					setSearchFieldVisibility(false, $obj, options);
-					return false;
-				}
+					var search = $input.val();
 
-				var search = $input.val();
+					if (search !== '') {
+						$('.selected li.selected', $obj).removeClass('selected');
 
-				// Replace trailing slashes to check if search term contains anything else.
-				if (search !== '') {
-					$('.selected li.selected', $obj).removeClass('selected');
+						search = search.replace(/^\s+|\s+$/g, '');
 
-					if ($input.data('lastSearch') != search) {
-						if (!values.isWaiting) {
-							values.isWaiting = true;
+						/*
+						 * Strategy:
+						 * 1. Load the cached result set if such exists for the given term and show the list.
+						 * 2. Skip anything if already expecting the result set to arrive for the given term.
+						 * 3. Schedule result set retrieval for the given term otherwise.
+						 */
 
-							var jqxhr = null;
-							window.setTimeout(function() {
-								values.isWaiting = false;
+						if (search in ms.values.searches) {
+							ms.values.search = search;
+							loadAvailable($obj);
+							showAvailable($obj);
+						}
+						else if (!(search in ms.values.searching)) {
+							ms.values.searchTimeout = setTimeout(function() {
+								ms.values.searching[search] = true;
 
-								var search = $input.val().replace(/^\s+|\s+$/g, '');
-
-								// re-check search after delay
-								if (search !== '' && $input.data('lastSearch') != search) {
-									values.search = search;
-
-									$input.data('lastSearch', values.search);
-
-									if (jqxhr != null) {
-										jqxhr.abort();
+								$.ajax({
+									url: ms.options.url + '&curtime=' + new CDate().getTime(),
+									type: 'GET',
+									dataType: 'json',
+									cache: false,
+									data: {
+										search: search,
+										limit: getLimit($obj)
 									}
+								})
+									.then(function(response) {
+										ms.values.searches[search] = response.result;
 
-									values.isAjaxLoaded = false;
-									var request_data = {
-										search: values.search,
-										limit: getLimit(values, options)
-									};
-
-									jqxhr = $.ajax({
-										url: options.url + '&curtime=' + new CDate().getTime(),
-										type: 'GET',
-										dataType: 'json',
-										cache: false,
-										data: request_data,
-										success: function(data) {
-											values.isAjaxLoaded = true;
-											loadAvailable(data.result, $obj, values, options);
+										if (search === $input.val().replace(/^\s+|\s+$/g, '')) {
+											ms.values.search = search;
+											loadAvailable($obj);
+											showAvailable($obj);
 										}
+									})
+									.done(function() {
+										delete ms.values.searching[search];
 									});
-								}
+
+								delete ms.values.searchTimeout;
 							}, 500);
 						}
 					}
 					else {
-						if ($('.available', $obj).is(':hidden')) {
-							showAvailable($obj, values);
-						}
-					}
-				}
-				else {
-					hideAvailable($obj);
-				}
-			})
-			.on('keydown', function(e) {
-				switch (e.which) {
-
-					case KEY.TAB:
-					case KEY.ESCAPE:
 						hideAvailable($obj);
-						cleanSearchInput($obj);
-						break;
+					}
+				})
+				.on('keydown', function(e) {
+					switch (e.which) {
+						case KEY.TAB:
+						case KEY.ESCAPE:
+							hideAvailable($obj);
+							cleanSearchInput($obj);
+							break;
 
-					case KEY.ENTER:
-						if ($input.val() !== '') {
-							var $selected = $('.available li.suggest-hover', $obj);
+						case KEY.ENTER:
+							if ($input.val() !== '') {
+								var $selected = $('li.suggest-hover', ms.values.available_div);
 
-							if ($selected.length) {
-								select($selected.data('id'), $obj, values, options);
-								$aria_live.text(sprintf(t('Added, %1$s'), $selected.data('label')));
-							}
-
-							return cancelEvent(e);
-						}
-						break;
-
-					case KEY.ARROW_LEFT:
-						if ($input.val() === '') {
-							var $collection = $('.selected li', $obj);
-
-							if ($collection.length) {
-								var $prev = $collection.filter('.selected').removeClass('selected').prev();
-								$prev = ($prev.length ? $prev : $collection.last()).addClass('selected');
-
-								$aria_live.text(($prev.hasClass('disabled'))
-									? sprintf(t('%1$s, read only'), $prev.data('label'))
-									: $prev.data('label')
-								);
-							}
-						}
-						break;
-
-					case KEY.ARROW_RIGHT:
-						if ($input.val() === '') {
-							var $collection = $('.selected li', $obj);
-
-							if ($collection.length) {
-								var $next = $collection.filter('.selected').removeClass('selected').next();
-								$next = ($next.length ? $next : $collection.first()).addClass('selected');
-
-								$aria_live.text(($next.hasClass('disabled'))
-									? sprintf(t('%1$s, read only'), $next.data('label'))
-									: $next.data('label')
-								);
-							}
-						}
-						break;
-
-					case KEY.ARROW_UP:
-					case KEY.ARROW_DOWN:
-						var $collection = $('.available:visible li', $obj),
-							$selected = $collection.filter('.suggest-hover').removeClass('suggest-hover');
-
-						if ($selected.length) {
-							$selected = (e.which == KEY.ARROW_UP)
-								? ($selected.is(':first-child') ? $collection.last() : $selected.prev())
-								: ($selected.is(':last-child') ? $collection.first() : $selected.next());
-
-							$selected.addClass('suggest-hover');
-							$aria_live.text($selected.data('label'));
-						}
-
-						scrollAvailable($obj);
-						return cancelEvent(e);
-
-					case KEY.BACKSPACE:
-					case KEY.DELETE:
-						if ($input.val() === '') {
-							var $selected = $('.selected li.selected', $obj);
-
-							if ($selected.length) {
-								var id = $selected.data('id'),
-									item = values.selected[id];
-
-								if (typeof item.disabled === 'undefined' || !item.disabled) {
-									var aria_text = sprintf(t('Removed, %1$s'), $selected.data('label'));
-
-									$selected = (e.which == KEY.BACKSPACE)
-										? ($selected.is(':first-child') ? $selected.next() : $selected.prev())
-										: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
-
-									removeSelected(id, $obj, values, options);
-									$obj.trigger('change', ms);
-
-									if ($selected.length) {
-										var $collection = $('.selected li', $obj);
-										$selected.addClass('selected');
-
-										aria_text += ', ' + sprintf(
-											($selected.hasClass('disabled'))
-												? t('Selected, %1$s, read only, in position %2$d of %3$d')
-												: t('Selected, %1$s in position %2$d of %3$d'),
-											$selected.data('label'),
-											$collection.index($selected) + 1,
-											$collection.length
-										);
-									}
-
-									$aria_live.text(aria_text);
+								if ($selected.length) {
+									select($obj, $selected.data('id'));
+									$aria_live.text(sprintf(t('Added, %1$s'), $selected.data('label')));
 								}
-								else {
-									$aria_live.text(t('Can not be removed'));
+
+								return false;
+							}
+							break;
+
+						case KEY.ARROW_LEFT:
+							if ($input.val() === '') {
+								var $collection = $('.selected li', $obj);
+
+								if ($collection.length) {
+									var $prev = $collection.filter('.selected').removeClass('selected').prev();
+									$prev = ($prev.length ? $prev : $collection.last()).addClass('selected');
+
+									$aria_live.text(($prev.hasClass('disabled'))
+										? sprintf(t('%1$s, read only'), $prev.data('label'))
+										: $prev.data('label')
+									);
 								}
 							}
-							else if (e.which == KEY.BACKSPACE) {
-								/*
-								 * Pressing Backspace on empty input field should select last element in
-								 * multiselect. For next Backspace press to be able to remove it.
-								 */
-								var $selected = $('.selected li:last-child', $obj).addClass('selected');
+							break;
+
+						case KEY.ARROW_RIGHT:
+							if ($input.val() === '') {
+								var $collection = $('.selected li', $obj);
+
+								if ($collection.length) {
+									var $next = $collection.filter('.selected').removeClass('selected').next();
+									$next = ($next.length ? $next : $collection.first()).addClass('selected');
+
+									$aria_live.text(($next.hasClass('disabled'))
+										? sprintf(t('%1$s, read only'), $next.data('label'))
+										: $next.data('label')
+									);
+								}
+							}
+							break;
+
+						case KEY.ARROW_UP:
+						case KEY.ARROW_DOWN:
+							var $collection = $('li', ms.values.available_div.filter(':visible')),
+								$selected = $collection.filter('.suggest-hover').removeClass('suggest-hover');
+
+							if ($selected.length) {
+								$selected = (e.which == KEY.ARROW_UP)
+									? ($selected.is(':first-child') ? $collection.last() : $selected.prev())
+									: ($selected.is(':last-child') ? $collection.first() : $selected.next());
+
+								$selected.addClass('suggest-hover');
 								$aria_live.text($selected.data('label'));
 							}
 
-							return cancelEvent(e);
-						}
-						break;
-				}
-			})
-			.on('focusin', function() {
-				$obj.addClass('active');
+							scrollAvailable($obj);
 
-				if (getSearchFieldVisibility($obj) == false) {
-					$('.selected li:first-child', $obj).addClass('selected');
-				}
-			})
-			.on('focusout', function() {
-				$obj.removeClass('active').find('li.selected').removeClass('selected');
-				cleanSearchInput($obj);
-			});
+							return false;
+
+						case KEY.BACKSPACE:
+						case KEY.DELETE:
+							if ($input.val() === '') {
+								var $selected = $('.selected li.selected', $obj);
+
+								if ($selected.length) {
+									var id = $selected.data('id'),
+										item = ms.values.selected[id];
+
+									if (typeof item.disabled === 'undefined' || !item.disabled) {
+										var aria_text = sprintf(t('Removed, %1$s'), $selected.data('label'));
+
+										$selected = (e.which == KEY.BACKSPACE)
+											? ($selected.is(':first-child') ? $selected.next() : $selected.prev())
+											: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
+
+										removeSelected($obj, id);
+
+										$obj.trigger('change', ms);
+
+										if ($selected.length) {
+											var $collection = $('.selected li', $obj);
+											$selected.addClass('selected');
+
+											aria_text += ', ' + sprintf(
+												($selected.hasClass('disabled'))
+													? t('Selected, %1$s, read only, in position %2$d of %3$d')
+													: t('Selected, %1$s in position %2$d of %3$d'),
+												$selected.data('label'),
+												$collection.index($selected) + 1,
+												$collection.length
+											);
+										}
+
+										$aria_live.text(aria_text);
+									}
+									else {
+										$aria_live.text(t('Can not be removed'));
+									}
+								}
+								else if (e.which == KEY.BACKSPACE) {
+									/*
+									 * Pressing Backspace on empty input field should select last element in
+									 * multiselect. For next Backspace press to be able to remove it.
+									 */
+									var $selected = $('.selected li:last-child', $obj).addClass('selected');
+									$aria_live.text($selected.data('label'));
+								}
+
+								return false;
+							}
+							break;
+					}
+				})
+				.on('focusin', function() {
+					$obj.addClass('active');
+				})
+				.on('focusout', function() {
+					if (ms.values.available_false_click) {
+						ms.values.available_false_click = false;
+						$('input[type="text"]', $obj).focus();
+					}
+					else {
+						$obj.removeClass('active');
+						$('.selected li:selected', $obj).removeClass('selected');
+						cleanSearchInput($obj);
+						hideAvailable($obj);
+					}
+				});
 
 		return $input;
 	}
 
-	function setDefaultValue($obj, options) {
-		if (!empty(options.defaultValue)) {
+	function addDefaultValue($obj) {
+		var ms = $obj.data('multiSelect');
+
+		if (!empty(ms.options.defaultValue)) {
 			$obj.append($('<input>', {
 				type: 'hidden',
-				name: options.name,
-				value: options.defaultValue,
+				name: ms.options.name,
+				value: ms.options.defaultValue,
 				'data-default': 1
 			}));
 		}
 	}
 
-	function removeDefaultValue($obj, options) {
-		if (!empty(options.defaultValue)) {
-			$('input[data-default="1"]', $obj).remove();
-		}
+	function removeDefaultValue($obj) {
+		$('input[data-default="1"]', $obj).remove();
 	}
 
-	function loadSelected(data, $obj, values, options) {
-		$.each(data, function(i, item) {
-			addSelected(item, $obj, values, options);
-		});
+	function select($obj, id) {
+		var ms = $obj.data('multiSelect');
+
+		addSelected($obj, ms.values.available[id]);
+
+		if (isSearchFieldVisible($obj)) {
+			$('input[type="text"]', $obj).focus();
+		}
+
+		$obj.trigger('change', ms);
 	}
 
-	function loadAvailable(data, $obj, values, options) {
-		cleanAvailable($obj, values);
+	function addSelected($obj, item) {
+		var ms = $obj.data('multiSelect');
 
-		// add new
-		if (options.addNew) {
-			var value = values['search'].replace(/^\s+|\s+$/g, '');
-
-			if (value.length) {
-				var addNew = false;
-
-				if (data.length || objectLength(values.selected) > 0) {
-					var names = {};
-
-					// check if value exists among available
-					if (data.length) {
-						$.each(data, function(i, item) {
-							if (item.name === value) {
-								names[item.name.toUpperCase()] = true;
-							}
-						});
-
-						if (typeof names[value.toUpperCase()] === 'undefined') {
-							addNew = true;
-						}
-					}
-
-					// check if value exists among selected
-					if (!addNew && objectLength(values.selected) > 0) {
-						$.each(values.selected, function(i, item) {
-							if (typeof item.isNew === 'undefined') {
-								names[item.name.toUpperCase()] = true;
-							}
-							else {
-								names[item.id.toUpperCase()] = true;
-							}
-						});
-
-						if (typeof names[value.toUpperCase()] === 'undefined') {
-							addNew = true;
-						}
-					}
-				}
-				else {
-					addNew = true;
-				}
-
-				if (addNew) {
-					data[data.length] = {
-						id: value,
-						name: value + ' (' + options.labels['new'] + ')',
-						isNew: true
-					};
-				}
-			}
+		if (item.id in ms.values.selected) {
+			return;
 		}
 
-		if (!empty(data)) {
-			$.each(data, function(i, item) {
-				if (options.limit != 0 && objectLength(values.available) < options.limit) {
-					if (typeof values.available[item.id] === 'undefined'
-							&& typeof values.selected[item.id] === 'undefined'
-							&& options.excludeids.indexOf(item.id) === -1) {
-						values.available[item.id] = item;
-					}
-				}
-				else {
-					values.isMoreMatchesFound = true;
-				}
-			});
-		}
+		removeDefaultValue($obj);
+		ms.values.selected[item.id] = item;
 
-		var found = 0,
-			preselected = '';
+		var prefix = (item.prefix || ''),
+			item_disabled = (typeof item.disabled !== 'undefined' && item.disabled);
 
-		// write empty result label
-		if (objectLength(values.available) == 0) {
-			var div = $('<div>', {
-				'class': 'multiselect-matches',
-				text: options.labels['No matches found']
-			})
-			.on('click', function() {
-				$('input[type="text"]', $obj).focus();
-			});
+		$obj.append($('<input>', {
+			type: 'hidden',
+			name: (ms.options.addNew && item.isNew) ? ms.options.name + '[new]' : ms.options.name,
+			value: item.id,
+			'data-name': item.name,
+			'data-prefix': prefix
+		}));
 
-			$('.available', $obj).append(div);
-		}
-		else {
-			$('.available', $obj)
-				.append($('<ul>', {
-					'class': 'multiselect-suggest',
-					'aria-hidden': true
-				}))
-				.on('mouseenter', function() {
-					values.isAvailableOpened = true;
-				})
-				.on('mouseleave', function() {
-					values.isAvailableOpened = false;
-				});
-
-			$.each(data, function (i, item) {
-				if (typeof values.available[item.id] !== 'undefined') {
-					if (found == 0) {
-						preselected = (item.prefix || '') + item.name;
-					}
-					addAvailable(item, $obj, values, options);
-					found++;
-				}
-			});
-		}
-
-		if (found > 0) {
-			$('[aria-live]', $obj).text(
-				(values.isMoreMatchesFound
-					? sprintf(t('More than %1$d matches for %2$s found'), found, values.search)
-					: sprintf(t('%1$d matches for %2$s found'), found, values.search)) +
-				', ' + sprintf(t('%1$s preselected, use down,up arrow keys and enter to select'), preselected)
-			);
-		}
-		else {
-			$('[aria-live]', $obj).text(options.labels['No matches found']);
-		}
-
-		// write more matches found label
-		if (values.isMoreMatchesFound) {
-			var div = $('<div>', {
-				'class': 'multiselect-matches',
-				text: options.labels['More matches found...']
-			})
-			.on('click', function() {
-				$('input[type="text"]', $obj).focus();
-			});
-
-			$('.available', $obj).prepend(div);
-		}
-
-		showAvailable($obj, values);
-	}
-
-	function addSelected(item, $obj, values, options) {
-		if (typeof values.selected[item.id] === 'undefined') {
-			removeDefaultValue($obj, options);
-			values.selected[item.id] = item;
-
-			var prefix = (item.prefix || ''),
-				item_disabled = (typeof(item.disabled) !== 'undefined' && item.disabled);
-
-			// add hidden input
-			$obj.append($('<input>', {
-				type: 'hidden',
-				name: (options.addNew && item.isNew) ? options.name + '[new]' : options.name,
-				value: item.id,
-				'data-name': item.name,
-				'data-prefix': prefix
-			}));
-
-			var li = $('<li>', {
+		var $li = $('<li>', {
 				'data-id': item.id,
 				'data-label': prefix + item.name
-			}).append(
-				$('<span>', {
-					'class': 'subfilter-enabled'
-				})
-					.append($('<span>', {
-						text: prefix + item.name,
-						title: item.name
-					}))
-					.append($('<span>')
-						.addClass('subfilter-disable-btn')
-						.on('click', function() {
-							if (!options.disabled && !item_disabled) {
-								removeSelected(item.id, $obj, values, options);
-								$obj.trigger('change', $obj.data('multiSelect'));
-							}
+			})
+				.append(
+					$('<span>', {
+						'class': 'subfilter-enabled'
+					})
+						.append($('<span>', {
+							text: prefix + item.name,
+							title: item.name
 						}))
-			);
+						.append($('<span>')
+							.addClass('subfilter-disable-btn')
+							.on('click', function() {
+								if (!ms.options.disabled && !item_disabled) {
+									removeSelected($obj, item.id);
+									if (isSearchFieldVisible($obj)) {
+										$('input[type="text"]', $obj).focus();
+									}
 
-			if (typeof(item.inaccessible) !== 'undefined' && item.inaccessible) {
-				li.addClass('inaccessible');
-			}
+									$obj.trigger('change', ms);
+								}
+							})
+						)
+				)
+				.on('click', function() {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+						$('.selected li.selected', $obj).removeClass('selected');
+						$(this).addClass('selected');
+						$('input[type="text"]', $obj).focus();
+					}
+				});
 
-			if (item_disabled) {
-				li.addClass('disabled');
-			}
-
-			$('.selected ul', $obj).append(li);
-
-			resizeSelectedText(li, $obj);
-
-			// set readonly
-			if (options.selectedLimit != 0 && $('.selected li', $obj).length >= options.selectedLimit) {
-				setSearchFieldVisibility(false, $obj, options);
-			}
+		if (typeof item.inaccessible !== 'undefined' && item.inaccessible) {
+			$li.addClass('inaccessible');
 		}
+
+		if (item_disabled) {
+			$li.addClass('disabled');
+		}
+
+		$('.selected ul', $obj).append($li);
+
+		cleanSearch($obj);
 	}
 
-	function removeSelected(id, $obj, values, options) {
-		// remove
+	function removeSelected($obj, id) {
+		var ms = $obj.data('multiSelect');
+
 		$('.selected li[data-id]', $obj).each(function(){
 			if ($(this).data('id') == id) {
 				$(this).remove();
@@ -904,162 +742,283 @@ jQuery(function($) {
 			}
 		});
 
-		delete values.selected[id];
+		delete ms.values.selected[id];
 
-		// remove readonly
-		if ($('.selected li', $obj).length == 0) {
-			setDefaultValue($obj, options);
+		if (!$('.selected li', $obj).length) {
+			addDefaultValue($obj);
 		}
 
-		// clean
-		cleanAvailable($obj, values);
-		cleanLastSearch($obj);
-
-		if (options.selectedLimit == 0 || $('.selected li', $obj).length < options.selectedLimit) {
-			setSearchFieldVisibility(true, $obj, options);
-			$('input[type="text"]', $obj).focus();
-		}
+		cleanSearch($obj);
 	}
 
-	function addAvailable(item, $obj, values, options) {
-		var is_new = item.isNew || false,
+	function addAvailable($obj, item) {
+		var ms = $obj.data('multiSelect'),
+			is_new = item.isNew || false,
 			prefix = item.prefix || '',
-			search = values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
+			search = ms.values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
 			$li = $('<li>', {
 				'data-id': item.id,
 				'data-label': prefix + item.name
 			})
-			.on('click', function() {
-				select(item.id, $obj, values, options);
-			})
-			.on('mouseenter', function() {
-				$('.available li.suggest-hover', $obj).removeClass('suggest-hover');
-				$li.addClass('suggest-hover');
-			});
+				.on('mouseenter', function() {
+					$('li.suggest-hover', ms.values.available_div).removeClass('suggest-hover');
+					$li.addClass('suggest-hover');
+				})
+				.on('click', function() {
+					select($obj, item.id);
+				});
 
 		if (prefix !== '') {
 			$li.append($('<span>', {'class': 'grey', text: prefix}));
 		}
 
-		// highlight matched
-		$li.append(item.name.replace(new RegExp(search, "gi"), function(match) {
-			return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
-		})).toggleClass('suggest-new', is_new);
+		// Highlight matched.
+		$li
+			.append(item.name.replace(new RegExp(search, 'gi'), function(match) {
+				return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
+			}))
+			.toggleClass('suggest-new', is_new);
 
-		$('.available ul', $obj).append($li);
+		$('ul', ms.values.available_div).append($li);
 	}
 
-	function select(id, $obj, values, options) {
-		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], $obj, values, options);
+	function loadAvailable($obj) {
+		var ms = $obj.data('multiSelect'),
+			data = ms.values.searches[ms.values.search];
 
-			hideAvailable($obj);
-			cleanAvailable($obj, values);
-			cleanLastSearch($obj);
+		cleanAvailable($obj);
 
-			if (options.selectedLimit == 0 || $('.selected li', $obj).length < options.selectedLimit) {
-				$('input[type="text"]', $obj).focus();
+		var addNew = false;
+
+		if (ms.options.addNew && ms.values.search.length) {
+			if (data.length || objectLength(ms.values.selected) > 0) {
+				var names = {};
+
+				// Check if value exists among available values.
+				$.each(data, function(i, item) {
+					if (item.name === ms.values.search) {
+						names[item.name.toUpperCase()] = true;
+					}
+				});
+
+				if (typeof names[ms.values.search.toUpperCase()] === 'undefined') {
+					addNew = true;
+				}
+
+				// Check if value exists among selected values.
+				if (!addNew && objectLength(ms.values.selected) > 0) {
+					$.each(ms.values.selected, function(i, item) {
+						if (typeof item.isNew === 'undefined') {
+							names[item.name.toUpperCase()] = true;
+						}
+						else {
+							names[item.id.toUpperCase()] = true;
+						}
+					});
+
+					if (typeof names[ms.values.search.toUpperCase()] === 'undefined') {
+						addNew = true;
+					}
+				}
 			}
-
-			$obj.trigger('change', $obj.data('multiSelect'));
+			else {
+				addNew = true;
+			}
 		}
-	}
 
-	function showAvailable($obj, values) {
-		var available = $('.available', $obj),
-			available_paddings = available.outerWidth() - available.width();
+		var available_more = false;
 
-		available.css({
-			'width': $obj.outerWidth() - available_paddings,
-			'left': -1
+		$.each(data, function(i, item) {
+			if (ms.options.limit == 0 || objectLength(ms.values.available) < ms.options.limit) {
+				if (typeof ms.values.available[item.id] === 'undefined'
+						&& typeof ms.values.selected[item.id] === 'undefined'
+						&& ms.options.excludeids.indexOf(item.id) === -1) {
+					ms.values.available[item.id] = item;
+				}
+			}
+			else {
+				available_more = true;
+			}
 		});
 
-		available.fadeIn(0);
-		available.scrollTop(0);
+		if (addNew) {
+			ms.values.available[ms.values.search] = {
+				id: ms.values.search,
+				name: ms.values.search + ' (' + ms.options.labels['new'] + ')',
+				isNew: true
+			};
+		}
 
-		if (objectLength(values.available) != 0) {
-			// remove selected item selected state
-			if ($('.selected li.selected', $obj).length > 0) {
-				$('.selected li.selected', $obj).removeClass('selected');
+		var found = 0,
+			preselected = '';
+
+		if (objectLength(ms.values.available) == 0) {
+			var div = $('<div>', {
+					'class': 'multiselect-matches',
+					text: ms.options.labels['No matches found']
+				})
+					.on('click', function() {
+						$('input[type="text"]', $obj).focus();
+					});
+
+			ms.values.available_div.append(div);
+		}
+		else {
+			ms.values.available_div.append($('<ul>', {
+				'class': 'multiselect-suggest',
+				'aria-hidden': true
+			}));
+
+			$.each(ms.values.available, function (i, item) {
+				if (found == 0) {
+					preselected = (item.prefix || '') + item.name;
+				}
+				addAvailable($obj, item);
+				found++;
+			});
+		}
+
+		if (found > 0) {
+			$('[aria-live]', $obj).text(
+				(available_more
+					? sprintf(t('More than %1$d matches for %2$s found'), found, ms.values.search)
+					: sprintf(t('%1$d matches for %2$s found'), found, ms.values.search)) +
+				', ' + sprintf(t('%1$s preselected, use down,up arrow keys and enter to select'), preselected)
+			);
+		}
+		else {
+			$('[aria-live]', $obj).text(ms.options.labels['No matches found']);
+		}
+
+		if (available_more) {
+			var div = $('<div>', {
+					'class': 'multiselect-matches',
+					text: ms.options.labels['More matches found...']
+				})
+					.on('click', function() {
+						$('input[type="text"]', $obj).focus();
+					});
+
+			ms.values.available_div.prepend(div);
+		}
+	}
+
+	function showAvailable($obj) {
+		var ms = $obj.data('multiSelect'),
+			$available = ms.values.available_div;
+
+		if ($available.parent().is(document.body)) {
+			return;
+		}
+
+		$('.multiselect-available').not($available).each(function() {
+			hideAvailable($(this).data('obj'));
+		});
+
+		$available.data('obj', $obj);
+
+		// Will disconnect this handler in hideAvailable().
+		var hide_handler = function() {
+			hideAvailable($obj);
+		};
+
+		$available.data('hide_handler', hide_handler);
+
+		$obj.parents().add(window).one('scroll', hide_handler);
+		$(window).one('resize', hide_handler);
+
+		var obj_offset = $obj.offset(),
+			obj_padding_y = $obj.outerHeight() - $obj.height(),
+			// Subtract 1px for borders of the input and available container to overlap.
+			available_top = obj_offset.top + $obj.height() + obj_padding_y / 2 - 1,
+			available_left = obj_offset.left,
+			available_width = $obj.width(),
+			available_max_height = Math.max(50, Math.min(400,
+				// Subtract 10px to make available box bottom clearly visible, for better usability.
+				$(window).height() + $(window).scrollTop() - available_top - obj_padding_y - 10
+			));
+
+		if (objectLength(ms.values.available) > 0) {
+			available_width_min = Math.max(available_width, 300);
+
+			// Prevent less than 15% width difference for the available list and the input field.
+			if ((available_width_min - available_width) / available_width > .15) {
+				available_width = available_width_min;
 			}
 
-			// pre-select first available
-			if ($('li', available).length > 0) {
-				if ($('li.suggest-hover', available).length > 0) {
-					$('li.suggest-hover', available).removeClass('suggest-hover');
-				}
-				$('li:first-child', available).addClass('suggest-hover');
+			available_left = Math.min(available_left, $(window).width() + $(window).scrollLeft() - available_width);
+			if (available_left < 0) {
+				available_width += available_left;
+				available_left = 0;
 			}
 		}
+
+		$available.css({
+			'top': available_top,
+			'left': available_left,
+			'width': available_width,
+			'max-height': available_max_height
+		});
+
+		$available.scrollTop(0);
+
+		if (objectLength(ms.values.available) != 0) {
+			// Remove selected item selected state.
+			$('.selected li.selected', $obj).removeClass('selected');
+
+			// Pre-select first available item.
+			if ($('li', $available).length > 0) {
+				$('li.suggest-hover', $available).removeClass('suggest-hover');
+				$('li:first-child', $available).addClass('suggest-hover');
+			}
+		}
+
+		$available.appendTo(document.body);
 	}
 
 	function hideAvailable($obj) {
-		$('.available', $obj).fadeOut(0);
-	}
+		var ms = $obj.data('multiSelect'),
+			$available = ms.values.available_div;
 
-	function cleanAvailable($obj, values) {
-		$('.multiselect-matches', $obj).remove();
-		$('.available ul', $obj).remove();
-		values.available = {};
-		values.isMoreMatchesFound = false;
-	}
+		clearSearchTimeout($obj);
 
-	function cleanLastSearch($obj) {
-		$('input[type="text"]', $obj).data('lastSearch', '').val('');
-	}
-
-	function cleanSearchInput($obj) {
-		$('input[type="text"]', $obj).val('');
-	}
-
-	function resizeSelectedText(li, $obj) {
-		var	li_margins = li.outerWidth(true) - li.width(),
-			span = $('span.subfilter-enabled', li),
-			span_paddings = span.outerWidth(true) - span.width(),
-			max_width = $('.selected ul', $obj).width() - li_margins - span_paddings,
-			text = $('span:first-child', span);
-
-		if (text.width() > max_width) {
-			var t = text.text();
-			var l = t.length;
-
-			while (text.width() > max_width && l != 0) {
-				text.text(t.substring(0, --l) + '...');
-			}
+		if (!$available.parent().is(document.body)) {
+			return;
 		}
+
+		$available.detach();
+
+		var hide_handler = $available.data('hide_handler');
+		$obj.parents().add(window).off('scroll', hide_handler);
+		$(window).off('resize', hide_handler);
+
+		$available.removeData(['obj', 'hide_handler']);
 	}
 
-	function resizeAllSelectedTexts($obj, options, values) {
-		$('.selected li', $obj).each(function() {
-			var li = $(this),
-				id = li.data('id'),
-				span = $('span.subfilter-enabled', li),
-				text = $('span:first-child', span),
-				t = empty(values.selected[id].prefix)
-					? values.selected[id].name
-					: values.selected[id].prefix + values.selected[id].name;
+	function cleanAvailable($obj) {
+		var ms = $obj.data('multiSelect');
 
-			// rewrite previous text to original
-			text.text(t);
+		hideAvailable($obj);
 
-			resizeSelectedText(li, $obj);
-		});
+		ms.values.available = {};
+		ms.values.available_div.empty();
 	}
 
 	function scrollAvailable($obj) {
-		var	selected = $('.available li.suggest-hover', $obj),
-			available = $('.available', $obj);
+		var ms = $obj.data('multiSelect'),
+			$available = ms.values.available_div,
+			$selected = $available.find('li.suggest-hover');
 
-		if (selected.length > 0) {
-			var	available_height = available.height(),
+		if ($selected.length > 0) {
+			var	available_height = $available.height(),
 				selected_top = 0,
-				selected_height = selected.outerHeight(true);
+				selected_height = $selected.outerHeight(true);
 
-			if ($('.multiselect-matches', $obj)) {
-				selected_top += $('.multiselect-matches', $obj).outerHeight(true);
+			if ($('.multiselect-matches', $available)) {
+				selected_top += $('.multiselect-matches', $available).outerHeight(true);
 			}
 
-			$('.available li', $obj).each(function() {
+			$available.find('li').each(function() {
 				var item = $(this);
 				if (item.hasClass('suggest-hover')) {
 					return false;
@@ -1067,32 +1026,73 @@ jQuery(function($) {
 				selected_top += item.outerHeight(true);
 			});
 
-			if (selected_top < available.scrollTop()) {
-				var prev = selected.prev();
+			if (selected_top < $available.scrollTop()) {
+				var prev = $selected.prev();
 
-				available.scrollTop((prev.length == 0) ? 0 : selected_top);
+				$available.scrollTop((prev.length == 0) ? 0 : selected_top);
 			}
-			else if (selected_top + selected_height > available.scrollTop() + available_height) {
-				available.scrollTop(selected_top - available_height + selected_height);
+			else if (selected_top + selected_height > $available.scrollTop() + available_height) {
+				$available.scrollTop(selected_top - available_height + selected_height);
 			}
 		}
 		else {
-			available.scrollTop(0);
+			$available.scrollTop(0);
 		}
 	}
 
-	function setSearchFieldVisibility(visible, container, options) {
+	function cleanSearchInput($obj) {
+		$('input[type="text"]', $obj).val('');
+
+		clearSearchTimeout($obj);
+	}
+
+	function cleanSearchHistory($obj) {
+		var ms = $obj.data('multiSelect');
+
+		ms.values.search = '';
+		ms.values.searches = {};
+		ms.values.searching = {};
+	}
+
+	function clearSearchTimeout($obj) {
+		var ms = $obj.data('multiSelect');
+
+		if (ms.values.searchTimeout !== undefined) {
+			clearTimeout(ms.values.searchTimeout);
+			delete ms.values.searchTimeout;
+		}
+	}
+
+	function cleanSearch($obj) {
+		cleanAvailable($obj);
+		cleanSearchInput($obj);
+		cleanSearchHistory($obj);
+		updateSearchFieldVisibility($obj);
+	}
+
+	function updateSearchFieldVisibility($obj) {
+		var ms = $obj.data('multiSelect'),
+			visible_now = !$obj.hasClass('search-disabled'),
+			visible = !ms.options.disabled
+				&& (ms.options.selectedLimit == 0 || $('.selected li', $obj).length < ms.options.selectedLimit);
+
+		if (visible === visible_now) {
+			return;
+		}
+
 		if (visible) {
-			container.removeClass('search-disabled')
+			var $label = $('label[for=' + $obj.attr('id') + '_ms]');
+
+			$obj.removeClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
-					placeholder: options.labels['type here to search'],
-					'aria-label': options.labels['type here to search'],
+					placeholder: ms.options.labels['type here to search'],
+					'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
 					readonly: false
 				});
 		}
 		else {
-			container.addClass('search-disabled')
+			$obj.addClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
 					placeholder: '',
@@ -1102,13 +1102,15 @@ jQuery(function($) {
 		}
 	}
 
-	function getSearchFieldVisibility(container) {
-		return container.not('.search-disabled').length > 0;
+	function isSearchFieldVisible($obj) {
+		return !$obj.hasClass('.search-disabled');
 	}
 
-	function getLimit(values, options) {
-		return (options.limit != 0)
-			? options.limit + objectLength(values.selected) + options.excludeids.length + 1
+	function getLimit($obj) {
+		var ms = $obj.data('multiSelect');
+
+		return (ms.options.limit != 0)
+			? ms.options.limit + objectLength(ms.values.selected) + ms.options.excludeids.length + 1
 			: null;
 	}
 

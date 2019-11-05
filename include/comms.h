@@ -190,6 +190,9 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 #define zbx_send_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, NULL, ZBX_TCP_PROTOCOL, timeout)
 
+#define zbx_send_response_same(sock, result, info, timeout) \
+		zbx_send_response_ext(sock, result, info, NULL, sock->protocol, timeout)
+
 #define zbx_send_proxy_response(sock, result, info, timeout) \
 		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
 

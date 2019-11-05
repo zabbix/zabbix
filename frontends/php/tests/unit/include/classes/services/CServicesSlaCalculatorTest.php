@@ -109,6 +109,34 @@ class CServicesSlaCalculatorTest extends PHPUnit_Framework_TestCase {
 					'problem' => 0.14084507042254,
 					'ok' => 99.859154929577
 				]
+			],
+			[
+				[],
+				[
+					[
+						'type' => SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
+						'ts_from' => strtotime('15 August 2019 10:00'),
+						'ts_to' => strtotime('15 August 2019 10:20')
+					]
+				],
+				strtotime('15 August 2019 10:10'),
+				strtotime('15 August 2019 10:30'),
+				5,
+				[
+					'dt' => [
+						'problemTime' => 0,
+						'okTime' => 600
+					],
+					'ut' => [
+						'problemTime' => 600,
+						'okTime' => 0
+					],
+					'problemTime' => 600,
+					'okTime' => 0,
+					'downtimeTime' => 600,
+					'problem' => 100,
+					'ok' => 0
+				]
 			]
 		];
 	}

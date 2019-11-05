@@ -3578,7 +3578,7 @@ static int	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applicat
 	int					ret = SUCCEED, i, new_applications = 0, new_discoveries = 0, index;
 	zbx_lld_application_t			*application;
 	const zbx_lld_application_prototype_t	*application_prototype;
-	zbx_uint64_t				applicationid, application_discoveryid;
+	zbx_uint64_t				applicationid = 0, application_discoveryid = 0;
 	zbx_db_insert_t				db_insert, db_insert_discovery;
 	zbx_vector_uint64_t			del_applicationids, del_discoveryids;
 	char					*sql_a = NULL, *sql_ad = NULL, *name;
