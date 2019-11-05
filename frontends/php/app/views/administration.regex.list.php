@@ -20,7 +20,7 @@
 
 
 if ($data['uncheck']) {
-	uncheckTableRows();
+	uncheckTableRows(null, [], 'regex');
 }
 
 $widget = (new CWidget())
