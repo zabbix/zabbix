@@ -30,9 +30,7 @@ AC_DEFUN([ZLIB_CHECK_CONFIG],
 If you want to specify zlib installation directories:
 AC_HELP_STRING([--with-zlib=DIR], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
 		[
-			if test "x$withval" = "xyes"; then
-				withval="/usr"
-			fi
+			test "x$withval" = "xyes" && withval=/usr
 			ZLIB_CFLAGS="-I$withval/include"
 			ZLIB_LDFLAGS="-L$withval/lib"
 			_zlib_dir_set="yes"
