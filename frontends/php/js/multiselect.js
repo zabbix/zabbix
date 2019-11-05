@@ -935,8 +935,9 @@ jQuery(function($) {
 		$obj.parents().add(window).off('scroll', hide_handler);
 		$(window).off('resize', hide_handler);
 
-		$available.removeData(['obj', 'hide_handler']);
-		$available.removeAttr('data-opener');
+		$available
+			.removeData(['obj', 'hide_handler'])
+			.removeAttr('data-opener');
 	}
 
 	function cleanAvailable($obj) {
