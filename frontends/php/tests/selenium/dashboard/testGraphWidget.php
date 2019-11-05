@@ -1451,6 +1451,7 @@ class testGraphWidget extends CWebTest {
 		$form = $this->openGraphWidget();
 
 		$this->fillForm($data, $form);
+		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Graph'));
 
@@ -1700,6 +1701,7 @@ class testGraphWidget extends CWebTest {
 		$form = $this->openGraphWidget('Test cases for update');
 
 		$this->fillForm($data, $form);
+		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
 		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 

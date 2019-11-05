@@ -605,7 +605,7 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($expected != $value && $raise_exception) {
-			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
+			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
 		}
 
 		return ($expected == $value);
