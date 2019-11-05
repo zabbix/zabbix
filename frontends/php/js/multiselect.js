@@ -865,6 +865,9 @@ jQuery(function($) {
 		$obj.parents().add(window).one('scroll', hide_handler);
 		$(window).one('resize', hide_handler);
 
+		// For auto-test purposes.
+		$available.attr('data-opener', $obj.attr('id'));
+
 		var obj_offset = $obj.offset(),
 			obj_padding_y = $obj.outerHeight() - $obj.height(),
 			// Subtract 1px for borders of the input and available container to overlap.
@@ -931,6 +934,7 @@ jQuery(function($) {
 		$(window).off('resize', hide_handler);
 
 		$available.removeData(['obj', 'hide_handler']);
+		$available.removeAttr('data-opener');
 	}
 
 	function cleanAvailable($obj) {
