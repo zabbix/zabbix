@@ -188,21 +188,21 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	protected function getUsersMs() {
-		if ($this->getInput('usrgrpid', 0) == 0) {
-			return [];
-		}
+	private function getUsersMs() {
+		$options = [
+			'output' => ['userid', 'alias', 'name', 'surname']
+		];
 
-		$options = ['output' => ['userid', 'alias', 'name', 'surname'], 'preservekeys' => true];
-
-		if ($this->hasInput('form_refresh')) {
-			$options['userids'] = $this->getInput('userids', []);
+		if ($this->hasInput('usrgrpid') && !$this->hasInput('form_refresh')) {
+			$options['usrgrpids'] = $this->getInput('usrgrpid');
 		}
 		else {
-			$options['usrgrpids'] = (array) $this->getInput('usrgrpid');
+			$options['userids'] = $this->getInput('userids', []);
 		}
 
-		$users = API::User()->get($options);
+		$users = (array_key_exists('usrgrpids', $options) || $options['userids'] !== [])
+			? API::User()->get($options)
+			: [];
 
 		$users_ms = [];
 		foreach ($users as $user) {
