@@ -20,12 +20,12 @@
 
 
 /**
- * Discovery checks popup
+ * Controller class containing operations for adding and updating discovery checks.
  */
 class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	/**
-	 * Default check type
+	 * Default discovery check type.
 	 */
 	const DEFAULT_TYPE = SVC_FTP;
 
@@ -35,31 +35,28 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'index' => 'required|int32', // Count of exists checks.
-			'validate' => 'in 1',
-			'update' => 'in 1',
-
-			'dcheckid' => 'string',
-			'type' => 'in '.implode(',', array_keys(discovery_check_type2str())),
-			'ports' => 'string|not_empty|db dchecks.ports',
-			'snmp_community' => 'string|not_empty|db dchecks.snmp_community',
-			'key_' => 'string|not_empty|db dchecks.key_',
-			'snmpv3_contextname' => 'string|db dchecks.snmpv3_contextname',
-			'snmpv3_securityname' => 'string|db dchecks.snmpv3_securityname',
-			'snmpv3_securitylevel' => 'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
-			'snmpv3_authprotocol' => 'db dchecks.snmpv3_authprotocol|in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA,
-			'snmpv3_authpassphrase' => 'string|db dchecks.snmpv3_authpassphrase',
-			'snmpv3_privprotocol' => 'db dchecks.snmpv3_privprotocol|in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES,
-			'snmpv3_privpassphrase' => 'string|not_empty|db dchecks.snmpv3_privpassphrase'
+			'index' =>					'required|int32', // count of existing checks
+			'update' =>					'in 1',
+			'validate' =>				'in 1',
+			'dcheckid' =>				'string',
+			'type' =>					'in '.implode(',', array_keys(discovery_check_type2str())),
+			'ports' =>					'string|not_empty|db dchecks.ports',
+			'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
+			'key_' =>					'string|not_empty|db dchecks.key_',
+			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
+			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
+			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
+			'snmpv3_authprotocol' =>	'db dchecks.snmpv3_authprotocol|in '.ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA,
+			'snmpv3_authpassphrase' =>	'string|db dchecks.snmpv3_authpassphrase',
+			'snmpv3_privprotocol' =>	'db dchecks.snmpv3_privprotocol|in '.ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES,
+			'snmpv3_privpassphrase' =>	'string|not_empty|db dchecks.snmpv3_privpassphrase'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if ($this->hasInput('ports')) {
-			if (!validate_port_list($this->getInput('ports'))) {
-				info(_('Incorrect port range.'));
-				$ret = false;
-			}
+		if ($this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
+			info(_('Incorrect port range.'));
+			$ret = false;
 		}
 
 		if (!$ret) {

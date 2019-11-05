@@ -61,23 +61,23 @@
 	 */
 	function addPopupValues(list) {
 		var ZBX_SVC = {
-			ssh: <?= SVC_SSH ?>,
-			ldap: <?= SVC_LDAP ?>,
-			smtp: <?= SVC_SMTP ?>,
-			ftp: <?= SVC_FTP ?>,
-			http: <?= SVC_HTTP ?>,
-			pop: <?= SVC_POP ?>,
-			nntp: <?= SVC_NNTP ?>,
-			imap: <?= SVC_IMAP ?>,
-			tcp: <?= SVC_TCP ?>,
-			agent: <?= SVC_AGENT ?>,
-			snmpv1: <?= SVC_SNMPv1 ?>,
-			snmpv2: <?= SVC_SNMPv2c ?>,
-			snmpv3: <?= SVC_SNMPv3 ?>,
-			icmp: <?= SVC_ICMPPING ?>,
-			https: <?= SVC_HTTPS ?>,
-			telnet: <?= SVC_TELNET ?>
-		},
+				ssh: <?= SVC_SSH ?>,
+				ldap: <?= SVC_LDAP ?>,
+				smtp: <?= SVC_SMTP ?>,
+				ftp: <?= SVC_FTP ?>,
+				http: <?= SVC_HTTP ?>,
+				pop: <?= SVC_POP ?>,
+				nntp: <?= SVC_NNTP ?>,
+				imap: <?= SVC_IMAP ?>,
+				tcp: <?= SVC_TCP ?>,
+				agent: <?= SVC_AGENT ?>,
+				snmpv1: <?= SVC_SNMPv1 ?>,
+				snmpv2: <?= SVC_SNMPv2c ?>,
+				snmpv3: <?= SVC_SNMPv3 ?>,
+				icmp: <?= SVC_ICMPPING ?>,
+				https: <?= SVC_HTTPS ?>,
+				telnet: <?= SVC_TELNET ?>
+			},
 			available_device_types = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
 
 		var addNewValue = function(value) {
@@ -96,7 +96,6 @@
 					jQuery('#dcheckCell_' + value.dcheckid).append($input);
 				}
 			}
-
 		}
 
 		var updateNewValue = function(value) {
@@ -123,11 +122,11 @@
 				if (value.hasOwnProperty(field_name)) {
 					var $obj = jQuery('input[name="dchecks[' + value.dcheckid + '][' + field_name + ']"]');
 
-					// If input exist update value.
+					// If the input exists, update the value or create it otherwise.
 					if ($obj.length) {
 						$obj.val(value[field_name]);
 					}
-					else { // If not exists create input.
+					else {
 						var $input = jQuery('<input>', {
 							name: 'dchecks[' + value.dcheckid + '][' + field_name + ']',
 							type: 'hidden',
@@ -154,11 +153,10 @@
 				value.dcheckid = getUniqueId();
 			}
 
-			// Add.
 			if (typeof ZBX_CHECKLIST[value.dcheckid] === 'undefined') {
 				addNewValue(value);
 			}
-			else { // Update.
+			else {
 				updateNewValue(value);
 			}
 
@@ -169,7 +167,7 @@
 			};
 
 			jQuery.each(elements, function(key, param) {
-				var	$obj = jQuery('#' + key + '_row_' + value.dcheckid);
+				var $obj = jQuery('#' + key + '_row_' + value.dcheckid);
 
 				if (jQuery.inArray(parseInt(value.type, 10), available_device_types) > -1) {
 					var new_obj = param[1];
@@ -216,11 +214,11 @@
 	}
 
 	jQuery(function() {
-		addPopupValues(<?= zbx_jsvalue(array_values($this->data['drule']['dchecks'])) ?>);
+		addPopupValues(<?= CJs::encodeJson(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery("input:radio[name='uniqueness_criteria'][value=<?= zbx_jsvalue($this->data['drule']['uniqueness_criteria']) ?>]").attr('checked', 'checked');
-		jQuery("input:radio[name='host_source'][value=<?= zbx_jsvalue($this->data['drule']['host_source']) ?>]").attr('checked', 'checked');
-		jQuery("input:radio[name='name_source'][value=<?= zbx_jsvalue($this->data['drule']['name_source']) ?>]").attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value=<?= CJs::encodeJson($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value=<?= CJs::encodeJson($data['drule']['host_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value=<?= CJs::encodeJson($data['drule']['name_source']) ?>]').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
@@ -265,7 +263,7 @@
 					params = {
 						update: 1,
 						index: $rows.index($row)
-					}
+					};
 
 					$row.find('input[type="hidden"]').each(function() {
 						var $input = jQuery(this),
@@ -319,12 +317,13 @@
 		return jQuery('#ports').val(getDCheckDefaultPort(jQuery('#type').val()));
 	}
 
+	var submit_dcheck_lock = false;
+
 	/**
 	 * Sends discovery check form data to the server for validation before adding it to the main form.
 	 *
 	 * @param {string} form_name  Form name that is sent to the server for validation.
 	 */
-	var submit_dcheck_lock = false;
 	function submitDCheck(form_name) {
 		if (submit_dcheck_lock) {
 			return false;
@@ -341,6 +340,7 @@
 
 		if (!dialogueid) {
 			submit_dcheck_lock = false;
+
 			return false;
 		}
 
@@ -349,13 +349,11 @@
 			dataType: 'json',
 			method: 'POST',
 		}).done(function(response) {
-			$form
-				.parent()
-				.find(".<?= ZBX_STYLE_MSG_BAD ?>, .<?= ZBX_STYLE_MSG_GOOD ?>")
-				.remove();
+			$form.parent().find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if (typeof response.errors !== 'undefined') {
 				submit_dcheck_lock = false;
+
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
@@ -367,11 +365,16 @@
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
 				}
-				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_DNS ?>';
-				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val() || '<?= ZBX_DISCOVERY_UNSPEC ?>';
+				dcheck.host_source = jQuery('[name="host_source"]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_DNS ?>';
+				dcheck.name_source = jQuery('[name="name_source"]:checked:not([data-id])').val()
+					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
-				if (validateDCheckDuplicate()) {
+				if (hasDCheckDuplicates()) {
 					submit_dcheck_lock = false;
+					jQuery(makeMessageBox('bad', <?= CJs::encodeJson(_('Check already exists.')) ?>, null, true, false))
+						.insertBefore($form);
+
 					return false;
 				}
 
@@ -388,15 +391,15 @@
 	 *
 	 * @return {boolean}
 	 */
-	function validateDCheckDuplicate() {
+	function hasDCheckDuplicates() {
 		var $form = jQuery(document.forms['dcheck_form']),
 			dcheckid = jQuery('#dcheckid').val(),
 			dcheck = $form
 				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
 				.serializeJSON(),
-			fields_name = ['key_', 'type', 'ports', 'snmp_community', 'snmpv3_authprotocol',
-				'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'snmpv3_securitylevel',
-				'snmpv3_securityname', 'snmpv3_contextname'
+			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+				'snmpv3_privpassphrase'
 			];
 
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
@@ -406,20 +409,18 @@
 				continue;
 			}
 
-			if (typeof dcheckid === 'undefined' || (typeof dcheckid !== 'undefined') && dcheckid != zbx_dcheckid) {
-				var duplicate_fields = fields_name
-					.map(function(value) { // Check if field is undefined or empty or values equels with exist checks.
+			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
+				var duplicate_fields = fields
+					.map(function(value) {
 						return typeof dcheck[value] === 'undefined'
 							|| dcheck[value] === ''
 							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
 					})
-					.filter(function(value) { // Remove false value from array.
+					.filter(function(value) {
 						return !!value;
 					});
 
-				if (duplicate_fields.length === fields_name.length) { // If all fields return true for checks.
-					jQuery(makeMessageBox('bad', "<?= _('Check already exists.') ?>", null, true, false))
-						.insertBefore($form);
+				if (duplicate_fields.length === fields.length) {
 					return true;
 				}
 			}
