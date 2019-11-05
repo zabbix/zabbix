@@ -363,10 +363,12 @@ jQuery(function($) {
 					var search = $input.val();
 
 					if (search !== '') {
+						search = search.trim();
+
 						$('.selected li.selected', $obj).removeClass('selected');
+					}
 
-						search = search.replace(/^\s+|\s+$/g, '');
-
+					if (search !== '') {
 						/*
 						 * Strategy:
 						 * 1. Load the cached result set if such exists for the given term and show the list.
@@ -396,7 +398,7 @@ jQuery(function($) {
 									.then(function(response) {
 										ms.values.searches[search] = response.result;
 
-										if (search === $input.val().replace(/^\s+|\s+$/g, '')) {
+										if (search === $input.val().trim()) {
 											ms.values.search = search;
 											loadAvailable($obj);
 											showAvailable($obj);
