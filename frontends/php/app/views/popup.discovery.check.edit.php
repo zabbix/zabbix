@@ -123,7 +123,10 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_privpassphrase'
 	);
 
-$form->addItem($form_list);
+$form->addItem([
+	$form_list,
+	(new CInput('submit', 'submit'))->addStyle('display: none;')
+]);
 
 $output = [
 	'header' => $data['title'],
