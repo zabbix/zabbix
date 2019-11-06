@@ -22,35 +22,9 @@
 class CControllerUsergroupEdit extends CController {
 
 	/**
-	 * @var array  Form object for adding new tag filter.
+	 * @var array  User group data from database.
 	 */
-	protected $new_tag_filter = [
-		'groupids' => [],
-		'tag' => '',
-		'value' => '',
-		'include_subgroups' => false
-	];
-
-	/**
-	 * @var array  Form object for adding new group right.
-	 */
-	protected $new_group_right = [
-		'groupids' => [],
-		'permission' => PERM_NONE,
-		'include_subgroups' => false
-	];
-
-	/**
-	 * @var array  Default values for usr group form object.
-	 */
-	protected $user_group = [
-		'usrgrpid' => 0,
-		'name' => '',
-		'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-		'users_status' => GROUP_STATUS_ENABLED,
-		'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-		'tag_filters' => []
-	];
+	private $user_group = [];
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -79,10 +53,6 @@ class CControllerUsergroupEdit extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
-		else {
-			$this->new_tag_filter = $this->getInput('new_tag_filter', []) + $this->new_tag_filter;
-			$this->new_group_right = $this->getInput('new_group_right', []) + $this->new_group_right;
-		}
 
 		return $ret;
 	}
@@ -94,7 +64,7 @@ class CControllerUsergroupEdit extends CController {
 
 		if ($this->hasInput('usrgrpid')) {
 			$user_groups = API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode'],
+				'output' => ['name', 'gui_access', 'users_status', 'debug_mode'],
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
@@ -111,30 +81,52 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	protected function doAction() {
+		// default values
+		$db_defaults = DB::getDefaults('usrgrp');
 		$data = [
-			'usrgrpid'         => $this->getInput('usrgrpid',     $this->user_group['usrgrpid']),
-			'name'             => $this->getInput('name',         $this->user_group['name']),
-			'gui_access'       => $this->getInput('gui_access',   $this->user_group['gui_access']),
-			'users_status'     => $this->getInput('users_status', $this->user_group['users_status']),
-			'debug_mode'       => $this->getInput('debug_mode',   $this->user_group['debug_mode']),
-
-			'group_rights'     => $this->getGroupRights(),
-			'new_group_right'  => $this->new_group_right,
-
-			'tag_filters'      => $this->getTagFilters(),
-			'new_tag_filter'   => $this->new_tag_filter,
-
-			'host_groups_ms'   => $this->getHostGroupsMs(),
-			'users_ms'         => $this->getUsersMs(),
-
-			'form_refresh'     => $this->getInput('form_refresh', 0),
-			'can_update_group' => (
-				$this->getInput('usrgrpid', 0) == 0) || granted2update_group($this->getInput('usrgrpid', 0)
-			)
+			'usrgrpid' => 0,
+			'name' => $db_defaults['name'],
+			'gui_access' => $db_defaults['gui_access'],
+			'users_status' => $db_defaults['users_status'],
+			'debug_mode' => $db_defaults['debug_mode'],
+			'form_refresh' => 0
 		];
 
-		$response = new CControllerResponseData($data);
+		// get values from the dabatase
+		if ($this->hasInput('usrgrpid')) {
+			$data['usrgrpid'] = $this->user_group['usrgrpid'];
+			$data['name'] = $this->user_group['name'];
+			$data['gui_access'] = $this->user_group['gui_access'];
+			$data['users_status'] = $this->user_group['users_status'];
+			$data['debug_mode'] = $this->user_group['debug_mode'];
+		}
 
+		// overwrite with input variables
+		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
+
+		$data['group_rights'] = $this->getGroupRights();
+		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
+			'groupids' => [],
+			'permission' => PERM_NONE,
+			'include_subgroups' => '0'
+		];
+
+		$data['tag_filters'] = $this->getTagFilters();
+		$data['new_tag_filter'] = $this->getInput('new_tag_filter', []) + [
+			'groupids' => [],
+			'tag' => '',
+			'value' => '',
+			'include_subgroups' => false
+		];
+
+		$data['host_groups_ms'] = self::getHostGroupsMs(
+			array_merge($data['new_group_right']['groupids'], $data['new_tag_filter']['groupids'])
+		);
+		$data['users_ms'] = $this->getUsersMs();
+
+		$data['can_update_group'] = !$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid'));
+
+		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));
 		$this->setResponse($response);
 	}
@@ -142,40 +134,42 @@ class CControllerUsergroupEdit extends CController {
 	/**
 	 * @return array
 	 */
-	protected function getGroupRights() {
+	private function getGroupRights() {
 		if ($this->hasInput('group_rights')) {
 			return $this->getInput('group_rights');
 		}
 
-		return collapseHostGroupRights(getHostGroupsRights((array) $this->user_group['usrgrpid']));
+		return collapseHostGroupRights(
+			getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
+		);
 	}
 
 	/**
 	 * @return array
 	 */
-	protected function getTagFilters() {
+	private function getTagFilters() {
 		if ($this->hasInput('tag_filters')) {
 			return collapseTagFilters($this->getInput('tag_filters'));
 		}
 
-		return collapseTagFilters($this->user_group['tag_filters']);
+		return collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 	}
 
 	/**
 	 * Returs all needed host groups formatted for multiselector.
 	 *
+	 * @param array $groupids
+	 *
 	 * @return array
 	 */
-	protected function getHostGroupsMs() {
-		$host_groupids = array_merge($this->new_tag_filter['groupids'], $this->new_group_right['groupids']);
-
-		if (!$host_groupids) {
+	private static function getHostGroupsMs(array $groupids) {
+		if (!$groupids) {
 			return [];
 		}
 
 		$host_groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
-			'groupids' => $host_groupids,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 		CArrayHelper::sort($host_groups, ['name']);
