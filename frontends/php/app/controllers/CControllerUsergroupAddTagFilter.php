@@ -24,8 +24,8 @@ class CControllerUsergroupAddTagFilter extends CController {
 	protected function checkInput() {
 
 		$fields = [
-			'new_tag_filter' => 'array',
-			'tag_filters'    => 'array'
+			'tag_filters'    => 'array',
+			'new_tag_filter' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);

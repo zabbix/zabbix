@@ -68,8 +68,8 @@ class CControllerUsergroupEdit extends CController {
 			'group_rights'    => 'array',
 			'tag_filters'     => 'array',
 
-			'new_tag_filter'  => 'array',
 			'new_group_right' => 'array',
+			'new_tag_filter'  => 'array',
 
 			'form_refresh'    => 'int32'
 		];
