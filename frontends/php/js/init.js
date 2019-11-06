@@ -126,7 +126,7 @@ jQuery(function($) {
 		});
 	});
 
-	function showMenuPopup($obj, data, options, event) {
+	function showMenuPopup($obj, data, event, options) {
 		var sections;
 
 		switch (data.type) {
@@ -279,14 +279,6 @@ jQuery(function($) {
 		}, data.options || {});
 
 		if (isServerRequestRequired(data.type)) {
-			var	$preloader = createMenuPopupPreloader();
-
-			addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
-
-			setTimeout(function() {
-				$preloader.fadeIn(200).position(options.position);
-			}, 500);
-
 			var url = new Curl('zabbix.php');
 
 			url.setArgument('action', 'menu.popup');
@@ -301,9 +293,17 @@ jQuery(function($) {
 					dataType: 'json'
 				});
 
+			var	$preloader = createMenuPopupPreloader();
+
+			setTimeout(function() {
+				$preloader.fadeIn(200).position(options.position);
+			}, 500);
+
+			addToOverlaysStack($preloader.prop('id'), event.target, 'preloader', xhr);
+
 			xhr.done(function(resp) {
 				overlayPreloaderDestroy($preloader.prop('id'));
-				showMenuPopup($obj, resp.data, options, event);
+				showMenuPopup($obj, resp.data, event, options);
 			});
 
 			$(document)
@@ -311,7 +311,7 @@ jQuery(function($) {
 				.on('click', {id: $preloader.prop('id'), xhr: xhr}, menuPopupPreloaderCloseHandler);
 		}
 		else {
-			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), options, event);
+			showMenuPopup($obj, jQuery.extend({type: data.type}, data.data), event, options);
 		}
 
 		return false;

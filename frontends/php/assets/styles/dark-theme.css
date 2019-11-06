@@ -443,8 +443,8 @@ ul.top-nav-icons {
         content: '';
         position: absolute;
         top: 50%;
-        right: .1em;
-        margin-top: -.1em;
+        right: .15em;
+        margin-top: -.15em;
         width: .3em;
         height: .3em;
         border-right: 2px solid #f2f2f2;
