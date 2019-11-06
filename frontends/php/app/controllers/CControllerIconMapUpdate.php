@@ -49,8 +49,6 @@ class CControllerIconMapUpdate extends CController {
 
 	protected function doAction() {
 		$iconmap = (array) $this->getInput('iconmap') + ['mappings' => []];
-
-		$iconmap['name'] = trim($iconmap['name']);
 		$iconmap['iconmapid'] = $this->getInput('iconmapid');
 
 		$result = (bool) API::IconMap()->update($iconmap);
