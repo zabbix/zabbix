@@ -32,7 +32,7 @@ var chkbxRange = {
 
 	init: function() {
 		var path = new Curl();
-		var filename = path.args.action ? path.args.action.split('.')[0] : basename(path.getPath(), '.php');
+		var filename = basename(path.getPath(), '.php');
 		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
 		// Erase old checkboxes.
 		this.chkboxes = {};
