@@ -52,7 +52,6 @@ class CNewValidator {
 		$this->input = $input;
 		$this->rules = $rules;
 		$this->validationRuleParser = new CValidationRule();
-		$this->range_time_parser = null;
 
 		$this->validate();
 	}
@@ -443,22 +442,6 @@ class CNewValidator {
 		$table_schema = DB::getSchema($table);
 
 		return (is_string($value) && $this->check_db_value($table_schema['fields'][$field], $value, $flags));
-	}
-
-	private function isLeapYear($year) {
-		return (0 == $year % 4 && (0 != $year % 100 || 0 == $year % 400));
-	}
-
-	private function getDaysInMonth($year, $month) {
-		if (in_array($month, [4, 6, 9, 11], true)) {
-			return 30;
-		}
-
-		if ($month == 2) {
-			return $this->isLeapYear($year) ? 29 : 28;
-		}
-
-		return 31;
 	}
 
 	private function isTimePeriods($value) {
