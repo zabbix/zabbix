@@ -1660,7 +1660,7 @@ https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</de
                     <preprocessing>
                         <step>
                             <type>5</type>
-                            <params>Time:\s(\d.\d+)\sms
+                            <params>Time:\s(\d+\.\d+)\sms
 \1</params>
                             <error_handler>0</error_handler>
                             <error_handler_params/>
