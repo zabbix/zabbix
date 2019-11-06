@@ -3992,12 +3992,12 @@ tr.cursor-move td * {
 
 .clock {
   display: flex;
+  justify-content: center;
   padding: 0 10px;
   height: 100%; }
 
 .clock-svg {
-  height: 100%;
-  width: 100%; }
+  flex-grow: 1; }
 
 .time-zone {
   margin: 0 0 .5em 0;

@@ -183,9 +183,7 @@ class CClock extends CDiv {
 			->addClass(ZBX_STYLE_CLOCK_SVG);
 
 		if ($this->width !== null && $this->height !== null) {
-			$clock
-				->setAttribute('width', $this->width.'px')
-				->setAttribute('height', $this->height.'px');
+			$clock->setAttribute('style', 'width: '.$this->width.'px; height:'.$this->height.'px;');
 		}
 
 		if ($this->error !== null) {
