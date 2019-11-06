@@ -205,33 +205,16 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: db_get_query_events                                              *
+ * Function: event_queries_fetch                                              *
  *                                                                            *
- * Purpose: get open, recently resolved and resolved problems with suppress   *
- *          data from database and prepare event query, event data structures *
+ * Purpose: free event suppress data structure                                *
  *                                                                            *
  ******************************************************************************/
-static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
+static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_queries)
 {
 	DB_ROW				row;
-	DB_RESULT			result;
-	zbx_event_suppress_query_t	*query = NULL;
-	zbx_event_suppress_data_t	*data = NULL;
 	zbx_uint64_t			eventid;
-	zbx_uint64_pair_t		pair;
-	zbx_vector_uint64_t		eventids;
-
-	/* get open or recently closed problems */
-
-	result = DBselect("select p.eventid,p.objectid,p.r_eventid,t.tag,t.value"
-			" from problem p"
-			" left join problem_tag t"
-				" on p.eventid=t.eventid"
-			" where p.source=%d"
-				" and p.object=%d"
-				" and " ZBX_SQL_MOD(p.eventid, %d) "=%d"
-			" order by p.eventid",
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
+	zbx_event_suppress_query_t	*query = NULL;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -260,6 +243,38 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 			zbx_vector_ptr_append(&query->tags, tag);
 		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: db_get_query_events                                              *
+ *                                                                            *
+ * Purpose: get open, recently resolved and resolved problems with suppress   *
+ *          data from database and prepare event query, event data structures *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_t *event_data)
+{
+	DB_ROW				row;
+	DB_RESULT			result;
+	zbx_event_suppress_data_t	*data = NULL;
+	zbx_uint64_t			eventid;
+	zbx_uint64_pair_t		pair;
+	zbx_vector_uint64_t		eventids;
+
+	/* get open or recently closed problems */
+
+	result = DBselect("select p.eventid,p.objectid,p.r_eventid,t.tag,t.value"
+			" from problem p"
+			" left join problem_tag t"
+				" on p.eventid=t.eventid"
+			" where p.source=%d"
+				" and p.object=%d"
+				" and " ZBX_SQL_MOD(p.eventid, %d) "=%d"
+			" order by p.eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, CONFIG_TIMER_FORKS, process_num - 1);
+
+	event_queries_fetch(result, event_queries);
 	DBfree_result(result);
 
 	/* get event suppress data */
@@ -303,27 +318,20 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select e.eventid,e.objectid,er.r_eventid"
+				"select e.eventid,e.objectid,er.r_eventid,t.tag,t.value"
 				" from events e"
 				" left join event_recovery er"
 					" on e.eventid=er.eventid"
+				" left join problem_tag t"
+					" on p.eventid=t.eventid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids.values, eventids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
 
 		result = DBselect("%s", sql);
 		zbx_free(sql);
 
-		while (NULL != (row = DBfetch(result)))
-		{
-			query = (zbx_event_suppress_query_t *)zbx_malloc(NULL, sizeof(zbx_event_suppress_query_t));
-			ZBX_STR2UINT64(query->eventid, row[0]);
-			ZBX_STR2UINT64(query->triggerid, row[1]);
-			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
-			zbx_vector_uint64_create(&query->functionids);
-			zbx_vector_ptr_create(&query->tags);
-			zbx_vector_uint64_pair_create(&query->maintenances);
-			zbx_vector_ptr_append(event_queries, query);
-		}
+		event_queries_fetch(result, event_queries);
 		DBfree_result(result);
 
 		zbx_vector_ptr_sort(event_queries, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
