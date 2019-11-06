@@ -21,20 +21,6 @@
 
 class CControllerTrigDisplayUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	protected $color_caption;
-
-	protected function init() {
-		$this->color_captions = [
-			'problem_unack_color' => _('Unacknowledged PROBLEM events'),
-			'problem_ack_color'   => _('Acknowledged PROBLEM events'),
-			'ok_unack_color'      => _('Unacknowledged RESOLVED events'),
-			'ok_ack_color'        => _('Acknowledged RESOLVED events')
-		];
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'custom_color'        => 'required | int32 | in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
@@ -43,20 +29,14 @@ class CControllerTrigDisplayUpdate extends CController {
 			'ok_unack_style'      => 'required | int32 | in 0,1',
 			'ok_ack_style'        => 'required | int32 | in 0,1',
 			'ok_period'           => 'required | string | not_empty',
-			'blink_period'        => 'required | string | not_empty'
+			'blink_period'        => 'required | string | not_empty',
+			'problem_unack_color' => 'rgb',
+			'problem_ack_color'   => 'rgb',
+			'ok_unack_color'      => 'rgb',
+			'ok_ack_color'        => 'rgb'
 		];
 
-		$color_fields = [
-			'problem_unack_color' => 'string',
-			'problem_ack_color'   => 'string',
-			'ok_unack_color'      => 'string',
-			'ok_ack_color'        => 'string'
-		];
-
-		$ret = $this->validateInput($fields + $color_fields);
-		if ($ret && $this->getInput('custom_color') == EVENT_CUSTOM_COLOR_ENABLED) {
-			$ret &= $this->validateColors($color_fields);
-		}
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -111,24 +91,5 @@ class CControllerTrigDisplayUpdate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @param array $fields
-	 *
-	 * @return bool
-	 */
-	protected function validateColors($fields) {
-		$color_validator = new CColorValidator();
-
-		foreach (array_keys($fields) as $field) {
-			if (!$color_validator->validate($this->getInput($field))) {
-				$caption = $this->color_captions[$field];
-				error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
-				return false;
-			}
-		}
-
-		return true;
 	}
 }

@@ -59,6 +59,7 @@ class CValidationRule {
 							if (!$this->parseString($buffer, $pos, $rule)		// string
 									&& !$this->parseRangeTime($buffer, $pos, $rule)		// range time
 									&& !$this->parseTimePeriods($buffer, $pos, $rule)	// time periods
+									&& !$this->parseRgb($buffer, $pos, $rule)			// rgb
 									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseLE($buffer, $pos, $rule)			// le
@@ -184,6 +185,22 @@ class CValidationRule {
 
 		$pos += 12;
 		$rules['time_periods'] = true;
+
+		return true;
+	}
+
+	/**
+	 * rgb
+	 *
+	 * 'rgb' => true
+	 */
+	private function parseRgb($buffer, &$pos, &$rules) {
+		if (strncmp(substr($buffer, $pos), 'rgb', 3) != 0) {
+			return false;
+		}
+
+		$pos += 3;
+		$rules['rgb'] = true;
 
 		return true;
 	}

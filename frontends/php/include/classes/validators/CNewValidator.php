@@ -288,6 +288,19 @@ class CNewValidator {
 					}
 					break;
 
+				/*
+				 * 'rgb' => true
+				 */
+				case 'rgb':
+					if (array_key_exists($field, $this->input) && !$this->isRgb($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field,
+								_('hexadecimal colour code (6 symbols) is expected')
+							)
+						);
+						return false;
+					}
+					break;
 
 				/*
 				 * 'string' => true
@@ -462,6 +475,10 @@ class CNewValidator {
 		}
 
 		return is_string($value) && $this->range_time_parser->parse($value) == CParser::PARSE_SUCCESS;
+	}
+
+	private function isRgb($value) {
+		return is_string($value) && preg_match('/^[A-F0-9]{6}$/', $value);
 	}
 
 	/**

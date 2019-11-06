@@ -21,22 +21,6 @@
 
 class CControllerTrigSeverityUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	protected $color_captions;
-
-	protected function init() {
-		$this->color_captions = [
-			'severity_color_0' => _('Not classified'),
-			'severity_color_1' => _('Information'),
-			'severity_color_2' => _('Warning'),
-			'severity_color_3' => _('Average'),
-			'severity_color_4' => _('High'),
-			'severity_color_5' => _('Disaster')
-		];
-	}
-
 	protected function checkInput() {
 		$fields = [
 			'severity_name_0'  => 'required | string | not_empty',
@@ -44,20 +28,16 @@ class CControllerTrigSeverityUpdate extends CController {
 			'severity_name_2'  => 'required | string | not_empty',
 			'severity_name_3'  => 'required | string | not_empty',
 			'severity_name_4'  => 'required | string | not_empty',
-			'severity_name_5'  => 'required | string | not_empty'
+			'severity_name_5'  => 'required | string | not_empty',
+			'severity_color_0' => 'required | string | not_empty | rgb',
+			'severity_color_1' => 'required | string | not_empty | rgb',
+			'severity_color_2' => 'required | string | not_empty | rgb',
+			'severity_color_3' => 'required | string | not_empty | rgb',
+			'severity_color_4' => 'required | string | not_empty | rgb',
+			'severity_color_5' => 'required | string | not_empty | rgb'
 		];
 
-		$color_fields = [
-			'severity_color_0' => 'required | string | not_empty',
-			'severity_color_1' => 'required | string | not_empty',
-			'severity_color_2' => 'required | string | not_empty',
-			'severity_color_3' => 'required | string | not_empty',
-			'severity_color_4' => 'required | string | not_empty',
-			'severity_color_5' => 'required | string | not_empty'
-		];
-
-		$ret = $this->validateInput($fields + $color_fields);
-		$ret &= $this->validateColors($color_fields);
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -104,24 +84,5 @@ class CControllerTrigSeverityUpdate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @param array $fields
-	 *
-	 * @return bool
-	 */
-	protected function validateColors($fields) {
-		$color_validator = new CColorValidator();
-
-		foreach (array_keys($fields) as $field) {
-			if (!$color_validator->validate($this->getInput($field))) {
-				$caption = $this->color_captions[$field];
-				error(_s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption));
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
