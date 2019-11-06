@@ -68,7 +68,23 @@ class testMultiselect extends CWebTest {
 		$form->invalidate();
 		$element = $form->getField('Items')->query('tag:input')->one();
 		$element->type('Zab');
+		$debug_button = $this->query('class:btn-debug')->one();
+		$zabbix_version = $this->query('xpath://footer[text()]')->one();
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
-		$this->assertScreenshotExcept(null, [$element]);
+		$this->assertScreenshotExcept(null, [$element, $debug_button,$zabbix_version]);
+	}
+
+	public function testMultiselect_NotSuggestAlreadySelected() {
+		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
+		$this->page->updateViewport();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$field = $form->getField('Host groups');
+		$field->select('Zabbix servers');
+		$element = $field->query('tag:input')->one();
+		$element->type('Zabbix server');
+		$this->query('class:multiselect-matches')->waitUntilVisible();
+		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
+			[$element]
+		);
 	}
 }
