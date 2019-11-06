@@ -1251,6 +1251,27 @@ AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static]) ;;
 esac])
 
+AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked binaries with selected libs],
+[case "${enableval}" in
+  yes)
+    saved_LIBS="$LIBS"
+    LIBS="${LIBS} -Wl,-Bstatic -Wl,-Bdynamic"
+    AC_MSG_CHECKING(if libs static linking is possible)
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
+      [AC_MSG_RESULT([yes])
+        static_linking_libs=yes],
+      [AC_MSG_RESULT([no])
+        static_linking_libs=no])
+      if test "x$static_linking_libs" = "xno"; then
+        AC_MSG_ERROR([static linking of libs is not possible on this system])
+      else
+        LIBS="$saved_LIBS"
+      fi
+    ;;
+  no) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
+esac])
+
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
