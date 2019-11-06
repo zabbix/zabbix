@@ -20,17 +20,15 @@
 
 
 $this->includeJSfile('app/views/administration.usergroup.edit.js.php');
+
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 $form = (new CForm())
 	->setName('user_group_form')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
-if ($data['usrgrpid'] == 0) {
-	$form->addVar('action', 'usergroup.create');
-}
-else {
-	$form->addVar('action', 'usergroup.update')->addVar('usrgrpid', $data['usrgrpid']);
+if ($data['usrgrpid'] != 0) {
+	$form->addVar('usrgrpid', $data['usrgrpid']);
 }
 
 $form_list = (new CFormList())
@@ -77,9 +75,6 @@ if ($data['can_update_group']) {
 	);
 }
 else {
-	$form
-		->addVar('gui_access', $data['gui_access'])
-		->addVar('users_status', GROUP_STATUS_ENABLED);
 	$form_list
 		->addRow(_('Frontend access'),
 			(new CSpan(user_auth_type2str($data['gui_access'])))
@@ -207,28 +202,27 @@ if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }
 
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')))
+	->setId('cancel');
+
 if ($data['usrgrpid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmitButton(_('Update'), 'action', 'usergroup.update'))->setId('update'),
 		[
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.delete')
 					->setArgument('usrgrpids', [$data['usrgrpid']])->setArgumentSID(),
 				_('Delete selected group?')
 			))->setId('delete'),
-			(new CRedirectButton(_('Cancel'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
-			))->setId('cancel')
+			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmitButton(_('Add'), 'action', 'usergroup.create'))->setId('add'),
 		[
-			(new CRedirectButton(_('Cancel'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
-			))->setId('cancel')
+			$cancel_button
 		]
 	));
 }
