@@ -38,13 +38,24 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		var $form = $('form');
+		var $form = $('form#valuemap');
+
 		$form.on('submit', function() {
 			$form.trimValues(['#name']);
 		});
 
 		$('#mappings_table').dynamicRows({
 			template: '#mapping_row'
+		});
+
+		$form.find('#clone').click(function() {
+			var url = new Curl('zabbix.php?action=valuemap.edit');
+
+			$form.serializeArray().forEach(function(field) {
+				url.setArgument(field.name, field.value);
+			});
+
+			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
 		});
 	});
 </script>

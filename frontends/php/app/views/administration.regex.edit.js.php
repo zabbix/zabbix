@@ -202,7 +202,8 @@
 	}(jQuery));
 
 	jQuery(function($) {
-		var $form = $('form');
+		var $form = $('form#regex');
+
 		$form.on('submit', function() {
 			$form.trimValues(['#name']);
 		});
@@ -213,6 +214,16 @@
 
 		$('#tbl_expr').dynamicRows({
 			template: '#row_expr'
+		});
+
+		$form.find('#clone').click(function() {
+			var url = new Curl('zabbix.php?action=regex.edit');
+
+			$form.serializeArray().forEach(function(field) {
+				url.setArgument(field.name, field.value);
+			});
+
+			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
 		});
 	});
 </script>

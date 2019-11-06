@@ -57,9 +57,20 @@
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
-		var $form = $('form');
+		var $form = $('form#iconmap');
+
 		$form.on('submit', function() {
 			$form.trimValues(['#iconmap_name']);
+		});
+
+		$form.find('#clone').click(function() {
+			var url = new Curl('zabbix.php?action=iconmap.edit');
+
+			$form.serializeArray().forEach(function(field) {
+				url.setArgument(field.name, field.value);
+			});
+
+			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
 		});
 
 		var iconMapTable = $('#iconMapTable'),

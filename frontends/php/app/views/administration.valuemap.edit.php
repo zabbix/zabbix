@@ -37,15 +37,12 @@ $widget = (new CWidget())
 	);
 
 $form = (new CForm())
+	->setId('valuemap')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', ($data['valuemapid'] == 0) ? 'valuemap.create' : 'valuemap.update')
 		->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
-
-if ($data['valuemapid'] != 0) {
-	$form->addVar('valuemapid', $data['valuemapid']);
-}
 
 $form_list = (new CFormList())
 	->addRow(
@@ -110,7 +107,7 @@ if ($data['valuemapid'] != 0) {
 	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CSubmitButton(_('Clone'), 'action', 'valuemap.clone'))->setId('clone'),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'valuemap.delete')
 					->setArgument('valuemapids', (array) $data['valuemapid']),

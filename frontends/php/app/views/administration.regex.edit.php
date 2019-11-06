@@ -44,8 +44,7 @@ if ($data['regexid'] != 0) {
 }
 
 $form = (new CForm())
-	->setId('autoreg-form')
-	->setName('autoreg-form')
+	->setId('regex')
 	->setAction($action->getUrl())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
@@ -148,7 +147,7 @@ if ($data['regexid'] != 0) {
 	$reg_exp_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CSubmitButton(_('Clone'), 'action', 'regex.clone'))->setId('clone'),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.delete')
 					->setArgument('regexids', (array) $data['regexid']),

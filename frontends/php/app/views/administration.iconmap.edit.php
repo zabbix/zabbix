@@ -47,16 +47,13 @@ $name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
 $form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
 
 $form = (new CForm())
+	->setId('iconmap')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
 		->getUrl()
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1);
-
-if ($data['iconmapid'] != 0) {
-	$form->addVar('iconmapid', $data['iconmapid']);
-}
 
 $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
@@ -137,7 +134,7 @@ if ($data['iconmapid'] != 0) {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CSubmitButton(_('Clone'), 'action', 'iconmap.clone'))->setId('clone'),
+			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'iconmap.delete')
 					->setArgument('iconmapid', $data['iconmapid']),
