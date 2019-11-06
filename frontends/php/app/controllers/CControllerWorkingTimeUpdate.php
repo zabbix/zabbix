@@ -23,11 +23,10 @@ class CControllerWorkingTimeUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'work_period' => 'required | string | not_empty | db config.work_period'
+			'work_period' => 'required|string|not_empty|time_periods|db config.work_period'
 		];
 
 		$ret = $this->validateInput($fields);
-		$ret = ($ret && $this->validateWorkingTime($this->getInput('work_period')));
 
 		if (!$ret) {
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
@@ -65,22 +64,5 @@ class CControllerWorkingTimeUpdate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @param string $working_time
-	 *
-	 * @return bool
-	 */
-	protected function validateWorkingTime($working_time) {
-		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
-
-		if ($time_period_parser->parse($working_time) != CParser::PARSE_SUCCESS) {
-			error(_s('Field "%1$s" is not correct: %2$s', _('Working time'), _('a time period is expected')));
-
-			return false;
-		}
-
-		return true;
 	}
 }
