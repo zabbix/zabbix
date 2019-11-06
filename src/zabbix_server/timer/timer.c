@@ -207,7 +207,7 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
  *                                                                            *
  * Function: event_queries_fetch                                              *
  *                                                                            *
- * Purpose: fetch events that need to be queries for maintenance              *
+ * Purpose: fetch events that need to be queried for maintenance              *
  *                                                                            *
  ******************************************************************************/
 static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_queries)
