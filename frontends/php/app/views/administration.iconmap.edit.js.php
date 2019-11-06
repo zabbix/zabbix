@@ -57,6 +57,11 @@
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
+		var $form = $('form');
+		$form.on('submit', function() {
+			$form.trimValues(['#iconmap_name']);
+		});
+
 		var iconMapTable = $('#iconMapTable'),
 			addMappingButton = $('#addMapping');
 

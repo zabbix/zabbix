@@ -202,6 +202,11 @@
 	}(jQuery));
 
 	jQuery(function($) {
+		var $form = $('form');
+		$form.on('submit', function() {
+			$form.trimValues(['#name']);
+		});
+
 		$('#testExpression, #tab_test').click(function() {
 			zabbixRegExp.testExpressions($('#test_string').val());
 		});
