@@ -18,14 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$form = (new CFormList())
+$form = (new CForm())
 	->cleanItems()
 	->setId('maintenance_period_form')
 	->addVar('action', 'popup.maintenance.period.edit')
 	->addVar('refresh', 1)
 	->addVar('update', $data['update'])
 	->addVar('index', $data['index']);
+
+$form_list = (new CFormList());
 
 if ($data['timeperiodid']) {
 	$form->addVar('timeperiodid', $data['timeperiodid']);
@@ -59,7 +60,7 @@ foreach ([1, 5, 9, 2, 6, 10, 3, 7, 11, 4, 8, 12] as $month) {
 	];
 }
 
-$form
+$form_list
 	->addRow((new CLabel(_('Period type'), 'timeperiod_type')),
 		(new CComboBox('timeperiod_type', $data['timeperiod_type'], null, [
 			TIMEPERIOD_TYPE_ONETIME	=> _('One time only'),
@@ -150,6 +151,10 @@ $form
 		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
 		'row_timeperiod_period_length'
 	);
+
+$form
+	->addItem($form_list)
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $output = [
 	'header' => $data['title'],
