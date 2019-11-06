@@ -207,7 +207,7 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
  *                                                                            *
  * Function: event_queries_fetch                                              *
  *                                                                            *
- * Purpose: free event suppress data structure                                *
+ * Purpose: fetch events that need to be queries for maintenance              *
  *                                                                            *
  ******************************************************************************/
 static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_queries)
@@ -241,6 +241,7 @@ static void	event_queries_fetch(DB_RESULT result, zbx_vector_ptr_t *event_querie
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
 			zbx_vector_ptr_append(&query->tags, tag);
+
 		}
 	}
 }
@@ -323,7 +324,7 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 				" left join event_recovery er"
 					" on e.eventid=er.eventid"
 				" left join problem_tag t"
-					" on p.eventid=t.eventid"
+					" on e.eventid=t.eventid"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids.values, eventids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
