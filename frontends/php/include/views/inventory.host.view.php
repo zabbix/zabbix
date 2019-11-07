@@ -125,7 +125,8 @@ $overviewFormList->addRow(_('Monitoring'),
 			'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')
 		),
 		new CLink(_('Latest data'),
-			(new CUrl('latest.php'))
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
 				->setArgument('form', '1')
 				->setArgument('select', '')
 				->setArgument('show_details', '1')

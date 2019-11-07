@@ -27,10 +27,16 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_4050000(void)
+static int	DBpatch_4050000(void)
 {
-	*** Feel free to use this function for the first DB patch! ***
-}*/
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.latest.sort' where idx='web.latest.php.sort'"))
+		return FAIL;
+
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.latest.sortorder' where idx='web.latest.php.sortorder'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -38,6 +44,6 @@ DBPATCH_START(4050)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(4050000, 0, 1)*/
+DBPATCH_ADD(4050000, 0, 1)
 
 DBPATCH_END()
