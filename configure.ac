@@ -1792,8 +1792,6 @@ else
 	LIBS="$LIBS $LIBPCRE_LIBS"
 fi
 
-AC_SUBST(LIBPCRE_CFLAGS)
-
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
 LIBICONV_CHECK_CONFIG([no])
@@ -1802,7 +1800,6 @@ if test "x$found_iconv" != "xyes"; then
 fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
-AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
