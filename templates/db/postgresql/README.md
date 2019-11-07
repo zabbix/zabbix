@@ -17,7 +17,7 @@ This template was tested on Zabbix 4.2.1 and PostgreSQL vesions 9.6, 10 and 11 o
     GRANT pg_monitor TO zbx_monitor;
     ```
 
-    For older PostgreSQL versions:
+    For PostgreSQL version 9.6 and below:
 
     ```sql
     CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>';
