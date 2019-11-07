@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Generator: Adobe Illustrator 23.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 24.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="678px" height="935px" viewBox="0 0 678 935" style="enable-background:new 0 0 678 935;" xml:space="preserve">
 <rect x="-6.809" y="-8.191" style="display:none;fill:#003333;" width="687.809" height="949"/>
@@ -1081,11 +1081,11 @@
 	<polygon style="fill:#FFFFFF;" points="487.602,908.186 489.395,906.394 484.395,906.394 484.395,911.394 486.188,909.601 
 		489.794,913.207 488.001,915 493.001,915 493.001,910 491.208,911.793 	"/>
 </g>
-<g>
-	<g>
-		<polygon style="fill:#FFFFFF;" points="85,307.869 83,307.869 83,310.869 83,312.869 85,312.869 88,312.869 88,310.869 
-			85,310.869 		"/>
-		<polygon style="fill:#FFFFFF;" points="95,310.869 92,310.869 92,312.869 95,312.869 97,312.869 97,310.869 97,307.869 
+<rect x="89" y="300" style="fill:#7F7F7F;" width="2" height="12"/>
+<polygon style="fill:#7F7F7F;" points="96,339 91,339 91,334 89,334 89,346 91,346 91,341 96,341 "/>
+<polygon style="fill:#7F7F7F;" points="96,377 91,377 91,372 89,372 89,379 96,379 "/>
+</svg>
+307.869 
 			95,307.869 		"/>
 		<polygon style="fill:#FFFFFF;" points="85,300.869 88,300.869 88,298.869 85,298.869 83,298.869 83,300.869 83,303.869 
 			85,303.869 		"/>
