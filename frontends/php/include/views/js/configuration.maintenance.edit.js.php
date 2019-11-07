@@ -54,7 +54,7 @@
 
 					params = {
 						update: 1,
-						index: rows.index(row)
+						index: row.find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1]
 					};
 
 					row.find('input[type="hidden"]').each(function() {
@@ -70,8 +70,16 @@
 					break;
 
 				case 'add':
+					var index = 0;
+
+					rows.each(function(row) {
+						index = Math.max(index,
+							parseInt($(this).find('[type="hidden"]:first').attr('name').match(/\[(\d+)\]/)[1])
+						);
+					});
+
 					params = {
-						index: rows.length
+						index: index + 1
 					}
 
 					PopUp("popup.maintenance.period.edit", params, null, btn);
