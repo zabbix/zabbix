@@ -130,9 +130,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
     am_save_ldflags="$LDFLAGS"
     am_save_libs="$LIBS"
 
+    if test "x$enable_static_libs" = "xyes"; then
+      OPENSSL_LIBS="-Wl,-Bstatic $OPENSSL_LIBS -Wl,-Bdynamic"
+    fi
+
     CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
     LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
-    LIBS="$LIBS $OPENSSL_LIBS"
+    LIBS="$OPENSSL_LIBS $LIBS"
 
     found_openssl="no"
     LIBOPENSSL_TRY_LINK([no])
