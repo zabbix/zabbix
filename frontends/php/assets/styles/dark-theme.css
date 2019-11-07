@@ -7,6 +7,9 @@
 .top-nav-profile {
   background: url(../img/icon-sprite.svg) no-repeat -84px -104px !important; }
 
+.top-nav-guest {
+  background: url(../img/icon-sprite.svg) no-repeat -241px -140px !important; }
+
 .top-nav-signout {
   background: url(../img/icon-sprite.svg) no-repeat -84px -140px !important; }
 
@@ -295,6 +298,8 @@ ul.top-nav-icons {
     background: url(../img/icon-sprite.svg) no-repeat -6px -32px; }
   ul.top-nav-icons .top-nav-profile {
     background: url(../img/icon-sprite.svg) no-repeat -6px -104px; }
+  ul.top-nav-icons .top-nav-guest {
+    background: url(../img/icon-sprite.svg) no-repeat -241px -104px; }
   ul.top-nav-icons .top-nav-signout {
     background: url(../img/icon-sprite.svg) no-repeat -6px -140px; }
   ul.top-nav-icons .top-nav-zbbshare {
