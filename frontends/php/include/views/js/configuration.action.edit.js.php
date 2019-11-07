@@ -177,10 +177,10 @@
 				.prop('disabled', !show);
 		}
 
-		showOpTypeAuth(type);
+		showOpTypeAuth();
 	}
 
-	function showOpTypeAuth(type) {
+	function showOpTypeAuth() {
 		var show_password = false,
 			show_publickey = false,
 			current_op_type = parseInt(jQuery('#operation_opcommand_type').val(), 10);
