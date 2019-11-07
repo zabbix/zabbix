@@ -758,7 +758,9 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 	);
 }
 
-$form->addItem($form_list);
+$form
+	->addItem($form_list)
+	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $output = [
 	'header' => $data['title'],
