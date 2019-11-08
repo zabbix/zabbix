@@ -254,7 +254,8 @@ jQuery(function($) {
 	 * @param string options['data'][prefix]		(optional)
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
-	 * @param array  options['excludeids']			an array of excluded ids (optional)
+	 * @param string options['placeholder']			set custom placeholder (optional)
+	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
@@ -286,6 +287,7 @@ jQuery(function($) {
 					'new': t('new'),
 					'Select': t('Select')
 				},
+				placeholder: t('type here to search'),
 				data: {},
 				only_hostid: 0,
 				excludeids: [],
@@ -412,8 +414,8 @@ jQuery(function($) {
 				'id': $label.length ? $label.attr('for') : null,
 				'class': 'input',
 				'type': 'text',
-				'placeholder': ms.options.labels['type here to search'],
-				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
+				'placeholder': ms.options.placeholder,
+				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 				'aria-required': ms.options.required_str
 			})
 				.on('keyup', function(e) {
@@ -1086,8 +1088,8 @@ jQuery(function($) {
 			$obj.removeClass('search-disabled')
 				.find('input[type="text"]')
 				.attr({
-					placeholder: ms.options.labels['type here to search'],
-					'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.labels['type here to search'],
+					placeholder: ms.options.placeholder,
+					'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
 					readonly: false
 				});
 		}

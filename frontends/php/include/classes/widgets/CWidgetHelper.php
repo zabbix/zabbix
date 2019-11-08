@@ -590,6 +590,7 @@ class CWidgetHelper {
 							'name' => $field->getName().'['.$row_num.'][hosts][]',
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
+							'placeholder' => _('host pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -601,7 +602,6 @@ class CWidgetHelper {
 							'add_post_js' => false
 						]))
 							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50),
@@ -610,6 +610,7 @@ class CWidgetHelper {
 							'name' => $field->getName().'['.$row_num.'][items][]',
 							'object_name' => 'items',
 							'data' => $value['items'],
+							'placeholder' => _('item pattern'),
 							'multiple' => true,
 							'popup' => [
 								'parameters' => [
@@ -626,7 +627,6 @@ class CWidgetHelper {
 							'add_post_js' => false
 						]))
 							->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-							->setAttribute('placeholder', _('host pattern'))
 							->setAriaRequired(self::isAriaRequired($field))
 							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					))->addClass(ZBX_STYLE_COLUMN_50)
@@ -948,6 +948,7 @@ class CWidgetHelper {
 							'name' => $field_name.'['.$row_num.'][hosts][]',
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
+							'placeholder' => _('host pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -964,6 +965,7 @@ class CWidgetHelper {
 							'name' => $field_name.'['.$row_num.'][items][]',
 							'object_name' => 'items',
 							'data' => $value['items'],
+							'placeholder' => _('item pattern'),
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',
