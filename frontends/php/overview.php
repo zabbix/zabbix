@@ -187,7 +187,10 @@ if ($type == SHOW_TRIGGERS) {
 		$trigger_options = [
 			'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 			'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'filter' => ['value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null]
+			'filter' => [
+				'value' => ($filter['showTriggers'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
+			],
+			'skipDependent' => ($filter['showTriggers'] == TRIGGERS_OPTION_ALL) ? null : true
 		];
 
 		$problem_options = [

@@ -6,7 +6,7 @@
 For Zabbix version: 4.4  
 The template to monitor Apache HTTPD by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
-`Template App Apache by HTTP` - (Zabbix version >= 4.2) - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
+`Template App Apache by HTTP` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
 
 ```text
 127.0.0.1

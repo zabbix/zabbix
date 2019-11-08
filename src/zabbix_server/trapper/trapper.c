@@ -118,7 +118,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		ret = FAIL;
 	}
 
-	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+	zbx_send_response_same(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
 
@@ -150,7 +150,7 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 		ret = FAIL;
 	}
 
-	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+	zbx_send_response_same(sock, ret, info, CONFIG_TIMEOUT);
 
 	zbx_free(info);
 

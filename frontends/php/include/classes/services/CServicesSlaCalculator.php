@@ -1,4 +1,23 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2019 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 /**
  * A class with SLA calculation logic.
@@ -19,15 +38,16 @@ class CServicesSlaCalculator {
 	 * - dt;
 	 * - ut.
 	 *
-	 * @param array $serviceAlarms
-	 * @param array $serviceTimes
-	 * @param int   $periodStart
-	 * @param int   $periodEnd
-	 * @param int   $startValue        the value of the last service alarm
+	 * @param array $service_alarms
+	 * @param array $service_times
+	 * @param int   $period_start
+	 * @param int   $period_end
+	 * @param int   $start_value        the value of the last service alarm
 	 *
 	 * @return array
 	 */
-	public function calculateSla(array $serviceAlarms, array $serviceTimes, $periodStart, $periodEnd, $startValue) {
+	public function calculateSla(array $service_alarms, array $service_times, $period_start, $period_end,
+			$start_value) {
 		/**
 		 * structure of "$data":
 		 * - alarm	- on/off status (0,1 - off; >1 - on)
@@ -42,8 +62,8 @@ class CServicesSlaCalculator {
 		$data = [];
 		$latest = 0; // Timestamp of last database record.
 
-		foreach ($serviceAlarms as $alarm) {
-			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
+		foreach ($service_alarms as $alarm) {
+			if ($alarm['clock'] >= $period_start && $alarm['clock'] <= $period_end) {
 				$data[$alarm['servicealarmid']] = [
 					'alarm' => $alarm['value'],
 					'clock' => $alarm['clock']
@@ -54,16 +74,16 @@ class CServicesSlaCalculator {
 			}
 		}
 
-		if ($periodEnd != $latest) {
-			$data[] = ['clock' => $periodEnd];
+		if ($period_end != $latest) {
+			$data[] = ['clock' => $period_end];
 		}
 
 		$unmarkedPeriodType = 'ut';
 
 		$service_time_data = [];
-		foreach ($serviceTimes as $time) {
+		foreach ($service_times as $time) {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
-				$this->expandPeriodicalTimes($service_time_data, $periodStart, $periodEnd, $time['ts_from'],
+				$this->expandPeriodicalTimes($service_time_data, $period_start, $period_end, $time['ts_from'],
 					$time['ts_to'], 'ut'
 				);
 
@@ -71,17 +91,17 @@ class CServicesSlaCalculator {
 				$unmarkedPeriodType = 'dt';
 			}
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
-				$this->expandPeriodicalTimes($service_time_data, $periodStart, $periodEnd, $time['ts_from'],
+				$this->expandPeriodicalTimes($service_time_data, $period_start, $period_end, $time['ts_from'],
 					$time['ts_to'], 'dt'
 				);
 			}
-			elseif($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart
-					&& $time['ts_from'] <= $periodEnd) {
-				if ($time['ts_from'] < $periodStart) {
-					$time['ts_from'] = $periodStart;
+			elseif ($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $period_start
+					&& $time['ts_from'] <= $period_end) {
+				if ($time['ts_from'] < $period_start) {
+					$time['ts_from'] = $period_start;
 				}
-				if ($time['ts_to'] > $periodEnd) {
-					$time['ts_to'] = $periodEnd;
+				if ($time['ts_to'] > $period_end) {
+					$time['ts_to'] = $period_end;
 				}
 
 				if (isset($service_time_data[$time['ts_from']]['dt_s'])) {
@@ -100,11 +120,39 @@ class CServicesSlaCalculator {
 			}
 		}
 
-		// Put service times between alarms at right positions.
 		if ($service_time_data) {
 			ksort($service_time_data);
 
-			$prev_time = $periodStart;
+			/*
+			 * If 'downtime' service time is active at moment of $period_start and service is in problem state, move
+			 * $start_value to moment when service time ends.
+			 */
+			if ($start_value > 1) {
+				$first_service_time_start_time = key($service_time_data);
+				$first_service_time = $service_time_data[$first_service_time_start_time];
+				if ($period_start == $first_service_time_start_time && array_key_exists('dt_s', $first_service_time)) {
+					foreach (array_keys($service_time_data) as $service_time_ts) {
+						if (array_key_exists('dt_e', $service_time_data[$service_time_ts])) {
+							$data[] = [
+								'alarm' => $start_value,
+								'clock' => $service_time_ts
+							];
+							$start_value = 0;
+							break;
+						}
+					}
+				}
+			}
+
+			/*
+			 * For next foreach we need incrementally increasing keys (starting with n > 0) but entries still need to
+			 * be sorted by 'clock'.
+			 */
+			CArrayHelper::sort($data, [['field' => 'clock', 'order' => ZBX_SORT_UP]]);
+			$data = array_combine(range(1, count($data)), array_values($data));
+
+			// Put service times between alarms at right positions.
+			$prev_time = $period_start;
 			$prev_alarmid = 0;
 			foreach ($data as $alarmid => $val) {
 				/**
@@ -131,24 +179,33 @@ class CServicesSlaCalculator {
 			'dt' => ['problemTime' => 0, 'okTime' => 0],
 			'ut' => ['problemTime' => 0, 'okTime' => 0]
 		];
-		$prevTime = $periodStart;
+		$prevTime = $period_start;
 
-		if (isset($data[$periodStart]['ut_s'])) {
-			$utCnt += $data[$periodStart]['ut_s'];
-		}
-		if (isset($data[$periodStart]['ut_e'])) {
-			$utCnt -= $data[$periodStart]['ut_e'];
-		}
-		if (isset($data[$periodStart]['dt_s'])) {
-			$dtCnt += $data[$periodStart]['dt_s'];
-		}
-		if (isset($data[$periodStart]['dt_e'])) {
-			$dtCnt -= $data[$periodStart]['dt_e'];
+		// Count active uptimes/downtimes at the beginning of calculated period.
+		foreach ($data as $val) {
+			if ($period_start != $val['clock']) {
+				continue;
+			}
+
+			if (array_key_exists('ut_s', $val)) {
+				$utCnt += $val['ut_s'];
+			}
+			if (array_key_exists('ut_e', $val)) {
+				$utCnt -= $val['ut_e'];
+			}
+			if (array_key_exists('dt_s', $val)) {
+				$dtCnt += $val['dt_s'];
+			}
+			if (array_key_exists('dt_e', $val)) {
+				$dtCnt -= $val['dt_e'];
+			}
+
+			break;
 		}
 
 		foreach ($data as $val) {
 			// skip first data [already read]
-			if ($val['clock'] == $periodStart) {
+			if ($val['clock'] == $period_start) {
 				continue;
 			}
 
@@ -166,7 +223,7 @@ class CServicesSlaCalculator {
 			$duration = max($val['clock'] - $prevTime, 0);
 
 			// state=0,1 [OK] (1 - information severity of trigger), >1 [PROBLEMS] (trigger severity)
-			if ($startValue > 1) {
+			if ($start_value > 1) {
 				$slaTime[$periodType]['problemTime'] += $duration;
 			}
 			else {
@@ -186,7 +243,7 @@ class CServicesSlaCalculator {
 				$dtCnt -= $val['dt_e'];
 			}
 			if (isset($val['alarm'])) {
-				$startValue = $val['alarm'];
+				$start_value = $val['alarm'];
 			}
 
 			$prevTime = $val['clock'];

@@ -872,7 +872,7 @@ class CHttpTest extends CApiService {
 
 				$db_httpsteps = API::getApiService()->select('httpstep', [
 					'output' => $this->outputExtend($options['selectSteps'], ['httptestid', 'httpstepid', 'post_type']),
-					'filters' => ['httptestid' => $httpTestIds],
+					'filter' => ['httptestid' => $httpTestIds],
 					'preservekeys' => true
 				]);
 				$relationMap = $this->createRelationMap($db_httpsteps, 'httptestid', 'httpstepid');

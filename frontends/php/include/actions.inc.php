@@ -319,29 +319,6 @@ function actionConditionValueToString(array $actions, array $config) {
 }
 
 /**
- * Converts numerical action operation condition values to their corresponding string values according to
- * action operation condition type. Since action list does not display operation conditions,
- * so there is only an array of operation conditions for single action which is displayed in operation details.
- *
- * @param array  $conditions					array of actions operation conditions
- * @param string $condition['conditiontype']	operation condition type
- * @param string $condition['value']			operation condition value
- *
- * @return array								returns an array of action operation condition string values
- */
-function actionOperationConditionValueToString(array $conditions) {
-	$result = [];
-
-	foreach ($conditions as $condition) {
-		if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_ACKNOWLEDGED) {
-			$result[] = $condition['value'] ? _('Ack') : _('Not Ack');
-		}
-	}
-
-	return $result;
-}
-
-/**
  * Returns the HTML representation of an action condition and action operation condition.
  *
  * @param string $condition_type

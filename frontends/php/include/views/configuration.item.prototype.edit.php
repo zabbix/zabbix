@@ -752,7 +752,9 @@ $form_list
 	->addRow(_('Application prototypes'), $application_prototype_listbox)
 	// Append description to form list.
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items' , 'description'))
 	)
 	// Append status to form list.
 	->addRow(_('Create enabled'),

@@ -206,8 +206,8 @@ class CMultiselectElement extends CElement {
 			$content = CXPathHelper::escapeQuotes($value);
 			try {
 				$element = $this->query('xpath', implode('|', [
-					'.//ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
-					'.//ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]/span[text()='.$content.']'
+					'//ul[@class="multiselect-suggest"]/li[@data-label='.$content.']',
+					'//ul[@class="multiselect-suggest"]/li[contains(@class, "suggest-new")]/span[text()='.$content.']'
 				]))->waitUntilPresent();
 			}
 			catch (NoSuchElementException $exception) {

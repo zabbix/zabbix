@@ -1828,8 +1828,11 @@ class testUsers extends CAPITest {
 	}
 
 	/**
-	* @dataProvider login_data
-	*/
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 *
+	 * @dataProvider login_data
+	 */
 	public function testUsers_Login($user, $expected_error) {
 		$this->disableAuthorization();
 		$this->call('user.login', $user, $expected_error);
@@ -1842,5 +1845,16 @@ class testUsers extends CAPITest {
 		}
 
 		$this->assertRegExp('/Account is blocked for (2[5-9]|30) seconds./', $result['error']['data']);
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }
