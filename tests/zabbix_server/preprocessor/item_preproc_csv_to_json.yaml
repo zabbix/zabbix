@@ -440,6 +440,38 @@ out:
   result: ''
   return: 'FAIL'
 ---
+test case: 'unclosed quoted field (UTF8-2)'
+in:
+  csv: 'col1,ыcol1'
+  params: "\nы\n0"
+out:
+  result: ''
+  return: 'FAIL'
+---
+test case: 'unclosed quoted field (UTF8-3)'
+in:
+  csv: 'col1,ꢂcol1'
+  params: "\nꢂ\n0"
+out:
+  result: ''
+  return: 'FAIL'
+---
+test case: 'unclosed quoted field (UTF8-4)'
+in:
+  csv: 'col1,😀col1'
+  params: "\n😀\n0"
+out:
+  result: ''
+  return: 'FAIL'
+---
+test case: 'escaped quotation character in unclosed quoted field (UTF8-3)'
+in:
+  csv: 'col1,ꢂcol1ꢂꢂ'
+  params: "\nꢂ\n0"
+out:
+  result: ''
+  return: 'FAIL'
+---
 test case: 'missing delimiter or line break after quoted field'
 in:
   csv: 'col1,"col1" '

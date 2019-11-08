@@ -1,0 +1,1 @@
+.......PS. [ZBX-16883] fixed possible out of bounds access in csv to json preprocessing (asestakovs)
