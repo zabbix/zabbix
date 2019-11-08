@@ -132,7 +132,7 @@ $new_group_right_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.add.group_right");')
+			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.add.groupright");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
@@ -184,7 +184,7 @@ $new_tag_filter_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.add.tag_filter");')
+			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.add.tagfilter");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
