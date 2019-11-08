@@ -684,9 +684,6 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 		->setHeader([_('Label'), _('Name'), _('Action')]);
 
 	$i = 0;
-
-	$opcondition_string_values = actionOperationConditionValueToString($opr_data['opconditions']);
-
 	foreach ($opr_data['opconditions'] as $index => $opcondition) {
 		if (!array_key_exists('conditiontype', $opcondition) || !$opcondition['conditiontype']) {
 			$opcondition['conditiontype'] = 0;
@@ -702,15 +699,14 @@ if ($data['type'] == ACTION_OPERATION && $data['source'] == EVENT_SOURCE_TRIGGER
 		}
 
 		$label = num2letter($i);
+		$cond_value = $opcondition['value'] ? _('Ack') : _('Not Ack');
 		$labelCol = (new CCol($label))
 			->addClass('label')
 			->setAttribute('data-conditiontype', $opcondition['conditiontype'])
 			->setAttribute('data-formulaid', $label);
 		$opcondition_table->addRow([
 				$labelCol,
-				getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-					$opcondition_string_values[$index], ''
-				),
+				getConditionDescription($opcondition['conditiontype'], $opcondition['operator'], $cond_value, ''),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('removeOperationCondition('.$i.');')
