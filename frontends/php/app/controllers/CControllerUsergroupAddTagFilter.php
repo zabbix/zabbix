@@ -25,7 +25,7 @@ class CControllerUsergroupAddTagFilter extends CController {
 
 		$fields = [
 			'tag_filters'    => 'array',
-			'new_tag_filter' => 'array'
+			'new_tag_filter' => 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -48,7 +48,7 @@ class CControllerUsergroupAddTagFilter extends CController {
 			'groupids' => [],
 			'tag' => '',
 			'value' => '',
-			'include_subgroups' => false
+			'include_subgroups' => '0'
 		];
 
 		if ($this->validateNewTagFilter($new_tag_filter)) {

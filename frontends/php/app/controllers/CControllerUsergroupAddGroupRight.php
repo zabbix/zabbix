@@ -23,8 +23,8 @@ class CControllerUsergroupAddGroupRight extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'group_rights'    => 'array',
-			'new_group_right' => 'array'
+			'group_rights'    => 'required|array',
+			'new_group_right' => 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,7 +46,7 @@ class CControllerUsergroupAddGroupRight extends CController {
 		$new_group_right = $this->getInput('new_group_right') + [
 			'groupids' => [],
 			'permission' => PERM_NONE,
-			'include_subgroups' => false
+			'include_subgroups' => '0'
 		];
 
 		if ($this->validateNewGroupRight($new_group_right)) {
@@ -87,14 +87,10 @@ class CControllerUsergroupAddGroupRight extends CController {
 			? [[], $new_group_right['groupids']]
 			: [$new_group_right['groupids'], []];
 
-		$view_data = [];
-		$view_data['group_rights'] = collapseHostGroupRights(applyHostGroupRights(
-			$this->getInput('group_rights', []),
-			$groupids,
-			$subgroupids,
-			$new_group_right['permission']
-		));
-
-		return $view_data;
+		return [
+			'group_rights' => collapseHostGroupRights(applyHostGroupRights(
+				$this->getInput('group_rights'), $groupids, $subgroupids, $new_group_right['permission']
+			))
+		];
 	}
 }
