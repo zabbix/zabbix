@@ -534,16 +534,20 @@ switch ($data['operationtype']) {
 			)
 			->addRow(
 				(new CLabel(_('Commands'), 'operation[opcommand][command]'))->setAsteriskMark(),
-				$commmand_textarea = (new CTextAreaFlexible(
-					'operation[opcommand][command]',
-					$opr_data['opcommand']['command'])
-				)
+				(new CTextArea('operation[opcommand][command]', $opr_data['opcommand']['command']))
 					->addClass(ZBX_STYLE_MONOSPACE_FONT)
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->addStyle('resize: vertical;')
+					->setAriaRequired()
+			)
+			->addRow(
+				(new CLabel(_('Commands'), 'operation_opcommand_command_ipmi'))->setAsteriskMark(),
+				(new CTextBox('operation[opcommand][command]', $opr_data['opcommand']['command']))
+					->addClass(ZBX_STYLE_MONOSPACE_FONT)
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setId('operation_opcommand_command_ipmi')
 					->setAriaRequired()
 			);
-
-		$inline_js .= $commmand_textarea->getPostJS();
 
 		$inline_js .=
 			"jQuery('#select_operation_opcommand_script').click(function(event) {".

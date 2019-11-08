@@ -143,6 +143,7 @@
 			opcommand_execute_on = '#operation_opcommand_execute_on',
 			opcommand_port = '#operation_opcommand_port',
 			opcommand_command = '#operation_opcommand_command',
+			opcommand_command_ipmi = '#operation_opcommand_command_ipmi',
 			opcommand_authtype = '#operation_opcommand_authtype',
 			opcommand_username = '#operation_opcommand_username';
 
@@ -155,9 +156,8 @@
 		optype_fieldids[opcommand_script] = [ZBX_SCRIPT_TYPES.userscript];
 		optype_fieldids[opcommand_execute_on] = [ZBX_SCRIPT_TYPES.script];
 		optype_fieldids[opcommand_port] = [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
-		optype_fieldids[opcommand_command] = [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ipmi, ZBX_SCRIPT_TYPES.ssh,
-			ZBX_SCRIPT_TYPES.telnet
-		];
+		optype_fieldids[opcommand_command] = [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
+		optype_fieldids[opcommand_command_ipmi] = [ZBX_SCRIPT_TYPES.ipmi];
 		optype_fieldids[opcommand_authtype] = [ZBX_SCRIPT_TYPES.ssh];
 		optype_fieldids[opcommand_username] = [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet];
 
