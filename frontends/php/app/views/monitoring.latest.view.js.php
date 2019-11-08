@@ -132,20 +132,23 @@ var latest = {
 			var $ = jQuery;
 
 			var refresh_fn = function() {
+					var $form = $('form').filter(function() {
+							return $(this).attr('name') == form_name;
+						});
+
 					$.getJSON(url)
 						.done(function(response) {
 							$('main .msg-bad').remove();
-
-							$('form').filter(function() {
-								return $(this).attr('name') == form_name;
-							}).replaceWith(response.body);
-
+							$form.replaceWith(response.body);
 							if ('messages' in response) {
 								$('main > :first-child').before(response.messages);
 							}
 
 							latest.initializeView();
 							chkbxRange.init();
+						})
+						.fail(function() {
+							$form.empty();
 						})
 						.always(function() {
 							setTimeout(refresh_fn, interval);

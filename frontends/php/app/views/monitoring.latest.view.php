@@ -18,29 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// Retrieve form partial.
-$form = call_user_func(function($data) {
-	return require(dirname(__FILE__).'/monitoring.latest.view.data.php');
-}, array_intersect_key($data, array_flip([
-	'sortField', 'sortOrder', 'filter', 'filterSet', 'hosts', 'items', 'applications', 'history'
-])));
-
-// Partial view used for page data refresh.
-if ($data['action'] === 'latest.view.data') {
-	$output = [
-		'body' => $form->toString()
-	];
-
-	if (($messages = getMessages()) !== null) {
-		$output['messages'] = $messages->toString();
-	}
-
-	echo (new CJson())->encode($output);
-
-	return;
-}
-
-// Full page processing.
 
 $this->addJsFile('multiselect.js');
 $this->addJsFile('layout.mode.js');
@@ -124,6 +101,13 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 		])
 	);
 }
+
+// Retrieve form partial.
+$form = call_user_func(function($data) {
+	return require dirname(__FILE__).'/monitoring.latest.view.data.php';
+}, array_intersect_key($data, array_flip([
+	'sortField', 'sortOrder', 'filter', 'filterSet', 'hosts', 'items', 'applications', 'history', 'view_url'
+])));
 
 $widget->addItem($form)->show();
 
