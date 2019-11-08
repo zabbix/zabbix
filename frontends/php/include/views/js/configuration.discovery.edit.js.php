@@ -404,6 +404,12 @@
 
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
+		console.log(dcheck);
+		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
+				|| dcheck['type'] == <?= SVC_SNMPv3 ?>) {
+			dcheck['key_'] = dcheck['snmp_oid'];
+		}
+
 		for (var zbx_dcheckid in ZBX_CHECKLIST) {
 			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
 				continue;

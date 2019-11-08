@@ -57,11 +57,10 @@ $form_list = (new CFormList())
 		'row_dcheck_snmp_community'
 	)
 	->addRow((new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
-		(new CTextBox('key_', $data['params']['key_']))
+		(new CTextBox('snmp_oid', $data['params']['key_']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			->setAriaRequired()
-			->setAttribute('maxlength', 512)
-			->setId('snmp_oid'),
+			->setAttribute('maxlength', 512),
 		'row_dcheck_snmp_oid'
 	)
 	->addRow(new CLabel(_('Context name'), 'snmpv3_contextname'),

@@ -35,7 +35,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'index' =>					'required|int32', // count of existing checks
+			'index' =>					'required|int32', // Count of existing checks.
 			'update' =>					'in 1',
 			'validate' =>				'in 1',
 			'dcheckid' =>				'string',
@@ -43,6 +43,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 			'ports' =>					'string|not_empty|db dchecks.ports',
 			'snmp_community' =>			'string|not_empty|db dchecks.snmp_community',
 			'key_' =>					'string|not_empty|db dchecks.key_',
+			'snmp_oid' =>				'string|not_empty|db dchecks.key_',
 			'snmpv3_contextname' =>		'string|db dchecks.snmpv3_contextname',
 			'snmpv3_securityname' =>	'string|db dchecks.snmpv3_securityname',
 			'snmpv3_securitylevel' =>	'db dchecks.snmpv3_securitylevel|in '.implode(',', [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]),
@@ -96,6 +97,11 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		$params['name'] = discovery_check_type2str($data['type']);
 
 		if ($this->getInput('validate', 0)) {
+			if ($params['type'] == SVC_SNMPv1 || $params['type'] == SVC_SNMPv2c
+					|| $params['type'] == SVC_SNMPv3) {
+				$params['key_'] = $data['snmp_oid'];
+			}
+
 			return $this->setResponse(
 				(new CControllerResponseData(['main_block' => CJs::encodeJson(['params' => $params])]))->disableView()
 			);
