@@ -54,7 +54,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
+		if ($ret && $this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
 			info(_('Incorrect port range.'));
 			$ret = false;
 		}
