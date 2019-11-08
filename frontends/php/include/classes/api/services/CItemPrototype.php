@@ -747,7 +747,9 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true
 		]);
 
-		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'master_itemid']);
+		$items = $this->extendFromObjects(zbx_toHash($items, 'itemid'), $db_items, ['type', 'authtype',
+			'master_itemid'
+		]);
 
 		$this->validateDependentItems($items);
 
@@ -771,9 +773,6 @@ class CItemPrototype extends CItemGeneral {
 				'verify_host' => $defaults['verify_host'],
 				'ssl_cert_file' => '',
 				'ssl_key_file' => '',
-				'authtype' => $defaults['authtype'],
-				'username' => '',
-				'password' => '',
 				'posts' => ''
 			]
 		];
@@ -802,9 +801,8 @@ class CItemPrototype extends CItemGeneral {
 			}
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				// Clean username and password on authtype change to HTTPTEST_AUTH_NONE.
-				if (array_key_exists('authtype', $item) && $item['authtype'] == HTTPTEST_AUTH_NONE
-						&& $item['authtype'] != $db_items[$item['itemid']]['authtype']) {
+				// Clean username and password when authtype is set to HTTPTEST_AUTH_NONE.
+				if ($item['authtype'] == HTTPTEST_AUTH_NONE) {
 					$item['username'] = '';
 					$item['password'] = '';
 				}
