@@ -46,6 +46,8 @@ new CViewSwitcher('type', 'change', <?= CJs::encodeJson([
 jQuery('#type').on('change', function() {
 	var dcheck_type = jQuery(this).val();
 
+	jQuery('#snmpv3_securitylevel').off('change');
+
 	if (dcheck_type == '<?= SVC_SNMPv3 ?>') {
 		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= CJs::encodeJson([
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
@@ -59,14 +61,24 @@ jQuery('#type').on('change', function() {
 
 		jQuery('#snmpv3_securitylevel').on('change', function() {
 			jQuery(window).trigger('resize');
-		})
+		});
 	}
 
 	jQuery(window).trigger('resize');
 });
 
 if (jQuery('#type').val() == '<?= SVC_SNMPv3 ?>') {
+	// Fire change event for CViewSwitcher.
 	jQuery('#type').trigger('change');
+
+	// After we can add event to clear form when type change.
+	jQuery('#type').on('change', function() {
+		clearDCheckForm();
+	});
+} else {
+	jQuery('#type').on('change', function() {
+		clearDCheckForm();
+	});
 }
 
 <?php return ob_get_clean(); ?>
