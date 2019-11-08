@@ -28,7 +28,6 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
@@ -50,7 +49,6 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestCheckTitle('Configuration of images');

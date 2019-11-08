@@ -20,6 +20,10 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
+/**
+ * @on-before disableDebugMode
+ * @on-after enableDebugMode
+ */
 class testPageActions extends CLegacyWebTest {
 
 	private $sqlHashAction = '';
@@ -46,6 +50,13 @@ class testPageActions extends CLegacyWebTest {
 	private $oldHashOpTemplate = '';
 	private $sqlHashOpConditions = '';
 	private $oldHashOpConditions = '';
+
+	private $event_sources = [
+		0 => 'Trigger actions',
+		1 => 'Discovery actions',
+		2 => 'Auto registration actions',
+		3 => 'Internal actions'
+	];
 
 	private function calculateHash($actionid) {
 		$this->sqlHashAction = 'SELECT actionid,name,eventsource,evaltype,status,def_shortdata,def_longdata,r_shortdata,'
@@ -150,19 +161,15 @@ class testPageActions extends CLegacyWebTest {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$this->zbxTestCheckHeader('Actions');
-		$this->zbxTestTextPresent('Event source');
-		$this->zbxTestTextPresent('Displaying');
-
 		$eventsources = [
-			EVENT_SOURCE_TRIGGERS => 'Triggers',
-			EVENT_SOURCE_DISCOVERY => 'Discovery',
-			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration',
-			EVENT_SOURCE_INTERNAL => 'Internal'
+			EVENT_SOURCE_TRIGGERS => 'Trigger actions',
+			EVENT_SOURCE_DISCOVERY => 'Discovery actions',
+			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+			EVENT_SOURCE_INTERNAL => 'Internal actions'
 		];
 
-		$this->zbxTestDropdownAssertSelected('eventsource', $eventsources[$eventsource]);
-		$this->zbxTestDropdownHasOptions('eventsource', $eventsources);
+		$this->zbxTestCheckHeader($eventsources[$eventsource]);
+		$this->zbxTestTextPresent('Displaying');
 
 		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
 
@@ -244,7 +251,8 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestCheckHeader('Actions');
+
+		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdisable');
@@ -274,7 +282,8 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestCheckHeader('Actions');
+
+		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massenable');
@@ -305,7 +314,8 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestCheckHeader('Actions');
+
+		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdelete');
@@ -318,5 +328,20 @@ class testPageActions extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 
 		$this->assertEquals($this->oldHashAction, CDBHelper::getHash($this->sqlHashAction));
+	}
+
+	/*
+	 * Debug button sometimes overlaps action link and impossible to click on it.
+	 */
+	public static function setDebugMode($value) {
+		DBexecute('UPDATE usrgrp SET debug_mode='.zbx_dbstr($value).' WHERE usrgrpid=7');
+	}
+
+	public function disableDebugMode() {
+		self::setDebugMode(0);
+	}
+
+	public static function enableDebugMode() {
+		self::setDebugMode(1);
 	}
 }

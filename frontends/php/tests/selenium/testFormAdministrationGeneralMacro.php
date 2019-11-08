@@ -47,7 +47,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('adm.macros.php');
-		$this->zbxTestDropdownAssertSelected('configDropDown', 'Macros');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Macros');
 
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestCheckHeader('Macros');

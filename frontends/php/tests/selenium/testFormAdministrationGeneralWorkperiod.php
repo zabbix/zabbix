@@ -32,7 +32,7 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->zbxTestCheckHeader('GUI');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 
@@ -48,7 +48,6 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Configuration updated');
 

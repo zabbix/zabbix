@@ -167,7 +167,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 	}
@@ -193,7 +193,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(@class, 'btn-max')]"));
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-max')]", 'title', 'Fullscreen');
 		$this->zbxTestAssertElementPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 	}
 
@@ -213,7 +213,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//button[@title="Kiosk mode"]'));
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementNotPresentXpath("//header");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title table']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='header-title']");
 		$this->zbxTestAssertElementPresentXpath("//ul[contains(@class, 'filter-breadcrumb')]");
 		$this->zbxTestAssertAttribute("//button[contains(@class, 'btn-kiosk')]", 'title', 'Kiosk mode');
 

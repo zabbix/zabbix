@@ -54,10 +54,6 @@ class testPageAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestCheckHeader('Regular expressions');
-		$this->zbxTestDropdownHasOptions('configDropDown', [
-			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
-			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
-		]);
 		$this->zbxTestAssertElementPresentId('form');
 
 		$this->zbxTestTextPresent(['Name', 'Expressions']);
