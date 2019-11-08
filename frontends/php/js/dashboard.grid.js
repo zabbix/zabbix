@@ -1192,6 +1192,8 @@
 
 		startPreloader(widget);
 
+		$('#dashbrd-save').prop('disabled', true);
+
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1242,6 +1244,7 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+				$('#dashbrd-save').prop('disabled', false);
 
 			}, function() {
 				// TODO: gentle message about failed update of widget content

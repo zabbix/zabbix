@@ -243,7 +243,7 @@ class CControllerDashboardUpdate extends CController {
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
 				->getUrl();
-			CSession::setValue('dashboardOk', $message);
+			CSession::setValue('messageOk', $message);
 		}
 		else {
 			if (!hasErrorMesssages()) {

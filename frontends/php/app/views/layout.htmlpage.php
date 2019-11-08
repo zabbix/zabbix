@@ -133,7 +133,7 @@ function local_generateFooter($data) {
 function local_showMessage() {
 	global $ZBX_MESSAGES;
 
-	if (CSession::keyExists('messageOk') || CSession::keyExists('messageError') || CSession::keyExists('dashboardOk')) {
+	if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
 		if (CSession::keyExists('messages')) {
 			$ZBX_MESSAGES = CSession::getValue('messages');
 			CSession::unsetValue(['messages']);
@@ -142,14 +142,11 @@ function local_showMessage() {
 		if (CSession::keyExists('messageOk')) {
 			show_messages(true, CSession::getValue('messageOk'));
 		}
-		elseif (CSession::keyExists('dashboardOk')) {
-			show_messages(true, CSession::getValue('dashboardOk'));
-		}
 		else {
 			show_messages(false, null, CSession::getValue('messageError'));
 		}
 
-		CSession::unsetValue(['messageOk', 'messageError', 'dashboardOk']);
+		CSession::unsetValue(['messageOk', 'messageError']);
 	}
 }
 
