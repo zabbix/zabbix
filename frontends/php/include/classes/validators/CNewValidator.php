@@ -281,7 +281,7 @@ class CNewValidator {
 				case 'time_periods':
 					if (array_key_exists($field, $this->input) && !$this->isTimePeriods($this->input[$field])) {
 						$this->addError($fatal,
-							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time periods is expected'))
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a time period is expected'))
 						);
 						return false;
 					}
