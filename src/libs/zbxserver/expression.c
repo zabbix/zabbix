@@ -1763,6 +1763,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_NAME			MVAR_EVENT "NAME}"
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
 #define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
+#define MVAR_EVENT_TAGS_PREFIX		MVAR_EVENT "TAGS."
 #define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
 #define MVAR_EVENT_SEVERITY		MVAR_EVENT "SEVERITY}"
@@ -2398,6 +2399,28 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
 				*replace_to = zbx_strdup(*replace_to, "unknown");
 		}
+		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+		{
+			char	*name;
+
+			if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
+					strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
+			{
+				int	i;
+
+				for (i = 0; i < event->tags.values_num; i++)
+				{
+					zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+					if (0 == strcmp(name, tag->tag))
+					{
+						*replace_to = zbx_strdup(*replace_to, tag->value);
+						break;
+					}
+				}
+				zbx_free(name);
+			}
+		}
 	}
 }
 
@@ -2794,20 +2817,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				pos = token.loc.r + 1;
 				continue;
 			case ZBX_TOKEN_MACRO:
-				if (0 == (indexed_macro = is_indexed_macro(*data, &token)))
+				if (0 != is_indexed_macro(*data, &token) &&
+						NULL != (m = macro_in_list(*data, token.loc, ex_macros, &N_functionid)))
 				{
-					/* Theoretically we could do m = macro_in_list() here as well to validate */
-					/* token and get unindexed macro equivalent, but it will be a double work */
-					/* since we will pass m through a lot of strcmp(m, MVAR_*) checks anyway, */
-					/* plus ex_macros is a long list. For now, we rely on this surgery. */
+					indexed_macro = 1;
+				}
+				else
+				{
 					m = *data + token.loc.l;
 					c = (*data)[token.loc.r + 1];
 					(*data)[token.loc.r + 1] = '\0';
-				}
-				else if (NULL == (m = macro_in_list(*data, token.loc, ex_macros, &N_functionid)))
-				{
-					pos = token.loc.r + 1;
-					continue;
 				}
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
@@ -4387,6 +4406,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, cons
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns, raw_value);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
+				{
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 				}
 			}
 		}
@@ -6231,4 +6254,3 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen)
 	return SUCCEED;
 #endif
 }
-

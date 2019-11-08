@@ -194,7 +194,9 @@ pre {
 
 pre, pre a, pre td, pre span {
   white-space: pre-wrap;
-  word-wrap: break-word; }
+  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word; }
 
 .top-nav-container {
   background-color: #2b2b2b;
@@ -1121,15 +1123,29 @@ output {
     padding: 0;
     margin: 0; }
   .multiselect .multiselect-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     padding-left: 2px;
     padding-bottom: 2px; }
     .multiselect .multiselect-list li {
-      display: inline-block;
-      margin: 2px 14px 0 0;
-      white-space: nowrap; }
+      display: block;
+      margin: 2px 2px 0 0;
+      overflow: hidden;
+      white-space: nowrap;
+      cursor: default; }
       .multiselect .multiselect-list li .subfilter-enabled {
-        padding: 0 9px 0 4px;
+        display: flex;
+        flex-direction: row;
+        padding: 0 3px 0 4px;
         line-height: 18px; }
+        .multiselect .multiselect-list li .subfilter-enabled > span:first-child {
+          overflow: hidden;
+          text-overflow: ellipsis; }
+        .multiselect .multiselect-list li .subfilter-enabled > .subfilter-disable-btn {
+          position: relative;
+          left: 3px;
+          flex-shrink: 0; }
       .multiselect .multiselect-list li.selected .subfilter-enabled,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn,
       .multiselect .multiselect-list li.selected .subfilter-disable-btn:active {
@@ -1191,13 +1207,10 @@ output {
   color: #f2f2f2;
   font-weight: bold; }
 
-.available {
+.multiselect-available {
   position: absolute;
-  z-index: 1000;
-  margin-top: 1px;
+  z-index: 20000;
   border: 1px solid #383838;
-  border-top: none;
-  max-height: 400px;
   overflow-y: auto;
   -webkit-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
@@ -2462,6 +2475,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .dashbrd-grid-widget-content {
   flex-grow: 1;
   margin-top: 2rem;
+  box-sizing: border-box;
+  height: calc(100% - 2rem);
   padding-bottom: 8px;
   overflow: auto;
   border: 1px solid #303030;
@@ -2494,6 +2509,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   transition: height .3s, margin-top .3s, box-shadow .3s; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header .dashbrd-grid-widget-content {
   margin-top: 0;
+  height: 100%;
   padding-top: 8px; }
 .dashbrd-grid-widget.dashbrd-grid-widget-hidden-header.dashbrd-grid-widget-focus .dashbrd-grid-widget-head {
   height: 2rem;
@@ -3129,6 +3145,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     max-height: calc(100vh - 190px);
     max-width: 45vw;
     white-space: nowrap; }
+  .overlay-dialogue .hintbox-description {
+    overflow: auto;
+    max-height: 240px;
+    max-width: 800px; }
   .overlay-dialogue .msg-bad,
   .overlay-dialogue .msg-good,
   .overlay-dialogue .msg-warning {
@@ -4211,10 +4231,6 @@ td[class] + td.disaster-bg {
   width: 18px;
   height: 18px;
   line-height: 18px;
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  right: -12px;
   color: #f2f2f2;
   background-color: #4f4f4f;
   -webkit-border-radius: 2px;
@@ -4420,11 +4436,11 @@ td[class] + td.disaster-bg {
   padding: 10px 0 0 0;
   text-align: center; }
 
-.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .dashbrd-grid-widget-content::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar, .overlay-dialogue .hintbox-description::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .dashbrd-grid-widget-content::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-track, .overlay-dialogue .hintbox-description::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #1f1f1f; }
-.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .dashbrd-grid-widget-content::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-scrollable::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-description::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #383838;
   border: 1px solid #2b2b2b; }
 
@@ -4493,6 +4509,9 @@ tr.cursor-move td * {
 
 .graph-wrapper {
   display: inline; }
+
+.widget-url {
+  display: block; }
 
 .clock {
   padding: 0 10px;
@@ -4601,9 +4620,10 @@ svg {
         min-height: 22px;
         width: 85px; }
       .overrides-options-list > li > div > .subfilter-disable-btn {
-        border: none !important;
+        position: absolute;
         right: 0px;
-        top: 0px; }
+        top: 0px;
+        border: 0; }
         .overrides-options-list > li > div > .subfilter-disable-btn:focus, .overrides-options-list > li > div > .subfilter-disable-btn:hover {
           background: none; }
 
@@ -4638,30 +4658,24 @@ svg {
     .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
       display: none; }
 
-ul.checkbox-list {
-  line-height: 20px;
-  display: flex;
-  flex-wrap: wrap; }
-  ul.checkbox-list > li {
-    ms-flex: 0 0 100%;
-    flex: 0 0 100%;
-    max-width: 100%;
-    -webkit-box-flex: 0; }
-
-ul.checkbox-list.col-3 > li {
-  display: inline-block;
-  -ms-flex: 0 0 33.33333%;
-  flex: 0 0 33.33333%;
-  max-width: 33.33333%; }
+.checkbox-list li {
+  margin-top: 4px; }
 
 .columns-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  /**
-   * Dynamically generated classes, e.g. .column-50.
-   */ }
+  flex-wrap: wrap; }
   .columns-wrapper [class^=column-] {
     -webkit-box-flex: 0; }
+  .columns-wrapper.columns-2 > div, .columns-wrapper.columns-2 > li {
+    display: block;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%; }
+  .columns-wrapper.columns-3 > div, .columns-wrapper.columns-3 > li {
+    display: block;
+    -ms-flex: 0 0 33.33333%;
+    flex: 0 0 33.33333%;
+    max-width: 33.33333%; }
   .columns-wrapper .column-5 {
     -ms-flex: 0 0 5%;
     flex: 0 0 5%;

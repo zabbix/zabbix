@@ -676,6 +676,16 @@ AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for linker options --start-group/--end-group)
+saved_LDFLAGS="$LDFLAGS"
+LDFLAGS="-Wl,--start-group -Wl,--end-group"
+AC_TRY_LINK([], [],
+HAVE_START_GROUP="yes"
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no)
+)
+LDFLAGS="$saved_LDFLAGS"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for functions                      *
@@ -1685,7 +1695,7 @@ SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
 if test "x$agent2" = "xyes"; then
 	AC_CHECK_PROGS([GO], [go], [no])
-	if test "x$go" = "xno"; then
+	if test "x$GO" = "xno"; then
 		AC_MSG_ERROR([Unable to find "go" executable in path])
 	fi
 fi
@@ -1771,7 +1781,6 @@ if test "x$found_iconv" != "xyes"; then
 fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
-
 AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
@@ -1799,7 +1808,13 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-CGO_LDFLAGS="-Wl,--start-group \
+if test "x$HAVE_START_GROUP" = "xyes"; then
+	LD_START_GROUP=-Wl,--start-group
+	LD_END_GROUP=-Wl,--end-group
+fi
+
+CGO_CFLAGS=$TLS_CFLAGS
+CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
 	\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 	\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 	\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
@@ -1813,13 +1828,14 @@ CGO_LDFLAGS="-Wl,--start-group \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
-	\${abs_top_builddir}/src/libs/zbxsysinfo/linux/libspecsysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
+	\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 	\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 	\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 	\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-	$LIBS $AGENT_LIBS \
-	-Wl,--end-group"
+	$LIBS $AGENT_LIBS $LD_END_GROUP"
+
+AC_SUBST(CGO_CFLAGS)
 AC_SUBST(CGO_LDFLAGS)
 
 AC_SUBST(ZBXGET_LDFLAGS)
@@ -1842,13 +1858,11 @@ AC_SUBST(CURL_SSL_KEY_LOCATION)
 AC_SUBST(LOAD_MODULE_PATH)
 
 GOBIN=${sbindir}
-GOPATH=$ac_abs_confdir/go
 GOCMD=go
 GOWORKDIR=$ac_abs_confdir/go/src/zabbix
 
 export GOBIN=${GOBIN}
 AC_SUBST(GOBIN)
-AC_SUBST(GOPATH)
 AC_SUBST(GOCMD)
 AC_SUBST(GOWORKDIR)
 
@@ -1893,6 +1907,7 @@ AC_OUTPUT([
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
+	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
@@ -1971,53 +1986,6 @@ AC_OUTPUT([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile
-	go/Makefile
-	go/src/Makefile
-	go/src/zabbix/Makefile
-	go/src/zabbix/cmd/Makefile
-	go/src/zabbix/cmd/zabbix_agent2/Makefile
-	go/src/zabbix/cmd/mock_server/Makefile
-	go/src/zabbix/pkg/Makefile
-	go/src/zabbix/pkg/conf/Makefile
-	go/src/zabbix/pkg/glexpr/Makefile
-	go/src/zabbix/pkg/itemutil/Makefile
-	go/src/zabbix/pkg/log/Makefile
-	go/src/zabbix/pkg/plugin/Makefile
-	go/src/zabbix/pkg/std/Makefile
-	go/src/zabbix/pkg/tls/Makefile
-	go/src/zabbix/pkg/version/Makefile
-	go/src/zabbix/pkg/watch/Makefile
-	go/src/zabbix/pkg/zbxcomms/Makefile
-	go/src/zabbix/pkg/zbxlib/Makefile
-	go/src/zabbix/pkg/zbxcmd/Makefile
-	go/src/zabbix/internal/Makefile
-	go/src/zabbix/internal/agent/Makefile
-	go/src/zabbix/internal/agent/remotecontrol/Makefile
-	go/src/zabbix/internal/agent/resultcache/Makefile
-	go/src/zabbix/internal/agent/scheduler/Makefile
-	go/src/zabbix/internal/agent/serverconnector/Makefile
-	go/src/zabbix/internal/agent/serverlistener/Makefile
-	go/src/zabbix/internal/agent/statuslistener/Makefile
-	go/src/zabbix/internal/monitor/Makefile
-	go/src/zabbix/plugins/Makefile
-	go/src/zabbix/plugins/log/Makefile
-	go/src/zabbix/plugins/system/Makefile
-	go/src/zabbix/plugins/system/cpucollector/Makefile
-	go/src/zabbix/plugins/system/uptime/Makefile
-	go/src/zabbix/plugins/system/uname/Makefile
-	go/src/zabbix/plugins/systemd/Makefile
-	go/src/zabbix/plugins/systemrun/Makefile
-	go/src/zabbix/plugins/kernel/Makefile
-	go/src/zabbix/plugins/proc/Makefile
-	go/src/zabbix/plugins/vfs/Makefile
-	go/src/zabbix/plugins/vfs/dev/Makefile
-	go/src/zabbix/plugins/vfs/file/Makefile
-	go/src/zabbix/plugins/zabbix/Makefile
-	go/src/zabbix/plugins/zabbix/stats/Makefile
-	go/src/zabbix/plugins/zabbix/sync/Makefile
-	go/src/zabbix/plugins/zabbix/async/Makefile
-	go/src/zabbix/plugins/net/Makefile
-	go/src/zabbix/plugins/net/netif/Makefile
 	])
 
 dnl The following variables use autoconf variables such as

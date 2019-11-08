@@ -4498,6 +4498,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __func__,
 			SSL_get_version(s->tls_ctx->ctx), SSL_get_cipher(s->tls_ctx->ctx));
+#ifdef HAVE_OPENSSL_WITH_PSK
+	psk_for_cb = NULL;
+#endif
 
 	return SUCCEED;
 
@@ -4509,6 +4512,10 @@ out:	/* an error occurred */
 out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
+#ifdef HAVE_OPENSSL_WITH_PSK
+	psk_for_cb = NULL;
+#endif
+
 	return ret;
 }
 #endif

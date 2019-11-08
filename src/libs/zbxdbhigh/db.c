@@ -1478,7 +1478,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
 {
 	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid;
+	zbx_uint64_t		autoreg_hostid = 0;
 	zbx_db_insert_t		db_insert;
 	int			i, create = 0, update = 0;
 	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;

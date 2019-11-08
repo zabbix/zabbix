@@ -777,15 +777,18 @@ function check_db_fields($dbFields, &$args) {
  * In some frontend places we can get array with bool as input values parameter. This is fail!
  * Therefore we need check it and return 1=0 as temporary solution to not break the frontend.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
- * @param bool   $zero_to_null
+ * @param string $field_name    Field name to be used in SQL WHERE condition
+ * @param array  $values        Array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $not_in        Builds inverted condition
+ * @param bool   $zero_to_null  Cast zero to null
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null = false) {
-	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (<id1>,<id2>,...,<idN>)"
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+	global $DB;
+
+	$MIN_NUM_BETWEEN = 4; // Minimum number of consecutive values for using "BETWEEN <id1> AND <idN>".
+	$MAX_NUM_IN = 950; // Maximum number of values for using "IN (<id1>,<id2>,...,<idN>)".
 
 	if (is_bool(reset($values))) {
 		return '1=0';
@@ -804,46 +807,82 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $zero_to_null
 	natsort($values);
 	$values = array_values($values);
 
-	foreach ($values as $i => $value) {
-		if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
-			$values[$i] = zbx_dbstr($value);
+	$intervals = [];
+	$singles = [];
+
+	if ($DB['TYPE'] == ZBX_DB_ORACLE) {
+		// For better performance, use "BETWEEN" constructs for sequential integer values, for Oracle database.
+
+		for ($i = 0, $size = count($values); $i < $size; $i++) {
+			if ($i + $MIN_NUM_BETWEEN < $size && bcsub($values[$i + $MIN_NUM_BETWEEN], $values[$i]) == $MIN_NUM_BETWEEN) {
+				$interval_first = $values[$i];
+
+				// Search for the last sequential integer value.
+				for ($i += $MIN_NUM_BETWEEN; $i < $size && bcsub($values[$i], $values[$i - 1]) == 1; $i++);
+				$i--;
+
+				$interval_last = $values[$i];
+
+				// Save the first and last values of the sequential interval.
+				$intervals[] = [dbQuoteInt($interval_first), dbQuoteInt($interval_last)];
+			}
+			else {
+				$singles[] = dbQuoteInt($values[$i]);
+			}
 		}
 	}
+	else {
+		// For better performance, use only "IN" constructs all other databases, except Oracle.
 
-	// concatenate conditions
+		$singles = array_map(function($value) {
+			return dbQuoteInt($value);
+		}, $values);
+	}
+
 	$condition = '';
-	$operatorAnd = $notIn ? ' AND ' : ' OR ';
 
-	$operatorNot = $notIn ? ' NOT' : '';
-	$chunks = array_chunk($values, $MAX_EXPRESSIONS);
-	$chunk_count = (int) $has_zero + count($chunks);
+	// Process intervals.
 
-	foreach ($chunks as $chunk) {
+	foreach ($intervals as $interval) {
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
+		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
+	}
+
+	// Process individual values.
+
+	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
+
+	foreach ($single_chunks as $chunk) {
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
 		if (count($chunk) == 1) {
-			$operator = $notIn ? '!=' : '=';
-
-			$condition .= ($condition !== '' ? $operatorAnd : '').$fieldName.$operator.$chunk[0];
+			$condition .= $field_name.($not_in ? '!=' : '=').$chunk[0];
 		}
 		else {
-			$chunkIns = '';
-
-			foreach ($chunk as $value) {
-				$chunkIns .= ','.$value;
-			}
-
-			$chunkIns = $fieldName.$operatorNot.' IN ('.substr($chunkIns, 1).')';
-
-			$condition .= ($condition !== '') ? $operatorAnd.$chunkIns : $chunkIns;
+			$condition .= $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 		}
 	}
 
 	if ($has_zero) {
-		$condition .= ($condition !== '') ? $operatorAnd : '';
-		$condition .= $fieldName;
-		$condition .= $notIn ? ' IS NOT NULL' : ' IS NULL';
+		if ($condition !== '') {
+			$condition .= $not_in ? ' AND ' : ' OR ';
+		}
+
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
-	return (!$notIn && $chunk_count > 1) ? '('.$condition.')' : $condition;
+	if (!$not_in) {
+		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
+			$condition = '('.$condition.')';
+		}
+	}
+
+	return $condition;
 }
 
 /**
@@ -889,6 +928,19 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	}
 
 	return '('.$fieldName.$in.'('.$condition.'))';
+}
+
+/**
+ * Quote a value if not an integer or out of BC Math bounds.
+ *
+ * @param mixed $value  Either the original or quoted value.
+ */
+function dbQuoteInt($value) {
+	if (!ctype_digit((string) $value) || bccomp($value, ZBX_MAX_UINT64) > 0) {
+		$value = zbx_dbstr($value);
+	}
+
+	return $value;
 }
 
 /**

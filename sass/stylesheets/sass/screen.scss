@@ -229,7 +229,9 @@ pre {
 
 %space-pre-wrap {
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	word-break: break-all;  // For the Internet Explorer.
+	word-break: break-word; // Override for the other browsers.
+	overflow-wrap: break-word;
 }
 
 .top-nav-container {
@@ -1659,17 +1661,35 @@ output {
 	}
 
 	.multiselect-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
 		padding-left: 2px;
 		padding-bottom: 2px;
 
 		li {
-			display: inline-block;
-			margin: 2px 14px 0 0;
+			display: block; // Override ".table-forms li".
+			margin: 2px 2px 0 0;
+			overflow: hidden;
 			white-space: nowrap;
+			cursor: default;
 
 			.subfilter-enabled {
-				padding: 0 9px 0 4px;
+				display: flex;
+				flex-direction: row;
+				padding: 0 3px 0 4px;
 				line-height: 18px;
+
+				& > span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				& > .subfilter-disable-btn {
+					position: relative;
+					left: 3px;
+					flex-shrink: 0;
+				}
 			}
 
 			&.selected {
@@ -1753,13 +1773,10 @@ output {
 	@extend .multiselect-suggest;
 }
 
-.available {
+.multiselect-available {
 	position: absolute;
-	z-index: 1000;
-	margin-top: 1px;
+	z-index: 20000;
 	border: 1px solid $action-border-color;
-	border-top: none;
-	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
@@ -3544,6 +3561,8 @@ $form-icon-btn: (
 .dashbrd-grid-widget-content {
 	flex-grow: 1;
 	margin-top: 2rem;
+	box-sizing: border-box;
+	height: calc(100% - 2rem);
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
@@ -3604,6 +3623,7 @@ $form-icon-btn: (
 
 		.dashbrd-grid-widget-content {
 			margin-top: 0;
+			height: 100%;
 			padding-top: 8px;
 		}
 
@@ -4553,6 +4573,13 @@ $form-icon-btn: (
 		max-height: calc(100vh - 190px);
 		max-width: 45vw;
 		white-space: nowrap;
+		@extend %webkit-scrollbar;
+	}
+
+	.hintbox-description {
+		overflow: auto;
+		max-height: 240px;
+		max-width: 800px;
 		@extend %webkit-scrollbar;
 	}
 
@@ -6064,10 +6091,6 @@ a.overlay-close-btn {
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	right: -12px;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -6416,6 +6439,11 @@ tr.cursor-move {
 	display: inline;
 }
 
+// Dashboard widget: URL
+.widget-url {
+	display: block;
+}
+
 // Analog Clock
 .clock {
 	padding: 0 10px;
@@ -6557,9 +6585,10 @@ svg {
 			}
 
 			> .subfilter-disable-btn {
-				border: none !important;
+				position: absolute;
 				right: 0px;
 				top: 0px;
+				border: 0;
 
 				&:focus,
 				&:hover {
@@ -6617,33 +6646,15 @@ svg {
 	}
 }
 
-ul.checkbox-list {
-	line-height: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	> li {
-		ms-flex: 0 0 100%;
-		flex: 0 0 100%;
-		max-width: 100%;
-		-webkit-box-flex: 0;
+.checkbox-list {
+	li {
+		margin-top: 4px;
 	}
 }
-
-@each $num, $width in (
-	3: 33.33333%
-) {
-	ul.checkbox-list.col-#{$num} > li {
-		display: inline-block;
-		-ms-flex: 0 0 $width;
-		flex: 0 0 $width;
-		max-width: $width;
-	}
-}
-
 
 .columns-wrapper {
-
-	$columns: (
+	$column-count: (2, 3);
+	$column-size: (
 		5: 5%,
 		10: 10%,
 		15: 15%,
@@ -6664,10 +6675,33 @@ ul.checkbox-list {
 		-webkit-box-flex: 0;
 	}
 
-	/**
-	 * Dynamically generated classes, e.g. .column-50.
-	 */
-	@each $class, $width in $columns {
+	// Dynamically generated classes for the columns count:
+	//  .columns-2
+	//  .columns-3
+	@each $count in $column-count {
+		&.columns-#{$count} > {
+			div, li {
+				display: block;
+				-ms-flex: 0 0 (100% / $count);
+				flex: 0 0 (100% / $count);
+				max-width: (100% / $count);
+			}
+		}
+	}
+
+	// Dynamically generated classes for the column width:
+	//  .column-5
+	//  .column-10
+	//  .column-15
+	//  .column-20
+	//  .column-33
+	//  .column-35
+	//  .column-40
+	//  .column-50
+	//  .column-75
+	//  .column-90
+	//  .column-95
+	@each $class, $width in $column-size {
 		.column-#{$class} {
 			-ms-flex: 0 0 $width;
 			flex: 0 0 $width;
@@ -7485,7 +7519,6 @@ table.preprocessing-test-results {
 		background: $host-avail-total-bg-color;
 	}
 }
-
 
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 
