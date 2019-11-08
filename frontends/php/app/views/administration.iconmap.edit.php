@@ -55,6 +55,10 @@ $form = (new CForm())
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', 1);
 
+if ($data['iconmapid'] != 0) {
+	$form->addVar('iconmapid', $data['iconmapid']);
+}
+
 $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')

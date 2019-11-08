@@ -44,6 +44,10 @@ $form = (new CForm())
 	)
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
 
+if ($data['valuemapid'] != 0) {
+	$form->addVar('valuemapid', $data['valuemapid']);
+}
+
 $form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),

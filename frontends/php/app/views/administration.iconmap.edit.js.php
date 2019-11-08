@@ -67,7 +67,9 @@
 			var url = new Curl('zabbix.php?action=iconmap.edit');
 
 			$form.serializeArray().forEach(function(field) {
-				url.setArgument(field.name, field.value);
+				if (field.name !== 'iconmapid') {
+					url.setArgument(field.name, field.value);
+				}
 			});
 
 			redirect(url.getUrl(), 'post', 'action', undefined, false, true);
