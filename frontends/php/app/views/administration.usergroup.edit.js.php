@@ -24,7 +24,7 @@
 		 */
 		function collectTagFilterFormData() {
 			var data = {
-				new_tag_filter: {groupids: [], include_subgroups: false, value: '', tag: ''},
+				new_tag_filter: {groupids: []},
 				tag_filters: []
 			};
 
@@ -33,7 +33,7 @@
 			});
 
 			data.new_tag_filter.include_subgroups = $new_tag_filter_table
-				.find('[name="new_tag_filter[include_subgroups]"]').prop('checked');
+				.find('[name="new_tag_filter[include_subgroups]"]').prop('checked') ? '1' : '0';
 
 			data.new_tag_filter.tag = $new_tag_filter_table.find('[name="new_tag_filter[tag]"]').val();
 			data.new_tag_filter.value = $new_tag_filter_table.find('[name="new_tag_filter[value]"]').val();
@@ -52,7 +52,7 @@
 		 */
 		function collectGroupRightFormData() {
 			var data = {
-				new_group_right: {groupids: [], include_subgroups: false, permission: null},
+				new_group_right: {groupids: []},
 				group_rights: {}
 			};
 
@@ -61,7 +61,7 @@
 			});
 
 			data.new_group_right.include_subgroups = $new_group_right_table
-				.find('[name="new_group_right[include_subgroups]"]').prop('checked');
+				.find('[name="new_group_right[include_subgroups]"]').prop('checked') ? '1' : '0';
 
 			data.new_group_right.permission = $new_group_right_table
 				.find('[name="new_group_right[permission]"]').filter(':checked').val();

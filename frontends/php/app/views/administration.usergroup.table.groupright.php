@@ -24,7 +24,6 @@ $group_rights_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host group'), _('Permissions')]);
 
-sdfile($data['group_rights']);
 foreach ($data['group_rights'] as $groupid => $group_right) {
 	$form_vars = [];
 	$form_data_json = [];
