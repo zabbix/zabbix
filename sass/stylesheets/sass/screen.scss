@@ -6091,6 +6091,7 @@ a.overlay-close-btn {
 }
 
 // Color picker
+
 .color-picker {
 	height: 20px;
 	white-space: nowrap;
@@ -6148,117 +6149,119 @@ a.overlay-close-btn {
 	}
 }
 
-.is-loading::after {
-	@include border-radius(50%);
-	@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
-	background-color: rgba($ui-bg-color, .8);
-	width: 20px;
-	height: 20px;
-	position: absolute;
-	margin: auto;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	border: 2px solid #ccd5d9;
-	border-bottom: 2px solid #0275b8;
-	animation: load 0.6s infinite linear;
-	z-index: 1;
-	content: '';
-}
+// Preloader
 
-.is-loading::before {
-	background-color: rgba($ui-bg-color, .8);
-	content: 'loading'; /* For screen-reader */
-	text-indent: 200%; /* For screen-reader, for IE 200% instead of 100% */
-	overflow: hidden;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	z-index: 1;
+@keyframes is-loading-kf {
+	to { @include rotate(360); }
 }
 
 .is-loading {
 	pointer-events: none;
-}
 
-.is-loading.is-loading-fadein {
 	&:before {
-		opacity: 0;
-		animation: fadein 2s ease-in 0.5s normal forwards;
+		background-color: rgba($ui-bg-color, .8);
+		content: 'loading'; // For screen-reader
+		text-indent: 200%;  // For screen-reader, for IE 200% instead of 100%
+		overflow: hidden;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 1;
 	}
 
 	&:after {
-		opacity: 0;
-		animation: fadein 2s ease-in 0.5s normal forwards,load 0.6s infinite linear;
+		@include border-radius(50%);
+		@include box-shadow (0 0 0 7px rgba($ui-bg-color, .8));
+		background-color: rgba($ui-bg-color, .8);
+		width: 20px;
+		height: 20px;
+		position: absolute;
+		margin: auto;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border: 2px solid $preloader-color;
+		border-bottom-color: $preloader-accent-color;
+		animation: is-loading-kf 0.6s infinite linear;
+		z-index: 1;
+		content: '';
+	}
+
+	&.is-loading-fadein {
+
+		&:before {
+			opacity: 0;
+			animation: fadein 2s ease-in 0.5s normal forwards;
+		}
+
+		&:after {
+			opacity: 0;
+			animation: fadein 2s ease-in 0.5s normal forwards, is-loading-kf 0.6s infinite linear;
+		}
+
+		.delayed-15s {
+
+			&:before,
+			&:after {
+				animation-delay: 15s;
+			}
+		}
 	}
 }
 
-.is-loading.is-loading-fadein.delayed-15s {
-	&:before {
-		animation-delay: 15s;
-	}
+button {
 
-	&:after {
-		animation-delay: 15s;
+	&.is-loading {
+		position: relative;
+
+		&:before {
+			background: none;
+		}
+
+		&:after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
 	}
 }
 
-.overlay-dialogue.modal .overlay-dialogue-body.is-loading {
-	position: relative;
-	overflow: hidden;
+.dashbrd-grid-widget-content,
+.dashbrd-grid-iterator-content {
+
+	&.is-loading:before {
+		margin: calc(.25rem + 1px);
+	}
 }
 
-.dashbrd-grid-widget-content.is-loading::before,
-.dashbrd-grid-iterator-content.is-loading::before {
-	top: .25rem;
-	bottom: .25rem;
-	left: .25rem;
-	right: .25rem;
-	margin: 1px;
+.overlay-dialogue.modal .overlay-dialogue-body {
+
+	&.is-loading {
+		position: relative;
+		overflow: hidden;
+	}
 }
 
 .menu-popup-preloader {
-	@include border-radius(0);
-	@include box-shadow(0 4px 20px 0 $action-shadow-color);
-	@include transform(none);
-	background: $action-preloader-bg-color;
+	@include box-shadow (0 4px 20px 0 $action-shadow-color);
+	background: $preloader-bg-color;
 	border: 1px solid $action-border-color;
-	height: 120px;
-	width: 120px;
+	height: 128px;
+	width: 128px;
 	position: fixed;
 	right: auto;
 	bottom: auto;
-	display: flex;
-	align-items: center;
-	margin: 0;
 	z-index: 1010;
-	padding: 7px;
-}
 
-.is-loading.menu-popup-preloader::before {
-	background: $action-preloader-bg-color;
-}
-
-button.is-loading::after {
-	background: none;
-	box-shadow: none;
-	width: 15px;
-	height: 15px;
-}
-
-button.is-loading::before {
-	background: none;
-}
-
-button.is-loading {
-	position: relative;
-}
-
-@keyframes load {
-	to { @include rotate(360); }
+	&:before {
+		background: $preloader-bg-color;
+	}
 }
 
 $browser-logos: (
@@ -6267,9 +6270,14 @@ $browser-logos: (
 	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
 	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
 	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
-
 );
 
+// Dynamically generated classes for the browser logo:
+//  .browser-logo-chrome
+//  .browser-logo-ff
+//  .browser-logo-ie
+//  .browser-logo-opera
+//  .browser-logo-safari
 @each $browser, $bgimage in $browser-logos {
 	.browser-logo-#{$browser} {
 		background: $bgimage;
