@@ -59,6 +59,14 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 			$ret = false;
 		}
 
+		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {
+			$item_key_parser = new CItemKey();
+			if ($item_key_parser->parse($this->getInput('key_')) != CParser::PARSE_SUCCESS) {
+				info(_s('Invalid key "%1$s": %2$s.', $this->getInput('key_'), $item_key_parser->getError()));
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$output = [];
 

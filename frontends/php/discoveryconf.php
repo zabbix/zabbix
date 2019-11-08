@@ -92,33 +92,6 @@ if (isset($_REQUEST['druleid'])) {
 	}
 }
 
-// ajax
-if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
-	$ajaxResponse = new CAjaxResponse;
-
-	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
-		$ajaxData = getRequest('ajaxdata', []);
-		$item_key_parser = new CItemKey();
-
-		foreach ($ajaxData as $check) {
-			switch ($check['field']) {
-				case 'itemKey':
-					if ($item_key_parser->parse($check['value']) != CParser::PARSE_SUCCESS) {
-						$ajaxResponse->error(
-							_s('Invalid key "%1$s": %2$s.', $check['value'], $item_key_parser->getError())
-						);
-					}
-					break;
-			}
-		}
-	}
-
-	$ajaxResponse->send();
-
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
-
 /*
  * Action
  */
