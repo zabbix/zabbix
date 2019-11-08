@@ -29,12 +29,12 @@ class CControllerTrigSeverityUpdate extends CController {
 			'severity_name_3'  => 'required | string | not_empty',
 			'severity_name_4'  => 'required | string | not_empty',
 			'severity_name_5'  => 'required | string | not_empty',
-			'severity_color_0' => 'required | string | not_empty | rgb',
-			'severity_color_1' => 'required | string | not_empty | rgb',
-			'severity_color_2' => 'required | string | not_empty | rgb',
-			'severity_color_3' => 'required | string | not_empty | rgb',
-			'severity_color_4' => 'required | string | not_empty | rgb',
-			'severity_color_5' => 'required | string | not_empty | rgb'
+			'severity_color_0' => 'required | rgb',
+			'severity_color_1' => 'required | rgb',
+			'severity_color_2' => 'required | rgb',
+			'severity_color_3' => 'required | rgb',
+			'severity_color_4' => 'required | rgb',
+			'severity_color_5' => 'required | rgb'
 		];
 
 		$ret = $this->validateInput($fields);
