@@ -34,7 +34,7 @@ class CPopupButtonElement extends CElement {
 	 *
 	 * @return $this
 	 */
-	public function fill($text) {
+	public function select($text) {
 		$is_nested = false;
 		if (is_array($text)) {
 			foreach ($text as $item) {
@@ -57,5 +57,12 @@ class CPopupButtonElement extends CElement {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function fill($text) {
+		return $this->select($text);
 	}
 }
