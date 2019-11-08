@@ -27,6 +27,8 @@ class CControllerLatestView extends CController {
 
 	protected function checkInput() {
 		$fields = [
+			'action' =>				'string',
+
 			// Table sorting inputs.
 			'sort' =>				'in host,name,lastclock',
 			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -294,24 +296,37 @@ class CControllerLatestView extends CController {
 			}
 		}
 
+		$refresh_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'latest.view.data')
+			->setArgument('groupids', $filter['groupids'])
+			->setArgument('hostids', $filter['hostids'])
+			->setArgument('application', $filter['application'])
+			->setArgument('select', $filter['select'])
+			->setArgument('show_without_data', $filter['showWithoutData'])
+			->setArgument('show_details', $filter['showDetails'])
+			->setArgument('filter_set', 1)
+			->setArgument('sort', $sortField)
+			->setArgument('sortorder', $sortOrder)
+			->getUrl();
+
 		/*
 		 * Display
 		 */
 		$data = [
-			'sortField' => $sortField,
-			'sortOrder' => $sortOrder,
-
+			'action' => $this->getInput('action'),
 			'filter' => $filter,
 			'filterSet' => $filterSet,
-
+			'sortField' => $sortField,
+			'sortOrder' => $sortOrder,
 			'hosts' => $hosts,
 			'items' => $items,
 			'applications' => $applications,
 			'history' => isset($history) ? $history : null,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data,
-
-			'active_tab' => CProfile::get('web.latest.filter.active', 1)
+			'active_tab' => CProfile::get('web.latest.filter.active', 1),
+			'refresh_url' => $refresh_url,
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
 		];
 
 		CView::$has_web_layout_mode = true;

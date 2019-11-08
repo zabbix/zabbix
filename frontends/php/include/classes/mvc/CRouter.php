@@ -83,6 +83,7 @@ class CRouter {
 		'favourite.create'				=> ['CControllerFavouriteCreate',					'layout.javascript',	null],
 		'favourite.delete'				=> ['CControllerFavouriteDelete',					'layout.javascript',	null],
 		'latest.view'					=> ['CControllerLatestView',						'layout.htmlpage',		'monitoring.latest.view'],
+		'latest.view.data'				=> ['CControllerLatestView',						'layout.json',			'monitoring.latest.view'],
 		'map.view'						=> ['CControllerMapView',							'layout.htmlpage',		'monitoring.map.view'],
 		'mediatype.create'				=> ['CControllerMediatypeCreate',					null,					null],
 		'mediatype.delete'				=> ['CControllerMediatypeDelete',					null,					null],
