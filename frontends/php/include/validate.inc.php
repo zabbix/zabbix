@@ -200,14 +200,6 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$message = _s('Field "%1$s" is not string.', $caption);
 		}
 	}
-	elseif ($type == T_ZBX_CLR) {
-		$colorValidator = new CColorValidator();
-
-		if (!$colorValidator->validate($var)) {
-			$error = true;
-			$message = _s('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).', $caption);
-		}
-	}
 	elseif ($type == T_ZBX_TP) {
 		$time_period_parser = new CTimePeriodsParser(['usermacros' => true]);
 
