@@ -52,10 +52,10 @@ class testPageActions extends CLegacyWebTest {
 	private $oldHashOpConditions = '';
 
 	private $event_sources = [
-		0 => 'Trigger actions',
-		1 => 'Discovery actions',
-		2 => 'Auto registration actions',
-		3 => 'Internal actions'
+		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
+		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
+		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_INTERNAL => 'Internal actions'
 	];
 
 	private function calculateHash($actionid) {
@@ -161,14 +161,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$eventsources = [
-			EVENT_SOURCE_TRIGGERS => 'Trigger actions',
-			EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
-			EVENT_SOURCE_INTERNAL => 'Internal actions'
-		];
-
-		$this->zbxTestCheckHeader($eventsources[$eventsource]);
+		$this->zbxTestCheckHeader($this->event_sources[$eventsource]);
 		$this->zbxTestTextPresent('Displaying');
 
 		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);

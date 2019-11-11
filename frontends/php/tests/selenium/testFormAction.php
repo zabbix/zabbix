@@ -1644,10 +1644,10 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$event_sources = [
-			0 => 'Trigger actions',
-			1 => 'Discovery actions',
-			2 => 'Auto registration actions',
-			3 => 'Internal actions'
+			EVENT_SOURCE_TRIGGERS => 'Trigger actions',
+			EVENT_SOURCE_DISCOVERY => 'Discovery actions',
+			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+			EVENT_SOURCE_INTERNAL => 'Internal actions'
 		];
 		$this->zbxTestCheckHeader($event_sources[$data['eventsource']]);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
