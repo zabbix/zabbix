@@ -97,8 +97,7 @@ class CControllerPopupDiscoveryCheckEdit extends CController {
 		$params['name'] = discovery_check_type2str($data['type']);
 
 		if ($this->getInput('validate', 0)) {
-			if ($params['type'] == SVC_SNMPv1 || $params['type'] == SVC_SNMPv2c
-					|| $params['type'] == SVC_SNMPv3) {
+			if ($params['type'] == SVC_SNMPv1 || $params['type'] == SVC_SNMPv2c || $params['type'] == SVC_SNMPv3) {
 				$params['key_'] = $data['snmp_oid'];
 			}
 

@@ -404,7 +404,6 @@
 
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
-		console.log(dcheck);
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
 				|| dcheck['type'] == <?= SVC_SNMPv3 ?>) {
 			dcheck['key_'] = dcheck['snmp_oid'];
