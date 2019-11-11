@@ -200,7 +200,7 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 
 	zbx_trim_float(buffer);
 
-	if (FAIL == is_double(buffer))
+	if (FAIL == is_double(buffer, NULL))
 		err = zbx_dsprintf(NULL, "a numerical value is expected");
 	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
