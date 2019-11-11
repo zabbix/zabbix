@@ -55,7 +55,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->query('id:overlay_dialogue')->waitUntilVisible();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Daily');
 		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
 		$this->page->waitUntilReady();
@@ -63,7 +63,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->query('id:overlay_dialogue')->waitUntilVisible();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Weekly');
 		$this->zbxTestCheckboxSelect('days_1');
 		$this->zbxTestCheckboxSelect('days_64');
@@ -77,7 +77,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "Monthly" maintenace period with "January" and "November".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->query('id:overlay_dialogue')->waitUntilVisible();
+		COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');
 		$this->zbxTestCheckboxSelect('months_1');
 		$this->zbxTestCheckboxSelect('months_1024');
