@@ -141,7 +141,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					'checks' => [
 						['check_action' => 'Add', 'type' => 'SNMPv1 agent']
 					],
-					'error_in_checks' => ['Incorrect value for field "snmp_community": cannot be empty.', 'Incorrect SNMP OID.'] // change after subissue 15 in ZBXNEXT-5413 is solved
+					'error_in_checks' => ['Incorrect value for field "snmp_community": cannot be empty.', 'Incorrect value for field "snmp_oid": cannot be empty.']
 				]
 			]
 		];
