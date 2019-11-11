@@ -156,9 +156,6 @@ define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);
 define('T_ZBX_DBL',			2);
 define('T_ZBX_RANGE_TIME',	3);
-define('T_ZBX_DBL_BIG',		9);
-define('T_ZBX_DBL_STR',		10);
-define('T_ZBX_TP',			11);
 define('T_ZBX_TU',			12);
 define('T_ZBX_ABS_TIME',	13);
 
