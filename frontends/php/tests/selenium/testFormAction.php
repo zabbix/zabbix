@@ -29,6 +29,13 @@ define('ACTION_BAD', 1);
  */
 class testFormAction extends CLegacyWebTest {
 
+	private $event_sources = [
+		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
+		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
+		EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
+		EVENT_SOURCE_INTERNAL => 'Internal actions'
+	];
+
 	public static function layout() {
 		return [
 			[
@@ -1643,13 +1650,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
 
-		$event_sources = [
-			EVENT_SOURCE_TRIGGERS => 'Trigger actions',
-			EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
-			EVENT_SOURCE_INTERNAL => 'Internal actions'
-		];
-		$this->zbxTestCheckHeader($event_sources[$data['eventsource']]);
+		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent([
 				'Action updated',
@@ -1970,14 +1971,7 @@ class testFormAction extends CLegacyWebTest {
 			case ACTION_GOOD:
 				$this->zbxTestCheckTitle('Configuration of actions');
 
-				$event_sources = [
-					EVENT_SOURCE_TRIGGERS => 'Trigger actions',
-					EVENT_SOURCE_DISCOVERY => 'Discovery actions',
-					EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration actions',
-					EVENT_SOURCE_INTERNAL => 'Internal actions'
-				];
-
-				$this->zbxTestCheckHeader($event_sources[$data['eventsource']]);
+				$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add action']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 				$sql = "SELECT actionid FROM actions WHERE name='".$data['name']."'";
