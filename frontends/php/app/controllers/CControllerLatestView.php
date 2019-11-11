@@ -111,9 +111,8 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('hostids', $filter['hostids'])
 			->setArgument('application', $filter['application'])
 			->setArgument('select', $filter['select'])
-			->setArgument('show_without_data', $filter['showWithoutData'])
-			->setArgument('show_details', $filter['showDetails'])
-			->setArgument('filter_set', 1)
+			->setArgument('show_without_data', $filter['showWithoutData'] ? 1 : null)
+			->setArgument('show_details', $filter['showDetails'] ? 1 : null)
 			->setArgument('sort', $sortField)
 			->setArgument('sortorder', $sortOrder)
 			->getUrl();

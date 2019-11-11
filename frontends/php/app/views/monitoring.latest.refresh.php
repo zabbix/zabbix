@@ -19,11 +19,8 @@
 **/
 
 
-// Retrieve form partial.
-$form = require dirname(__FILE__).'/monitoring.latest.view.data.php';
-
 $output = [
-	'body' => $form->toString()
+	'body' => require dirname(__FILE__).'/monitoring.latest.view.data.php'
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -102,18 +102,12 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-// Retrieve form partial.
-$form = call_user_func(function($data) {
+$form_data = array_intersect_key($data, array_flip([
+	'filter', 'sortField', 'sortOrder', 'hosts', 'items', 'applications', 'history', 'filterSet', 'view_url'
+]));
+
+$form_html = call_user_func(function($data) {
 	return require dirname(__FILE__).'/monitoring.latest.view.data.php';
-}, array_intersect_key($data, array_flip([
-	'sortField', 'sortOrder', 'filter', 'filterSet', 'hosts', 'items', 'applications', 'history', 'view_url'
-])));
+}, $form_data);
 
-$widget->addItem($form)->show();
-
-$this->addPostJS(
-	'jQuery(function() {'.
-		'latest.initializeView();'.
-		'latest.initializeRefresh("'.$form->getName().'", "'.$data['refresh_url'].'", '.$data['refresh_interval'].');'.
-	'});'
-);
+$widget->addItem($form_html)->show();

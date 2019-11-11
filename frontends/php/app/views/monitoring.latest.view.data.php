@@ -443,4 +443,4 @@ $form->addItem([
 	])
 ]);
 
-return $form;
+return $form->toString();
