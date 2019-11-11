@@ -265,7 +265,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info_icons[] = makeErrorIcon($trigger['error']);
+			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
 		}
 	}
 

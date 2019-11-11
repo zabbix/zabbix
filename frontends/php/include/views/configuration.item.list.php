@@ -176,7 +176,7 @@ foreach ($data['items'] as $item) {
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $data['config']),
 			$trigger_description,
-			$expression,
+			(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
