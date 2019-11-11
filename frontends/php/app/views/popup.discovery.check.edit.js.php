@@ -43,12 +43,13 @@ new CViewSwitcher('type', 'change', <?= CJs::encodeJson([
 	SVC_TELNET => ['row_dcheck_ports']
 ]) ?>);
 
-jQuery('#type').on('change', function() {
-	var dcheck_type = jQuery(this).val();
+var $type = jQuery('#type'),
+	$snmpv3_securitylevel = jQuery('#snmpv3_securitylevel');
 
-	jQuery('#snmpv3_securitylevel').off('change');
+$type.on('change', function() {
+	$snmpv3_securitylevel.off('change');
 
-	if (dcheck_type == '<?= SVC_SNMPv3 ?>') {
+	if (jQuery(this).val() == <?= SVC_SNMPv3 ?>) {
 		new CViewSwitcher('snmpv3_securitylevel', 'change', <?= CJs::encodeJson([
 			ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV => [],
 			ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => ['row_dcheck_snmpv3_authprotocol',
@@ -59,7 +60,7 @@ jQuery('#type').on('change', function() {
 			]
 		]) ?>);
 
-		jQuery('#snmpv3_securitylevel').on('change', function() {
+		$snmpv3_securitylevel.on('change', function() {
 			jQuery(window).trigger('resize');
 		});
 	}
@@ -67,18 +68,25 @@ jQuery('#type').on('change', function() {
 	jQuery(window).trigger('resize');
 });
 
-if (jQuery('#type').val() == '<?= SVC_SNMPv3 ?>') {
-	// Fire change event for CViewSwitcher.
-	jQuery('#type').trigger('change');
+if ($type.val() == <?= SVC_SNMPv3 ?>) {
+	// Fire the change event to initialize CViewSwitcher.
+	$type.trigger('change');
 
-	// After we can add event to clear form when type change.
-	jQuery('#type').on('change', function() {
-		clearDCheckForm();
-	});
-} else {
-	jQuery('#type').on('change', function() {
-		clearDCheckForm();
-	});
+	// Now we can add the event to clear the form on type change.
+	$type.on('change', clearDCheckForm);
+}
+else {
+	$type.on('change', clearDCheckForm);
+}
+
+/**
+ * Resets fields of the discovery check form to default values.
+ */
+function clearDCheckForm() {
+	jQuery('#key_, #snmp_community, #snmp_oid, #snmpv3_contextname, #snmpv3_securityname, #snmpv3_authpassphrase, ' +
+		'#snmpv3_privpassphrase').val('');
+	jQuery('#snmpv3_securitylevel').val(<?= ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV ?>);
+	jQuery('#snmpv3_authprotocol_0, #snmpv3_privprotocol_0').prop('checked', true);
 }
 
 <?php return ob_get_clean(); ?>

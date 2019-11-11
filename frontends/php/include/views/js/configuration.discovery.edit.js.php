@@ -433,30 +433,4 @@
 
 		return false;
 	}
-
-	function clearDCheckForm() {
-		var inputs = ['key_', 'snmp_community', 'snmp_oid', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_authpassphrase', 'snmpv3_privpassphrase'
-			],
-			selects = ['snmpv3_securitylevel'],
-			radio = ['snmpv3_authprotocol', 'snmpv3_privprotocol'];
-
-		for (var key in inputs) {
-			if (inputs.hasOwnProperty(key)) {
-				jQuery('#' + inputs[key]).val('');
-			}
-		}
-
-		for (var key in selects) {
-			if (selects.hasOwnProperty(key)) {
-				jQuery('#' + selects[key]).val(0);
-			}
-		}
-
-		for (var key in radio) {
-			if (inputs.hasOwnProperty(key)) {
-				jQuery('#' + radio[key] + '_0').click();
-			}
-		}
-	}
 </script>
