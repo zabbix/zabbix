@@ -56,7 +56,7 @@ class CControllerUsergroupList extends CController {
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'is_filter_visible' => CProfile::get('web.usergroup.filter.active', 1),
-			'sort' => CProfile::get('web.usergroup.sort', 'name', PROFILE_TYPE_STR),
+			'sort' => CProfile::get('web.usergroup.sort', 'name'),
 			'sortorder' => CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP),
 			'profileIdx' => 'web.usergroup.filter',
 			'usergroups' => $this->selectUserGroups($paging, $filter),
