@@ -158,10 +158,6 @@
 			return function(resp) {
 				if (resp.body) {
 					handle_data(resp.body);
-
-					$ms_tag_filter_groups.multiSelect('clean');
-					$new_tag_filter_table.find('[name="new_tag_filter[tag]"]').val('');
-					$new_tag_filter_table.find('[name="new_tag_filter[value]"]').val('');
 				}
 				else if (resp.errors) {
 					addMessage(resp.errors);
