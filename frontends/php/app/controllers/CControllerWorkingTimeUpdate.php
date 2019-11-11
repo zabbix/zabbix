@@ -23,7 +23,7 @@ class CControllerWorkingTimeUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'work_period' => 'required|string|not_empty|time_periods|db config.work_period'
+			'work_period' => 'required | time_periods'
 		];
 
 		$ret = $this->validateInput($fields);

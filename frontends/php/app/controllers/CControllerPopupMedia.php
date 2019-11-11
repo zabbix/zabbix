@@ -38,7 +38,7 @@ class CControllerPopupMedia extends CController {
 			'mediatypeid' =>	'db media_type.mediatypeid',
 			'sendto' =>			'string',
 			'sendto_emails'	=>	'array',
-			'period' =>			'string|time_periods',
+			'period' =>			'time_periods',
 			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>		'',
 			'add' =>			'in 1'
