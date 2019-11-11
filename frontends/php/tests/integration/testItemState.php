@@ -40,69 +40,69 @@ class testItemState extends CIntegrationTest {
 
 	private static $items = [
 		'zbx_psv_01' => [
-			'key'	=> 'vfs.file.contents['.PSV_FILE_NAME.']',
-			'type'	=> ITEM_TYPE_ZABBIX
+			'key' => 'vfs.file.contents['.PSV_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX
 		],
 		'zbx_act_01' => [
-			'key'	=> 'vfs.file.contents['.ACT_FILE_NAME.']',
-			'type'	=> ITEM_TYPE_ZABBIX_ACTIVE
+			'key' => 'vfs.file.contents['.ACT_FILE_NAME.']',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE
 		]
 	];
 
 	private static $scenarios = [
 		[
-			'name'			=> 'zbx_psv_01',
-			'delay_s'		=> 7,
-			'refresh_unsupported'	=> 10,
-			'after_sync'		=> false
+			'name' => 'zbx_psv_01',
+			'delay_s' => 7,
+			'refresh_unsupported' => 10,
+			'after_sync' => false
 		],
 		[
-			'name'			=> 'zbx_psv_01',
-			'delay_s'		=> 17,
-			'refresh_unsupported'	=> 10,
-			'after_sync'		=> false
+			'name' => 'zbx_psv_01',
+			'delay_s' => 17,
+			'refresh_unsupported' => 10,
+			'after_sync' => false
 		],
 		[
-			'name'			=> 'zbx_psv_01',
-			'delay_s'		=> 7,
-			'refresh_unsupported'	=> 10,
-			'after_sync'		=> true
+			'name' => 'zbx_psv_01',
+			'delay_s' => 7,
+			'refresh_unsupported' => 10,
+			'after_sync' => true
 		],
 		[
-			'name'			=> 'zbx_psv_01',
-			'delay_s'		=> 17,
-			'refresh_unsupported'	=> 10,
-			'after_sync'		=> true
+			'name' => 'zbx_psv_01',
+			'delay_s' => 17,
+			'refresh_unsupported' => 10,
+			'after_sync' => true
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 10,
-			'refresh_unsupported'	=> 90
+			'name' => 'zbx_act_01',
+			'delay_s' => 10,
+			'refresh_unsupported' => 90
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 90,
-			'refresh_unsupported'	=> 10
+			'name' => 'zbx_act_01',
+			'delay_s' => 90,
+			'refresh_unsupported' => 10
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 10,
-			'refresh_unsupported'	=> 20
+			'name' => 'zbx_act_01',
+			'delay_s' => 10,
+			'refresh_unsupported' => 20
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 10,
-			'refresh_unsupported'	=> 50
+			'name' => 'zbx_act_01',
+			'delay_s' => 10,
+			'refresh_unsupported' => 50
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 40,
-			'refresh_unsupported'	=> 20
+			'name' => 'zbx_act_01',
+			'delay_s' => 40,
+			'refresh_unsupported' => 20
 		],
 		[
-			'name'			=> 'zbx_act_01',
-			'delay_s'		=> 40,
-			'refresh_unsupported'	=> 60
+			'name' => 'zbx_act_01',
+			'delay_s' => 40,
+			'refresh_unsupported' => 60
 		]
 	];
 
@@ -185,14 +185,14 @@ class testItemState extends CIntegrationTest {
 	public function serverConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel'		=> 4,
-				'LogFileSize'		=> 20
+				'DebugLevel' => 4,
+				'LogFileSize' => 20
 			],
 			self::COMPONENT_AGENT => [
-				'Hostname' 		=> 'test_host',
-				'ServerActive' 		=> '127.0.0.1',
-				'RefreshActiveChecks'	=> REF_ACT_CHKS_INTERVAL,
-				'BufferSend'		=> 1
+				'Hostname'  => 'test_host',
+				'ServerActive'  => '127.0.0.1',
+				'RefreshActiveChecks' => REF_ACT_CHKS_INTERVAL,
+				'BufferSend' => 1
 			]
 		];
 	}
@@ -204,8 +204,8 @@ class testItemState extends CIntegrationTest {
 		// Disable all items
 		foreach (self::$items as $item) {
 			$response = $this->call('item.update', [
-				'itemid'	=> $item['itemid'],
-				'status'	=> ITEM_STATUS_DISABLED
+				'itemid' => $item['itemid'],
+				'status' => ITEM_STATUS_DISABLED
 			]);
 
 			$this->assertEquals($item['itemid'], $response['result']['itemids'][0]);
@@ -218,9 +218,9 @@ class testItemState extends CIntegrationTest {
 
 		// Enable item
 		$response = $this->call('item.update', [
-			'itemid'	=> $itemid,
-			'status'	=> ITEM_STATUS_ACTIVE,
-			'delay'		=> $delay,
+			'itemid' => $itemid,
+			'status' => ITEM_STATUS_ACTIVE,
+			'delay' => $delay,
 		]);
 
 		$this->assertEquals($itemid, $response['result']['itemids'][0]);
@@ -248,8 +248,8 @@ class testItemState extends CIntegrationTest {
 		sleep(1);
 
 		$response = $this->call('item.get', [
-			'itemids'	=> self::$items[$scenario['name']]['itemid'],
-			'output'	=> ['state']
+			'itemids' => self::$items[$scenario['name']]['itemid'],
+			'output' => ['state']
 		]);
 
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')');
@@ -284,8 +284,8 @@ class testItemState extends CIntegrationTest {
 		sleep(1);
 
 		$response = $this->call('item.get', [
-			'itemids'	=> self::$items[$scenario['name']]['itemid'],
-			'output'	=> ['state']
+			'itemids' => self::$items[$scenario['name']]['itemid'],
+			'output' => ['state']
 		]);
 
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')');
