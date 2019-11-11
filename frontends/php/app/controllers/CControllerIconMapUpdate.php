@@ -62,7 +62,11 @@ class CControllerIconMapUpdate extends CController {
 		else {
 			$url->setArgument('iconmapid', $iconmap['iconmapid']);
 			$response = new CControllerResponseRedirect($url->setArgument('action', 'iconmap.edit'));
-			$response->setFormData($this->getInputAll());
+			$form_data = $this->getInputAll();
+			if (!array_key_exists('mappings', $form_data['iconmap'])) {
+				$form_data['iconmap']['mappings'] = [];
+			}
+			$response->setFormData($form_data);
 			$response->setMessageError(_('Cannot update icon map'));
 		}
 
