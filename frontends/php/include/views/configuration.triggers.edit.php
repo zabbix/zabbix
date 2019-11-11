@@ -444,7 +444,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 							->removeId()
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$readonly
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
