@@ -27,14 +27,14 @@ class CControllerUsergroupList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' => 'in name',
-			'sortorder' => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'filter_name' => 'string',
+			'filter_user_status' => 'in -1,'.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'filter_set' => 'in 1',
 			'filter_rst' => 'in 1',
-			'filter_user_status' => 'in -1,'.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'sort' => 'in name',
+			'sortorder' => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' => 'ge 1',
-			'uncheck' => 'in 1',
-			'filter_name' => 'string'
+			'uncheck' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -73,16 +73,16 @@ class CControllerUsergroupList extends CController {
 	/**
 	 * Updates use profile key values based on current input.
 	 */
-	protected function updateUserProfile() {
+	private function updateUserProfile() {
 		if ($this->hasInput('filter_set')) {
+			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1),
 				PROFILE_TYPE_INT
 			);
-			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.usergroup.filter_user_status');
 			CProfile::delete('web.usergroup.filter_name');
+			CProfile::delete('web.usergroup.filter_user_status');
 		}
 
 		CProfile::update('web.usergroup.sort',
@@ -99,7 +99,7 @@ class CControllerUsergroupList extends CController {
 	 *
 	 * @return array  Sorted and paginated user groups.
 	 */
-	protected function selectUserGroups(&$paging, &$filter) {
+	private function selectUserGroups(&$paging, &$filter) {
 		$config = select_config();
 
 		$filter = [
