@@ -55,18 +55,20 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "Daily" maintenance period.
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->page->waitUntilReady();
+		$this->query('id:overlay_dialogue')->waitUntilVisible();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Daily');
 		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[2]/td','Daily');
 
 		// Add "Weekly" maintenance period with "Monday" and "Sunday".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->page->waitUntilReady();
+		$this->query('id:overlay_dialogue')->waitUntilVisible();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Weekly');
 		$this->zbxTestCheckboxSelect('days_1');
 		$this->zbxTestCheckboxSelect('days_64');
 		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		// Check weekly period in frontend.
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td','Weekly');
 		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[3]/td[2]');
@@ -75,11 +77,12 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Add "Monthly" maintenace period with "January" and "November".
 		$this->zbxTestClickXpathWait('//button[@class="btn-link" and text()="Add"]');
-		$this->page->waitUntilReady();
+		$this->query('id:overlay_dialogue')->waitUntilVisible();
 		$this->zbxTestDropdownSelectWait('timeperiod_type', 'Monthly');
 		$this->zbxTestCheckboxSelect('months_1');
 		$this->zbxTestCheckboxSelect('months_1024');
 		$this->zbxTestClickXpathWait('//div[@id="overlay_dialogue"]//button[text()="Add"]');
+		$this->page->waitUntilReady();
 		// Check monthly period in frontend.
 		$this->zbxTestAssertElementText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td','Monthly');
 		$text = $this->zbxTestGetText('//ul[@id="maintenancePeriodFormList"]//tbody/tr[4]/td[2]');
