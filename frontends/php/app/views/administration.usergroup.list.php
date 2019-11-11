@@ -35,7 +35,7 @@ $widget = (new CWidget())
 	->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')))
 		->addVar('action', 'usergroup.list')
 		->setProfile($data['profileIdx'])
-		->setActiveTab($data['is_filter_visible'])
+		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
 			(new CFormList())->addRow(_('Name'),
 				(new CTextBox('filter_name', $data['filter']['name']))
@@ -147,11 +147,6 @@ foreach ($this->data['usergroups'] as $usergroup) {
 
 	$users = [];
 	foreach ($usergroup['users'] as $user) {
-		if ($user === null) {
-			$users[] = ' &hellip;';
-			break;
-		}
-
 		if ($users) {
 			$users[] = ', ';
 		}
@@ -161,12 +156,16 @@ foreach ($this->data['usergroups'] as $usergroup) {
 		);
 
 		$users[] = (new CLink(getUserFullname($user), (new CUrl('zabbix.php'))
-				->setArgument('action', 'user.edit')
-				->setArgument('userid', $user['userid'])
-				->getUrl()
-			))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass($user_has_access ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+			->setArgument('action', 'user.edit')
+			->setArgument('userid', $user['userid'])
+			->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass($user_has_access ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+	}
+
+	if (count($usergroup['users']) != $usergroup['user_cnt']) {
+		$users[] = ' &hellip;';
 	}
 
 	$name = new CLink($usergroup['name'], (new CUrl('zabbix.php'))
@@ -176,13 +175,13 @@ foreach ($this->data['usergroups'] as $usergroup) {
 	);
 
 	$table->addRow([
-		new CCheckBox('usrgrpids[' . $usergroup['usrgrpid'] . ']', $usergroup['usrgrpid']),
+		new CCheckBox('usrgrpids['.$usergroup['usrgrpid'].']', $usergroup['usrgrpid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[new CLink(_('Users'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'user.list')
 			->setArgument('filter_usrgrpid', $usergroup['usrgrpid'])
 			->getUrl()
-		), CViewHelper::showNum($usergroup['user_ctn'])],
+		), CViewHelper::showNum($usergroup['user_cnt'])],
 		$users,
 		$gui_access,
 		$debug_mode,

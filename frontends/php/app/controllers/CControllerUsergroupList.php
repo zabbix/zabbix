@@ -51,97 +51,68 @@ class CControllerUsergroupList extends CController {
 	}
 
 	protected function doAction() {
-		$this->updateUserProfile();
+		$sort_field = getRequest('sort', CProfile::get('web.usergroup.sort', 'name'));
+		$sort_order = getRequest('sortorder', CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP));
 
-		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
-			'is_filter_visible' => CProfile::get('web.usergroup.filter.active', 1),
-			'sort' => CProfile::get('web.usergroup.sort', 'name'),
-			'sortorder' => CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP),
-			'profileIdx' => 'web.usergroup.filter',
-			'usergroups' => $this->selectUserGroups($paging, $filter),
-			'paging' => $paging,
-			'filter' => $filter
-		];
+		CProfile::update('web.usergroup.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.usergroup.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		$response = new CControllerResponseData($data);
-
-		$response->setTitle(_('Configuration of user groups'));
-		$this->setResponse($response);
-	}
-
-	/**
-	 * Updates use profile key values based on current input.
-	 */
-	private function updateUserProfile() {
-		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.usergroup.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.usergroup.filter_user_status', $this->getInput('filter_user_status', -1),
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.usergroup.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.usergroup.filter_user_status', getRequest('filter_user_status', -1),
 				PROFILE_TYPE_INT
 			);
 		}
-		elseif ($this->hasInput('filter_rst')) {
+		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.usergroup.filter_name');
 			CProfile::delete('web.usergroup.filter_user_status');
 		}
 
-		CProfile::update('web.usergroup.sort',
-			$this->getInput('sort', CProfile::get('web.usergroup.sort', 'name')), PROFILE_TYPE_STR
-		);
-		CProfile::update('web.usergroup.sortorder',
-			$this->getInput('sortorder', CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP)), PROFILE_TYPE_STR
-		);
-	}
-
-	/**
-	 * @param array &$paging  Field the paginator will be created in.
-	 * @param array &$filter  Outputs the filter value being used for selection.
-	 *
-	 * @return array  Sorted and paginated user groups.
-	 */
-	private function selectUserGroups(&$paging, &$filter) {
-		$config = select_config();
-
+		// Prepare data for view.
 		$filter = [
 			'name' => CProfile::get('web.usergroup.filter_name', ''),
 			'user_status' => CProfile::get('web.usergroup.filter_user_status', -1)
 		];
 
-		$options = [
-			'output' => API_OUTPUT_EXTEND,
-			'selectUsers' => API_OUTPUT_EXTEND,
-			'limit' => $config['search_limit'] + 1
+		$config = select_config();
+
+		$data = [
+			'uncheck' => $this->hasInput('uncheck'),
+			'sort' => $sort_field,
+			'sortorder' => $sort_order,
+			'filter' => $filter,
+			'profileIdx' => 'web.usergroup.filter',
+			'active_tab' => CProfile::get('web.usergroup.filter.active', 1),
+			'usergroups' => API::UserGroup()->get([
+				'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
+				'selectUsers' => ['userid', 'alias', 'name', 'surname', 'gui_access', 'users_status'],
+				'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
+				'filter' => ['user_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
+				'sortfield' => $sort_field,
+				'limit' => $config['search_limit'] + 1
+			])
 		];
 
-		if ($filter['name'] !== '') {
-			$options['search'] = ['name' => $filter['name']];
-		}
-
-		if ($filter['user_status'] != -1) {
-			$options['filter'] = ['users_status' => $filter['user_status']];
-		}
-
-		$usergroups = API::UserGroup()->get($options);
-
-		CArrayHelper::sort($usergroups, [[
-			'field' => CProfile::get('web.usergroup.sort', 'name'),
-			'order' => CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP)
-		]]);
-
-		$paging = getPagingLine($usergroups, CProfile::get('web.usergroup.sortorder', ZBX_SORT_UP),
+		// sorting & paging
+		CArrayHelper::sort($data['usergroups'], [['field' => $sort_field, 'order' => $sort_order]]);
+		$data['paging'] = getPagingLine($data['usergroups'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.list')
 		);
 
-		foreach ($usergroups as &$usergroup) {
-			order_result($usergroup['users'], 'alias');
+		foreach ($data['usergroups'] as &$usergroup) {
+			CArrayHelper::sort($usergroup['users'], ['alias']);
 
-			$usergroup['user_ctn'] = count($usergroup['users']);
-			if ($usergroup['user_ctn'] > $config['max_in_table']) {
-				array_splice($usergroup['users'], $config['max_in_table'], $usergroup['user_ctn'], [null]);
+			$usergroup['user_cnt'] = count($usergroup['users']);
+			if ($usergroup['user_cnt'] > $config['max_in_table']) {
+				$usergroup['users'] = array_slice($usergroup['users'], 0, $config['max_in_table']);
 			}
 		}
 		unset($usergroup);
 
-		return $usergroups;
+		$response = new CControllerResponseData($data);
+
+		$response->setTitle(_('Configuration of user groups'));
+		$this->setResponse($response);
 	}
 }
