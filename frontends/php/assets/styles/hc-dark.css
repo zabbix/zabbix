@@ -5510,6 +5510,10 @@ table.preprocessing-test-results .rel-container {
       border-left-color: white; }
   .menu-popup .menu-popup-item.selected::before {
     background: url(../img/icon-sprite.svg) no-repeat -317px -835px; }
+  .menu-popup.page-title-submenu::before {
+    background-color: #383838;
+    border-top: 1px solid #666;
+    border-left: 1px solid #666; }
 
 ul.top-nav-icons input {
   border: 1px solid #666 !important;
