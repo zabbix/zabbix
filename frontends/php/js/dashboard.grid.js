@@ -1627,10 +1627,6 @@
 		}
 
 		hidePreloader(widget);
-
-		// Stop animations and set to visible state.
-		// Do not use .show(), nor .fadeTo(0, 1) here, since these set display: block, which will break css rules.
-		widget['content_body'].stop(true, true).css('opacity', 1);
 	}
 
 	function setUpdateWidgetContentTimer($obj, data, widget, rf_rate) {
