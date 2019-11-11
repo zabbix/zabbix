@@ -50,13 +50,29 @@ class CPopupButtonElement extends CElement {
 		}
 
 		foreach ($text as $item) {
-			$this->click();
-
-			$this->query('xpath://ul[contains(@class, "menu-popup-top")]')->waitUntilVisible()->asPopupMenu()->one()
-					->waitUntilReady()->fill($item);
+			$this->getMenu()->waitUntilReady()->fill($item);
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get popup menu.
+	 *
+	 * @return CPopupMenuElement
+	 */
+	public function getMenu() {
+		$query = $this->query('xpath://ul[contains(@class, "menu-popup-top")]')
+				->asPopupMenu();
+
+		$menu = $query->one(false);
+		if ($menu !== null) {
+			return $menu;
+		}
+
+		$this->click();
+
+		return $query->waitUntilVisible()->one();
 	}
 
 	/**
