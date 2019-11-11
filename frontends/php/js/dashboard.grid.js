@@ -1617,7 +1617,6 @@
 			delete widget['preloader_timeoutid'];
 
 			showPreloader(widget);
-			widget['content_body'].stop(true, true).fadeTo(widget['preloader_fadespeed'], 0.4);
 		}, widget['preloader_timeout']);
 	}
 
@@ -1786,7 +1785,6 @@
 			'header': '',
 			'view_mode': iterator['view_mode'],
 			'preloader_timeout': 10000,	// in milliseconds
-			'preloader_fadespeed': 500,
 			'update_paused': false,
 			'initial_load': true,
 			'ready': false,
@@ -3274,7 +3272,6 @@
 				},
 				'rf_rate': 0,
 				'preloader_timeout': 10000,	// in milliseconds
-				'preloader_fadespeed': 500,
 				'update_paused': false,
 				'initial_load': true,
 				'ready': false,
