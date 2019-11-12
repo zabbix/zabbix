@@ -108,7 +108,7 @@ class CControllerUsergroupEdit extends CController {
 		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
 			'groupids' => [],
 			'permission' => PERM_NONE,
-			'include_subgroups' => '0'
+			'include_subgroups' => false
 		];
 
 		$data['tag_filters'] = $this->getTagFilters();
@@ -124,7 +124,7 @@ class CControllerUsergroupEdit extends CController {
 		);
 		$data['users_ms'] = $this->getUsersMs();
 
-		$data['can_update_group'] = !$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid'));
+		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));
