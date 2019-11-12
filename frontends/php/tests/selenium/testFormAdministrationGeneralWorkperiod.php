@@ -60,72 +60,72 @@ class testFormAdministrationGeneralWorkperiod extends CLegacyWebTest {
 			[
 				'work_period' => 'test',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7 09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '0-7,09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-5,09:00-18:00,6-7,10:00-16:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-8,09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,09:00-25:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,24:00-00:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,14:00-13:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,25:00-26:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7,13:60-14:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '1-7',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '09:00-24:00',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Incorrect value for field "work_period": cannot be empty.'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '{WORKING_HOURS}',
 				'success_expected' => TEST_BAD,
-				'error-msg' => 'Field "Working time" is not correct: a time period is expected'
+				'error-msg' => 'Incorrect value for field "work_period": a time period is expected.'
 			],
 			[
 				'work_period' => '{$WORKING_HOURS}',
