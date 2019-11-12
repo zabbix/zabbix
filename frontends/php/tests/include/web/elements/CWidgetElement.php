@@ -82,7 +82,7 @@ class CWidgetElement extends CElement {
 	 * @return $this
 	 */
 	public function delete() {
-		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click();
+		$this->query('xpath:.//button[@class="btn-widget-delete"]')->one()->click()->waitUntilNotVisible();;
 
 		return $this;
 	}

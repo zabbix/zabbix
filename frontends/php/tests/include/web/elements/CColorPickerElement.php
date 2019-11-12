@@ -33,8 +33,6 @@ class CColorPickerElement extends CCompositeInputElement {
 	 * @inheritdoc
 	 */
 	public function overwrite($text) {
-		$this->getInput()->overwrite($text);
-
 		return parent::overwrite($text)->fireEvent();
 	}
 }

@@ -63,12 +63,14 @@ trait FilterTrait {
 	 * @return CMultifieldTablelement
 	 */
 	public function setTags($tags, $selector = 'id:filter-tags') {
+		$table = $this->getTagTable($selector);
+
 		foreach ($tags as $i => $tag) {
 			if ($i === 0) {
-				$this->getTagTable($selector)->updateRow($i, $tag);
+				$table->updateRow($i, $tag);
 			}
 			else {
-				$this->getTagTable($selector)->addRow($tag);
+				$table->addRow($tag);
 			}
 		}
 
