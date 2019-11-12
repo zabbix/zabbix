@@ -53,7 +53,7 @@ class CControllerPopupConditionOperationsEdit extends CControllerPopupConditionC
 			'inputs' => [
 				'conditiontype' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
-				'value' => $this->getInput('value'),
+				'value' => $this->getInput('value')
 			]
 		];
 	}
