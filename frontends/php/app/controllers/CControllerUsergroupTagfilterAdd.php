@@ -85,6 +85,11 @@ class CControllerUsergroupTagfilterAdd extends CController {
 			];
 		}
 
-		$this->setResponse(new CControllerResponseData(['tag_filters' => collapseTagFilters($tag_filters)]));
+		$this->setResponse(new CControllerResponseData([
+			'tag_filters' => collapseTagFilters($tag_filters),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

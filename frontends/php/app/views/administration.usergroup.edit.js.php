@@ -156,13 +156,19 @@
 		 */
 		function respHandler(handle_data) {
 			return function(resp) {
-				if (resp.body) {
-					handle_data(resp.body);
-				}
-
 				removeMessages();
 				if (resp.messages) {
 					addMessage(resp.messages);
+				}
+
+				if (resp.body) {
+					var	html = resp.body;
+
+					if (resp.debug) {
+						html += resp.debug;
+					}
+
+					handle_data(html);
 				}
 			}
 		}
