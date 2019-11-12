@@ -95,9 +95,9 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 			(new CFormList())
 				->addRow(_('Name'), (new CTextBox('select', $data['filter']['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
 				->addRow(_('Show items without data'),
-					(new CCheckBox('show_without_data'))->setChecked($data['filter']['showWithoutData'] == 1)
+					(new CCheckBox('show_without_data'))->setChecked($data['filter']['show_without_data'] == 1)
 				)
-				->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($data['filter']['showDetails'] == 1))
+				->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($data['filter']['show_details'] == 1))
 		])
 	);
 }

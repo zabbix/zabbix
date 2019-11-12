@@ -52,6 +52,7 @@ abstract class CControllerLatest extends CController {
 
 		// we'll only display the values if the filter is set
 		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
+
 		if ($filter_set) {
 			$groupids = null;
 			if ($child_groups) {
@@ -151,7 +152,7 @@ abstract class CControllerLatest extends CController {
 				$history = Manager::History()->getLastValues($items, 2, ZBX_HISTORY_PERIOD);
 
 				// filter items without history
-				if (!$filter['showWithoutData']) {
+				if (!$filter['show_without_data']) {
 					foreach ($items as $key => $item) {
 						if (!isset($history[$item['itemid']])) {
 							unset($items[$key]);

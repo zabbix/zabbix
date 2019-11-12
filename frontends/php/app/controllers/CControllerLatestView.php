@@ -91,8 +91,8 @@ class CControllerLatestView extends CControllerLatest {
 			'hostids' => CProfile::getArray('web.latest.filter.hostids'),
 			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
-			'showWithoutData' => CProfile::get('web.latest.filter.show_without_data', 1),
-			'showDetails' => CProfile::get('web.latest.filter.show_details', 0)
+			'show_without_data' => CProfile::get('web.latest.filter.show_without_data', 1),
+			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
 		];
 
 		$sortField = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
@@ -107,8 +107,8 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('hostids', $filter['hostids'])
 			->setArgument('application', $filter['application'])
 			->setArgument('select', $filter['select'])
-			->setArgument('show_without_data', $filter['showWithoutData'] ? 1 : null)
-			->setArgument('show_details', $filter['showDetails'] ? 1 : null)
+			->setArgument('show_without_data', $filter['show_without_data'] ? 1 : null)
+			->setArgument('show_details', $filter['show_details'] ? 1 : null)
 			->setArgument('filter_set', 1)
 			->setArgument('sort', $sortField)
 			->setArgument('sortorder', $sortOrder);

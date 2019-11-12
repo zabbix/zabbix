@@ -43,7 +43,7 @@ $check_all = (new CColHeader(
 
 $view_url = $data['view_curl']->getUrl();
 
-if ($data['filter']['showDetails']) {
+if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,

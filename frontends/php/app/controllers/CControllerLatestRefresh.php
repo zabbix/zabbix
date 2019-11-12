@@ -72,8 +72,8 @@ class CControllerLatestRefresh extends CControllerLatest {
 			'hostids' => $this->hasInput('hostids') ? $this->getInput('hostids') : null,
 			'application' => $this->getInput('application', ''),
 			'select' => $this->getInput('select', ''),
-			'showWithoutData' => $this->getInput('show_without_data', 0),
-			'showDetails' => $this->getInput('show_details', 0)
+			'show_without_data' => $this->getInput('show_without_data', 0),
+			'show_details' => $this->getInput('show_details', 0)
 		];
 
 		$sortField = $this->getInput('sort', 'name');
