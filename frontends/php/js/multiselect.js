@@ -288,7 +288,7 @@ jQuery(function($) {
 					'Select': t('Select')
 				},
 				placeholder: t('type here to search'),
-				data: {},
+				data: [],
 				only_hostid: 0,
 				excludeids: [],
 				addNew: false,
