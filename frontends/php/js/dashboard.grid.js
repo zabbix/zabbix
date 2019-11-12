@@ -1192,6 +1192,8 @@
 
 		startPreloader(widget);
 
+		$('#dashbrd-save').prop('disabled', true);
+
 		jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1242,6 +1244,8 @@
 					widget['update_attempts'] = 0;
 					updateWidgetContent($obj, data, widget);
 				}
+				$('#dashbrd-save').prop('disabled', false);
+
 			}, function() {
 				// TODO: gentle message about failed update of widget content
 				widget['update_attempts'] = 0;
@@ -1337,6 +1341,8 @@
 				.appendTo($obj);
 		}
 
+		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -1347,6 +1353,7 @@
 					// Error returned. Remove previous errors.
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(resp.errors);
+					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
 				}
 				else {
 					// No errors, proceed with update.
