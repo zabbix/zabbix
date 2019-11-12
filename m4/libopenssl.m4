@@ -134,20 +134,24 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
       AC_REQUIRE([PKG_PROG_PKG_CONFIG])
       PKG_PROG_PKG_CONFIG()
       test -z $PKG_CONFIG && AC_MSG_ERROR([Not found pkg-config library])
-      PKG_CHECK_EXISTS(openssl,[
-        if test "x$_libopenssl_dir" = "xno" ;then
+      m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+
+      if test "x$_libopenssl_dir" = "xno" -o -z "$_libopenssl_dir"; then
+        PKG_CHECK_EXISTS(openssl,[
           OPENSSL_LIBS=`$PKG_CONFIG --static --libs openssl`
-        else
-          OPENSSL_LIBS=`PKG_CONFIG_LIBDIR=$_libopenssl_dir/lib/pkgconfig $PKG_CONFIG --static --libs openssl`
-        fi
-        if test "x$ARCH" = "xaix"; then
-          OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl_a/-Wl,-Bstatic -lssl_a -Wl,-Bdynamic/g'|sed 's/-lcrypto_a/-Wl,-Bstatic -lcrypto_a -Wl,-Bdynamic/g'`
-        else
-          OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl/-Wl,-Bstatic -lssl -Wl,-Bdynamic/g'|sed 's/-lcrypto/-Wl,-Bstatic -lcrypto -Wl,-Bdynamic/g'`
-        fi
-      ],[
-        AC_MSG_ERROR([Not found openssl library])
-      ])
+        ],[
+          AC_MSG_ERROR([Not found openssl library])
+        ])
+      else
+        AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors openssl]) || AC_MSG_ERROR([Not found openssl library])
+        OPENSSL_LIBS=`PKG_CONFIG_LIBDIR="$_libopenssl_dir/lib/pkgconfig" $PKG_CONFIG --static --libs openssl`
+      fi
+
+      if test "x$ARCH" = "xaix"; then
+        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl_a/-Wl,-Bstatic -lssl_a -Wl,-Bdynamic/g'|sed 's/-lcrypto_a/-Wl,-Bstatic -lcrypto_a -Wl,-Bdynamic/g'`
+      else
+        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl/-Wl,-Bstatic -lssl -Wl,-Bdynamic/g'|sed 's/-lcrypto/-Wl,-Bstatic -lcrypto -Wl,-Bdynamic/g'`
+      fi
     fi
 
     CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
