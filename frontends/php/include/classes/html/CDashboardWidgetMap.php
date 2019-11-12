@@ -178,15 +178,11 @@ class CDashboardWidgetMap extends CDiv {
 			$this->sysmap_data['container'] = "#map_{$this->uniqueid}";
 
 			$script_run .= 'jQuery(function($) {'.
-					'$("#'.$this->getId().'").zbx_mapwidget({'.
-						'uniqueid: "'.$this->uniqueid.'",'.
-						'map_options: '.zbx_jsvalue($this->sysmap_data).
-					'});'.
-					// Hack for Safari to manually accept parent container height in pixels when map widget is loaded.
-					'if (SF) {'.
-						'$("#'.$this->getId().'").height($("#'.$this->getId().'").parent().height())'.
-					'}'.
-				'});';
+				'$("#'.$this->getId().'").zbx_mapwidget({'.
+					'uniqueid: "'.$this->uniqueid.'",'.
+					'map_options: '.zbx_jsvalue($this->sysmap_data).
+				'});'.
+			'});';
 		}
 		elseif ($this->error !== null && $this->source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
 			$error_msg_html = (new CTableInfo())->setNoDataMessage($this->error);
