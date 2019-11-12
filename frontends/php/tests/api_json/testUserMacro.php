@@ -117,8 +117,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_create
-	*/
+	 * @dataProvider globalmacro_create
+	 */
 	public function testUserMacro_CreateGlobal($globalmacro, $expected_error) {
 		$result = $this->call('usermacro.createglobal', $globalmacro, $expected_error);
 
@@ -232,8 +232,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_failed
-	*/
+	 * @dataProvider globalmacro_failed
+	 */
 	public function testUserMacro_FailedCreateUpdateGlobal($globalmacro, $expected_error) {
 		$methods = ['usermacro.createglobal', 'usermacro.updateglobal'];
 
@@ -331,8 +331,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_update
-	*/
+	 * @dataProvider globalmacro_update
+	 */
 	public function testUserMacro_UpdateGlobal($globalmacros, $expected_error) {
 		$result = $this->call('usermacro.updateglobal', $globalmacros, $expected_error);
 
@@ -425,8 +425,8 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_delete
-	*/
+	 * @dataProvider globalmacro_delete
+	 */
 	public function testUserMacro_DeleteGlobal($globalmacro, $expected_error) {
 		$result = $this->call('usermacro.deleteglobal', $globalmacro, $expected_error);
 
@@ -519,10 +519,24 @@ class testUserMacro extends CAPITest {
 	}
 
 	/**
-	* @dataProvider globalmacro_permissions
-	*/
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 *
+	 * @dataProvider globalmacro_permissions
+	 */
 	public function testUserMacro_UserPermissionsGlobal($method, $user, $globalmacro, $expected_error) {
 		$this->authorize($user['user'], $user['password']);
 		$this->call($method, $globalmacro, $expected_error);
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

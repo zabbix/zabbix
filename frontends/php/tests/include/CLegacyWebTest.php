@@ -244,8 +244,8 @@ class CLegacyWebTest extends CWebTest {
 		$xpath = 'xpath://div[contains(@class, "multiselect") and @id="'.$id.'"]/input';
 		$this->query($xpath)->one()->overwrite($string);
 		$this->zbxTestClickXpathWait(
-			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='available']".
-			"/ul[@class='multiselect-suggest']/li[@data-id='$string']"
+			"//div[@class='multiselect-available' and @data-opener='$id']/ul[@class='multiselect-suggest']".
+			"/li[@data-id='$string']"
 		);
 
 		$this->zbxTestMultiselectAssertSelected($id, $string.' (new)');

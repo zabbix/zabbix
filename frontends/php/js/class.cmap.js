@@ -1506,9 +1506,6 @@ ZABBIX.apps.map = (function($) {
 
 						$('#link-connect-to').show();
 						this.form.show();
-
-						// resize multiselect
-						$('.multiselect').multiSelect('resize');
 					}
 
 					// only one shape is selected
@@ -2332,7 +2329,10 @@ ZABBIX.apps.map = (function($) {
 					this.data.inherited_label = null;
 				}
 
-				if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
+				if (this.data.label_type == CMap.LABEL_TYPE_LABEL) {
+					this.data.inherited_label = this.data.label;
+				}
+				else if (this.data.label_type == CMap.LABEL_TYPE_NAME) {
 					if (this.data.elementtype != Selement.TYPE_IMAGE) {
 						this.data.inherited_label = this.data.elements[0].elementName;
 					}

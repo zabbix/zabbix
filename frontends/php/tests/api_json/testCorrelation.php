@@ -107,6 +107,9 @@ class testCorrelation extends CAPITest {
 	}
 
 	/**
+	 * @on-before removeGuestFromDisabledGroup
+	 * @on-after addGuestToDisabledGroup
+	 *
 	 * @dataProvider getCorrelationDeletePermissionsData
 	 */
 	public function testCorrelation_DeletePermissions($login, $correlation, $expected_error) {
@@ -117,5 +120,16 @@ class testCorrelation extends CAPITest {
 		$this->call('correlation.delete', $correlation, $expected_error);
 
 		$this->assertEquals($old_hash_correlation, CDBHelper::getHash($sql_correlation));
+	}
+
+	/**
+	 * Guest user needs to be out of "Disabled" group to have access to frontend.
+	 */
+	public static function removeGuestFromDisabledGroup() {
+		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	public function addGuestToDisabledGroup() {
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }
