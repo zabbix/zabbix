@@ -27,21 +27,21 @@ class CControllerLatestView extends CControllerLatest {
 
 	protected function checkInput() {
 		$fields = [
-			'page' =>				'ge 1',
+			'page' =>						'ge 1',
 
 			// Filter inputs.
-			'groupids' =>			'array_id',
-			'hostids' =>			'array_id',
-			'application' =>		'string',
-			'select' =>				'string',
-			'show_without_data' =>	'in 1',
-			'show_details' =>		'in 1',
-			'filter_set' =>			'in 1',
-			'filter_rst' =>			'in 1',
+			'filter_groupids' =>			'array_id',
+			'filter_hostids' =>				'array_id',
+			'filter_application' =>			'string',
+			'filter_select' =>				'string',
+			'filter_show_without_data' =>	'in 1',
+			'filter_show_details' =>		'in 1',
+			'filter_set' =>					'in 1',
+			'filter_rst' =>					'in 1',
 
 			// Table sorting inputs.
-			'sort' =>				'in host,name,lastclock',
-			'sort_order' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
+			'sort' =>						'in host,name,lastclock',
+			'sortorder' =>					'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,11 +54,11 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function checkPermissions() {
-		if ($this->hasInput('groupids') && !isReadableHostGroups($this->getInput('groupids'))) {
+		if ($this->hasInput('filter_groupids') && !isReadableHostGroups($this->getInput('filter_groupids'))) {
 			return false;
 		}
 
-		if ($this->hasInput('hostids') && !isReadableHosts($this->getInput('hostids'))) {
+		if ($this->hasInput('filter_hostids') && !isReadableHosts($this->getInput('filter_hostids'))) {
 			return false;
 		}
 
@@ -70,12 +70,12 @@ class CControllerLatestView extends CControllerLatest {
 		 * Filter
 		 */
 		if ($this->hasInput('filter_set')) {
-			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('groupids', []), PROFILE_TYPE_STR);
-			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('hostids', []), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.application', $this->getInput('application', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.select', $this->getInput('select', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.latest.filter.show_without_data', $this->getInput('show_without_data', 0), PROFILE_TYPE_INT);
-			CProfile::update('web.latest.filter.show_details', $this->getInput('show_details', 0), PROFILE_TYPE_INT);
+			CProfile::updateArray('web.latest.filter.groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_STR);
+			CProfile::updateArray('web.latest.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_STR);
+			CProfile::update('web.latest.filter.application', $this->getInput('filter_application', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.latest.filter.select', $this->getInput('filter_select', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.latest.filter.show_without_data', $this->getInput('filter_show_without_data', 0), PROFILE_TYPE_INT);
+			CProfile::update('web.latest.filter.show_details', $this->getInput('filter_show_details', 0), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::deleteIdx('web.latest.filter.groupids');
@@ -96,22 +96,22 @@ class CControllerLatestView extends CControllerLatest {
 		];
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
-		$sort_order = $this->getInput('sort_order', CProfile::get('web.latest.sort_order', ZBX_SORT_UP));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.latest.sortorder', ZBX_SORT_UP));
 
 		CProfile::update('web.latest.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.latest.sort_order', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.latest.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'latest.view')
-			->setArgument('groupids', $filter['groupids'])
-			->setArgument('hostids', $filter['hostids'])
-			->setArgument('application', $filter['application'])
-			->setArgument('select', $filter['select'])
-			->setArgument('show_without_data', $filter['show_without_data'] ? 1 : null)
-			->setArgument('show_details', $filter['show_details'] ? 1 : null)
+			->setArgument('filter_groupids', $filter['groupids'])
+			->setArgument('filter_hostids', $filter['hostids'])
+			->setArgument('filter_application', $filter['application'])
+			->setArgument('filter_select', $filter['select'])
+			->setArgument('filter_show_without_data', $filter['show_without_data'] ? 1 : null)
+			->setArgument('filter_show_details', $filter['show_details'] ? 1 : null)
 			->setArgument('filter_set', 1)
 			->setArgument('sort', $sort_field)
-			->setArgument('sort_order', $sort_order);
+			->setArgument('sortorder', $sort_order);
 
 		$refresh_curl = clone $view_curl;
 		$refresh_curl

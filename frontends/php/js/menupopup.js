@@ -135,9 +135,9 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
 		if (typeof options.filter_application !== 'undefined') {
-			url.setArgument('application', options.filter_application);
+			url.setArgument('filter_application', options.filter_application);
 		}
-		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('filter_hostids[]', options.hostid);
 		url.setArgument('filter_set', '1');
 		latest_data.url = url.getUrl();
 

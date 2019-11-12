@@ -100,7 +100,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('hostids[]', $hostid)
+				->setArgument('filter_hostids[]', $hostid)
 				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Problems'),
@@ -167,7 +167,7 @@ foreach ($data['groups'] as $groupid => $group) {
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('groupids[]', $groupid)
+				->setArgument('filter_groupids[]', $groupid)
 				->setArgument('filter_set', '1')
 		),
 		new CLink(_('Problems'),
