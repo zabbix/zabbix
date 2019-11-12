@@ -29,14 +29,14 @@ abstract class CControllerLatest extends CController {
 		// multiselect host groups
 		$multiselect_hostgroup_data = [];
 		if ($filter['groupids']) {
-			$filterGroups = API::HostGroup()->get([
+			$filter_groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
 
-			if ($filterGroups) {
-				foreach ($filterGroups as $group) {
+			if ($filter_groups) {
+				foreach ($filter_groups as $group) {
 					$multiselect_hostgroup_data[] = [
 						'id' => $group['groupid'],
 						'name' => $group['name']
@@ -55,7 +55,7 @@ abstract class CControllerLatest extends CController {
 		if ($filter_set) {
 			$groupids = null;
 			if ($child_groups) {
-				$groups = $filterGroups;
+				$groups = $filter_groups;
 				foreach ($child_groups as $child_group) {
 					$child_groups = API::HostGroup()->get([
 						'output' => ['groupid'],
@@ -81,16 +81,13 @@ abstract class CControllerLatest extends CController {
 		}
 
 		if ($hosts) {
-
 			foreach ($hosts as &$host) {
 				$host['item_cnt'] = 0;
 			}
 			unset($host);
 
-			$sortFields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
-			CArrayHelper::sort($hosts, $sortFields);
-
-			$hostIds = array_keys($hosts);
+			$sort_fields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
+			CArrayHelper::sort($hosts, $sort_fields);
 
 			$applications = null;
 
@@ -98,7 +95,7 @@ abstract class CControllerLatest extends CController {
 			if ($filter['application'] !== '') {
 				$applications = API::Application()->get([
 					'output' => API_OUTPUT_EXTEND,
-					'hostids' => $hostIds,
+					'hostids' => array_keys($hosts),
 					'search' => ['name' => $filter['application']],
 					'preservekeys' => true
 				]);
@@ -174,15 +171,15 @@ abstract class CControllerLatest extends CController {
 
 				// sort
 				if ($sortField === 'name') {
-					$sortFields = [['field' => 'name_expanded', 'order' => $sortOrder], 'itemid'];
+					$sort_fields = [['field' => 'name_expanded', 'order' => $sortOrder], 'itemid'];
 				}
 				elseif ($sortField === 'lastclock') {
-					$sortFields = [['field' => 'lastclock', 'order' => $sortOrder], 'name_expanded', 'itemid'];
+					$sort_fields = [['field' => 'lastclock', 'order' => $sortOrder], 'name_expanded', 'itemid'];
 				}
 				else {
-					$sortFields = ['name_expanded', 'itemid'];
+					$sort_fields = ['name_expanded', 'itemid'];
 				}
-				CArrayHelper::sort($items, $sortFields);
+				CArrayHelper::sort($items, $sort_fields);
 
 				if ($applications) {
 					foreach ($applications as &$application) {
@@ -192,9 +189,9 @@ abstract class CControllerLatest extends CController {
 					unset($application);
 
 					// by default order by application name and application id
-					$sortFields = ($sortField === 'host') ? [['field' => 'hostname', 'order' => $sortOrder]] : [];
-					array_push($sortFields, 'name', 'applicationid');
-					CArrayHelper::sort($applications, $sortFields);
+					$sort_fields = ($sortField === 'host') ? [['field' => 'hostname', 'order' => $sortOrder]] : [];
+					array_push($sort_fields, 'name', 'applicationid');
+					CArrayHelper::sort($applications, $sort_fields);
 				}
 			}
 		}
@@ -202,12 +199,12 @@ abstract class CControllerLatest extends CController {
 		// multiselect hosts
 		$multiselect_host_data = [];
 		if ($filter['hostids']) {
-			$filterHosts = API::Host()->get([
+			$filter_hosts = API::Host()->get([
 				'output' => ['hostid', 'name'],
 				'hostids' => $filter['hostids']
 			]);
 
-			foreach ($filterHosts as $host) {
+			foreach ($filter_hosts as $host) {
 				$multiselect_host_data[] = [
 					'id' => $host['hostid'],
 					'name' => $host['name']
