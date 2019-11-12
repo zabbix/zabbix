@@ -46,7 +46,7 @@ switch ($data['type']) {
 			"reloadPopup(this.form, 'popup.condition.event.corr');", corrConditionTypes()
 		);
 
-		$form_list->addRow(_('Condition type'), $condition_type_combobox);
+		$form_list->addRow(_('Type'), $condition_type_combobox);
 
 		switch ($condition_type) {
 			// Old|New event tag form elements.
@@ -155,7 +155,7 @@ switch ($data['type']) {
 			"reloadPopup(this.form, 'popup.condition.actions');", $action_condition_options
 		);
 
-		$form_list->addRow(_('Condition type'), $action_condition_type_combobox);
+		$form_list->addRow(_('Type'), $action_condition_type_combobox);
 
 		switch ($condition_type) {
 			// Trigger form elements.
@@ -404,18 +404,16 @@ switch ($data['type']) {
 
 			// Discovery object form elements.
 			case CONDITION_TYPE_DOBJECT:
-				$dobject_options = [];
-				foreach ([EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE] as $object) {
-					$dobject_options[$object] = discovery_object2str($object);
-				}
-
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
 					->addValue(
 						$combobox_options[CONDITION_TYPE_DOBJECT][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
-				$new_condition_value = new CComboBox('value', null, null, $dobject_options);
+				$new_condition_value = (new CRadioButtonList('value', EVENT_OBJECT_DHOST))
+					->setModern(true)
+					->addValue(discovery_object2str(EVENT_OBJECT_DHOST), EVENT_OBJECT_DHOST)
+					->addValue(discovery_object2str(EVENT_OBJECT_DSERVICE), EVENT_OBJECT_DSERVICE);
 
 				$form_list
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
@@ -454,23 +452,22 @@ switch ($data['type']) {
 
 			// Discovery status form elements.
 			case CONDITION_TYPE_DSTATUS:
-				$dstatus_options = [];
-				foreach ([DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER,
-					DOBJECT_STATUS_LOST] as $stat) {
-					$dstatus_options[$stat] = discovery_object_status2str($stat);
-				}
-
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
 					->addValue(
 						$combobox_options[CONDITION_TYPE_DSTATUS][CONDITION_OPERATOR_EQUAL],
 						CONDITION_OPERATOR_EQUAL
 					);
-				$new_condition_value = new CComboBox('value', null, null, $dstatus_options);
+				$new_condition_value = (new CRadioButtonList('value', DOBJECT_STATUS_UP))
+				->setModern(true)
+				->addValue(discovery_object_status2str(DOBJECT_STATUS_UP), DOBJECT_STATUS_UP)
+				->addValue(discovery_object_status2str(DOBJECT_STATUS_DOWN), DOBJECT_STATUS_DOWN)
+				->addValue(discovery_object_status2str(DOBJECT_STATUS_DISCOVER), DOBJECT_STATUS_DISCOVER)
+				->addValue(discovery_object_status2str(DOBJECT_STATUS_LOST), DOBJECT_STATUS_LOST);
 
 				$form_list
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-					->addRow(_('Status'), $new_condition_value);
+					->addRow(_('Discovery status'), $new_condition_value);
 				break;
 
 			// Proxy form elements.
@@ -628,7 +625,7 @@ switch ($data['type']) {
 			"reloadPopup(this.form, 'popup.condition.operations');", $combobox_options
 		);
 
-		$form_list->addRow(_('Condition type'), $opcondition_type_combobox);
+		$form_list->addRow(_('Type'), $opcondition_type_combobox);
 
 		// Acknowledge form elements.
 		$operators_options = [];
