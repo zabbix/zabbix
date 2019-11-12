@@ -46,6 +46,7 @@ class CControllerUsergroupUpdate extends CController {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 						->setArgument('action', 'usergroup.edit')
+						->setArgument('usrgrpid', $this->getInput('usrgrpid'))
 						->getUrl()
 					);
 					$response->setFormData($this->getInputAll());
