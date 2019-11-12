@@ -296,7 +296,10 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			}
 
 			if (array_key_exists('linked_templates', $visible)) {
-				$parent_templateids = zbx_objectValues($template['parentTemplates'], 'templateid');
+				$parent_templateids = array_key_exists('parentTemplates', $template)
+					? zbx_objectValues($template['parentTemplates'], 'templateid')
+					: [];
+
 				switch (getRequest('mass_action_tpls')) {
 					case ZBX_ACTION_ADD:
 						$template['templates'] = array_unique(

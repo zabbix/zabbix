@@ -474,7 +474,10 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 			}
 
 			if (array_key_exists('templates', $visible)) {
-				$host_templateids = zbx_objectValues($host['parentTemplates'], 'templateid');
+				$host_templateids = array_key_exists('parentTemplates', $host)
+					? zbx_objectValues($host['parentTemplates'], 'templateid')
+					: [];
+
 				switch (getRequest('mass_action_tpls')) {
 					case ZBX_ACTION_ADD:
 						$host['templates'] = array_unique(array_merge($host_templateids, getRequest('templates', [])));
