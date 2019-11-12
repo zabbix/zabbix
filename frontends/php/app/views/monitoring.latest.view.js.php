@@ -30,15 +30,19 @@ jQuery(function($) {
 		},
 
 		refresh: function() {
-			this.beforeRefresh();
+			this.setLoading();
 
 			var deferred = $.getJSON(this.getRefreshUrl());
 
 			return this.bindDataEvents(deferred);
 		},
 
-		beforeRefresh: function() {
+		setLoading: function() {
 			this.getCurrentForm().addClass('in-progress delayed-15s');
+		},
+
+		clearLoading: function() {
+			this.getCurrentForm().removeClass('in-progress delayed-15s');
 		},
 
 		doRefresh: function(body) {
@@ -54,13 +58,16 @@ jQuery(function($) {
 				.done(function(response) {
 					that.onDataDone.call(that, response);
 				})
-				.fail(this.onDataFail.bind(this))
+				.fail(function(jqXHR) {
+					that.onDataFail.call(that, jqXHR);
+				})
 				.always(this.onDataAlways.bind(this));
 
 			return deferred;
 		},
 
 		onDataDone: function(response) {
+			this.clearLoading();
 			this.removeMessages();
 			this.doRefresh(response.body);
 			if ('messages' in response) {
@@ -68,8 +75,12 @@ jQuery(function($) {
 			}
 		},
 
-		onDataFail: function() {
-			this.getCurrentForm().empty();
+		onDataFail: function(jqXHR) {
+			var messages = $(jqXHR.responseText).find('.msg-global');
+			if (messages.length) {
+				this.clearLoading();
+				this.getCurrentForm().html(messages);
+			}
 		},
 
 		onDataAlways: function() {
