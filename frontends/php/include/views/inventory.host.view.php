@@ -127,17 +127,15 @@ $overviewFormList->addRow(_('Monitoring'),
 		new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('form', '1')
-				->setArgument('select', '')
-				->setArgument('show_details', '1')
-				->setArgument('filter_set', 'Filter')
-				->setArgument('hostids[]', $data['host']['hostid'])
+				->setArgument('hostids', [$data['host']['hostid']])
+				->setArgument('show_details', 1)
+				->setArgument('filter_set', 1)
 		),
 		new CLink(_('Problems'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'problem.view')
 				->setArgument('filter_hostids[]', $data['host']['hostid'])
-				->setArgument('filter_set', '1')
+				->setArgument('filter_set', 1)
 		),
 		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
 		new CLink(_('Screens'),
