@@ -81,7 +81,8 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		switch ($this->getInput('timeperiod_type', null)) {
 			case TIMEPERIOD_TYPE_ONETIME:
 				$parser = new CAbsoluteTimeParser();
-				$failed = ($parser->parse($this->getInput('start_date')) != CParser::PARSE_SUCCESS);
+				$start_date = trim($this->getInput('start_date'));
+				$failed = ($parser->parse($start_date) != CParser::PARSE_SUCCESS);
 				$start_date = $parser->getDateTime(true);
 
 				if ($failed || !validateDateInterval($start_date->format('Y'), $start_date->format('m'),
@@ -168,7 +169,7 @@ class CControllerPopupMaintenancePeriodEdit extends CController {
 		if ($this->getInput('refresh', 0)) {
 			if ($data['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
 				$parser = new CAbsoluteTimeParser();
-				$parser->parse($data['start_date']);
+				$parser->parse(trim($data['start_date']));
 				$start_date = $parser->getDateTime(true);
 				$data['start_date'] = $start_date->format(ZBX_DATE_TIME);
 			}
