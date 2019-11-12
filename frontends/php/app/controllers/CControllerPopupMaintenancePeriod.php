@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupMaintenancePeriodEdit extends CController {
+class CControllerPopupMaintenancePeriod extends CController {
 
 	protected function checkInput() {
 		$fields = [

@@ -155,7 +155,7 @@ class CRouter {
 		'popup.services'				=> ['CControllerPopupServices',						'layout.json',			'popup.services'],
 		'popup.testtriggerexpr'			=> ['CControllerPopupTestTriggerExpr',				'layout.json',			'popup.testtriggerexpr'],
 		'popup.triggerwizard'			=> ['CControllerPopupTriggerWizard',				'layout.json',			'popup.triggerwizard'],
-		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriodEdit',		'layout.json',			'popup.maintenance.period.edit'],
+		'popup.maintenance.period'		=> ['CControllerPopupMaintenancePeriod',			'layout.json',			'popup.maintenance.period'],
 		'popup.mediatypetest.edit'		=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'		=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search']
