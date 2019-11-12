@@ -41,7 +41,7 @@ class CControllerLatestView extends CControllerLatest {
 
 			// Table sorting inputs.
 			'sort' =>				'in host,name,lastclock',
-			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
+			'sort_order' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -95,11 +95,11 @@ class CControllerLatestView extends CControllerLatest {
 			'show_details' => CProfile::get('web.latest.filter.show_details', 0)
 		];
 
-		$sortField = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
-		$sortOrder = $this->getInput('sortorder', CProfile::get('web.latest.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
+		$sort_order = $this->getInput('sort_order', CProfile::get('web.latest.sort_order', ZBX_SORT_UP));
 
-		CProfile::update('web.latest.sort', $sortField, PROFILE_TYPE_STR);
-		CProfile::update('web.latest.sortorder', $sortOrder, PROFILE_TYPE_STR);
+		CProfile::update('web.latest.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.latest.sort_order', $sort_order, PROFILE_TYPE_STR);
 
 		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'latest.view')
@@ -110,8 +110,8 @@ class CControllerLatestView extends CControllerLatest {
 			->setArgument('show_without_data', $filter['show_without_data'] ? 1 : null)
 			->setArgument('show_details', $filter['show_details'] ? 1 : null)
 			->setArgument('filter_set', 1)
-			->setArgument('sort', $sortField)
-			->setArgument('sortorder', $sortOrder);
+			->setArgument('sort', $sort_field)
+			->setArgument('sort_order', $sort_order);
 
 		$refresh_curl = clone $view_curl;
 		$refresh_curl
@@ -124,13 +124,13 @@ class CControllerLatestView extends CControllerLatest {
 		 */
 		$data = [
 			'filter' => $filter,
-			'sortField' => $sortField,
-			'sortOrder' => $sortOrder,
+			'sort_field' => $sort_field,
+			'sort_order' => $sort_order,
 			'view_curl' => $view_curl,
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'active_tab' => CProfile::get('web.latest.filter.active', 1)
-		] + parent::prepareData($filter, $sortField, $sortOrder);
+		] + parent::prepareData($filter, $sort_field, $sort_order);
 
 		CView::$has_web_layout_mode = true;
 

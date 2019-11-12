@@ -24,7 +24,7 @@ $paging = getPagingLine($data['items'], ZBX_SORT_UP, clone $data['view_curl']);
 $form = (new CForm('GET', 'history.php'))
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
-// table
+
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 if (!$data['filter_set']) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
@@ -47,13 +47,13 @@ if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 13%'),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 21%'),
+		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 13%'),
+		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 21%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 14%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
@@ -64,9 +64,9 @@ else {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 17%'),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 40%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 14%'),
+		make_sorting_header(_('Host'), 'host', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 17%'),
+		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 40%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sort_field'], $data['sort_order'], $view_url)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%')
@@ -177,7 +177,6 @@ foreach ($data['items'] as $key => $item) {
 		$change = UNKNOWN_VALUE;
 	}
 
-
 	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']));
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
@@ -189,6 +188,7 @@ foreach ($data['items'] as $key => $item) {
 		$actions = $item['show_link']
 			? new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid'])
 			: UNKNOWN_VALUE;
+
 		$checkbox->setEnabled(false);
 	}
 
@@ -199,7 +199,7 @@ foreach ($data['items'] as $key => $item) {
 
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
-	if ($data['filter']['showDetails']) {
+	if ($data['filter']['show_details']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
@@ -257,9 +257,11 @@ foreach ($data['items'] as $key => $item) {
 }
 
 foreach ($data['applications'] as $appid => $dbApp) {
-	$host = $data['hosts'][$dbApp['hostid']];
+	if (!isset($tab_rows[$appid])) {
+		continue;
+	}
 
-	if(!isset($tab_rows[$appid])) continue;
+	$host = $data['hosts'][$dbApp['hostid']];
 
 	$appRows = $tab_rows[$appid];
 
@@ -281,7 +283,7 @@ foreach ($data['applications'] as $appid => $dbApp) {
 		'',
 		$hostName,
 		(new CCol([bold($dbApp['name']), ' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')']))
-			->setColSpan($data['filter']['showDetails'] ? 10 : 5)
+			->setColSpan($data['filter']['show_details'] ? 10 : 5)
 	]);
 
 	// add toggle sub rows
@@ -299,10 +301,12 @@ foreach ($data['items'] as $item) {
 	$lastHistory = isset($data['history'][$item['itemid']][0]) ? $data['history'][$item['itemid']][0] : null;
 	$prevHistory = isset($data['history'][$item['itemid']][1]) ? $data['history'][$item['itemid']][1] : null;
 
-	if (strpos($item['units'], ',') !== false)
+	if (strpos($item['units'], ',') !== false) {
 		list($item['units'], $item['unitsLong']) = explode(',', $item['units']);
-	else
+	}
+	else {
 		$item['unitsLong'] = '';
+	}
 
 	// last check time and last value
 	if ($lastHistory) {
@@ -346,6 +350,7 @@ foreach ($data['items'] as $item) {
 		$actions = $item['show_link']
 			? new CLink(_('History'), 'history.php?action='.HISTORY_VALUES.'&itemids[]='.$item['itemid'])
 			: UNKNOWN_VALUE;
+
 		$checkbox->setEnabled(false);
 	}
 
@@ -357,7 +362,7 @@ foreach ($data['items'] as $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$host = $data['hosts'][$item['hostid']];
-	if ($data['filter']['showDetails']) {
+	if ($data['filter']['show_details']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST)
 			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
@@ -404,11 +409,12 @@ foreach ($data['items'] as $item) {
 }
 
 foreach ($data['hosts'] as $hostId => $dbHost) {
-	$host = $data['hosts'][$dbHost['hostid']];
-
-	if(!isset($tab_rows[$hostId])) {
+	if (!isset($tab_rows[$hostId])) {
 		continue;
 	}
+
+	$host = $data['hosts'][$dbHost['hostid']];
+
 	$appRows = $tab_rows[$hostId];
 
 	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
@@ -429,7 +435,7 @@ foreach ($data['hosts'] as $hostId => $dbHost) {
 		'',
 		$hostName,
 		(new CCol([bold('- '.('other').' -'), ' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')']))
-			->setColSpan($data['filter']['showDetails'] ? 10 : 5)
+			->setColSpan($data['filter']['show_details'] ? 10 : 5)
 	]);
 
 	// add toggle sub rows

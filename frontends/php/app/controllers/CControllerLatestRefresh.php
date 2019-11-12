@@ -39,7 +39,7 @@ class CControllerLatestRefresh extends CControllerLatest {
 
 			// Table sorting inputs.
 			'sort' =>				'in host,name,lastclock',
-			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
+			'sort_order' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP
 		];
 
 		$ret = $this->validateInput($fields);
@@ -76,8 +76,8 @@ class CControllerLatestRefresh extends CControllerLatest {
 			'show_details' => $this->getInput('show_details', 0)
 		];
 
-		$sortField = $this->getInput('sort', 'name');
-		$sortOrder = $this->getInput('sortorder', ZBX_SORT_UP);
+		$sort_field = $this->getInput('sort', 'name');
+		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
 
 		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'latest.view')
@@ -85,21 +85,21 @@ class CControllerLatestRefresh extends CControllerLatest {
 			->setArgument('hostids', $filter['hostids'])
 			->setArgument('application', $filter['application'])
 			->setArgument('select', $filter['select'])
-			->setArgument('show_without_data', $filter['showWithoutData'] ? 1 : null)
-			->setArgument('show_details', $filter['showDetails'] ? 1 : null)
+			->setArgument('show_without_data', $filter['show_without_data'] ? 1 : null)
+			->setArgument('show_details', $filter['show_details'] ? 1 : null)
 			->setArgument('filter_set', 1)
-			->setArgument('sort', $sortField)
-			->setArgument('sortorder', $sortOrder);
+			->setArgument('sort', $sort_field)
+			->setArgument('sort_order', $sort_order);
 
 		/*
 		 * Display
 		 */
 		$data = [
 			'filter' => $filter,
-			'sortField' => $sortField,
-			'sortOrder' => $sortOrder,
+			'sort_field' => $sort_field,
+			'sort_order' => $sort_order,
 			'view_curl' => $view_curl
-		] + parent::prepareData($filter, $sortField, $sortOrder);
+		] + parent::prepareData($filter, $sort_field, $sort_order);
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

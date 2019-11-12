@@ -21,7 +21,7 @@
 
 abstract class CControllerLatest extends CController {
 
-	protected function prepareData($filter, $sortField, $sortOrder) {
+	protected function prepareData($filter, $sort_field, $sort_order) {
 		$applications = [];
 		$items = [];
 		$child_groups = [];
@@ -87,7 +87,7 @@ abstract class CControllerLatest extends CController {
 			}
 			unset($host);
 
-			$sort_fields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
+			$sort_fields = ($sort_field === 'host') ? [['field' => 'name', 'order' => $sort_order]] : ['name'];
 			CArrayHelper::sort($hosts, $sort_fields);
 
 			$applications = null;
@@ -171,11 +171,11 @@ abstract class CControllerLatest extends CController {
 				unset($item);
 
 				// sort
-				if ($sortField === 'name') {
-					$sort_fields = [['field' => 'name_expanded', 'order' => $sortOrder], 'itemid'];
+				if ($sort_field === 'name') {
+					$sort_fields = [['field' => 'name_expanded', 'order' => $sort_order], 'itemid'];
 				}
-				elseif ($sortField === 'lastclock') {
-					$sort_fields = [['field' => 'lastclock', 'order' => $sortOrder], 'name_expanded', 'itemid'];
+				elseif ($sort_field === 'lastclock') {
+					$sort_fields = [['field' => 'lastclock', 'order' => $sort_order], 'name_expanded', 'itemid'];
 				}
 				else {
 					$sort_fields = ['name_expanded', 'itemid'];
@@ -190,7 +190,7 @@ abstract class CControllerLatest extends CController {
 					unset($application);
 
 					// by default order by application name and application id
-					$sort_fields = ($sortField === 'host') ? [['field' => 'hostname', 'order' => $sortOrder]] : [];
+					$sort_fields = ($sort_field === 'host') ? [['field' => 'hostname', 'order' => $sort_order]] : [];
 					array_push($sort_fields, 'name', 'applicationid');
 					CArrayHelper::sort($applications, $sort_fields);
 				}

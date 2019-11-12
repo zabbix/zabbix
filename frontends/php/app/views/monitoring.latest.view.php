@@ -37,7 +37,6 @@ $widget = (new CWidget())
 	);
 
 if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
-	// Filter
 	$widget->addItem((new CFilter((new CUrl('zabbix.php'))->setArgument('action', 'latest.view')))
 		->setProfile('web.latest.filter')
 		->setActiveTab($data['active_tab'])
@@ -103,7 +102,7 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 }
 
 $form_data = array_intersect_key($data, array_flip([
-	'filter', 'sortField', 'sortOrder', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
+	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
 ]));
 
 $form_html = call_user_func(function($data) {
