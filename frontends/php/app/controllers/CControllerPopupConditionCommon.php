@@ -84,8 +84,6 @@ abstract class CControllerPopupConditionCommon extends CController {
 
 	/**
 	 * Validate manually fields that we can't properly validate via standard MVC validation rules.
-	 *
-	 * @return void
 	 */
 	abstract protected function validateFieldsManually();
 
