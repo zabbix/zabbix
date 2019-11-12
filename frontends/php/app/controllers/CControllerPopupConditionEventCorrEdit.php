@@ -46,7 +46,7 @@ class CControllerPopupConditionEventCorrEdit extends CControllerPopupConditionCo
 
 	protected function validateFieldsManually() {
 		$validator = new CEventCorrCondValidator();
-		$validate = $validator->validate([
+		$is_valid = $validator->validate([
 			'type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
 			'tag' => getRequest('tag'),
@@ -56,11 +56,11 @@ class CControllerPopupConditionEventCorrEdit extends CControllerPopupConditionCo
 			'groupids' => getRequest('groupids')
 		]);
 
-		if (!$validate) {
+		if (!$is_valid) {
 			error($validator->getError());
 		}
 
-		return $validate;
+		return $is_valid;
 	}
 
 	protected function getManuallyValidatedFields() {
