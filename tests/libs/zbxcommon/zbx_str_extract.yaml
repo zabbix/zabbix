@@ -1,0 +1,86 @@
+---
+test case: 'Success: abcd, 4'
+in:
+  text: 'abcd'
+  len: 4
+out:
+  value: abcd
+  return: SUCCEED
+---
+test case: 'Success: abcd, 1'
+in:
+  text: 'abcd'
+  len: 1
+out:
+  value: 'a'
+  return: SUCCEED
+---
+test case: 'Success: abcd, 0'
+in:
+  text: 'abcd'
+  len: 0
+out:
+  value: ''
+  return: SUCCEED
+---
+test case: 'Success: "abcd", 6'
+in:
+  text: '"abcd"'
+  len: 6
+out:
+  value: 'abcd'
+  return: SUCCEED
+---
+test case: 'Success: "ab\\/cd", 9'
+in:
+  text: '"ab\\/cd"'
+  len: 9
+out:
+  value: 'ab\/cd'
+  return: SUCCEED
+---
+test case: 'Success: "\\", 4'
+in:
+  text: '"\\"'
+  len: 4
+out:
+  value: '\'
+  return: SUCCEED
+---
+test case: 'Success: "a\"bc\"d", 10'
+in:
+  text: '"a\"bc\"d"'
+  len: 10
+out:
+  value: 'a"bc"d'
+  return: SUCCEED
+---
+test case: 'Success: "", 2'
+in:
+  text: '""'
+  len: 2
+out:
+  value: ''
+  return: SUCCEED
+---
+test case: 'Failure: "", 1'
+in:
+  text: '""'
+  len: 1
+out:
+  return: FAIL
+---
+test case: 'Failure: "\a", 4'
+in:
+  text: '"\a"'
+  len: 4
+out:
+  return: FAIL
+---
+test case: 'Failure: "abcd", 7'
+in:
+  text: '"abcd"'
+  len: 7
+out:
+  return: FAIL
+...

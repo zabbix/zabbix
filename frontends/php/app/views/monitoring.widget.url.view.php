@@ -21,7 +21,7 @@
 
 $item = ($data['url']['error'] !== null)
 	? (new CTableInfo())->setNoDataMessage($data['url']['error'])
-	: (new CIFrame($data['url']['url'], '100%', '98%', 'auto')); // height is 98% to remove vertical scroll on widget
+	: (new CIFrame($data['url']['url'], '100%', '100%', 'auto'))->addClass(ZBX_STYLE_WIDGET_URL);
 
 $output = [
 	'header' => $data['name'],

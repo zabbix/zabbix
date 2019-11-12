@@ -126,7 +126,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<env key="GOPATH" value="$GOPATH:$PWD"/>
 						<arg line="-s"/>
 						<arg line="-j5"/>
 						<arg line="@{target}"/>

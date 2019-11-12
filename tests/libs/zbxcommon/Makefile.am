@@ -14,7 +14,9 @@ SERVER_tests = \
 	zbx_trim_float \
 	zbx_trim_integer \
 	zbx_variant_compare \
-	zbx_user_macro_parse
+	zbx_user_macro_parse \
+	zbx_str_extract \
+	convert_to_utf8
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -296,5 +298,32 @@ zbx_user_macro_parse_LDADD += @SERVER_LIBS@
 zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+zbx_str_extract_SOURCES = \
+	zbx_str_extract.c \
+	$(COMMON_SRC_FILES)
+
+zbx_str_extract_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_str_extract_LDADD += @SERVER_LIBS@
+
+zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_str_extract_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+convert_to_utf8_SOURCES = \
+     convert_to_utf8.c \
+     $(COMMON_SRC_FILES)
+
+convert_to_utf8_LDADD = \
+     $(COMMON_LIB_FILES)
+
+convert_to_utf8_LDADD += @SERVER_LIBS@
+
+convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@
+
+convert_to_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

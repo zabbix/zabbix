@@ -108,7 +108,7 @@ class testPageLatestData extends CLegacyWebTest {
 			preg_match_all('/https?:\/\/\S+/', $data['description'], $urls);
 			// Verify that each of the urls is clickable.
 			foreach ($urls[0] as $url) {
-				$this->assertTrue($overlay->query('xpath:./a[@href="'.$url.'"]')->one()->isClickable());
+				$this->assertTrue($overlay->query('xpath:./div/a[@href="'.$url.'"]')->one()->isClickable());
 			}
 
 			// Verify that the tool-tip can be closed.

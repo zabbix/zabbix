@@ -15,7 +15,7 @@
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -1123,7 +1123,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Messages</name>
                         <host>Template App RabbitMQ cluster by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -1145,7 +1145,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Connections</name>
                         <host>Template App RabbitMQ cluster by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -1167,7 +1167,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Messages status</name>
                         <host>Template App RabbitMQ cluster by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -1189,7 +1189,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Queues</name>
                         <host>Template App RabbitMQ cluster by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -1211,7 +1211,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Messages per second</name>
                         <host>Template App RabbitMQ cluster by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -1237,7 +1237,7 @@ Template tooling version used: 0.32</description>
 &#13;
 You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq&#13;
 &#13;
-Template tooling version used: 0.32</description>
+Template tooling version used: 0.33</description>
          <groups>
             <group>
                <name>Templates/Applications</name>
@@ -2533,7 +2533,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Node status</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>0</y>
@@ -2555,7 +2555,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Uptime</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>0</y>
@@ -2577,7 +2577,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Disk free</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>1</y>
@@ -2599,7 +2599,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Memory used</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>1</y>
@@ -2621,7 +2621,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: File descriptors</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>0</x>
                      <y>2</y>
@@ -2643,7 +2643,7 @@ Template tooling version used: 0.32</description>
                         <name>RabbitMQ: Sockets</name>
                         <host>Template App RabbitMQ node by HTTP</host>
                      </resource>
-                     <width>500</width>
+                     <width>750</width>
                      <height>100</height>
                      <x>1</x>
                      <y>2</y>

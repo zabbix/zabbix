@@ -905,7 +905,7 @@ function makeDescriptionIcon($description) {
 	return (new CSpan())
 		->addClass(ZBX_STYLE_ICON_DESCRIPTION)
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->setHint(zbx_str2links($description), '', true, 'max-width: '.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;');
+		->setHint(zbx_str2links($description), 'hintbox-description');
 }
 
 /**

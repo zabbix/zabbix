@@ -110,6 +110,7 @@ tests/libs/zbxcommon/replace_key_params_dyn
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
 tests/libs/zbxcommon/zbx_interval_preproc
+tests/libs/zbxcommon/zbx_str_extract
 tests/libs/zbxcommon/zbx_token_find
 tests/libs/zbxcommon/zbx_trim_float
 tests/libs/zbxcommon/zbx_trim_integer
@@ -128,6 +129,7 @@ tests/libs/zbxdbcache/is_item_processed_by_server
 tests/libs/zbxdbcache/zbx_vc_add_values
 tests/libs/zbxdbcache/zbx_vc_get_value
 tests/libs/zbxdbcache/zbx_vc_get_values
+tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxjson/zbx_json_open_path
@@ -164,8 +166,6 @@ tests/zabbix_server/preprocessor/zbx_item_preproc
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
 /zabbix-*.tar.gz
 .vscode
-go/src/zabbix/cmd/zabbix_agent2/zabbix_agent2
-go/src/zabbix/cmd/mock_server/mock_server
 sbin/zabbix_agentd
 sbin/zabbix_proxy
 sbin/zabbix_server
@@ -193,3 +193,5 @@ bin/zabbix_get
 bin/zabbix_sender
 .cproject
 etc/agent.conf
+sbin/zabbix_agent2
+etc/zabbix_agent2.conf
