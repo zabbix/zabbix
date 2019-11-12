@@ -213,9 +213,8 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 			$options['selectGroups'] = ['groupid'];
 		}
 
-		if (array_key_exists('linked_templates', $visible) &&
-				!(getRequest('mass_action_tpls') == ZBX_ACTION_REPLACE && !hasRequest('mass_clear_tpls'))
-		) {
+		if (array_key_exists('linked_templates', $visible)
+				&& !(getRequest('mass_action_tpls') == ZBX_ACTION_REPLACE && !hasRequest('mass_clear_tpls'))) {
 			$options['selectParentTemplates'] = ['templateid'];
 		}
 
