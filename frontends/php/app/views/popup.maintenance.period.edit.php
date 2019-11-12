@@ -21,7 +21,7 @@
 $form = (new CForm())
 	->cleanItems()
 	->setId('maintenance_period_form')
-	->addVar('action', 'popup.maintenance.period.edit')
+	->addVar('action', 'popup.maintenance.period')
 	->addVar('refresh', 1)
 	->addVar('update', $data['update'])
 	->addVar('index', $data['index']);

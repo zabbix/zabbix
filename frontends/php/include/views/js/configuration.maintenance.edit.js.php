@@ -66,7 +66,7 @@
 						}
 					});
 
-					PopUp("popup.maintenance.period.edit", params, null, btn);
+					PopUp("popup.maintenance.period", params, null, btn);
 					break;
 
 				case 'add':
@@ -82,7 +82,7 @@
 						index: index + 1
 					}
 
-					PopUp("popup.maintenance.period.edit", params, null, btn);
+					PopUp("popup.maintenance.period", params, null, btn);
 					break;
 			}
 		});
