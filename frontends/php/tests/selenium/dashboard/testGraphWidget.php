@@ -308,11 +308,11 @@ class testGraphWidget extends CWebTest {
 	/*
 	 * Data provider for "Data set" tab validation on creating.
 	 */
-	public function getDataSetValidationCreateData() {
+	public function getDatasetValidationCreateData() {
 		$data = [];
 
 		// Add host and item values for the first "Data set" in each case of the data provider.
-		foreach ($this->getDataSetValidationData() as $item) {
+		foreach ($this->getDatasetValidationData() as $item) {
 			if (array_key_exists('Data set', $item[0])) {
 				$item[0]['Data set'][0] = array_merge($item[0]['Data set'][0], [
 					'host' => 'ЗАББИКС Сервер',
@@ -372,11 +372,11 @@ class testGraphWidget extends CWebTest {
 	/*
 	 * Data provider for "Data set" tab validation on updating.
 	 */
-	public function getDataSetValidationUpdateData() {
+	public function getDatasetValidationUpdateData() {
 		$data = [];
 
 		// Add existing widget name for each case in data provider.
-		foreach ($this->getDataSetValidationData() as $item) {
+		foreach ($this->getDatasetValidationData() as $item) {
 				$item[0]['Widget name'] = 'Test cases for update';
 
 			$data[] = $item;
@@ -423,7 +423,7 @@ class testGraphWidget extends CWebTest {
 	 * @dataProvider getDatasetValidationCreateData
 	 * @dataProvider getDatasetValidationUpdateData
 	 */
-	public function testGraphWidget_DataSetValidation($data) {
+	public function testGraphWidget_DatasetValidation($data) {
 		$this->validate($data, 'Data set');
 	}
 
