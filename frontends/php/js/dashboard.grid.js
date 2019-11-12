@@ -2157,6 +2157,7 @@
 		}
 
 		startPreloader(widget);
+		$('#dashbrd-save').prop('disabled', true);
 
 		widget['updating_content'] = true;
 
@@ -2193,6 +2194,7 @@
 				}
 
 				doAction('onContentUpdated', $obj, data, null);
+				$('#dashbrd-save').prop('disabled', false);
 			})
 			.then(function() {
 				// Separate 'then' section allows to execute scripts added by widgets in previous section first.
@@ -2261,6 +2263,8 @@
 			ajax_data['fields'] = JSON.stringify(fields);
 		}
 
+		$('.dialogue-widget-save', data.dialogue.div).prop('disabled', true);
+
 		$.ajax({
 			url: url.getUrl(),
 			method: 'POST',
@@ -2273,6 +2277,7 @@
 
 					$('.msg-bad', data.dialogue['body']).remove();
 					data.dialogue['body'].prepend(response.errors);
+					$('.dialogue-widget-save', data.dialogue.div).prop('disabled', false);
 
 					return $.Deferred().reject();
 				}
