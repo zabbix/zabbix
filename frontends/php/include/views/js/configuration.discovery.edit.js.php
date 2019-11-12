@@ -333,7 +333,7 @@
 		var $form = jQuery(document.forms['dcheck_form']);
 
 		$form.trimValues([
-			'#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
+			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
 			'#snmpv3_authpassphrase', '#snmpv3_privpassphrase'
 		]);
 
