@@ -27,6 +27,8 @@ class CControllerLatestView extends CControllerLatest {
 
 	protected function checkInput() {
 		$fields = [
+			'page' =>				'ge 1',
+
 			// Filter inputs.
 			'groupids' =>			'array_id',
 			'hostids' =>			'array_id',
@@ -76,14 +78,12 @@ class CControllerLatestView extends CControllerLatest {
 			CProfile::update('web.latest.filter.show_details', $this->getInput('show_details', 0), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			DBStart();
 			CProfile::deleteIdx('web.latest.filter.groupids');
 			CProfile::deleteIdx('web.latest.filter.hostids');
 			CProfile::delete('web.latest.filter.application');
 			CProfile::delete('web.latest.filter.select');
 			CProfile::delete('web.latest.filter.show_without_data');
 			CProfile::delete('web.latest.filter.show_details');
-			DBend();
 		}
 
 		$filter = [
@@ -92,7 +92,7 @@ class CControllerLatestView extends CControllerLatest {
 			'application' => CProfile::get('web.latest.filter.application', ''),
 			'select' => CProfile::get('web.latest.filter.select', ''),
 			'showWithoutData' => CProfile::get('web.latest.filter.show_without_data', 1),
-			'showDetails' => CProfile::get('web.latest.filter.show_details')
+			'showDetails' => CProfile::get('web.latest.filter.show_details', 0)
 		];
 
 		$sortField = $this->getInput('sort', CProfile::get('web.latest.sort', 'name'));
@@ -101,21 +101,23 @@ class CControllerLatestView extends CControllerLatest {
 		CProfile::update('web.latest.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.latest.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-		$view_url = (new CUrl('zabbix.php'))
+		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'latest.view')
-			->getUrl();
-
-		$refresh_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'latest.refresh')
 			->setArgument('groupids', $filter['groupids'])
 			->setArgument('hostids', $filter['hostids'])
 			->setArgument('application', $filter['application'])
 			->setArgument('select', $filter['select'])
 			->setArgument('show_without_data', $filter['showWithoutData'] ? 1 : null)
 			->setArgument('show_details', $filter['showDetails'] ? 1 : null)
+			->setArgument('filter_set', 1)
 			->setArgument('sort', $sortField)
-			->setArgument('sortorder', $sortOrder)
-			->getUrl();
+			->setArgument('sortorder', $sortOrder);
+
+		$refresh_curl = clone $view_curl;
+		$refresh_curl
+			->setArgument('action', 'latest.refresh')
+			->setArgument('page', $this->getInput('page', 1))
+			->removeArgument('filter_set');
 
 		/*
 		 * Display
@@ -124,10 +126,10 @@ class CControllerLatestView extends CControllerLatest {
 			'filter' => $filter,
 			'sortField' => $sortField,
 			'sortOrder' => $sortOrder,
-			'active_tab' => CProfile::get('web.latest.filter.active', 1),
-			'view_url' => $view_url,
-			'refresh_url' => $refresh_url,
-			'refresh_interval' => CWebUser::getRefresh() * 1000
+			'view_curl' => $view_curl,
+			'refresh_url' => $refresh_curl->getUrl(),
+			'refresh_interval' => CWebUser::getRefresh() * 1000,
+			'active_tab' => CProfile::get('web.latest.filter.active', 1)
 		] + parent::prepareData($filter, $sortField, $sortOrder);
 
 		CView::$has_web_layout_mode = true;

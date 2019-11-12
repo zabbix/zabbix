@@ -27,6 +27,8 @@ class CControllerLatestRefresh extends CControllerLatest {
 
 	protected function checkInput() {
 		$fields = [
+			'page' =>				'ge 1',
+
 			// Filter inputs.
 			'groupids' =>			'array_id',
 			'hostids' =>			'array_id',
@@ -66,8 +68,8 @@ class CControllerLatestRefresh extends CControllerLatest {
 		 * Filter
 		 */
 		$filter = [
-			'groupids' => $this->getInput('groupids', []),
-			'hostids' => $this->getInput('hostids', []),
+			'groupids' => $this->hasInput('groupids') ? $this->getInput('groupids') : null,
+			'hostids' => $this->hasInput('hostids') ? $this->getInput('hostids') : null,
 			'application' => $this->getInput('application', ''),
 			'select' => $this->getInput('select', ''),
 			'showWithoutData' => $this->getInput('show_without_data', 0),
@@ -77,9 +79,17 @@ class CControllerLatestRefresh extends CControllerLatest {
 		$sortField = $this->getInput('sort', 'name');
 		$sortOrder = $this->getInput('sortorder', ZBX_SORT_UP);
 
-		$view_url = (new CUrl('zabbix.php'))
+		$view_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'latest.view')
-			->getUrl();
+			->setArgument('groupids', $filter['groupids'])
+			->setArgument('hostids', $filter['hostids'])
+			->setArgument('application', $filter['application'])
+			->setArgument('select', $filter['select'])
+			->setArgument('show_without_data', $filter['showWithoutData'] ? 1 : null)
+			->setArgument('show_details', $filter['showDetails'] ? 1 : null)
+			->setArgument('filter_set', 1)
+			->setArgument('sort', $sortField)
+			->setArgument('sortorder', $sortOrder);
 
 		/*
 		 * Display
@@ -88,10 +98,8 @@ class CControllerLatestRefresh extends CControllerLatest {
 			'filter' => $filter,
 			'sortField' => $sortField,
 			'sortOrder' => $sortOrder,
-			'view_url' => $view_url,
+			'view_curl' => $view_curl
 		] + parent::prepareData($filter, $sortField, $sortOrder);
-
-		CView::$has_web_layout_mode = true;
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

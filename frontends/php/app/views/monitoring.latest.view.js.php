@@ -26,7 +26,13 @@ jQuery(function($) {
 		$('main .msg-bad').remove();
 	};
 
+	LatestPage.prototype.beforeRefresh = function() {
+		this.getCurrentForm().addClass('in-progress delayed-15s');
+	};
+
 	LatestPage.prototype.refresh = function() {
+		this.beforeRefresh();
+
 		var deferred = $.getJSON(this.getRefreshUrl());
 
 		return this.bindDataEvents(deferred);

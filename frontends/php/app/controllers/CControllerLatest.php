@@ -28,7 +28,7 @@ abstract class CControllerLatest extends CController {
 
 		// multiselect host groups
 		$multiselect_hostgroup_data = [];
-		if ($filter['groupids'] !== null) {
+		if ($filter['groupids']) {
 			$filterGroups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groupids'],

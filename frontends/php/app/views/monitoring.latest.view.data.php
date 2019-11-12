@@ -19,6 +19,8 @@
 **/
 
 
+$paging = getPagingLine($data['items'], ZBX_SORT_UP, clone $data['view_curl']);
+
 $form = (new CForm('GET', 'history.php'))
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
@@ -39,17 +41,19 @@ $check_all = (new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
 ))->addStyle('width: 15px');
 
+$view_url = $data['view_curl']->getUrl();
+
 if ($data['filter']['showDetails']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 13%'),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 21%'),
+		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 13%'),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 21%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 14%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
@@ -60,9 +64,9 @@ else {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 17%'),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 40%'),
-		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $data['view_url'])->addStyle('width: 14%'),
+		make_sorting_header(_('Host'), 'host', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 17%'),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 40%'),
+		make_sorting_header(_('Last check'), 'lastclock', $data['sortField'], $data['sortOrder'], $view_url)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%')
@@ -437,6 +441,7 @@ foreach ($data['hosts'] as $hostId => $dbHost) {
 
 $form->addItem([
 	$table,
+	$paging,
 	new CActionButtonList('graphtype', 'itemids', [
 		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
 		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
