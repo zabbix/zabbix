@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerUsergroupAddGroupRight extends CController {
+class CControllerUsergroupGrouprightAdd extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -29,9 +29,19 @@ class CControllerUsergroupAddGroupRight extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$new_group_right = $this->getInput('new_group_right') + ['groupids' => []];
+
+			if (!$new_group_right['groupids']) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+				'main_block' => CJs::encodeJson(['messages' => getMessages()->toString()])
 			]))->disableView());
 		}
 
@@ -49,48 +59,14 @@ class CControllerUsergroupAddGroupRight extends CController {
 			'include_subgroups' => '0'
 		];
 
-		if ($this->validateNewGroupRight($new_group_right)) {
-			$view = (new CView('administration.usergroup.table.groupright', $this->getViewData($new_group_right)));
-			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['body' => $view->render()->toString()])
-			])));
-		}
-		else {
-			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
-			])));
-		}
-	}
-
-	/**
-	 * @param array $new_group_right
-	 *
-	 * @return bool
-	 */
-	protected function validateNewGroupRight($new_group_right) {
-		if (!$new_group_right['groupids']) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param array $new_group_right
-	 *
-	 * @return array
-	 */
-	protected function getViewData(array $new_group_right) {
 		list($groupids, $subgroupids) = $new_group_right['include_subgroups']
 			? [[], $new_group_right['groupids']]
 			: [$new_group_right['groupids'], []];
 
-		return [
+		$this->setResponse(new CControllerResponseData([
 			'group_rights' => collapseHostGroupRights(applyHostGroupRights(
 				$this->getInput('group_rights'), $groupids, $subgroupids, $new_group_right['permission']
 			))
-		];
+		]));
 	}
 }

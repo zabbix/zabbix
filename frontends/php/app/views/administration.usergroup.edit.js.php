@@ -159,8 +159,10 @@
 				if (resp.body) {
 					handle_data(resp.body);
 				}
-				else if (resp.errors) {
-					addMessage(resp.errors);
+
+				removeMessages();
+				if (resp.messages) {
+					addMessage(resp.messages);
 				}
 			}
 		}
@@ -177,7 +179,6 @@
 
 			url.setArgument('action', action);
 
-			removeMessages();
 			disableNewTagFilterForm();
 
 			xhr_new_tag_filter && xhr_new_tag_filter.abort();
@@ -199,7 +200,6 @@
 
 			url.setArgument('action', action);
 
-			removeMessages();
 			disableNewGroupRightForm();
 
 			xhr_new_group_right && xhr_new_group_right.abort();

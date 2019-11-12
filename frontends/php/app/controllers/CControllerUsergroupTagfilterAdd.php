@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerUsergroupAddTagFilter extends CController {
+class CControllerUsergroupTagfilterAdd extends CController {
 
 	protected function checkInput() {
 
@@ -30,9 +30,29 @@ class CControllerUsergroupAddTagFilter extends CController {
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$new_tag_filter = $this->getInput('new_tag_filter') + [
+				'groupids' => [],
+				'tag' => '',
+				'value' => ''
+			];
+
+			if (!$new_tag_filter['groupids']) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
+
+				$ret = false;
+			}
+
+			if ($ret && $new_tag_filter['tag'] === '' && $new_tag_filter['value'] !== '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
+
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
+				'main_block' => CJs::encodeJson(['messages' => getMessages()->toString()])
 			]))->disableView());
 		}
 
@@ -51,60 +71,20 @@ class CControllerUsergroupAddTagFilter extends CController {
 			'include_subgroups' => '0'
 		];
 
-		if ($this->validateNewTagFilter($new_tag_filter)) {
-			$view = (new CView('administration.usergroup.table.tagfilter', $this->getViewData($new_tag_filter)));
-			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['body' => $view->render()->toString()])
-			])));
-		}
-		else {
-			$this->setResponse((new CControllerResponseData([
-				'main_block' => CJs::encodeJson(['errors' => getMessages()->toString()])
-			])));
-		}
-	}
-
-	/**
-	 * @param array $new_tag_filter
-	 *
-	 * @return bool
-	 */
-	protected function validateNewTagFilter($new_tag_filter) {
-		if (!$new_tag_filter['groupids']) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
-
-			return false;
-		}
-		elseif ($new_tag_filter['tag'] === '' && $new_tag_filter['value'] !== '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param array $new_tag_filter
-	 *
-	 * @return array
-	 */
-	protected function getViewData(array $new_tag_filter) {
 		$groupids = $new_tag_filter['include_subgroups']
 			? getSubGroups($new_tag_filter['groupids'])
 			: $new_tag_filter['groupids'];
 
-		$view_data = ['tag_filters' => $this->getInput('tag_filters', [])];
+		$tag_filters = $this->getInput('tag_filters', []);
+
 		foreach ($groupids as $groupid) {
-			$view_data['tag_filters'][] = [
+			$tag_filters[] = [
 				'groupid' => $groupid,
 				'tag' => $new_tag_filter['tag'],
 				'value' => $new_tag_filter['value'],
 			];
 		}
 
-		$view_data['tag_filters'] = collapseTagFilters($view_data['tag_filters']);
-
-		return $view_data;
+		$this->setResponse(new CControllerResponseData(['tag_filters' => collapseTagFilters($tag_filters)]));
 	}
 }

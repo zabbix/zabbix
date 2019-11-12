@@ -96,7 +96,9 @@ $form_list->addRow(_('Debug mode'),
 
 $permissions_form_list = new CFormList('permissions_form_list');
 $permissions_form_list->addRow(_('Permissions'),
-	(new CDiv((new CView('administration.usergroup.table.groupright', $data))->render()))
+	(new CDiv(
+		(new CView('administration.usergroup.grouprights.html', ['group_rights' => $data['group_rights']]))->render()
+	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -132,7 +134,7 @@ $new_group_right_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.add.groupright");')
+			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
@@ -145,7 +147,9 @@ $permissions_form_list->addRow(null,
 $tag_filter_form_list = new CFormList('tagFilterFormList');
 
 $tag_filter_form_list->addRow(_('Permissions'),
-	(new CDiv((new CView('administration.usergroup.table.tagfilter', $data))->render()))
+	(new CDiv(
+		(new CView('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']]))->render()
+	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
@@ -184,7 +188,7 @@ $new_tag_filter_table = (new CTable())
 	)
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.add.tagfilter");')
+			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
