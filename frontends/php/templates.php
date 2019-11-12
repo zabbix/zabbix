@@ -306,6 +306,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 							array_merge($parent_templateids, getRequest('linked_templates', []))
 						);
 						break;
+
 					case ZBX_ACTION_REPLACE:
 						$template['templates'] = getRequest('linked_templates', []);
 						if (getRequest('mass_clear_tpls')) {
@@ -314,6 +315,7 @@ elseif (hasRequest('action') && getRequest('action') === 'template.massupdate' &
 							);
 						}
 						break;
+
 					case ZBX_ACTION_REMOVE:
 						$template['templates'] = array_unique(
 							array_diff($parent_templateids, getRequest('linked_templates', []))

@@ -482,6 +482,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 					case ZBX_ACTION_ADD:
 						$host['templates'] = array_unique(array_merge($host_templateids, getRequest('templates', [])));
 						break;
+
 					case ZBX_ACTION_REPLACE:
 						$host['templates'] = getRequest('templates', []);
 						if (getRequest('mass_clear_tpls')) {
@@ -490,6 +491,7 @@ elseif (hasRequest('action') && getRequest('action') === 'host.massupdate' && ha
 							);
 						}
 						break;
+
 					case ZBX_ACTION_REMOVE:
 						$host['templates'] = array_unique(array_diff($host_templateids, getRequest('templates', [])));
 						if (getRequest('mass_clear_tpls')) {
