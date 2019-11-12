@@ -22,7 +22,7 @@
 /**
  * Event correlation new condition popup.
  */
-class CControllerPopupConditionEventCorrEdit extends CControllerPopupConditionCommon {
+class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon {
 
 	protected function getCheckInputs() {
 		return [

@@ -156,9 +156,9 @@ class CRouter {
 		'popup.trigdesc.view'				=> ['CControllerPopupTrigDescView',					'layout.json',			'popup.trigdesc.view'],
 		'popup.mediatypetest.edit'			=> ['CControllerPopupMediatypeTestEdit',			'layout.json',			'popup.mediatypetest.edit'],
 		'popup.mediatypetest.send'			=> ['CControllerPopupMediatypeTestSend',			'layout.json',			null],
-		'popup.condition.event.corr.edit'	=> ['CControllerPopupConditionEventCorrEdit',		'layout.json',			'popup.condition.common'],
-		'popup.condition.actions.edit'		=> ['CControllerPopupConditionActionsEdit',			'layout.json',			'popup.condition.common'],
-		'popup.condition.operations.edit'	=> ['CControllerPopupConditionOperationsEdit',		'layout.json',			'popup.condition.common'],
+		'popup.condition.event.corr'		=> ['CControllerPopupConditionEventCorr',			'layout.json',			'popup.condition.common'],
+		'popup.condition.actions'			=> ['CControllerPopupConditionActions',				'layout.json',			'popup.condition.common'],
+		'popup.condition.operations'		=> ['CControllerPopupConditionOperations',			'layout.json',			'popup.condition.common'],
 		'trigdesc.update'					=> ['CControllerTrigDescUpdate',					'layout.json',			null],
 		'search'							=> ['CControllerSearch',							'layout.htmlpage',		'search']
 	];

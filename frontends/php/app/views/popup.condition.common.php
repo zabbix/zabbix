@@ -43,7 +43,7 @@ switch ($data['type']) {
 
 		// Type select.
 		$condition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.event.corr.edit');", corrConditionTypes()
+			"reloadPopup(this.form, 'popup.condition.event.corr');", corrConditionTypes()
 		);
 
 		$form_list->addRow(_('Condition type'), $condition_type_combobox);
@@ -152,7 +152,7 @@ switch ($data['type']) {
 
 		// Type select.
 		$action_condition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.actions.edit');", $action_condition_options
+			"reloadPopup(this.form, 'popup.condition.actions');", $action_condition_options
 		);
 
 		$form_list->addRow(_('Condition type'), $action_condition_type_combobox);
@@ -625,7 +625,7 @@ switch ($data['type']) {
 
 		// Type select.
 		$opcondition_type_combobox = new CComboBox('condition_type', $condition_type,
-			"reloadPopup(this.form, 'popup.condition.operations.edit');", $combobox_options
+			"reloadPopup(this.form, 'popup.condition.operations');", $combobox_options
 		);
 
 		$form_list->addRow(_('Condition type'), $opcondition_type_combobox);
