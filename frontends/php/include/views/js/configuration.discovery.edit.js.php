@@ -330,8 +330,14 @@
 		}
 		submit_dcheck_lock = true;
 
-		var $form = jQuery(document.forms['dcheck_form']),
-			data = $form
+		var $form = jQuery(document.forms['dcheck_form']);
+
+		$form.trimValues([
+			'#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
+			'#snmpv3_authpassphrase', '#snmpv3_privpassphrase'
+		]);
+
+		var data = $form
 				.find('#type, #ports, input[type=hidden], input[type=text]:visible, select:visible, input[type=radio]:checked:visible')
 				.serialize(),
 			dialogueid = $form
