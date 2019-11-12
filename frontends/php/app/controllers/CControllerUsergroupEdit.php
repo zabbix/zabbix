@@ -108,7 +108,7 @@ class CControllerUsergroupEdit extends CController {
 		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
 			'groupids' => [],
 			'permission' => PERM_NONE,
-			'include_subgroups' => false
+			'include_subgroups' => '0'
 		];
 
 		$data['tag_filters'] = $this->getTagFilters();
@@ -116,7 +116,7 @@ class CControllerUsergroupEdit extends CController {
 			'groupids' => [],
 			'tag' => '',
 			'value' => '',
-			'include_subgroups' => false
+			'include_subgroups' => '0'
 		];
 
 		$data['host_groups_ms'] = self::getHostGroupsMs(
