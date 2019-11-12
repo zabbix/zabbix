@@ -140,7 +140,11 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
         else
           OPENSSL_LIBS=`PKG_CONFIG_LIBDIR=$_libopenssl_dir/lib/pkgconfig $PKG_CONFIG --static --libs openssl`
         fi
-        OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl/-Wl,-Bstatic -lssl -Wl,-Bdynamic/g'|sed 's/-lcrypto/-Wl,-Bstatic -lcrypto -Wl,-Bdynamic/g'`
+        if test "x$ARCH" = "xaix"; then
+          OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl_a/-Wl,-Bstatic -lssl_a -Wl,-Bdynamic/g'|sed 's/-lcrypto_a/-Wl,-Bstatic -lcrypto_a -Wl,-Bdynamic/g'`
+        else
+          OPENSSL_LIBS=`echo "$OPENSSL_LIBS"|sed 's/-lssl/-Wl,-Bstatic -lssl -Wl,-Bdynamic/g'|sed 's/-lcrypto/-Wl,-Bstatic -lcrypto -Wl,-Bdynamic/g'`
+        fi
       ],[
         AC_MSG_ERROR([Not found openssl library])
       ])
