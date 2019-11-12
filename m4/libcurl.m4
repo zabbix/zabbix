@@ -108,6 +108,8 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
            if test "x$LIBCURL_CFLAGS" = "x"; then
               LIBCURL_CFLAGS=`$_libcurl_config --cflags`
            fi
+
+
            if test "x$LIBCURL_LIBS" = "x"; then
 		_full_libcurl_libs=`$_libcurl_config --libs`
 		for i in $_full_libcurl_libs; do
@@ -118,14 +120,27 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 				-R*)
 					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS -Wl,$i"
 			;;
+				-lcurl)
+					test "x$enable_static_libs" = "xyes" && i="-Wl,-Bstatic $i -Wl,-Bdynamic"
+					LIBCURL_LIBS="$LIBCURL_LIBS $i"
+			;;
 				-l*)
 					LIBCURL_LIBS="$LIBCURL_LIBS $i"
 			;;
 			esac
 		done
 
-		if test "x$enable_static" = "xyes"; then
+		if test "x$enable_static" = "xyes" -o "x$enable_static_libs" = "xyes"; then
 			_full_libcurl_libs=`$_libcurl_config --static-libs`
+
+			if test "x$enable_static_libs" = "xyes" -a -z "$LIBPTHREAD_LIBS"; then
+				LIBPTHREAD_CHECK_CONFIG([no])
+				if test "x$found_libpthread" != "xyes"; then
+					AC_MSG_ERROR([Unable to use libpthread (libpthread check failed)])
+				fi
+				_full_libcurl_libs="$LIBPTHREAD_LIBS $_full_libcurl_libs"
+			fi
+
 			for i in $_full_libcurl_libs; do
 				case $i in
 					-lcurl)
@@ -133,6 +148,13 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 					-l*)
 						_lib_name=`echo "$i" | cut -b3-`
 						AC_CHECK_LIB($_lib_name , main,[
+								if test "x$enable_static_libs" = "xyes"; then
+									case $i in
+										-lssl|-lcrypto|-lssl_a|-lcrypto_a)
+											i="-Wl,-Bstatic $i -Wl,-Bdynamic -ldl"
+									;;
+									esac
+								fi
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							],[
 								AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
@@ -185,6 +207,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
      if test "x$_libcurl_try_link" = "xyes"; then
         # we didn't find curl-config, so let's see if the user-supplied
         # link line (or failing that, "-lcurl") is enough.
+
         LIBCURL_LIBS=${LIBCURL_LIBS-"$_libcurl_libs -lcurl"}
 
         AC_CACHE_CHECK([whether libcurl is usable],
