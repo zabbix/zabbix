@@ -101,7 +101,6 @@ svg a {
 	&:focus {
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, 0.35);
-
 	}
 }
 
@@ -527,24 +526,59 @@ ul.top-nav-icons {
 }
 
 .header-title {
-	border-bottom: 1px solid $ui-border-color;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin: -10px 0 10px;
 	padding: 10px 0 6px;
-	width: 100%;
+	border-bottom: 1px solid $ui-border-color;
 
-	.cell {
+	& > div {
+		overflow: hidden;
 
-		&:first-child {
-			max-width: calc(100vw - 370px);
+		&:last-child {
+			flex-shrink: 0;
 		}
 	}
 
 	h1 {
+		position: relative;
 		line-height: 24px;
 		overflow: hidden;
 		padding-top: 1px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	a.link-action {
+		display: block;
+		box-sizing: border-box;
+		height: 25px;
+
+		h1 {
+			padding-right: 1em;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				right: .15em;
+				margin-top: -.15em;
+				width: .3em;
+				height: .3em;
+				border-right: 2px solid $font-color;
+				border-bottom: 2px solid $font-color;
+				transform: rotate(45deg);
+				@include transition(border-color .2s ease-out);
+			}
+		}
+
+		&:hover,
+		&:focus {
+			h1::after {
+				border-color: $link-hover-color;
+			}
+		}
 	}
 
 	form {
@@ -4475,6 +4509,19 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		@extend %overflow-ellipsis;
+	}
+
+	&.page-title-submenu::before {
+		content: '';
+		position: absolute;
+		top: -7px;
+		left: 10px;
+		width: 12px;
+		height: 12px;
+		background-color: $ui-bg-color;
+		border-top: 1px solid $action-border-color;
+		border-left: 1px solid $action-border-color;
+		transform: rotate(45deg);
 	}
 }
 

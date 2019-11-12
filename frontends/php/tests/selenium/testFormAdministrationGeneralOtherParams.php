@@ -43,7 +43,6 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDropdownAssertSelected('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
@@ -69,7 +68,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	public function testFormAdministrationGeneralOtherParams_CheckHostGroupsLayout() {
 
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
@@ -84,7 +83,8 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 	public function testFormAdministrationGeneralOtherParams_CheckUserGroupLayout() {
 
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
+
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
@@ -100,7 +100,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
@@ -116,7 +116,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 
 		// trying to enter max possible value

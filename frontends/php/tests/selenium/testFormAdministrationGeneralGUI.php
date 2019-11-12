@@ -40,7 +40,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 	public function testFormAdministrationGeneralGUI_CheckLayout($allValues) {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestTextPresent([
@@ -168,7 +168,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1000';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '1');
@@ -178,7 +178,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '999999');
@@ -189,7 +189,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
 		// Check to enter 0 value
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '0');
@@ -201,7 +201,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '-1');
@@ -229,7 +229,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=1000'));
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputType('max_in_table', '1');
@@ -242,7 +242,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=1'));
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '99999');
@@ -255,7 +255,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM config WHERE max_in_table=99999'));
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('max_in_table', '-1');
@@ -286,7 +286,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$sql = 'SELECT server_check_interval FROM config WHERE server_check_interval=10';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect value in the DB field "server_check_interval"');
 
-		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
+		$this->query('id:page-title-general')->asPopupButton()->one()->select('GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestCheckboxSelect('server_check_interval', false);

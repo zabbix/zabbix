@@ -52,7 +52,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'overview.php',
 				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Overview',
+				'header' =>	'Trigger overview',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -62,7 +62,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'overview.php?form_refresh=1&groupid=0&type=0&view_style=0',
 				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Overview',
+				'header' =>	'Trigger overview',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -450,7 +450,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Trigger actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -460,7 +460,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=0',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Trigger actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -470,7 +470,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=1',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Discovery actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -480,7 +480,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=2',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Auto registration actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -490,7 +490,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			[[
 				'url' => 'actionconf.php?eventsource=3',
 				'title' =>	'Configuration of actions',
-				'header' => 'Actions',
+				'header' => 'Internal actions',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

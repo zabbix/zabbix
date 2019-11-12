@@ -23,15 +23,7 @@ include('include/views/js/administration.general.trigger.options.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php'))
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $triggerDOFormList = (new CFormList())
 	->addRow(_('Use custom event status colours'), (new CCheckBox('custom_color'))

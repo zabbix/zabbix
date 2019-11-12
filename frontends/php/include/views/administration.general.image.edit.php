@@ -20,13 +20,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Images'))
-	->setControls((new CForm())
-		->cleanItems()
-		->setAttribute('aria-label', _('Main filter'))
-		->addItem((new CList())
-			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
-		)
-	);
+	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 $imageForm = (new CForm('post', null, 'multipart/form-data'))
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)

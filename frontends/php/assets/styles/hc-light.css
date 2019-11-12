@@ -397,18 +397,45 @@ ul.top-nav-icons {
   vertical-align: top; }
 
 .header-title {
-  border-bottom: 1px solid #9f9f9f;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   margin: -10px 0 10px;
   padding: 10px 0 6px;
-  width: 100%; }
-  .header-title .cell:first-child {
-    max-width: calc(100vw - 370px); }
+  border-bottom: 1px solid #9f9f9f; }
+  .header-title > div {
+    overflow: hidden; }
+    .header-title > div:last-child {
+      flex-shrink: 0; }
   .header-title h1 {
+    position: relative;
     line-height: 24px;
     overflow: hidden;
     padding-top: 1px;
     text-overflow: ellipsis;
     white-space: nowrap; }
+  .header-title a.link-action {
+    display: block;
+    box-sizing: border-box;
+    height: 25px; }
+    .header-title a.link-action h1 {
+      padding-right: 1em; }
+      .header-title a.link-action h1::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: .15em;
+        margin-top: -.15em;
+        width: .3em;
+        height: .3em;
+        border-right: 2px solid #000;
+        border-bottom: 2px solid #000;
+        transform: rotate(45deg);
+        -webkit-transition: border-color 0.2s ease-out;
+        -moz-transition: border-color 0.2s ease-out;
+        transition: border-color 0.2s ease-out; }
+    .header-title a.link-action:hover h1::after, .header-title a.link-action:focus h1::after {
+      border-color: #000; }
   .header-title form {
     display: flex;
     justify-content: flex-end; }
@@ -3029,6 +3056,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .menu-popup h3 {
     height: 24px;
     line-height: 24px; }
+  .menu-popup.page-title-submenu::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 10px;
+    width: 12px;
+    height: 12px;
+    background-color: #fff;
+    border-top: 1px solid #383838;
+    border-left: 1px solid #383838;
+    transform: rotate(45deg); }
 
 .search-suggest {
   position: absolute;

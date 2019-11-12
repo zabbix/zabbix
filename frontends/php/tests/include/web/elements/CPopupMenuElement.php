@@ -79,7 +79,7 @@ class CPopupMenuElement extends CElement {
 			$items = [$items];
 		}
 
-		return count(array_diff($items, $this->getItems()->asText())) === 0;
+		return count(array_diff($this->getItems()->asText(), $items)) === 0;
 	}
 
 
