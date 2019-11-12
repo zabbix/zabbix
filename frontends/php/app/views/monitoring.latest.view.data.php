@@ -26,7 +26,7 @@ $form = (new CForm('GET', 'history.php'))
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 // table
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-if (!$data['filterSet']) {
+if (!$data['filter_set']) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 

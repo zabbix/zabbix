@@ -51,8 +51,8 @@ abstract class CControllerLatest extends CController {
 		}
 
 		// we'll only display the values if the filter is set
-		$filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
-		if ($filterSet) {
+		$filter_set = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
+		if ($filter_set) {
 			$groupids = null;
 			if ($child_groups) {
 				$groups = $filterGroups;
@@ -222,7 +222,7 @@ abstract class CControllerLatest extends CController {
 			'history' => isset($history) ? $history : null,
 			'multiselect_hostgroup_data' => $multiselect_hostgroup_data,
 			'multiselect_host_data' => $multiselect_host_data,
-			'filterSet' => $filterSet,
+			'filter_set' => $filter_set,
 		];
 	}
 }
