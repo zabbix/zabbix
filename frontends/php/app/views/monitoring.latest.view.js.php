@@ -1,225 +1,229 @@
 <script type="text/javascript">
 
 jQuery(function($) {
+
 	function LatestPage() {
 		this.running = false;
 		this.timeout = null;
 	}
 
-	LatestPage.prototype.getRefreshUrl = function() {
-		return "<?= $this->data['refresh_url']; ?>";
-	};
+	LatestPage.prototype = {
 
-	LatestPage.prototype.getRefreshInterval = function() {
-		return "<?= $this->data['refresh_interval']; ?>";
-	};
+		getRefreshUrl: function() {
+			return "<?= $this->data['refresh_url']; ?>";
+		},
 
-	LatestPage.prototype.getCurrentForm = function() {
-		return $('form[name=items]');
-	};
+		getRefreshInterval: function() {
+			return "<?= $this->data['refresh_interval']; ?>";
+		},
 
-	LatestPage.prototype.addMessages = function(messages) {
-		$('main').prepend(messages);
-	};
+		getCurrentForm: function() {
+			return $('form[name=items]');
+		},
 
-	LatestPage.prototype.removeMessages = function() {
-		$('main .msg-bad').remove();
-	};
+		addMessages: function(messages) {
+			$('main').prepend(messages);
+		},
 
-	LatestPage.prototype.beforeRefresh = function() {
-		this.getCurrentForm().addClass('in-progress delayed-15s');
-	};
+		removeMessages: function() {
+			$('main .msg-bad').remove();
+		},
 
-	LatestPage.prototype.refresh = function() {
-		this.beforeRefresh();
+		refresh: function() {
+			this.beforeRefresh();
 
-		var deferred = $.getJSON(this.getRefreshUrl());
+			var deferred = $.getJSON(this.getRefreshUrl());
 
-		return this.bindDataEvents(deferred);
-	};
+			return this.bindDataEvents(deferred);
+		},
 
-	LatestPage.prototype.bindDataEvents = function(deferred) {
-		var that = this;
+		beforeRefresh: function() {
+			this.getCurrentForm().addClass('in-progress delayed-15s');
+		},
 
-		deferred
-			.done(function(response) {
-				that.onDataDone.call(that, response);
-			})
-			.fail(this.onDataFail.bind(this))
-			.always(this.onDataAlways.bind(this));
+		doRefresh: function(body) {
+			this.getCurrentForm().replaceWith(body);
+			this.hydrate();
+			chkbxRange.init();
+		},
 
-		return deferred;
-	};
+		bindDataEvents: function(deferred) {
+			var that = this;
 
-	LatestPage.prototype.onDataDone = function(response) {
-		this.removeMessages();
-		this.doRefresh(response.body);
-		if ('messages' in response) {
-			this.addMessages(response.messages);
-		}
-	};
+			deferred
+				.done(function(response) {
+					that.onDataDone.call(that, response);
+				})
+				.fail(this.onDataFail.bind(this))
+				.always(this.onDataAlways.bind(this));
 
-	LatestPage.prototype.onDataFail = function() {
-		this.getCurrentForm().empty();
-	};
+			return deferred;
+		},
 
-	LatestPage.prototype.onDataAlways = function() {
-		if (this.running) {
+		onDataDone: function(response) {
+			this.removeMessages();
+			this.doRefresh(response.body);
+			if ('messages' in response) {
+				this.addMessages(response.messages);
+			}
+		},
+
+		onDataFail: function() {
+			this.getCurrentForm().empty();
+		},
+
+		onDataAlways: function() {
+			if (this.running) {
+				this.scheduleRefresh();
+			}
+		},
+
+		scheduleRefresh: function() {
+			this.unscheduleRefresh();
+			this.timeout = setTimeout((function() {
+				this.timeout = null;
+				this.refresh();
+			}).bind(this), this.getRefreshInterval());
+		},
+
+		unscheduleRefresh: function() {
+			if (this.timeout !== null) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+		},
+
+		start: function() {
+			this.running = true;
 			this.scheduleRefresh();
-		}
-	};
+		},
 
-	LatestPage.prototype.scheduleRefresh = function() {
-		this.unscheduleRefresh();
-		this.timeout = setTimeout((function() {
-			this.timeout = null;
-			this.refresh();
-		}).bind(this), this.getRefreshInterval());
-	};
+		stop: function() {
+			this.running = false;
+			this.unscheduleRefresh();
+		},
 
-	LatestPage.prototype.unscheduleRefresh = function() {
-		if (this.timeout !== null) {
-			clearTimeout(this.timeout);
-			this.timeout = null;
-		}
-	};
-
-	LatestPage.prototype.start = function() {
-		this.running = true;
-		this.scheduleRefresh();
-	};
-
-	LatestPage.prototype.stop = function() {
-		this.running = false;
-		this.unscheduleRefresh();
-	};
-
-	LatestPage.prototype.hydrate = function() {
-		var open_state_all = '0';
-
-		$('.app-list-toggle').each(function() {
-			var open_state = $(this).data('open-state');
-
-			$('span', this)
-				.addClass(open_state == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
-
-			if (open_state == '0') {
-				var	hostid = $(this).attr('data-host-id');
-				if (hostid) {
-					$('tr[parent_host_id=' + hostid + ']').hide();
-				}
-				else {
-					$('tr[parent_app_id=' + $(this).attr('data-app-id') + ']').hide();
-				}
-			}
-			else {
-				open_state_all = '1';
-			}
-		});
-
-		$('.app-list-toggle-all').data('open-state', open_state_all);
-		$('.app-list-toggle-all span')
-			.addClass(open_state_all == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
-
-		// click event for main toggle (+-) button
-		$('.app-list-toggle-all').click(function() {
-			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
-			$(this).closest('table').fadeTo(0, 0);
-
-			var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
-				del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
-				add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
-				applicationids = [],
-				hostids = [];
-
-			// change and store new state
-			$(this).data('open-state', open_state);
-
-			$('span', this)
-				.removeClass(del_class)
-				.addClass(add_class);
+		hydrate: function() {
+			var open_state_all = '0';
 
 			$('.app-list-toggle').each(function() {
-				if ($(this).data('open-state') != open_state) {
-					$(this).data('open-state', open_state);
-					$('span', this)
-						.removeClass(del_class)
-						.addClass(add_class);
+				var open_state = $(this).data('open-state');
 
-					var hostid = $(this).attr('data-host-id');
+				$('span', this)
+					.addClass(open_state == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
+
+				if (open_state == '0') {
+					var	hostid = $(this).attr('data-host-id');
 					if (hostid) {
-						$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
-						hostids.push(hostid);
+						$('tr[parent_host_id=' + hostid + ']').hide();
 					}
 					else {
-						var applicationid = $(this).attr('data-app-id');
-						$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
-						applicationids.push(applicationid);
+						$('tr[parent_app_id=' + $(this).attr('data-app-id') + ']').hide();
 					}
+				}
+				else {
+					open_state_all = '1';
 				}
 			});
 
-			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
-			$(this).closest('table').fadeTo(0, 1);
+			$('.app-list-toggle-all').data('open-state', open_state_all);
+			$('.app-list-toggle-all span')
+				.addClass(open_state_all == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-			if (!empty(hostids)) {
-				updateUserProfile('web.latest.toggle_other', open_state, hostids);
-			}
-			if (!empty(applicationids)) {
-				updateUserProfile('web.latest.toggle', open_state, applicationids);
-			}
-		});
+			// click event for main toggle (+-) button
+			$('.app-list-toggle-all').click(function() {
+				// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
+				$(this).closest('table').fadeTo(0, 0);
 
-		// click event for every toggle (+-) button
-		$('.app-list-toggle').click(function() {
-			var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
-				del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
-				add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
-				open_state_all = '0';
+				var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
+					del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
+					add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
+					applicationids = [],
+					hostids = [];
 
-			// change and store new state
-			$(this).data('open-state', open_state);
+				// change and store new state
+				$(this).data('open-state', open_state);
 
-			$('span', this)
-				.removeClass(del_class)
-				.addClass(add_class);
-
-			if (open_state == '0') {
-				$('.app-list-toggle').each(function() {
-					if ($(this).data('open-state') != '0') {
-						open_state_all = '1';
-					}
-				});
-			}
-			else {
-				open_state_all = '1';
-			}
-
-			if ($('.app-list-toggle-all').data('open-state') != open_state_all) {
-				$('.app-list-toggle-all').data('open-state', open_state_all);
-				$('.app-list-toggle-all span')
+				$('span', this)
 					.removeClass(del_class)
 					.addClass(add_class);
-			}
 
-			var hostid = $(this).attr('data-host-id');
-			if (hostid) {
-				$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
-				updateUserProfile('web.latest.toggle_other', open_state, [hostid]);
-			}
-			else {
-				var applicationid = $(this).attr('data-app-id');
-				$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
-				updateUserProfile('web.latest.toggle', open_state, [applicationid]);
-			}
-		});
+				$('.app-list-toggle').each(function() {
+					if ($(this).data('open-state') != open_state) {
+						$(this).data('open-state', open_state);
+						$('span', this)
+							.removeClass(del_class)
+							.addClass(add_class);
+
+						var hostid = $(this).attr('data-host-id');
+						if (hostid) {
+							$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
+							hostids.push(hostid);
+						}
+						else {
+							var applicationid = $(this).attr('data-app-id');
+							$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
+							applicationids.push(applicationid);
+						}
+					}
+				});
+
+				// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
+				$(this).closest('table').fadeTo(0, 1);
+
+				if (!empty(hostids)) {
+					updateUserProfile('web.latest.toggle_other', open_state, hostids);
+				}
+				if (!empty(applicationids)) {
+					updateUserProfile('web.latest.toggle', open_state, applicationids);
+				}
+			});
+
+			// click event for every toggle (+-) button
+			$('.app-list-toggle').click(function() {
+				var open_state = ($(this).data('open-state') == '0') ? '1' : '0',
+					del_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_DOWN ?>' : '<?= ZBX_STYLE_ARROW_RIGHT ?>',
+					add_class = (open_state == '0') ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>',
+					open_state_all = '0';
+
+				// change and store new state
+				$(this).data('open-state', open_state);
+
+				$('span', this)
+					.removeClass(del_class)
+					.addClass(add_class);
+
+				if (open_state == '0') {
+					$('.app-list-toggle').each(function() {
+						if ($(this).data('open-state') != '0') {
+							open_state_all = '1';
+						}
+					});
+				}
+				else {
+					open_state_all = '1';
+				}
+
+				if ($('.app-list-toggle-all').data('open-state') != open_state_all) {
+					$('.app-list-toggle-all').data('open-state', open_state_all);
+					$('.app-list-toggle-all span')
+						.removeClass(del_class)
+						.addClass(add_class);
+				}
+
+				var hostid = $(this).attr('data-host-id');
+				if (hostid) {
+					$('tr[parent_host_id=' + hostid + ']').toggle(open_state == '1');
+					updateUserProfile('web.latest.toggle_other', open_state, [hostid]);
+				}
+				else {
+					var applicationid = $(this).attr('data-app-id');
+					$('tr[parent_app_id=' + applicationid + ']').toggle(open_state == '1');
+					updateUserProfile('web.latest.toggle', open_state, [applicationid]);
+				}
+			});
+		}
 	};
-
-	LatestPage.prototype.doRefresh = function(body) {
-		this.getCurrentForm().replaceWith(body);
-		this.hydrate();
-		chkbxRange.init();
-	}
 
 	window.latest_page = new LatestPage(true);
 	window.latest_page.hydrate();
