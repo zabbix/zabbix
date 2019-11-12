@@ -1480,15 +1480,6 @@
 					.toggleClass('resizing-top', data['resizing_top'])
 					.toggleClass('resizing-left', data['resizing_left']);
 
-				// Hack for Safari to manually accept parent container height in pixels on widget resize.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
-
 				/*
 				 * 1. Prevent physically resizing widgets beyond the allowed limits.
 				 * 2. Prevent browser's vertical scrollbar from appearing when resizing right size of the widgets.
@@ -1538,15 +1529,6 @@
 				stopWidgetPositioning($obj, data, widget);
 
 				widget['container'].removeAttr('style');
-
-				// Hack for Safari to manually accept parent container height in pixels when done widget snapping to grid.
-				if (SF) {
-					$.each(data['widgets'], function() {
-						if (this.type === 'clock' || this.type === 'sysmap') {
-							this.content_body.find(':first').height(this.content_body.height());
-						}
-					});
-				}
 
 				if (widget['iterator']) {
 					alignIteratorContents($obj, data, widget, widget['pos']);
@@ -3597,7 +3579,7 @@
 						 * Set the 'sticked-to-top' class before updating the body for it's mutation handler
 						 * to have actual data for the popup positioning.
 						 */
-						if (data.dialogue['widget_type'] === 'svggraph') {
+						if (response.options.stick_to_top) {
 							jQuery('[data-dialogueid="widgetConfg"]').addClass('sticked-to-top');
 						}
 

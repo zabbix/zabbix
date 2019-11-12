@@ -4466,15 +4466,13 @@ tr.cursor-move td * {
   display: block; }
 
 .clock {
+  display: flex;
+  justify-content: center;
   padding: 0 10px;
-  height: 99%;
-  width: auto; }
+  height: 100%; }
 
 .clock-svg {
-  max-height: 100%;
-  max-width: 100%;
-  display: block;
-  margin: 0 auto; }
+  flex-grow: 1; }
 
 .time-zone {
   margin: 0 0 .5em 0;
