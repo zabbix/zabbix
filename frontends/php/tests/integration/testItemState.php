@@ -111,21 +111,17 @@ class testItemState extends CIntegrationTest {
 	 */
 	public function prepareData() {
 		// Create host "test_host"
-		$interfaces = [
-			[
-				'type' => 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-			]
-		];
-
 		$response = $this->call('host.create', [
 			[
 				'host' => 'test_host',
-				'interfaces' => $interfaces,
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				],
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_NOT_MONITORED
 			]
@@ -171,8 +167,8 @@ class testItemState extends CIntegrationTest {
 			$item['itemid'] = $itemids[$id++];
 		}
 
-		file_put_contents(PSV_FILE_NAME, '1');
-		file_put_contents(ACT_FILE_NAME, '1');
+		$this->assertTrue(@file_put_contents(PSV_FILE_NAME, '1') !== false);
+		$this->assertTrue(@file_put_contents(ACT_FILE_NAME, '1') !== false);
 
 		return true;
 	}
@@ -203,40 +199,34 @@ class testItemState extends CIntegrationTest {
 	public function prepareItem($itemid, $delay) {
 		// Disable all items
 		foreach (self::$items as $item) {
-			$response = $this->call('item.update', [
-				'itemid' => $item['itemid'],
-				'status' => ITEM_STATUS_DISABLED
-			]);
-
-			$this->assertEquals($item['itemid'], $response['result']['itemids'][0]);
+			if ($item['itemid'] == $itemid) {
+				$items[] = [
+					'itemid' => $itemid,
+					'status' => ITEM_STATUS_ACTIVE,
+					'delay' => $delay,
+				];
+			} else {
+				$items[] = [
+					'itemid' => $item['itemid'],
+					'status' => ITEM_STATUS_DISABLED
+				];
+			}
 		}
 
+		$response = $this->call('item.update', $items);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(count($items), count($response['result']['itemids']));
 		$this->reloadConfigurationCache();
 
 		// Clear log
 		$this->clearLog(self::COMPONENT_SERVER);
-
-		// Enable item
-		$response = $this->call('item.update', [
-			'itemid' => $itemid,
-			'status' => ITEM_STATUS_ACTIVE,
-			'delay' => $delay,
-		]);
-
-		$this->assertEquals($itemid, $response['result']['itemids'][0]);
-		$this->reloadConfigurationCache();
 	}
 
 	/**
 	 * Routine to check item state and intervals.
 	 */
 	public function checkItemStatePassive($scenario, $state) {
-		if ($scenario['after_sync'] === true || $state === ITEM_STATE_NORMAL) {
-			$delay = $scenario['delay_s'];
-		} else {
-			$delay = $scenario['refresh_unsupported'];
-		}
-
+		$delay = ($scenario['after_sync'] === true || $state === ITEM_STATE_NORMAL ? $scenario['delay_s'] : $delay = $scenario['refresh_unsupported']);
 		$wait = $delay + 60;
 		$key = self::$items[$scenario['name']]['key'];
 
@@ -328,21 +318,31 @@ class testItemState extends CIntegrationTest {
 	}
 
 	/**
+	 * Function to get scenarios by type.
+	 *
+	 * @param integer      $type     type
+	 *
+	 * @return array
+	 */
+	public function getScenariosByType($type) {
+		$scenarios = [];
+
+		foreach (self::$scenarios as $scenario) {
+			if (self::$items[$scenario['name']]['type'] === $type) {
+				$scenarios[] = [$scenario];
+			}
+		}
+
+		return $scenarios;
+	}
+
+	/**
 	 * Data provider (passive checks).
 	 *
 	 * @return array
 	 */
 	public function getDataPassive() {
-		$scenarios = [];
-		foreach (self::$scenarios as $scenario) {
-			if (self::$items[$scenario['name']]['type'] === ITEM_TYPE_ZABBIX_ACTIVE) {
-				continue;
-			}
-
-			$scenarios[] = [$scenario];
-		}
-
-		return $scenarios;
+		return $this->getScenariosByType(ITEM_TYPE_ZABBIX);
 	}
 
 	/**
@@ -351,14 +351,7 @@ class testItemState extends CIntegrationTest {
 	 * @return array
 	 */
 	public function getDataActive() {
-		$scenarios = [];
-		foreach (self::$scenarios as $scenario) {
-			if (self::$items[$scenario['name']]['type'] === ITEM_TYPE_ZABBIX_ACTIVE) {
-				$scenarios[] = [$scenario];
-			}
-		}
-
-		return $scenarios;
+		return $this->getScenariosByType(ITEM_TYPE_ZABBIX_ACTIVE);
 	}
 
 	/**
@@ -368,7 +361,7 @@ class testItemState extends CIntegrationTest {
 	 */
 	public function testItemState_checkPassive($data) {
 		// Set refresh unsupported items interval
-		DBexecute("UPDATE config SET refresh_unsupported='".$data['refresh_unsupported']."s' WHERE configid=1");
+		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'), "Failed to set config.refresh_unsupported");
 
 		// Prepare item
 		$this->prepareItem(self::$items[$data['name']]['itemid'], $data['delay_s'].'s');
@@ -378,16 +371,16 @@ class testItemState extends CIntegrationTest {
 
 		// Make item not supported
 		if ($data['after_sync'] === true) {
-			file_put_contents(PSV_FILE_NAME, 'text');
+			$this->assertTrue(@file_put_contents(PSV_FILE_NAME, 'text') !== false);
 		} else {
-			unlink(PSV_FILE_NAME);
+			$this->assertTrue(@unlink(PSV_FILE_NAME) !== false);
 		}
 
 		// Check item state and intervals
 		$this->checkItemStatePassive($data, ITEM_STATE_NOTSUPPORTED);
 
 		// Make item supported
-		file_put_contents(PSV_FILE_NAME, '1');
+		$this->assertTrue(@file_put_contents(PSV_FILE_NAME, '1') !== false);
 
 		// Check item state and intervals
 		$this->checkItemStatePassive($data, ITEM_STATE_NORMAL);
@@ -400,7 +393,7 @@ class testItemState extends CIntegrationTest {
 	 */
 	public function testItemState_checkActive($data) {
 		// Set refresh unsupported items interval
-		DBexecute("UPDATE config SET refresh_unsupported='".$data['refresh_unsupported']."s' WHERE configid=1");
+		$this->assertTrue(DBexecute('UPDATE config SET refresh_unsupported='.zbx_dbstr($data['refresh_unsupported'].'s').' WHERE configid=1'), "Failed to set config.refresh_unsupported");
 
 		// Prepare item
 		$this->prepareItem(self::$items[$data['name']]['itemid'], $data['delay_s'].'s');
@@ -413,13 +406,13 @@ class testItemState extends CIntegrationTest {
 		$this->checkItemStateActive($data, ITEM_STATE_NORMAL, $refresh_active);
 
 		// Make item not supported
-		unlink(ACT_FILE_NAME);
+		$this->assertTrue(@unlink(ACT_FILE_NAME) !== false);
 
 		// Check item state and intervals
 		$this->checkItemStateActive($data, ITEM_STATE_NOTSUPPORTED, $refresh_active);
 
 		// Make item supported
-		file_put_contents(ACT_FILE_NAME, '1');
+		$this->assertTrue(@file_put_contents(ACT_FILE_NAME, '1') !== false);
 
 		// Check item state and intervals
 		$this->checkItemStateActive($data, ITEM_STATE_NORMAL, $refresh_active);
