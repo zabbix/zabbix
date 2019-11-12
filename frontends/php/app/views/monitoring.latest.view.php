@@ -101,12 +101,8 @@ if (in_array($web_layout_mode, [ZBX_LAYOUT_NORMAL, ZBX_LAYOUT_FULLSCREEN])) {
 	);
 }
 
-$form_data = array_intersect_key($data, array_flip([
+$widget->addItem((new CView('monitoring.latest.view.html', array_intersect_key($data, array_flip([
 	'filter', 'sort_field', 'sort_order', 'view_curl', 'hosts', 'items', 'applications', 'history', 'filter_set'
-]));
+]))))->getOutput());
 
-$form_html = call_user_func(function($data) {
-	return require dirname(__FILE__).'/monitoring.latest.view.data.php';
-}, $form_data);
-
-$widget->addItem($form_html)->show();
+$widget->show();

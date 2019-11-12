@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerLatestRefresh extends CControllerLatest {
+class CControllerLatestViewRefresh extends CControllerLatest {
 
 	protected function init() {
 		$this->disableSIDValidation();

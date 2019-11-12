@@ -115,7 +115,7 @@ class CControllerLatestView extends CControllerLatest {
 
 		$refresh_curl = clone $view_curl;
 		$refresh_curl
-			->setArgument('action', 'latest.refresh')
+			->setArgument('action', 'latest.view.refresh')
 			->setArgument('page', $this->getInput('page', 1))
 			->removeArgument('filter_set');
 

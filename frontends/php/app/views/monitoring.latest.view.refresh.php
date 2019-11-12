@@ -20,7 +20,7 @@
 
 
 $output = [
-	'body' => require dirname(__FILE__).'/monitoring.latest.view.data.php'
+	'body' => (new CView('monitoring.latest.view.html', $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {
