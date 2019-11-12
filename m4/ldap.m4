@@ -66,13 +66,14 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
        fi
 
        if test "x$found_ldap" != "xno"; then
-               if test "x$enable_static" = "xyes"; then
-                       LDAP_LIBS=" -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
-               fi
 
                LDAP_CPPFLAGS="-I$LDAP_INCDIR"
                LDAP_LDFLAGS="-L$LDAP_LIBDIR"
                LDAP_LIBS="-lldap -llber $LDAP_LIBS"
+
+               if test "x$enable_static" = "xyes"; then
+                       LDAP_LIBS="$LDAP_LIBS -lgnutls -lpthread -lsasl2"
+               fi
 
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
