@@ -54,14 +54,9 @@ function submitConditionPopup(response) {
  */
 function validateConditionPopup() {
 	var $form = jQuery(document.forms['popup.condition']),
-		url = new Curl($form.attr('action')),
-		$submit_btn = jQuery('.popup-condition-submit-btn');
+		url = new Curl($form.attr('action'));
 
 	url.setArgument('validate', 1);
-
-	$submit_btn
-		.prop('disabled', true)
-		.hide();
 
 	return jQuery
 		.ajax({
@@ -71,10 +66,6 @@ function validateConditionPopup() {
 			type: 'post'
 		})
 		.done(function(response) {
-			$submit_btn
-				.prop('disabled', false)
-				.show();
-
 			$form
 				.parent()
 				.find(".msg-bad")
